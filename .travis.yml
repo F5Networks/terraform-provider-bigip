@@ -15,11 +15,11 @@ deploy:
   api_key:
     secure: pu+/NBPKLM+6sl76GzuIxsmsp2LBEUY0y2UXEoAVtrY52WbybBtJW8HB+Vqx1QJEdSJCQ48QonkGB5H7M3FuLy9BjCJHm+Na0L3TPoYxMAGtkUWUzz/sErRRQarOJ3HxJCdiBNKZHaY9yPlHYpPYYVO7vgWV8EppP9LuVT7tUW3KRkqqURKqYPfV9hlfBZ1Ik6QB8vqophzZuPWHHqWF2249wO06Lr9B0QV907Cum6RCFOOTzqmwDgc1V0f6JePIOq9RmnkFiSdmTGi+fGFHbkVomjbGE1HR8vPO1XVbRZ3AYQnA1eGKpfjBzWn0NSmcPh79UQRohC3luAHJRIKBuGmDc6dm1dmFh3nicq8T565Vupxxq1YxVG4S3wdr+apk1vM6pA+eHk0l+n1OdTSFmYhFygt6YDx5OWKhCgQyvtYBW3tsMIe7WtfOrkZotFzeQczQoE0mZ7vTW70zPzjnnA2KbDTMdX83cQ0vqZEuufTDFBQ/rbK7CZeAk82rJ4SaLHeCcxcLaDKQobKEYmVtsqA4OIqejQpjqerQK0dg5L8r6e8YJT4jLuEGpktNPGsiOQXNvnU7gChsQRj2Rq2GzU4EvUfCQ1mKjzzFNyT5mkfGUUvBRWytyuwfrSTAbvIGprCg56/x8W7CElSK3ZTbSpZnQqnVicmLZYwYinTTe+4=
   file:
-    - "terraform-provider-bigip_darwin_386"
-    - "terraform-provider-bigip_darwin_amd64"
-    - "terraform-provider-bigip_linux_386"
-    - "terraform-provider-bigip_linux_amd64"
-    - "terraform-provider-bigip_windows_386.exe"
-    - "terraform-provider-bigip_windows_amd64.exe"
+    - "bin/terraform-provider-bigip_darwin_386"
+    - "bin/terraform-provider-bigip_darwin_amd64"
+    - "bin/terraform-provider-bigip_linux_386"
+    - "bin/terraform-provider-bigip_linux_amd64"
+    - "bin/terraform-provider-bigip_windows_386.exe"
+    - "bin/terraform-provider-bigip_windows_amd64.exe"
   on:
     tags: true
