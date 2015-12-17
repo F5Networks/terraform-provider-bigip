@@ -2,6 +2,17 @@
 
 A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
 
+# Installation
+
+ - Download the latest [release](https://github.com/DealerDotCom/terraform-provider-bigip/releases) for your platform.
+ - Rename the executable to `terraform-provider-bigip`
+ - Copy somewhere on your path or update `.terraformrc` in your home directory like so:
+```
+providers {
+	bigip = "/path/to/terraform-provider-bigip"
+}
+```
+
 # Provider Configuration
 
 ### Example
@@ -135,4 +146,3 @@ resource "bigip_ltm_virtual_server" "vs" {
 `pool` - (Optional) Default pool name
 
 `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: `24` or `255.255.255.0`. A CIDR mask of `0` is the same as `0.0.0.0`
-
