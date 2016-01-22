@@ -3,7 +3,7 @@ package bigip
 import (
 	"log"
 
-	"github.com/DealerDotCom/go-bigip"
+	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"regexp"
 	"strings"
