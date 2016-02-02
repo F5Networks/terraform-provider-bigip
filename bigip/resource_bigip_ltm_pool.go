@@ -3,10 +3,9 @@ package bigip
 import (
 	"log"
 	"regexp"
-	"fmt"
 	"strings"
 
-	"github.com/DealerDotCom/go-bigip"
+	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -29,17 +28,19 @@ func resourceBigipLtmPool() *schema.Resource {
 			},
 
 			"nodes": &schema.Schema{
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				Optional: true,
 				Description: "Nodes to add to the pool. Format node_name:port. e.g. node01:443",
 			},
 
-			"monitor": &schema.Schema{
-				Type:     schema.TypeString,
-				//Elem:     &schema.Schema{Type: schema.TypeString},
+			"monitors": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				Optional: true,
-				Description: "Assign a monitor to a pool.",
+				Description: "Assign monitors to a pool.",
 			},
 
 			"partition": &schema.Schema{
@@ -110,6 +111,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	partition := pool.Partition
 	if partition == "" {
 		partition = DEFAULT_PARTITION
@@ -120,17 +122,10 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("allow_nat", pool.AllowNAT)
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
-	d.Set("nodes", nodes)
-	parts := strings.Split(strings.TrimSpace(pool.Monitor),"/")
-	d.Set("monitor", parts[len(parts)-1])
-//	monitors := strings.Split(pool.Monitor, " and ")
-//	for i := range monitors {
-//		// strip off the partition name
-//		parts := strings.Split(monitors[i],"/")
-//		monitors[i] = strings.TrimSpace(parts[len(parts)-1])
-//	}
-//	sort.Sort(sort.StringSlice(monitors))
-//	d.Set("monitors", monitors)
+	d.Set("nodes", makeStringSet(&nodes))
+
+	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
+	d.Set("monitors", makeStringSet(&monitors))
 
 	return nil;
 }
@@ -158,12 +153,20 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 
+	//monitors
+	var monitors []string
+	if m, ok := d.GetOk("monitors"); ok {
+		for _, monitor := range m.(*schema.Set).List() {
+			monitors = append(monitors, monitor.(string))
+		}
+	}
+
 	pool := &bigip.Pool{
 		Name: name,
 		AllowNAT: d.Get("allow_nat").(bool),
 		AllowSNAT: d.Get("allow_snat").(bool),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
-		Monitor: d.Get("monitor").(string),
+		Monitor: strings.Join(monitors, " and "),
 		//Partition: d.Get("partition").(string),
 	}
 
@@ -172,40 +175,23 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	//monitors
-//	m := d.Get("monitors").([]interface{})
-//	if len(m) > 0 {
-//		for _, monitor := range m {
-//			fmt.Println("Adding monitor " + monitor.(string))
-//			client.AddMonitorToPool(monitor.(string), name)
-//		}
-//	}
-
 	//members
-	existing_nodes, err := client.PoolMembers(name)
-	existing_set := mapify(existing_nodes)
-
-	incoming_list := d.Get("nodes").([]interface{})
-	if len(incoming_list) > 0 {
-		for i := range incoming_list {
-			incoming := incoming_list[i].(string)
-			if _, ok := existing_set[incoming]; ok {
-				delete(existing_set, incoming)
-			} else {
-				if !NODE_VALIDATION.MatchString(incoming) {
-					return fmt.Errorf("%s must match spec <node_name>:<port>", incoming);
-				}
-				err := client.AddPoolMember(name, incoming)
-				if err != nil {
-					return err
-				}
-			}
+	nodes, err := client.PoolMembers(name)
+	if err != nil {
+		return err
+	}
+	existing := makeStringSet(&nodes)
+	incoming := d.Get("nodes").(*schema.Set)
+	delete := existing.Difference(incoming)
+	add := incoming.Difference(existing)
+	if delete.Len() > 0 {
+		for _, d := range delete.List() {
+			client.DeletePoolMember(name, d.(string))
 		}
 	}
-	for key, _ := range existing_set {
-		err := client.DeletePoolMember(name, key)
-		if err != nil {
-			return err
+	if add.Len() > 0 {
+		for _, d := range add.List() {
+			client.AddPoolMember(name, d.(string))
 		}
 	}
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/DealerDotCom/go-bigip"
+	"github.com/scottdware/go-bigip"
 )
 
 type Config struct {

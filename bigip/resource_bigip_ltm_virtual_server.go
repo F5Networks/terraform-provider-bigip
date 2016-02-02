@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"fmt"
 
-	"github.com/DealerDotCom/go-bigip"
+	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"strings"
 )
@@ -48,6 +48,27 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Default: "255.255.255.255",
 				Description: "Mask can either be in CIDR notation or decimal, i.e.: \"24\" or \"255.255.255.0\". A CIDR mask of \"0\" is the same as \"0.0.0.0\"",
 			},
+
+			"profiles": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"rules": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+			},
+
+			"source_address_translation": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Description: "none, automap, snat",
+			},
 		},
 	}
 }
@@ -71,6 +92,12 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 	}
 
 	d.SetId(name)
+
+	err = resourceBigipLtmVirtualServerUpdate(d, meta)
+	if err != nil {
+		client.DeleteVirtualServer(name)
+		return err
+	}
 
 	return resourceBigipLtmVirtualServerRead(d, meta)
 }
@@ -100,6 +127,18 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("pool", pool[len(pool) - 1])
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
+	d.Set("rules", makeStringSet(&vs.Rules))
+	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+
+	profiles, err := client.VirtualServerProfiles(vs.Name)
+	if err != nil {
+		return err
+	}
+	profile_names := schema.NewSet(schema.HashString,make([]interface{}, 0, len(profiles.Profiles)))
+	for _, profile := range profiles.Profiles {
+		profile_names.Add(profile.Name)
+	}
+	d.Set("profiles", profile_names)
 
 	return nil;
 }
@@ -127,14 +166,35 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 
 	name := d.Id()
 
-	vs := &bigip.VirtualServer{
-		Destination: d.Get("destination").(string),
-		Pool: d.Get("pool").(string),
-		Mask: d.Get("mask").(string),
-		SourcePort: fmt.Sprintf("%d", d.Get("port").(int)),
+	var profiles []bigip.Profile
+	if p, ok := d.GetOk("profiles"); ok {
+		for _, profile := range p.(*schema.Set).List() {
+			profiles = append(profiles, bigip.Profile{Name: profile.(string)})
+		}
 	}
 
-	return client.ModifyVirtualServer(name, vs)
+	var rules []string
+	if cfg_rules, ok := d.GetOk("rules"); ok {
+		for _, rule := range cfg_rules.(*schema.Set).List() {
+			rules = append(rules, rule.(string))
+		}
+	}
+
+	vs := &bigip.VirtualServer{
+		Destination: fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
+		Pool: d.Get("pool").(string),
+		Mask: d.Get("mask").(string),
+		Rules: rules,
+		Profiles: profiles,
+		SourceAddressTranslation: struct {Type string `json:"type,omitempty"`}{Type: d.Get("source_address_translation").(string)},
+	}
+
+	err := client.ModifyVirtualServer(name, vs)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{}) error {
@@ -144,4 +204,13 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 	log.Println("[INFO] Deleting virtual server " + name)
 
 	return client.DeleteVirtualServer(name)
+}
+
+
+func makeStringSet(list *[]string) *schema.Set {
+	ilist := make([]interface{}, len(*list))
+	for i, v := range *list {
+		ilist[i] = v
+	}
+	return schema.NewSet(schema.HashString, ilist)
 }
