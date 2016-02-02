@@ -1,6 +1,6 @@
 # Overview
 
-A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
+A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM. [![Build Status](https://travis-ci.org/DealerDotCom/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/DealerDotCom/terraform-provider-bigip)
 
 # Installation
 
