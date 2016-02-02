@@ -63,6 +63,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Set:      schema.HashString,
 				Optional: true,
 			},
+
+			"source_address_translation": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Description: "none, automap, snat",
+			},
 		},
 	}
 }
@@ -122,6 +128,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
 	d.Set("rules", makeStringSet(&vs.Rules))
+	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 
 	profiles, err := client.VirtualServerProfiles(vs.Name)
 	if err != nil {
@@ -179,6 +186,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Mask: d.Get("mask").(string),
 		Rules: rules,
 		Profiles: profiles,
+		SourceAddressTranslation: struct {Type string `json:"type,omitempty"`}{Type: d.Get("source_address_translation").(string)},
 	}
 
 	err := client.ModifyVirtualServer(name, vs)
