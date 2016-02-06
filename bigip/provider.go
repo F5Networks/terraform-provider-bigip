@@ -32,6 +32,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_node": resourceBigipLtmNode(),
 			"bigip_ltm_pool": resourceBigipLtmPool(),
 			"bigip_ltm_monitor": resourceBigipLtmMonitor(),
+			"bigip_ltm_irule": resourceBigipLtmIRule(),
 		},
 
 		ConfigureFunc: providerConfigure,

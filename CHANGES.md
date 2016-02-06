@@ -1,0 +1,13 @@
+# NEXT
+
+- iRule creation support
+- **Breaking Change** - rules property on bigip_ltm_virtual_server renamed to irules
+
+# 0.2.0
+
+- Added profiles, irules, source_address_translation to virtual servers
+- Cleaned up handling of lists
+
+# 0.1.0
+
+- Initial release

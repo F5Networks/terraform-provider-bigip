@@ -57,7 +57,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
-			"rules": &schema.Schema{
+			"irules": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
@@ -127,14 +127,14 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("pool", pool[len(pool) - 1])
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
-	d.Set("rules", makeStringSet(&vs.Rules))
+	d.Set("irules", makeStringSet(&vs.Rules))
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 
 	profiles, err := client.VirtualServerProfiles(vs.Name)
 	if err != nil {
 		return err
 	}
-	profile_names := schema.NewSet(schema.HashString,make([]interface{}, 0, len(profiles.Profiles)))
+	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
 	for _, profile := range profiles.Profiles {
 		profile_names.Add(profile.Name)
 	}
@@ -186,7 +186,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Mask: d.Get("mask").(string),
 		Rules: rules,
 		Profiles: profiles,
-		SourceAddressTranslation: struct {Type string `json:"type,omitempty"`}{Type: d.Get("source_address_translation").(string)},
+		SourceAddressTranslation: struct{Type string `json:"type,omitempty"`}{Type: d.Get("source_address_translation").(string)},
 	}
 
 	err := client.ModifyVirtualServer(name, vs)

@@ -148,3 +148,32 @@ resource "bigip_ltm_virtual_server" "vs" {
 `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: `24` or `255.255.255.0`. A CIDR mask of `0` is the same as `0.0.0.0`
 
 `source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat` 
+
+## bigip_ltm_irule
+
+Creates iRules
+
+### Example
+
+```
+# Loading from a file is the preferred method
+resource "bigip_ltm_irule" "rule" {
+  name = "terraform_irule"
+  irule = "${file("myirule.tcl")}"
+}
+
+resource "bigip_ltm_irule" "rule2" {
+  name = "terraform_irule2"
+  irule = <<EOF
+when CLIENT_ACCEPTED {
+     log local0. "test"
+   }
+EOF
+}
+```
+
+### Reference
+
+`name` - (Required) Name of the iRule
+
+`irule` - (Required) Body of the iRule
