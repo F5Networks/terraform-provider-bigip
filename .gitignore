@@ -1,3 +1,6 @@
 *.tfstate*
 .idea/
 bin/
+
+#test files
+bigip.test
