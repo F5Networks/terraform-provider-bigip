@@ -136,8 +136,6 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	log.Printf("VS %#c", vs)
-
 	// /Common/virtual_server_name:80
 	regex := regexp.MustCompile("(/\\w+/)?([\\w._-]+)(:\\d+)?")
 	destination := regex.FindStringSubmatch(vs.Destination)
