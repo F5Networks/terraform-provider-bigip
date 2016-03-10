@@ -48,3 +48,19 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	return config.Client()
 }
+
+func makeStringSet(list *[]string) *schema.Set {
+	ilist := make([]interface{}, len(*list))
+	for i, v := range *list {
+		ilist[i] = v
+	}
+	return schema.NewSet(schema.HashString, ilist)
+}
+
+func setToStringSlice(s *schema.Set) []string {
+	list := make([]string, s.Len())
+	for i,v := range(s.List()){
+		list[i] = v.(string)
+	}
+	return list
+}
