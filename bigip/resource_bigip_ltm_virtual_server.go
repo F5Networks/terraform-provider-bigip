@@ -206,11 +206,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	vs := &bigip.VirtualServer{
 		Destination: fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
 		Source:      d.Get("source").(string),
-		IPProtocol:  d.Get("protocol").(string),
 		Pool:        d.Get("pool").(string),
 		Mask:        d.Get("mask").(string),
 		Rules:       rules,
 		Profiles:    profiles,
+		IPProtocol:  d.Get("ip_protocol").(string),
 		SourceAddressTranslation: struct {
 			Type string `json:"type,omitempty"`
 		}{Type: d.Get("source_address_translation").(string)},
