@@ -24,6 +24,18 @@ provider "bigip" {
 }
 ```
 
+### Reference
+
+`address` - (Required) Address of the device
+
+`username` - (Required) Username for authentication
+
+`password` - (Required) Password for authentication
+
+`loginReference` - (Optional) Login reference for token auth, needed
+if you are using non-local accounts (LDAP, Radius, etc).
+
+
 # Resources
 
 ## bigip_ltm_monitor
@@ -178,6 +190,7 @@ EOF
 
 `irule` - (Required) Body of the iRule
 
+
 ## bigip_ltm_virtual_address
 
 Configures a Virtual Address
@@ -189,3 +202,4 @@ resource "bigip_ltm_virtual_address" "" {
   
 }
 ```
+
