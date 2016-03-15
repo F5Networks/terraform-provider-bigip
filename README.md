@@ -32,9 +32,9 @@ provider "bigip" {
 
 `password` - (Required) Password for authentication
 
-`loginReference` - (Optional) Login reference for token auth, needed
-if you are using non-local accounts (LDAP, Radius, etc).
+`auth_token` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
 
+`login_ref` - (Optional, Default=tmos) Specify the login reference for external auth, the setting "tmos" will work with most providers
 
 # Resources
 
@@ -198,8 +198,32 @@ Configures a Virtual Address
 ### Example 
 
 ```
-resource "bigip_ltm_virtual_address" "" {
-  
+resource "bigip_ltm_virtual_address" "vs_va" {
+
+    name = "${bigip_ltm_virtual_server.vs.destination}"
+    advertize_route = true
 }
 ```
+
+### Reference
+
+`name` - (Required) Name of the virtual address
+
+`description` - (Optional) Description of the virtual address
+
+`partition` - (Required, Default=Common) LTM partition to create the resource in
+
+`advertize_route` - (Optional) Enabled dynamic routing of the address
+
+`conn_limit` - (Optional, Default=0) Max number of connections for virtual address
+
+`enabled` - (Optional, Default=true) Enable or disable the virtual address
+
+`arp` - (Optional, Default=true) Enable or disable ARP for the virtual address
+
+`auto_delete` - (Optional, Default=true) Automatically delete the virtual address with the virtual server 
+
+`icmp_echo` - (Optional, Default=true) Enable/Disable ICMP response to the virtual address
+
+`traffic_group` - (Optional, Default=/Common/traffic-group-1) Specify the partition and traffic group
 
