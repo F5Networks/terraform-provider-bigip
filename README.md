@@ -177,3 +177,15 @@ EOF
 `name` - (Required) Name of the iRule
 
 `irule` - (Required) Body of the iRule
+
+## bigip_ltm_virtual_address
+
+Configures a Virtual Address
+
+### Example 
+
+```
+resource "bigip_ltm_virtual_address" "" {
+  
+}
+```
