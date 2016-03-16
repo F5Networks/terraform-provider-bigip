@@ -161,7 +161,9 @@ resource "bigip_ltm_virtual_server" "vs" {
 
 `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: `24` or `255.255.255.0`. A CIDR mask of `0` is the same as `0.0.0.0`
 
-`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat` 
+`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat`
+
+`ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
 
 ## bigip_ltm_irule
 

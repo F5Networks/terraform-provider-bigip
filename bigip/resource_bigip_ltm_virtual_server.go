@@ -39,16 +39,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Description: "Source IP and mask for the virtual server",
 			},
 
-			"protocol": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "",
-				Description: "IP Protocol",
-			},
-
 			"destination": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true},
+				Required: true,
+			},
 
 			"pool": &schema.Schema{
 				Type:        schema.TypeString,
