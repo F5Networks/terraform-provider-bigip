@@ -36,6 +36,8 @@ provider "bigip" {
 
 `login_ref` - (Optional, Default=tmos) Specify the login reference for external auth, the setting "tmos" will work with most providers
 
+`login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
+
 # Resources
 
 ## bigip_ltm_monitor
@@ -193,7 +195,9 @@ EOF
 
 ## bigip_ltm_virtual_address
 
-Configures a Virtual Address
+Configures a Virtual Address. NOTE: create/delete are not implemented
+since the virtual addresses should be created/deleted automatically
+with the corresponding virtual server.
 
 ### Example 
 
@@ -211,7 +215,7 @@ resource "bigip_ltm_virtual_address" "vs_va" {
 
 `description` - (Optional) Description of the virtual address
 
-`partition` - (Required, Default=Common) LTM partition to create the resource in
+`partition` - (Optional, Default=Common) LTM partition to create the resource in
 
 `advertize_route` - (Optional) Enabled dynamic routing of the address
 
