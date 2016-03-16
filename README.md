@@ -34,8 +34,6 @@ provider "bigip" {
 
 `auth_token` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
 
-`login_ref` - (Optional, Default=tmos) Specify the login reference for external auth, the setting "tmos" will work with most providers
-
 `login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
 
 # Resources
