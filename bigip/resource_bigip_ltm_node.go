@@ -3,8 +3,8 @@ package bigip
 import (
 	"log"
 
-	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 	"regexp"
 	"strings"
 )
@@ -19,17 +19,17 @@ func resourceBigipLtmNode() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the node",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"address": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Address of the node",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -75,7 +75,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", node.Name)
 	d.Set("address", node.Address)
 
-	return nil;
+	return nil
 }
 
 func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -102,7 +102,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	vs := &bigip.Node{
-		Name: name,
+		Name:    name,
 		Address: d.Get("address").(string),
 	}
 
@@ -126,9 +126,9 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 			if e != nil {
 				return e
 			}
-			for _,member := range(members) {
-				if strings.HasPrefix(member,name + ":") {
-					e = client.DeletePoolMember(poolName,member)
+			for _, member := range members {
+				if strings.HasPrefix(member, name+":") {
+					e = client.DeletePoolMember(poolName, member)
 					if e != nil {
 						return e
 					}

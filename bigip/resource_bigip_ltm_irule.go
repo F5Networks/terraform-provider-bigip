@@ -3,8 +3,8 @@ package bigip
 import (
 	"log"
 
-	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmIRule() *schema.Resource {
@@ -17,22 +17,22 @@ func resourceBigipLtmIRule() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the iRule",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"partition": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "LTM Partition",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"irule": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "The iRule body",
 			},
 		},
@@ -58,7 +58,7 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 
 	irule, err := client.IRule(name)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	d.Set("partition", irule.Partition)
@@ -87,9 +87,9 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 
 	r := &bigip.IRule{
-		Name: name,
+		Name:      name,
 		Partition: d.Get("partition").(string),
-		Rule: d.Get("irule").(string),
+		Rule:      d.Get("irule").(string),
 	}
 
 	return client.ModifyIRule(name, r)

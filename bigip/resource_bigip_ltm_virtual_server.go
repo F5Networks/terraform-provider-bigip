@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-
-	"strings"
+    "strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
