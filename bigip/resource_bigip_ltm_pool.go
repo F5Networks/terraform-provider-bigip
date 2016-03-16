@@ -198,14 +198,6 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func mapify(s []string) map[string]struct{} {
-	set := make(map[string]struct{}, len(s))
-	for _, s := range s {
-		set[s] = struct{}{}
-	}
-	return set
-}
-
 func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 

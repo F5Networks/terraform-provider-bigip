@@ -75,7 +75,7 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 
 	_, err := client.IRule(name)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
 	return true, nil
