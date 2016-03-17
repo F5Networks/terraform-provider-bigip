@@ -24,6 +24,18 @@ provider "bigip" {
 }
 ```
 
+### Reference
+
+`address` - (Required) Address of the device
+
+`username` - (Required) Username for authentication
+
+`password` - (Required) Password for authentication
+
+`auth_token` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
+
+`login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
+
 # Resources
 
 ## bigip_ltm_monitor
@@ -147,7 +159,9 @@ resource "bigip_ltm_virtual_server" "vs" {
 
 `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: `24` or `255.255.255.0`. A CIDR mask of `0` is the same as `0.0.0.0`
 
-`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat` 
+`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat`
+
+`ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
 
 ## bigip_ltm_irule
 
@@ -177,3 +191,43 @@ EOF
 `name` - (Required) Name of the iRule
 
 `irule` - (Required) Body of the iRule
+
+
+## bigip_ltm_virtual_address
+
+Configures a Virtual Address. NOTE: create/delete are not implemented
+since the virtual addresses should be created/deleted automatically
+with the corresponding virtual server.
+
+### Example 
+
+```
+resource "bigip_ltm_virtual_address" "vs_va" {
+
+    name = "${bigip_ltm_virtual_server.vs.destination}"
+    advertize_route = true
+}
+```
+
+### Reference
+
+`name` - (Required) Name of the virtual address
+
+`description` - (Optional) Description of the virtual address
+
+`partition` - (Optional, Default=Common) LTM partition to create the resource in
+
+`advertize_route` - (Optional) Enabled dynamic routing of the address
+
+`conn_limit` - (Optional, Default=0) Max number of connections for virtual address
+
+`enabled` - (Optional, Default=true) Enable or disable the virtual address
+
+`arp` - (Optional, Default=true) Enable or disable ARP for the virtual address
+
+`auto_delete` - (Optional, Default=true) Automatically delete the virtual address with the virtual server 
+
+`icmp_echo` - (Optional, Default=true) Enable/Disable ICMP response to the virtual address
+
+`traffic_group` - (Optional, Default=/Common/traffic-group-1) Specify the partition and traffic group
+

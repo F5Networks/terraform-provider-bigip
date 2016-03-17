@@ -1,13 +1,14 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
 	"regexp"
-	"fmt"
 
-	"github.com/scottdware/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmVirtualServer() *schema.Resource {
@@ -20,15 +21,22 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the virtual server",
 			},
 
 			"port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
 				Description: "Listen port for the virtual server",
+			},
+
+			"source": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "0.0.0.0/0",
+				Description: "Source IP and mask for the virtual server",
 			},
 
 			"destination": &schema.Schema{
@@ -37,15 +45,15 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"pool": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Default pool for this virtual server",
 			},
 
 			"mask": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default: "255.255.255.255",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "255.255.255.255",
 				Description: "Mask can either be in CIDR notation or decimal, i.e.: \"24\" or \"255.255.255.0\". A CIDR mask of \"0\" is the same as \"0.0.0.0\"",
 			},
 
@@ -65,16 +73,16 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source_address_translation": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "none, automap, snat",
 			},
 
 			"ip_protocol": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "all, tcp, udp",
 			},
 		},
@@ -131,8 +139,10 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 
 	pool := strings.Split(vs.Pool, "/")
 	d.Set("destination", destination[2])
+	d.Set("source", vs.Source)
+	d.Set("protocol", vs.IPProtocol)
 	d.Set("name", vs.Name)
-	d.Set("pool", pool[len(pool) - 1])
+	d.Set("pool", pool[len(pool)-1])
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
 	d.Set("irules", makeStringSet(&vs.Rules))
@@ -149,7 +159,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	}
 	d.Set("profiles", profile_names)
 
-	return nil;
+	return nil
 }
 
 func resourceBigipLtmVirtualServerExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -189,12 +199,15 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 
 	vs := &bigip.VirtualServer{
 		Destination: fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
-		Pool: d.Get("pool").(string),
-		Mask: d.Get("mask").(string),
-		Rules: rules,
-		Profiles: profiles,
-		IPProtocol: d.Get("ip_protocol").(string),
-		SourceAddressTranslation: struct{Type string `json:"type,omitempty"`}{Type: d.Get("source_address_translation").(string)},
+		Source:      d.Get("source").(string),
+		Pool:        d.Get("pool").(string),
+		Mask:        d.Get("mask").(string),
+		Rules:       rules,
+		Profiles:    profiles,
+		IPProtocol:  d.Get("ip_protocol").(string),
+		SourceAddressTranslation: struct {
+			Type string `json:"type,omitempty"`
+		}{Type: d.Get("source_address_translation").(string)},
 	}
 
 	err := client.ModifyVirtualServer(name, vs)
