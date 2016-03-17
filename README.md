@@ -280,7 +280,7 @@ resource "bigip_ltm_policy" "policy" {
 
 `rule` - defines a single rule to add to the policy. Multiple rules can be defined for a single policy.
  
- #### Rules
+**Rules**
  
  Actions and Conditions support all fields available via the iControlREST API. You can see all of the 
  available fields in the [iControlREST API documentation](https://devcentral.f5.com/d/icontrol-rest-api-reference-version-120).
