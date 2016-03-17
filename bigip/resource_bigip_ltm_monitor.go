@@ -1,11 +1,11 @@
 package bigip
 
 import (
-	"log"
 	"fmt"
+	"log"
 
-	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -18,89 +18,89 @@ func resourceBigipLtmMonitor() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the monitor",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"parent": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
 				ValidateFunc: validateParent,
-				ForceNew: true,
-				Description: "Existing monitor to inherit from. Must be one of http, https, icmp or gateway-icmp.",
+				ForceNew:     true,
+				Description:  "Existing monitor to inherit from. Must be one of http, https, icmp or gateway-icmp.",
 			},
 
 			"interval": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
 				Description: "Check interval in seconds",
-				Default: 3,
+				Default:     3,
 			},
 
 			"timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
 				Description: "Timeout in seconds",
-				Default: 16,
+				Default:     16,
 			},
 
 			"send": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default: "GET /\\r\\n",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "GET /\\r\\n",
 				Description: "Request string to send.",
 			},
 
 			"receive": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Expected response string.",
 			},
 
 			"receive_disable": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Expected response string.",
 			},
 
 			"partition": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default: DEFAULT_PARTITION,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     DEFAULT_PARTITION,
 				Description: "LTM Partition",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"reverse": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default: false,
+				Default:  false,
 			},
 
 			"transparent": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default: false,
+				Default:  false,
 			},
 
 			"manual_resume": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default: false,
+				Default:  false,
 			},
 
 			"ip_dscp": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default: 0,
+				Default:  0,
 			},
 
 			"time_until_up": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default: 0,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
 				Description: "Time in seconds",
 			},
 		},
@@ -182,16 +182,16 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 	name := d.Id()
 
 	m := &bigip.Monitor{
-		Interval: d.Get("interval").(int),
-		Timeout: d.Get("timeout").(int),
-		SendString: d.Get("send").(string),
-		ReceiveString: d.Get("receive").(string),
+		Interval:       d.Get("interval").(int),
+		Timeout:        d.Get("timeout").(int),
+		SendString:     d.Get("send").(string),
+		ReceiveString:  d.Get("receive").(string),
 		ReceiveDisable: d.Get("receive_disable").(string),
-		Reverse: d.Get("reverse").(bool),
-		Transparent: d.Get("transparent").(bool),
-		IPDSCP: d.Get("ip_dscp").(int),
-		TimeUntilUp: d.Get("time_until_up").(int),
-		ManualResume: d.Get("manual_resume").(bool),
+		Reverse:        d.Get("reverse").(bool),
+		Transparent:    d.Get("transparent").(bool),
+		IPDSCP:         d.Get("ip_dscp").(int),
+		TimeUntilUp:    d.Get("time_until_up").(int),
+		ManualResume:   d.Get("manual_resume").(bool),
 	}
 
 	return client.ModifyMonitor(name, d.Get("parent").(string), m)

@@ -231,3 +231,64 @@ resource "bigip_ltm_virtual_address" "vs_va" {
 
 `traffic_group` - (Optional, Default=/Common/traffic-group-1) Specify the partition and traffic group
 
+## bigip_ltm_policy
+
+Configure [local traffic policies](https://support.f5.com/kb/en-us/solutions/public/15000/000/sol15085.html).
+This is a fairly low level resource that does little to make actually using policies any simpler. A solid
+understanding of how policies and their associated rules, actions and conditions
+are managed through iControlREST is recommended.
+
+### Example 
+
+```
+resource "bigip_ltm_policy" "policy" {
+  name = "my_policy"
+  strategy = "/Common/first-match"
+  requires = ["http"]
+  controls = ["forwarding"]
+  rule {
+    name = "rule1"
+
+    condition {
+      httpUri = true
+      startsWith = true
+      values = ["/foo"]
+    }
+
+    condition {
+      httpMethod = true
+      values = ["GET"]
+    }
+
+    action {
+      forward = true
+      pool = "/Common/my_pool"
+    }
+  }
+}
+```
+
+### Reference
+
+`name` - (Required) Name of the policy
+
+`strategy` - (Required) Strategy selection when more than one rule matches.
+
+`requires` - (Required) Defines the types of conditions that you can use when configuring a rule.
+
+`controls` - (Required) Defines the types of actions that you can use when configuring a rule.
+
+`rule` - defines a single rule to add to the policy. Multiple rules can be defined for a single policy.
+ 
+**Rules**
+ 
+ Actions and Conditions support all fields available via the iControlREST API. You can see all of the 
+ available fields in the [iControlREST API documentation](https://devcentral.f5.com/d/icontrol-rest-api-reference-version-120).
+ Each field in the actions and conditions objects is available. Pro tip: Create your policy via the GUI first then use
+ the REST API to figure out how to configure the terraform resource.
+ 
+ `name` (Required) - Name of the rule
+ 
+ `action` - Defines a single action. Multiple actions can exist per rule.
+ 
+ `condition` - Defines a single condition. Multiple conditions can exist per rule.

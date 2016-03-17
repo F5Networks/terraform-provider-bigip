@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/scottdware/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 var NODE_VALIDATION = regexp.MustCompile(":\\d{2,5}$")
@@ -21,54 +21,54 @@ func resourceBigipLtmPool() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the pool",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"nodes": &schema.Schema{
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
 				Description: "Nodes to add to the pool. Format node_name:port. e.g. node01:443",
 			},
 
 			"monitors": &schema.Schema{
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
 				Description: "Assign monitors to a pool.",
 			},
 
 			"partition": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default: DEFAULT_PARTITION,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     DEFAULT_PARTITION,
 				Description: "LTM Partition",
-				ForceNew: true,
+				ForceNew:    true,
 			},
 
 			"allow_nat": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 				Description: "Allow NAT",
 			},
 
 			"allow_snat": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 				Description: "Allow SNAT",
 			},
 
 			"load_balancing_mode": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default: "round-robin",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "round-robin",
 				Description: "Possible values: round-robin, ...",
 			},
 		},
@@ -127,7 +127,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
 
-	return nil;
+	return nil
 }
 
 func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -162,11 +162,11 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	pool := &bigip.Pool{
-		Name: name,
-		AllowNAT: d.Get("allow_nat").(bool),
-		AllowSNAT: d.Get("allow_snat").(bool),
+		Name:              name,
+		AllowNAT:          d.Get("allow_nat").(bool),
+		AllowSNAT:         d.Get("allow_snat").(bool),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
-		Monitor: strings.Join(monitors, " and "),
+		Monitor:           strings.Join(monitors, " and "),
 		//Partition: d.Get("partition").(string),
 	}
 
@@ -196,14 +196,6 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	return nil
-}
-
-func mapify(s []string) (map[string]struct{}) {
-	set := make(map[string] struct{}, len(s))
-	for _, s := range s {
-		set[s] = struct{}{}
-	}
-	return set
 }
 
 func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error {
