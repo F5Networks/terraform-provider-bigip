@@ -212,5 +212,5 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of http, https, icmp or gateway-icmp")}
+	return nil, []error{fmt.Errorf("parent must be one of http, https, icmp, gateway-icmp, or tcp")}
 }
