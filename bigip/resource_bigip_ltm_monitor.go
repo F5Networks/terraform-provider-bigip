@@ -208,7 +208,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
 
-	if p == "http" || p == "https" || p == "icmp" || p == "gateway-icmp" {
+	if p == "http" || p == "https" || p == "icmp" || p == "gateway-icmp" || p == "tcp" {
 		return nil, nil
 	}
 
