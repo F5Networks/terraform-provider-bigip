@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
+    "strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
@@ -20,9 +20,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the virtual server",
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
@@ -45,9 +45,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"pool": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "Default pool for this virtual server",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Default pool for this virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
@@ -101,6 +101,13 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "all, tcp, udp",
+			},
+
+			"policies": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
 			},
 		},
 	}
@@ -165,6 +172,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("irules", makeStringSet(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+	d.Set("policies", vs.Policies)
 
 	profiles, err := client.VirtualServerProfiles(vs.Name)
 	if err != nil {
@@ -184,10 +192,10 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			break
 		default:
 			profile_names.Add(profile.FullPath)
-		}
+	}
 	}
 	if profile_names.Len() > 0 {
-		d.Set("profiles", profile_names)
+	d.Set("profiles", profile_names)
 	}
 	if client_profile_names.Len() > 0 {
 		d.Set("client_profiles", client_profile_names)
@@ -239,6 +247,17 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		}
 	}
 
+	var policies []bigip.Policy
+	if p, ok := d.GetOk("policies"); ok {
+		for _, policy := range p.(*schema.Set).List() {
+			if strings.HasPrefix(policy.(string), "/") {
+				policies = append(policies, bigip.Policy{FullPath: policy.(string)})
+			} else {
+				policies = append(policies, bigip.Policy{Name: policy.(string)})
+			}
+		}
+	}
+
 	var rules []string
 	if cfg_rules, ok := d.GetOk("irules"); ok {
 		rules = setToStringSlice(cfg_rules.(*schema.Set))
@@ -251,6 +270,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Mask:        d.Get("mask").(string),
 		Rules:       rules,
 		Profiles:    profiles,
+		Policies:    policies,
 		IPProtocol:  d.Get("ip_protocol").(string),
 		SourceAddressTranslation: struct {
 			Type string `json:"type,omitempty"`
