@@ -18,23 +18,11 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the virtual address",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the virtual address",
+				ValidateFunc: validateF5Name,
 			},
-
-			"partition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "Common",
-				Description: "LTM partition to create the resource in",
-			},
-
-			// "description": &schema.Schema{
-			// 	Type:        schema.TypeString,
-			// 	Optional:    true,
-			// 	Description: "Description of the virtual address",
-			// },
 
 			"arp": &schema.Schema{
 				Type:        schema.TypeBool,
@@ -117,9 +105,7 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("virtual address %s not found", name)
 	}
 
-	d.Set("name", va.Name)
-	d.Set("partition", va.Partition)
-	// d.Set("description", va.Description)
+	d.Set("name", name)
 	d.Set("arp", va.ARP)
 	if va.AutoDelete != "true" {
 		d.Set("auto_delete", false)
@@ -145,7 +131,7 @@ func resourceBigipLtmVirtualAddressExists(d *schema.ResourceData, meta interface
 		return false, err
 	}
 	for _, cand := range vas.VirtualAddresses {
-		if cand.Name == name {
+		if cand.FullPath == name {
 			va = &cand
 			break
 		}
@@ -164,8 +150,7 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 	name := d.Id()
 
 	va := &bigip.VirtualAddress{
-		Name:               d.Get("name").(string),
-		Partition:          d.Get("partition").(string),
+		Name:               name,
 		ARP:                d.Get("arp").(bool),
 		ConnectionLimit:    d.Get("conn_limit").(int),
 		Enabled:            d.Get("enabled").(bool),

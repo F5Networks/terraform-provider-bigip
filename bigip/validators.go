@@ -3,6 +3,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"regexp"
 )
 
 //Validate the incoming set only contains values from the specified set
@@ -25,4 +26,12 @@ func validateStringValue(values []string) schema.SchemaValidateFunc {
 		errors = append(errors, fmt.Errorf("%q must be one of %v", field, values))
 		return
 	}
+}
+
+func validateF5Name(value interface{}, field string) (ws []string, errors []error) {
+	match, _ := regexp.MatchString("/[\\w_\\-.]+/[\\w_\\-.]+", value.(string))
+	if !match {
+		errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+	}
+	return
 }

@@ -19,10 +19,11 @@ func resourceBigipLtmNode() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the node",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the node",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
 			},
 
 			"address": &schema.Schema{
@@ -30,7 +31,10 @@ func resourceBigipLtmNode() *schema.Resource {
 				Required:    true,
 				Description: "Address of the node",
 				ForceNew:    true,
+				//ValidateFunc: TODO: validate valid IP address format
 			},
+
+			//TODO: more fields!
 		},
 	}
 }
@@ -38,13 +42,8 @@ func resourceBigipLtmNode() *schema.Resource {
 func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
+	name := d.Get("name").(string)
 	address := d.Get("address").(string)
-	var name string
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		name = address
-	}
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
 	err := client.CreateNode(
@@ -72,7 +71,6 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("name", node.Name)
 	d.Set("address", node.Address)
 
 	return nil
@@ -84,16 +82,15 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 	name := d.Id()
 	log.Println("[INFO] Fetching node " + name)
 
-	vs, err := client.GetNode(name)
+	node, err := client.GetNode(name)
 	if err != nil {
 		return false, err
 	}
 
-	if vs == nil {
+	if node == nil {
 		d.SetId("")
 	}
-
-	return vs != nil, nil
+	return node != nil, nil
 }
 
 func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -102,7 +99,6 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	vs := &bigip.Node{
-		Name:    name,
 		Address: d.Get("address").(string),
 	}
 

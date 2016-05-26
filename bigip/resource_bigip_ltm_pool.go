@@ -21,10 +21,11 @@ func resourceBigipLtmPool() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the pool",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the pool",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
 			},
 
 			"nodes": &schema.Schema{
@@ -41,14 +42,6 @@ func resourceBigipLtmPool() *schema.Resource {
 				Set:         schema.HashString,
 				Optional:    true,
 				Description: "Assign monitors to a pool.",
-			},
-
-			"partition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     DEFAULT_PARTITION,
-				Description: "LTM Partition",
-				ForceNew:    true,
 			},
 
 			"allow_nat": &schema.Schema{
@@ -112,13 +105,6 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	partition := pool.Partition
-	if partition == "" {
-		partition = DEFAULT_PARTITION
-	}
-
-	d.Set("name", pool.Name)
-	d.Set("partition", partition)
 	d.Set("allow_nat", pool.AllowNAT)
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
@@ -162,12 +148,10 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	pool := &bigip.Pool{
-		Name:              name,
 		AllowNAT:          d.Get("allow_nat").(bool),
 		AllowSNAT:         d.Get("allow_snat").(bool),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
 		Monitor:           strings.Join(monitors, " and "),
-		//Partition: d.Get("partition").(string),
 	}
 
 	err := client.ModifyPool(name, pool)

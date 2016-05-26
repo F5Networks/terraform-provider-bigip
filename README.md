@@ -59,8 +59,6 @@ resource "bigip_ltm_monitor" "monitor" {
 
 `parent` - (Required) Existing LTM monitor to inherit from
 
-`partition` - (Required) LTM partition to create the resource in. Default = Common.
-
 `interval` - (Optional) Check interval in seconds
 
 `timeout` - (Optional) Timeout in seconds
@@ -118,8 +116,6 @@ resource "bigip_ltm_pool" "pool" {
 
 `name` - (Required) Name of the pool
 
-`partition` - (Required) LTM partition to create the resource in. Default = Common.
-
 `nodes` - (Optional) Nodes to add to the pool. Format node_name:port. e.g. `node01:443`
 
 `monitors` - (Optional) List of monitor names to associate with the pool
@@ -148,8 +144,6 @@ resource "bigip_ltm_virtual_server" "vs" {
 ### Reference
 
 `name` - (Required) Name of the virtual server
-
-`partition` - (Required, Default=Common) LTM partition to create the resource in.
 
 `port` - (Required) Listen port for the virtual server
 
@@ -214,8 +208,6 @@ resource "bigip_ltm_virtual_address" "vs_va" {
 `name` - (Required) Name of the virtual address
 
 `description` - (Optional) Description of the virtual address
-
-`partition` - (Optional, Default=Common) LTM partition to create the resource in
 
 `advertize_route` - (Optional) Enabled dynamic routing of the address
 

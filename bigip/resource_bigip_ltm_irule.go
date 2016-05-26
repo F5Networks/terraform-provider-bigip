@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
+	"strings"
 )
 
 func resourceBigipLtmIRule() *schema.Resource {
@@ -17,23 +18,20 @@ func resourceBigipLtmIRule() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the iRule",
-				ForceNew:    true,
-			},
-
-			"partition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "LTM Partition",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the iRule",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
 			},
 
 			"irule": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The iRule body",
+				StateFunc: func(s interface{}) string {
+					return strings.TrimSpace(s.(string))
+				},
 			},
 		},
 	}
@@ -61,7 +59,6 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	d.Set("partition", irule.Partition)
 	d.Set("irule", irule.Rule)
 
 	return nil
@@ -73,12 +70,12 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 	name := d.Id()
 	log.Println("[INFO] Fetching iRule " + name)
 
-	_, err := client.IRule(name)
+	irule, err := client.IRule(name)
 	if err != nil {
 		return false, err
 	}
 
-	return true, nil
+	return irule != nil, nil
 }
 
 func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -87,9 +84,8 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 
 	r := &bigip.IRule{
-		Name:      name,
-		Partition: d.Get("partition").(string),
-		Rule:      d.Get("irule").(string),
+		FullPath: name,
+		Rule:     d.Get("irule").(string),
 	}
 
 	return client.ModifyIRule(name, r)
