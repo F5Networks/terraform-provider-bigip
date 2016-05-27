@@ -4,6 +4,7 @@ A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently avail
 
 [![Build Status](https://travis-ci.org/DealerDotCom/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/DealerDotCom/terraform-provider-bigip)
 
+
 # Installation
 
  - Download the latest [release](https://github.com/DealerDotCom/terraform-provider-bigip/releases) for your platform.
@@ -40,6 +41,9 @@ provider "bigip" {
 
 # Resources
 
+For resources should be named with their "full path". The full path is the combination of the partition + name of the resource.
+For example `/Common/my-pool`.
+
 ## bigip_ltm_monitor
 
 Configures a custom monitor for use by health checks.
@@ -47,7 +51,7 @@ Configures a custom monitor for use by health checks.
 ### Example
 ```
 resource "bigip_ltm_monitor" "monitor" {
-  name = "terraform_monitor"
+  name = "/Common/terraform_monitor"
   parent = "http"
   send = "GET /some/path\r\n"
   timeout = "999"
@@ -89,7 +93,7 @@ Manages a node configuration
 
 ```
 resource "bigip_ltm_node" "node" {
-  name = "terraform_node1"
+  name = "/Common/terraform_node1"
   address = "10.10.10.10"
 }
 ```
@@ -106,7 +110,7 @@ resource "bigip_ltm_node" "node" {
 
 ```
 resource "bigip_ltm_pool" "pool" {
-  name = "terraform-pool"
+  name = "/Common/terraform-pool"
   load_balancing_mode = "round-robin"
   nodes = ["${bigip_ltm_node.node.name}:80"]
   monitors = ["${bigip_ltm_monitor.monitor.name}","${bigip_ltm_monitor.monitor2.name}"]
@@ -136,7 +140,7 @@ Configures a Virtual Server
 
 ```
 resource "bigip_ltm_virtual_server" "vs" {
-  name = "terraform_vs_http"
+  name = "/Common/terraform_vs_http"
   destination = "10.12.12.12"
   port = 80
   pool = "${bigip_ltm_pool.pool.name}"
@@ -168,12 +172,12 @@ Creates iRules
 ```
 # Loading from a file is the preferred method
 resource "bigip_ltm_irule" "rule" {
-  name = "terraform_irule"
+  name = "/Common/terraform_irule"
   irule = "${file("myirule.tcl")}"
 }
 
 resource "bigip_ltm_irule" "rule2" {
-  name = "terraform_irule2"
+  name = "/Common/terraform_irule2"
   irule = <<EOF
 when CLIENT_ACCEPTED {
      log local0. "test"
@@ -200,7 +204,7 @@ with the corresponding virtual server.
 ```
 resource "bigip_ltm_virtual_address" "vs_va" {
 
-    name = "${bigip_ltm_virtual_server.vs.destination}"
+    name = "/Common/${bigip_ltm_virtual_server.vs.destination}"
     advertize_route = true
 }
 ```
@@ -236,12 +240,12 @@ are managed through iControlREST is recommended.
 
 ```
 resource "bigip_ltm_policy" "policy" {
-  name = "my_policy"
+  name = "/Common/my_policy"
   strategy = "/Common/first-match"
   requires = ["http"]
   controls = ["forwarding"]
   rule {
-    name = "rule1"
+    name = "/Common/rule1"
 
     condition {
       httpUri = true
@@ -286,3 +290,26 @@ resource "bigip_ltm_policy" "policy" {
  `action` - Defines a single action. Multiple actions can exist per rule.
  
  `condition` - Defines a single condition. Multiple conditions can exist per rule.
+
+
+# Building
+
+Create the distributable packages like so:
+
+```
+make && make dist
+```
+
+# Testing
+
+Running the acceptance test suite requires an F5 to test against. Set `BIGIP_HOST`, `BIGIP_USER`
+and `BIGIP_PASSWORD` to a device to run the tests against. By default tests will use the `Common` 
+partition for creating objects. You can change the partition by setting `BIGIP_TEST_PARTITION`.
+
+```
+BIGIP_HOST=f5.mycompany.com BIGIP_USER=foo BIGIP_PASSWORD=secret make testacc
+```
+
+
+Read (here)[https://github.com/hashicorp/terraform/blob/master/.github/CONTRIBUTING.md#running-an-acceptance-test] for
+more information about acceptance testing in Terraform.
