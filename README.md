@@ -143,11 +143,21 @@ Configures a Virtual Server
 ### Example
 
 ```
-resource "bigip_ltm_virtual_server" "vs" {
+resource "bigip_ltm_virtual_server" "http" {
   name = "/Common/terraform_vs_http"
   destination = "10.12.12.12"
   port = 80
-  pool = "${bigip_ltm_pool.pool.name}"
+  pool = "/Common/the-default-pool"
+}
+
+# A Virtual server with SSL enabled
+resource "bigip_ltm_virtual_server" "https" {
+  name = "/Common/terraform_vs_https"
+  destination = "${var.vip_ip}"
+  port = 443
+  pool = "${var.pool}"
+  profiles = ["/Common/tcp","/Common/my-awesome-ssl-cert","/Common/http"]
+  source_address_translation = "automap"
 }
 ```
 
@@ -166,6 +176,8 @@ resource "bigip_ltm_virtual_server" "vs" {
 `source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat`
 
 `ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
+
+`profiles` - (Optional) List of all profiles associated with the virtual server. This includes protocol, ssl, http, etc.
 
 ## bigip_ltm_irule
 
