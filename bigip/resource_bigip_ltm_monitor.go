@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
+	"strings"
 )
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -18,10 +19,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the monitor",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the monitor",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
 			},
 
 			"parent": &schema.Schema{
@@ -29,7 +31,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateParent,
 				ForceNew:     true,
-				Description:  "Existing monitor to inherit from. Must be one of http, https, icmp or gateway-icmp.",
+				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
 
 			"interval": &schema.Schema{
@@ -51,6 +53,9 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Optional:    true,
 				Default:     "GET /\\r\\n",
 				Description: "Request string to send.",
+				StateFunc: func(s interface{}) string {
+					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
+				},
 			},
 
 			"receive": &schema.Schema{
@@ -63,14 +68,6 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Expected response string.",
-			},
-
-			"partition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     DEFAULT_PARTITION,
-				Description: "LTM Partition",
-				ForceNew:    true,
 			},
 
 			"reverse": &schema.Schema{
@@ -109,13 +106,13 @@ func resourceBigipLtmMonitor() *schema.Resource {
 
 func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
-	log.Println("[INFO] Creating monitor " + name)
+
+	log.Println("[INFO] Creating monitor " + name + " :: " + monitorParent(d.Get("parent").(string)))
 
 	client.CreateMonitor(
 		name,
-		d.Get("parent").(string),
+		monitorParent(d.Get("parent").(string)),
 		d.Get("interval").(int),
 		d.Get("timeout").(int),
 		d.Get("send").(string),
@@ -138,22 +135,23 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	for _, m := range monitors {
-		if m.Name == name {
+		if m.FullPath == name {
 			d.Set("interval", m.Interval)
 			d.Set("timeout", m.Timeout)
 			d.Set("send", m.SendString)
 			d.Set("receive", m.ReceiveString)
 			d.Set("receive_disable", m.ReceiveDisable)
-			d.Set("partition", m.Partition)
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
 			d.Set("ip_dscp", m.IPDSCP)
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
+			d.Set("parent", m.ParentMonitor)
+			d.Set("name", name)
 			return nil
 		}
 	}
-	return nil
+	return fmt.Errorf("Couldn't find monitor ", name)
 }
 
 func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -168,7 +166,7 @@ func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bo
 	}
 
 	for _, m := range monitors {
-		if m.Name == name {
+		if m.FullPath == name {
 			return true, nil
 		}
 	}
@@ -194,23 +192,26 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		ManualResume:   d.Get("manual_resume").(bool),
 	}
 
-	return client.ModifyMonitor(name, d.Get("parent").(string), m)
+	return client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
 }
 
 func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	parent := d.Get("parent").(string)
+	parent := monitorParent(d.Get("parent").(string))
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	return client.DeleteMonitor(name, parent)
 }
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-
-	if p == "http" || p == "https" || p == "icmp" || p == "gateway-icmp" || p == "tcp" {
+	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of http, https, icmp, gateway-icmp, or tcp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, or /Common/tcp")}
+}
+
+func monitorParent(s string) string {
+	return strings.TrimPrefix(s, "/Common/")
 }

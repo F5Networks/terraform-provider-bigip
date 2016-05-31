@@ -1,23 +1,16 @@
 language: go
 
 go:
-  - 1.5
+  - 1.6
 
 before_install:
   - go get github.com/mitchellh/gox
 
-script:
-  - go test -v ./...
-  - gox -output="target/bin/{{.OS}}_{{.Arch}}/{{.Dir}}" -osarch="linux/amd64 linux/386" -os="windows darwin"
+install: make get-deps
 
-after_success:
-  - mkdir target/pkg
-  - tar czf target/pkg/terraform-provider-bigip_darwin_386.tar.gz -C target/bin/darwin_386 .
-  - tar czf target/pkg/terraform-provider-bigip_darwin_amd64.tar.gz -C target/bin/darwin_amd64 .
-  - tar czf target/pkg/terraform-provider-bigip_linux_386.tar.gz -C target/bin/linux_386 .
-  - tar czf target/pkg/terraform-provider-bigip_linux_amd64.tar.gz -C target/bin/linux_amd64 .
-  - tar czf target/pkg/terraform-provider-bigip_windows_386.tar.gz -C target/bin/windows_386 .
-  - tar czf target/pkg/terraform-provider-bigip_windows_amd64.tar.gz -C target/bin/windows_amd64 .
+script: make bin
+
+after_success: make dist
 
 deploy:
   provider: releases

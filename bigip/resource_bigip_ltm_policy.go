@@ -23,17 +23,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the Policy",
-				ForceNew:    true,
-			},
-
-			"partition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "LTM Partition",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the Policy",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
 			},
 
 			"controls": &schema.Schema{
@@ -53,9 +47,10 @@ func resourceBigipLtmPolicy() *schema.Resource {
 			},
 
 			"strategy": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Policy Strategy (i.e. /Common/first-match)",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Policy Strategy (i.e. /Common/first-match)",
+				ValidateFunc: validateF5Name,
 			},
 
 			"rule": &schema.Schema{

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-    "strings"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
@@ -20,9 +20,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the virtual server",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the virtual server",
+				ValidateFunc: validateF5Name,
 			},
 
 			"port": &schema.Schema{
@@ -44,9 +45,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"pool": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Default pool for this virtual server",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Default pool for this virtual server",
+				ValidateFunc: validateF5Name,
 			},
 
 			"mask": &schema.Schema{
@@ -140,7 +142,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("destination", destination[2])
 	d.Set("source", vs.Source)
 	d.Set("protocol", vs.IPProtocol)
-	d.Set("name", vs.Name)
+	d.Set("name", name)
 	d.Set("pool", pool[len(pool)-1])
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
@@ -220,7 +222,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	name := d.Get("name").(string)
+	name := d.Id()
 	log.Println("[INFO] Deleting virtual server " + name)
 
 	return client.DeleteVirtualServer(name)
