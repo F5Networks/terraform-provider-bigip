@@ -8,11 +8,11 @@ import (
 	"testing"
 )
 
-var TEST_RULE_NAME = "/" + TEST_PARTITION + "/test-rule"
+var TEST_IRULE_NAME = "/" + TEST_PARTITION + "/test-rule"
 
 var TEST_IRULE_RESOURCE = `
 	resource "bigip_ltm_irule" "test-rule" {
-		name = "` + TEST_RULE_NAME + `"
+		name = "` + TEST_IRULE_NAME + `"
 		irule = <<EOF
 when CLIENT_ACCEPTED {
      log local0. "test"
@@ -26,12 +26,12 @@ func TestBigipLtmIRule_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testIRulesDestroyed,
+		CheckDestroy: testCheckIRulesDestroyed,
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: TEST_IRULE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIRuleExists(TEST_RULE_NAME),
+					testCheckIRuleExists(TEST_IRULE_NAME),
 				),
 			},
 		},
@@ -60,7 +60,7 @@ func testCheckIRuleExists(name string) resource.TestCheckFunc {
 	}
 }
 
-func testIRulesDestroyed(s *terraform.State) error {
+func testCheckIRulesDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {

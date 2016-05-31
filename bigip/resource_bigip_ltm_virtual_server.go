@@ -45,9 +45,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"pool": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Default pool for this virtual server",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Default pool for this virtual server",
+				ValidateFunc: validateF5Name,
 			},
 
 			"mask": &schema.Schema{

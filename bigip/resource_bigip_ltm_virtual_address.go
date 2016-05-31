@@ -67,10 +67,11 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 			},
 
 			"traffic_group": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/traffic-group-1",
-				Description: "Specify the partition and traffic group",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "/Common/traffic-group-1",
+				Description:  "Specify the partition and traffic group",
+				ValidateFunc: validateF5Name,
 			},
 		},
 	}

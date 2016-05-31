@@ -1,4 +1,5 @@
 TEST = ./bigip
+TESTARGS = -v
 PROJ = terraform-provider-bigip
 
 ARCHS = amd64 386
@@ -51,7 +52,7 @@ vet:
 		exit 1; \
 	fi
 
-test: get-deps
+test: build
 	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: fmt build
@@ -59,7 +60,7 @@ testacc: fmt build
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
 		exit 1; \
 	fi
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+	@TF_ACC=1 go test $(TEST) $(TESTARGS) -timeout 120m
 
 clean:
 	@go clean

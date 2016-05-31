@@ -1,6 +1,6 @@
 *.tfstate*
 .idea/
 bin/
-
+target/
 #test files
 bigip.test

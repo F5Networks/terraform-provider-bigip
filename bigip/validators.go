@@ -3,6 +3,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"reflect"
 	"regexp"
 )
 
@@ -29,9 +30,29 @@ func validateStringValue(values []string) schema.SchemaValidateFunc {
 }
 
 func validateF5Name(value interface{}, field string) (ws []string, errors []error) {
-	match, _ := regexp.MatchString("/[\\w_\\-.]+/[\\w_\\-.]+", value.(string))
-	if !match {
-		errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+		break
+	case []string:
+		values = value.([]string)
+		break
+	case *[]string:
+		values = *(value.(*[]string))
+		break
+	case string:
+		values = []string{value.(string)}
+		break
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
+	}
+
+	for _, v := range values {
+		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.]+$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+		}
 	}
 	return
 }

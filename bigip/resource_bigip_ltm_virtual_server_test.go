@@ -3,6 +3,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
 	"testing"
@@ -10,7 +11,7 @@ import (
 
 var TEST_VS_NAME = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
 
-var TEST_VS_RESOURCE = `
+var TEST_VS_RESOURCE = TEST_IRULE_RESOURCE + `
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TEST_VS_NAME + `"
 	destination = "10.255.255.254"
@@ -18,6 +19,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	mask = "255.255.255.255"
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
+	irules = ["${bigip_ltm_irule.test-rule.name}"]
 }
 `
 
@@ -26,8 +28,11 @@ func TestBigipLtmVS_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckVSsDestroyed,
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+			testCheckIRulesDestroyed,
+		),
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: TEST_VS_RESOURCE,
@@ -39,6 +44,9 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("irules.%d", schema.HashString(TEST_IRULE_NAME)),
+						TEST_IRULE_NAME),
 				),
 			},
 		},
