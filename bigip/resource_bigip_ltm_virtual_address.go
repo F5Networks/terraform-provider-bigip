@@ -78,8 +78,12 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 }
 
 func resourceBigipLtmVirtualAddressCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
 	name := d.Get("name").(string)
-	log.Printf("[INFO] not creating virtual address %s - should have been created automatically\n", name)
+	log.Println("[INFO] Creating virtual address " + name)
+
+	client.CreateVirtualAddress(name, hydrateVirtualAddress(d))
 
 	d.SetId(name)
 	return resourceBigipLtmVirtualAddressRead(d, meta)
@@ -98,19 +102,17 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	for _, va = range vas.VirtualAddresses {
-		if va.Name == name {
+		if va.FullPath == name {
 			break
 		}
 	}
-	if va.Name != name {
+	if va.FullPath != name {
 		return fmt.Errorf("virtual address %s not found", name)
 	}
 
 	d.Set("name", name)
 	d.Set("arp", va.ARP)
-	if va.AutoDelete != "true" {
-		d.Set("auto_delete", false)
-	}
+	d.Set("auto_delete", va.AutoDelete)
 	d.Set("conn_limit", va.ConnectionLimit)
 	d.Set("enabled", va.Enabled)
 	d.Set("icmp_echo", va.ICMPEcho)
@@ -150,21 +152,7 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 
 	name := d.Id()
 
-	va := &bigip.VirtualAddress{
-		Name:               name,
-		ARP:                d.Get("arp").(bool),
-		ConnectionLimit:    d.Get("conn_limit").(int),
-		Enabled:            d.Get("enabled").(bool),
-		ICMPEcho:           d.Get("icmp_echo").(bool),
-		RouteAdvertisement: d.Get("advertize_route").(bool),
-		TrafficGroup:       d.Get("traffic_group").(string),
-	}
-
-	if !d.Get("auto_delete").(bool) {
-		va.AutoDelete = "false"
-	} else {
-		va.AutoDelete = "true"
-	}
+	va := hydrateVirtualAddress(d)
 
 	err := client.ModifyVirtualAddress(name, va)
 	if err != nil {
@@ -174,8 +162,22 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 	return nil
 }
 
+func hydrateVirtualAddress(d *schema.ResourceData) *bigip.VirtualAddress {
+	return &bigip.VirtualAddress{
+		Name:               d.Id(),
+		ARP:                d.Get("arp").(bool),
+		ConnectionLimit:    d.Get("conn_limit").(int),
+		Enabled:            d.Get("enabled").(bool),
+		ICMPEcho:           d.Get("icmp_echo").(bool),
+		RouteAdvertisement: d.Get("advertize_route").(bool),
+		TrafficGroup:       d.Get("traffic_group").(string),
+		AutoDelete:         d.Get("auto_delete").(bool),
+	}
+}
+
 func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
-	log.Printf("[INFO] unable to delete virtual address %s - not implemented\n", name)
-	return nil
+	log.Printf("[INFO] Deleting virtual address " + name)
+	client := meta.(*bigip.BigIP)
+	return client.DeleteVirtualAddress(name)
 }

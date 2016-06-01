@@ -15,6 +15,7 @@ var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
 var TEST_VA_RESOURCE = `
 resource "bigip_ltm_virtual_address" "test-va" {
 	name = "` + TEST_VA_NAME + `"
+
 }
 `
 
