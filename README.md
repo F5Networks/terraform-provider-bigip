@@ -159,6 +159,17 @@ resource "bigip_ltm_virtual_server" "https" {
   profiles = ["/Common/tcp","/Common/my-awesome-ssl-cert","/Common/http"]
   source_address_translation = "automap"
 }
+
+# A Virtual server with separate client and server profiles
+resource "bigip_ltm_virtual_server" "https" {
+  name = "/Common/terraform_vs_https"
+  destination = "${var.vip_ip}"
+  port = 443
+  pool = "${var.pool}"
+  client_profiles = ["/Common/tcp"]
+  server_profiles = ["/Common/tcp-lan-optimized"]
+  source_address_translation = "automap"
+}
 ```
 
 ### Reference
@@ -177,7 +188,11 @@ resource "bigip_ltm_virtual_server" "https" {
 
 `ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
 
-`profiles` - (Optional) List of all profiles associated with the virtual server. This includes protocol, ssl, http, etc.
+`profiles` - (Optional) List of profiles associated both client and server contexts on the virtual server. This includes protocol, ssl, http, etc.
+
+`client_profiles` - (Optional) List of client context profiles associated on the virtual server. Not mutually exclusive with `profiles` and `server_profiles`
+
+`server_profiles` - (Optional) List of server context profiles associated on the virtual server. Not mutually exclusive with `profiles` and `client_profiles`
 
 ## bigip_ltm_irule
 

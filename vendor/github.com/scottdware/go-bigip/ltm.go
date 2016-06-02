@@ -581,6 +581,7 @@ type Profiles struct {
 
 type Profile struct {
 	Name      string `json:"name,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
 	Partition string `json:"partition,omitempty"`
 	Context   string `json:"context,omitempty"`
 }

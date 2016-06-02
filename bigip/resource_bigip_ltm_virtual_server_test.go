@@ -20,6 +20,9 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
 	irules = ["${bigip_ltm_irule.test-rule.name}"]
+	profiles = ["/Common/http"]
+	client_profiles = ["/Common/tcp"]
+	server_profiles = ["/Common/tcp-lan-optimized"]
 }
 `
 
@@ -47,6 +50,15 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("irules.%d", schema.HashString(TEST_IRULE_NAME)),
 						TEST_IRULE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/http")),
+						"/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("client_profiles.%d", schema.HashString("/Common/tcp")),
+						"/Common/tcp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
+						"/Common/tcp-lan-optimized"),
 				),
 			},
 		},

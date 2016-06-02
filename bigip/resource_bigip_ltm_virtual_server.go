@@ -66,6 +66,22 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
+			"client_profiles": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"server_profiles": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"irules": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -154,11 +170,31 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return err
 	}
+
 	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+	client_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+	server_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
 	for _, profile := range profiles.Profiles {
-		profile_names.Add(profile.Name)
+		switch profile.Context {
+		case bigip.CONTEXT_CLIENT:
+			client_profile_names.Add(profile.FullPath)
+			break
+		case bigip.CONTEXT_SERVER:
+			server_profile_names.Add(profile.FullPath)
+			break
+		default:
+			profile_names.Add(profile.FullPath)
+		}
 	}
-	d.Set("profiles", profile_names)
+	if profile_names.Len() > 0 {
+		d.Set("profiles", profile_names)
+	}
+	if client_profile_names.Len() > 0 {
+		d.Set("client_profiles", client_profile_names)
+	}
+	if server_profile_names.Len() > 0 {
+		d.Set("server_profiles", server_profile_names)
+	}
 
 	return nil
 }
@@ -189,7 +225,17 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	var profiles []bigip.Profile
 	if p, ok := d.GetOk("profiles"); ok {
 		for _, profile := range p.(*schema.Set).List() {
-			profiles = append(profiles, bigip.Profile{Name: profile.(string)})
+			profiles = append(profiles, bigip.Profile{Name: profile.(string), Context: bigip.CONTEXT_ALL})
+		}
+	}
+	if p, ok := d.GetOk("client_profiles"); ok {
+		for _, profile := range p.(*schema.Set).List() {
+			profiles = append(profiles, bigip.Profile{Name: profile.(string), Context: bigip.CONTEXT_CLIENT})
+		}
+	}
+	if p, ok := d.GetOk("server_profiles"); ok {
+		for _, profile := range p.(*schema.Set).List() {
+			profiles = append(profiles, bigip.Profile{Name: profile.(string), Context: bigip.CONTEXT_SERVER})
 		}
 	}
 
