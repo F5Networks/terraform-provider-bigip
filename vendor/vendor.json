@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "qeC6dcJT13l1LbXb8d0NsIwWkiw=",
+			"path": "github.com/hashicorp/terraform",
+			"revision": "6e586c89394f5474b6c5f3217a4a75ce80c3fd6c",
+			"revisionTime": "2016-05-09T20:31:07Z"
+		}
+	],
+	"rootPath": "github.com/DealerDotCom/terraform-provider-bigip"
+}
