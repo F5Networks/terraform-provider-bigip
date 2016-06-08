@@ -56,7 +56,7 @@ Configures a custom monitor for use by health checks.
 ```
 resource "bigip_ltm_monitor" "monitor" {
   name = "/Common/terraform_monitor"
-  parent = "http"
+  parent = "/Common/http"
   send = "GET /some/path\r\n"
   timeout = "999"
   interval = "999"
