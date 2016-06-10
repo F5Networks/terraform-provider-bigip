@@ -1,67 +1,121 @@
 package bigip
 
 import (
+	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestMapEntity(t *testing.T) {
-	var c bigip.PolicyRuleCondition
-	m := map[string]interface{}{
-		"name":       "foo",
-		"address":    true,
-		"generation": 1,
-		"values":     []interface{}{"biz", "baz"},
-	}
+var TEST_POLICY_NAME = fmt.Sprintf("/%s/test-policy", TEST_PARTITION)
+var TEST_RULE_NAME = fmt.Sprintf("/%s/test-rule", TEST_PARTITION)
 
-	mapEntity(m, &c)
-
-	assert.Equal(t, "foo", c.Name)
-	assert.Equal(t, true, c.Address)
-	assert.Equal(t, 1, c.Generation)
-	assert.Equal(t, []string{"biz", "baz"}, c.Values)
+var TEST_POLICY_RESOURCE = `
+resource "bigip_ltm_pool" "test-pool" {
+	name = "` + TEST_POOL_NAME + `"
+	monitors = ["/Common/http"]
+	allow_nat = true
+	allow_snat = true
+	load_balancing_mode = "round-robin"
 }
 
-func TestMapFromEntity(t *testing.T) {
-	p := bigip.Policy{
-		Name:     "policy",
-		Strategy: "/Common/first-match",
-		Controls: []string{"forwarding"},
-		Requires: []string{"http"},
-		Rules: []bigip.PolicyRule{
-			bigip.PolicyRule{
-				Name: "rule",
-				Actions: []bigip.PolicyRuleAction{
-					bigip.PolicyRuleAction{
-						HttpUri: true,
-						Value:   "/something",
-					},
-				},
-				Conditions: []bigip.PolicyRuleCondition{
-					bigip.PolicyRuleCondition{
-						Name:       "foo",
-						Generation: 1,
-						Address:    true,
-					},
-					bigip.PolicyRuleCondition{
-						Values: []string{"biz", "baz"},
-					},
-				},
+resource "bigip_ltm_policy" "test-policy" {
+	name = "` + TEST_POLICY_NAME + `"
+	controls = ["forwarding"]
+	requires = ["http"]
+	rule {
+		name = "` + TEST_RULE_NAME + `"
+		condition {
+        	        httpUri = true
+                	startsWith = true
+                	values = ["/foo", "/bar"]
+                }
+
+                condition {
+                	httpMethod = true
+                	values = ["GET"]
+                }
+
+                action {
+                	forward = true
+                	pool = "${bigip_ltm_pool.test-pool.name}"
+                }
+	}
+}
+`
+
+func TestBigipLtmPolicy_create(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckPolicyDestroyed,
+			testCheckPoolsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_POLICY_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "name", TEST_POLICY_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy",
+						fmt.Sprintf("controls.%d", schema.HashString("forwarding")),
+						"forwarding"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy",
+						fmt.Sprintf("requires.%d", schema.HashString("http")),
+						"http"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.name", TEST_RULE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.httpUri", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.startsWith", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.values.0", "/foo"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.values.1", "/bar"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.1.httpMethod", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.1.values.0", "GET"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.action.0.forward", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.action.0.pool", TEST_POOL_NAME),
+				),
 			},
 		},
+	})
+}
+
+func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		client := testAccProvider.Meta().(*bigip.BigIP)
+
+		p, err := client.GetPolicy(TEST_POLICY_NAME)
+		if err != nil {
+			return err
+		}
+
+		if p == nil {
+			return fmt.Errorf("Policy %s not created.", TEST_POLICY_NAME)
+		}
+
+		return nil
 	}
+}
 
-	d := resourceBigipLtmPolicy().TestResourceData()
-	err := policyToData(&p, d)
+func testCheckPolicyDestroyed(s *terraform.State) error {
+	client := testAccProvider.Meta().(*bigip.BigIP)
 
-	assert.Nil(t, err, err)
-	assert.Equal(t, "/Common/first-match", d.Get("strategy").(string))
-	assert.Equal(t, []string{"forwarding"}, setToStringSlice(d.Get("controls").(*schema.Set)))
-	assert.Equal(t, []string{"http"}, setToStringSlice(d.Get("requires").(*schema.Set)))
-	assert.Equal(t, "rule", d.Get("rule.0.name").(string))
-	assert.Equal(t, true, d.Get("rule.0.condition.0.address").(bool))
-	assert.Equal(t, []interface{}{"biz", "baz"}, d.Get("rule.0.condition.1.values").([]interface{}))
-	assert.Equal(t, "/something", d.Get("rule.0.action.0.value").(string))
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "bigip_ltm_policy" {
+			continue
+		}
+
+		name := rs.Primary.ID
+		p, err := client.GetPolicy(name)
+		if err != nil {
+			return err
+		}
+		if p != nil {
+			return fmt.Errorf("Virtual address %s not destroyed.", name)
+		}
+	}
+	return nil
 }

@@ -147,6 +147,7 @@ type VirtualServer struct {
 	VSIndex          int       `json:"vsIndex,omitempty"`
 	Rules            []string  `json:"rules,omitempty"`
 	Profiles         []Profile `json:"profiles,omitempty"`
+	Policies         []string  `json:"policies,omitempty"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
@@ -197,6 +198,10 @@ type virtualAddressDTO struct {
 
 type Policies struct {
 	Policies []Policy `json:"items"`
+}
+
+type VirtualServerPolicies struct {
+	PolicyRef Policies `json:"policiesReference"`
 }
 
 type Policy struct {
@@ -259,6 +264,7 @@ type PolicyRules struct {
 
 type PolicyRule struct {
 	Name       string
+	FullPath   string
 	Ordinal    int
 	Conditions []PolicyRuleCondition
 	Actions    []PolicyRuleAction
@@ -267,6 +273,7 @@ type PolicyRule struct {
 type policyRuleDTO struct {
 	Name       string `json:"name"`
 	Ordinal    int    `json:"ordinal"`
+	FullPath   string `json:"fullPath,omitempty"`
 	Conditions struct {
 		Items []PolicyRuleCondition `json:"items,omitempty"`
 	} `json:"conditionsReference,omitempty"`
@@ -277,8 +284,9 @@ type policyRuleDTO struct {
 
 func (p *PolicyRule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(policyRuleDTO{
-		Name:    p.Name,
-		Ordinal: p.Ordinal,
+		Name:     p.Name,
+		Ordinal:  p.Ordinal,
+		FullPath: p.FullPath,
 		Conditions: struct {
 			Items []PolicyRuleCondition `json:"items,omitempty"`
 		}{Items: p.Conditions},
@@ -299,6 +307,7 @@ func (p *PolicyRule) UnmarshalJSON(b []byte) error {
 	p.Ordinal = dto.Ordinal
 	p.Actions = dto.Actions.Items
 	p.Conditions = dto.Conditions.Items
+	p.FullPath = dto.FullPath
 
 	return nil
 }
@@ -544,6 +553,7 @@ type Monitor struct {
 	Interval       int
 	IPDSCP         int
 	ManualResume   bool
+	Password       string
 	ReceiveString  string
 	ReceiveDisable string
 	Reverse        bool
@@ -552,6 +562,7 @@ type Monitor struct {
 	Timeout        int
 	Transparent    bool
 	UpInterval     int
+	Username       string
 }
 
 type monitorDTO struct {
@@ -565,6 +576,7 @@ type monitorDTO struct {
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
 	ManualResume   string `json:"manualResume,omitempty" bool:"enabled"`
+	Password       string `json:"password,omitempty"`
 	ReceiveString  string `json:"recv,omitempty"`
 	ReceiveDisable string `json:"recvDisable,omitempty"`
 	Reverse        string `json:"reverse,omitempty" bool:"enabled"`
@@ -573,6 +585,7 @@ type monitorDTO struct {
 	Timeout        int    `json:"timeout,omitempty"`
 	Transparent    string `json:"transparent,omitempty" bool:"enabled"`
 	UpInterval     int    `json:"upInterval,omitempty"`
+	Username       string `json:"username,omitempty"`
 }
 
 type Profiles struct {
@@ -600,6 +613,9 @@ type IRule struct {
 func (p *Monitor) MarshalJSON() ([]byte, error) {
 	var dto monitorDTO
 	marshal(&dto, p)
+	if strings.Contains(dto.SendString, "\r\n") {
+		dto.SendString = strings.Replace(dto.SendString, "\r\n", "\\r\\n", -1)
+	}
 	return json.Marshal(dto)
 }
 
@@ -875,8 +891,14 @@ func (b *BigIP) GetVirtualServer(name string) (*VirtualServer, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	vs.Profiles = profiles.Profiles
+
+	policy_names, err := b.VirtualServerPolicyNames(name)
+	if err != nil {
+		return nil, err
+	}
+	vs.Policies = policy_names
+
 	return &vs, nil
 }
 
@@ -903,6 +925,21 @@ func (b *BigIP) VirtualServerProfiles(vs string) (*Profiles, error) {
 	}
 
 	return &p, nil
+}
+
+//Get the names of policies associated with a particular virtual server
+func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
+	var policies VirtualServerPolicies
+	err, _ := b.getForEntity(&policies, uriLtm, uriVirtual, vs, "policies")
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("%v\n", policies)
+	retval := make([]string, 0, len(policies.PolicyRef.Policies))
+	for _, p := range policies.PolicyRef.Policies {
+		retval = append(retval, p.FullPath)
+	}
+	return retval, nil
 }
 
 // VirtualAddresses returns a list of virtual addresses.
@@ -960,14 +997,6 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", or "gateway icmp".
 func (b *BigIP) CreateMonitor(name, parent string, interval, timeout int, send, receive string) error {
-	if strings.Contains(send, "\r\n") {
-		send = strings.Replace(send, "\r\n", "\\r\\n", -1)
-	}
-
-	if strings.Contains(parent, "gateway") {
-		parent = "gateway_icmp"
-	}
-
 	config := &Monitor{
 		Name:          name,
 		ParentMonitor: parent,
@@ -977,7 +1006,16 @@ func (b *BigIP) CreateMonitor(name, parent string, interval, timeout int, send, 
 		ReceiveString: receive,
 	}
 
-	return b.post(config, uriLtm, uriMonitor, parent)
+	return b.AddMonitor(config)
+}
+
+// Create a monitor by supplying a config
+func (b *BigIP) AddMonitor(config *Monitor) error {
+	if strings.Contains(config.ParentMonitor, "gateway") {
+		config.ParentMonitor = "gateway_icmp"
+	}
+
+	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
 }
 
 // DeleteMonitor removes a monitor.
@@ -989,12 +1027,8 @@ func (b *BigIP) DeleteMonitor(name, parent string) error {
 // one of "http", "https", "icmp", or "gateway icmp". Fields that
 // can be modified are referenced in the Monitor struct.
 func (b *BigIP) ModifyMonitor(name, parent string, config *Monitor) error {
-	if strings.Contains(config.SendString, "\r\n") {
-		config.SendString = strings.Replace(config.SendString, "\r\n", "\\r\\n", -1)
-	}
-
-	if strings.Contains(parent, "gateway") {
-		parent = "gateway_icmp"
+	if strings.Contains(config.ParentMonitor, "gateway") {
+		config.ParentMonitor = "gateway_icmp"
 	}
 
 	return b.put(config, uriLtm, uriMonitor, parent, name)
