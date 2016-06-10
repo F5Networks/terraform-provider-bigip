@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-    "strings"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
@@ -20,9 +20,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the virtual server",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
@@ -45,9 +45,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"pool": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Default pool for this virtual server",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Default pool for this virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
@@ -192,10 +192,10 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			break
 		default:
 			profile_names.Add(profile.FullPath)
-	}
+		}
 	}
 	if profile_names.Len() > 0 {
-	d.Set("profiles", profile_names)
+		d.Set("profiles", profile_names)
 	}
 	if client_profile_names.Len() > 0 {
 		d.Set("client_profiles", client_profile_names)
@@ -247,15 +247,9 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		}
 	}
 
-	var policies []bigip.Policy
+	var policies []string
 	if p, ok := d.GetOk("policies"); ok {
-		for _, policy := range p.(*schema.Set).List() {
-			if strings.HasPrefix(policy.(string), "/") {
-				policies = append(policies, bigip.Policy{FullPath: policy.(string)})
-			} else {
-				policies = append(policies, bigip.Policy{Name: policy.(string)})
-			}
-		}
+		policies = setToStringSlice(p.(*schema.Set))
 	}
 
 	var rules []string

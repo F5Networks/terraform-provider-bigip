@@ -11,7 +11,7 @@ import (
 
 var TEST_VS_NAME = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
 
-var TEST_VS_RESOURCE = TEST_IRULE_RESOURCE + `
+var TEST_VS_RESOURCE = TEST_IRULE_RESOURCE + TEST_POLICY_RESOURCE + `
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TEST_VS_NAME + `"
 	destination = "10.255.255.254"
@@ -23,6 +23,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
+	policies = ["${bigip_ltm_policy.test-policy.name}"]
 }
 `
 
@@ -35,6 +36,7 @@ func TestBigipLtmVS_create(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 			testCheckIRulesDestroyed,
+			testCheckPolicyDestroyed,
 		),
 		Steps: []resource.TestStep{
 			resource.TestStep{
@@ -59,6 +61,9 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("policies.%d", schema.HashString(TEST_POLICY_NAME)),
+						TEST_POLICY_NAME),
 				),
 			},
 		},

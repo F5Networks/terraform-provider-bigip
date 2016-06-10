@@ -48,7 +48,8 @@ func resourceBigipLtmPolicy() *schema.Resource {
 
 			"strategy": &schema.Schema{
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:     true,
+				Default:      "/Common/first-match",
 				Description:  "Policy Strategy (i.e. /Common/first-match)",
 				ValidateFunc: validateF5Name,
 			},
@@ -59,9 +60,10 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "Rule name",
+							Type:         schema.TypeString,
+							Required:     true,
+							Description:  "Rule name",
+							ValidateFunc: validateF5Name,
 						},
 						"action": &schema.Schema{
 							Type:     schema.TypeList,
@@ -1082,15 +1084,12 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 	name := d.Id()
 	log.Println("[INFO] Fetching policy " + name)
 
-	_, err := client.GetPolicy(name)
+	p, err := client.GetPolicy(name)
 	if err != nil {
-		if strings.HasPrefix(err.Error(), "HTTP 404") {
-			return false, nil
-		}
 		return false, err
 	}
 
-	return true, nil
+	return p != nil, nil
 }
 
 func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -1110,7 +1109,6 @@ func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	var p bigip.Policy
 	p.Name = name
-	p.Partition = d.Get("partition").(string)
 	p.Strategy = d.Get("strategy").(string)
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
@@ -1144,49 +1142,36 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 }
 
 func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
-	d.Set("partition", p.Partition)
 	d.Set("strategy", p.Strategy)
 	d.Set("controls", makeStringSet(&p.Controls))
 	d.Set("requires", makeStringSet(&p.Requires))
 
-	rules := make([]map[string]interface{}, 0, len(p.Rules))
-	for _, r := range p.Rules {
-		rule := make(map[string]interface{})
-		rule["name"] = r.Name
+	for i, r := range p.Rules {
+		rule := fmt.Sprintf("rule.%d", i)
+		d.Set(fmt.Sprintf("%s.name", rule), r.FullPath)
 
-		actions := make([]map[string]interface{}, 0, len(r.Actions))
-		for _, a := range r.Actions {
-			actions = append(actions, mapify(a))
+		for x, a := range r.Actions {
+			action := fmt.Sprintf("%s.action.%d", rule, x)
+			interfaceToResourceData(a, d, action)
 		}
-		rule["action"] = actions
 
-		conditions := make([]map[string]interface{}, 0, len(r.Conditions))
-		for _, c := range r.Conditions {
-			conditions = append(conditions, mapify(c))
+		for x, c := range r.Conditions {
+			condition := fmt.Sprintf("%s.condition.%d", rule, x)
+			interfaceToResourceData(c, d, condition)
 		}
-		rule["condition"] = conditions
-
-		rules = append(rules, rule)
-	}
-	err := d.Set("rule", rules)
-	if err != nil {
-		return err
 	}
 	return nil
 }
 
-//Turn an object into a map
-func mapify(obj interface{}) map[string]interface{} {
-	m := make(map[string]interface{})
+func interfaceToResourceData(obj interface{}, d *schema.ResourceData, prefix string) {
 	v := reflect.ValueOf(obj)
 	for fi := 0; fi < v.NumField(); fi++ {
 		fn := v.Type().Field(fi).Name
 		if fn != "Name" && fn != "Generation" {
 			f := v.Field(fi)
 			if (f.Kind() == reflect.Slice && f.Interface() != nil) || f.Interface() != reflect.Zero(f.Type()).Interface() {
-				m[fmt.Sprintf("%s%s", strings.ToLower(fn[0:1]), fn[1:])] = f.Interface()
+				d.Set(fmt.Sprintf("%s.%s%s", prefix, strings.ToLower(fn[0:1]), fn[1:]), f.Interface())
 			}
 		}
 	}
-	return m
 }
