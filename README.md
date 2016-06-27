@@ -39,7 +39,7 @@ provider "bigip" {
 
 `password` - (Required) Password for authentication
 
-`auth_token` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
+`token_auth` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
 
 `login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
 
