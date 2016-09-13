@@ -179,29 +179,31 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-	client_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-	server_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-	for _, profile := range profiles.Profiles {
-		switch profile.Context {
-		case bigip.CONTEXT_CLIENT:
-			client_profile_names.Add(profile.FullPath)
-			break
-		case bigip.CONTEXT_SERVER:
-			server_profile_names.Add(profile.FullPath)
-			break
-		default:
-			profile_names.Add(profile.FullPath)
+	if profiles != nil && len(profiles.Profiles) > 0 {
+		profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		client_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		server_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		for _, profile := range profiles.Profiles {
+			switch profile.Context {
+			case bigip.CONTEXT_CLIENT:
+				client_profile_names.Add(profile.FullPath)
+				break
+			case bigip.CONTEXT_SERVER:
+				server_profile_names.Add(profile.FullPath)
+				break
+			default:
+				profile_names.Add(profile.FullPath)
+			}
 		}
-	}
-	if profile_names.Len() > 0 {
-		d.Set("profiles", profile_names)
-	}
-	if client_profile_names.Len() > 0 {
-		d.Set("client_profiles", client_profile_names)
-	}
-	if server_profile_names.Len() > 0 {
-		d.Set("server_profiles", server_profile_names)
+		if profile_names.Len() > 0 {
+			d.Set("profiles", profile_names)
+		}
+		if client_profile_names.Len() > 0 {
+			d.Set("client_profiles", client_profile_names)
+		}
+		if server_profile_names.Len() > 0 {
+			d.Set("server_profiles", server_profile_names)
+		}
 	}
 
 	return nil
