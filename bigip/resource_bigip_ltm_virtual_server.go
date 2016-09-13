@@ -174,7 +174,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	d.Set("policies", vs.Policies)
 
-	profiles, err := client.VirtualServerProfiles(vs.Name)
+	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
 	}
