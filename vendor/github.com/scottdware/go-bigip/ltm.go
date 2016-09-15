@@ -138,6 +138,7 @@ type VirtualServer struct {
 	Source                   string `json:"source,omitempty"`
 	SourceAddressTranslation struct {
 		Type string `json:"type,omitempty"`
+		Pool string `json:"pool,omitempty"`
 	} `json:"sourceAddressTranslation,omitempty"`
 	SourcePort       string    `json:"sourcePort,omitempty"`
 	SYNCookieStatus  string    `json:"synCookieStatus,omitempty"`
