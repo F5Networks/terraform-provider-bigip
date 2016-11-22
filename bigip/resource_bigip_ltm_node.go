@@ -16,6 +16,9 @@ func resourceBigipLtmNode() *schema.Resource {
 		//Update: resourceBigipLtmNodeUpdate,
 		Delete: resourceBigipLtmNodeDelete,
 		Exists: resourceBigipLtmNodeExists,
+		Importer: &schema.ResourceImporter{
+			State: resourceBigipLtmNodeImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -72,6 +75,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("address", node.Address)
+	d.Set("name", name)
 
 	return nil
 }
@@ -136,4 +140,8 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 		}
 	}
 	return err
+}
+
+func resourceBigipLtmNodeImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	return []*schema.ResourceData{d}, nil
 }

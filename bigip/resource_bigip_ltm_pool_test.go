@@ -42,6 +42,27 @@ func TestBigipLtmPool_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmPool_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_POOL_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolExists(TEST_POOL_NAME, true),
+				),
+				ResourceName:      TEST_POOL_RESOURCE,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 //TODO: test adding/removing nodes
 
 func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {

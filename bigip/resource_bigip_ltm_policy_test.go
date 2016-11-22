@@ -83,6 +83,27 @@ func TestBigipLtmPolicy_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmPolicy_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicyDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_POLICY_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TEST_POLICY_NAME, true),
+				),
+				ResourceName:      TEST_POLICY_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

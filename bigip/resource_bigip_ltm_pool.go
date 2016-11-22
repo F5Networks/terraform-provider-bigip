@@ -18,6 +18,9 @@ func resourceBigipLtmPool() *schema.Resource {
 		Update: resourceBigipLtmPoolUpdate,
 		Delete: resourceBigipLtmPoolDelete,
 		Exists: resourceBigipLtmPoolExists,
+		Importer: &schema.ResourceImporter{
+			State: resourceBigIpLtmPoolImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -27,7 +30,6 @@ func resourceBigipLtmPool() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-
 			"nodes": &schema.Schema{
 				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -109,6 +111,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
 	d.Set("nodes", makeStringSet(&nodes))
+	d.Set("name", name)
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
@@ -189,4 +192,8 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 	log.Println("[INFO] Deleting pool " + name)
 
 	return client.DeletePool(name)
+}
+
+func resourceBigIpLtmPoolImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	return []*schema.ResourceData{d}, nil
 }

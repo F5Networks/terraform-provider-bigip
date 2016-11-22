@@ -56,6 +56,27 @@ func TestBigipLtmMonitor_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmMonitor_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_MONITOR_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TEST_MONITOR_NAME),
+				),
+				ResourceName:      TEST_MONITOR_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testCheckMonitorExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

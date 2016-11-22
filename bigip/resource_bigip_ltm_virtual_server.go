@@ -17,6 +17,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 		Update: resourceBigipLtmVirtualServerUpdate,
 		Delete: resourceBigipLtmVirtualServerDelete,
 		Exists: resourceBigipLtmVirtualServerExists,
+		Importer: &schema.ResourceImporter{
+			State: resourceBigipLtmVirtualServerImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -300,4 +303,8 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 	log.Println("[INFO] Deleting virtual server " + name)
 
 	return client.DeleteVirtualServer(name)
+}
+
+func resourceBigipLtmVirtualServerImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	return []*schema.ResourceData{d}, nil
 }

@@ -70,6 +70,27 @@ func TestBigipLtmVS_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmVS_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVSsDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_VS_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists(TEST_VS_NAME, true),
+				),
+				ResourceName:      TEST_VS_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 //TODO: test adding rules, profiles, policies, etc
 
 func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {

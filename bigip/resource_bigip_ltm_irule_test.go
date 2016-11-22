@@ -38,6 +38,27 @@ func TestBigipLtmIRule_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmIRule_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIRulesDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_IRULE_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckIRuleExists(TEST_IRULE_NAME),
+				),
+				ResourceName:      TEST_IRULE_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testCheckIRuleExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

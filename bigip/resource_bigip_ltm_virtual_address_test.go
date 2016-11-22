@@ -37,6 +37,27 @@ func TestBigipLtmVA_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmVA_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVAsDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_VA_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVAExists(TEST_VA_NAME, true),
+				),
+				ResourceName:      TEST_VA_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testCheckVAExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

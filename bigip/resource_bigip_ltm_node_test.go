@@ -37,6 +37,27 @@ func TestBigipLtmNode_create(t *testing.T) {
 	})
 }
 
+func TestBigipLtmNode_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: TEST_NODE_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(TEST_NODE_NAME, true),
+				),
+				ResourceName:      TEST_NODE_NAME,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 //var TEST_NODE_IN_POOL_RESOURCE = `
 //resource "bigip_ltm_pool" "test-pool" {
 //	name = "` + TEST_POOL_NAME + `"
