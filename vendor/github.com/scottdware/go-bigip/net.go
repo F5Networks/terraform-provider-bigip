@@ -190,7 +190,7 @@ func (b *BigIP) AddInterfaceToVlan(vlan, iface string, tagged bool) error {
 		config.Untagged = true
 	}
 
-	return b.put(config, uriNet, uriVlan, vlan, "interfaces")
+	return b.post(config, uriNet, uriVlan, vlan, "interfaces")
 }
 
 // SelfIPs returns a list of self IP's.
