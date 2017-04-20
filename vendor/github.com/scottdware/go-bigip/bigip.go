@@ -229,6 +229,23 @@ func (b *BigIP) put(body interface{}, path ...string) error {
 	return callErr
 }
 
+func (b *BigIP) patch(body interface{}, path ...string) error {
+	marshalJSON, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
+
+	_, callErr := b.APICall(req)
+	return callErr
+}
+
 //Get a url and populate an entity. If the entity does not exist (404) then the
 //passed entity will be untouched and false will be returned as the second parameter.
 //You can use this to distinguish between a missing entity or an actual error.

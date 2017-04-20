@@ -1,11 +1,12 @@
 package bigip
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
 	"log"
 	"reflect"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 const DEFAULT_PARTITION = "Common"
@@ -57,6 +58,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_policy":          resourceBigipLtmPolicy(),
 			"bigip_ltm_vlan":            resourceBigipLtmVlan(),
 			"bigip_ltm_xselfip":         resourceBigipLtmSelfIP(),
+			"bigip_ltm_ntp":             resourceBigipLtmNtp(),
 		},
 
 		ConfigureFunc: providerConfigure,
