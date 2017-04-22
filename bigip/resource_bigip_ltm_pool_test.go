@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
@@ -93,7 +94,7 @@ func testCheckPoolMember(pool_name, member_name string) resource.TestCheckFunc {
 		}
 
 		for _, member := range members {
-			if member == member_name {
+			if member.Name == member_name {
 				return nil
 			}
 		}

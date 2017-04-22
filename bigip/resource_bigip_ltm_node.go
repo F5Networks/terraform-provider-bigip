@@ -3,10 +3,10 @@ package bigip
 import (
 	"log"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/scottdware/go-bigip"
-	"regexp"
-	"strings"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -127,11 +127,9 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 				return e
 			}
 			for _, member := range members {
-				if strings.HasPrefix(member, name+":") {
-					e = client.DeletePoolMember(poolName, member)
-					if e != nil {
-						return e
-					}
+				e = client.DeletePoolMember(poolName, member.Name)
+				if e != nil {
+					return e
 				}
 			}
 			err = client.DeleteNode(name)

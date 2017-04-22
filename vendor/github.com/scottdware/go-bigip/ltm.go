@@ -6,6 +6,129 @@ import (
 	"strings"
 )
 
+// ServerSSLProfiles
+// Documentation: https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_ltm_profile_server-ssl.ashx
+
+// ServerSSLProfiles contains a list of every server-ssl profile on the BIG-IP system.
+type ServerSSLProfiles struct {
+	ServerSSLProfiles []ServerSSLProfile `json:"items"`
+}
+
+// ServerSSLProfile contains information about each server-ssl profile. You can use all
+// of these fields when modifying a server-ssl profile.
+type ServerSSLProfile struct {
+	Name                         string   `json:"name,omitempty"`
+	Partition                    string   `json:"partition,omitempty"`
+	FullPath                     string   `json:"fullPath,omitempty"`
+	Generation                   int      `json:"generation,omitempty"`
+	AlertTimeout                 string   `json:"alertTimeout,omitempty"`
+	Authenticate                 string   `json:"authenticate,omitempty"`
+	AuthenticateDepth            int      `json:"authenticateDepth,omitempty"`
+	CaFile                       string   `json:"caFile,omitempty"`
+	CacheSize                    int      `json:"cacheSize,omitempty"`
+	CacheTimeout                 int      `json:"cacheTimeout,omitempty"`
+	Cert                         string   `json:"cert,omitempty"`
+	Chain                        string   `json:"chain,omitempty"`
+	Ciphers                      string   `json:"Ciphers,omitempty"`
+	DefaultsFrom                 string   `json:"defaultsFrom,omitempty"`
+	ExpireCertResponseControl    string   `json:"expireCertResponseControl,omitempty"`
+	GenericAlert                 string   `json:"genericAlert,omitempty"`
+	HandshakeTimeout             string   `json:"handshakeTimeout,omitempty"`
+	Key                          string   `json:"key,omitempty"`
+	ModSslMethods                string   `json:"modSslMethods,omitempty"`
+	Mode                         string   `json:"mode,omitempty"`
+	TmOptions                    []string `json:"tmOptions,omitempty"`
+	Passphrase                   string   `json:"passphrase,omitempty"`
+	PeerCertMode                 string   `json:"peerCertMode,omitempty"`
+	ProxySsl                     string   `json:"proxySsl,omitempty"`
+	RenegotiatePeriod            string   `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize              string   `json:"renegotiateSize,omitempty"`
+	Renegotiation                string   `json:"renegotiation,omitempty"`
+	RetainCertificate            string   `json:"retainCertificate,omitempty"`
+	SecureRenegotiation          string   `json:"secureRenegotiation,omitempty"`
+	ServerName                   string   `json:"serverName,omitempty"`
+	SessionMirroring             string   `json:"sessionMirroring,omitempty"`
+	SessionTicket                string   `json:"sessionTicket,omitempty"`
+	SniDefault                   string   `json:"sniDefault,omitempty"`
+	SniRequire                   string   `json:"sniRequire,omitempty"`
+	SslForwardProxy              string   `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass        string   `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash                  string   `json:"sslSignHash,omitempty"`
+	StrictResume                 string   `json:"strictResume,omitempty"`
+	UncleanShutdown              string   `json:"uncleanShutdown,omitempty"`
+	UntrustedCertResponseControl string   `json:"untrustedCertResponseControl,omitempty"`
+}
+
+// ClientSSLProfiles
+// Documentation: https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_ltm_profile_client-ssl.ashx
+
+// ClientSSLProfiles contains a list of every client-ssl profile on the BIG-IP system.
+type ClientSSLProfiles struct {
+	ClientSSLProfiles []ClientSSLProfile `json:"items"`
+}
+
+// ClientSSLProfile contains information about each client-ssl profile. You can use all
+// of these fields when modifying a client-ssl profile.
+type ClientSSLProfile struct {
+	Name              string `json:"name,omitempty"`
+	Partition         string `json:"partition,omitempty"`
+	FullPath          string `json:"fullPath,omitempty"`
+	Generation        int    `json:"generation,omitempty"`
+	AlertTimeout      string `json:"alertTimeout,omitempty"`
+	AllowNonSsl       string `json:"allowNonSsl,omitempty"`
+	Authenticate      string `json:"authenticate,omitempty"`
+	AuthenticateDepth int    `json:"authenticateDepth,omitempty"`
+	CaFile            string `json:"caFile,omitempty"`
+	CacheSize         int    `json:"cacheSize,omitempty"`
+	CacheTimeout      int    `json:"cacheTimeout,omitempty"`
+	Cert              string `json:"cert,omitempty"`
+	CertKeyChain      []struct {
+		Name       string `json:"name,omitempty"`
+		Cert       string `json:"cert,omitempty"`
+		Chain      string `json:"chain,omitempty"`
+		Key        string `json:"key,omitempty"`
+		Passphrase string `json:"passphrase,omitempty"`
+	} `json:"certKeyChain,omitempty"`
+	CertExtensionIncludes           []string `json:"certExtensionIncludes,omitempty"`
+	CertLifespan                    int      `json:"certLifespan,omitempty"`
+	CertLookupByIpaddrPort          string   `json:"certLookupByIpaddrPort,omitempty"`
+	Chain                           string   `json:"chain,omitempty"`
+	Ciphers                         string   `json:"Ciphers,omitempty"`
+	ClientCertCa                    string   `json:"clientCertCa,omitempty"`
+	CrlFile                         string   `json:"crlFile,omitempty"`
+	DefaultsFrom                    string   `json:"defaultsFrom,omitempty"`
+	ForwardProxyBypassDefaultAction string   `json:"forwardProxyBypassDefaultAction,omitempty"`
+	GenericAlert                    string   `json:"genericAlert,omitempty"`
+	HandshakeTimeout                string   `json:"handshakeTimeout,omitempty"`
+	InheritCertkeychain             string   `json:"inheritCertkeychain,omitempty"`
+	Key                             string   `json:"key,omitempty"`
+	ModSslMethods                   string   `json:"modSslMethods,omitempty"`
+	Mode                            string   `json:"mode,omitempty"`
+	TmOptions                       []string `json:"tmOptions,omitempty"`
+	Passphrase                      string   `json:"passphrase,omitempty"`
+	PeerCertMode                    string   `json:"peerCertMode,omitempty"`
+	ProxyCaCert                     string   `json:"proxyCaCert,omitempty"`
+	ProxyCaKey                      string   `json:"proxyCaKey,omitempty"`
+	ProxyCaPassphrase               string   `json:"proxyCaPassphrase,omitempty"`
+	ProxySsl                        string   `json:"proxySsl,omitempty"`
+	ProxySslPassthrough             string   `json:"proxySslPassthrough,omitempty"`
+	RenegotiatePeriod               string   `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize                 string   `json:"renegotiateSize,omitempty"`
+	Renegotiation                   string   `json:"renegotiation,omitempty"`
+	RetainCertificate               string   `json:"retainCertificate,omitempty"`
+	SecureRenegotiation             string   `json:"secureRenegotiation,omitempty"`
+	ServerName                      string   `json:"serverName,omitempty"`
+	SessionMirroring                string   `json:"sessionMirroring,omitempty"`
+	SessionTicket                   string   `json:"sessionTicket,omitempty"`
+	SniDefault                      string   `json:"sniDefault,omitempty"`
+	SniRequire                      string   `json:"sniRequire,omitempty"`
+	SslForwardProxy                 string   `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass           string   `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash                     string   `json:"sslSignHash,omitempty"`
+	StrictResume                    string   `json:"strictResume,omitempty"`
+	UncleanShutdown                 string   `json:"uncleanShutdown,omitempty"`
+}
+
 // Nodes contains a list of every node on the BIG-IP system.
 type Nodes struct {
 	Nodes []Node `json:"items"`
@@ -27,6 +150,65 @@ type Node struct {
 	Ratio           int    `json:"ratio,omitempty"`
 	Session         string `json:"session,omitempty"`
 	State           string `json:"state,omitempty"`
+}
+
+// DataGroups contains a list of data groups on the BIG-IP system.
+type DataGroups struct {
+	DataGroups []DataGroup `json:"items"`
+}
+
+// DataGroups contains information about each data group.
+type DataGroup struct {
+	Name       string
+	Partition  string
+	FullPath   string
+	Generation int
+	Type       string
+	Records    []DataGroupRecord
+}
+
+type DataGroupRecord struct {
+	Name string `json:"name,omitempty"`
+	Data string `json:"data,omitempty"`
+}
+
+type dataGroupDTO struct {
+	Name       string             `json:"name,omitempty"`
+	Partition  string             `json:"partition,omitempty"`
+	FullPath   string             `json:"fullPath,omitempty"`
+	Generation int                `json:"generation,omitempty"`
+	Type       string             `json:"type,omitempty"`
+	Records    []DataGroupRecord  `json:"records,omitempty"`
+}
+
+func (p *DataGroup) MarshalJSON() ([]byte, error) {
+	var dto dataGroupDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *DataGroup) UnmarshalJSON(b []byte) error {
+	var dto dataGroupDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+// SnatPools contains a list of every snatpool on the BIG-IP system.
+type SnatPools struct {
+	SnatPools []SnatPool `json:"items"`
+}
+
+// SnatPool contains information about each individual snatpool. You can use all
+// of these fields when modifying a snatpool.
+type SnatPool struct {
+	Name       string   `json:"name,omitempty"`
+	Partition  string   `json:"partition,omitempty"`
+	FullPath   string   `json:"fullPath,omitempty"`
+	Generation int      `json:"generation,omitempty"`
+	Members    []string `json:"members,omitempty"`
 }
 
 // Pools contains a list of pools on the BIG-IP system.
@@ -58,7 +240,14 @@ type Pool struct {
 	QueueOnConnectionLimit string
 	QueueTimeLimit         int
 	ReselectTries          int
+	ServiceDownAction      string
 	SlowRampTime           int
+}
+
+// PoolMember returns the name and state of each pool member of the given pool.
+type PoolMember struct {
+	Name  string
+	State string
 }
 
 // Pool transfer object so we can mask the bool data munging
@@ -84,6 +273,7 @@ type poolDTO struct {
 	QueueOnConnectionLimit string `json:"queueOnConnectionLimit,omitempty"`
 	QueueTimeLimit         int    `json:"queueTimeLimit,omitempty"`
 	ReselectTries          int    `json:"reselectTries,omitempty"`
+	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
 	SlowRampTime           int    `json:"slowRampTime,omitempty"`
 }
 
@@ -144,8 +334,10 @@ type VirtualServer struct {
 	SYNCookieStatus  string    `json:"synCookieStatus,omitempty"`
 	TranslateAddress string    `json:"translateAddress,omitempty"`
 	TranslatePort    string    `json:"translatePort,omitempty"`
+	VlansEnabled     bool      `json:"vlansEnabled,omitempty"`
 	VlansDisabled    bool      `json:"vlansDisabled,omitempty"`
 	VSIndex          int       `json:"vsIndex,omitempty"`
+	Vlans            []string  `json:"vlans,omitempty"`
 	Rules            []string  `json:"rules,omitempty"`
 	Profiles         []Profile `json:"profiles,omitempty"`
 	Policies         []string  `json:"policies,omitempty"`
@@ -633,11 +825,17 @@ const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
 	uriPool           = "pool"
+	uriProfile        = "profile"
+	uriServerSSL      = "server-ssl"
+	uriClientSSL      = "client-ssl"
 	uriVirtual        = "virtual"
 	uriVirtualAddress = "virtual-address"
+	uriSnatPool       = "snatpool"
 	uriMonitor        = "monitor"
 	uriIRule          = "rule"
 	uriPolicy         = "policy"
+	uriDatagroup      = "data-group"
+	uriInternal       = "internal"
 	ENABLED           = "enable"
 	DISABLED          = "disable"
 	CONTEXT_SERVER    = "serverside"
@@ -679,6 +877,160 @@ var cidr = map[string]string{
 	"30": "255.255.255.252",
 	"31": "255.255.255.254",
 	"32": "255.255.255.255",
+}
+
+// SnatPools returns a list of snatpools.
+func (b *BigIP) SnatPools() (*SnatPools, error) {
+	var snatPools SnatPools
+	err, _ := b.getForEntity(&snatPools, uriLtm, uriSnatPool)
+	if err != nil {
+		return nil, err
+	}
+
+	return &snatPools, nil
+}
+
+// CreateSnatPool adds a new snatpool to the BIG-IP system.
+func (b *BigIP) CreateSnatPool(name string, members []string) error {
+	config := &SnatPool{
+		Name:    name,
+		Members: members,
+	}
+
+	return b.post(config, uriLtm, uriSnatPool)
+}
+
+// AddSnatPool adds a new snatpool by config to the BIG-IP system.
+func (b *BigIP) AddSnatPool(config *SnatPool) error {
+
+	return b.post(config, uriLtm, uriSnatPool)
+}
+
+// GetSnatPool retrieves a SnatPool by name. Returns nil if the snatpool does not exist
+func (b *BigIP) GetSnatPool(name string) (*SnatPool, error) {
+	var snatPool SnatPool
+	err, ok := b.getForEntity(&snatPool, uriLtm, uriSnatPool, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &snatPool, nil
+}
+
+// DeleteSnatPool removes a snatpool.
+func (b *BigIP) DeleteSnatPool(name string) error {
+	return b.delete(uriLtm, uriSnatPool, name)
+}
+
+// ModifySnatPool allows you to change any attribute of a snatpool. Fields that
+// can be modified are referenced in the Snatpool struct.
+func (b *BigIP) ModifySnatPool(name string, config *SnatPool) error {
+	return b.put(config, uriLtm, uriSnatPool, name)
+}
+
+// ServerSSLProfiles returns a list of server-ssl profiles.
+func (b *BigIP) ServerSSLProfiles() (*ServerSSLProfiles, error) {
+	var serverSSLProfiles ServerSSLProfiles
+	err, _ := b.getForEntity(&serverSSLProfiles, uriLtm, uriProfile, uriServerSSL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &serverSSLProfiles, nil
+}
+
+// GetServerSSLProfile gets a server-ssl profile by name. Returns nil if the server-ssl profile does not exist
+func (b *BigIP) GetServerSSLProfile(name string) (*ServerSSLProfile, error) {
+	var serverSSLProfile ServerSSLProfile
+	err, ok := b.getForEntity(&serverSSLProfile, uriLtm, uriProfile, uriServerSSL, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &serverSSLProfile, nil
+}
+
+// CreateServerSSLProfile creates a new server-ssl profile on the BIG-IP system.
+func (b *BigIP) CreateServerSSLProfile(name string, parent string) error {
+	config := &ServerSSLProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriProfile, uriServerSSL)
+}
+
+// AddServerSSLProfile adds a new server-ssl profile on the BIG-IP system.
+func (b *BigIP) AddServerSSLProfile(config *ServerSSLProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriServerSSL)
+}
+
+// DeleteServerSSLProfile removes a server-ssl profile.
+func (b *BigIP) DeleteServerSSLProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriServerSSL, name)
+}
+
+// ModifyServerSSLProfile allows you to change any attribute of a sever-ssl profile.
+// Fields that can be modified are referenced in the VirtualServer struct.
+func (b *BigIP) ModifyServerSSLProfile(name string, config *ServerSSLProfile) error {
+	return b.put(config, uriLtm, uriProfile, uriServerSSL, name)
+}
+
+// ClientSSLProfiles returns a list of client-ssl profiles.
+func (b *BigIP) ClientSSLProfiles() (*ClientSSLProfiles, error) {
+	var clientSSLProfiles ClientSSLProfiles
+	err, _ := b.getForEntity(&clientSSLProfiles, uriLtm, uriProfile, uriClientSSL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &clientSSLProfiles, nil
+}
+
+// GetClientSSLProfile gets a client-ssl profile by name. Returns nil if the client-ssl profile does not exist
+func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
+	var clientSSLProfile ClientSSLProfile
+	err, ok := b.getForEntity(&clientSSLProfile, uriLtm, uriProfile, uriClientSSL, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &clientSSLProfile, nil
+}
+
+// CreateClientSSLProfile creates a new client-ssl profile on the BIG-IP system.
+func (b *BigIP) CreateClientSSLProfile(name string, parent string) error {
+	config := &ClientSSLProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriProfile, uriClientSSL)
+}
+
+// AddClientSSLProfile adds a new client-ssl profile on the BIG-IP system.
+func (b *BigIP) AddClientSSLProfile(config *ClientSSLProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriClientSSL)
+}
+
+// DeleteClientSSLProfile removes a client-ssl profile.
+func (b *BigIP) DeleteClientSSLProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriClientSSL, name)
+}
+
+// ModifyClientSSLProfile allows you to change any attribute of a client-ssl profile.
+// Fields that can be modified are referenced in the ClientSSLProfile struct.
+func (b *BigIP) ModifyClientSSLProfile(name string, config *ClientSSLProfile) error {
+	return b.put(config, uriLtm, uriProfile, uriClientSSL, name)
 }
 
 // Nodes returns a list of nodes.
@@ -747,6 +1099,44 @@ func (b *BigIP) NodeStatus(name, state string) error {
 	return b.put(config, uriLtm, uriNode, name)
 }
 
+// InternalDataGroups returns a list of internal data groups.
+func (b *BigIP) InternalDataGroups() (*DataGroups, error) {
+	var dataGroups DataGroups
+	err, _ := b.getForEntity(&dataGroups, uriLtm, uriDatagroup, uriInternal)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dataGroups, nil
+}
+
+func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
+	return b.post(config, uriLtm, uriDatagroup, uriInternal)
+}
+
+func (b *BigIP) DeleteInternalDataGroup(name string) error {
+	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+}
+
+// Modify a named internal data group, REPLACING all the records
+func (b *BigIP) ModifyInternalDataGroupRecords(name string, records *[]DataGroupRecord) error {
+	config := &DataGroup {
+		Records: *records,
+	}
+	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
+}
+
+// Get the internal data group records for a named internal data group
+func (b *BigIP) GetInternalDataGroupRecords(name string) (*[]DataGroupRecord, error) {
+	var dataGroupRecords []DataGroupRecord
+	err, _ := b.getForEntity(&dataGroupRecords, uriLtm, uriDatagroup, uriInternal, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dataGroupRecords, nil
+}
+
 // Pools returns a list of pools.
 func (b *BigIP) Pools() (*Pools, error) {
 	var pools Pools
@@ -758,18 +1148,19 @@ func (b *BigIP) Pools() (*Pools, error) {
 	return &pools, nil
 }
 
-// PoolMembers returns a list of pool members for the given pool.
-func (b *BigIP) PoolMembers(name string) ([]string, error) {
+// PoolMembers returns a list of pool members for the given pool. Contained within the PoolMember
+// struct are the name and state fields.
+func (b *BigIP) PoolMembers(name string) ([]PoolMember, error) {
 	var nodes Nodes
-	members := []string{}
-	errString := []string{}
+	members := []PoolMember{}
 	err, _ := b.getForEntity(&nodes, uriLtm, uriPool, name, "members")
 	if err != nil {
-		return errString, err
+		return nil, err
 	}
 
 	for _, m := range nodes.Nodes {
-		members = append(members, m.Name)
+		member := &PoolMember{Name: m.Name, State: m.State}
+		members = append(members, *member)
 	}
 
 	return members, nil
@@ -935,7 +1326,6 @@ func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%v\n", policies)
 	retval := make([]string, 0, len(policies.PolicyRef.Policies))
 	for _, p := range policies.PolicyRef.Policies {
 		retval = append(retval, p.FullPath)
@@ -976,10 +1366,10 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 	return b.delete(uriLtm, uriVirtualAddress, vaddr)
 }
 
-// Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, and ICMP monitors.
+// Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp"}
 
 	for _, name := range monitorUris {
 		var m Monitors
@@ -996,7 +1386,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 }
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
-// "icmp", or "gateway icmp".
+// "icmp", "gateway icmp", or "tcp".
 func (b *BigIP) CreateMonitor(name, parent string, interval, timeout int, send, receive string) error {
 	config := &Monitor{
 		Name:          name,
@@ -1025,7 +1415,7 @@ func (b *BigIP) DeleteMonitor(name, parent string) error {
 }
 
 // ModifyMonitor allows you to change any attribute of a monitor. <parent> must be
-// one of "http", "https", "icmp", or "gateway icmp". Fields that
+// one of "http", "https", "icmp", "gateway icmp", or "tcp". Fields that
 // can be modified are referenced in the Monitor struct.
 func (b *BigIP) ModifyMonitor(name, parent string, config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
