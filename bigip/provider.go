@@ -59,6 +59,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_vlan":            resourceBigipLtmVlan(),
 			"bigip_ltm_xselfip":         resourceBigipLtmSelfIP(),
 			"bigip_ltm_ntp":             resourceBigipLtmNtp(),
+			"bigip_ltm_dns":             resourceBigipLtmDns(),
 		},
 
 		ConfigureFunc: providerConfigure,

@@ -156,20 +156,9 @@ type RouteDomain struct {
 	Strict     string   `json:"strict,omitempty"`
 	Vlans      []string `json:"vlans,omitempty"`
 }
-type Ntps struct {
-	Ntps []Ntp `json:"items"`
-}
-
-type Ntp struct {
-	Description string `json:"description,omitempty"`
-	Servers     string `json:"servers,omitempty"`
-	Timezone    string `json:"timezone,omitempty"`
-}
 
 const (
-	uriSys         = "sys"
 	uriNet         = "net"
-	uriNtp         = "ntp"
 	uriInterface   = "interface"
 	uriSelf        = "self"
 	uriTrunk       = "trunk"
@@ -225,16 +214,6 @@ func (b *BigIP) CreateSelfIP(name, address, vlan string) error {
 	}
 
 	return b.put(config, uriNet, uriSelf)
-}
-
-func (b *BigIP) CreateNtp(description, servers, timezone string) error {
-	config := &Ntp{
-		Description: description,
-		Servers:     servers,
-		Timezone:    timezone,
-	}
-
-	return b.patch(config, uriSys, uriNtp)
 }
 
 // DeleteSelfIP removes a self IP.

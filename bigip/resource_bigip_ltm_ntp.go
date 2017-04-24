@@ -21,20 +21,22 @@ func resourceBigipLtmNtp() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"description": &schema.Schema{
 				Type:         schema.TypeString,
-				Optional:     true,
+				Required:     true,
 				Description:  "Name of the ntp Servers",
 				ValidateFunc: validateF5Name,
 			},
 
 			"servers": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:        schema.TypeSet,
+				Set:         schema.HashString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
 				Description: "Servers Address",
 			},
 
 			"timezone": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Servers timezone",
 			},
 		},
@@ -46,7 +48,7 @@ func resourceBigipLtmNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
-	servers := d.Get("servers").(string)
+	servers := setToStringSlice(d.Get("servers").(*schema.Set))
 	timezone := d.Get("timezone").(string)
 
 	log.Println("[INFO] Creating Ntp ")

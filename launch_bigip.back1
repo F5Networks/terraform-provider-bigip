@@ -1,0 +1,12 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+resource "bigip_ltm_dns" "dns2" {
+   description = "/Common/dns2"
+   nameServers = "10.10.10.11"
+   numberOfDots = "0"
+   search = "cisco.com"
+}
