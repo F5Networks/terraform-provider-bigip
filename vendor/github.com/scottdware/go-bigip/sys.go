@@ -1,10 +1,10 @@
 package bigip
 
-type Ntps struct {
-	Ntps []Ntp `json:"items"`
+type NTPs struct {
+	NTPs []NTP `json:"items"`
 }
 
-type Ntp struct {
+type NTP struct {
 	Description string   `json:"description,omitempty"`
 	Servers     []string `json:"servers,omitempty"`
 	Timezone    string   `json:"timezone,omitempty"`
@@ -27,14 +27,29 @@ const (
 	uriDNS = "dns"
 )
 
-func (b *BigIP) CreateNtp(description string, servers []string, timezone string) error {
-	config := &Ntp{
+func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
+	config := &NTP{
 		Description: description,
 		Servers:     servers,
 		Timezone:    timezone,
 	}
 
 	return b.patch(config, uriSys, uriNtp)
+}
+
+func (b *BigIP) ModifyNTP(config *NTP) error {
+	return b.put(config, uriSys, uriNtp)
+}
+
+func (b *BigIP) NTPs() (*NTP, error) {
+	var ntp NTP
+	err, _ := b.getForEntity(&ntp, uriSys, uriNtp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &ntp, nil
 }
 
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {
@@ -50,10 +65,6 @@ func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots
 
 func (b *BigIP) ModifyDNS(config *DNS) error {
 	return b.put(config, uriSys, uriDNS)
-}
-
-func (b *BigIP) DeleteDNS(description string) error {
-	return b.delete(uriLtm, uriDNS, description)
 }
 
 func (b *BigIP) DNSs() (*DNS, error) {

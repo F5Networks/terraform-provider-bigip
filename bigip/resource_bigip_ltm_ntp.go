@@ -53,7 +53,7 @@ func resourceBigipLtmNtpCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Println("[INFO] Creating Ntp ")
 
-	err := client.CreateNtp(
+	err := client.CreateNTP(
 		description,
 		servers,
 		timezone,
@@ -67,11 +67,36 @@ func resourceBigipLtmNtpCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipLtmNtpUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
 
-	return nil
+	description := d.Id()
+
+	log.Println("[INFO] Updating DNS " + description)
+
+	r := &bigip.NTP{
+		Description: description,
+		Servers:     setToStringSlice(d.Get("servers").(*schema.Set)),
+		Timezone:    d.Get("timezone").(string),
+	}
+
+	return client.ModifyNTP(r)
 }
 
 func resourceBigipLtmNtpRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	description := d.Id()
+
+	log.Println("[INFO] Reading NTP " + description)
+
+	ntp, err := client.NTPs()
+	if err != nil {
+		return err
+	}
+
+	d.Set("description", ntp.Description)
+	d.Set("servers", ntp.Servers)
+	d.Set("timezone", ntp.Timezone)
 
 	return nil
 }

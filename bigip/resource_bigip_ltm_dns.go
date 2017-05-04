@@ -115,9 +115,8 @@ func resourceBigipLtmDnsRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipLtmDnsDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-	description := d.Id()
-	return client.DeleteIRule(description)
+
+	return nil
 }
 
 func resourceBigipLtmDnsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
