@@ -1,0 +1,462 @@
+{
+    "items": [
+        {
+            "description": "Deployed by appsvcs_integration_v2.0(001)_001 in Standalone mode on 05/04/17 07:58:25",
+            "deviceGroup": "none",
+            "fullPath": "/Common/virtual_server_routing_with_https.app/virtual_server_routing_with_https",
+            "generation": 218,
+            "inheritedDevicegroup": "true",
+            "inheritedTrafficGroup": "true",
+            "kind": "tm:sys:application:service:servicestate",
+            "lists": [
+                {
+                    "encrypted": "no",
+                    "name": "vs__BundledItems"
+                }
+            ],
+            "name": "virtual_server_routing_with_https",
+            "partition": "Common",
+            "selfLink": "https://localhost/mgmt/tm/sys/application/service/~Common~virtual_server_routing_with_https.app~virtual_server_routing_with_https?ver=12.1.1",
+            "strictUpdates": "enabled",
+            "subPath": "virtual_server_routing_with_https.app",
+            "tables": [
+                {
+                    "columnNames": [
+                        "CIDRRange"
+                    ],
+                    "name": "feature__easyL4FirewallBlacklist",
+                    "rows": [
+                        {
+                            "row": [
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "columnNames": [
+                        "CIDRRange"
+                    ],
+                    "name": "feature__easyL4FirewallSourceList",
+                    "rows": [
+                        {
+                            "row": [
+                                "0.0.0.0/0"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "columnNames": [
+                        "Group",
+                        "Target",
+                        "Parameter"
+                    ],
+                    "name": "l7policy__rulesAction",
+                    "rows": [
+                        {
+                            "row": [
+                                "",
+                                "",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "columnNames": [
+                        "Group",
+                        "Operand",
+                        "Negate",
+                        "Condition",
+                        "Value",
+                        "CaseSensitive",
+                        "Missing"
+                    ],
+                    "name": "l7policy__rulesMatch",
+                    "rows": [
+                        {
+                            "row": [
+                                "",
+                                "",
+                                "no",
+                                "equals",
+                                "",
+                                "no",
+                                "no"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "monitor__Monitors"
+                },
+                {
+                    "columnNames": [
+                        "Index",
+                        "IPAddress",
+                        "Port",
+                        "ConnectionLimit",
+                        "Ratio",
+                        "PriorityGroup",
+                        "State",
+                        "AdvOptions"
+                    ],
+                    "name": "pool__Members",
+                    "rows": [
+                        {
+                            "row": [
+                                "0",
+                                "",
+                                "80",
+                                "0",
+                                "1",
+                                "0",
+                                "enabled",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "columnNames": [
+                        "Index",
+                        "Name",
+                        "Description",
+                        "LbMethod",
+                        "Monitor",
+                        "AdvOptions"
+                    ],
+                    "name": "pool__Pools",
+                    "rows": [
+                        {
+                            "row": [
+                                "0",
+                                "",
+                                "",
+                                "round-robin",
+                                "",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "columnNames": [
+                        "Listener",
+                        "Destination"
+                    ],
+                    "name": "vs__Listeners",
+                    "rows": [
+                        {
+                            "row": [
+                                "",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "template": "/Common/appsvcs_integration_v2.0_001_sap_v2",
+            "templateModified": "no",
+            "templateReference": {
+                "link": "https://localhost/mgmt/tm/sys/application/template/~Common~appsvcs_integration_v2.0_001_sap_v2?ver=12.1.1"
+            },
+            "trafficGroup": "/Common/traffic-group-1",
+            "trafficGroupReference": {
+                "link": "https://localhost/mgmt/tm/cm/traffic-group/~Common~traffic-group-1?ver=12.1.1"
+            },
+            "variables": [
+                {
+                    "encrypted": "no",
+                    "name": "extensions__Field1"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "extensions__Field2"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "extensions__Field3"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__easyL4Firewall",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__insertXForwardedFor",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__redirectToHTTPS",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__securityEnableHSTS",
+                    "value": "disabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__sslEasyCipher",
+                    "value": "disabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__statsHTTP",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "feature__statsTLS",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__apmDeployMode",
+                    "value": "preserve-bypass"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__appStats",
+                    "value": "enabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__asmDeployMode",
+                    "value": "preserve-bypass"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__logLevel",
+                    "value": "7"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__mode",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__routeDomain",
+                    "value": "auto"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "iapp__strictUpdates",
+                    "value": "enabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "l7policy__defaultASM",
+                    "value": "bypass"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "l7policy__defaultL7DOS",
+                    "value": "bypass"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "l7policy__strategy",
+                    "value": "/Common/first-match"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "pool__DefaultPoolIndex",
+                    "value": "0"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "pool__MemberDefaultPort",
+                    "value": "80"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "pool__addr",
+                    "value": "2.2.2.2"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "pool__mask",
+                    "value": "255.255.255.255"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "pool__port",
+                    "value": "443"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__AdvOptions"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__AdvPolicies"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__AdvProfiles"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ConnectionLimit",
+                    "value": "0"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__Description"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__IpProtocol",
+                    "value": "tcp"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__Irules"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__Name",
+                    "value": "virtual_server_routing_with_https_default_vs_443"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__OptionConnectionMirroring",
+                    "value": "disabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__OptionSourcePort",
+                    "value": "preserve"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileAccess"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileAnalytics"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientProtocol",
+                    "value": "/Common/tcp-wan-optimized"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSL"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSLAdvOptions"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSLCert",
+                    "value": "/Common/default.crt"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSLChain",
+                    "value": "/Common/ca-bundle.crt"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSLCipherString",
+                    "value": "DEFAULT:!SSLV3"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileClientSSLKey",
+                    "value": "/Common/default.key"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileCompression",
+                    "value": "/Common/httpcompression"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileConnectivity"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileDefaultPersist",
+                    "value": "/Common/cookie"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileFallbackPersist",
+                    "value": "/Common/source_addr"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileHTTP",
+                    "value": "/Common/http"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileOneConnect",
+                    "value": "/Common/oneconnect"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfilePerRequest"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileRequestLogging"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileSecurityDoS"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileSecurityIPBlacklist",
+                    "value": "none"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileSecurityLogProfiles"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileServerProtocol",
+                    "value": "/Common/tcp-lan-optimized"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__ProfileServerSSL"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__RouteAdv",
+                    "value": "disabled"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__SNATConfig",
+                    "value": "automap"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__SourceAddress",
+                    "value": "0.0.0.0/0"
+                },
+                {
+                    "encrypted": "no",
+                    "name": "vs__VirtualAddrAdvOptions"
+                }
+            ]
+        }
+    ],
+    "kind": "tm:sys:application:service:servicecollectionstate",
+    "selfLink": "https://localhost/mgmt/tm/sys/application/service?ver=12.1.1"
+}
+

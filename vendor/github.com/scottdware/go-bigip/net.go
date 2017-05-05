@@ -213,7 +213,7 @@ func (b *BigIP) CreateSelfIP(name, address, vlan string) error {
 		Vlan:    vlan,
 	}
 
-	return b.post(config, uriNet, uriSelf)
+	return b.put(config, uriNet, uriSelf)
 }
 
 // DeleteSelfIP removes a self IP.
