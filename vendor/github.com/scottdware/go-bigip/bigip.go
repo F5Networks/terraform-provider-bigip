@@ -138,6 +138,13 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	} else {
 		format = "%s/mgmt/tm/%s"
 	}
+
+	//if strings.Contains(options.URL, "mgmt/tm/sys/provision") {
+	//format = "%s/%s"
+	//} else {
+	//	format = "%s/mgmt/tm/%s"
+	//}
+
 	url := fmt.Sprintf(format, b.Host, options.URL)
 	body := bytes.NewReader([]byte(options.Body))
 	req, _ = http.NewRequest(strings.ToUpper(options.Method), url, body)

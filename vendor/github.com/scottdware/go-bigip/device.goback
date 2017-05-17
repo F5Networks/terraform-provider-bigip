@@ -1,0 +1,46 @@
+package bigip
+
+type LICs struct {
+	LICs []LIC `json:"items"`
+}
+
+type LIC struct {
+	DeviceAddress string
+	Username      string
+	Password      string
+}
+type LICDTO struct {
+	DeviceAddress string `json:"deviceAddress,omitempty"`
+	Username      string `json:"username,omitempty"`
+	Password      string `json:"password,omitempty"`
+}
+
+const (
+	uriDiv = "device"
+	uriLic = "licensing/pool/purchased-pool/licenses/e0a94ea6-e859-4bec-961d-261c91ef85ad/members"
+)
+
+func (b *BigIP) CreateLIC(deviceAddress string, username string, password string) error {
+	config := &LIC{
+		DeviceAddress: deviceAddress,
+		Username:      username,
+		Password:      password,
+	}
+
+	return b.post(config, uriDiv, uriLic)
+}
+
+func (b *BigIP) ModifyLIC(config *LIC) error {
+	return b.put(config, uriDiv, uriLic)
+}
+
+func (b *BigIP) LICs() (*LIC, error) {
+	var members LIC
+	err, _ := b.getForEntity(&members, uriDiv, uriLic)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &members, nil
+}

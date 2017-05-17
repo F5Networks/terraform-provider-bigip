@@ -1,18 +1,17 @@
 provider "bigip" {
-  address = "10.192.74.79"
+  address = "10.192.74.80"
   username = "admin"
   password = "admin"
 }
 
-resource "bigip_ltm_ntp" "ntp1" {
-  description = "/Common/NTP1"
-  servers = ["time.facebook.com"]
-  timezone = "America/Los_Angeles"
+resource "bigip_ltm_lic" "lic1" {
+  deviceAddress = "10.192.74.55"
+  username = "admin"
+  password = "admin"
+}
+resource "bigip_ltm_lic" "lic2" {
+  deviceAddress = "10.192.74.61"
+  username = "admin"
+  password = "admin"
 }
 
-resource "bigip_ltm_dns" "dns1" {
-   description = "/Common/DNS1"
-   nameServers = ["1.1.1.1"]
-   numberOfDots = 2
-   search = ["f5.com"]
-}
