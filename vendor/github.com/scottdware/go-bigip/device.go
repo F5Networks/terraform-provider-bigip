@@ -14,11 +14,34 @@ type LIC struct {
 	Password      string
 }
 
+type LicensePools struct {
+	LicensePool []LicensePool `json:"items"`
+}
+
+type LicensePool struct {
+	Items []struct {
+		Uuid string `json:"Uuid,omitempty"`
+	}
+}
+
 type LICDTO struct {
 	DeviceAddress string `json:"deviceAddress,omitempty"`
 	Username      string `json:"username,omitempty"`
 	Password      string `json:"password,omitempty"`
 }
+
+// https://10.192.74.80/mgmt/cm/device/licensing/pool/purchased-pool/licenses
+// The above command will spit out license uuid and which should be mapped uriUuid
+const (
+	uriMgmt = "mgmt"
+	uriCm   = "cm"
+	uriDiv  = "device"
+	uriLins = "licensing"
+	uriPoo  = "pool"
+	uriPur  = "purchased-pool"
+	uriLicn = "licenses"
+	uriMemb = "members"
+)
 
 func (p *LIC) MarshalJSON() ([]byte, error) {
 	var dto LICDTO
@@ -35,22 +58,27 @@ func (p *LIC) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
-const (
-	uriMgmt = "mgmt"
-	uriCm   = "cm"
-	uriDiv  = "device"
-	uriLins = "licensing"
-	uriPoo  = "pool"
-	uriPur  = "purchased-pool"
-	uriLicn = "licenses"
-	uriUuid = "e0a94ea6-e859-4bec-961d-261c91ef85ad"
-	uriMemb = "members"
-)
+func (b *BigIP) getLicensePool() (*LicensePool, error) {
+	var licensePool LicensePool
+	err, _ := b.getForEntity(&licensePool, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn)
+	if err != nil {
+		return nil, err
+	}
+	// for loop over all returned license pools to check which one has available licenses
+	// getAvailablePool(member[index_of_array].Uuid)
+	// At the end change return statement to return only the UUID string of the one where license
+	// is availble
+	return &licensePool, nil
+}
 
 // VirtualAddresses returns a list of virtual addresses.
 func (b *BigIP) LIC() (*LIC, error) {
 	var va LIC
-	err, _ := b.getForEntity(&va, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, uriUuid, uriMemb)
+	licensePool, licensePoolErr := b.getLicensePool()
+	if licensePoolErr != nil {
+		return nil, licensePoolErr
+	}
+	err, _ := b.getForEntity(&va, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 	if err != nil {
 		return nil, err
 	}
@@ -64,16 +92,29 @@ func (b *BigIP) CreateLIC(deviceAddress string, username string, password string
 		Password:      password,
 	}
 
-	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, uriUuid, uriMemb)
+	licensePool, licensePoolErr := b.getLicensePool()
+	if licensePoolErr != nil {
+		return licensePoolErr
+	}
+
+	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 }
 
 func (b *BigIP) ModifyLIC(config *LIC) error {
-	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, uriUuid, uriMemb)
+	licensePool, licensePoolErr := b.getLicensePool()
+	if licensePoolErr != nil {
+		return licensePoolErr
+	}
+	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 }
 
 func (b *BigIP) LICs() (*LIC, error) {
 	var members LIC
-	err, _ := b.getForEntity(&members, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, uriUuid, uriMemb)
+	licensePool, licensePoolErr := b.getLicensePool()
+	if licensePoolErr != nil {
+		return nil, licensePoolErr
+	}
+	err, _ := b.getForEntity(&members, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 
 	if err != nil {
 		return nil, err

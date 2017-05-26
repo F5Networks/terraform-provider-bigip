@@ -1,0 +1,1172 @@
+2017/05/25 19:41:08 [INFO] Terraform version: 0.8.1  a54c3478b456502c19be675c17eb58309808ebc1
+2017/05/25 19:41:08 [INFO] CLI args: []string{"/usr/local/bin/terraform", "apply"}
+2017/05/25 19:41:08 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/05/25 19:41:08 [DEBUG] Discovered plugin: bigip = /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
+2017/05/25 19:41:08 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/05/25 19:41:08 [DEBUG] Attempting to open CLI config file: /Users/shitole/.terraformrc
+2017/05/25 19:41:08 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2017/05/25 19:41:08 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/05/25 19:41:08 [TRACE] Preserving existing state lineage "0521a57a-4c2d-4c40-b6e4-d6a91c362552"
+2017/05/25 19:41:08 [TRACE] Preserving existing state lineage "0521a57a-4c2d-4c40-b6e4-d6a91c362552"
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.ConfigTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.OrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.VertexTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.FlattenTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.ProxyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.DestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [DEBUG] Checking resource noop: bigip_license.lic11
+2017/05/25 19:41:08 [DEBUG] No diff, not a noop
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:08 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:08 [DEBUG] Starting graph walk: walkInput
+2017/05/25 19:41:08 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:08 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:08 [TRACE] [walkInput] Entering eval tree: provider.bigip
+2017/05/25 19:41:08 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:08 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:08 [DEBUG] plugin: starting plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip []string{"/Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip"}
+2017/05/25 19:41:12 [DEBUG] plugin: waiting for RPC address for: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 [DEBUG] plugin: plugin address: unix /var/folders/yh/4084gs6x7t78bhqz9qw8cbdjt0h10j/T/plugin168172351
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInputProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkInput] Exiting eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkInput] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:12 [TRACE] [walkInput] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkInput] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkInput] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/05/25 19:41:12 [TRACE] [walkInput] Entering eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/05/25 19:41:12 [TRACE] [walkInput] Exiting eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [INFO] Validating the context...
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ConfigTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.OrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.VertexTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.FlattenTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProxyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.DestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [DEBUG] Checking resource noop: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] No diff, not a noop
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:12 [DEBUG] Starting graph walk: walkValidate
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateCount
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [INFO] Starting shadow graph walk: walkValidate
+2017/05/25 19:41:12 [DEBUG] Waiting for shadow graph to complete...
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateCount
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/05/25 19:41:12 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/05/25 19:41:12 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
+2017/05/25 19:41:12 [INFO] Shadow graph success!
+2017/05/25 19:41:12 [INFO] Validation result: 0 warnings, 0 errors
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ConfigTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.OrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.VertexTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.FlattenTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.ProxyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.DestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_license.lic11 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [DEBUG] Checking resource noop: bigip_license.lic11
+2017/05/25 19:41:12 [DEBUG] No diff, not a noop
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:12 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_license.lic11 - *terraform.GraphNodeConfigResource
+2017/05/25 19:41:12 [DEBUG] Starting graph walk: walkRefresh
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:12 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:12 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 Resource schema
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:12 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:12 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:12 [INFO] Initializing BigIP connection
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalRefresh
+2017/05/25 19:41:13 [DEBUG] refresh: bigip_license.lic11: no state, not refreshing
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
+2017/05/25 19:41:13 [INFO] Starting shadow graph walk: walkRefresh
+2017/05/25 19:41:13 [DEBUG] Waiting for shadow graph to complete...
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.graphNodeExpandedResource
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalRefresh
+2017/05/25 19:41:13 [DEBUG] refresh: bigip_license.lic11: no state, not refreshing
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/05/25 19:41:13 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
+2017/05/25 19:41:13 [INFO] Shadow graph success!
+2017/05/25 19:41:13 [TRACE] ConfigTransformer: Starting for path: []
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ConfigTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OutputTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OrphanResourceTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [TRACE] AttachResourceConfigTransformer: Beginning...
+2017/05/25 19:41:13 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"lic11", Type:"bigip_license", RawCount:(*config.RawConfig)(0xc4203411a0), RawConfig:(*config.RawConfig)(0xc420340ea0), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [DEBUG] Resource state not found for "bigip_license.lic11": bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachStateTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootVariableTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.DisableProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ParentProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Attach provider request: []string{} bigip
+2017/05/25 19:41:13 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc420340b40)}
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "bigip_license.lic11" references: []
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ReferenceTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [DEBUG] Starting graph walk: walkPlan
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 [INFO] Initializing BigIP connection
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ResourceCountTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] OrphanResourceCount: Starting...
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] Resource state not found for "bigip_license.lic11": bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachStateTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "bigip_license.lic11" references: []
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ReferenceTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [INFO] Starting shadow graph walk: walkPlan
+2017/05/25 19:41:13 [DEBUG] Waiting for shadow graph to complete...
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': expanding/walking dynamic subgraph
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ResourceCountTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] OrphanResourceCount: Starting...
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] Resource state not found for "bigip_license.lic11": bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachStateTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "bigip_license.lic11" references: []
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ReferenceTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.NodePlannableResourceInstance
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkPlan] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/05/25 19:41:13 [TRACE] [walkPlan] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [INFO] Shadow graph success!
+2017/05/25 19:41:13 [TRACE] DiffTransformer: starting
+2017/05/25 19:41:13 [TRACE] DiffTransformer: Module: CREATE: bigip_license.lic11
+  deviceAddress: "" => "10.192.74.55"
+  password:      "" => "admin"
+  username:      "" => "admin"
+2017/05/25 19:41:13 [TRACE] DiffTransformer: Resource "bigip_license.lic11": *terraform.InstanceDiff{mu:sync.Mutex{state:0, sema:0x0}, Attributes:map[string]*terraform.ResourceAttrDiff{"deviceAddress":*terraform.ResourceAttrDiff{Old:"", New:"10.192.74.55", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "password":*terraform.ResourceAttrDiff{Old:"", New:"admin", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "id":*terraform.ResourceAttrDiff{Old:"", New:"", NewComputed:true, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:true, Sensitive:false, Type:0x2}, "username":*terraform.ResourceAttrDiff{Old:"", New:"admin", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}}, Destroy:false, DestroyDeposed:false, DestroyTainted:false}
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.DiffTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+2017/05/25 19:41:13 [TRACE] AttachResourceConfigTransformer: Beginning...
+2017/05/25 19:41:13 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"lic11", Type:"bigip_license", RawCount:(*config.RawConfig)(0xc4203411a0), RawConfig:(*config.RawConfig)(0xc420340ea0), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+2017/05/25 19:41:13 [DEBUG] Resource state not found for "bigip_license.lic11": bigip_license.lic11
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachStateTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.DisableProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ParentProviderTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Attach provider request: []string{} bigip
+2017/05/25 19:41:13 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc420340b40)}
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] DestroyEdgeTransformer: Beginning destroy edge transformation...
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.DestroyEdgeTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] CBDEdgeTransformer: Beginning CBD transformation...
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.CBDEdgeTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.graphTransformerMulti:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootVariableTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.OutputTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "bigip_license.lic11" references: []
+2017/05/25 19:41:13 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.ReferenceTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.CountBoundaryTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
+  bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
+  bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_license.lic11 - *terraform.NodeApplyableResource
+  provider.bigip - *terraform.NodeApplyableProvider
+meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
+  bigip_license.lic11 - *terraform.NodeApplyableResource
+provider.bigip - *terraform.NodeApplyableProvider
+2017/05/25 19:41:13 [DEBUG] Starting graph walk: walkApply
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:13 [TRACE] [walkApply] Entering eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 Resource schema
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 [INFO] Initializing BigIP connection
+2017/05/25 19:41:13 [TRACE] [walkApply] Exiting eval tree: provider.bigip
+2017/05/25 19:41:13 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:13 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:13 [TRACE] [walkApply] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:13 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalCompareDiff
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:13 [DEBUG] root: eval: *terraform.EvalApply
+2017/05/25 19:41:13 [DEBUG] apply: bigip_license.lic11: executing Apply
+2017/05/25 19:41:13 [DEBUG] plugin: terraform-provider-bigip: 2017/05/25 19:41:13 [INFO] Creating Lic
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: panic: runtime error: index out of range
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: goroutine 99 [running]:
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: panic(0x5be900, 0xc42000c100)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/runtime/panic.go:500 +0x1a1
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/scottdware/go-bigip.(*BigIP).CreateLIC(0xc420132af0, 0xc42041b4d4, 0xc, 0xc42041b548, 0x5, 0xc42041b528, 0x5, 0xc4202458a8, 0x0)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/scottdware/go-bigip/device.go:80 +0x1a4
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/bigip.resourceBigipLtmLicCreate(0xc420414ea0, 0x65f5a0, 0xc420132af0, 0x5c5840, 0xcaf1)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/bigip/resource_bigip_ltm_lic.go:57 +0x2bc
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Resource).Apply(0xc4202eb260, 0xc420132c80, 0xc4203d3800, 0x65f5a0, 0xc420132af0, 0x1, 0xc4203d1b60, 0x0)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/resource.go:162 +0x30e
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Provider).Apply(0xc4202eb380, 0xc420132c30, 0xc420132c80, 0xc4203d3800, 0x0, 0x18, 0x18)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/provider.go:212 +0x9b
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin.(*ResourceProviderServer).Apply(0xc4203e8200, 0xc4203d32e0, 0xc42041b550, 0x0, 0x0)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin/resource_provider.go:488 +0x57
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.call(0xc420268d80, 0xc4201383e0, 0x13, 0x662341, 0x4, 0xc420301ee0, 0x3, 0x3, 0x949b40, 0xc42013d980, ...)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/reflect/value.go:434 +0x5c8
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.Call(0xc420268d80, 0xc4201383e0, 0x13, 0xc420301ee0, 0x3, 0x3, 0x0, 0xc420233980, 0xc420233920)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/reflect/value.go:302 +0xa4
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: net/rpc.(*service).call(0xc42013dac0, 0xc42013da80, 0xc420137ff0, 0xc42013e800, 0xc4203d2b00, 0x564a40, 0xc4203d32e0, 0x16, 0x564a80, 0xc42041b550, ...)
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/net/rpc/server.go:383 +0x148
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: created by net/rpc.(*Server).ServeCodec
+2017/05/25 19:41:14 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/net/rpc/server.go:477 +0x421
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalApplyPost
+2017/05/25 19:41:14 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
+
+* bigip_license.lic11: unexpected EOF
+2017/05/25 19:41:14 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
+
+* bigip_license.lic11: unexpected EOF
+2017/05/25 19:41:14 [TRACE] [walkApply] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:14 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:14 [INFO] Starting shadow graph walk: walkApply
+2017/05/25 19:41:14 [DEBUG] Waiting for shadow graph to complete...
+2017/05/25 19:41:14 [DEBUG] plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip: plugin process exited
+2017/05/25 19:41:14 [DEBUG] vertex 'root.provider.bigip': walking
+2017/05/25 19:41:14 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/05/25 19:41:14 [TRACE] [walkApply] Entering eval tree: provider.bigip
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/05/25 19:41:14 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:14 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/05/25 19:41:14 [TRACE] [walkApply] Exiting eval tree: provider.bigip
+2017/05/25 19:41:14 [DEBUG] vertex "bigip_license.lic11", got dep: "provider.bigip"
+2017/05/25 19:41:14 [DEBUG] vertex 'root.bigip_license.lic11': walking
+2017/05/25 19:41:14 [DEBUG] vertex 'root.bigip_license.lic11': evaluating
+2017/05/25 19:41:14 [TRACE] [walkApply] Entering eval tree: bigip_license.lic11
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalSequence
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:14 [DEBUG] root: eval: terraform.EvalNoop
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalCompareDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalReadState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalApply
+2017/05/25 19:41:14 [DEBUG] apply: bigip_license.lic11: executing Apply
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalIf
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/05/25 19:41:14 [DEBUG] root: eval: *terraform.EvalApplyPost
+2017/05/25 19:41:14 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
+
+* bigip_license.lic11: unexpected EOF
+2017/05/25 19:41:14 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
+
+* bigip_license.lic11: unexpected EOF
+2017/05/25 19:41:14 [TRACE] [walkApply] Exiting eval tree: bigip_license.lic11
+2017/05/25 19:41:14 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_license.lic11"
+2017/05/25 19:41:14 [ERROR] Shadow graph error: 1 error(s) occurred:
+
+* bigip_license.lic11: unexpected EOF
+2017/05/25 19:41:14 [TRACE] Preserving existing state lineage "0521a57a-4c2d-4c40-b6e4-d6a91c362552"
+2017/05/25 19:41:14 [TRACE] Preserving existing state lineage "0521a57a-4c2d-4c40-b6e4-d6a91c362552"
+2017/05/25 19:41:14 [DEBUG] plugin: waiting for all plugin processes to complete...
