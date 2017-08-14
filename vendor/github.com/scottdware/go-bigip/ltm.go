@@ -611,6 +611,65 @@ type IRule struct {
 	Rule      string `json:"apiAnonymous,omitempty"`
 }
 
+type oneconnectDTO struct {
+	Name                string `json:"name,omitempty"`
+	Partition           string `json:"partition,omitempty"`
+	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
+	IdleTimeoutOverride string `json:"idleTimeoutOverride,omitempty"`
+	MaxAge              int    `json:"maxAge,omitempty"`
+	MaxReuse            int    `json:"maxReuse,omitempty"`
+	MaxSize             int    `json:"maxSize,omitempty"`
+	SourceMask          string `json:"sourceMask,omitempty"`
+	SharePools          string `json:"sharePools,omitempty"`
+}
+type Oneconnects struct {
+	Oneconnects []Oneconnect `json:"items"`
+}
+
+type Oneconnect struct {
+	Name                string
+	Partition           string
+	DefaultsFrom        string
+	IdleTimeoutOverride string
+	MaxAge              int
+	MaxReuse            int
+	MaxSize             int
+	SourceMask          string
+	SharePools          string
+}
+
+type Records struct {
+	Name []string `json:"name,omitempty"`
+}
+
+type Datagroup struct {
+	Name   string
+	Typos  string
+	Record Records
+}
+type Datagroups struct {
+	Datagroups []Datagroup `json:"items"`
+}
+type datagroupDTO struct {
+	Name   string `json:"name,omitempty"`
+	Typos  string `json:"type,omitempty"`
+	Record string `json:"records,omitempty"`
+}
+
+func (p *Datagroup) MarshalJSON() ([]byte, error) {
+	var dto datagroupDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Datagroup) UnmarshalJSON(b []byte) error {
+	var dto datagroupDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
 func (p *Monitor) MarshalJSON() ([]byte, error) {
 	var dto monitorDTO
 	marshal(&dto, p)
@@ -629,6 +688,21 @@ func (p *Monitor) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
+func (p *Oneconnect) MarshalJSON() ([]byte, error) {
+	var dto oneconnectDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Oneconnect) UnmarshalJSON(b []byte) error {
+	var dto oneconnectDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -637,7 +711,11 @@ const (
 	uriVirtualAddress = "virtual-address"
 	uriMonitor        = "monitor"
 	uriIRule          = "rule"
+	uriDatagroup      = "data-group"
+	uriInternal       = "internal"
 	uriPolicy         = "policy"
+	uriProfile        = "profile"
+	uriOneconnect     = "one-connect"
 	ENABLED           = "enable"
 	DISABLED          = "disable"
 	CONTEXT_SERVER    = "serverside"
@@ -1088,6 +1166,37 @@ func (b *BigIP) ModifyIRule(name string, irule *IRule) error {
 	return b.put(irule, uriLtm, uriIRule, name)
 }
 
+func (b *BigIP) Datagroups() (*Datagroup, error) {
+	var datagroup Datagroup
+	err, _ := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriInternal)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &datagroup, nil
+}
+
+// CreateDataGroup adds a new Datagroup to the BIG-IP system.
+func (b *BigIP) CreateDatagroup(name, typos string, records Records) error {
+	config := &Datagroup{
+		Name:   name,
+		Typos:  typos,
+		Record: records,
+	}
+
+	return b.post(config, uriLtm, uriDatagroup, uriInternal)
+}
+
+func (b *BigIP) ModifyDatagroup(name string, config *Datagroup) error {
+	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
+}
+
+// DeleteDatagroup removes a Datagroup entry.
+func (b *BigIP) DeleteDatagroup(name string) error {
+	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+}
+
 func (b *BigIP) Policies() (*Policies, error) {
 	var p Policies
 	err, _ := b.getForEntity(&p, uriLtm, uriPolicy)
@@ -1163,4 +1272,31 @@ func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 //Delete a policy by name.
 func (b *BigIP) DeletePolicy(name string) error {
 	return b.delete(uriLtm, uriPolicy, name)
+}
+
+// Oneconnect profile creation
+func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsFrom, sharePools, sourceMask string, maxAge, maxReuse, maxSize int) error {
+	oneconnect := &Oneconnect{
+		Name:                name,
+		IdleTimeoutOverride: idleTimeoutOverride,
+		Partition:           partition,
+		DefaultsFrom:        defaultsFrom,
+		SharePools:          sharePools,
+		SourceMask:          sourceMask,
+		MaxAge:              maxAge,
+		MaxReuse:            maxReuse,
+		MaxSize:             maxSize,
+	}
+	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
+}
+
+// DeleteOneconnect removes an OneConnect profile from the system.
+func (b *BigIP) DeleteOneconnect(name string) error {
+	return b.delete(uriLtm, uriProfile, uriOneconnect, name)
+}
+
+// ModifyOneconnect updates the given Oneconnect profile with any changed values.
+func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
+	oneconnect.Name = name
+	return b.put(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
 }

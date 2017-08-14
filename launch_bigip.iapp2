@@ -1,0 +1,25 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+resource "aws_cloudformation_stack" "network" {
+
+ name = "network-stack"
+    parameters {
+    availabilityZone1 = "us-east-1a"
+   }
+}
+template_body  = "${file("fullstacklearning.json")}"
+resource "bigip_ltm_iapp" "iapp1"
+
+        {   
+            description = " this is iapp example",
+            deviceGroup = "none",
+            inheritedDevicegroup = "true",
+            inheritedTrafficGroup = "true",
+            template = "/Common/f5.http",
+        }
+
+

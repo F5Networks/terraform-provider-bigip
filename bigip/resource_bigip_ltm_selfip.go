@@ -22,10 +22,10 @@ func resourceBigipLtmSelfIP() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the SelfIP",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the SelfIP",
+				//ValidateFunc: validateF5Name,
 			},
 
 			"ip": &schema.Schema{
@@ -35,14 +35,13 @@ func resourceBigipLtmSelfIP() *schema.Resource {
 			},
 
 			"vlan": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the vlan",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the vlan",
+				//ValidateFunc: validateF5Name,
 			},
 		},
 	}
-
 }
 
 func resourceBigipLtmSelfIPCreate(d *schema.ResourceData, meta interface{}) error {
@@ -54,7 +53,8 @@ func resourceBigipLtmSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 
 	log.Println("[INFO] Creating SelfIP ")
 
-	err := client.CreateSelfIP(name+"-self", ip, vlan)
+	err := client.CreateSelfIP(name, ip, vlan)
+	// err := client.CreateSelfIP(name+"-self", ip, vlan)
 
 	if err != nil {
 		return err
@@ -63,25 +63,74 @@ func resourceBigipLtmSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	d.SetId(name)
 
 	return resourceBigipLtmSelfIPRead(d, meta)
+	// return nil
 }
 
 func resourceBigipLtmSelfIPRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+	log.Println("[INFO] Fetching SelfIP " + name)
+
+	selfIPs, err := client.SelfIPs()
+	if err != nil {
+		return err
+	}
+	for _, selfip := range selfIPs.SelfIPs {
+		log.Println(selfip.Name)
+		if selfip.Name == name {
+			return nil
+		}
+	}
 
 	return nil
 }
 
 func resourceBigipLtmSelfIPExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+	log.Println("[INFO] Fetching SelfIP " + name)
+
+	selfIPs, err := client.SelfIPs()
+	if err != nil {
+		return false, err
+	}
+	for _, selfip := range selfIPs.SelfIPs {
+		log.Println(selfip.Name)
+		if selfip.Name == name {
+			return true, nil
+		}
+	}
 
 	return false, nil
+
 }
 
 func resourceBigipLtmSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+
+	log.Println("[INFO] Updating SelfIP " + name)
+
+	r := &bigip.SelfIP{
+		Name:    name,
+		Address: d.Get("ip").(string),
+		Vlan:    d.Get("vlan").(string),
+	}
+
+	return client.ModifySelfIP(name, r)
+
 }
 
 func resourceBigipLtmSelfIPDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
 
-	return nil
+	log.Println("[INFO] Deleting selfIP " + name)
+
+	return client.DeleteSelfIP(name)
 }
 
 func resourceBigipLtmSelfIPImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

@@ -71,7 +71,7 @@ func resourceBigipLtmNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	description := d.Id()
 
-	log.Println("[INFO] Updating DNS " + description)
+	log.Println("[INFO] Updating NTP " + description)
 
 	r := &bigip.NTP{
 		Description: description,
@@ -102,7 +102,7 @@ func resourceBigipLtmNtpRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipLtmNtpDelete(d *schema.ResourceData, meta interface{}) error {
-
+	/* This function is not supported on BIG-IP, you cannot DELETE NTP API is not supported */
 	return nil
 }
 

@@ -4,10 +4,11 @@ import (
 	"log"
 
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 	"reflect"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})

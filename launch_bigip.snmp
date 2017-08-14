@@ -1,0 +1,12 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+resource "bigip_snmp" "snmp" {
+  sysContact = " NetOPsAdmin s.shitole@f5.com" 
+  sysLocation = "SeattleHQ"
+  allowedAddresses = ["202.10.10.2"]
+}
+
