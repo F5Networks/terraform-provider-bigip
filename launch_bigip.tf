@@ -1,15 +1,14 @@
 provider "bigip" {
-  address = "10.192.74.73"
+/* BIG-IQ CM used to license BIG-IP devices */ 
+  address = "10.192.74.92"
   username = "admin"
   password = "admin"
 }
 
-resource "bigip_snmp_traps" "snmp_traps" {
-name = "snmptraps"
-community = "f5community"
-host = "195.10.10.1"
-description = "Setup snmp traps"
-port = 111
-
+resource "bigip_license_f5bigmstbt10G" "San_Jose_f5bigipmstbt10G" {
+/* BIG-IP at San Jose Licensed */  
+  deviceAddress = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+  unitOfMeasure = "yearly"
 }
-

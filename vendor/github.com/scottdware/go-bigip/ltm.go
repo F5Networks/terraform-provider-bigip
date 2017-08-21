@@ -638,38 +638,50 @@ type Oneconnect struct {
 	SharePools          string
 }
 
-type Records struct {
-	Name []string `json:"name,omitempty"`
+type tcpDTO struct {
+	Name              string `json:"name,omitempty"`
+	Partition         string `json:"partition,omitempty"`
+	DefaultsFrom      string `json:"defaultsFrom,omitempty"`
+	IdleTimeout       int    `json:"idleTimeout,omitempty"`
+	CloseWaitTimeout  int    `json:"closeWaitTimeout,omitempty"`
+	FinWait_2Timeout  int    `json:"finWait_2Timeout,omitempty"`
+	FinWaitTimeout    int    `json:"finWaitTimeout,omitempty"`
+	KeepAliveInterval int    `json:"keepAliveInterval,omitempty"`
+	DeferredAccept    string `json:"deferredAccept,omitempty"`
+	FastOpen          string `json:"fastOpen,omitempty"`
 }
 
-type Datagroup struct {
-	Name   string
-	Typos  string
-	Record Records
+type Tcps struct {
+	Tcps []Tcp `json:"items"`
 }
+
+type Tcp struct {
+	Name              string
+	Partition         string
+	DefaultsFrom      string
+	IdleTimeout       int
+	CloseWaitTimeout  int
+	FinWait_2Timeout  int
+	FinWaitTimeout    int
+	KeepAliveInterval int
+	DeferredAccept    string
+	FastOpen          string
+}
+
+type AddRecords struct {
+	Name string `json:"name,omitempty"`
+	Data string `json:"data,omitempty"`
+}
+
 type Datagroups struct {
 	Datagroups []Datagroup `json:"items"`
 }
-type datagroupDTO struct {
-	Name   string `json:"name,omitempty"`
-	Typos  string `json:"type,omitempty"`
-	Record string `json:"records,omitempty"`
+
+type Datagroup struct {
+	Name string `json:"name,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 
-func (p *Datagroup) MarshalJSON() ([]byte, error) {
-	var dto datagroupDTO
-	marshal(&dto, p)
-	return json.Marshal(dto)
-}
-
-func (p *Datagroup) UnmarshalJSON(b []byte) error {
-	var dto datagroupDTO
-	err := json.Unmarshal(b, &dto)
-	if err != nil {
-		return err
-	}
-	return marshal(p, &dto)
-}
 func (p *Monitor) MarshalJSON() ([]byte, error) {
 	var dto monitorDTO
 	marshal(&dto, p)
@@ -703,6 +715,21 @@ func (p *Oneconnect) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
+func (p *Tcp) MarshalJSON() ([]byte, error) {
+	var dto tcpDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Tcp) UnmarshalJSON(b []byte) error {
+	var dto tcpDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -721,6 +748,7 @@ const (
 	CONTEXT_SERVER    = "serverside"
 	CONTEXT_CLIENT    = "clientside"
 	CONTEXT_ALL       = "all"
+	uriTcp            = "tcp"
 )
 
 var cidr = map[string]string{
@@ -1166,37 +1194,6 @@ func (b *BigIP) ModifyIRule(name string, irule *IRule) error {
 	return b.put(irule, uriLtm, uriIRule, name)
 }
 
-func (b *BigIP) Datagroups() (*Datagroup, error) {
-	var datagroup Datagroup
-	err, _ := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriInternal)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &datagroup, nil
-}
-
-// CreateDataGroup adds a new Datagroup to the BIG-IP system.
-func (b *BigIP) CreateDatagroup(name, typos string, records Records) error {
-	config := &Datagroup{
-		Name:   name,
-		Typos:  typos,
-		Record: records,
-	}
-
-	return b.post(config, uriLtm, uriDatagroup, uriInternal)
-}
-
-func (b *BigIP) ModifyDatagroup(name string, config *Datagroup) error {
-	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
-}
-
-// DeleteDatagroup removes a Datagroup entry.
-func (b *BigIP) DeleteDatagroup(name string) error {
-	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
-}
-
 func (b *BigIP) Policies() (*Policies, error) {
 	var p Policies
 	err, _ := b.getForEntity(&p, uriLtm, uriPolicy)
@@ -1299,4 +1296,61 @@ func (b *BigIP) DeleteOneconnect(name string) error {
 func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 	oneconnect.Name = name
 	return b.put(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
+}
+
+// Create TCP profile for WAN or LAN
+
+func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
+	tcp := &Tcp{
+		Name:              name,
+		Partition:         partition,
+		DefaultsFrom:      defaultsFrom,
+		IdleTimeout:       idleTimeout,
+		CloseWaitTimeout:  closeWaitTimeout,
+		FinWait_2Timeout:  finWait_2Timeout,
+		FinWaitTimeout:    finWaitTimeout,
+		KeepAliveInterval: keepAliveInterval,
+		DeferredAccept:    deferredAccept,
+		FastOpen:          fastOpen,
+	}
+	return b.post(tcp, uriLtm, uriProfile, uriTcp)
+}
+
+// DeleteOneconnect removes an OneConnect profile from the system.
+func (b *BigIP) DeleteTcp(name string) error {
+	return b.delete(uriLtm, uriProfile, uriTcp, name)
+}
+
+// ModifyTcp updates the given Oneconnect profile with any changed values.
+func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
+	tcp.Name = name
+	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
+}
+
+// Vlans returns a list of vlans.
+func (b *BigIP) Datagroups() (*Datagroups, error) {
+	var datagroups Datagroups
+	err, _ := b.getForEntity(&datagroups, uriLtm, uriDatagroup, uriInternal)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &datagroups, nil
+}
+
+// CreateVlan adds a new VLAN to the BIG-IP system.
+func (b *BigIP) CreateDatagroup(typo string, name string) error {
+	config := &Datagroup{
+		Name: name,
+		Type: typo,
+	}
+
+	return b.post(config, uriLtm, uriDatagroup, uriInternal)
+}
+
+func (b *BigIP) AddRecords(name, data string) error {
+	config := &AddRecords{}
+
+	return b.post(config, uriLtm, uriDatagroup, uriInternal, "Datagroups")
 }

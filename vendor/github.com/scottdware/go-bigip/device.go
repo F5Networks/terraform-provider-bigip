@@ -33,14 +33,17 @@ type LICDTO struct {
 // https://10.192.74.80/mgmt/cm/device/licensing/pool/purchased-pool/licenses
 // The above command will spit out license uuid and which should be mapped uriUuid
 const (
-	uriMgmt = "mgmt"
-	uriCm   = "cm"
-	uriDiv  = "device"
-	uriLins = "licensing"
-	uriPoo  = "pool"
-	uriPur  = "purchased-pool"
-	uriLicn = "licenses"
-	uriMemb = "members"
+	uriMgmt          = "mgmt"
+	uriCm            = "cm"
+	uriDiv           = "device"
+	uriLins          = "licensing"
+	uriPoo           = "pool"
+	uriPur           = "purchased-pool"
+	uriLicn          = "licenses"
+	uriMemb          = "members"
+	uriUtility       = "utility"
+	uriOfferings     = "offerings"
+	uriF5BIGMSPBT10G = "f37c66e0-a80d-43e8-924b-3bbe9fe96bbe"
 )
 
 func (p *LIC) MarshalJSON() ([]byte, error) {
