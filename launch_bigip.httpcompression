@@ -1,0 +1,15 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+
+resource "bigip_httpcompress_profile" "sjhttpcompression"
+
+        {
+            name = "/Common/sjhttpcompression"
+            defaultsFrom = "/Common/httpcompression"
+            uriExclude   = ["www.abc.f5.com"]
+            uriInclude   = ["www.xyzbc.cisco.com"]
+        }

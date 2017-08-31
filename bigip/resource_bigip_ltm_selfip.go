@@ -15,7 +15,7 @@ func resourceBigipLtmSelfIP() *schema.Resource {
 		Read:   resourceBigipLtmSelfIPRead,
 		Update: resourceBigipLtmSelfIPUpdate,
 		Delete: resourceBigipLtmSelfIPDelete,
-		Exists: resourceBigipLtmSelfIPExists,
+		//Exists: resourceBigipLtmSelfIPExists,
 		Importer: &schema.ResourceImporter{
 			State: resourceBigipLtmSelfIPImporter,
 		},

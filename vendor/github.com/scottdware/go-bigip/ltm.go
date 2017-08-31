@@ -668,7 +668,95 @@ type Tcp struct {
 	FastOpen          string
 }
 
-type AddRecords struct {
+type fasthttpDTO struct {
+	Name                        string `json:"name,omitempty"`
+	DefaultsFrom                string `json:"defaultsFrom,omitempty"`
+	IdleTimeout                 int    `json:"idleTimeout,omitempty"`
+	ConnpoolIdleTimeoutOverride int    `json:"connpoolIdleTimeoutOverride,omitempty"`
+	ConnpoolMaxReuse            int    `json:"connpoolMaxReuse,omitempty"`
+	ConnpoolMaxSize             int    `json:"connpoolMaxSize,omitempty"`
+	ConnpoolMinSize             int    `json:"connpoolMinSize,omitempty"`
+	ConnpoolReplenish           string `json:"connpoolReplenish,omitempty"`
+	ConnpoolStep                int    `json:"deferredAccept,omitempty"`
+	ForceHttp_10Response        string `json:"forceHttp_10Response,omitempty"`
+	MaxHeaderSize               int    `json:"maxHeaderSize,omitempty"`
+}
+
+type Fasthttps struct {
+	Fasthttps []Fasthttp `json:"items"`
+}
+
+type Fasthttp struct {
+	Name                        string
+	DefaultsFrom                string
+	IdleTimeout                 int
+	ConnpoolIdleTimeoutOverride int
+	ConnpoolMaxReuse            int
+	ConnpoolMaxSize             int
+	ConnpoolMinSize             int
+	ConnpoolReplenish           string
+	ConnpoolStep                int
+	ForceHttp_10Response        string
+	MaxHeaderSize               int
+}
+
+type fastl4DTO struct {
+	Name                  string `json:"name,omitempty"`
+	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
+	ClientTimeout         int    `json:"clientTimeout,omitempty"`
+	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
+	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
+	IdleTimeout           int    `json:"idleTimeout,omitempty"`
+	IpTosToClient         string `json:"ipTosToClient,omitempty"`
+	IpTosToServer         string `json:"ipTosToServer,omitempty"`
+	KeepAliveInterval     string `json:"keepAliveInterval,omitempty"`
+}
+
+type Fastl4s struct {
+	Fastl4s []Fastl4 `json:"items"`
+}
+
+type Fastl4 struct {
+	Name                  string
+	Partition             string
+	DefaultsFrom          string
+	ClientTimeout         int
+	ExplicitFlowMigration string
+	HardwareSynCookie     string
+	IdleTimeout           int
+	IpTosToClient         string
+	IpTosToServer         string
+	KeepAliveInterval     string
+}
+
+type httpcompressDTO struct {
+	Name         string   `json:"name,omitempty"`
+	DefaultsFrom string   `json:"defaultsFrom,omitempty"`
+	UriExclude   []string `json:"uriExclude,omitempty"`
+	UriInclude   []string `json:"uriInclude,omitempty"`
+}
+
+type Httpcompresss struct {
+	Httpcompresss []Httpcompress `json:"items"`
+}
+
+type Httpcompress struct {
+	Name         string
+	DefaultsFrom string
+	UriExclude   []string
+	UriInclude   []string
+}
+
+type Records struct {
+	Name string
+	Data string
+}
+
+type Recordss struct {
+	Recordss []Records `json:"items"`
+}
+
+type RecordsDTO struct {
 	Name string `json:"name,omitempty"`
 	Data string `json:"data,omitempty"`
 }
@@ -678,8 +766,17 @@ type Datagroups struct {
 }
 
 type Datagroup struct {
-	Name string `json:"name,omitempty"`
-	Type string `json:"type,omitempty"`
+	Name    string
+	Type    string
+	Records []Records
+}
+
+type DatagroupDTO struct {
+	Name    string `json:"name,omitempty"`
+	Type    string `json:"type,omitempty"`
+	Records struct {
+		Items []Records `json:"items,omitempty"`
+	} `json:"records,omitempty"`
 }
 
 func (p *Monitor) MarshalJSON() ([]byte, error) {
@@ -730,6 +827,81 @@ func (p *Tcp) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
+func (p *Fasthttp) MarshalJSON() ([]byte, error) {
+	var dto fasthttpDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Fasthttp) UnmarshalJSON(b []byte) error {
+	var dto fasthttpDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Fastl4) MarshalJSON() ([]byte, error) {
+	var dto fastl4DTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Fastl4) UnmarshalJSON(b []byte) error {
+	var dto fastl4DTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Httpcompress) MarshalJSON() ([]byte, error) {
+	var dto httpcompressDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Httpcompress) UnmarshalJSON(b []byte) error {
+	var dto httpcompressDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Datagroup) MarshalJSON() ([]byte, error) {
+	var dto DatagroupDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Datagroup) UnmarshalJSON(b []byte) error {
+	var dto DatagroupDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Records) MarshalJSON() ([]byte, error) {
+	var dto RecordsDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Records) UnmarshalJSON(b []byte) error {
+	var dto RecordsDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -749,6 +921,9 @@ const (
 	CONTEXT_CLIENT    = "clientside"
 	CONTEXT_ALL       = "all"
 	uriTcp            = "tcp"
+	uriFasthttp       = "fasthttp"
+	uriFastl4         = "fastl4"
+	uriHttpcompress   = "http-compression"
 )
 
 var cidr = map[string]string{
@@ -1327,7 +1502,118 @@ func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
-// Vlans returns a list of vlans.
+func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {
+	fasthttp := &Fasthttp{
+		Name:                        name,
+		DefaultsFrom:                defaultsFrom,
+		IdleTimeout:                 idleTimeout,
+		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
+		ConnpoolMaxReuse:            connpoolMaxReuse,
+		ConnpoolMaxSize:             connpoolMaxSize,
+		ConnpoolMinSize:             connpoolMinSize,
+		ConnpoolReplenish:           connpoolReplenish,
+		ConnpoolStep:                connpoolStep,
+		ForceHttp_10Response:        forceHttp_10Response,
+		MaxHeaderSize:               maxHeaderSize,
+	}
+	return b.post(fasthttp, uriLtm, uriProfile, uriFasthttp)
+}
+
+// Delete Fast http removes an Fasthttp profile from the system.
+func (b *BigIP) DeleteFasthttp(name string) error {
+	return b.delete(uriLtm, uriProfile, uriFasthttp, name)
+}
+
+// ModifyFasthttp updates the given Fasthttp profile with any changed values.
+func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
+	fasthttp.Name = name
+	return b.put(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
+}
+
+func (b *BigIP) Fasthttp() (*Fasthttps, error) {
+	var fasthttps Fasthttps
+	err, _ := b.getForEntity(&fasthttps, uriLtm, uriProfile, uriFasthttp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &fasthttps, nil
+}
+
+func (b *BigIP) CreateFastl4(name, partition, defaultsFrom string, clientTimeout int, explicitFlowMigration, hardwareSynCookie string, idleTimeout int, ipTosToClient, ipTosToServer, keepAliveInterval string) error {
+	fastl4 := &Fastl4{
+		Name:                  name,
+		Partition:             partition,
+		DefaultsFrom:          defaultsFrom,
+		ClientTimeout:         clientTimeout,
+		ExplicitFlowMigration: explicitFlowMigration,
+		HardwareSynCookie:     hardwareSynCookie,
+		IdleTimeout:           idleTimeout,
+		IpTosToClient:         ipTosToClient,
+		IpTosToServer:         ipTosToServer,
+		KeepAliveInterval:     keepAliveInterval,
+	}
+	return b.post(fastl4, uriLtm, uriProfile, uriFastl4)
+}
+
+// Delete Fast http removes an Fasthttp profile from the system.
+func (b *BigIP) DeleteFastl4(name string) error {
+	return b.delete(uriLtm, uriProfile, uriFastl4, name)
+}
+
+// ModifyFastl4 updates the given Fastl4 profile with any changed values.
+func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
+	fastl4.Name = name
+	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
+}
+
+func (b *BigIP) Fastl4() (*Fastl4s, error) {
+	var fastl4s Fastl4s
+	err, _ := b.getForEntity(&fastl4s, uriLtm, uriProfile, uriFastl4)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &fastl4s, nil
+}
+
+// ===============
+
+func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude []string) error {
+	httpcompress := &Httpcompress{
+		Name:         name,
+		DefaultsFrom: defaultsFrom,
+		UriExclude:   uriExclude,
+		UriInclude:   uriInclude,
+	}
+	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
+}
+
+// Delete Fast http removes an Fasthttp profile from the system.
+func (b *BigIP) DeleteHttpcompress(name string) error {
+	return b.delete(uriLtm, uriProfile, uriHttpcompress, name)
+}
+
+// ModifyFastl4 updates the given Fastl4 profile with any changed values.
+func (b *BigIP) ModifyHttpcompress(name string, httpcompress *Httpcompress) error {
+	httpcompress.Name = name
+	return b.put(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
+}
+
+func (b *BigIP) Httpcompress() (*Httpcompresss, error) {
+	var httpcompresss Httpcompresss
+	err, _ := b.getForEntity(&httpcompresss, uriLtm, uriProfile, uriHttpcompress)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &httpcompresss, nil
+}
+
+// Datagroups returns a list of datagroups.
 func (b *BigIP) Datagroups() (*Datagroups, error) {
 	var datagroups Datagroups
 	err, _ := b.getForEntity(&datagroups, uriLtm, uriDatagroup, uriInternal)
@@ -1339,18 +1625,23 @@ func (b *BigIP) Datagroups() (*Datagroups, error) {
 	return &datagroups, nil
 }
 
-// CreateVlan adds a new VLAN to the BIG-IP system.
-func (b *BigIP) CreateDatagroup(typo string, name string) error {
+// CreateDatagroup adds a new Datagroup to the BIG-IP system.
+func (b *BigIP) CreateDatagroup(typo, name string, records []Records) error {
 	config := &Datagroup{
-		Name: name,
-		Type: typo,
+		Type:    typo,
+		Name:    name,
+		Records: records,
 	}
 
 	return b.post(config, uriLtm, uriDatagroup, uriInternal)
 }
+func (b *BigIP) Records() (*Records, error) {
+	var records Records
+	err, _ := b.getForEntity(&records, uriLtm, uriDatagroup, uriInternal)
 
-func (b *BigIP) AddRecords(name, data string) error {
-	config := &AddRecords{}
+	if err != nil {
+		return nil, err
+	}
 
-	return b.post(config, uriLtm, uriDatagroup, uriInternal, "Datagroups")
+	return &records, nil
 }

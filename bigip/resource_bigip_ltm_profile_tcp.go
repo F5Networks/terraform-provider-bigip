@@ -33,7 +33,7 @@ func resourceBigipLtmTcp() *schema.Resource {
 			"defaultsFrom": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Use the parent oneconnect profile",
+				Description: "Use the parent tcp profile",
 			},
 
 			"idleTimeout": &schema.Schema{

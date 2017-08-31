@@ -1,14 +1,14 @@
 provider "bigip" {
-/* BIG-IQ CM used to license BIG-IP devices */ 
-  address = "10.192.74.92"
+  address = "10.192.74.73"
   username = "admin"
   password = "admin"
 }
 
-resource "bigip_license_f5bigmstbt10G" "San_Jose_f5bigipmstbt10G" {
-/* BIG-IP at San Jose Licensed */  
-  deviceAddress = "10.192.74.73"
-  username = "admin"
-  password = "admin"
-  unitOfMeasure = "yearly"
+resource "bigip_datagroup" "datagroup1" {
+  name = "dgx8"
+  type = "string"
+  records  {
+   name = "xyx.f5.com"
+   data = "pool100"
+   }
 }

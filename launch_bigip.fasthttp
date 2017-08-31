@@ -1,0 +1,22 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+
+resource "bigip_fasthttp_profile" "sjfasthttpprofile"
+
+        {
+            name = "sjfasthttpprofile"
+            defaultsFrom = "/Common/fasthttp"
+            idleTimeout = 300
+            connpoolIdleTimeoutOverride	= 0
+            connpoolMaxReuse = 2
+            connpoolMaxSize  = 2048
+            connpoolMinSize = 0
+            connpoolReplenish = "enabled"
+            connpoolStep = 4
+            forceHttp_10Response = "disabled"
+            maxHeaderSize = 32768
+      }

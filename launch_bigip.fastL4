@@ -1,0 +1,21 @@
+provider "bigip" {
+  address = "10.192.74.73"
+  username = "admin"
+  password = "admin"
+}
+
+
+resource "bigip_fastl4_profile" "sjfastl4profile"
+
+        {
+            name = "/Common/sjfastl4profile"
+            partition = "Common"
+            defaultsFrom = "/Common/fastL4"
+            clientTimeout = 40
+            explicitFlowMigration = "enabled"
+            hardwareSynCookie = "enabled"
+            idleTimeout = 200
+            ipTosToClient = "pass-through"
+            ipTosToServer = "pass-through"
+            keepAliveInterval = "disabled"  //This cannot take enabled
+        }

@@ -84,12 +84,12 @@ resource "bigip_ltm_pool"  "pool" {
 }
 
 resource "bigip_ltm_virtual_server" "http" {
+	pool = "/Common/terraform-pool"
         name = "/Common/terraform_vs_http"
 	destination = "100.1.1.100"
 	port = 80
-	pool = "/Common/terraform-pool"
 	source_address_translation = "automap"
-        depends_on = ["bigip_ltm_provision.provision-afm"]
+        depends_on = ["bigip_ltm_pool.pool"]
 }
 
 
