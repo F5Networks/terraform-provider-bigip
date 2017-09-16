@@ -4,10 +4,10 @@ provider "bigip" {
   password = "admin"
 }
 resource "bigip_syslog" "sys1" {
-  remoteServers = {
+  remote_servers = {
   	name = "/Common/sanjay"
   	host = "myserver1.com"
-    remotePort = 514
+    remote_port = 514
  }
 }
 

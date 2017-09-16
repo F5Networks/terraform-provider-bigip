@@ -10,13 +10,13 @@ resource "bigip_ltm_oneconnect" "oneconnect-sanjose"
         {  
             name = "sanjose"
             partition = "Common"
-            defaultsFrom = "/Common/oneconnect"
-            idleTimeoutOverride = "disabled"
-            maxAge = 3600
-            maxReuse = 1000
-            maxSize = 1000
-            sharePools = "disabled"
-            sourceMask = "255.255.255.255"
+            defaults_from = "/Common/oneconnect"
+            idler_timeout_override = "disabled"
+            max_age = 3600
+            max_reuse = 1000
+            max_size = 1000
+            sharer_pools = "disabled"
+            source_mask = "255.255.255.255"
         }
 
 

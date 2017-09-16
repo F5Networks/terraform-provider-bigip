@@ -9,13 +9,13 @@ resource "bigip_tcp_profile" "sanjose-tcp-lan-profile"
 
         {  
             name = "sanjose-tcp-lan-profile"
-            idleTimeout = 200
-            closeWaitTimeout = 5
-            finWait_2Timeout = 5
-            finWaitTimeout = 300
-            keepAliveInterval = 1700
-            deferredAccept = "enabled"
-            fastOpen = "enabled"
+            idle_timeout = 200
+            close_wait_timeout = 5
+            finwait_2timeout = 5
+            finwait_timeout = 300
+            keepalive_interval = 1700
+            deferred_accept = "enabled"
+            fast_open = "enabled"
         }
 
 

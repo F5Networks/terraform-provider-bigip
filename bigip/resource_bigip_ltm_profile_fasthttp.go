@@ -26,60 +26,60 @@ func resourceBigipLtmFasthttp() *schema.Resource {
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaultsFrom": &schema.Schema{
+			"defaults_from": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fasthttp profile",
 			},
 
-			"idleTimeout": &schema.Schema{
+			"idle_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
 			},
 
-			"connpoolIdleTimeoutOverride": &schema.Schema{
+			"connpoolidle_timeoutoverride": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "idleTimeout can be given value",
+				Description: "idle_timeout can be given value",
 			},
 
-			"connpoolMaxReuse": &schema.Schema{
+			"connpool_maxreuse": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "connpoolMaxReuse timer",
+				Description: "connpool_maxreuse timer",
 			},
 
-			"connpoolMaxSize": &schema.Schema{
+			"connpool_maxsize": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "timer integer",
 			},
 
-			"connpoolMinSize": &schema.Schema{
+			"connpool_minsize": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Pool min size",
 			},
 
-			"connpoolReplenish": &schema.Schema{
+			"connpool_replenish": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "enabled or disabled",
 			},
 
-			"connpoolStep": &schema.Schema{
+			"connpool_step": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
 			},
-			"forceHttp_10Response": &schema.Schema{
+			"forcehttp_10response": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "disabled or enabled ",
 			},
 
-			"maxHeaderSize": &schema.Schema{
+			"maxheader_size": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
@@ -93,16 +93,16 @@ func resourceBigipLtmFasthttpCreate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	defaultsFrom := d.Get("defaultsFrom").(string)
-	idleTimeout := d.Get("idleTimeout").(int)
-	connpoolIdleTimeoutOverride := d.Get("connpoolIdleTimeoutOverride").(int)
-	connpoolMaxReuse := d.Get("connpoolMaxReuse").(int)
-	connpoolMaxSize := d.Get("connpoolMaxSize").(int)
-	connpoolMinSize := d.Get("connpoolMinSize").(int)
-	connpoolReplenish := d.Get("connpoolReplenish").(string)
-	connpoolStep := d.Get("connpoolStep").(int)
-	forceHttp_10Response := d.Get("forceHttp_10Response").(string)
-	maxHeaderSize := d.Get("maxHeaderSize").(int)
+	defaultsFrom := d.Get("defaults_from").(string)
+	idleTimeout := d.Get("idle_timeout").(int)
+	connpoolIdleTimeoutOverride := d.Get("connpoolidle_timeoutoverride").(int)
+	connpoolMaxReuse := d.Get("connpool_maxreuse").(int)
+	connpoolMaxSize := d.Get("connpool_maxsize").(int)
+	connpoolMinSize := d.Get("connpool_minsize").(int)
+	connpoolReplenish := d.Get("connpool_replenish").(string)
+	connpoolStep := d.Get("connpool_step").(int)
+	forceHttp_10Response := d.Get("forcehttp_10response").(string)
+	maxHeaderSize := d.Get("maxheader_size").(int)
 	log.Println("[INFO] Creating Fasthttp profile")
 
 	err := client.CreateFasthttp(
@@ -135,16 +135,16 @@ func resourceBigipLtmFasthttpUpdate(d *schema.ResourceData, meta interface{}) er
 
 	r := &bigip.Fasthttp{
 		Name:                        name,
-		DefaultsFrom:                d.Get("defaultsFrom").(string),
-		IdleTimeout:                 d.Get("idleTimeout").(int),
-		ConnpoolIdleTimeoutOverride: d.Get("connpoolIdleTimeoutOverride").(int),
-		ConnpoolMaxReuse:            d.Get("connpoolMaxReuse").(int),
-		ConnpoolMaxSize:             d.Get("connpoolMaxSize").(int),
-		ConnpoolMinSize:             d.Get("connpoolMinSize").(int),
-		ConnpoolReplenish:           d.Get("connpoolReplenish").(string),
-		ConnpoolStep:                d.Get("connpoolStep").(int),
-		ForceHttp_10Response:        d.Get("forceHttp_10Response").(string),
-		MaxHeaderSize:               d.Get("maxHeaderSize").(int),
+		DefaultsFrom:                d.Get("defaults_from").(string),
+		IdleTimeout:                 d.Get("idle_timeout").(int),
+		ConnpoolIdleTimeoutOverride: d.Get("connpoolidle_timeoutoverride").(int),
+		ConnpoolMaxReuse:            d.Get("connpool_maxreuse").(int),
+		ConnpoolMaxSize:             d.Get("connpool_maxsize").(int),
+		ConnpoolMinSize:             d.Get("connpool_minsize").(int),
+		ConnpoolReplenish:           d.Get("connpool_replenish").(string),
+		ConnpoolStep:                d.Get("connpool_step").(int),
+		ForceHttp_10Response:        d.Get("forcehttp_10response").(string),
+		MaxHeaderSize:               d.Get("maxheader_size").(int),
 	}
 
 	return client.ModifyFasthttp(name, r)

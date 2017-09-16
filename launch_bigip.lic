@@ -7,26 +7,26 @@ provider "bigip" {
 
 resource "bigip_license" "San_Jose" {
 /* BIG-IP at San Jose Licensed */  
-  deviceAddress = "10.192.74.55"
+  device_address = "10.192.74.55"
   username = "admin"
   password = "admin"
 }
 resource "bigip_license" "New_York" {
 /* BIG-IP at New York  Licensed */  
-  deviceAddress = "10.192.74.61"
+  device_address = "10.192.74.61"
   username = "admin"
   password = "admin"
 }
 resource "bigip_license" "San_Antonio" {
 /* BIG-IP at San Antonio Licensed */  
-  deviceAddress = "10.192.74.73"
+  device_address = "10.192.74.73"
   username = "admin"
   password = "admin"
 }
 
 resource "bigip_license" "Seattle" {
 /* BIG-IP at Seattle Licensed */
-  deviceAddress = "10.192.74.81"
+  device_address = "10.192.74.81"
   username = "admin"
   password = "admin"
 }

@@ -5,8 +5,8 @@ provider "bigip" {
 }
 
 resource "bigip_snmp" "snmp" {
-  sysContact = " NetOPsAdmin s.shitole@f5.com" 
-  sysLocation = "SeattleHQ"
-  allowedAddresses = ["202.10.10.2"]
+  sys_contact = " NetOPsAdmin s.shitole@f5.com" 
+  sys_location = "SeattleHQ"
+  allowedaddresses = ["202.10.10.2"]
 }
 

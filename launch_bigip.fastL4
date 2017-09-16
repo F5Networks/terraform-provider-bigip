@@ -10,12 +10,12 @@ resource "bigip_fastl4_profile" "sjfastl4profile"
         {
             name = "/Common/sjfastl4profile"
             partition = "Common"
-            defaultsFrom = "/Common/fastL4"
-            clientTimeout = 40
-            explicitFlowMigration = "enabled"
-            hardwareSynCookie = "enabled"
-            idleTimeout = 200
-            ipTosToClient = "pass-through"
-            ipTosToServer = "pass-through"
-            keepAliveInterval = "disabled"  //This cannot take enabled
+            defaults_from = "/Common/fastL4"
+            client_timeout = 40
+            explicitflow_migration = "enabled"
+            hardware_syncookie = "enabled"
+            idle_timeout = 200
+            iptos_toclient = "pass-through"
+            iptos_toserver = "pass-through"
+            keepalive_interval = "disabled"  //This cannot take enabled
         }

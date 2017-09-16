@@ -1,1218 +1,1233 @@
-2017/08/31 15:20:15 [INFO] Terraform version: 0.8.1  a54c3478b456502c19be675c17eb58309808ebc1
-2017/08/31 15:20:15 [INFO] CLI args: []string{"/usr/local/bin/terraform", "apply"}
-2017/08/31 15:20:15 [DEBUG] Detected home directory from env var: /Users/shitole
-2017/08/31 15:20:15 [DEBUG] Discovered plugin: bigip = /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
-2017/08/31 15:20:15 [DEBUG] Detected home directory from env var: /Users/shitole
-2017/08/31 15:20:15 [DEBUG] Attempting to open CLI config file: /Users/shitole/.terraformrc
-2017/08/31 15:20:15 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
-2017/08/31 15:20:15 [DEBUG] Detected home directory from env var: /Users/shitole
-2017/08/31 15:20:15 [TRACE] Preserving existing state lineage "95330def-b3db-4c87-83a1-c4472a0bde36"
-2017/08/31 15:20:15 [TRACE] Preserving existing state lineage "95330def-b3db-4c87-83a1-c4472a0bde36"
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ConfigTransformerOld:
+2017/09/15 14:55:48 [INFO] Terraform version: 0.8.1  a54c3478b456502c19be675c17eb58309808ebc1
+2017/09/15 14:55:48 [INFO] CLI args: []string{"/usr/local/bin/terraform", "apply"}
+2017/09/15 14:55:48 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/09/15 14:55:48 [DEBUG] Discovered plugin: bigip = /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
+2017/09/15 14:55:48 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/09/15 14:55:48 [DEBUG] Attempting to open CLI config file: /Users/shitole/.terraformrc
+2017/09/15 14:55:48 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2017/09/15 14:55:48 [DEBUG] Detected home directory from env var: /Users/shitole
+2017/09/15 14:55:48 [DEBUG] New state was assigned lineage "8c0c734f-d7ec-4307-80a9-cb3779e395cf"
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ConfigTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProvisionerTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.VertexTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.VertexTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.FlattenTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.FlattenTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProxyTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProxyTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DestroyTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DestroyTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
   provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
   provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [DEBUG] Checking resource noop: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] No diff, not a noop
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+2017/09/15 14:55:48 [DEBUG] Checking resource noop: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] No diff, not a noop
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneNoopTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [DEBUG] Starting graph walk: walkInput
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkInput] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] plugin: starting plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip []string{"/Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip"}
-2017/08/31 15:20:15 [DEBUG] plugin: waiting for RPC address for: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 [DEBUG] plugin: plugin address: unix /var/folders/yh/4084gs6x7t78bhqz9qw8cbdjt0h10j/T/plugin529369256
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInputProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkInput] Exiting eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkInput] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:15 [TRACE] [walkInput] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkInput] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkInput] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
-2017/08/31 15:20:15 [TRACE] [walkInput] Entering eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCloseProvider
-2017/08/31 15:20:15 [TRACE] [walkInput] Exiting eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [INFO] Validating the context...
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ConfigTransformerOld:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProvisionerTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.VertexTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.FlattenTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProxyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [DEBUG] Checking resource noop: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] No diff, not a noop
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneNoopTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [DEBUG] Starting graph walk: walkInput
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkInput] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] plugin: starting plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip []string{"/Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip"}
+2017/09/15 14:55:48 [DEBUG] plugin: waiting for RPC address for: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 [DEBUG] plugin: plugin address: unix /var/folders/yh/4084gs6x7t78bhqz9qw8cbdjt0h10j/T/plugin838063276
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInputProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkInput] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkInput] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkInput] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkInput] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkInput] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/09/15 14:55:48 [TRACE] [walkInput] Entering eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/09/15 14:55:48 [TRACE] [walkInput] Exiting eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [INFO] Validating the context...
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ConfigTransformerOld:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.VertexTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.FlattenTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProxyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [DEBUG] Checking resource noop: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] No diff, not a noop
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [DEBUG] Starting graph walk: walkValidate
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateCount
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCloseProvider
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [INFO] Starting shadow graph walk: walkValidate
-2017/08/31 15:20:15 [DEBUG] Waiting for shadow graph to complete...
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateCount
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
-2017/08/31 15:20:15 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCloseProvider
-2017/08/31 15:20:15 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [INFO] Shadow graph success!
-2017/08/31 15:20:15 [INFO] Validation result: 0 warnings, 0 errors
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ConfigTransformerOld:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProvisionerTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.VertexTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.FlattenTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProxyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-bigip_datagroup.datagroup1 (destroy) - *terraform.graphNodeResourceDestroy
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [DEBUG] Checking resource noop: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] No diff, not a noop
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.PruneNoopTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProviderTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip - *terraform.GraphNodeConfigProvider
-provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-  provider.bigip - *terraform.GraphNodeConfigProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
-
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
   provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip - *terraform.GraphNodeConfigProvider
 provider.bigip (close) - *terraform.graphNodeCloseProvider
-  bigip_datagroup.datagroup1 - *terraform.GraphNodeConfigResource
-2017/08/31 15:20:15 [DEBUG] Starting graph walk: walkRefresh
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 [INFO] Initializing BigIP connection
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [DEBUG] Starting graph walk: walkValidate
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateCount
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalRefresh
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCloseProvider
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [INFO] Starting shadow graph walk: walkRefresh
-2017/08/31 15:20:15 [DEBUG] Waiting for shadow graph to complete...
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [INFO] Starting shadow graph walk: walkValidate
+2017/09/15 14:55:48 [DEBUG] Waiting for shadow graph to complete...
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateCount
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.graphNodeExpandedResource
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalRefresh
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalCloseProvider
-2017/08/31 15:20:15 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
-2017/08/31 15:20:15 [INFO] Shadow graph success!
-2017/08/31 15:20:15 [TRACE] ConfigTransformer: Starting for path: []
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ConfigTransformer:
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/09/15 14:55:48 [TRACE] [walkValidate] Entering eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/09/15 14:55:48 [TRACE] [walkValidate] Exiting eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [INFO] Shadow graph success!
+2017/09/15 14:55:48 [INFO] Validation result: 0 warnings, 0 errors
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ConfigTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OutputTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.OrphanResourceTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AddOutputOrphanTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [TRACE] AttachResourceConfigTransformer: Beginning...
-2017/08/31 15:20:15 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_datagroup.datagroup1
-2017/08/31 15:20:15 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"datagroup1", Type:"bigip_datagroup", RawCount:(*config.RawConfig)(0xc420343c20), RawConfig:(*config.RawConfig)(0xc4203436e0), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [DEBUG] Attaching resource state to "bigip_datagroup.datagroup1": Type = bigip_datagroup
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AttachStateTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootVariableTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DisableProviderTransformerOld:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProvisionerTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProvisionerTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.VertexTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.FlattenTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProxyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CreateBeforeDestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+bigip_ltm_dns.dns1 (destroy) - *terraform.graphNodeResourceDestroy
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneDestroyTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [DEBUG] Checking resource noop: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] No diff, not a noop
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.PruneNoopTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CloseProvisionerTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+  provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip - *terraform.GraphNodeConfigProvider
+provider.bigip (close) - *terraform.graphNodeCloseProvider
+  bigip_ltm_dns.dns1 - *terraform.GraphNodeConfigResource
+2017/09/15 14:55:48 [DEBUG] Starting graph walk: walkRefresh
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 [INFO] Initializing BigIP connection
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalRefresh
+2017/09/15 14:55:48 [DEBUG] refresh: bigip_ltm_dns.dns1: no state, not refreshing
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [INFO] Starting shadow graph walk: walkRefresh
+2017/09/15 14:55:48 [DEBUG] Waiting for shadow graph to complete...
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformerOld:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.graphNodeExpandedResource
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalRefresh
+2017/09/15 14:55:48 [DEBUG] refresh: bigip_ltm_dns.dns1: no state, not refreshing
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "provider.bigip (close)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip (close)': evaluating
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Entering eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCloseProvider
+2017/09/15 14:55:48 [TRACE] [walkRefresh] Exiting eval tree: provider.bigip (close)
+2017/09/15 14:55:48 [INFO] Shadow graph success!
+2017/09/15 14:55:48 [TRACE] ConfigTransformer: Starting for path: []
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ConfigTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OutputTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanResourceTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [TRACE] AttachResourceConfigTransformer: Beginning...
+2017/09/15 14:55:48 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"dns1", Type:"bigip_ltm_dns", RawCount:(*config.RawConfig)(0xc420382cc0), RawConfig:(*config.RawConfig)(0xc420382900), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [DEBUG] Resource state not found for "bigip_ltm_dns.dns1": bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachStateTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootVariableTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.DisableProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DisableProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ParentProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ParentProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Attach provider request: []string{} bigip
-2017/08/31 15:20:15 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc420343380)}
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
+2017/09/15 14:55:48 [TRACE] Attach provider request: []string{} bigip
+2017/09/15 14:55:48 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc4203825a0)}
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [DEBUG] ReferenceTransformer: "bigip_datagroup.datagroup1" references: []
-2017/08/31 15:20:15 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.ReferenceTransformer:
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "bigip_ltm_dns.dns1" references: []
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ReferenceTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TargetsTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.RootTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResource
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:15 [DEBUG] Starting graph walk: walkPlan
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:15 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:15 [TRACE] [walkPlan] Entering eval tree: provider.bigip
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 Resource schema
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:15 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:15 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:15 [INFO] Initializing BigIP connection
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkPlan] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ResourceCountTransformer:
+2017/09/15 14:55:48 [DEBUG] Starting graph walk: walkPlan
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 [INFO] Initializing BigIP connection
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] OrphanResourceCount: Starting...
-2017/08/31 15:20:16 [TRACE] OrphanResourceCount: Checking: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] OrphanResourceCount: Starting...
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] Attaching resource state to "bigip_datagroup.datagroup1": Type = bigip_datagroup
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.AttachStateTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] Resource state not found for "bigip_ltm_dns.dns1": bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachStateTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.TargetsTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] ReferenceTransformer: "bigip_datagroup.datagroup1" references: []
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ReferenceTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "bigip_ltm_dns.dns1" references: []
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ReferenceTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.RootTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkPlan] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteDiff
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [INFO] Starting shadow graph walk: walkPlan
-2017/08/31 15:20:16 [DEBUG] Waiting for shadow graph to complete...
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:16 [TRACE] [walkPlan] Entering eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkPlan] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': expanding/walking dynamic subgraph
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ResourceCountTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [INFO] Starting shadow graph walk: walkPlan
+2017/09/15 14:55:48 [DEBUG] Waiting for shadow graph to complete...
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountCheckComputed
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCountFixZeroOneBoundary
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': expanding/walking dynamic subgraph
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ResourceCountTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] OrphanResourceCount: Starting...
-2017/08/31 15:20:16 [TRACE] OrphanResourceCount: Checking: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] OrphanResourceCount: Starting...
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanResourceCountTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] Attaching resource state to "bigip_datagroup.datagroup1": Type = bigip_datagroup
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.AttachStateTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] Resource state not found for "bigip_ltm_dns.dns1": bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachStateTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.TargetsTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TargetsTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] ReferenceTransformer: "bigip_datagroup.datagroup1" references: []
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ReferenceTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "bigip_ltm_dns.dns1" references: []
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ReferenceTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.RootTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodePlannableResourceInstance
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkPlan] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteDiff
-2017/08/31 15:20:16 [TRACE] [walkPlan] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [INFO] Shadow graph success!
-2017/08/31 15:20:16 [TRACE] DiffTransformer: starting
-2017/08/31 15:20:16 [TRACE] DiffTransformer: Module: UPDATE: bigip_datagroup.datagroup1
-  name: "dgx7" => "dgx8"
-2017/08/31 15:20:16 [TRACE] DiffTransformer: Resource "bigip_datagroup.datagroup1": *terraform.InstanceDiff{mu:sync.Mutex{state:0, sema:0x0}, Attributes:map[string]*terraform.ResourceAttrDiff{"name":*terraform.ResourceAttrDiff{Old:"dgx7", New:"dgx8", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}}, Destroy:false, DestroyDeposed:false, DestroyTainted:false}
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.DiffTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodePlannableResourceInstance
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkPlan] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCheckPreventDestroy
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/09/15 14:55:48 [TRACE] [walkPlan] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [INFO] Shadow graph success!
+2017/09/15 14:55:48 [TRACE] DiffTransformer: starting
+2017/09/15 14:55:48 [TRACE] DiffTransformer: Module: CREATE: bigip_ltm_dns.dns1
+  description:           "" => "/Common/DNS1"
+  nameservers.#:         "0" => "1"
+  nameservers.218290772: "" => "1.1.1.1"
+  numberOfDots:          "" => "2"
+  search.#:              "0" => "1"
+  search.3719609835:     "" => "f5.com"
+2017/09/15 14:55:48 [TRACE] DiffTransformer: Resource "bigip_ltm_dns.dns1": *terraform.InstanceDiff{mu:sync.Mutex{state:0, sema:0x0}, Attributes:map[string]*terraform.ResourceAttrDiff{"search.3719609835":*terraform.ResourceAttrDiff{Old:"", New:"f5.com", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "id":*terraform.ResourceAttrDiff{Old:"", New:"", NewComputed:true, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:true, Sensitive:false, Type:0x2}, "description":*terraform.ResourceAttrDiff{Old:"", New:"/Common/DNS1", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "nameservers.218290772":*terraform.ResourceAttrDiff{Old:"", New:"1.1.1.1", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "nameservers.#":*terraform.ResourceAttrDiff{Old:"0", New:"1", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "numberOfDots":*terraform.ResourceAttrDiff{Old:"", New:"2", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}, "search.#":*terraform.ResourceAttrDiff{Old:"0", New:"1", NewComputed:false, NewRemoved:false, NewExtra:interface {}(nil), RequiresNew:false, Sensitive:false, Type:0x0}}, Destroy:false, DestroyDeposed:false, DestroyTainted:false}
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DiffTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OrphanOutputTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
-2017/08/31 15:20:16 [TRACE] AttachResourceConfigTransformer: Beginning...
-2017/08/31 15:20:16 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"datagroup1", Type:"bigip_datagroup", RawCount:(*config.RawConfig)(0xc420343c20), RawConfig:(*config.RawConfig)(0xc4203436e0), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
+2017/09/15 14:55:48 [TRACE] AttachResourceConfigTransformer: Beginning...
+2017/09/15 14:55:48 [TRACE] AttachResourceConfigTransformer: Attach resource config request: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Attaching resource config: &config.Resource{Mode:0, Name:"dns1", Type:"bigip_ltm_dns", RawCount:(*config.RawConfig)(0xc420382cc0), RawConfig:(*config.RawConfig)(0xc420382900), Provisioners:[]*config.Provisioner(nil), Provider:"", DependsOn:[]string(nil), Lifecycle:config.ResourceLifecycle{CreateBeforeDestroy:false, PreventDestroy:false, IgnoreChanges:[]string(nil)}}
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachResourceConfigTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
-2017/08/31 15:20:16 [DEBUG] Attaching resource state to "bigip_datagroup.datagroup1": Type = bigip_datagroup
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.AttachStateTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
+2017/09/15 14:55:48 [DEBUG] Resource state not found for "bigip_ltm_dns.dns1": bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachStateTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.MissingProviderTransformer:
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.MissingProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.DisableProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DisableProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ParentProviderTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ParentProviderTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Attach provider request: []string{} bigip
-2017/08/31 15:20:16 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc420343380)}
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
+2017/09/15 14:55:48 [TRACE] Attach provider request: []string{} bigip
+2017/09/15 14:55:48 [TRACE] Attaching provider config: *config.ProviderConfig{Name:"bigip", Alias:"", RawConfig:(*config.RawConfig)(0xc4203825a0)}
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.AttachProviderConfigTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] DestroyEdgeTransformer: Beginning destroy edge transformation...
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.DestroyEdgeTransformer:
+2017/09/15 14:55:48 [TRACE] DestroyEdgeTransformer: Beginning destroy edge transformation...
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.DestroyEdgeTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] CBDEdgeTransformer: Beginning CBD transformation...
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.CBDEdgeTransformer:
+2017/09/15 14:55:48 [TRACE] CBDEdgeTransformer: Beginning CBD transformation...
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CBDEdgeTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.graphTransformerMulti:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.graphTransformerMulti:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.RootVariableTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootVariableTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.OutputTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.OutputTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ModuleVariableTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [DEBUG] ReferenceTransformer: "bigip_datagroup.datagroup1" references: []
-2017/08/31 15:20:16 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.ReferenceTransformer:
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "bigip_ltm_dns.dns1" references: []
+2017/09/15 14:55:48 [DEBUG] ReferenceTransformer: "provider.bigip" references: []
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.ReferenceTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.CountBoundaryTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.CountBoundaryTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
-  bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+  bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.RootTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.RootTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
-  bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+  bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
+2017/09/15 14:55:48 [TRACE] Graph after step *terraform.TransitiveReductionTransformer:
 
-bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
   provider.bigip - *terraform.NodeApplyableProvider
 meta.count-boundary (count boundary fixup) - *terraform.NodeCountBoundary
-  bigip_datagroup.datagroup1 - *terraform.NodeApplyableResource
+  bigip_ltm_dns.dns1 - *terraform.NodeApplyableResource
 provider.bigip - *terraform.NodeApplyableProvider
-2017/08/31 15:20:16 [DEBUG] Starting graph walk: walkApply
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:16 [TRACE] [walkApply] Entering eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 Resource schema
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 [INFO] Initializing BigIP connection
-2017/08/31 15:20:16 [TRACE] [walkApply] Exiting eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkApply] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCompareDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApply
-2017/08/31 15:20:16 [DEBUG] apply: bigip_datagroup.datagroup1: executing Apply
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 2017/08/31 15:20:16 [INFO] Updating Vlan dgx7
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: panic: interface conversion: interface is nil, not int
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: goroutine 83 [running]:
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: panic(0x5d8a60, 0xc4204809c0)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/runtime/panic.go:500 +0x1a1
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/bigip.resourceBigipLtmDatagroupUpdate(0xc42035c120, 0x675e20, 0xc42013aaa0, 0x5da9c0, 0xcaf1)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/bigip/resource_bigip_ltm_datagroup.go:153 +0x178
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Resource).Apply(0xc420345260, 0xc4202ac280, 0xc420444ea0, 0x675e20, 0xc42013aaa0, 0x1, 0xc4203588a0, 0x0)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/resource.go:168 +0x1ff
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Provider).Apply(0xc420345620, 0xc4202ac190, 0xc4202ac280, 0xc420444ea0, 0x0, 0x18, 0x18)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/provider.go:212 +0x9b
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin.(*ResourceProviderServer).Apply(0xc42012dc80, 0xc420444240, 0xc42047c5d0, 0x0, 0x0)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin/resource_provider.go:488 +0x57
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.call(0xc4202a4240, 0xc420136160, 0x13, 0x678dc3, 0x4, 0xc42004dee0, 0x3, 0x3, 0x0, 0x0, ...)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/reflect/value.go:434 +0x5c8
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.Call(0xc4202a4240, 0xc420136160, 0x13, 0xc42004dee0, 0x3, 0x3, 0x0, 0x0, 0x0)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/reflect/value.go:302 +0xa4
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: net/rpc.(*service).call(0xc42013fec0, 0xc42013fe80, 0xc4201b2870, 0xc420138d00, 0xc420442640, 0x5786a0, 0xc420444240, 0x16, 0x5786e0, 0xc42047c5d0, ...)
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/net/rpc/server.go:383 +0x148
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: created by net/rpc.(*Server).ServeCodec
-2017/08/31 15:20:16 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/go/src/net/rpc/server.go:477 +0x421
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApplyPost
-2017/08/31 15:20:16 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
+2017/09/15 14:55:48 [DEBUG] Starting graph walk: walkApply
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkApply] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 Resource schema
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 2017/09/15 14:55:48 [INFO] Initializing BigIP connection
+2017/09/15 14:55:48 [TRACE] [walkApply] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkApply] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCompareDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApply
+2017/09/15 14:55:48 [DEBUG] apply: bigip_ltm_dns.dns1: executing Apply
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: panic: interface conversion: interface {} is nil, not *schema.Set
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: goroutine 84 [running]:
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/bigip.resourceBigipLtmDnsCreate(0xc4201d4780, 0x16bc340, 0xc4202f4190, 0x0, 0x0)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/bigip/resource_bigip_ltm_dns.go:59 +0x391
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Resource).Apply(0xc420530180, 0xc420128320, 0xc420138ec0, 0x16bc340, 0xc4202f4190, 0x1, 0xc420080f90, 0xc420080f90)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/resource.go:162 +0x2c7
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema.(*Provider).Apply(0xc420530840, 0xc4201282d0, 0xc420128320, 0xc420138ec0, 0x1baa6c8, 0x0, 0x18)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/helper/schema/provider.go:212 +0xa4
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin.(*ResourceProviderServer).Apply(0xc42028e020, 0xc420138920, 0xc420284290, 0x0, 0x0)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/Users/shitole/dev/src/github.com/terraform-provider-bigip/vendor/github.com/hashicorp/terraform/plugin/resource_provider.go:488 +0x57
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.call(0xc4201d57a0, 0xc4202f60a0, 0x13, 0x16bf305, 0x4, 0xc420230f20, 0x3, 0x3, 0x0, 0xc42006e700, ...)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/Cellar/go/1.9/libexec/src/reflect/value.go:434 +0x906
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: reflect.Value.Call(0xc4201d57a0, 0xc4202f60a0, 0x13, 0xc42030d720, 0x3, 0x3, 0xc42030d720, 0xc42030d728, 0xc42013db80)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/Cellar/go/1.9/libexec/src/reflect/value.go:302 +0xa4
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: net/rpc.(*service).call(0xc42013c100, 0xc4202f4000, 0xc42052c180, 0xc4202f8000, 0xc42028e4e0, 0x15b2360, 0xc420138920, 0x16, 0x15b23a0, 0xc420284290, ...)
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/Cellar/go/1.9/libexec/src/net/rpc/server.go:381 +0x142
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: created by net/rpc.(*Server).ServeCodec
+2017/09/15 14:55:48 [DEBUG] plugin: terraform-provider-bigip: 	/usr/local/Cellar/go/1.9/libexec/src/net/rpc/server.go:475 +0x36b
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApplyPost
+2017/09/15 14:55:48 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
 
-* bigip_datagroup.datagroup1: unexpected EOF
-2017/08/31 15:20:16 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
+* bigip_ltm_dns.dns1: unexpected EOF
+2017/09/15 14:55:48 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
 
-* bigip_datagroup.datagroup1: unexpected EOF
-2017/08/31 15:20:16 [TRACE] [walkApply] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:16 [INFO] Starting shadow graph walk: walkApply
-2017/08/31 15:20:16 [DEBUG] Waiting for shadow graph to complete...
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.provider.bigip': evaluating
-2017/08/31 15:20:16 [TRACE] [walkApply] Entering eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInitProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip: plugin process exited
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalOpFilter
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalConfigProvider
-2017/08/31 15:20:16 [TRACE] [walkApply] Exiting eval tree: provider.bigip
-2017/08/31 15:20:16 [DEBUG] vertex "bigip_datagroup.datagroup1", got dep: "provider.bigip"
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': walking
-2017/08/31 15:20:16 [DEBUG] vertex 'root.bigip_datagroup.datagroup1': evaluating
-2017/08/31 15:20:16 [TRACE] [walkApply] Entering eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalSequence
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInstanceInfo
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: terraform.EvalNoop
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalInterpolate
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalValidateResource
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalCompareDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalGetProvider
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalReadState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApply
-2017/08/31 15:20:16 [DEBUG] apply: bigip_datagroup.datagroup1: executing Apply
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalIf
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteState
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalWriteDiff
-2017/08/31 15:20:16 [DEBUG] root: eval: *terraform.EvalApplyPost
-2017/08/31 15:20:16 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
+* bigip_ltm_dns.dns1: unexpected EOF
+2017/09/15 14:55:48 [TRACE] [walkApply] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [INFO] Starting shadow graph walk: walkApply
+2017/09/15 14:55:48 [DEBUG] Waiting for shadow graph to complete...
+2017/09/15 14:55:48 [DEBUG] plugin: /Users/shitole/dev/src/github.com/terraform-provider-bigip/terraform-provider-bigip: plugin process exited
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.provider.bigip': evaluating
+2017/09/15 14:55:48 [TRACE] [walkApply] Entering eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInitProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalBuildProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSetProviderConfig
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalOpFilter
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalConfigProvider
+2017/09/15 14:55:48 [TRACE] [walkApply] Exiting eval tree: provider.bigip
+2017/09/15 14:55:48 [DEBUG] vertex "bigip_ltm_dns.dns1", got dep: "provider.bigip"
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': walking
+2017/09/15 14:55:48 [DEBUG] vertex 'root.bigip_ltm_dns.dns1': evaluating
+2017/09/15 14:55:48 [TRACE] [walkApply] Entering eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalSequence
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInstanceInfo
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: terraform.EvalNoop
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalInterpolate
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalValidateResource
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalCompareDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalGetProvider
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalReadState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApply
+2017/09/15 14:55:48 [DEBUG] apply: bigip_ltm_dns.dns1: executing Apply
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApplyProvisioners
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalIf
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteState
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalWriteDiff
+2017/09/15 14:55:48 [DEBUG] root: eval: *terraform.EvalApplyPost
+2017/09/15 14:55:48 [ERROR] root: eval: *terraform.EvalApplyPost, err: 1 error(s) occurred:
 
-* bigip_datagroup.datagroup1: unexpected EOF
-2017/08/31 15:20:16 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
+* bigip_ltm_dns.dns1: unexpected EOF
+2017/09/15 14:55:48 [ERROR] root: eval: *terraform.EvalSequence, err: 1 error(s) occurred:
 
-* bigip_datagroup.datagroup1: unexpected EOF
-2017/08/31 15:20:16 [TRACE] [walkApply] Exiting eval tree: bigip_datagroup.datagroup1
-2017/08/31 15:20:16 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_datagroup.datagroup1"
-2017/08/31 15:20:16 [ERROR] Shadow graph error: 1 error(s) occurred:
+* bigip_ltm_dns.dns1: unexpected EOF
+2017/09/15 14:55:48 [TRACE] [walkApply] Exiting eval tree: bigip_ltm_dns.dns1
+2017/09/15 14:55:48 [DEBUG] vertex "meta.count-boundary (count boundary fixup)", got dep: "bigip_ltm_dns.dns1"
+2017/09/15 14:55:48 [ERROR] Shadow graph error: 1 error(s) occurred:
 
-* bigip_datagroup.datagroup1: unexpected EOF
-2017/08/31 15:20:16 [TRACE] Preserving existing state lineage "95330def-b3db-4c87-83a1-c4472a0bde36"
-2017/08/31 15:20:16 [TRACE] Preserving existing state lineage "95330def-b3db-4c87-83a1-c4472a0bde36"
-2017/08/31 15:20:16 [DEBUG] plugin: waiting for all plugin processes to complete...
+* bigip_ltm_dns.dns1: unexpected EOF
+2017/09/15 14:55:48 [TRACE] Preserving existing state lineage "8c0c734f-d7ec-4307-80a9-cb3779e395cf"
+2017/09/15 14:55:48 [DEBUG] plugin: waiting for all plugin processes to complete...

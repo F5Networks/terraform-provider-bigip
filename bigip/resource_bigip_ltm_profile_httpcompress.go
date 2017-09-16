@@ -26,20 +26,20 @@ func resourceBigipLtmHttpcompress() *schema.Resource {
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaultsFrom": &schema.Schema{
+			"defaults_from": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Httpcompress profile",
 			},
 
-			"uriExclude": &schema.Schema{
+			"uri_exclude": &schema.Schema{
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Description: "Servers Address",
 			},
-			"uriInclude": &schema.Schema{
+			"uri_include": &schema.Schema{
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -54,9 +54,9 @@ func resourceBigipLtmHttpcompressCreate(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	defaultsFrom := d.Get("defaultsFrom").(string)
-	uriExclude := setToStringSlice(d.Get("uriExclude").(*schema.Set))
-	uriInclude := setToStringSlice(d.Get("uriInclude").(*schema.Set))
+	defaultsFrom := d.Get("defaults_from").(string)
+	uriExclude := setToStringSlice(d.Get("uri_exclude").(*schema.Set))
+	uriInclude := setToStringSlice(d.Get("uri_include").(*schema.Set))
 
 	log.Println("[INFO] Creating Httpcompress profile")
 
@@ -83,9 +83,9 @@ func resourceBigipLtmHttpcompressUpdate(d *schema.ResourceData, meta interface{}
 
 	r := &bigip.Httpcompress{
 		Name:         name,
-		DefaultsFrom: d.Get("defaultsFrom").(string),
-		UriExclude:   setToStringSlice(d.Get("uriExclude").(*schema.Set)),
-		UriInclude:   setToStringSlice(d.Get("uriInclude").(*schema.Set)),
+		DefaultsFrom: d.Get("defaults_from").(string),
+		UriExclude:   setToStringSlice(d.Get("uri_exclude").(*schema.Set)),
+		UriInclude:   setToStringSlice(d.Get("uri_include").(*schema.Set)),
 	}
 
 	return client.ModifyHttpcompress(name, r)

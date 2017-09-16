@@ -36,12 +36,6 @@ type Provision struct {
 	MemoryRatio int    `json:"memoryRatio,omitempty"`
 }
 
-type RemoteServer struct {
-	Name       string `json:"name,omitempty"`
-	Host       string `json:"host,omitempty"`
-	RemotePort int    `json:"remotePort,omitempty"`
-}
-
 type Syslogs struct {
 	Syslogs []Syslog `json:"items"`
 }
@@ -51,11 +45,63 @@ type Syslog struct {
 	RemoteServers []RemoteServer
 }
 
-type SyslogDTO struct {
+type syslogDTO struct {
 	AuthPrivFrom  string `json:"authPrivFrom,omitempty"`
 	RemoteServers struct {
 		Items []RemoteServer `json:"items,omitempty"`
 	} `json:"remoteServers,omitempty"`
+}
+
+func (p *Syslog) MarshalJSON() ([]byte, error) {
+	var dto syslogDTO
+	return json.Marshal(dto)
+}
+
+func (p *Syslog) UnmarshalJSON(b []byte) error {
+	var dto syslogDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+
+	p.AuthPrivFrom = dto.AuthPrivFrom
+	p.RemoteServers = dto.RemoteServers.Items
+
+	return nil
+}
+
+type RemoteServer struct {
+	Name       string `json:"name,omitempty"`
+	Host       string `json:"host,omitempty"`
+	RemotePort int    `json:"remotePort,omitempty"`
+}
+
+type remoteServerDTO struct {
+	Name       string `json:"name,omitempty"`
+	Host       string `json:"host,omitempty"`
+	RemotePort int    `json:"remotePort,omitempty"`
+}
+
+func (p *RemoteServer) MarshalJSON() ([]byte, error) {
+	return json.Marshal(remoteServerDTO{
+		Name:       p.Name,
+		Host:       p.Host,
+		RemotePort: p.RemotePort,
+	})
+}
+
+func (p *RemoteServer) UnmarshalJSON(b []byte) error {
+	var dto remoteServerDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+
+	p.Name = dto.Name
+	p.Host = dto.Host
+	p.RemotePort = dto.RemotePort
+
+	return nil
 }
 
 type SNMPs struct {
@@ -104,21 +150,6 @@ const (
 	uriSnmp      = "snmp"
 	uriTraps     = "traps"
 )
-
-func (p *Syslog) MarshalJSON() ([]byte, error) {
-	var dto SyslogDTO
-	marshal(&dto, p)
-	return json.Marshal(dto)
-}
-
-func (p *Syslog) UnmarshalJSON(b []byte) error {
-	var dto SyslogDTO
-	err := json.Unmarshal(b, &dto)
-	if err != nil {
-		return err
-	}
-	return marshal(p, &dto)
-}
 
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
 	config := &NTP{
@@ -234,13 +265,12 @@ func (b *BigIP) Syslogs() (*Syslog, error) {
 	return &syslog, nil
 }
 
-func (b *BigIP) CreateSyslog(authPrivFrom string, remoteServers []RemoteServer) error {
-	config := &Syslog{
-		AuthPrivFrom:  authPrivFrom,
-		RemoteServers: remoteServers,
-	}
+func (b *BigIP) CreateSyslog(r *Syslog) error {
+	return b.patch(r, uriSys, uriSyslog)
+}
 
-	return b.patch(config, uriSys, uriSyslog)
+func (b *BigIP) ModifySyslog(r *Syslog) error {
+	return b.put(r, uriSys, uriSyslog)
 }
 
 func (b *BigIP) CreateSNMP(sysContact string, sysLocation string, allowedAddresses []string) error {

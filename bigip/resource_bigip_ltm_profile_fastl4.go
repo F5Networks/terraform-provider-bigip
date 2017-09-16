@@ -30,42 +30,42 @@ func resourceBigipLtmFastl4() *schema.Resource {
 				Optional:    true,
 				Description: "name of partition",
 			},
-			"defaultsFrom": &schema.Schema{
+			"defaults_from": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"clientTimeout": &schema.Schema{
+			"client_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"explicitFlowMigration": &schema.Schema{
+			"explicitflow_migration": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"hardwareSynCookie": &schema.Schema{
+			"hardware_syncookie": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"idleTimeout": &schema.Schema{
+			"idle_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"ipTosToClient": &schema.Schema{
+			"iptos_toclient": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"ipTosToServer": &schema.Schema{
+			"iptos_toserver": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"keepAliveInterval": &schema.Schema{
+			"keepalive_interval": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
@@ -80,14 +80,14 @@ func resourceBigipLtmFastl4Create(d *schema.ResourceData, meta interface{}) erro
 
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
-	defaultsFrom := d.Get("defaultsFrom").(string)
-	clientTimeout := d.Get("clientTimeout").(int)
-	explicitFlowMigration := d.Get("explicitFlowMigration").(string)
-	hardwareSynCookie := d.Get("hardwareSynCookie").(string)
-	idleTimeout := d.Get("idleTimeout").(int)
-	ipTosToClient := d.Get("ipTosToClient").(string)
-	ipTosToServer := d.Get("ipTosToServer").(string)
-	keepAliveInterval := d.Get("keepAliveInterval").(string)
+	defaultsFrom := d.Get("defaults_from").(string)
+	clientTimeout := d.Get("client_timeout").(int)
+	explicitFlowMigration := d.Get("explicitflow_migration").(string)
+	hardwareSynCookie := d.Get("hardware_syncookie").(string)
+	idleTimeout := d.Get("idle_timeout").(int)
+	ipTosToClient := d.Get("iptos_toclient").(string)
+	ipTosToServer := d.Get("iptos_toserver").(string)
+	keepAliveInterval := d.Get("keepalive_interval").(string)
 
 	log.Println("[INFO] Creating Fastl4 profile")
 
@@ -121,14 +121,14 @@ func resourceBigipLtmFastl4Update(d *schema.ResourceData, meta interface{}) erro
 	r := &bigip.Fastl4{
 		Name:                  name,
 		Partition:             d.Get("partition").(string),
-		DefaultsFrom:          d.Get("defaultsFrom").(string),
-		ClientTimeout:         d.Get("clientTimeout").(int),
-		ExplicitFlowMigration: d.Get("explicitFlowMigration").(string),
-		HardwareSynCookie:     d.Get("hardwareSynCookie").(string),
-		IdleTimeout:           d.Get("idleTimeout").(int),
-		IpTosToClient:         d.Get("ipTosToClient").(string),
-		IpTosToServer:         d.Get("ipTosToServer").(string),
-		KeepAliveInterval:     d.Get("keepAliveInterval").(string),
+		DefaultsFrom:          d.Get("defaults_from").(string),
+		ClientTimeout:         d.Get("client_timeout").(int),
+		ExplicitFlowMigration: d.Get("explicitflow_migration").(string),
+		HardwareSynCookie:     d.Get("hardware_syncookie").(string),
+		IdleTimeout:           d.Get("idle_timeout").(int),
+		IpTosToClient:         d.Get("iptos_toclient").(string),
+		IpTosToServer:         d.Get("iptos_toserver").(string),
+		KeepAliveInterval:     d.Get("keepalive_interval").(string),
 	}
 
 	return client.ModifyFastl4(name, r)

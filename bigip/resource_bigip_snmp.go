@@ -20,18 +20,18 @@ func resourceBigipLtmSnmp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"sysContact": &schema.Schema{
+			"sys_contact": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Contact Person email",
 				//ValidateFunc: validateF5Name,
 			},
-			"sysLocation": &schema.Schema{
+			"sys_location": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Location of the F5 ",
 			},
-			"allowedAddresses": &schema.Schema{
+			"allowedaddresses": &schema.Schema{
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -46,9 +46,9 @@ func resourceBigipLtmSnmp() *schema.Resource {
 func resourceBigipLtmSnmpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	sysContact := d.Get("sysContact").(string)
-	sysLocation := d.Get("sysLocation").(string)
-	allowedAddresses := setToStringSlice(d.Get("allowedAddresses").(*schema.Set))
+	sysContact := d.Get("sys_contact").(string)
+	sysLocation := d.Get("sys_location").(string)
+	allowedAddresses := setToStringSlice(d.Get("allowedaddresses").(*schema.Set))
 
 	log.Println("[INFO] Creating Snmp ")
 
@@ -74,8 +74,8 @@ func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	r := &bigip.SNMP{
 		SysContact:       sysContact,
-		SysLocation:      d.Get("sysLocation").(string),
-		AllowedAddresses: setToStringSlice(d.Get("allowedAddresses").(*schema.Set)),
+		SysLocation:      d.Get("sys_location").(string),
+		AllowedAddresses: setToStringSlice(d.Get("allowedaddresses").(*schema.Set)),
 	}
 
 	return client.ModifySNMP(r)
@@ -94,9 +94,9 @@ func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("sysContact", snmp.SysContact)
-	d.Set("sysContact", snmp.SysLocation)
-	d.Set("allowedAddresses", snmp.AllowedAddresses)
+	d.Set("sys_contact", snmp.SysContact)
+	d.Set("sys_location", snmp.SysLocation)
+	d.Set("allowedaddresses", snmp.AllowedAddresses)
 
 	return nil
 }

@@ -5,11 +5,11 @@ provider "bigip" {
 }
 resource "bigip_ltm_provision" "provision-afm" {
   name = "/Common/afm"
-  fullPath  = "afm"
-  cpuRatio = 0
-  diskRatio = 0
+  full_path  = "afm"
+  cpu_ratio = 0
+  disk_ratio = 0
   level = "nominal"
-  memoryRatio = 0
+  memory_ratio = 0
 }
 
 resource "bigip_ltm_ntp" "ntp1" {
@@ -21,8 +21,8 @@ resource "bigip_ltm_ntp" "ntp1" {
 
 resource "bigip_ltm_dns" "dns1" {
    	description = "/Common/DNS1"
-   	nameServers = ["8.8.8.8"]
-   	numberOfDots = 2
+   	name_servers = ["8.8.8.8"]
+   	numberof_dots = 2
    	search = ["f5.com"]
    	depends_on = ["bigip_ltm_provision.provision-afm"]
 }

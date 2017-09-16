@@ -26,19 +26,19 @@ func resourceBigipLtmProvision() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"fullPath": &schema.Schema{
+			"full_path": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "path",
 			},
 
-			"cpuRatio": &schema.Schema{
+			"cpu_ratio": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "cpu Ratio",
 			},
 
-			"diskRatio": &schema.Schema{
+			"disk_ratio": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "disk Ratio",
@@ -50,7 +50,7 @@ func resourceBigipLtmProvision() *schema.Resource {
 				Description: "what level nominal or dedicated",
 			},
 
-			"memoryRatio": &schema.Schema{
+			"memory_ratio": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "memory Ratio",
@@ -64,11 +64,11 @@ func resourceBigipLtmProvisionCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	fullPath := d.Get("fullPath").(string)
-	cpuRatio := d.Get("cpuRatio").(int)
-	diskRatio := d.Get("diskRatio").(int)
+	fullPath := d.Get("full_path").(string)
+	cpuRatio := d.Get("cpu_ratio").(int)
+	diskRatio := d.Get("disk_ratio").(int)
 	level := d.Get("level").(string)
-	memoryRatio := d.Get("memoryRatio").(int)
+	memoryRatio := d.Get("memory_ratio").(int)
 
 	log.Println("[INFO] Provisioning  ")
 
@@ -97,11 +97,11 @@ func resourceBigipLtmProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 
 	r := &bigip.Provision{
 		Name:        name,
-		FullPath:    d.Get("fullPath").(string),
-		CpuRatio:    d.Get("cpuRatio").(int),
-		DiskRatio:   d.Get("diskRatio").(int),
+		FullPath:    d.Get("full_path").(string),
+		CpuRatio:    d.Get("cpu_ratio").(int),
+		DiskRatio:   d.Get("disk_ratio").(int),
 		Level:       d.Get("level").(string),
-		MemoryRatio: d.Get("memoryRatio").(int),
+		MemoryRatio: d.Get("memory_ratio").(int),
 	}
 
 	return client.ModifyProvision(r)
@@ -120,11 +120,11 @@ func resourceBigipLtmProvisionRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.Set("name", provision.Name)
-	d.Set("fullPath", provision.FullPath)
-	d.Set("cpuRatio", provision.CpuRatio)
-	d.Set("diskRatio", provision.DiskRatio)
+	d.Set("full_path", provision.FullPath)
+	d.Set("cpu_ratio", provision.CpuRatio)
+	d.Set("disk_ratio", provision.DiskRatio)
 	d.Set("level", provision.Level)
-	d.Set("memoryRatio", provision.MemoryRatio)
+	d.Set("memory_ratio", provision.MemoryRatio)
 
 	return nil
 }

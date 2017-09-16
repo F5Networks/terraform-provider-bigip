@@ -30,51 +30,51 @@ func resourceBigipLtmTcp() *schema.Resource {
 				Optional:    true,
 				Description: "name of partition",
 			},
-			"defaultsFrom": &schema.Schema{
+			"defaults_from": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent tcp profile",
 			},
 
-			"idleTimeout": &schema.Schema{
+			"idle_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "idleTimeout can be given value",
+				Description: "idle_timeout can be given value",
 			},
 
-			"closeWaitTimeout": &schema.Schema{
+			"close_wait_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "close wait timer integer",
 			},
 
-			"finWait_2Timeout": &schema.Schema{
+			"finwait_2timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "timer integer",
 			},
 
-			"finWaitTimeout": &schema.Schema{
+			"finwait_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "fin wait timer integer",
 			},
 
-			"keepAliveInterval": &schema.Schema{
+			"keepalive_interval": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "keepAliveInterval timer integer",
+				Description: "keepalive_interval timer integer",
 			},
 
-			"deferredAccept": &schema.Schema{
+			"deferred_accept": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Defferred accept",
 			},
-			"fastOpen": &schema.Schema{
+			"fast_open": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "fastopen value ",
+				Description: "fast_open value ",
 			},
 		},
 	}
@@ -86,14 +86,14 @@ func resourceBigipLtmTcpCreate(d *schema.ResourceData, meta interface{}) error {
 
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
-	defaultsFrom := d.Get("defaultsFrom").(string)
-	idleTimeout := d.Get("idleTimeout").(int)
-	closeWaitTimeout := d.Get("closeWaitTimeout").(int)
-	finWait_2Timeout := d.Get("finWait_2Timeout").(int)
-	finWaitTimeout := d.Get("finWaitTimeout").(int)
-	keepAliveInterval := d.Get("keepAliveInterval").(int)
-	deferredAccept := d.Get("deferredAccept").(string)
-	fastOpen := d.Get("fastOpen").(string)
+	defaultsFrom := d.Get("defaults_from").(string)
+	idleTimeout := d.Get("idle_timeout").(int)
+	closeWaitTimeout := d.Get("close_wait_timeout").(int)
+	finWait_2Timeout := d.Get("finwait_2timeout").(int)
+	finWaitTimeout := d.Get("finwait_timeout").(int)
+	keepAliveInterval := d.Get("keepalive_interval").(int)
+	deferredAccept := d.Get("deferred_accept").(string)
+	fastOpen := d.Get("fast_open").(string)
 	log.Println("[INFO] Creating TCP profile")
 
 	err := client.CreateTcp(
@@ -126,14 +126,14 @@ func resourceBigipLtmTcpUpdate(d *schema.ResourceData, meta interface{}) error {
 	r := &bigip.Tcp{
 		Name:              name,
 		Partition:         d.Get("partition").(string),
-		DefaultsFrom:      d.Get("defaultsFrom").(string),
-		IdleTimeout:       d.Get("idleTimeout").(int),
-		CloseWaitTimeout:  d.Get("closeWaitTimeout").(int),
-		FinWait_2Timeout:  d.Get("finWait_2Timeout").(int),
-		FinWaitTimeout:    d.Get("finWaitTimeout").(int),
-		KeepAliveInterval: d.Get("keepAliveInterval").(int),
-		DeferredAccept:    d.Get("deferredAccept").(string),
-		FastOpen:          d.Get("fastOpen").(string),
+		DefaultsFrom:      d.Get("defaults_from").(string),
+		IdleTimeout:       d.Get("idle_timeout").(int),
+		CloseWaitTimeout:  d.Get("close_wait_timeout").(int),
+		FinWait_2Timeout:  d.Get("finwait_2timeout").(int),
+		FinWaitTimeout:    d.Get("finwait_timeout").(int),
+		KeepAliveInterval: d.Get("keepalive_interval").(int),
+		DeferredAccept:    d.Get("deferred_accept").(string),
+		FastOpen:          d.Get("fast_open").(string),
 	}
 
 	return client.ModifyTcp(name, r)

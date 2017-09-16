@@ -26,13 +26,13 @@ func resourceBigipLtmSnmpTraps() *schema.Resource {
 				Description: "Name",
 				//ValidateFunc: validateF5Name,
 			},
-			"authPasswordEncrypted": &schema.Schema{
+			"auth_passwordencrypted": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Encrypted password ",
 			},
 
-			"authProtocol": &schema.Schema{
+			"auth_protocol": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the protocol used to authenticate the user.",
@@ -50,7 +50,7 @@ func resourceBigipLtmSnmpTraps() *schema.Resource {
 				Description: "User defined description.",
 			},
 
-			"engineId": &schema.Schema{
+			"engine_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the authoritative security engine for SNMPv3.",
@@ -66,28 +66,28 @@ func resourceBigipLtmSnmpTraps() *schema.Resource {
 				Optional:    true,
 				Description: "The port that the trap will be sent to.",
 			},
-			"privacyPassword": &schema.Schema{
+			"privacy_password": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the clear text password used to encrypt traffic. This field will not be displayed. ",
 			},
-			"privacyPasswordEncrypted": &schema.Schema{
+			"privacy_password_encrypted": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the encrypted password used to encrypt traffic. ",
 			},
-			"privacyProtocol": &schema.Schema{
+			"privacy_protocol": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the protocol used to encrypt traffic. ",
 			},
-			"securityLevel": &schema.Schema{
+			"security_level": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies whether or not traffic is encrypted and whether or not authentication is required.",
 			},
 
-			"securityName": &schema.Schema{
+			"security_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Security name used in conjunction with SNMPv3.",
@@ -107,18 +107,18 @@ func resourceBigipLtmSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	authPasswordEncrypted := d.Get("authPasswordEncrypted").(string)
-	authProtocol := d.Get("authProtocol").(string)
+	authPasswordEncrypted := d.Get("auth_passwordencrypted").(string)
+	authProtocol := d.Get("auth_protocol").(string)
 	community := d.Get("community").(string)
 	description := d.Get("description").(string)
-	engineId := d.Get("engineId").(string)
+	engineId := d.Get("engine_id").(string)
 	host := d.Get("host").(string)
 	port := d.Get("port").(int)
-	privacyPassword := d.Get("privacyPassword").(string)
-	privacyPasswordEncrypted := d.Get("privacyPasswordEncrypted").(string)
-	privacyProtocol := d.Get("privacyProtocol").(string)
-	securityLevel := d.Get("securityLevel").(string)
-	securityName := d.Get("securityName").(string)
+	privacyPassword := d.Get("privacy_password").(string)
+	privacyPasswordEncrypted := d.Get("privacy_password_encrypted").(string)
+	privacyProtocol := d.Get("privacy_protocol").(string)
+	securityLevel := d.Get("security_level").(string)
+	securityName := d.Get("security_name").(string)
 	version := d.Get("version").(string)
 
 	log.Println("[INFO] Creating Snmp traps ")
@@ -157,16 +157,16 @@ func resourceBigipLtmSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 	r := &bigip.TRAP{
 		Name: name,
 		Host: d.Get("host").(string),
-		AuthPasswordEncrypted:    d.Get("authPasswordEncrypted").(string),
-		AuthProtocol:             d.Get("authProtocol").(string),
+		AuthPasswordEncrypted:    d.Get("auth_passwordencrypted").(string),
+		AuthProtocol:             d.Get("auth_protocol").(string),
 		Community:                d.Get("community").(string),
 		Description:              d.Get("description").(string),
-		EngineId:                 d.Get("engineId").(string),
-		PrivacyPassword:          d.Get("privacyPassword").(string),
-		PrivacyPasswordEncrypted: d.Get("privacyPasswordEncrypted").(string),
-		PrivacyProtocol:          d.Get("privacyProtocol").(string),
-		SecurityLevel:            d.Get("securityLevel").(string),
-		SecurityName:             d.Get("securityName").(string),
+		EngineId:                 d.Get("engine_id").(string),
+		PrivacyPassword:          d.Get("privacy_password").(string),
+		PrivacyPasswordEncrypted: d.Get("privacy_password_encrypted").(string),
+		PrivacyProtocol:          d.Get("privacy_protocol").(string),
+		SecurityLevel:            d.Get("security_level").(string),
+		SecurityName:             d.Get("security_name").(string),
 		Version:                  d.Get("version").(string),
 	}
 
@@ -187,18 +187,18 @@ func resourceBigipLtmSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.Set("name", traps.Name)
-	d.Set("authPasswordEncrypted", traps.AuthPasswordEncrypted)
-	d.Set("authProtocol", traps.AuthProtocol)
+	d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted)
+	d.Set("auth_protocol", traps.AuthProtocol)
 	d.Set("community", traps.Community)
 	d.Set("description", traps.Description)
-	d.Set("engineId", traps.EngineId)
+	d.Set("engine_id", traps.EngineId)
 	d.Set("host", traps.Host)
 	d.Set("port", traps.Port)
-	d.Set("privacyPassword", traps.PrivacyPassword)
-	d.Set("privacyPasswordEncrypted", traps.PrivacyPasswordEncrypted)
-	d.Set("privacyProtocol", traps.PrivacyProtocol)
-	d.Set("securityLevel", traps.SecurityLevel)
-	d.Set("securityName", traps.SecurityName)
+	d.Set("privacy_password", traps.PrivacyPassword)
+	d.Set("privacy_password_encrypted", traps.PrivacyPasswordEncrypted)
+	d.Set("privacy_protocol", traps.PrivacyProtocol)
+	d.Set("security_level", traps.SecurityLevel)
+	d.Set("security_name", traps.SecurityName)
 	d.Set("version", traps.Version)
 
 	return nil

@@ -747,16 +747,38 @@ type Httpcompress struct {
 	UriInclude   []string
 }
 
+type http2DTO struct {
+	Name                           string   `json:"name,omitempty"`
+	DefaultsFrom                   string   `json:"defaultsFrom,omitempty"`
+	ConcurrentStreamsPerConnection int      `json:"concurrentStreamsPerConnection,omitempty"`
+	ConnectionIdleTimeout          int      `json:"connectionIdleTimeout,omitempty"`
+	HeaderTableSize                int      `json:"headerTableSize,omitempty"`
+	ActivationModes                []string `json:"activationModes,omitempty"`
+}
+
+type Http2s struct {
+	Http2s []Http2 `json:"items"`
+}
+
+type Http2 struct {
+	Name                           string
+	DefaultsFrom                   string
+	ConcurrentStreamsPerConnection int
+	ConnectionIdleTimeout          int
+	HeaderTableSize                int
+	ActivationModes                []string
+}
+
 type Records struct {
 	Name string
 	Data string
 }
 
 type Recordss struct {
-	Recordss []Records `json:"items"`
+	Recordss []Records `json:"items,omitempty"`
 }
 
-type RecordsDTO struct {
+type recordsDTO struct {
 	Name string `json:"name,omitempty"`
 	Data string `json:"data,omitempty"`
 }
@@ -771,7 +793,7 @@ type Datagroup struct {
 	Records []Records
 }
 
-type DatagroupDTO struct {
+type datagroupDTO struct {
 	Name    string `json:"name,omitempty"`
 	Type    string `json:"type,omitempty"`
 	Records struct {
@@ -872,34 +894,59 @@ func (p *Httpcompress) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
-func (p *Datagroup) MarshalJSON() ([]byte, error) {
-	var dto DatagroupDTO
+func (p *Http2) MarshalJSON() ([]byte, error) {
+	var dto http2DTO
 	marshal(&dto, p)
 	return json.Marshal(dto)
+}
+
+func (p *Http2) UnmarshalJSON(b []byte) error {
+	var dto http2DTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Datagroup) MarshalJSON() ([]byte, error) {
+	return json.Marshal(datagroupDTO{
+		Name: p.Name,
+		Type: p.Type,
+		Records: struct {
+			Items []Records `json:"items,omitempty"`
+		}{Items: p.Records},
+	})
 }
 
 func (p *Datagroup) UnmarshalJSON(b []byte) error {
-	var dto DatagroupDTO
+	var dto datagroupDTO
 	err := json.Unmarshal(b, &dto)
 	if err != nil {
 		return err
 	}
-	return marshal(p, &dto)
+	p.Name = dto.Name
+	p.Type = dto.Type
+	p.Records = dto.Records.Items
+	return nil
 }
 
 func (p *Records) MarshalJSON() ([]byte, error) {
-	var dto RecordsDTO
-	marshal(&dto, p)
-	return json.Marshal(dto)
+	return json.Marshal(recordsDTO{
+		Name: p.Name,
+		Data: p.Data,
+	})
 }
 
 func (p *Records) UnmarshalJSON(b []byte) error {
-	var dto RecordsDTO
+	var dto recordsDTO
 	err := json.Unmarshal(b, &dto)
 	if err != nil {
 		return err
 	}
-	return marshal(p, &dto)
+	p.Name = dto.Name
+	p.Data = dto.Data
+	return nil
 }
 
 const (
@@ -924,6 +971,7 @@ const (
 	uriFasthttp       = "fasthttp"
 	uriFastl4         = "fastl4"
 	uriHttpcompress   = "http-compression"
+	uriHttp2          = "http2"
 )
 
 var cidr = map[string]string{
@@ -1613,35 +1661,71 @@ func (b *BigIP) Httpcompress() (*Httpcompresss, error) {
 	return &httpcompresss, nil
 }
 
-// Datagroups returns a list of datagroups.
-func (b *BigIP) Datagroups() (*Datagroups, error) {
-	var datagroups Datagroups
-	err, _ := b.getForEntity(&datagroups, uriLtm, uriDatagroup, uriInternal)
+func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
+	http2 := &Http2{
+		Name:                           name,
+		DefaultsFrom:                   defaultsFrom,
+		ConcurrentStreamsPerConnection: concurrentStreamsPerConnection,
+		ConnectionIdleTimeout:          connectionIdleTimeout,
+		HeaderTableSize:                headerTableSize,
+		ActivationModes:                activationModes,
+	}
+	return b.post(http2, uriLtm, uriProfile, uriHttp2)
+}
+
+// Delete  http2 removes an http2 profile from the system.
+func (b *BigIP) DeleteHttp2(name string) error {
+	return b.delete(uriLtm, uriProfile, uriHttp2, name)
+}
+
+// Modify http2 updates the given http2 profile with any changed values.
+func (b *BigIP) ModifyHttp2(name string, http2 *Http2) error {
+	http2.Name = name
+	return b.put(http2, uriLtm, uriProfile, uriHttp2, name)
+}
+
+func (b *BigIP) Http2() (*Http2s, error) {
+	var http2s Http2s
+	err, _ := b.getForEntity(&http2s, uriLtm, uriProfile, uriHttp2)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &datagroups, nil
+	return &http2s, nil
+}
+
+// Datagroups returns a list of datagroups.
+func (b *BigIP) GetDatagroup(name string) (*Datagroup, error) {
+	var p Datagroup
+	err, ok := b.getForEntity(&p, uriLtm, uriDatagroup, uriInternal, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	var records Records
+	err, _ = b.getForEntity(&records, uriLtm, uriDatagroup, uriInternal, name, "records")
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
+
 }
 
 // CreateDatagroup adds a new Datagroup to the BIG-IP system.
-func (b *BigIP) CreateDatagroup(typo, name string, records []Records) error {
-	config := &Datagroup{
-		Type:    typo,
-		Name:    name,
-		Records: records,
-	}
-
-	return b.post(config, uriLtm, uriDatagroup, uriInternal)
+func (b *BigIP) CreateDatagroup(p *Policy) error {
+	return b.post(p, uriLtm, uriDatagroup, uriInternal)
 }
-func (b *BigIP) Records() (*Records, error) {
-	var records Records
-	err, _ := b.getForEntity(&records, uriLtm, uriDatagroup, uriInternal)
 
-	if err != nil {
-		return nil, err
-	}
+//Update an existing Datagroup.
+func (b *BigIP) UpdateDatagroup(name string, p *Datagroup) error {
+	return b.put(p, uriLtm, uriDatagroup, uriInternal, name)
+}
 
-	return &records, nil
+//Delete a Datagroup.
+func (b *BigIP) DeleteDatagroup(name string) error {
+	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
 }

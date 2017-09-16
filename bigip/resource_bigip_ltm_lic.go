@@ -26,7 +26,7 @@ func resourceBigipLtmLic() *schema.Resource {
 				Description: "Username of BIG-IP",
 				//	ValidateFunc: validateF5Name,
 			},
-			"deviceAddress": &schema.Schema{
+			"device_address": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Device which needs to be licensed",
@@ -45,7 +45,7 @@ func resourceBigipLtmLic() *schema.Resource {
 func resourceBigipLtmLicCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	deviceAddress := d.Get("deviceAddress").(string)
+	deviceAddress := d.Get("device_address").(string)
 	username := d.Get("username").(string)
 	password := d.Get("password").(string)
 	log.Println("[INFO] Creating Lic ")
@@ -91,7 +91,7 @@ func resourceBigipLtmLicRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("deviceAddress", members.DeviceAddress)
+	d.Set("device_address", members.DeviceAddress)
 	d.Set("username", members.Username)
 	d.Set("password", members.Password)
 

@@ -26,7 +26,7 @@ func resourceBigipLtmULic() *schema.Resource {
 				Description: "Username of BIG-IP",
 				//	ValidateFunc: validateF5Name,
 			},
-			"deviceAddress": &schema.Schema{
+			"device_address": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Device which needs to be licensed",
@@ -37,7 +37,7 @@ func resourceBigipLtmULic() *schema.Resource {
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"unitOfMeasure": &schema.Schema{
+			"unitof_measure": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP subscription yearly/hourly",
@@ -50,10 +50,10 @@ func resourceBigipLtmULic() *schema.Resource {
 func resourceBigipLtmULicCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	deviceAddress := d.Get("deviceAddress").(string)
+	deviceAddress := d.Get("device_address").(string)
 	username := d.Get("username").(string)
 	password := d.Get("password").(string)
-	unitOfMeasure := d.Get("unitOfMeasure").(string)
+	unitOfMeasure := d.Get("unitof_measure").(string)
 	log.Println("[INFO] Creating Lic ")
 
 	err := client.CreateULIC(
@@ -81,7 +81,7 @@ func resourceBigipLtmULicUpdate(d *schema.ResourceData, meta interface{}) error 
 		DeviceAddress: deviceAddress,
 		Username:      d.Get("username").(string),
 		Password:      d.Get("password").(string),
-		UnitOfMeasure: d.Get("unitOfMeasure").(string),
+		UnitOfMeasure: d.Get("unitof_measure").(string),
 	}
 
 	return client.ModifyULIC(r)
@@ -99,7 +99,7 @@ func resourceBigipLtmULicRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("deviceAddress", members.DeviceAddress)
+	d.Set("device_address", members.DeviceAddress)
 	d.Set("username", members.Username)
 	d.Set("password", members.Password)
 	//d.set("unitOfMeasure", members.UnitOfMeasure)
@@ -118,7 +118,7 @@ func resourceBigipLtmULicDelete(d *schema.ResourceData, meta interface{}) error 
 		DeviceAddress: deviceAddress,
 		Username:      d.Get("username").(string),
 		Password:      d.Get("password").(string),
-		UnitOfMeasure: d.Get("unitOfMeasure").(string),
+		UnitOfMeasure: d.Get("unitof_measure").(string),
 	}
 
 	return client.DeleteULIC(r)

@@ -8,8 +8,8 @@ provider "bigip" {
 resource "bigip_httpcompress_profile" "sjhttpcompression"
 
         {
-            name = "/Common/sjhttpcompression"
-            defaultsFrom = "/Common/httpcompression"
-            uriExclude   = ["www.abc.f5.com"]
-            uriInclude   = ["www.xyzbc.cisco.com"]
+            name = "/Common/sjhttpcompression2"
+            defaults_from = "/Common/httpcompression"
+            uri_exclude   = ["www.abc.f5.com", "www.abc2.f5.com"]
+            uri_include   = ["www.xyzbc.cisco.com"]
         }

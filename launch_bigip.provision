@@ -6,10 +6,10 @@ provider "bigip" {
 
 resource "bigip_ltm_provision" "provision1" {
   name = "/Common/afm"
-  fullPath  = "afm"
-  cpuRatio = 0
-  diskRatio = 0
+  full_path  = "afm"
+  cpu_ratio = 0
+  disk_ratio = 0
   level = "nominal"
-  memoryRatio = 0
+  memory_ratio = 0
 }
 

@@ -9,14 +9,14 @@ resource "bigip_fasthttp_profile" "sjfasthttpprofile"
 
         {
             name = "sjfasthttpprofile"
-            defaultsFrom = "/Common/fasthttp"
-            idleTimeout = 300
-            connpoolIdleTimeoutOverride	= 0
-            connpoolMaxReuse = 2
-            connpoolMaxSize  = 2048
-            connpoolMinSize = 0
-            connpoolReplenish = "enabled"
-            connpoolStep = 4
-            forceHttp_10Response = "disabled"
-            maxHeaderSize = 32768
+            defaults_from = "/Common/fasthttp"
+            idle_timeout = 300
+            connpoolidle_timeoutoverride	= 0
+            connpool_maxreuse = 2
+            connpool_maxsize  = 2048
+            connpool_minsize = 0
+            connpool_replenish = "enabled"
+            connpool_step = 4
+            forcehttp_10response = "disabled"
+            maxheader_size = 32768
       }

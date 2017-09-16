@@ -26,7 +26,7 @@ func resourceBigipLtmDns() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"nameServers": &schema.Schema{
+			"name_servers": &schema.Schema{
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -34,7 +34,7 @@ func resourceBigipLtmDns() *schema.Resource {
 				Description: "Servers Address",
 			},
 
-			"numberOfDots": &schema.Schema{
+			"numberof_dots": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "how many DNS Servers",
@@ -56,8 +56,8 @@ func resourceBigipLtmDnsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
-	nameservers := setToStringSlice(d.Get("nameServers").(*schema.Set))
-	numberofdots := d.Get("numberOfDots").(int)
+	nameservers := setToStringSlice(d.Get("name_servers").(*schema.Set))
+	numberofdots := d.Get("numberof_dots").(int)
 	search := setToStringSlice(d.Get("search").(*schema.Set))
 
 	log.Println("[INFO] Creating Dns ")
@@ -86,8 +86,8 @@ func resourceBigipLtmDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	r := &bigip.DNS{
 		Description:  description,
-		NameServers:  setToStringSlice(d.Get("nameServers").(*schema.Set)),
-		NumberOfDots: d.Get("numberOfDots").(int),
+		NameServers:  setToStringSlice(d.Get("name_servers").(*schema.Set)),
+		NumberOfDots: d.Get("numberof_dots").(int),
 		Search:       setToStringSlice(d.Get("search").(*schema.Set)),
 	}
 
@@ -107,8 +107,8 @@ func resourceBigipLtmDnsRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("description", dns.Description)
-	d.Set("nameServers", dns.NameServers)
-	d.Set("numberOfDots", dns.NumberOfDots)
+	d.Set("name_servers", dns.NameServers)
+	d.Set("numberof_dots", dns.NumberOfDots)
 	d.Set("search", dns.Search)
 
 	return nil

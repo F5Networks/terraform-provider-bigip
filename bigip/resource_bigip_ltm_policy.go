@@ -74,7 +74,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"appService": &schema.Schema{
+									"app_service": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -114,7 +114,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"clonePool": &schema.Schema{
+									"clone_pool": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -134,22 +134,22 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"cookieHash": &schema.Schema{
+									"cookie_hash": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookieInsert": &schema.Schema{
+									"cookie_insert": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookiePassive": &schema.Schema{
+									"cookie_passive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookieRewrite": &schema.Schema{
+									"cookie_rewrite": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -164,7 +164,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"destinationAddress": &schema.Schema{
+									"destination_address": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -189,7 +189,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"expirySecs": &schema.Schema{
+									"expiry_secs": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
@@ -214,7 +214,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"fromProfile": &schema.Schema{
+									"from_profile": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -234,42 +234,42 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"httpBasicAuth": &schema.Schema{
+									"http_basicauth": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpCookie": &schema.Schema{
+									"http_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpHeader": &schema.Schema{
+									"http_header": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpHost": &schema.Schema{
+									"http_host": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpReferer": &schema.Schema{
+									"http_referer": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpReply": &schema.Schema{
+									"http_reply": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpSetCookie": &schema.Schema{
+									"httpset_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpUri": &schema.Schema{
+									"http_uri": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -284,12 +284,12 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"internalVirtual": &schema.Schema{
+									"internal_virtual": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"ipAddress": &schema.Schema{
+									"ip_address": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -319,7 +319,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"ltmPolicy": &schema.Schema{
+									"ltm_policy": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -334,7 +334,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"tmName": &schema.Schema{
+									"tm_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -409,7 +409,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"queryString": &schema.Schema{
+									"query_string": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -439,7 +439,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"requestAdapt": &schema.Schema{
+									"request_adapt": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -454,7 +454,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"responseAdapt": &schema.Schema{
+									"response_adapt": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -474,12 +474,12 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"serverSsl": &schema.Schema{
+									"server_ssl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"setVariable": &schema.Schema{
+									"set_variable": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -494,27 +494,27 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"sourceAddress": &schema.Schema{
+									"source_address": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslClientHello": &schema.Schema{
+									"ssl_clienthello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslServerHandshake": &schema.Schema{
+									"ssl_server_handshake": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslServerHello": &schema.Schema{
+									"ssl_serverhello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslSessionId": &schema.Schema{
+									"ssl_sessionId": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -529,7 +529,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"tcpNagle": &schema.Schema{
+									"tcp_nagle": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -602,27 +602,27 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"appService": &schema.Schema{
+									"app_service": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"browserType": &schema.Schema{
+									"browser_type": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"browserVersion": &schema.Schema{
+									"browser_version": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"caseInsensitive": &schema.Schema{
+									"case_insensitive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"caseSensitive": &schema.Schema{
+									"case_sensitive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -632,12 +632,12 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"cipherBits": &schema.Schema{
+									"cipher_bits": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"clientSsl": &schema.Schema{
+									"client_ssl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -647,7 +647,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"commonName": &schema.Schema{
+									"common_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -662,27 +662,27 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"countryCode": &schema.Schema{
+									"country_code": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"countryName": &schema.Schema{
+									"country_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cpuUsage": &schema.Schema{
+									"cpu_usage": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"deviceMake": &schema.Schema{
+									"device_make": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"deviceModel": &schema.Schema{
+									"device_model": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -692,7 +692,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"endsWith": &schema.Schema{
+									"ends_with": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -727,7 +727,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"greaterOrEqual": &schema.Schema{
+									"greateror_equal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -737,57 +737,57 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"httpBasicAuth": &schema.Schema{
+									"http_basicauth": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpCookie": &schema.Schema{
+									"http_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpHeader": &schema.Schema{
+									"http_header": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpHost": &schema.Schema{
+									"http_host": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpMethod": &schema.Schema{
+									"http_method": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpReferer": &schema.Schema{
+									"http_referer": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpSetCookie": &schema.Schema{
+									"httpset_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpStatus": &schema.Schema{
+									"http_status": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpUri": &schema.Schema{
+									"http_uri": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpUserAgent": &schema.Schema{
+									"http_user_agent": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpVersion": &schema.Schema{
+									"http_version": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -827,7 +827,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"lessOrEqual": &schema.Schema{
+									"less_or_equal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -862,7 +862,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"tmName": &schema.Schema{
+									"tm_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
@@ -887,7 +887,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"pathSegment": &schema.Schema{
+									"path_segment": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -907,22 +907,22 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"queryParameter": &schema.Schema{
+									"query_parameter": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"queryString": &schema.Schema{
+									"query_string": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"regionCode": &schema.Schema{
+									"region_code": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"regionName": &schema.Schema{
+									"region_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -942,7 +942,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"routeDomain": &schema.Schema{
+									"route_domain": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -957,37 +957,37 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"serverName": &schema.Schema{
+									"server_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslCert": &schema.Schema{
+									"ssl_cert": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslClientHello": &schema.Schema{
+									"ssl_clienthello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslExtension": &schema.Schema{
+									"ssl_extension": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslServerHandshake": &schema.Schema{
+									"ssl_server_handshake": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"sslServerHello": &schema.Schema{
+									"ssl_serverhello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"startsWith": &schema.Schema{
+									"starts_with": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -1002,12 +1002,12 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"unnamedQueryParameter": &schema.Schema{
+									"unnamed_queryparameter": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"userAgentToken": &schema.Schema{
+									"user_agent_token": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -1038,7 +1038,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"vlanId": &schema.Schema{
+									"vlan_id": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,

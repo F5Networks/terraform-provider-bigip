@@ -7,8 +7,8 @@ provider "bigip" {
 
 resource "bigip_license_f5bigmstbt10G" "San_Jose_f5bigipmstbt10G" {
 /* BIG-IP at San Jose Licensed */  
-  deviceAddress = "10.192.74.73"
+  device_address = "10.192.74.73"
   username = "admin"
   password = "admin"
-  unitOfMeasure = "yearly"
+  unitof_measure = "yearly"
 }

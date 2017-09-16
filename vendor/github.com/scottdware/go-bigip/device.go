@@ -30,6 +30,38 @@ type LICDTO struct {
 	Password      string `json:"password,omitempty"`
 }
 
+type Devicenames struct {
+	Devicenames []Devicename `json:"items"`
+}
+
+type Devicename struct {
+	Command string `json:"command,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Target  string `json:"target,omitempty"`
+}
+
+type Devices struct {
+	Devices []Device `json:"items"`
+}
+
+type Device struct {
+	ConfigsyncIp      string `json:"configsyncIp,omitempty"`
+	Name              string `json:"name,omitempty"`
+	MirrorIp          string `json:"mirrorIp,omitempty"`
+	MirrorSecondaryIp string `json:"mirrorSecondaryIp,omitempty"`
+}
+
+type Devicegroups struct {
+	Devicegroups []Devicegroup `json:"items"`
+}
+
+type Devicegroup struct {
+	AutoSync       string `json:"autoSync,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Type           string `json:"type,omitempty"`
+	FullLoadOnSync string `json:"fullLoadOnSync,omitempty"`
+}
+
 // https://10.192.74.80/mgmt/cm/device/licensing/pool/purchased-pool/licenses
 // The above command will spit out license uuid and which should be mapped uriUuid
 const (
@@ -124,4 +156,81 @@ func (b *BigIP) LICs() (*LIC, error) {
 	}
 
 	return &members, nil
+}
+
+func (b *BigIP) CreateDevicename(command, name, target string) error {
+	config := &Devicename{
+		Command: command,
+		Name:    name,
+		Target:  target,
+	}
+
+	return b.post(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) ModifyDevicename(config *Devicename) error {
+	return b.put(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) Devicenames() (*Devicename, error) {
+	var devicename Devicename
+	err, _ := b.getForEntity(&devicename, uriCm, uriDiv)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &devicename, nil
+}
+
+func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp string) error {
+	config := &Device{
+		Name:              name,
+		ConfigsyncIp:      configsyncIp,
+		MirrorIp:          mirrorIp,
+		MirrorSecondaryIp: mirrorSecondaryIp,
+	}
+
+	return b.post(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) ModifyDevice(config *Device) error {
+	return b.put(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) Devices() (*Device, error) {
+	var device Device
+	err, _ := b.getForEntity(&device, uriCm, uriDiv)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &device, nil
+}
+
+func (b *BigIP) CreateDevicegroup(name, autoSync, typo, fullLoadOnSync string) error {
+	config := &Devicegroup{
+		Name:           name,
+		AutoSync:       autoSync,
+		Type:           typo,
+		FullLoadOnSync: fullLoadOnSync,
+	}
+
+	return b.post(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
+	return b.put(config, uriCm, uriDiv)
+}
+
+func (b *BigIP) Devicegroups() (*Devicegroup, error) {
+	var devicegroup Devicegroup
+	err, _ := b.getForEntity(&devicegroup, uriCm, uriDiv)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &devicegroup, nil
 }
