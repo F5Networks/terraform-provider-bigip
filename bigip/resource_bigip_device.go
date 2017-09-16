@@ -20,7 +20,7 @@ func resourceBigipLtmDevice() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"configsyncIp": &schema.Schema{
+			"configsync_ip": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username of BIG-IP",
@@ -32,12 +32,12 @@ func resourceBigipLtmDevice() *schema.Resource {
 				Description: "Address of the Device which needs to be Deviceensed",
 			},
 
-			"mirrorIp": &schema.Schema{
+			"mirror_ip": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"mirrorSecondaryIp": &schema.Schema{
+			"mirror_secondary_ip": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
@@ -50,10 +50,10 @@ func resourceBigipLtmDevice() *schema.Resource {
 func resourceBigipLtmDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	configsyncIp := d.Get("configsyncIp").(string)
+	configsyncIp := d.Get("configsync_ip").(string)
 	name := d.Get("name").(string)
-	mirrorIp := d.Get("mirrorIp").(string)
-	mirrorSecondaryIp := d.Get("mirrorSecondaryIp").(string)
+	mirrorIp := d.Get("mirror_ip").(string)
+	mirrorSecondaryIp := d.Get("mirror_secondary_ip").(string)
 
 	log.Println("[INFO] Creating Device ")
 
@@ -80,9 +80,9 @@ func resourceBigipLtmDeviceUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	r := &bigip.Device{
 		Name:              name,
-		ConfigsyncIp:      d.Get("configsyncIp").(string),
-		MirrorIp:          d.Get("mirrorIp").(string),
-		MirrorSecondaryIp: d.Get("mirrorSecondaryIp").(string),
+		ConfigsyncIp:      d.Get("configsync_ip").(string),
+		MirrorIp:          d.Get("mirror_ip").(string),
+		MirrorSecondaryIp: d.Get("mirror_secondary_ip").(string),
 	}
 
 	return client.ModifyDevice(r)
@@ -101,9 +101,9 @@ func resourceBigipLtmDeviceRead(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	d.Set("name", members.Name)
-	d.Set("mirrorIp", members.MirrorIp)
-	d.Set("configsyncIp", members.ConfigsyncIp)
-	d.Set("mirrorSecondaryIp", members.MirrorSecondaryIp)
+	d.Set("mirror_ip", members.MirrorIp)
+	d.Set("configsync_ip", members.ConfigsyncIp)
+	d.Set("mirror_secondary_ip", members.MirrorSecondaryIp)
 	return nil
 }
 

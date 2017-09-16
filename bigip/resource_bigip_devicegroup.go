@@ -26,7 +26,7 @@ func resourceBigipLtmDevicegroup() *schema.Resource {
 				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
 			},
 
-			"autoSync": &schema.Schema{
+			"auto_sync": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
@@ -36,7 +36,7 @@ func resourceBigipLtmDevicegroup() *schema.Resource {
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"fullLoadOnSync": &schema.Schema{
+			"full_load_on_sync": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
@@ -49,10 +49,10 @@ func resourceBigipLtmDevicegroup() *schema.Resource {
 func resourceBigipLtmDevicegroupCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	autoSync := d.Get("autoSync").(string)
+	autoSync := d.Get("auto_sync").(string)
 	name := d.Get("name").(string)
 	typo := d.Get("type").(string)
-	fullLoadOnSync := d.Get("fullLoadOnSync").(string)
+	fullLoadOnSync := d.Get("full_load_on_sync").(string)
 
 	log.Println("[INFO] Creating Devicegroup ")
 
@@ -79,9 +79,9 @@ func resourceBigipLtmDevicegroupUpdate(d *schema.ResourceData, meta interface{})
 
 	r := &bigip.Devicegroup{
 		Name:           name,
-		AutoSync:       d.Get("autoSync").(string),
+		AutoSync:       d.Get("auto_sync").(string),
 		Type:           d.Get("type").(string),
-		FullLoadOnSync: d.Get("fullLoadOnSync").(string),
+		FullLoadOnSync: d.Get("full_load_on_sync").(string),
 	}
 
 	return client.ModifyDevicegroup(r)
@@ -100,9 +100,9 @@ func resourceBigipLtmDevicegroupRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.Set("name", members.Name)
-	d.Set("autoSync", members.AutoSync)
+	d.Set("auto_sync", members.AutoSync)
 	d.Set("type", members.Type)
-	d.Set("fullLoadOnSync", members.FullLoadOnSync)
+	d.Set("full_load_on_sync", members.FullLoadOnSync)
 	return nil
 }
 

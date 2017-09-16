@@ -7,3 +7,6 @@ bigip.test
 *.tfvars
 vendor/.DS_Store
 .DS_Store
+*.goback*
+*.iapp
+
