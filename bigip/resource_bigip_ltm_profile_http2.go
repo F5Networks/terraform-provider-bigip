@@ -26,30 +26,30 @@ func resourceBigipLtmHttp2() *schema.Resource {
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaultsFrom": &schema.Schema{
+			"defaults_from": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"concurrentStreamsPerConnection": &schema.Schema{
+			"concurrent_streams_per_connection": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"connectionIdleTimeout": &schema.Schema{
+			"connection_idle_timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
-			"headerTableSize": &schema.Schema{
+			"header_table_size": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"activationModes": &schema.Schema{
+			"activation_modes": &schema.Schema{
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -64,11 +64,11 @@ func resourceBigipLtmHttp2Create(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	defaultsFrom := d.Get("defaultsFrom").(string)
-	concurrentStreamsPerConnection := d.Get("concurrentStreamsPerConnection").(int)
-	connectionIdleTimeout := d.Get("connectionIdleTimeout").(int)
-	headerTableSize := d.Get("headerTableSize").(int)
-	activationModes := setToStringSlice(d.Get("activationModes").(*schema.Set))
+	defaultsFrom := d.Get("defaults_from").(string)
+	concurrentStreamsPerConnection := d.Get("concurrent_streams_per_connection").(int)
+	connectionIdleTimeout := d.Get("connection_idle_timeout").(int)
+	headerTableSize := d.Get("header_table_size").(int)
+	activationModes := setToStringSlice(d.Get("activation_modes").(*schema.Set))
 
 	log.Println("[INFO] Creating Http2 profile")
 
@@ -97,11 +97,11 @@ func resourceBigipLtmHttp2Update(d *schema.ResourceData, meta interface{}) error
 
 	r := &bigip.Http2{
 		Name:                           name,
-		DefaultsFrom:                   d.Get("defaultsFrom").(string),
-		ConcurrentStreamsPerConnection: d.Get("concurrentStreamsPerConnection").(int),
-		ConnectionIdleTimeout:          d.Get("connectionIdleTimeout").(int),
-		HeaderTableSize:                d.Get("headerTableSize").(int),
-		ActivationModes:                setToStringSlice(d.Get("activationModes").(*schema.Set)),
+		DefaultsFrom:                   d.Get("defaults_from").(string),
+		ConcurrentStreamsPerConnection: d.Get("concurrentr_streams_perr_connection").(int),
+		ConnectionIdleTimeout:          d.Get("connection_idle_timeout").(int),
+		HeaderTableSize:                d.Get("header_table_size").(int),
+		ActivationModes:                setToStringSlice(d.Get("activation_modes").(*schema.Set)),
 	}
 
 	return client.ModifyHttp2(name, r)

@@ -11,12 +11,13 @@ import (
 // ModuleVariableTransformer is a GraphTransformer that adds all the variables
 // in the configuration to the graph.
 //
-// This only adds variables that are referenced by other thigns in the graph.
+// This only adds variables that are referenced by other things in the graph.
 // If a module variable is not referenced, it won't be added to the graph.
 type ModuleVariableTransformer struct {
 	Module *module.Tree
 
 	DisablePrune bool // True if pruning unreferenced should be disabled
+	Input        bool // True if this is from an Input operation.
 }
 
 func (t *ModuleVariableTransformer) Transform(g *Graph) error {
@@ -99,6 +100,7 @@ func (t *ModuleVariableTransformer) transformSingle(g *Graph, parent, m *module.
 			Config:    v,
 			Value:     value,
 			Module:    t.Module,
+			Input:     t.Input,
 		}
 
 		if !t.DisablePrune {

@@ -15,6 +15,9 @@ type NodeApplyableModuleVariable struct {
 	Value     *config.RawConfig // Value is the value that is set
 
 	Module *module.Tree // Antiquated, want to remove
+
+	// Input is set if this graph was created for the Input operation.
+	Input bool
 }
 
 func (n *NodeApplyableModuleVariable) Name() string {
@@ -35,6 +38,13 @@ func (n *NodeApplyableModuleVariable) Path() []string {
 	}
 
 	return rootModulePath
+}
+
+// RemovableIfNotTargeted
+func (n *NodeApplyableModuleVariable) RemoveIfNotTargeted() bool {
+	// We need to add this so that this node will be removed if
+	// it isn't targeted or a dependency of a target.
+	return true
 }
 
 // GraphNodeReferenceGlobal
@@ -85,12 +95,24 @@ func (n *NodeApplyableModuleVariable) EvalTree() EvalNode {
 	// within the variables mapping.
 	var config *ResourceConfig
 	variables := make(map[string]interface{})
+
+	var interpolate EvalNode
+
+	if n.Input {
+		interpolate = &EvalTryInterpolate{
+			Config: n.Value,
+			Output: &config,
+		}
+	} else {
+		interpolate = &EvalInterpolate{
+			Config: n.Value,
+			Output: &config,
+		}
+	}
+
 	return &EvalSequence{
 		Nodes: []EvalNode{
-			&EvalInterpolate{
-				Config: n.Value,
-				Output: &config,
-			},
+			interpolate,
 
 			&EvalVariableBlock{
 				Config:         &config,

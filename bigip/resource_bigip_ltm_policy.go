@@ -514,7 +514,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_sessionId": &schema.Schema{
+									"ssl_session_id": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -569,7 +569,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
-									"vlanId": &schema.Schema{
+									"vlan_id": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,

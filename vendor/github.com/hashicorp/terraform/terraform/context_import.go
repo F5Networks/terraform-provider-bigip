@@ -23,6 +23,9 @@ type ImportTarget struct {
 
 	// ID is the ID of the resource to import. This is resource-specific.
 	ID string
+
+	// Provider string
+	Provider string
 }
 
 // Import takes already-created external resources and brings them
@@ -37,8 +40,7 @@ type ImportTarget struct {
 // imported.
 func (c *Context) Import(opts *ImportOpts) (*State, error) {
 	// Hold a lock since we can modify our own state here
-	v := c.acquireRun("import")
-	defer c.releaseRun(v)
+	defer c.acquireRun("import")()
 
 	// Copy our own state
 	c.state = c.state.DeepCopy()
@@ -64,7 +66,7 @@ func (c *Context) Import(opts *ImportOpts) (*State, error) {
 	}
 
 	// Walk it
-	if _, err := c.walk(graph, nil, walkImport); err != nil {
+	if _, err := c.walk(graph, walkImport); err != nil {
 		return c.state, err
 	}
 

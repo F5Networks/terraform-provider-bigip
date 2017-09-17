@@ -84,6 +84,13 @@ type SimpleVariable struct {
 	Key string
 }
 
+// TerraformVariable is a "terraform."-prefixed variable used to access
+// metadata about the Terraform run.
+type TerraformVariable struct {
+	Field string
+	key   string
+}
+
 // A UserVariable is a variable that is referencing a user variable
 // that is inputted from outside the configuration. This looks like
 // "${var.foo}"
@@ -94,6 +101,12 @@ type UserVariable struct {
 	key string
 }
 
+// A LocalVariable is a variable that references a local value defined within
+// the current module, via a "locals" block. This looks like "${local.foo}".
+type LocalVariable struct {
+	Name string
+}
+
 func NewInterpolatedVariable(v string) (InterpolatedVariable, error) {
 	if strings.HasPrefix(v, "count.") {
 		return NewCountVariable(v)
@@ -101,8 +114,12 @@ func NewInterpolatedVariable(v string) (InterpolatedVariable, error) {
 		return NewPathVariable(v)
 	} else if strings.HasPrefix(v, "self.") {
 		return NewSelfVariable(v)
+	} else if strings.HasPrefix(v, "terraform.") {
+		return NewTerraformVariable(v)
 	} else if strings.HasPrefix(v, "var.") {
 		return NewUserVariable(v)
+	} else if strings.HasPrefix(v, "local.") {
+		return NewLocalVariable(v)
 	} else if strings.HasPrefix(v, "module.") {
 		return NewModuleVariable(v)
 	} else if !strings.ContainsRune(v, '.') {
@@ -278,6 +295,22 @@ func (v *SimpleVariable) GoString() string {
 	return fmt.Sprintf("*%#v", *v)
 }
 
+func NewTerraformVariable(key string) (*TerraformVariable, error) {
+	field := key[len("terraform."):]
+	return &TerraformVariable{
+		Field: field,
+		key:   key,
+	}, nil
+}
+
+func (v *TerraformVariable) FullKey() string {
+	return v.key
+}
+
+func (v *TerraformVariable) GoString() string {
+	return fmt.Sprintf("*%#v", *v)
+}
+
 func NewUserVariable(key string) (*UserVariable, error) {
 	name := key[len("var."):]
 	elem := ""
@@ -303,6 +336,25 @@ func (v *UserVariable) FullKey() string {
 }
 
 func (v *UserVariable) GoString() string {
+	return fmt.Sprintf("*%#v", *v)
+}
+
+func NewLocalVariable(key string) (*LocalVariable, error) {
+	name := key[len("local."):]
+	if idx := strings.Index(name, "."); idx > -1 {
+		return nil, fmt.Errorf("Can't use dot (.) attribute access in local.%s; use square bracket indexing", name)
+	}
+
+	return &LocalVariable{
+		Name: name,
+	}, nil
+}
+
+func (v *LocalVariable) FullKey() string {
+	return fmt.Sprintf("local.%s", v.Name)
+}
+
+func (v *LocalVariable) GoString() string {
 	return fmt.Sprintf("*%#v", *v)
 }
 
