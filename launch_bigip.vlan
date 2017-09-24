@@ -7,7 +7,7 @@ resource "bigip_ltm_vlan" "vlan1" {
 	name = "/Common/Internal"
 	tag = 101
 	interfaces = {
-    name = 1.2,
+                vlanport = 1.2,
 		tagged = false
 	}
 }

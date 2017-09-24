@@ -40,10 +40,10 @@ func resourceBigipLtmVlan() *schema.Resource {
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"vlanport": &schema.Schema{
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: "Interface name",
+							Description: "Vlan name",
 						},
 
 						"tagged": &schema.Schema{
@@ -79,7 +79,7 @@ func resourceBigipLtmVlanCreate(d *schema.ResourceData, meta interface{}) error 
 	ifaceCount := d.Get("interfaces.#").(int)
 	for i := 0; i < ifaceCount; i++ {
 		prefix := fmt.Sprintf("interfaces.%d", i)
-		iface := d.Get(prefix + ".name").(string)
+		iface := d.Get(prefix + ".vlanport").(string)
 		tagged := d.Get(prefix + ".tagged").(bool)
 
 		err = client.AddInterfaceToVlan(name, iface, tagged)
