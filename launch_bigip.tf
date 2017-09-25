@@ -1,3 +1,6 @@
+terraform {
+  required_version = ">= 0.10.0"
+}
 provider "bigip" {
 address = "10.192.74.73"
 username = "admin"
@@ -11,7 +14,9 @@ module  "vlan" {
   vlanport = "1.1"
   tagged = true
  }
+
  output "vlanport" {
  value = "${module.vlan.vlanport}"
  }
+
 

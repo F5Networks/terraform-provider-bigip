@@ -6,7 +6,6 @@ resource "bigip_ltm_vlan" "vlan" {
 		vlanport = "${var.vlanport}",
 		tagged = "${var.tagged}"
 	}	
-
 }
 
 
