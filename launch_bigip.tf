@@ -4,21 +4,14 @@ username = "admin"
 password = "admin"
 
 }
-module  "sjvlan1" {
-  source = "./vlanmodule"
+module  "vlan" {
+  source = "./terraform-bigip-vlan"
   name = "/Common/intvlan"
   tag = 101
   vlanport = "1.1"
   tagged = true
  }
-
-resource "bigip_ltm_selfip" "selfip" {
-
-        name = "/Common/InternalselfIP"
-        ip = "100.1.1.1/24"
-        vlan = "/Common/intvlan"
-        depends_on = ["module.sjvlan1"]
-        }
-
-
+ output "vlanport" {
+ value = "${module.vlan.vlanport}"
+ }
 

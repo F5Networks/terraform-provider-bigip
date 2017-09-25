@@ -1,7 +1,3 @@
-variable "name" {}
-variable  tag  {}
-variable "vlanport"    {}
-variable "tagged"    {}
 
 resource "bigip_ltm_vlan" "vlan" {
 	name = "${var.name}"
@@ -12,4 +8,5 @@ resource "bigip_ltm_vlan" "vlan" {
 	}	
 
 }
+
 
