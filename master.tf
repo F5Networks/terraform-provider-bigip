@@ -1,5 +1,6 @@
 provider "bigip" {
   address = "10.192.74.73"
+  //address = "10.0.1.79"
   username = "admin"
   password = "admin"
 }
@@ -30,7 +31,7 @@ resource "bigip_ltm_vlan" "vlan1" {
 	name = "/Common/internal"
 	tag = 101
 	interfaces = {
-		name = 1.2,
+		vlanport = 1.2,
 		tagged = false
 	}	
 
@@ -41,7 +42,7 @@ resource "bigip_ltm_vlan" "vlan2" {
         name = "/Common/external"
         tag = 102
         interfaces = {
-                name = 1.1,
+                vlanport = 1.1,
                 tagged = false
         }
 

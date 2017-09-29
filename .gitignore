@@ -1,4 +1,6 @@
 *.tfstate*
+.terraform
+terraform-provider-bigip
 .idea/
 bin/
 target/

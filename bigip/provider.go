@@ -65,7 +65,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_provision":         resourceBigipLtmProvision(),
 			//"bigip_ltm_iapp":          resourceBigipLtmiApp(),
 			"bigip_route": resourceBigipLtmRoute(),
-			//"bigip_datagroup":            resourceBigipLtmDatagroup(),
+			//	"bigip_datagroup":            resourceBigipLtmDatagroup(),
 			"bigip_ltm_oneconnect":       resourceBigipLtmOneconnect(),
 			"bigip_syslog":               resourceBigipLtmSyslog(),
 			"bigip_snmp":                 resourceBigipLtmSnmp(),
