@@ -57,12 +57,12 @@ func resourceBigipLtmSyslog() *schema.Resource {
 
 func resourceBigipLtmSyslogCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	r := dataToSysLog(d)
-
 	log.Println("[INFO] Creating Syslog servers.")
 
-	err := client.CreateSyslog(&r)
+	r := dataToSysLog(d)
+	log.Println("[INFO] Data to Syslog.", r)
 
+	err := client.CreateSyslog(&r)
 	if err != nil {
 		return err
 	}
@@ -71,32 +71,27 @@ func resourceBigipLtmSyslogCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceBigipLtmSyslogUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-
+	// client := meta.(*bigip.BigIP)
 	name := d.Id()
 
 	log.Println("[INFO] Updating Syslog " + name)
 
-	r := dataToSysLog(d)
-
-	return client.ModifySyslog(&r)
+	// r := dataToSysLog(d)
+	//
+	// return client.ModifySyslog(&r)
 	return nil
 }
 
 func resourceBigipLtmSyslogRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-
-	log.Println("[INFO] Reading Syslog " + name)
-
-	syslog, err := client.Syslogs()
-	if err != nil {
-		return err
-	}
-
-	d.Set("auth_privfrom", syslog.AuthPrivFrom)
-
+	// client := meta.(*bigip.BigIP)
+	// s, err := client.Syslogs()
+	// log.Println("[INFO] Reading Syslog.")
+	//
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// return syslogToData(s, d)
 	return nil
 }
 
@@ -124,4 +119,16 @@ func dataToSysLog(d *schema.ResourceData) bigip.Syslog {
 	}
 
 	return r
+}
+
+func syslogToData(p *bigip.Syslog, d *schema.ResourceData) error {
+	d.Set("auth_privfrom", p.AuthPrivFrom)
+
+	for i, r := range p.RemoteServers {
+		prefix := fmt.Sprintf("remote_servers.%d", i)
+		d.Set(fmt.Sprintf("%s.host", prefix), r.Host)
+		d.Set(fmt.Sprintf("%s.name", prefix), r.Name)
+		d.Set(fmt.Sprintf("%s.remote_port", prefix), r.RemotePort)
+	}
+	return nil
 }

@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_NODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)

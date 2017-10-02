@@ -3,10 +3,11 @@ package bigip
 import (
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 	"regexp"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
