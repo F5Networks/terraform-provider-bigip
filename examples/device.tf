@@ -8,8 +8,9 @@ provider "bigip" {
 resource "bigip_device" "my_new_device"
 
         {
-            name = "bigip200.f5.com"
-            configsyncIp = "2.2.2.2"
-            mirrorIp = "10.10.10.10"
-            mirrorSecondaryIp = "11.11.11.11"
+            name = "bigip300.f5.com"
+            configsync_ip = "2.2.2.2"
+            mirror_ip = "10.10.10.10"
+            mirror_secondary_ip = "11.11.11.11"
         }
+ 
