@@ -62,7 +62,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_dns":               resourceBigipLtmDns(),
 			"bigip_license":               resourceBigipLtmLic(),
 			"bigip_license_f5bigmstbt10G": resourceBigipLtmULic(),
-			"bigip_ltm_provision":         resourceBigipLtmProvision(),
+			"bigip_provision":             resourceBigipLtmProvision(),
 			//"bigip_ltm_iapp":          resourceBigipLtmiApp(),
 			"bigip_route": resourceBigipLtmRoute(),
 			//	"bigip_datagroup":            resourceBigipLtmDatagroup(),
