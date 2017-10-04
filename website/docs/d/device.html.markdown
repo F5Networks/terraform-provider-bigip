@@ -30,4 +30,4 @@ resource "bigip_device" "my_new_device"
             mirror_ip = "10.10.10.10"
             mirror_secondary_ip = "11.11.11.11"
         }
-        ```
+```       
