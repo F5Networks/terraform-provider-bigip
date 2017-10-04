@@ -12,14 +12,14 @@ resource "bigip_ltm_provision" "provision-afm" {
   memory_ratio = 0
 }
 
-resource "bigip_ltm_ntp" "ntp1" {
+resource "bigip_ntp" "ntp1" {
   	description = "/Common/NTP1"
   	servers = ["time.google.com"]
   	timezone = "America/Los_Angeles"
 	depends_on = ["bigip_ltm_provision.provision-afm"]
 }
 
-resource "bigip_ltm_dns" "dns1" {
+resource "bigip_dns" "dns1" {
    	description = "/Common/DNS1"
    	name_servers = ["8.8.8.8"]
    	numberof_dots = 2
