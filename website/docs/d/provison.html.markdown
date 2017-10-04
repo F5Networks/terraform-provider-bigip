@@ -9,7 +9,7 @@ description: |-
 # bigip\_provision
 
 `bigip_provision` provides details bout how to enable "ilx", "asm" "apm" resource on BIG-IP
-## Elxample Usage
+## Example Usage
 
 
 ```hcl
@@ -31,9 +31,12 @@ resource "bigip_provision" "provision-ilx" {
 
 ## Argument Reference
 
-* `bigip_provsion` - Common is the partition and ilx is the module being enabled it could be asm, afm apm etc.
+* `bigip_provision` - Is the resource which is used to provision big-ip modules like asm, afm, ilx etc
 * `Common/ilx` - Common is the partition and ilx is the module being enabled it could be asm, afm apm etc.
-* `cpuRatio` - m, afm apm etc.
+* `cpuRatio` - how much cpu resources you need for this resource
+* `diskRatio` - how much disk space you want to allocate for this resource.
+* `memoryRatio` - how much memory you want to deidcate for this resource
+
 
 
       
