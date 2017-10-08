@@ -769,22 +769,17 @@ type Http2 struct {
 	ActivationModes                []string
 }
 
+type Recordss struct {
+	Recordss []Records `json:"items"`
+}
+
 type Records struct {
 	Name string
 	Data string
 }
-
-type Recordss struct {
-	Recordss []Records `json:"items,omitempty"`
-}
-
-type recordsDTO struct {
+type RecordsDTO struct {
 	Name string `json:"name,omitempty"`
 	Data string `json:"data,omitempty"`
-}
-
-type Datagroups struct {
-	Datagroups []Datagroup `json:"items"`
 }
 
 type Datagroup struct {
@@ -793,12 +788,46 @@ type Datagroup struct {
 	Records []Records
 }
 
-type datagroupDTO struct {
+type Datagroups struct {
+	Datagroups []Datagroup `json:"items"`
+}
+
+type DatagroupDTO struct {
 	Name    string `json:"name,omitempty"`
 	Type    string `json:"type,omitempty"`
 	Records struct {
 		Items []Records `json:"items,omitempty"`
 	} `json:"records,omitempty"`
+}
+
+func (p *Datagroup) MarshalJSON() ([]byte, error) {
+	var dto DatagroupDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Datagroup) UnmarshalJSON(b []byte) error {
+	var dto DatagroupDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
+}
+
+func (p *Records) MarshalJSON() ([]byte, error) {
+	var dto RecordsDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Records) UnmarshalJSON(b []byte) error {
+	var dto RecordsDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
 }
 
 func (p *Monitor) MarshalJSON() ([]byte, error) {
@@ -907,46 +936,6 @@ func (p *Http2) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	return marshal(p, &dto)
-}
-
-func (p *Datagroup) MarshalJSON() ([]byte, error) {
-	return json.Marshal(datagroupDTO{
-		Name: p.Name,
-		Type: p.Type,
-		Records: struct {
-			Items []Records `json:"items,omitempty"`
-		}{Items: p.Records},
-	})
-}
-
-func (p *Datagroup) UnmarshalJSON(b []byte) error {
-	var dto datagroupDTO
-	err := json.Unmarshal(b, &dto)
-	if err != nil {
-		return err
-	}
-	p.Name = dto.Name
-	p.Type = dto.Type
-	p.Records = dto.Records.Items
-	return nil
-}
-
-func (p *Records) MarshalJSON() ([]byte, error) {
-	return json.Marshal(recordsDTO{
-		Name: p.Name,
-		Data: p.Data,
-	})
-}
-
-func (p *Records) UnmarshalJSON(b []byte) error {
-	var dto recordsDTO
-	err := json.Unmarshal(b, &dto)
-	if err != nil {
-		return err
-	}
-	p.Name = dto.Name
-	p.Data = dto.Data
-	return nil
 }
 
 const (
@@ -1696,36 +1685,48 @@ func (b *BigIP) Http2() (*Http2s, error) {
 }
 
 // Datagroups returns a list of datagroups.
-func (b *BigIP) GetDatagroup(name string) (*Datagroup, error) {
-	var p Datagroup
-	err, ok := b.getForEntity(&p, uriLtm, uriDatagroup, uriInternal, name)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return nil, nil
-	}
-	var records Records
-	err, _ = b.getForEntity(&records, uriLtm, uriDatagroup, uriInternal, name, "records")
+func (b *BigIP) Datagroups(name string) (*Datagroups, error) {
+	var datagroups Datagroups
+	err, _ := b.getForEntity(&datagroups, uriLtm, uriDatagroup, uriInternal, name)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return &p, nil
-
+	return &datagroups, nil
 }
 
 // CreateDatagroup adds a new Datagroup to the BIG-IP system.
-func (b *BigIP) CreateDatagroup(p *Policy) error {
-	return b.post(p, uriLtm, uriDatagroup, uriInternal)
-}
+func (b *BigIP) CreateDatagroup(typo, name string, records []Records) error {
+	//func (b *BigIP) CreateDatagroup(typo, name string) error {
+	config := &Datagroup{
+		Type:    typo,
+		Name:    name,
+		Records: records,
+	}
 
-//Update an existing Datagroup.
-func (b *BigIP) UpdateDatagroup(name string, p *Datagroup) error {
-	return b.put(p, uriLtm, uriDatagroup, uriInternal, name)
+	return b.post(config, uriLtm, uriDatagroup, uriInternal)
 }
+func (b *BigIP) Records() (*Records, error) {
+	var records Records
+	err, _ := b.getForEntity(&records, uriLtm, uriDatagroup, uriInternal)
 
-//Delete a Datagroup.
+	if err != nil {
+		return nil, err
+	}
+
+	return &records, nil
+}
 func (b *BigIP) DeleteDatagroup(name string) error {
+
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+}
+
+func (b *BigIP) AddRecords(name, rname, data string) error {
+	config := &Records{}
+
+	config.Name = rname
+	config.Data = data
+
+	return b.post(config, uriLtm, uriDatagroup, uriInternal, "records")
 }
