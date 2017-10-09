@@ -10,7 +10,8 @@ go get github.com/aws/aws-sdk-go/service/s3
 go get github.com/mattn/go-isatty
 go get github.com/posener/complete
 go get github.com/posener/complete/cmd/install
-pwd
+go get github.com/armon/go-radix
+
 ls
 cd terraform-provider-f5/
  go build -o terraform-provider-bigip
