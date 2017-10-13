@@ -78,6 +78,8 @@ func Provider() terraform.ResourceProvider {
 			"bigip_device_name":          resourceBigipLtmDevicename(),
 			"bigip_device":               resourceBigipLtmDevice(),
 			"bigip_devicegroup":          resourceBigipLtmDevicegroup(),
+			"bigip_snat":                 resourceBigipLtmSnat(),
+			"bigip_snatpool":             resourceBigipLtmSnatpool(),
 		},
 
 		ConfigureFunc: providerConfigure,

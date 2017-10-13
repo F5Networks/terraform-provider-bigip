@@ -3,6 +3,7 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -938,6 +939,88 @@ func (p *Http2) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
+type Snats struct {
+	Snats []Snat `json:"items"`
+}
+
+// VirtualAddress contains information about each individual virtual address.
+type Snat struct {
+	Name          string
+	Partition     string
+	FullPath      string
+	AutoLasthop   string
+	Mirror        bool
+	SourcePort    string
+	Translation   string
+	Snatpool      string
+	VlansDisabled bool
+	Origins       []string
+}
+
+type snatDTO struct {
+	Name          string   `json:"name"`
+	Partition     string   `json:"partition,omitempty"`
+	FullPath      string   `json:"fullPath,omitempty"`
+	AutoLasthop   string   `json:"autoLastHop,omitempty"`
+	Mirror        bool     `json:"mirror,omitempty" bool:"disabled"`
+	SourcePort    string   `json:"sourePort,omitempty"`
+	Translation   string   `json:"translation,omitempty"`
+	Snatpool      string   `json:"snatpool,omitempty"`
+	VlansDisabled bool     `json:"vlansDisabled,omitempty" bool:"disabled"`
+	Origins       []string `json:"origins,omitempty"`
+}
+
+func (p *Snat) MarshalJSON() ([]byte, error) {
+	var dto snatDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Snat) UnmarshalJSON(b []byte) error {
+	var dto snatDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	p.Origins = dto.Origins
+	//return marshal(p, &dto)
+	return nil
+}
+
+type Snatpools struct {
+	Snatpools []Snatpool `json:"items"`
+}
+
+// Snatpool structure
+type Snatpool struct {
+	Name      string
+	Partition string
+	Members   []string
+}
+
+type snatpoolDTO struct {
+	Name      string   `json:"name"`
+	Partition string   `json:"partition,omitempty"`
+	Members   []string `json:"members,omitempty"`
+}
+
+func (p *Snatpool) MarshalJSON() ([]byte, error) {
+	var dto snatpoolDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Snatpool) UnmarshalJSON(b []byte) error {
+	var dto snatpoolDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	p.Members = dto.Members
+	//return marshal(p, &dto)
+	return nil
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -961,6 +1044,8 @@ const (
 	uriFastl4         = "fastl4"
 	uriHttpcompress   = "http-compression"
 	uriHttp2          = "http2"
+	uriSnat           = "snat"
+	uriSnatpool       = "snatpool"
 )
 
 var cidr = map[string]string{
@@ -1729,4 +1814,98 @@ func (b *BigIP) AddRecords(name, rname, data string) error {
 	config.Data = data
 
 	return b.post(config, uriLtm, uriDatagroup, uriInternal, "records")
+}
+
+// Snats returns a list of snat
+func (b *BigIP) Snats(name string) (*Snats, error) {
+	var snats Snats
+	err, _ := b.getForEntity(&snats, uriLtm, uriSnat, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &snats, nil
+}
+
+func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool string, vlansDisabled, mirror bool, origins []string) error {
+	snat := &Snat{
+		Name:          name,
+		Partition:     partition,
+		AutoLasthop:   autoLastHop,
+		SourcePort:    sourcePort,
+		Translation:   translation,
+		Snatpool:      snatpool,
+		Mirror:        mirror,
+		VlansDisabled: vlansDisabled,
+		Origins:       origins,
+	}
+	log.Println("[INFO] Creating snat  ", snat)
+	return b.post(snat, uriLtm, uriSnat)
+}
+
+func (b *BigIP) ModifySnat(config *Snat) error {
+	return b.patch(config, uriLtm, uriSnat)
+}
+
+// Get a Snat list  by name. Returns nil if the node does not exist
+func (b *BigIP) GetSnat(name string) (*Snat, error) {
+	var snat Snat
+	err, ok := b.getForEntity(&snat, uriLtm, uriSnat, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &snat, nil
+}
+
+func (b *BigIP) DeleteSnat(name string) error {
+	return b.delete(uriLtm, uriSnat, name)
+}
+
+// Snats returns a list of snat
+func (b *BigIP) Snatpools(name string) (*Snatpools, error) {
+	var snatpools Snatpools
+	err, _ := b.getForEntity(&snatpools, uriLtm, uriSnatpool, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &snatpools, nil
+}
+
+func (b *BigIP) CreateSnatpool(name, partition string, members []string) error {
+	snatpool := &Snatpool{
+		Name:      name,
+		Partition: partition,
+		Members:   members,
+	}
+	log.Println("[INFO] Creating snatpool ", snatpool)
+	return b.post(snatpool, uriLtm, uriSnatpool)
+}
+
+func (b *BigIP) ModifySnatpool(config *Snatpool) error {
+	return b.put(config, uriLtm, uriSnatpool)
+}
+
+// Get a Snat list  by name. Returns nil if the node does not exist
+func (b *BigIP) GetSnatpool(name string) (*Snatpool, error) {
+	var snatpool Snatpool
+	err, ok := b.getForEntity(&snatpool, uriLtm, uriSnatpool, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &snatpool, nil
+}
+
+func (b *BigIP) DeleteSnatpool(name string) error {
+	return b.delete(uriLtm, uriSnatpool, name)
 }
