@@ -29,13 +29,13 @@ resource "bigip_ltm_policy" "test-policy" {
 	rule {
 		name = "` + TEST_RULE_NAME + `"
 		condition {
-        	        httpUri = true
-                	startsWith = true
+        	        http_uri = true
+                	starts_with = true
                 	values = ["/foo", "/bar"]
                 }
 
                 condition {
-                	httpMethod = true
+                	http_method = true
                 	values = ["GET"]
                 }
 
@@ -70,11 +70,11 @@ func TestBigipLtmPolicy_create(t *testing.T) {
 						fmt.Sprintf("requires.%d", schema.HashString("http")),
 						"http"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.name", TEST_RULE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.httpUri", "true"),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.startsWith", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.http_uri", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.starts_with", "true"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.values.0", "/foo"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.0.values.1", "/bar"),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.1.httpMethod", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.1.http_method", "true"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.condition.1.values.0", "GET"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.action.0.forward", "true"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "rule.0.action.0.pool", TEST_POOL_NAME),

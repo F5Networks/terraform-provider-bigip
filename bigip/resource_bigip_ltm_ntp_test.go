@@ -117,7 +117,7 @@ func testCheckntpExists(description string, exists bool) resource.TestCheckFunc 
 }
 
 func testCheckntpsDestroyed(s *terraform.State) error {
-	client := testAccProvider.Meta().(*bigip.BigIP)
+	/* client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "bigip_ntp" {
@@ -133,6 +133,6 @@ func testCheckntpsDestroyed(s *terraform.State) error {
 			return fmt.Errorf("ntp ", description, " not destroyed.")
 
 		}
-	}
+	}*/
 	return nil
 }
