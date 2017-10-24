@@ -704,10 +704,10 @@ type Fasthttp struct {
 type fastl4DTO struct {
 	Name                  string `json:"name,omitempty"`
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
-	ClientTimeout         int    `json:"clientTimeout,omitempty"`
+	ClientTimeout         int    `json:"clientTimeout,string,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
 	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
-	IdleTimeout           int    `json:"idleTimeout,omitempty"`
+	IdleTimeout           int    `json:"idleTimeout,string,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
 	IpTosToServer         string `json:"ipTosToServer,omitempty"`
 	KeepAliveInterval     string `json:"keepAliveInterval,omitempty"`
@@ -1690,7 +1690,7 @@ func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
 }
 
-func (b *BigIP) Fastl4() (*Fastl4s, error) {
+func (b *BigIP) Fastl4(name string) (*Fastl4s, error) {
 	var fastl4s Fastl4s
 	err, _ := b.getForEntity(&fastl4s, uriLtm, uriProfile, uriFastl4)
 

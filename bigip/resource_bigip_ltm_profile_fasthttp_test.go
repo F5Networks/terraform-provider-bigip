@@ -14,7 +14,7 @@ var TEST_FASTHTTP_NAME = fmt.Sprintf("/%s/test-fasthttp", TEST_PARTITION)
 var TEST_FASTHTTP_RESOURCE = `
 resource "bigip_fasthttp_profile" "test-fasthttp" {
 	name = "` + TEST_FASTHTTP_NAME + `"
-	defaults_from = "/Common/fasthttp"
+	defaults_from = "fasthttp"
             idle_timeout = 300
             connpoolidle_timeoutoverride	= 0
             connpool_maxreuse = 2
@@ -40,7 +40,7 @@ func TestBigipLtmfasthttp_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfasthttpExists(TEST_FASTHTTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "name", TEST_FASTHTTP_NAME),
-					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "defaults_from", "Common/fasthttp"),
+					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "defaults_from", "fasthttp"),
 					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "idle_timeout", "300"),
 					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "connpoolidle_timeoutoverride", "0"),
 					resource.TestCheckResourceAttr("bigip_fasthttp_profile.test-fasthttp", "connpool_maxreuse", "2"),
@@ -116,14 +116,14 @@ func testCheckfasthttpExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		fasthttp, err := client.Fasthttp()
+		p, err := client.Fasthttp()
 		if err != nil {
 			return err
 		}
-		if exists && fasthttp == nil {
+		if exists && p == nil {
 			return fmt.Errorf("fasthttp ", name, " was not created.")
 		}
-		if !exists && fasthttp != nil {
+		if !exists && p != nil {
 			return fmt.Errorf("fasthttp ", name, " still exists.")
 		}
 		return nil
@@ -143,7 +143,7 @@ func testCheckfasthttpsDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if fasthttp != nil {
+		if fasthttp == nil {
 			return fmt.Errorf("fasthttp ", name, " not destroyed.")
 		}
 	}
