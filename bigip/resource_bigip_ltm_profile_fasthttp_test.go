@@ -70,7 +70,7 @@ func TestBigipLtmfasthttp_import(t *testing.T) {
 					testCheckfasthttpExists(TEST_FASTHTTP_NAME, true),
 				),
 				ResourceName:      TEST_FASTHTTP_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

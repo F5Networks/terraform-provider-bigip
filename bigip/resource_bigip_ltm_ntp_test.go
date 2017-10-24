@@ -12,7 +12,7 @@ import (
 var TEST_NTP_NAME = fmt.Sprintf("/%s/test-ntp", TEST_PARTITION)
 
 var TEST_NTP_RESOURCE = `
-resource "bigip_ltm_ntp" "test-ntp" {
+resource "bigip_ntp" "test-ntp" {
 	description = "` + TEST_NTP_NAME + `"
 	servers = ["10.10.10.10"]
 	timezone = "America/Los_Angeles"
@@ -31,9 +31,9 @@ func TestBigipLtmNtp_create(t *testing.T) {
 				Config: TEST_NTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_ntp.test-ntp", "description", TEST_NTP_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_ntp.test-ntp", "servers", "10.10.10.10"),
-					resource.TestCheckResourceAttr("bigip_ltm_ntp.test-ntp", "timezone", "America/Los_Angeles"),
+					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "description", TEST_NTP_NAME),
+					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "10.10.10.10"),
+					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "timezone", "America/Los_Angeles"),
 				),
 			},
 		},
@@ -54,7 +54,7 @@ func TestBigipLtmNtp_import(t *testing.T) {
 					testCheckntpExists(TEST_NTP_NAME, true),
 				),
 				ResourceName:      TEST_NTP_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},
@@ -120,7 +120,7 @@ func testCheckntpsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ltm_ntp" {
+		if rs.Type != "bigip_ntp" {
 			continue
 		}
 

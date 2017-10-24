@@ -2,11 +2,12 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_POLICY_NAME = fmt.Sprintf("/%s/test-policy", TEST_PARTITION)
@@ -97,7 +98,7 @@ func TestBigipLtmPolicy_import(t *testing.T) {
 					testCheckPolicyExists(TEST_POLICY_NAME, true),
 				),
 				ResourceName:      TEST_POLICY_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

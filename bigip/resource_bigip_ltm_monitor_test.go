@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_MONITOR_NAME = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
@@ -70,7 +71,7 @@ func TestBigipLtmMonitor_import(t *testing.T) {
 					testCheckMonitorExists(TEST_MONITOR_NAME),
 				),
 				ResourceName:      TEST_MONITOR_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

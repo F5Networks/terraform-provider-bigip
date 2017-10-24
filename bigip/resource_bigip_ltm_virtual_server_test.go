@@ -2,11 +2,12 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_VS_NAME = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
@@ -84,7 +85,7 @@ func TestBigipLtmVS_import(t *testing.T) {
 					testCheckVSExists(TEST_VS_NAME, true),
 				),
 				ResourceName:      TEST_VS_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

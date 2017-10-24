@@ -78,20 +78,20 @@ func resourceBigipLtmDatagroupCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-/*
-	recordCount := d.Get("records.#").(int)
-	for i := 0; i < recordCount; i++ {
-		prefix := fmt.Sprintf("records.%d", i)
-		rname := d.Get(prefix + "name").(string)
-		data := d.Get(prefix + "data").(string)
+	/*
+		recordCount := d.Get("records.#").(int)
+		for i := 0; i < recordCount; i++ {
+			prefix := fmt.Sprintf("records.%d", i)
+			rname := d.Get(prefix + "name").(string)
+			data := d.Get(prefix + "data").(string)
 
-		err = client.AddRecords(name, rname, data)
-		if err != nil {
-			return err
+			err = client.AddRecords(name, rname, data)
+			if err != nil {
+				return err
+			}
 		}
-	}
-	// New cod
-*/
+		// New cod
+	*/
 	d.SetId(name)
 
 	return resourceBigipLtmDatagroupRead(d, meta)
@@ -100,24 +100,22 @@ func resourceBigipLtmDatagroupCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceBigipLtmDatagroupRead(d *schema.ResourceData, meta interface{}) error {
-/*client := meta.(*bigip.BigIP)
+	/*client := meta.(*bigip.BigIP)
 
- name := d.Id()
+	   name := d.Id()
 
- log.Println("[INFO] Fetching Datagroup " + name)
+	   log.Println("[INFO] Fetching Datagroup " + name)
 
- datagroup, err := client.Datagroups(name)
- if err != nil {
-	 return err
- }
+	   datagroup, err := client.Datagroups(name)
+	   if err != nil {
+	  	 return err
+	   }
 
-// d.Set("type", datagroup.Type)
- d.Set("name", name)
-*/
- return nil
+	  // d.Set("type", datagroup.Type)
+	   d.Set("name", name)
+	*/
+	return nil
 }
-
-
 
 func resourceBigipLtmDatagroupExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	/* client := meta.(*bigip.BigIP)

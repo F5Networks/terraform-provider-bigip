@@ -52,7 +52,7 @@ func TestBigipLtmNode_import(t *testing.T) {
 					testCheckNodeExists(TEST_NODE_NAME, true),
 				),
 				ResourceName:      TEST_NODE_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
@@ -56,7 +57,7 @@ func TestBigipLtmPool_import(t *testing.T) {
 					testCheckPoolExists(TEST_POOL_NAME, true),
 				),
 				ResourceName:      TEST_POOL_RESOURCE,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},

@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
-	"testing"
 )
 
 var TEST_IRULE_NAME = "/" + TEST_PARTITION + "/test-rule"
@@ -52,7 +53,7 @@ func TestBigipLtmIRule_import(t *testing.T) {
 					testCheckIRuleExists(TEST_IRULE_NAME),
 				),
 				ResourceName:      TEST_IRULE_NAME,
-				ImportState:       true,
+				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},
