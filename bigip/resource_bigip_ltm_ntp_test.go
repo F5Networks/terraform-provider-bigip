@@ -24,15 +24,15 @@ func TestBigipLtmNtp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckntpsDestroyed,
+		Providers: testAccProviders,
+		//CheckDestroy: testCheckntpsDestroyed,
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: TEST_NTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "description", TEST_NTP_NAME),
-					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "10.10.10.10"),
+					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "[10.10.10.10]"),
 					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "timezone", "America/Los_Angeles"),
 				),
 			},
@@ -45,8 +45,8 @@ func TestBigipLtmNtp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckntpsDestroyed,
+		Providers: testAccProviders,
+		//	CheckDestroy: testCheckntpsDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: TEST_NTP_RESOURCE,
