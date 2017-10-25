@@ -704,10 +704,11 @@ type Fasthttp struct {
 type fastl4DTO struct {
 	Name                  string `json:"name,omitempty"`
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
-	ClientTimeout         int    `json:"clientTimeout,string,omitempty"`
+	Partition             string `json:"partition,omitempty"`
+	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
 	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
-	IdleTimeout           int    `json:"idleTimeout,string,omitempty"`
+	IdleTimeout           int    `json:"idleTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
 	IpTosToServer         string `json:"ipTosToServer,omitempty"`
 	KeepAliveInterval     string `json:"keepAliveInterval,omitempty"`
@@ -1622,6 +1623,17 @@ func (b *BigIP) DeleteTcp(name string) error {
 func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	tcp.Name = name
 	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
+}
+
+func (b *BigIP) Tcp() (*Tcps, error) {
+	var tcps Tcps
+	err, _ := b.getForEntity(&tcps, uriLtm, uriProfile, uriTcp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &tcps, nil
 }
 
 func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {

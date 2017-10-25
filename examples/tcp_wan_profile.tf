@@ -9,14 +9,14 @@ resource "bigip_tcp_profile" "sanjose-tcp-wan-profile"
 
         {  
             name = "sanjose-tcp-wan-profile"
-            defaultsFrom = "/Common/tcp-wan-optimized"
-            idleTimeout = 300
-            closeWaitTimeout = 5
-            finWait_2Timeout = 5
-            finWaitTimeout = 300
-            keepAliveInterval = 1700
-            deferredAccept = "enabled"
-            fastOpen = "enabled"
+            defaults_from = "/Common/tcp-wan-optimized"
+            idle_timeout = 300
+            close_wait_timeout = 5
+            finwait_2timeout = 5
+            finwait_timeout = 300
+            keepalive_interval = 1700
+            deferred_accept = "enabled"
+            fast_open = "enabled"
         }
 
 

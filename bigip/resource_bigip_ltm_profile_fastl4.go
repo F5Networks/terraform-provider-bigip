@@ -108,7 +108,7 @@ func resourceBigipLtmFastl4Create(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipLtmFastl4Read(d, meta)
 }
 
 func resourceBigipLtmFastl4Update(d *schema.ResourceData, meta interface{}) error {
