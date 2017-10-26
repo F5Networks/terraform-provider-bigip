@@ -12,7 +12,7 @@ import (
 var TEST_FASTL4_NAME = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
 
 var TEST_FASTL4_RESOURCE = `
-resource "bigip_fastl4_profile" "sjfastl4profile" {
+resource "bigip_fastl4_profile" "test-fastl4" {
             name = "` + TEST_FASTL4_NAME + `"
             partition = "Common"
             defaults_from = "/Common/fastL4"
@@ -22,11 +22,11 @@ resource "bigip_fastl4_profile" "sjfastl4profile" {
             hardware_syncookie = "enabled"
             iptos_toclient = "pass-through"
             iptos_toserver = "pass-through"
-            keepalive_interval = "disabled"  //This cannot take enabled
+            keepalive_interval = "disabled" 
  }
 `
 
-func TestBigipLtmfastl4_create(t *testing.T) {
+func TestBigipLtmFastl4_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

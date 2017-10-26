@@ -705,10 +705,10 @@ type fastl4DTO struct {
 	Name                  string `json:"name,omitempty"`
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
 	Partition             string `json:"partition,omitempty"`
-	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
 	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
 	IdleTimeout           int    `json:"idleTimeout,omitempty"`
+	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
 	IpTosToServer         string `json:"ipTosToServer,omitempty"`
 	KeepAliveInterval     string `json:"keepAliveInterval,omitempty"`
@@ -722,10 +722,10 @@ type Fastl4 struct {
 	Name                  string
 	Partition             string
 	DefaultsFrom          string
-	ClientTimeout         int
 	ExplicitFlowMigration string
 	HardwareSynCookie     string
 	IdleTimeout           int
+	ClientTimeout         int
 	IpTosToClient         string
 	IpTosToServer         string
 	KeepAliveInterval     string
@@ -1625,7 +1625,7 @@ func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
-func (b *BigIP) Tcp() (*Tcps, error) {
+func (b *BigIP) Tcp(name string) (*Tcps, error) {
 	var tcps Tcps
 	err, _ := b.getForEntity(&tcps, uriLtm, uriProfile, uriTcp)
 

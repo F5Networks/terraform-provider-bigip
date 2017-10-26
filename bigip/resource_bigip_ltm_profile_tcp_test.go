@@ -12,10 +12,10 @@ import (
 var TEST_TCP_NAME = fmt.Sprintf("/%s/test-tcp", TEST_PARTITION)
 
 var TEST_TCP_RESOURCE = `
-resource "bigip_tcp_profile" "sanjose-tcp-wan-profile"
+resource "bigip_tcp_profile" "test-tcp"
 
         {
-            name = "sanjose-tcp-wan-profile"
+            name = "/Common/sanjose-tcp-wan-profile"
             defaults_from = "/Common/tcp-wan-optimized"
             idle_timeout = 300
             close_wait_timeout = 5
@@ -27,7 +27,7 @@ resource "bigip_tcp_profile" "sanjose-tcp-wan-profile"
         }
 `
 
-func TestBigipLtmtcp_create(t *testing.T) {
+func TestBigipLtmTcp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -39,7 +39,7 @@ func TestBigipLtmtcp_create(t *testing.T) {
 				Config: TEST_TCP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTcpExists(TEST_TCP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "name", "sanjose-tcp-wan-profile"),
+					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "name", "/Common/sanjose-tcp-wan-profile"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "defaults_from", "/Common/tcp-wan-optimized"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "idle_timeout", "300"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "close_wait_timeout", "5"),
@@ -47,7 +47,6 @@ func TestBigipLtmtcp_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "finwait_timeout", "300"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "keepalive_interval", "1700"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "deferred_accept", "enabled"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "manual_resume", "false"),
 					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "fast_open", "enabled"),
 				),
 			},
@@ -79,19 +78,17 @@ func TestBigipLtmTcp_import(t *testing.T) {
 func testCheckTcpExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-
-		tcps, err := client.Tcp()
+		p, err := client.Tcp(name)
 		if err != nil {
 			return err
 		}
-		if exists && tcps == nil {
-			return fmt.Errorf("tcp profile ", name, " was not created.")
+		if exists && p == nil {
+			return fmt.Errorf("fastl4 ", name, " was not created.")
 		}
-		if !exists && tcps != nil {
-			return fmt.Errorf("tcp profile ", name, " still exists.")
+		if !exists && p != nil {
+			return fmt.Errorf("fastl4 ", name, " still exists.")
 		}
 		return nil
-
 	}
 }
 
@@ -104,7 +101,7 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		tcp, err := client.Tcp()
+		tcp, err := client.Tcp(name)
 		if err != nil {
 			return err
 		}
