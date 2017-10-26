@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
 )
@@ -32,8 +33,11 @@ func TestBigipLtmNtp_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "description", TEST_NTP_NAME),
-					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "[10.10.10.10]"),
+					//resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "[10.10.10.10]"),
 					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "timezone", "America/Los_Angeles"),
+					resource.TestCheckResourceAttr("bigip_ntp.test-ntp",
+						fmt.Sprintf("servers.%d", schema.HashString("10.10.10.10")),
+						"10.10.10.10"),
 				),
 			},
 		},
