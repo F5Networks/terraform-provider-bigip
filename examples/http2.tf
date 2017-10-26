@@ -9,8 +9,8 @@ resource "bigip_http2_profile" "nyhttp2"
 
         {
             name = "/Common/NewYork_http2"
-            defaultsFrom = "/Common/http2"
-            concurrentStreamsPerConnection = 10
-            connectionIdleTimeout= 30
-            activationModes = ["alpn","npn"]
+            defaults_from = "/Common/http2"
+            concurrent_streams_per_connection = 10
+            connection_idle_timeout= 30
+            activation_modes = ["alpn","npn"]
         }
