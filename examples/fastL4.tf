@@ -14,7 +14,7 @@ resource "bigip_fastl4_profile" "sjfastl4profile"
             client_timeout = 40
             explicitflow_migration = "enabled"
             hardware_syncookie = "enabled"
-            idle_timeout = 200
+            idle_timeout = "200"
             iptos_toclient = "pass-through"
             iptos_toserver = "pass-through"
             keepalive_interval = "disabled"  //This cannot take enabled

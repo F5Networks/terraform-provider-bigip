@@ -707,7 +707,7 @@ type fastl4DTO struct {
 	Partition             string `json:"partition,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
 	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
-	IdleTimeout           int    `json:"idleTimeout,omitempty"`
+	IdleTimeout           string `json:"idleTimeout,omitempty"`
 	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
 	IpTosToServer         string `json:"ipTosToServer,omitempty"`
@@ -724,7 +724,7 @@ type Fastl4 struct {
 	DefaultsFrom          string
 	ExplicitFlowMigration string
 	HardwareSynCookie     string
-	IdleTimeout           int
+	IdleTimeout           string
 	ClientTimeout         int
 	IpTosToClient         string
 	IpTosToServer         string
@@ -1675,7 +1675,7 @@ func (b *BigIP) Fasthttp() (*Fasthttps, error) {
 	return &fasthttps, nil
 }
 
-func (b *BigIP) CreateFastl4(name, partition, defaultsFrom string, clientTimeout int, explicitFlowMigration, hardwareSynCookie string, idleTimeout int, ipTosToClient, ipTosToServer, keepAliveInterval string) error {
+func (b *BigIP) CreateFastl4(name, partition, defaultsFrom string, clientTimeout int, explicitFlowMigration, hardwareSynCookie string, idleTimeout string, ipTosToClient, ipTosToServer, keepAliveInterval string) error {
 	fastl4 := &Fastl4{
 		Name:                  name,
 		Partition:             partition,

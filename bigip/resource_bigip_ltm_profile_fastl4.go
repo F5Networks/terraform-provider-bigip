@@ -51,7 +51,7 @@ func resourceBigipLtmFastl4() *schema.Resource {
 				Description: "Use the parent Fastl4 profile",
 			},
 			"idle_timeout": &schema.Schema{
-				Type:        schema.TypeInt,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
@@ -84,7 +84,7 @@ func resourceBigipLtmFastl4Create(d *schema.ResourceData, meta interface{}) erro
 	clientTimeout := d.Get("client_timeout").(int)
 	explicitFlowMigration := d.Get("explicitflow_migration").(string)
 	hardwareSynCookie := d.Get("hardware_syncookie").(string)
-	idleTimeout := d.Get("idle_timeout").(int)
+	idleTimeout := d.Get("idle_timeout").(string)
 	ipTosToClient := d.Get("iptos_toclient").(string)
 	ipTosToServer := d.Get("iptos_toserver").(string)
 	keepAliveInterval := d.Get("keepalive_interval").(string)
@@ -125,7 +125,7 @@ func resourceBigipLtmFastl4Update(d *schema.ResourceData, meta interface{}) erro
 		ClientTimeout:         d.Get("client_timeout").(int),
 		ExplicitFlowMigration: d.Get("explicitflow_migration").(string),
 		HardwareSynCookie:     d.Get("hardware_syncookie").(string),
-		IdleTimeout:           d.Get("idle_timeout").(int),
+		IdleTimeout:           d.Get("idle_timeout").(string),
 		IpTosToClient:         d.Get("iptos_toclient").(string),
 		IpTosToServer:         d.Get("iptos_toserver").(string),
 		KeepAliveInterval:     d.Get("keepalive_interval").(string),
