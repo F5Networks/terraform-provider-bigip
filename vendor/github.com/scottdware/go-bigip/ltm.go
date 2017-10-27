@@ -1585,6 +1585,17 @@ func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsF
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
+func (b *BigIP) Oneconnect(name string) (*Oneconnects, error) {
+	var oneconnects Oneconnects
+	err, _ := b.getForEntity(&oneconnects, uriLtm, uriProfile, uriOneconnect)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &oneconnects, nil
+}
+
 // DeleteOneconnect removes an OneConnect profile from the system.
 func (b *BigIP) DeleteOneconnect(name string) error {
 	return b.delete(uriLtm, uriProfile, uriOneconnect, name)

@@ -102,7 +102,7 @@ func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipLtmSnmpDelete(d *schema.ResourceData, meta interface{}) error {
-	/* This function is not supported on BIG-IP, you cannot DELETE NTP API is not supported */
+	// No API support for Delete
 	return nil
 }
 

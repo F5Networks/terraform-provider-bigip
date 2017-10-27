@@ -13,11 +13,10 @@ var TEST_ROUTE_NAME = fmt.Sprintf("/%s/test-route", TEST_PARTITION)
 
 var TEST_ROUTE_RESOURCE = `
 resource "bigip_route" "test-route" {
-  name = "sanjose-route2"
+  name = "/Common/test-route"
   network = "10.10.10.0/24"
   gw      = "1.1.1.2"
 }
-
 `
 
 func TestBigipLtmroute_create(t *testing.T) {

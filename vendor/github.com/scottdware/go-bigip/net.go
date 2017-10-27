@@ -1,6 +1,7 @@
 package bigip
 
 import (
+	"log"
 	"strings"
 )
 
@@ -324,7 +325,7 @@ func (b *BigIP) CreateRoute(name, network, gateway string) error {
 		Network: network,
 		Gateway: gateway,
 	}
-
+	log.Println("[INFO] route stuff.", config)
 	return b.post(config, uriNet, uriRoute)
 }
 
