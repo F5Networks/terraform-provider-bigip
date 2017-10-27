@@ -25,14 +25,14 @@ resource "bigip_ltm_vlan" "vlan2" {
 
 }
 
-resource "bigip_ltm_xselfip" "selfip1" {
+resource "bigip_ltm_selfip" "selfip1" {
 	name = "/Common/internalselfIP"
 	ip = " 11.1.1.1/24"
 	vlan = "/Common/internal"
 	depends_on = ["bigip_ltm_vlan.vlan1"]
 	}
 
-resource "bigip_ltm_xselfip" "selfipr2" {
+resource "bigip_ltm_selfip" "selfip2" {
         name = "/Common/externalselfIP"
         ip = " 100.1.1.1/24"
         vlan = "/Common/external"
