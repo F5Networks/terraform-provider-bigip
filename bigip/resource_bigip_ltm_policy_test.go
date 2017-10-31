@@ -24,6 +24,7 @@ resource "bigip_ltm_pool" "test-pool" {
 
 resource "bigip_ltm_policy" "test-policy" {
 	name = "` + TEST_POLICY_NAME + `"
+	strategy = "/Common/first-match"
 	controls = ["forwarding"]
 	requires = ["http"]
 	rule {
@@ -48,6 +49,7 @@ func TestBigipLtmPolicy_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TEST_POLICY_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "name", TEST_POLICY_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "strategy", "/Common/first-match"),
 					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy",
 						fmt.Sprintf("controls.%d", schema.HashString("forwarding")),
 						"forwarding"),

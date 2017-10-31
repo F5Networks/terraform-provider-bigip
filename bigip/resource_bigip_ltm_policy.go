@@ -51,11 +51,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 			},
 
 			"strategy": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "/Common/first-match",
-				Description:  "Policy Strategy (i.e. /Common/first-match)",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "/Common/first-match",
+				Description: "Policy Strategy (i.e. /Common/first-match)",
+				//ValidateFunc: validateF5Name,
 			},
 
 			"rule": &schema.Schema{
@@ -64,10 +64,10 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": &schema.Schema{
-							Type:         schema.TypeString,
-							Required:     true,
-							Description:  "Rule name",
-							ValidateFunc: validateF5Name,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Rule name",
+							//ValidateFunc: validateF5Name,
 						},
 						"action": &schema.Schema{
 							Type:     schema.TypeList,
