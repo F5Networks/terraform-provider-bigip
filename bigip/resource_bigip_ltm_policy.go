@@ -27,11 +27,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the Policy",
-				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the Policy",
+				ForceNew:    true,
+				//ValidateFunc: validateF5Name,
 			},
 
 			"controls": &schema.Schema{

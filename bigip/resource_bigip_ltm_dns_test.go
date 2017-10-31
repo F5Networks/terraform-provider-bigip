@@ -10,54 +10,58 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-var TEST_NTP_NAME = fmt.Sprintf("/%s/test-ntp", TEST_PARTITION)
+var TEST_DNS_NAME = fmt.Sprintf("/%s/test-dns", TEST_PARTITION)
 
-var TEST_NTP_RESOURCE = `
-resource "bigip_ntp" "test-ntp" {
-	description = "` + TEST_NTP_NAME + `"
-	servers = ["10.10.10.10"]
-	timezone = "America/Los_Angeles"
+var TEST_DNS_RESOURCE = `
+resource "bigip_dns" "test-dns" {
+   description = "` + TEST_DNS_NAME + `"
+   name_servers = ["1.1.1.1"]
+   numberof_dots = 2
+   search = ["f5.com"]
 }
+
 `
 
-func TestBigipLtmNtp_create(t *testing.T) {
+func TestBigipLtmdns_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testCheckntpsDestroyed,
+		//CheckDestroy: testCheckdnssDestroyed,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: TEST_NTP_RESOURCE,
+				Config: TEST_DNS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckntpExists(TEST_NTP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "description", TEST_NTP_NAME),
-					//resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "servers", "[10.10.10.10]"),
-					resource.TestCheckResourceAttr("bigip_ntp.test-ntp", "timezone", "America/Los_Angeles"),
-					resource.TestCheckResourceAttr("bigip_ntp.test-ntp",
-						fmt.Sprintf("servers.%d", schema.HashString("10.10.10.10")),
-						"10.10.10.10"),
+					testCheckdnsExists(TEST_DNS_NAME, true),
+					resource.TestCheckResourceAttr("bigip_dns.test-dns", "description", TEST_DNS_NAME),
+					resource.TestCheckResourceAttr("bigip_dns.test-dns", "numberof_dots", "2"),
+					resource.TestCheckResourceAttr("bigip_dns.test-dns",
+						fmt.Sprintf("name_servers.%d", schema.HashString("1.1.1.1")),
+						"1.1.1.1"),
+					resource.TestCheckResourceAttr("bigip_dns.test-dns",
+						fmt.Sprintf("search.%d", schema.HashString("f5.com")),
+						"f5.com"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmNtp_import(t *testing.T) {
+func TestBigipLtmdns_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//	CheckDestroy: testCheckntpsDestroyed, ( No Delet API support)
+		//	CheckDestroy: testCheckdnssDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: TEST_NTP_RESOURCE,
+				Config: TEST_DNS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckntpExists(TEST_NTP_NAME, true),
+					testCheckdnsExists(TEST_DNS_NAME, true),
 				),
-				ResourceName:      TEST_NTP_NAME,
+				ResourceName:      TEST_DNS_NAME,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -100,41 +104,41 @@ func TestBigipLtmNtp_import(t *testing.T) {
 //	})
 //}
 
-func testCheckntpExists(description string, exists bool) resource.TestCheckFunc {
+func testCheckdnsExists(description string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		ntp, err := client.NTPs()
+		dns, err := client.DNSs()
 		if err != nil {
 			return err
 		}
-		if exists && ntp == nil {
-			return fmt.Errorf("ntp ", description, " was not created.")
+		if exists && dns == nil {
+			return fmt.Errorf("dns ", description, " was not created.")
 
 		}
-		if !exists && ntp != nil {
-			return fmt.Errorf("ntp ", description, " still exists.")
+		if !exists && dns != nil {
+			return fmt.Errorf("dns ", description, " still exists.")
 
 		}
 		return nil
 	}
 }
 
-func testCheckntpsDestroyed(s *terraform.State) error {
+func testCheckdnssDestroyed(s *terraform.State) error {
 	/* client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ntp" {
+		if rs.Type != "bigip_dns" {
 			continue
 		}
 
 		description := rs.Primary.ID
-		ntp, err := client.NTPs()
+		dns, err := client.dnss()
 		if err != nil {
 			return err
 		}
-		if ntp != nil {
-			return fmt.Errorf("ntp ", description, " not destroyed.")
+		if dns != nil {
+			return fmt.Errorf("dns ", description, " not destroyed.")
 
 		}
 	}*/

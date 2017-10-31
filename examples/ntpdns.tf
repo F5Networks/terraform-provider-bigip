@@ -12,7 +12,7 @@ resource "bigip_ntp" "ntp1" {
 
 resource "bigip_dns" "dns1" {
    description = "/Common/DNS1"
-   nameServers = ["1.1.1.1"]
-   numberOfDots = 2
+   name_servers = ["1.1.1.1"]
+   numberof_Dots = 2
    search = ["f5.com"]
 }
