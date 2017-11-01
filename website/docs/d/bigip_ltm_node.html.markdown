@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_node"
-sidebar_current: "docs-bigip-datasource-monitor-x"
+sidebar_current: "docs-bigip-datasource-node-x"
 description: |-
     Provides details about bigip_ltm_node resource
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_virtual_address"
-sidebar_current: "docs-bigip-datasource-monitor-x"
+sidebar_current: "docs-bigip-datasource-virtual_address-x"
 description: |-
     Provides details about bigip_ltm_virtual_address resource
 ---
