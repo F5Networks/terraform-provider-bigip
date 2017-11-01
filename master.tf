@@ -1,5 +1,13 @@
+provider "aws" { 
+    region = "${var.AWS_REGION}"
+}
+
+
+
+
+
 provider "bigip" {
-  address = "10.192.74.73"
+  address = "10.192.74.61"
   username = "admin"
   password = "admin"
 }
