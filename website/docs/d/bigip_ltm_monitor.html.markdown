@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_device_name"
-sidebar_current: "docs-bigip-datasource-device_name-x"
+page_title: "BIG-IP: bigip_ltm_monitor"
+sidebar_current: "docs-bigip-datasource-monitor-x"
 description: |-
-    Provides details about bigip device_name
+    Provides details about bigip_ltm_monitor resource
 ---
 
 # bigip\_ltm\_monitor
@@ -12,7 +12,6 @@ description: |-
 
 For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
 
-This resource is helpful when configuring the BIG-IP device_name in cluster or in HA mode.
 ## Example Usage
 
 
