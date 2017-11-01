@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_ltm_pool resource
 ---
 
-# bigip\_ltm\_monitor
+# bigip\_ltm\_pool
 
 `bigip_ltm_pool` Manages a pool configuration
 

@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_ltm_node resource
 ---
 
-# bigip\_ltm\_monitor
+# bigip\_ltm\_node
 
 `bigip_ltm_node` Manages a node configuration
 
