@@ -38,13 +38,6 @@
 			"revisionTime": "2016-11-22T16:59:48Z"
 		},
 		{
-			"checksumSHA1": "PkPgpx/FYoIJCbihlRZEp7oHG9Q=",
-			"origin": "github.com/hashicorp/terraform/vendor/github.com/go-ini/ini",
-			"path": "github.com/go-ini/ini",
-			"revision": "594014d4f65f61c1399fc337e5fc2211b5a28474",
-			"revisionTime": "2016-11-22T16:59:48Z"
-		},
-		{
 			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "11b8df160996e00fd4b55cbaafb3d84ec6d50fa8",
@@ -264,12 +257,6 @@
 			"revisionTime": "2017-09-15T18:54:44Z"
 		},
 		{
-			"checksumSHA1": "Vbo55GDzPgG/L/+W2pcvDhxrPZc=",
-			"path": "github.com/hashicorp/terraform/helper/experiment",
-			"revision": "5afe1d39d1117596f490ad41accb03316384416f",
-			"revisionTime": "2017-09-15T18:54:44Z"
-		},
-		{
 			"checksumSHA1": "BmIPKTr0zDutSJdyq7pYXrK1I3E=",
 			"path": "github.com/hashicorp/terraform/helper/hashcode",
 			"revision": "5afe1d39d1117596f490ad41accb03316384416f",
@@ -296,12 +283,6 @@
 		{
 			"checksumSHA1": "pCGhHS9BP0onot7vLaHIRDs31Bc=",
 			"path": "github.com/hashicorp/terraform/helper/schema",
-			"revision": "5afe1d39d1117596f490ad41accb03316384416f",
-			"revisionTime": "2017-09-15T18:54:44Z"
-		},
-		{
-			"checksumSHA1": "1yCGh/Wl4H4ODBBRmIRFcV025b0=",
-			"path": "github.com/hashicorp/terraform/helper/shadow",
 			"revision": "5afe1d39d1117596f490ad41accb03316384416f",
 			"revisionTime": "2017-09-15T18:54:44Z"
 		},
@@ -333,13 +314,6 @@
 			"checksumSHA1": "Gm2k+46HxKqsjI8lCWBp/jRaPrM=",
 			"origin": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/yamux",
 			"path": "github.com/hashicorp/yamux",
-			"revision": "594014d4f65f61c1399fc337e5fc2211b5a28474",
-			"revisionTime": "2016-11-22T16:59:48Z"
-		},
-		{
-			"checksumSHA1": "3/Bhy+ua/DCv2ElMD5GzOYSGN6g=",
-			"origin": "github.com/hashicorp/terraform/vendor/github.com/jmespath/go-jmespath",
-			"path": "github.com/jmespath/go-jmespath",
 			"revision": "594014d4f65f61c1399fc337e5fc2211b5a28474",
 			"revisionTime": "2016-11-22T16:59:48Z"
 		},
@@ -660,5 +634,5 @@
 			"revisionTime": "2017-09-15T00:40:38Z"
 		}
 	],
-	"rootPath": "github.com/terraform-provider-bigip"
+	"rootPath": "github.com/f5devcentral/terraform-provider-f5"
 }
