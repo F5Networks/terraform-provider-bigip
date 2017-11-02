@@ -7,6 +7,5 @@ import (
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: bigip.Provider,
-	})
+		ProviderFunc: bigip.Provider})
 }
