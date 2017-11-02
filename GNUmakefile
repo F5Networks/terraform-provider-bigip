@@ -9,7 +9,7 @@ OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
 PKG_DIR = $(OUT_DIR)/pkg
 
-TF_DIR = ../hashicorp/terraform
+TF_DIR = ../../hashicorp/terraform
 BIGIP_BIN_PATH = $(TF_DIR)/builtin/bins/provider-bigip
 
 PKGS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(PKG_DIR)/$(PROJ)_$(os)_$(arch)$(PKG_SUFFIX)))
