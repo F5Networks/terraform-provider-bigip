@@ -4,6 +4,8 @@ language: go
 go:
   - 1.9
 
+go_import_path: github.com/f5devcentral/terraform-provider-f5
+
 before_install:
   - go get github.com/hashicorp/terraform
   - go get github.com/mitchellh/gox
