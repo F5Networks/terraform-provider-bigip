@@ -2,7 +2,7 @@
 
 A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
 
-[![Build Status](https://travis-ci.org/DealerDotCom/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/DealerDotCom/terraform-provider-bigip)
+[![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-f5.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-f5)
 [![Join the chat at https://gitter.im/DealerDotCom/terraform-provider-bigip](https://badges.gitter.im/DealerDotCom/terraform-provider-bigip.svg)](https://gitter.im/DealerDotCom/terraform-provider-bigip?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # F5 Requirements
