@@ -2,8 +2,8 @@
 
 A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
 
-[![Build Status](https://travis-ci.org/DealerDotCom/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/DealerDotCom/terraform-provider-bigip)
-[![Join the chat at https://gitter.im/DealerDotCom/terraform-provider-bigip](https://badges.gitter.im/DealerDotCom/terraform-provider-bigip.svg)](https://gitter.im/DealerDotCom/terraform-provider-bigip?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-f5.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-f5)
+[![Join the chat at https://gitter.im/f5devcentral/terraform-provider-f5](https://badges.gitter.im/f5devcentral/terraform-provider-f5.svg)](https://gitter.im/f5devcentral/terraform-provider-f5?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # F5 Requirements
 
@@ -11,7 +11,7 @@ This provider uses the iControlREST API. Make sure that is installed and enabled
 
 # Installation
 
- - Download the latest [release](https://github.com/DealerDotCom/terraform-provider-bigip/releases) for your platform.
+ - Download the latest [release](https://github.com/f5devcentral/terraform-provider-f5/releases) for your platform.
  - Rename the executable to `terraform-provider-bigip`
  - Copy somewhere on your path, or update `.terraformrc` in your home directory like so:
 ```
@@ -230,7 +230,7 @@ Configures a Virtual Address. NOTE: create/delete are not implemented
 since the virtual addresses should be created/deleted automatically
 with the corresponding virtual server.
 
-### Example 
+### Example
 
 ```
 resource "bigip_ltm_virtual_address" "vs_va" {
@@ -254,7 +254,7 @@ resource "bigip_ltm_virtual_address" "vs_va" {
 
 `arp` - (Optional, Default=true) Enable or disable ARP for the virtual address
 
-`auto_delete` - (Optional, Default=true) Automatically delete the virtual address with the virtual server 
+`auto_delete` - (Optional, Default=true) Automatically delete the virtual address with the virtual server
 
 `icmp_echo` - (Optional, Default=true) Enable/Disable ICMP response to the virtual address
 
@@ -267,7 +267,7 @@ This is a fairly low level resource that does little to make actually using poli
 understanding of how policies and their associated rules, actions and conditions
 are managed through iControlREST is recommended.
 
-### Example 
+### Example
 
 ```
 resource "bigip_ltm_policy" "policy" {
@@ -308,18 +308,18 @@ resource "bigip_ltm_policy" "policy" {
 `controls` - (Required) Defines the types of actions that you can use when configuring a rule.
 
 `rule` - defines a single rule to add to the policy. Multiple rules can be defined for a single policy.
- 
+
 **Rules**
- 
- Actions and Conditions support all fields available via the iControlREST API. You can see all of the 
+
+ Actions and Conditions support all fields available via the iControlREST API. You can see all of the
  available fields in the [iControlREST API documentation](https://devcentral.f5.com/d/icontrol-rest-api-reference-version-120).
  Each field in the actions and conditions objects is available. Pro tip: Create your policy via the GUI first then use
  the REST API to figure out how to configure the terraform resource.
- 
+
  `name` (Required) - Name of the rule
- 
+
  `action` - Defines a single action. Multiple actions can exist per rule.
- 
+
  `condition` - Defines a single condition. Multiple conditions can exist per rule.
 
 
@@ -339,7 +339,7 @@ See these pages for more information:
 # Testing
 
 Running the acceptance test suite requires an F5 to test against. Set `BIGIP_HOST`, `BIGIP_USER`
-and `BIGIP_PASSWORD` to a device to run the tests against. By default tests will use the `Common` 
+and `BIGIP_PASSWORD` to a device to run the tests against. By default tests will use the `Common`
 partition for creating objects. You can change the partition by setting `BIGIP_TEST_PARTITION`.
 
 ```
