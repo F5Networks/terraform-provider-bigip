@@ -1,0 +1,185 @@
+package bigip
+
+import (
+	"log"
+	"regexp"
+	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/scottdware/go-bigip"
+)
+
+var NODE_VALIDATION = regexp.MustCompile(":\\d{2,5}$")
+
+func resourceBigipGtmDatacenter() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceBigipGtmDatacenterCreate,
+		Read:   resourceBigipGtmDatacenterRead,
+		Update: resourceBigipGtmDatacenterUpdate,
+		Delete: resourceBigipGtmDatacenterDelete,
+		Exists: resourceBigipGtmDatacenterExists,
+		Importer: &schema.ResourceImporter{
+			State: resourceBigIpGtmDatacenterImporter,
+		},
+
+		Schema: map[string]*schema.Schema{
+			"name": &schema.Schema{
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the datacenter",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
+			},
+			"metadata": &schema.Schema{
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
+				Description: "meta data value array ",
+			},
+
+			"description": &schema.Schema{
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
+				Description: "Assign monitors to a datacenter.",
+			},
+
+			"proberpool": &schema.Schema{
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Allow NAT",
+			},
+		},
+	}
+}
+
+func resourceBigipGtmDatacenterCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Get("name").(string)
+
+	log.Println("[INFO] Creating DataCenter " + name)
+	err := client.CreateDatacenter(name)
+	if err != nil {
+		return err
+	}
+	d.SetId(name)
+
+	err = resourceBigipGtmDatacenterUpdate(d, meta)
+	if err != nil {
+		client.DeleteDatacenter(name)
+		return err
+	}
+
+	return resourceBigipGtmDatacenterRead(d, meta)
+}
+
+func resourceBigipGtmDatacenterRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+
+	log.Println("[INFO] Reading Datacenter " + name)
+
+	datacenter, err := client.GetDatacenter(name)
+	if err != nil {
+		return err
+	}
+	nodes, err := client.DatacenterMembers(name)
+	if err != nil {
+		return err
+	}
+
+	d.Set("allow_nat", datacenter.AllowNAT)
+	d.Set("allow_snat", datacenter.AllowSNAT)
+	d.Set("load_balancing_mode", datacenter.LoadBalancingMode)
+	d.Set("nodes", makeStringSet(&nodes))
+	d.Set("name", name)
+
+	monitors := strings.Split(strings.TrimSpace(datacenter.Monitor), " and ")
+	d.Set("monitors", makeStringSet(&monitors))
+
+	return nil
+}
+
+func resourceBigipGtmDatacenterExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+	log.Println("[INFO] Checking Datacenter " + name + " exists.")
+
+	datacenter, err := client.GetDatacenter(name)
+	if err != nil {
+		return false, err
+	}
+
+	if datacenter == nil {
+		d.SetId("")
+	}
+
+	return datacenter != nil, nil
+}
+
+func resourceBigipGtmDatacenterUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+
+	//monitors
+	var monitors []string
+	if m, ok := d.GetOk("monitors"); ok {
+		for _, monitor := range m.(*schema.Set).List() {
+			monitors = append(monitors, monitor.(string))
+		}
+	}
+
+	datacenter := &bigip.Datacenter{
+		AllowNAT:          d.Get("allow_nat").(bool),
+		AllowSNAT:         d.Get("allow_snat").(bool),
+		LoadBalancingMode: d.Get("load_balancing_mode").(string),
+		Monitor:           strings.Join(monitors, " and "),
+	}
+
+	err := client.ModifyDatacenter(name, datacenter)
+	if err != nil {
+		return err
+	}
+
+	//members
+	nodes, err := client.DatacenterMembers(name)
+	if err != nil {
+		return err
+	}
+	existing := makeStringSet(&nodes)
+	incoming := d.Get("nodes").(*schema.Set)
+	delete := existing.Difference(incoming)
+	add := incoming.Difference(existing)
+	if delete.Len() > 0 {
+		for _, d := range delete.List() {
+			client.DeleteDatacenterMember(name, d.(string))
+		}
+	}
+	if add.Len() > 0 {
+		for _, d := range add.List() {
+			client.AddDatacenterMember(name, d.(string))
+		}
+	}
+
+	return nil
+}
+
+func resourceBigipGtmDatacenterDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+	log.Println("[INFO] Deleting datacenter " + name)
+
+	return client.DeleteDatacenter(name)
+}
+
+func resourceBigIpGtmDatacenterImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	return []*schema.ResourceData{d}, nil
+}
