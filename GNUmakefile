@@ -15,7 +15,7 @@ BINS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(BIN_DIR)/$(os)_$(arch)/$(PRO
 default: bin
 
 build:
-	@go build terraform-provider-bigip ./...
+	@go build ./...
 
 bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
