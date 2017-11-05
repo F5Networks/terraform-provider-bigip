@@ -3,6 +3,7 @@
 A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
 
 [![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-f5.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-f5)
+[![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-f5)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-f5)
 [![Join the chat at https://gitter.im/f5devcentral/terraform-provider-f5](https://badges.gitter.im/f5devcentral/terraform-provider-f5.svg)](https://gitter.im/f5devcentral/terraform-provider-f5?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # F5 Requirements
