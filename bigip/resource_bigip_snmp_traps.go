@@ -171,7 +171,6 @@ func resourceBigipLtmSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return client.ModifyTRAP(r)
-	return nil
 }
 
 func resourceBigipLtmSnmpTrapsRead(d *schema.ResourceData, meta interface{}) error {

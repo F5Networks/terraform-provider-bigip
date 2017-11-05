@@ -76,10 +76,10 @@ func testChecksnatExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("Snat ", name, " was not created.")
+			return fmt.Errorf("Snat %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("Snat ", name, " still exists.")
+			return fmt.Errorf("Snat %s still exists.", name)
 		}
 		return nil
 	}
@@ -99,7 +99,7 @@ func testChecksnatsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if snat == nil {
-			return fmt.Errorf("Snat ", name, " not destroyed.")
+			return fmt.Errorf("Snat %s not destroyed.", name)
 		}
 	}
 	return nil

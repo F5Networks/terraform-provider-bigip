@@ -79,7 +79,6 @@ func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	return client.ModifySNMP(r)
-	return nil
 }
 
 func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
