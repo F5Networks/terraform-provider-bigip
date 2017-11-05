@@ -31,7 +31,7 @@ func TestBigipLtmHttp2_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_HTTP2_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TEST_HTTP2_NAME, true),
@@ -53,7 +53,7 @@ func TestBigipLtmHttp2_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_HTTP2_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TEST_HTTP2_NAME, true),

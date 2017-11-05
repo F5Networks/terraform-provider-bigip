@@ -39,7 +39,7 @@ func TestBigipLtmVS_create(t *testing.T) {
 			testCheckIRulesDestroyed,
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists(TEST_VS_NAME, true),
@@ -63,7 +63,7 @@ func TestBigipLtmVS_create(t *testing.T) {
 						"/Common/tcp-lan-optimized"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("vlans.%d", schema.HashString("TEST_VLAN_NAME")),
-					  "TEST_VLAN_NAME"),
+						"TEST_VLAN_NAME"),
 				),
 			},
 		},
@@ -78,7 +78,7 @@ func TestBigipLtmVS_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckVSsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists(TEST_VS_NAME, true),

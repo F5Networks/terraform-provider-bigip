@@ -28,7 +28,7 @@ func TestBigipLtmVA_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VA_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVAExists(TEST_VA_NAME, true),
@@ -46,7 +46,7 @@ func TestBigipLtmVA_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VA_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVAExists(TEST_VA_NAME, true),

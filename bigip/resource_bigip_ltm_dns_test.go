@@ -30,7 +30,7 @@ func TestBigipLtmdns_create(t *testing.T) {
 		Providers: testAccProviders,
 		//CheckDestroy: testCheckdnssDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_DNS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckdnsExists(TEST_DNS_NAME, true),
@@ -56,7 +56,7 @@ func TestBigipLtmdns_import(t *testing.T) {
 		Providers: testAccProviders,
 		//	CheckDestroy: testCheckdnssDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_DNS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckdnsExists(TEST_DNS_NAME, true),

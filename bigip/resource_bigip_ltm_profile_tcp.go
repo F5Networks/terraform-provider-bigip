@@ -19,59 +19,59 @@ func resourceBigipLtmTcp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the TCP Profile",
 				//ValidateFunc: validateF5Name,
 			},
-			"partition": &schema.Schema{
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "name of partition",
 			},
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent tcp profile",
 			},
 
-			"idle_timeout": &schema.Schema{
+			"idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "idle_timeout can be given value",
 			},
 
-			"close_wait_timeout": &schema.Schema{
+			"close_wait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "close wait timer integer",
 			},
 
-			"finwait_2timeout": &schema.Schema{
+			"finwait_2timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "timer integer",
 			},
 
-			"finwait_timeout": &schema.Schema{
+			"finwait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "fin wait timer integer",
 			},
 
-			"keepalive_interval": &schema.Schema{
+			"keepalive_interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "keepalive_interval timer integer",
 			},
 
-			"deferred_accept": &schema.Schema{
+			"deferred_accept": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Defferred accept",
 			},
-			"fast_open": &schema.Schema{
+			"fast_open": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "fast_open value ",

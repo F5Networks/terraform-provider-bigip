@@ -34,7 +34,7 @@ func TestBigipLtmFastl4_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_FASTL4_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TEST_FASTL4_NAME, true),
@@ -63,7 +63,7 @@ func TestBigipLtmfastl4_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_FASTL4_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TEST_FASTL4_NAME, true),

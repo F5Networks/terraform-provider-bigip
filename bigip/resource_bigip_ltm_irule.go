@@ -20,7 +20,7 @@ func resourceBigipLtmIRule() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the iRule",
@@ -28,7 +28,7 @@ func resourceBigipLtmIRule() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"irule": &schema.Schema{
+			"irule": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The iRule body",

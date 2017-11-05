@@ -22,31 +22,31 @@ func resourceBigipLtmVlan() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the vlan",
 				//			ValidateFunc: validateF5Name,
 			},
 
-			"tag": &schema.Schema{
+			"tag": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "Tagged number",
 			},
 
-			"interfaces": &schema.Schema{
+			"interfaces": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"vlanport": &schema.Schema{
+						"vlanport": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "Vlan name",
 						},
 
-						"tagged": &schema.Schema{
+						"tagged": {
 							Type:        schema.TypeBool,
 							Required:    true,
 							Description: "Interface tagged",

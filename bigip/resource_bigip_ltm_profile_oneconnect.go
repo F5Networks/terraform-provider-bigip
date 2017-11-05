@@ -19,51 +19,51 @@ func resourceBigipLtmOneconnect() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Oneconnect Profile",
 				//ValidateFunc: validateF5Name,
 			},
-			"partition": &schema.Schema{
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "name of partition",
 			},
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent oneconnect profile",
 			},
 
-			"idle_timeout_override": &schema.Schema{
+			"idle_timeout_override": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "idleTimeoutOverride can be enabled or disabled",
 			},
 
-			"share_pools": &schema.Schema{
+			"share_pools": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "sharePools can be enabled or disabled",
 			},
-			"source_mask": &schema.Schema{
+			"source_mask": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "source_mask can be 255.255.255.255",
 			},
 
-			"max_age": &schema.Schema{
+			"max_age": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "max_age has integer value typical 3600 sec",
 			},
-			"max_reuse": &schema.Schema{
+			"max_reuse": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "max_reuse has integer value typical 1000 sec",
 			},
-			"max_size": &schema.Schema{
+			"max_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "max_size has integer value typical 1000 sec",

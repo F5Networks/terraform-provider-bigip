@@ -36,7 +36,7 @@ func TestBigipLtmMonitor_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_MONITOR_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckMonitorExists(TEST_MONITOR_NAME),
@@ -65,7 +65,7 @@ func TestBigipLtmMonitor_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_MONITOR_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckMonitorExists(TEST_MONITOR_NAME),

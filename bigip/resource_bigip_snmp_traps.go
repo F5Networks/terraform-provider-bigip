@@ -20,80 +20,80 @@ func resourceBigipLtmSnmpTraps() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Name",
 				//ValidateFunc: validateF5Name,
 			},
-			"auth_passwordencrypted": &schema.Schema{
+			"auth_passwordencrypted": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Encrypted password ",
 			},
 
-			"auth_protocol": &schema.Schema{
+			"auth_protocol": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the protocol used to authenticate the user.",
 			},
 
-			"community": &schema.Schema{
+			"community": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the community string used for this trap. ",
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "User defined description.",
 			},
 
-			"engine_id": &schema.Schema{
+			"engine_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the authoritative security engine for SNMPv3.",
 			},
 
-			"host": &schema.Schema{
+			"host": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The host the trap will be sent to.",
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "The port that the trap will be sent to.",
 			},
-			"privacy_password": &schema.Schema{
+			"privacy_password": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the clear text password used to encrypt traffic. This field will not be displayed. ",
 			},
-			"privacy_password_encrypted": &schema.Schema{
+			"privacy_password_encrypted": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the encrypted password used to encrypt traffic. ",
 			},
-			"privacy_protocol": &schema.Schema{
+			"privacy_protocol": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the protocol used to encrypt traffic. ",
 			},
-			"security_level": &schema.Schema{
+			"security_level": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies whether or not traffic is encrypted and whether or not authentication is required.",
 			},
 
-			"security_name": &schema.Schema{
+			"security_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Security name used in conjunction with SNMPv3.",
 			},
 
-			"version": &schema.Schema{
+			"version": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "SNMP version used for sending the trap. ",

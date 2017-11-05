@@ -20,56 +20,56 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the virtual address",
 				ValidateFunc: validateF5Name,
 			},
 
-			"arp": &schema.Schema{
+			"arp": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Enable or disable ARP for the virtual address",
 				Default:     true,
 			},
 
-			"auto_delete": &schema.Schema{
+			"auto_delete": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "Automatically delete the virtual address with the virtual server",
 			},
 
-			"conn_limit": &schema.Schema{
+			"conn_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Default:     0,
 				Description: "Max number of connections for virtual address",
 			},
 
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "Enable or disable the virtual address",
 			},
 
-			"icmp_echo": &schema.Schema{
+			"icmp_echo": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "Enable/Disable ICMP response to the virtual address",
 			},
 
-			"advertize_route": &schema.Schema{
+			"advertize_route": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
 				Description: "Enabled dynamic routing of the address",
 			},
 
-			"traffic_group": &schema.Schema{
+			"traffic_group": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "/Common/traffic-group-1",

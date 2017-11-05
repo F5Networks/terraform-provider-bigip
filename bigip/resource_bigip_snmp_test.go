@@ -28,7 +28,7 @@ func TestBigipLtmsnmp_create(t *testing.T) {
 		Providers: testAccProviders,
 		//CheckDestroy: testChecksnmpsDestroyed, (delete API not supported )
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNMP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnmpExists(TEST_SNMP_NAME, true),
@@ -51,7 +51,7 @@ func TestBigipLtmsnmp_import(t *testing.T) {
 		Providers: testAccProviders,
 		//CheckDestroy: testChecksnmpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNMP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnmpExists(TEST_SNMP_NAME, true),

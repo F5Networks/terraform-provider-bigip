@@ -21,20 +21,20 @@ func resourceBigipLtmSelfIP() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the SelfIP",
 				//ValidateFunc: validateF5Name,
 			},
 
-			"ip": &schema.Schema{
+			"ip": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "SelfIP IP address",
 			},
 
-			"vlan": &schema.Schema{
+			"vlan": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the vlan",

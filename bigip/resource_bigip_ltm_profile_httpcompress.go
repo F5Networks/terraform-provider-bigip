@@ -19,27 +19,27 @@ func resourceBigipLtmHttpcompress() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Httpcompress Profile",
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Httpcompress profile",
 			},
 
-			"uri_exclude": &schema.Schema{
+			"uri_exclude": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Description: "Servers Address",
 			},
-			"uri_include": &schema.Schema{
+			"uri_include": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

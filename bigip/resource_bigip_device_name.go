@@ -20,19 +20,19 @@ func resourceBigipLtmDevicename() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"command": &schema.Schema{
+			"command": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username of BIG-IP",
 				//	ValidateFunc: validateF5Name,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Device which needs to be Devicenameensed",
 			},
 
-			"target": &schema.Schema{
+			"target": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",

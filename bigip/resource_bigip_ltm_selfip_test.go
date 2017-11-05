@@ -38,7 +38,7 @@ func TestBigipLtmselfip_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckselfipExists(TEST_SELFIP_NAME, true),
@@ -59,7 +59,7 @@ func TestBigipLtmselfip_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckselfipExists(TEST_SELFIP_NAME, true),

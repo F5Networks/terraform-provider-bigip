@@ -20,50 +20,50 @@ func resourceBigipLtmSnat() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Snat list Name",
 				//	ValidateFunc: validateF5Name,
 			},
-			"partition": &schema.Schema{
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Which partition on BIG-IP",
 			},
 
-			"autolasthop": &schema.Schema{
+			"autolasthop": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP autolasthop",
 			},
-			"mirror": &schema.Schema{
+			"mirror": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"sourceport": &schema.Schema{
+			"sourceport": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"translation": &schema.Schema{
+			"translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"snatpool": &schema.Schema{
+			"snatpool": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"vlansdisabled": &schema.Schema{
+			"vlansdisabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
 
-			"origins": &schema.Schema{
+			"origins": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

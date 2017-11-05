@@ -35,7 +35,7 @@ func TestBigipLtmfasthttp_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_FASTHTTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfasthttpExists(TEST_FASTHTTP_NAME, true),
@@ -64,7 +64,7 @@ func TestBigipLtmfasthttp_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_FASTHTTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfasthttpExists(TEST_FASTHTTP_NAME, true),

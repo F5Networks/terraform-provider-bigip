@@ -21,7 +21,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the monitor",
@@ -29,7 +29,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"parent": &schema.Schema{
+			"parent": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateParent,
@@ -37,21 +37,21 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
 
-			"interval": &schema.Schema{
+			"interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Check interval in seconds",
 				Default:     3,
 			},
 
-			"timeout": &schema.Schema{
+			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Timeout in seconds",
 				Default:     16,
 			},
 
-			"send": &schema.Schema{
+			"send": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "GET /\\r\\n",
@@ -61,43 +61,43 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				},
 			},
 
-			"receive": &schema.Schema{
+			"receive": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Expected response string.",
 			},
 
-			"receive_disable": &schema.Schema{
+			"receive_disable": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Expected response string.",
 			},
 
-			"reverse": &schema.Schema{
+			"reverse": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"transparent": &schema.Schema{
+			"transparent": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"manual_resume": &schema.Schema{
+			"manual_resume": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"ip_dscp": &schema.Schema{
+			"ip_dscp": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 			},
 
-			"time_until_up": &schema.Schema{
+			"time_until_up": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Default:     0,

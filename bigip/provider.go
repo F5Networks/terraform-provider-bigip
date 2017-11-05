@@ -14,32 +14,32 @@ const DEFAULT_PARTITION = "Common"
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"address": &schema.Schema{
+			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Domain name/IP of the BigIP",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_HOST", nil),
 			},
-			"username": &schema.Schema{
+			"username": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username with API access to the BigIP",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_USER", nil),
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The user's password",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_PASSWORD", nil),
 			},
-			"token_auth": &schema.Schema{
+			"token_auth": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
-			"login_ref": &schema.Schema{
+			"login_ref": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "tmos",
@@ -115,7 +115,7 @@ func setToStringSlice(s *schema.Set) []string {
 //Copy map values into an object where map key == object field name (e.g. map[foo] == &{Foo: ...}
 func mapEntity(d map[string]interface{}, obj interface{}) {
 	val := reflect.ValueOf(obj).Elem()
-	for field, _ := range d {
+	for field := range d {
 		f := val.FieldByName(strings.Title(field))
 		if f.IsValid() {
 			if f.Kind() == reflect.Slice {
