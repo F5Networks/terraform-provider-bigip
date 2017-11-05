@@ -21,7 +21,7 @@ bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
 		go get github.com/mitchellh/gox; \
 	fi
-	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-bigip"
+	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-provider-bigip" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-f5"
 
 dist:
 	@mkdir -p $(PKG_DIR) 2>/dev/null
