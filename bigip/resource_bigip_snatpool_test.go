@@ -28,7 +28,7 @@ func TestBigipLtmsnatpool_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testChecksnatpoolsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNATPOOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
@@ -53,7 +53,7 @@ func TestBigipLtmsnatpool_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testChecksnatpoolsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNATPOOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),

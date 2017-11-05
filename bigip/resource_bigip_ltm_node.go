@@ -21,7 +21,7 @@ func resourceBigipLtmNode() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the node",
@@ -29,7 +29,7 @@ func resourceBigipLtmNode() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"address": &schema.Schema{
+			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the node",

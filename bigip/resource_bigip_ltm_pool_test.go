@@ -29,7 +29,7 @@ func TestBigipLtmPool_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_POOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
@@ -51,7 +51,7 @@ func TestBigipLtmPool_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_POOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),

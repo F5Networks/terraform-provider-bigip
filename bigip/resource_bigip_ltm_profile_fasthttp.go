@@ -19,67 +19,67 @@ func resourceBigipLtmFasthttp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Fasthttp Profile",
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fasthttp profile",
 			},
 
-			"idle_timeout": &schema.Schema{
+			"idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
 			},
 
-			"connpoolidle_timeoutoverride": &schema.Schema{
+			"connpoolidle_timeoutoverride": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "idle_timeout can be given value",
 			},
 
-			"connpool_maxreuse": &schema.Schema{
+			"connpool_maxreuse": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "connpool_maxreuse timer",
 			},
 
-			"connpool_maxsize": &schema.Schema{
+			"connpool_maxsize": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "timer integer",
 			},
 
-			"connpool_minsize": &schema.Schema{
+			"connpool_minsize": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Pool min size",
 			},
 
-			"connpool_replenish": &schema.Schema{
+			"connpool_replenish": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "enabled or disabled",
 			},
 
-			"connpool_step": &schema.Schema{
+			"connpool_step": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
 			},
-			"forcehttp_10response": &schema.Schema{
+			"forcehttp_10response": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "disabled or enabled ",
 			},
 
-			"maxheader_size": &schema.Schema{
+			"maxheader_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",

@@ -20,19 +20,19 @@ func resourceBigipLtmLic() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"username": &schema.Schema{
+			"username": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username of BIG-IP",
 				//	ValidateFunc: validateF5Name,
 			},
-			"device_address": &schema.Schema{
+			"device_address": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Device which needs to be licensed",
 			},
 
-			"password": &schema.Schema{
+			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",

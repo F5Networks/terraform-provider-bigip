@@ -34,7 +34,7 @@ func TestBigipLtmoneconnect_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_ONECONNECT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckoneconnectExists(TEST_ONECONNECT_NAME, true),
@@ -60,7 +60,7 @@ func TestBigipLtmoneconnect_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_ONECONNECT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckoneconnectExists(TEST_ONECONNECT_NAME, true),

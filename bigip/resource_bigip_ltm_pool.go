@@ -23,14 +23,14 @@ func resourceBigipLtmPool() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the pool",
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-			"nodes": &schema.Schema{
+			"nodes": {
 				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Set:         schema.HashString,
@@ -38,7 +38,7 @@ func resourceBigipLtmPool() *schema.Resource {
 				Description: "Nodes to add to the pool. Format node_name:port. e.g. node01:443",
 			},
 
-			"monitors": &schema.Schema{
+			"monitors": {
 				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Set:         schema.HashString,
@@ -46,21 +46,21 @@ func resourceBigipLtmPool() *schema.Resource {
 				Description: "Assign monitors to a pool.",
 			},
 
-			"allow_nat": &schema.Schema{
+			"allow_nat": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "Allow NAT",
 			},
 
-			"allow_snat": &schema.Schema{
+			"allow_snat": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "Allow SNAT",
 			},
 
-			"load_balancing_mode": &schema.Schema{
+			"load_balancing_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "round-robin",

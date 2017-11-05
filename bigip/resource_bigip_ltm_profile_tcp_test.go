@@ -35,7 +35,7 @@ func TestBigipLtmTcp_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_TCP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTcpExists(TEST_TCP_NAME, true),
@@ -62,7 +62,7 @@ func TestBigipLtmTcp_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_TCP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTcpExists(TEST_TCP_NAME, true),

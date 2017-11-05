@@ -29,7 +29,7 @@ func TestBigipLtmsnat_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNAT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatExists(TEST_SNAT_NAME, true),
@@ -55,7 +55,7 @@ func TestBigipLtmsnat_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_SNAT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatExists(TEST_SNAT_NAME, true),

@@ -19,37 +19,37 @@ func resourceBigipLtmHttp2() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Http2 Profile",
 				//ValidateFunc: validateF5Name,
 			},
 
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"concurrent_streams_per_connection": &schema.Schema{
+			"concurrent_streams_per_connection": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"connection_idle_timeout": &schema.Schema{
+			"connection_idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
-			"header_table_size": &schema.Schema{
+			"header_table_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Http2 profile",
 			},
 
-			"activation_modes": &schema.Schema{
+			"activation_modes": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

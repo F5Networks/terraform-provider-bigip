@@ -26,7 +26,7 @@ func TestBigipLtmNode_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckNodeExists(TEST_NODE_NAME, true),
@@ -46,7 +46,7 @@ func TestBigipLtmNode_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckNodeExists(TEST_NODE_NAME, true),

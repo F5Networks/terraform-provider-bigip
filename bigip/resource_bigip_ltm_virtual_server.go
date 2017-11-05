@@ -22,46 +22,46 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
-			"port": &schema.Schema{
+			"port": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "Listen port for the virtual server",
 			},
 
-			"source": &schema.Schema{
+			"source": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "0.0.0.0/0",
 				Description: "Source IP and mask for the virtual server",
 			},
 
-			"destination": &schema.Schema{
+			"destination": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"pool": &schema.Schema{
+			"pool": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Description:  "Default pool for this virtual server",
 				ValidateFunc: validateF5Name,
 			},
 
-			"mask": &schema.Schema{
+			"mask": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "255.255.255.255",
 				Description: "Mask can either be in CIDR notation or decimal, i.e.: \"24\" or \"255.255.255.0\". A CIDR mask of \"0\" is the same as \"0.0.0.0\"",
 			},
 
-			"profiles": &schema.Schema{
+			"profiles": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
@@ -69,7 +69,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
-			"client_profiles": &schema.Schema{
+			"client_profiles": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
@@ -77,7 +77,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
-			"server_profiles": &schema.Schema{
+			"server_profiles": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
@@ -85,42 +85,42 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
-			"irules": &schema.Schema{
+			"irules": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
 			},
 
-			"source_address_translation": &schema.Schema{
+			"source_address_translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "none, automap, snat",
 			},
 
-			"snatpool": &schema.Schema{
+			"snatpool": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Name of the snatpool to use. Requires source_address_translation to be set to 'snat'.",
 			},
 
-			"ip_protocol": &schema.Schema{
+			"ip_protocol": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "all, tcp, udp",
 			},
 
-			"policies": &schema.Schema{
+			"policies": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
 			},
 
-			"vlans": &schema.Schema{
+			"vlans": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,

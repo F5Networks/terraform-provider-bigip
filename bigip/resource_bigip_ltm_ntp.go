@@ -19,14 +19,14 @@ func resourceBigipLtmNtp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the ntp Servers",
 				ValidateFunc: validateF5Name,
 			},
 
-			"servers": &schema.Schema{
+			"servers": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -34,7 +34,7 @@ func resourceBigipLtmNtp() *schema.Resource {
 				Description: "Servers Address",
 			},
 
-			"timezone": &schema.Schema{
+			"timezone": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Servers timezone",

@@ -51,9 +51,9 @@ func TestF5NameSet(t *testing.T) {
 func TestF5NameList(t *testing.T) {
 	//test string => expected error count
 	data := map[*[]string]int{
-		&[]string{"/Common/foo", "/Common/bar"}: 0,
-		&[]string{"/Common/foo", "bar"}:         1,
-		&[]string{"foo", "bar"}:                 2,
+		{"/Common/foo", "/Common/bar"}: 0,
+		{"/Common/foo", "bar"}:         1,
+		{"foo", "bar"}:                 2,
 	}
 
 	for d, ec := range data {

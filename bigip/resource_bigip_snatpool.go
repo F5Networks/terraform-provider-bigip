@@ -20,19 +20,19 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Snatpool list Name",
 				//	ValidateFunc: validateF5Name,
 			},
-			"partition": &schema.Schema{
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Which partition on BIG-IP",
 			},
 
-			"members": &schema.Schema{
+			"members": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

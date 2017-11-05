@@ -19,53 +19,53 @@ func resourceBigipLtmFastl4() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Fastl4 Profile",
 				//ValidateFunc: validateF5Name,
 			},
-			"partition": &schema.Schema{
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "name of partition",
 			},
-			"defaults_from": &schema.Schema{
+			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"client_timeout": &schema.Schema{
+			"client_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"explicitflow_migration": &schema.Schema{
+			"explicitflow_migration": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"hardware_syncookie": &schema.Schema{
+			"hardware_syncookie": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"idle_timeout": &schema.Schema{
+			"idle_timeout": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"iptos_toclient": &schema.Schema{
+			"iptos_toclient": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"iptos_toserver": &schema.Schema{
+			"iptos_toserver": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
-			"keepalive_interval": &schema.Schema{
+			"keepalive_interval": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Use the parent Fastl4 profile",

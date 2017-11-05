@@ -19,14 +19,14 @@ func resourceBigipLtmDns() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the Dns Servers",
 				ValidateFunc: validateF5Name,
 			},
 
-			"name_servers": &schema.Schema{
+			"name_servers": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -34,13 +34,13 @@ func resourceBigipLtmDns() *schema.Resource {
 				Description: "Servers Address",
 			},
 
-			"numberof_dots": &schema.Schema{
+			"numberof_dots": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "how many DNS Servers",
 			},
 
-			"search": &schema.Schema{
+			"search": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

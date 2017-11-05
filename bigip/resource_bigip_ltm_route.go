@@ -19,20 +19,20 @@ func resourceBigipLtmRoute() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the route",
 				//ValidateFunc: validateF5Name,
 			},
 
-			"network": &schema.Schema{
+			"network": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Destination network",
 			},
 
-			"gw": &schema.Schema{
+			"gw": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Gw address",

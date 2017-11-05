@@ -20,23 +20,23 @@ func resourceBigipLtmDevicegroup() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
 			},
 
-			"auto_sync": &schema.Schema{
+			"auto_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"type": &schema.Schema{
+			"type": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"full_load_on_sync": &schema.Schema{
+			"full_load_on_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",

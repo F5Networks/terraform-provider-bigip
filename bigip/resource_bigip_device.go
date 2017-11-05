@@ -20,24 +20,24 @@ func resourceBigipLtmDevice() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"configsync_ip": &schema.Schema{
+			"configsync_ip": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Username of BIG-IP",
 				//	ValidateFunc: validateF5Name,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the Device which needs to be Deviceensed",
 			},
 
-			"mirror_ip": &schema.Schema{
+			"mirror_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-			"mirror_secondary_ip": &schema.Schema{
+			"mirror_secondary_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",

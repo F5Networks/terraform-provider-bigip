@@ -28,7 +28,7 @@ func TestBigipLtmNtp_create(t *testing.T) {
 		Providers: testAccProviders,
 		//CheckDestroy: testCheckntpsDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_NTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),
@@ -52,7 +52,7 @@ func TestBigipLtmNtp_import(t *testing.T) {
 		Providers: testAccProviders,
 		//	CheckDestroy: testCheckntpsDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_NTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),

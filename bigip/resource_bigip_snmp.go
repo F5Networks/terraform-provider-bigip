@@ -20,18 +20,18 @@ func resourceBigipLtmSnmp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"sys_contact": &schema.Schema{
+			"sys_contact": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Contact Person email",
 				//ValidateFunc: validateF5Name,
 			},
-			"sys_location": &schema.Schema{
+			"sys_location": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Location of the F5 ",
 			},
-			"allowedaddresses": &schema.Schema{
+			"allowedaddresses": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},

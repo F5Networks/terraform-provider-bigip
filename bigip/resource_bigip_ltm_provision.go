@@ -19,38 +19,38 @@ func resourceBigipLtmProvision() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the module to be provisioned",
 				ValidateFunc: validateF5Name,
 			},
 
-			"full_path": &schema.Schema{
+			"full_path": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "path",
 			},
 
-			"cpu_ratio": &schema.Schema{
+			"cpu_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "cpu Ratio",
 			},
 
-			"disk_ratio": &schema.Schema{
+			"disk_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "disk Ratio",
 			},
 
-			"level": &schema.Schema{
+			"level": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "what level nominal or dedicated",
 			},
 
-			"memory_ratio": &schema.Schema{
+			"memory_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "memory Ratio",
