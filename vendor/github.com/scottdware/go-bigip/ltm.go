@@ -1229,7 +1229,6 @@ const (
 	uriDatagroup      = "data-group"
 	uriInternal       = "internal"
 	uriPolicy         = "policy"
-	uriProfile        = "profile"
 	uriOneconnect     = "one-connect"
 	ENABLED           = "enable"
 	DISABLED          = "disable"
