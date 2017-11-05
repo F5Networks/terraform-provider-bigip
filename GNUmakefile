@@ -1,6 +1,6 @@
 TEST = ./bigip
 TESTARGS = -v
-PROJ = terraform-provider-bigip
+PROJ = terraform-provider-f5
 
 ARCHS = amd64 386
 OS = windows darwin linux
@@ -21,10 +21,7 @@ bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
 		go get github.com/mitchellh/gox; \
 	fi
-	@cp main.go "$(BIGIP_BIN_PATH)/main.go"
-	@sed -i'' -e "s|github.com/f5devcentral/terraform-provider-f5|github.com/hashicorp/terraform/builtin/providers|" "$(BIGIP_BIN_PATH)/main.go"
-	@cp -r bigip "$(TF_DIR)/builtin/providers"
-	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/hashicorp/terraform/builtin/bins/provider-bigip"
+	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-f5"
 
 dist:
 	@mkdir -p $(PKG_DIR) 2>/dev/null
