@@ -1,6 +1,6 @@
 TEST = ./bigip
 TESTARGS = -v
-PROJ = terraform-provider-bigip
+PROJ = terraform-provider-f5
 
 ARCHS = amd64 386
 OS = windows darwin linux
@@ -15,7 +15,7 @@ BINS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(BIN_DIR)/$(os)_$(arch)/$(PRO
 default: bin
 
 build:
-	@go build ./...
+	@go build terraform-provider-bigip ./...
 
 bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
