@@ -21,6 +21,8 @@ bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
 		go get github.com/mitchellh/gox; \
 	fi
+	@sed -i'' -e "s|github.com/f5devcentral/terraform-provider-f5|github.com/hashicorp/terraform/builtin/providers|" "$(TRAVIS_BUILD_DIR)/main.go"
+	@cp -r bigip "$(TF_DIR)/builtin/providers"
 	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/hashicorp/terraform/builtin/bins/provider-bigip"
 
 dist:
