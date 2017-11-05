@@ -178,21 +178,31 @@ resource "bigip_ltm_virtual_server" "https" {
 
 `port` - (Required) Listen port for the virtual server
 
+`source` - (Optional) Source IP and mask
+
 `destination` - (Required) Destination IP
 
 `pool` - (Optional) Default pool name
 
 `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: `24` or `255.255.255.0`. A CIDR mask of `0` is the same as `0.0.0.0`
 
-`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat`
-
-`ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
-
 `profiles` - (Optional) List of profiles associated both client and server contexts on the virtual server. This includes protocol, ssl, http, etc.
 
 `client_profiles` - (Optional) List of client context profiles associated on the virtual server. Not mutually exclusive with `profiles` and `server_profiles`
 
 `server_profiles` - (Optional) List of server context profiles associated on the virtual server. Not mutually exclusive with `profiles` and `client_profiles`
+
+`irules` - (Optional) List of irules associated on the virtual server
+
+`source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` or `snat`
+
+`snatpool` - (Optional) Name of the snatpool to use. Requires source_address_translation to be set to 'snat'
+
+`ip_protocol` - (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
+
+`policies` - (Optional) List of policies associated on the virtual server
+
+`vlans` - (Optional) List of VLANs associated on the virtual server
 
 ## bigip_ltm_irule
 

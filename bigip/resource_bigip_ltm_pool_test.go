@@ -84,35 +84,35 @@ func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {
 	}
 }
 
-func testCheckPoolMember(pool_name, member_name string) resource.TestCheckFunc {
+func testCheckPoolMember(poolName, memberName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		members, err := client.PoolMembers(pool_name)
+		members, err := client.PoolMembers(poolName)
 		if err != nil {
 			return err
 		}
 
 		for _, member := range members {
-			if member == member_name {
+			if member.Name == memberName {
 				return nil
 			}
 		}
 
-		return fmt.Errorf("Member %s not found in %s", member_name, pool_name)
+		return fmt.Errorf("Member %s not found in %s", memberName, poolName)
 	}
 }
 
-func testCheckEmptyPool(pool_name string) resource.TestCheckFunc {
+func testCheckEmptyPool(poolName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		members, err := client.PoolMembers(pool_name)
+		members, err := client.PoolMembers(poolName)
 		if err != nil {
 			return err
 		}
 		if len(members) != 0 {
-			return fmt.Errorf("Pool %s not empty (%d members))", pool_name, len(members))
+			return fmt.Errorf("Pool %s not empty (%d members))", poolName, len(members))
 		}
 		return nil
 	}

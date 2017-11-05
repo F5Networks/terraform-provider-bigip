@@ -119,6 +119,13 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Set:      schema.HashString,
 				Optional: true,
 			},
+
+			"vlans": &schema.Schema{
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -184,6 +191,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	d.Set("snatpool", vs.SourceAddressTranslation.Pool)
 	d.Set("policies", vs.Policies)
+	d.Set("vlans", vs.Vlans)
 
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
@@ -265,6 +273,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		policies = setToStringSlice(p.(*schema.Set))
 	}
 
+	var vlans []string
+	if v, ok := d.GetOk("vlans"); ok {
+		vlans = setToStringSlice(v.(*schema.Set))
+	}
+
 	var rules []string
 	if cfg_rules, ok := d.GetOk("irules"); ok {
 		rules = setToStringSlice(cfg_rules.(*schema.Set))
@@ -278,6 +291,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Rules:       rules,
 		Profiles:    profiles,
 		Policies:    policies,
+		Vlans:       vlans,
 		IPProtocol:  d.Get("ip_protocol").(string),
 		SourceAddressTranslation: struct {
 			Type string `json:"type,omitempty"`

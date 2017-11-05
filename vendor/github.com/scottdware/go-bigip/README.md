@@ -11,7 +11,7 @@ Some of the tasks you can do are as follows:
 * Modify individual settings for all of the above.
 * Change the status of nodes and individual pool members (enable/disable).
 
-> **Note**: You must be on version 11.4+
+> **Note**: You must be on version 11.4+! For the features that deal with internal data groups, you must be running version 11.6+!
 
 ### Examples & Documentation
 Visit the [GoDoc][godoc-go-bigip] page for package documentation and examples.
@@ -19,7 +19,7 @@ Visit the [GoDoc][godoc-go-bigip] page for package documentation and examples.
 Here's a [blog post][blog] that goes a little more in-depth.
 
 ### Contributors
-A very special thanks to the following who have helped contribute to this software!
+A very special thanks to the following who have helped contribute to this software, especially:
 
 * [Adam Burnett](https://github.com/aburnett)
 * [Michael D. Ivey](https://github.com/ivey)

@@ -107,10 +107,16 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	nodeNames := make([]string, 0, len(nodes))
+
+	for _, node := range nodes {
+		nodeNames = append(nodeNames, node.Name)
+	}
+
 	d.Set("allow_nat", pool.AllowNAT)
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
-	d.Set("nodes", makeStringSet(&nodes))
+	d.Set("nodes", makeStringSet(&nodeNames))
 	d.Set("name", name)
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
@@ -167,7 +173,14 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return err
 	}
-	existing := makeStringSet(&nodes)
+
+	nodeNames := make([]string, 0, len(nodes))
+
+	for _, node := range nodes {
+		nodeNames = append(nodeNames, node.Name)
+	}
+
+	existing := makeStringSet(&nodeNames)
 	incoming := d.Get("nodes").(*schema.Set)
 	delete := existing.Difference(incoming)
 	add := incoming.Difference(existing)
