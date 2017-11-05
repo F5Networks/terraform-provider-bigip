@@ -15,13 +15,13 @@ BINS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(BIN_DIR)/$(os)_$(arch)/$(PRO
 default: bin
 
 build:
-	@go build -o terraform-provider-bigip ./...
+	@go build ./...
 
 bin: test
 	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
 		go get github.com/mitchellh/gox; \
 	fi
-	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-f5"
+	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-bigip"
 
 dist:
 	@mkdir -p $(PKG_DIR) 2>/dev/null
