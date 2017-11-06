@@ -65,6 +65,7 @@ test-compile: fmtcheck generate
 		@if [ "$(TEST)" = "./..." ]; then \
 			echo "ERROR: Set TEST to a specific package. For example,"; \
 			echo "  make test-compile TEST=./builtin/providers/bigip"; \
+			make testacc
 			exit 1; \
 		fi
 		go test -c $(TEST) $(TESTARGS)

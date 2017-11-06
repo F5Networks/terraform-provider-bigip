@@ -174,12 +174,12 @@ type DataGroupRecord struct {
 }
 
 type dataGroupDTO struct {
-	Name       string             `json:"name,omitempty"`
-	Partition  string             `json:"partition,omitempty"`
-	FullPath   string             `json:"fullPath,omitempty"`
-	Generation int                `json:"generation,omitempty"`
-	Type       string             `json:"type,omitempty"`
-	Records    []DataGroupRecord  `json:"records,omitempty"`
+	Name       string            `json:"name,omitempty"`
+	Partition  string            `json:"partition,omitempty"`
+	FullPath   string            `json:"fullPath,omitempty"`
+	Generation int               `json:"generation,omitempty"`
+	Type       string            `json:"type,omitempty"`
+	Records    []DataGroupRecord `json:"records,omitempty"`
 }
 
 func (p *DataGroup) MarshalJSON() ([]byte, error) {
@@ -1521,7 +1521,7 @@ func (b *BigIP) DeleteInternalDataGroup(name string) error {
 
 // Modify a named internal data group, REPLACING all the records
 func (b *BigIP) ModifyInternalDataGroupRecords(name string, records *[]DataGroupRecord) error {
-	config := &DataGroup {
+	config := &DataGroup{
 		Records: *records,
 	}
 	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
