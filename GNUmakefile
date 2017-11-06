@@ -58,6 +58,16 @@ testacc: fmt build
 		exit 1; \
 	fi
 	@TF_ACC=1 go test $(TEST) $(TESTARGS) -timeout 120m
+	e2etest: generate
+		TF_ACC=1 go test -v ./command/e2etest
+
+test-compile: fmtcheck generate
+		@if [ "$(TEST)" = "./..." ]; then \
+			echo "ERROR: Set TEST to a specific package. For example,"; \
+			echo "  make test-compile TEST=./builtin/providers/bigip"; \
+			exit 1; \
+		fi
+		go test -c $(TEST) $(TESTARGS)
 
 clean:
 	@go clean
