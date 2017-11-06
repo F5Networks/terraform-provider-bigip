@@ -18,6 +18,6 @@ go get golang.org/x/crypto/openpgp/s2k
 
 
 ls
-cd terraform-provider-f5/
+cd terraform-provider-bigip/
  go build -o terraform-provider-bigip
 
