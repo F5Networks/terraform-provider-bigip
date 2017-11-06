@@ -24,6 +24,8 @@ before_install:
   - go get golang.org/x/crypto/openpgp/packet
   - go get golang.org/x/crypto/openpgp/s2k
 
+testacc:
+  - make testacc
 script:
   - make bin
 
