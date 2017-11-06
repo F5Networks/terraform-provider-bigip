@@ -97,7 +97,7 @@ func testCheckIRulesDestroyed(s *terraform.State) error {
 			return nil
 		}
 		if irule != nil {
-			return fmt.Errorf("IRule ", name, " not destroyed.")
+			return fmt.Errorf("IRule %s not destroyed.", name)
 		}
 	}
 	return nil

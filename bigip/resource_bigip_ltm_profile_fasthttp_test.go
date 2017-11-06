@@ -121,10 +121,10 @@ func testCheckfasthttpExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("fasthttp ", name, " was not created.")
+			return fmt.Errorf("fasthttp %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fasthttp ", name, " still exists.")
+			return fmt.Errorf("fasthttp %s still exists.", name)
 		}
 		return nil
 	}
@@ -144,7 +144,7 @@ func testCheckfasthttpsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if fasthttp == nil {
-			return fmt.Errorf("fasthttp ", name, " not destroyed.")
+			return fmt.Errorf("fasthttp %s not destroyed.", name)
 		}
 	}
 	return nil

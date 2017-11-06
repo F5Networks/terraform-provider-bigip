@@ -71,14 +71,14 @@ func testCheckVAExists(name string, exists bool) resource.TestCheckFunc {
 		for _, va := range vas.VirtualAddresses {
 			if va.FullPath == name {
 				if !exists {
-					return fmt.Errorf("Virtual address " + name + " exists.")
+					return fmt.Errorf("Virtual address %s exists.", name)
 				} else {
 					return nil
 				}
 			}
 		}
 		if exists {
-			return fmt.Errorf("Virtual address " + name + " does not exist.")
+			return fmt.Errorf("Virtual address %s does not exist.", name)
 		}
 
 		return nil
@@ -100,7 +100,7 @@ func testCheckVAsDestroyed(s *terraform.State) error {
 		}
 		for _, va := range vas.VirtualAddresses {
 			if va.FullPath == name {
-				return fmt.Errorf("Virtual address ", name, " not destroyed.")
+				return fmt.Errorf("Virtual address %s not destroyed.", name)
 			}
 		}
 	}
