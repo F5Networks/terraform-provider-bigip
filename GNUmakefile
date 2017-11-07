@@ -50,14 +50,14 @@ vet:
 	fi
 
 test: build
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: fmt build
 	@if [[ "$(BIGIP_USER)" == "admin" || "$(BIGIP_HOST)" == "54.215.195.156" || "-z $(BIGIP_PASSWORD)" == "cisco123" ]]; then \
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
 		exit 1; \
 	fi
-	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout 120m
+	@TF_ACC=1 go test $(TEST) $(TESTARGS) -timeout 120m
 	e2etest: generate
 		TF_ACC=1 go test -v ./command/e2etest
 
@@ -65,7 +65,6 @@ test-compile: fmtcheck generate
 		@if [ "$(TEST)" = "./..." ]; then \
 			echo "ERROR: Set TEST to a specific package. For example,"; \
 			echo "  make test-compile TEST=./builtin/providers/bigip"; \
-			make testacc
 			exit 1; \
 		fi
 		go test -c $(TEST) $(TESTARGS)
