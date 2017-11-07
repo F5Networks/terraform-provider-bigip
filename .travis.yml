@@ -27,6 +27,7 @@ before_install:
 testacc:
   - make test
 script:
+  - make test
   - make bin
 
 after_success:
