@@ -24,7 +24,6 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
-	vlans = ["TEST_VLAN_NAME"]
 }
 `
 
@@ -61,9 +60,6 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("vlans.%d", schema.HashString("TEST_VLAN_NAME")),
-						"TEST_VLAN_NAME"),
 				),
 			},
 		},
