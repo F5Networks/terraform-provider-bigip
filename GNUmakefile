@@ -51,7 +51,10 @@ vet:
 
 test: build
 	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
-
+	@if [[ "$(BIGIP_USER)" == "admin" || "$(BIGIP_HOST)" == "13.57.25.130" || "-z $(BIGIP_PASSWORD)" == "cisco123" ]]; then \
+		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
+		exit 1; \
+	fi
 testacc: fmt build
 	@if [[ "$(BIGIP_USER)" == "admin" || "$(BIGIP_HOST)" == "13.57.25.130" || "-z $(BIGIP_PASSWORD)" == "cisco123" ]]; then \
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
