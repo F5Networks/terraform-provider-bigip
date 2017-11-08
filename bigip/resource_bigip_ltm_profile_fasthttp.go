@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmFasthttp() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmFasthttpCreate,
 		Update: resourceBigipLtmFasthttpUpdate,

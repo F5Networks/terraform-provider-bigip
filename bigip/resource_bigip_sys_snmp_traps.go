@@ -9,7 +9,6 @@ import (
 
 // this module does not have DELETE function as there is no API for Delete
 func resourceBigipLtmSnmpTraps() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmSnmpTrapsCreate,
 		Update: resourceBigipLtmSnmpTrapsUpdate,

@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmRoute() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmRouteCreate,
 		Update: resourceBigipLtmRouteUpdate,

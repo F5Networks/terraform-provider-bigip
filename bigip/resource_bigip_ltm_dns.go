@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmDns() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmDnsCreate,
 		Update: resourceBigipLtmDnsUpdate,

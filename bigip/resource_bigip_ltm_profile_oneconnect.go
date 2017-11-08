@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmOneconnect() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmOneconnectCreate,
 		Update: resourceBigipLtmOneconnectUpdate,
