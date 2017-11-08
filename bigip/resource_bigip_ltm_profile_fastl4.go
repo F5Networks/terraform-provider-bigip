@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmFastl4() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmFastl4Create,
 		Update: resourceBigipLtmFastl4Update,

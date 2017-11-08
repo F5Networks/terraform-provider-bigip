@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmHttp2() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmHttp2Create,
 		Update: resourceBigipLtmHttp2Update,

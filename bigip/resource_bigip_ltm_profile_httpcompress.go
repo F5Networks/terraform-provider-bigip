@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmHttpcompress() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmHttpcompressCreate,
 		Update: resourceBigipLtmHttpcompressUpdate,

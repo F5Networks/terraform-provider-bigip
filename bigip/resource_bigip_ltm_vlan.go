@@ -9,7 +9,6 @@ import (
 )
 
 func resourceBigipLtmVlan() *schema.Resource {
-	log.Println("Resource schema")
 
 	return &schema.Resource{
 		Create: resourceBigipLtmVlanCreate,

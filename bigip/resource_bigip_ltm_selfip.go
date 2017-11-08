@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmSelfIP() *schema.Resource {
-	log.Println("Resource schema")
 
 	return &schema.Resource{
 		Create: resourceBigipLtmSelfIPCreate,

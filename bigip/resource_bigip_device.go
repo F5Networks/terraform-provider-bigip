@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmDevice() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmDeviceCreate,
 		Update: resourceBigipLtmDeviceUpdate,
