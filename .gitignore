@@ -32,6 +32,7 @@ website/node_modules
 *.iml
 *.tf
 website/vendor
+ketmap
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
