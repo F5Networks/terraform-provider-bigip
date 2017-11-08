@@ -8,14 +8,14 @@ import (
 )
 
 // this module does not have DELETE function as there is no API for Delete
-func resourceBigipLtmSnmp() *schema.Resource {
+func resourceBigipNetSnmp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmSnmpCreate,
-		Update: resourceBigipLtmSnmpUpdate,
-		Read:   resourceBigipLtmSnmpRead,
-		Delete: resourceBigipLtmSnmpDelete,
+		Create: resourceBigipNetSnmpCreate,
+		Update: resourceBigipNetSnmpUpdate,
+		Read:   resourceBigipNetSnmpRead,
+		Delete: resourceBigipNetSnmpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSnmpImporter,
+			State: resourceBigipNetSnmpImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -42,7 +42,7 @@ func resourceBigipLtmSnmp() *schema.Resource {
 
 }
 
-func resourceBigipLtmSnmpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Get("sys_contact").(string)
@@ -64,7 +64,7 @@ func resourceBigipLtmSnmpCreate(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -80,7 +80,7 @@ func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 	return client.ModifySNMP(r)
 }
 
-func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -99,11 +99,11 @@ func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmSnmpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpDelete(d *schema.ResourceData, meta interface{}) error {
 	// No API support for Delete
 	return nil
 }
 
-func resourceBigipLtmSnmpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipNetSnmpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

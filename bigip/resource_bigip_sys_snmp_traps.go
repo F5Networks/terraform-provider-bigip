@@ -8,14 +8,14 @@ import (
 )
 
 // this module does not have DELETE function as there is no API for Delete
-func resourceBigipLtmSnmpTraps() *schema.Resource {
+func resourceBigipNetSnmpTraps() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmSnmpTrapsCreate,
-		Update: resourceBigipLtmSnmpTrapsUpdate,
-		Read:   resourceBigipLtmSnmpTrapsRead,
-		Delete: resourceBigipLtmSnmpTrapsDelete,
+		Create: resourceBigipNetSnmpTrapsCreate,
+		Update: resourceBigipNetSnmpTrapsUpdate,
+		Read:   resourceBigipNetSnmpTrapsRead,
+		Delete: resourceBigipNetSnmpTrapsDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSnmpTrapsImporter,
+			State: resourceBigipNetSnmpTrapsImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -102,7 +102,7 @@ func resourceBigipLtmSnmpTraps() *schema.Resource {
 
 }
 
-func resourceBigipLtmSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -146,7 +146,7 @@ func resourceBigipLtmSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBigipLtmSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -172,7 +172,7 @@ func resourceBigipLtmSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 	return client.ModifyTRAP(r)
 }
 
-func resourceBigipLtmSnmpTrapsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpTrapsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	host := d.Id()
@@ -202,7 +202,7 @@ func resourceBigipLtmSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceBigipLtmSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -211,6 +211,6 @@ func resourceBigipLtmSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) e
 	return client.DeleteTRAP(name)
 }
 
-func resourceBigipLtmSnmpTrapsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipNetSnmpTrapsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

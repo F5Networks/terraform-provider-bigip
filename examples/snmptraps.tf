@@ -4,7 +4,7 @@ provider "bigip" {
   password = "admin"
 }
 
-resource "bigip_snmp_traps" "snmp_traps" {
+resource "bigip_net_snmp_traps" "snmp_traps" {
 name = "snmptraps"
 community = "f5community"
 host = "195.10.10.1"

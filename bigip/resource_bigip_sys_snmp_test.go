@@ -13,14 +13,14 @@ import (
 var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TEST_PARTITION)
 
 var TEST_SNMP_RESOURCE = `
-resource "bigip_snmp" "test-snmp" {
+resource "bigip_net_snmp" "test-snmp" {
   sys_contact = "NetOPsAdmin s.shitole@f5.com"
   sys_location = "SeattleHQ"
   allowedaddresses = ["202.10.10.2"]
 }
 `
 
-func TestBigipLtmsnmp_create(t *testing.T) {
+func TestBigipNetsnmp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -32,9 +32,9 @@ func TestBigipLtmsnmp_create(t *testing.T) {
 				Config: TEST_SNMP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnmpExists(TEST_SNMP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_snmp.test-snmp", "sys_contact", "NetOPsAdmin s.shitole@f5.com"),
-					resource.TestCheckResourceAttr("bigip_snmp.test-snmp", "sys_location", "SeattleHQ"),
-					resource.TestCheckResourceAttr("bigip_snmp.test-snmp",
+					resource.TestCheckResourceAttr("bigip_net_snmp.test-snmp", "sys_contact", "NetOPsAdmin s.shitole@f5.com"),
+					resource.TestCheckResourceAttr("bigip_net_snmp.test-snmp", "sys_location", "SeattleHQ"),
+					resource.TestCheckResourceAttr("bigip_net_snmp.test-snmp",
 						fmt.Sprintf("allowedaddresses.%d", schema.HashString("202.10.10.2")),
 						"202.10.10.2"),
 				),
@@ -43,7 +43,7 @@ func TestBigipLtmsnmp_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmsnmp_import(t *testing.T) {
+func TestBigipNetsnmp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -85,7 +85,7 @@ func testChecksnmpExists(name string, exists bool) resource.TestCheckFunc {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_snmp" {
+		if rs.Type != "bigip_net_snmp" {
 			continue
 		}
 
