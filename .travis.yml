@@ -1,43 +1,40 @@
 sudo: false
 language: go
-
 go:
-  - 1.9
-
+- 1.9
 go_import_path: github.com/f5devcentral/terraform-provider-bigip
-
 before_install:
-  - go get github.com/hashicorp/terraform
-  - go get github.com/mitchellh/gox
-  - go get github.com/scottdware/go-bigip
-  - go get github.com/aws/aws-sdk-go/aws
-  - go get github.com/aws/aws-sdk-go/aws/ec2metadata
-  - go get github.com/aws/aws-sdk-go/aws/session
-  - go get github.com/aws/aws-sdk-go/service/s3
-  - go get github.com/bgentry/speakeasy
-  - go get github.com/mattn/go-isatty
-  - go get github.com/posener/complete
-  - go get github.com/posener/complete/cmd/install
-  - go get github.com/armon/go-radix
-  - go get golang.org/x/crypto/openpgp/armor
-  - go get golang.org/x/crypto/openpgp/errors
-  - go get golang.org/x/crypto/openpgp/packet
-  - go get golang.org/x/crypto/openpgp/s2k
-
+- go get github.com/hashicorp/terraform
+- go get github.com/mitchellh/gox
+- go get github.com/scottdware/go-bigip
+- go get github.com/aws/aws-sdk-go/aws
+- go get github.com/aws/aws-sdk-go/aws/ec2metadata
+- go get github.com/aws/aws-sdk-go/aws/session
+- go get github.com/aws/aws-sdk-go/service/s3
+- go get github.com/bgentry/speakeasy
+- go get github.com/mattn/go-isatty
+- go get github.com/posener/complete
+- go get github.com/posener/complete/cmd/install
+- go get github.com/armon/go-radix
+- go get golang.org/x/crypto/openpgp/armor
+- go get golang.org/x/crypto/openpgp/errors
+- go get golang.org/x/crypto/openpgp/packet
+- go get golang.org/x/crypto/openpgp/s2k
 testacc:
-  - make test
+- make test
 script:
-  - make test
-  - make bin
-
+- make test
+- make bin
 after_success:
-  - make dist
-
+- make dist
 deploy:
   provider: releases
   api_key:
     secure: pu+/NBPKLM+6sl76GzuIxsmsp2LBEUY0y2UXEoAVtrY52WbybBtJW8HB+Vqx1QJEdSJCQ48QonkGB5H7M3FuLy9BjCJHm+Na0L3TPoYxMAGtkUWUzz/sErRRQarOJ3HxJCdiBNKZHaY9yPlHYpPYYVO7vgWV8EppP9LuVT7tUW3KRkqqURKqYPfV9hlfBZ1Ik6QB8vqophzZuPWHHqWF2249wO06Lr9B0QV907Cum6RCFOOTzqmwDgc1V0f6JePIOq9RmnkFiSdmTGi+fGFHbkVomjbGE1HR8vPO1XVbRZ3AYQnA1eGKpfjBzWn0NSmcPh79UQRohC3luAHJRIKBuGmDc6dm1dmFh3nicq8T565Vupxxq1YxVG4S3wdr+apk1vM6pA+eHk0l+n1OdTSFmYhFygt6YDx5OWKhCgQyvtYBW3tsMIe7WtfOrkZotFzeQczQoE0mZ7vTW70zPzjnnA2KbDTMdX83cQ0vqZEuufTDFBQ/rbK7CZeAk82rJ4SaLHeCcxcLaDKQobKEYmVtsqA4OIqejQpjqerQK0dg5L8r6e8YJT4jLuEGpktNPGsiOQXNvnU7gChsQRj2Rq2GzU4EvUfCQ1mKjzzFNyT5mkfGUUvBRWytyuwfrSTAbvIGprCg56/x8W7CElSK3ZTbSpZnQqnVicmLZYwYinTTe+4=
   file_glob: true
-  file: "target/pkg/*.tar.gz"
+  file: target/pkg/*.tar.gz
   on:
     tags: true
+env:
+  global:
+    secure: hEAB2nV1hOPAh3mxj3MlwJ6EVSf4M+QbiljYwafp+uINQbveYhexCWK9me92hpjzvWprd9zts0As8DGeI+V0GcKCWO9JgGwCLGoYZF9xT7QWrH4xg7XlSMuQkQ2xAQFJSmPUiRd7d/9iGTiD1mbeQtO9WgKm8+mnwrizGx5dwd8dY/e/CXiEBYef07/DX0n2boz3LUfHwa0GZvBNZ16hf9T7U09zxd0MaKbZlxFJCShv/Zen1QU/w71GvCpZfl0EeShazQDfnr4lVATiQKF7TFA0KRPCXx3EvsUTg3yJS/Zdclp9H5g4/LybpCFAvTkmZYp7UUDVd98cNmDVhhCPpFX+LvpZf0+1gfEcLeFquTK7/rorvNTACNW94pFxGRu1IrA88OXZ8NrKuQ13hTpYZolG1ZURdTT1VmmXhKNeEHyZBthP5xY7jeQ2BkTqfddT/I1D69/SnFKShEtquVUUmCCP6uDeZeb++pCEIkn5cNselYKVlbIZ/lSsqL003oBeBYIZg1xsvO9U1hLIJRMxWL4wIr6RjOy71CwHj78uQSY5fIcDBqwrKWtnhvEAcXZBZqAtdviEGj1OiN7AMPzffqFjfUDtVaz2nDk9l1RMj183hDRlFKww61hNUa3s3VALofz+DWAxYJXxQ9Cbhnhl/pY2bqb6AP39t/WqFGypTm4=
