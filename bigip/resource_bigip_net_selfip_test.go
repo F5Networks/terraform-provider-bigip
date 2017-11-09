@@ -13,7 +13,7 @@ var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
 
 var TEST_SELFIP_RESOURCE = `
 
-resource "bigip_ltm_vlan" "test-vlan" {
+resource "bigip_net_vlan" "test-vlan" {
 	name = "` + TEST_VLAN_NAME + `"
 	tag = 101
 	interfaces = {
@@ -22,15 +22,15 @@ resource "bigip_ltm_vlan" "test-vlan" {
 	}
 }
 
-resource "bigip_ltm_selfip" "test-selfip" {
+resource "bigip_net_selfip" "test-selfip" {
 	name = "/Common/test-selfip"
 	ip = "11.1.1.1/24"
 	vlan = "/Common/test-vlan"
-	depends_on = ["bigip_ltm_vlan.test-vlan"]
+	depends_on = ["bigip_net_vlan.test-vlan"]
 		}
 `
 
-func TestBigipLtmselfip_create(t *testing.T) {
+func TestBigipNetselfip_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -42,16 +42,16 @@ func TestBigipLtmselfip_create(t *testing.T) {
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckselfipExists(TEST_SELFIP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_selfip.test-selfip", "name", "/Common/test-selfip"),
-					resource.TestCheckResourceAttr("bigip_ltm_selfip.test-selfip", "ip", "11.1.1.1/24"),
-					resource.TestCheckResourceAttr("bigip_ltm_selfip.test-selfip", "vlan", "/Common/test-vlan"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", "/Common/test-selfip"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "ip", "11.1.1.1/24"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", "/Common/test-vlan"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmselfip_import(t *testing.T) {
+func TestBigipNetselfip_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -93,7 +93,7 @@ func testCheckselfipsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ltm_selfip" {
+		if rs.Type != "bigip_net_selfip" {
 			continue
 		}
 

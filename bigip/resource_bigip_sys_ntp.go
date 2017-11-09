@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmNtp() *schema.Resource {
+func resourceBigipSysNtp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmNtpCreate,
-		Update: resourceBigipLtmNtpUpdate,
-		Read:   resourceBigipLtmNtpRead,
-		Delete: resourceBigipLtmNtpDelete,
+		Create: resourceBigipSysNtpCreate,
+		Update: resourceBigipSysNtpUpdate,
+		Read:   resourceBigipSysNtpRead,
+		Delete: resourceBigipSysNtpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmNtpImporter,
+			State: resourceBigipSysNtpImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -43,7 +43,7 @@ func resourceBigipLtmNtp() *schema.Resource {
 
 }
 
-func resourceBigipLtmNtpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
@@ -65,7 +65,7 @@ func resourceBigipLtmNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmNtpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -81,7 +81,7 @@ func resourceBigipLtmNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 	return client.ModifyNTP(r)
 }
 
-func resourceBigipLtmNtpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -100,11 +100,11 @@ func resourceBigipLtmNtpRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmNtpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
 	/* This function is not supported on BIG-IP, you cannot DELETE NTP API is not supported */
 	return nil
 }
 
-func resourceBigipLtmNtpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipSysNtpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

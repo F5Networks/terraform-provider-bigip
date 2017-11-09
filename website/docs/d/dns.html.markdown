@@ -1,6 +1,6 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_dns"
+page_title: "BIG-IP: bigip_sys_dns"
 sidebar_current: "docs-bigip-datasource-dns-x"
 description: |-
     Provides details about bigip dns
@@ -8,7 +8,7 @@ description: |-
 
 # bigip\_dns
 
-`bigip_dns` provides details about a specific bigip
+`bigip_sys_dns` provides details about a specific bigip
 
 This resource is helpful when configuring DNS server on the BIG-IP. 
 ## Example Usage
@@ -22,7 +22,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_dns" "dns1" {
+resource "bigip_sys_dns" "dns1" {
    description = "/Common/DNS1"
    name_servers = ["1.1.1.1"]
    numberof_dots = 2
@@ -33,7 +33,7 @@ resource "bigip_dns" "dns1" {
 
 ## Argument Reference
 
-* `bigip_dns` - Is the resource is used to configure dns name server on the BIG-IP.
+* `bigip_sys_dns` - Is the resource is used to configure dns name server on the BIG-IP.
 
 * `/Common/DNS` - Is the description of the DNS server in the main or common partition of BIG-IP.
 

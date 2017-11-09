@@ -10,6 +10,5 @@ community = "f5community"
 host = "195.10.10.1"
 description = "Setup snmp traps"
 port = 111
-
 }
 

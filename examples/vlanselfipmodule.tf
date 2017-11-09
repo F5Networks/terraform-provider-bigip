@@ -12,7 +12,7 @@ module  "sjvlan1" {
   tagged = true
  }
 
-resource "bigip_ltm_selfip" "selfip" {
+resource "bigip_net_selfip" "selfip" {
 
         name = "/Common/InternalselfIP"
         ip = "100.1.1.1/24"

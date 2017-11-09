@@ -8,16 +8,16 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmVlan() *schema.Resource {
+func resourceBigipNetVlan() *schema.Resource {
 
 	return &schema.Resource{
-		Create: resourceBigipLtmVlanCreate,
-		Read:   resourceBigipLtmVlanRead,
-		Update: resourceBigipLtmVlanUpdate,
-		Delete: resourceBigipLtmVlanDelete,
-		//Exists: resourceBigipLtmVlanExists,
+		Create: resourceBigipNetVlanCreate,
+		Read:   resourceBigipNetVlanRead,
+		Update: resourceBigipNetVlanUpdate,
+		Delete: resourceBigipNetVlanDelete,
+		//Exists: resourceBigipNetVlanExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmVlanImporter,
+			State: resourceBigipNetVlanImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -30,24 +30,24 @@ func resourceBigipLtmVlan() *schema.Resource {
 
 			"tag": {
 				Type:        schema.TypeInt,
-				Required:    true,
+				Optional:    true,
 				Description: "Tagged number",
 			},
 
 			"interfaces": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vlanport": {
 							Type:        schema.TypeString,
-							Required:    true,
+							Optional:    true,
 							Description: "Vlan name",
 						},
 
 						"tagged": {
 							Type:        schema.TypeBool,
-							Required:    true,
+							Optional:    true,
 							Description: "Interface tagged",
 						},
 					},
@@ -58,7 +58,7 @@ func resourceBigipLtmVlan() *schema.Resource {
 
 }
 
-func resourceBigipLtmVlanCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -91,10 +91,10 @@ func resourceBigipLtmVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 	return nil
 
-	//	return resourceBigipLtmVlanRead(d, meta)
+	//	return resourceBigipNetVlanRead(d, meta)
 }
 
-func resourceBigipLtmVlanRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 	/*	client := meta.(*bigip.BigIP)
 
 		name := d.Id()
@@ -116,7 +116,7 @@ func resourceBigipLtmVlanRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmVlanExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+func resourceBigipNetVlanExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	/* client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -136,7 +136,7 @@ func resourceBigipLtmVlanExists(d *schema.ResourceData, meta interface{}) (bool,
 	return false, nil
 }
 
-func resourceBigipLtmVlanUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -152,7 +152,7 @@ func resourceBigipLtmVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 
 }
 
-func resourceBigipLtmVlanDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -161,6 +161,6 @@ func resourceBigipLtmVlanDelete(d *schema.ResourceData, meta interface{}) error 
 	return client.DeleteVlan(name)
 }
 
-func resourceBigipLtmVlanImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipNetVlanImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

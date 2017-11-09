@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmProvision() *schema.Resource {
+func resourceBigipSysProvision() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProvisionCreate,
-		Update: resourceBigipLtmProvisionUpdate,
-		Read:   resourceBigipLtmProvisionRead,
-		Delete: resourceBigipLtmProvisionDelete,
+		Create: resourceBigipSysProvisionCreate,
+		Update: resourceBigipSysProvisionUpdate,
+		Read:   resourceBigipSysProvisionRead,
+		Delete: resourceBigipSysProvisionDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProvisionImporter,
+			State: resourceBigipSysProvisionImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -59,7 +59,7 @@ func resourceBigipLtmProvision() *schema.Resource {
 
 }
 
-func resourceBigipLtmProvisionCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -87,7 +87,7 @@ func resourceBigipLtmProvisionCreate(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBigipLtmProvisionUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -106,7 +106,7 @@ func resourceBigipLtmProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 	return client.ModifyProvision(r)
 }
 
-func resourceBigipLtmProvisionRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -128,11 +128,11 @@ func resourceBigipLtmProvisionRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceBigipLtmProvisionDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmProvisionImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipSysProvisionImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

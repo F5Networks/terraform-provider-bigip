@@ -3,7 +3,7 @@ provider "bigip" {
   username = "admin"
   password = "admin"
 }
-resource "bigip_ltm_vlan" "vlan1" {
+resource "bigip_net_vlan" "vlan1" {
 	name = "/Common/Internal"
 	tag = 101
 	interfaces = {

@@ -4,13 +4,13 @@ provider "bigip" {
   password = "admin"
 }
 
-resource "bigip_ntp" "ntp1" {
+resource "bigip_sys_ntp" "ntp1" {
   description = "/Common/NTP1"
   servers = ["time.facebook.com"]
   timezone = "America/Los_Angeles"
 }
 
-resource "bigip_dns" "dns1" {
+resource "bigip_sys_dns" "dns1" {
    description = "/Common/DNS1"
    name_servers = ["1.1.1.1"]
    numberof_Dots = 2

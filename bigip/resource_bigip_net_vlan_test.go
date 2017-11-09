@@ -12,7 +12,7 @@ import (
 var TEST_VLAN_NAME = fmt.Sprintf("/%s/test-vlan", TEST_PARTITION)
 
 var TEST_VLAN_RESOURCE = `
-resource "bigip_ltm_vlan" "test-vlan" {
+resource "bigip_net_vlan" "test-vlan" {
 	name = "/Common/test-vlan"
 	tag = 101
 	interfaces = {
@@ -22,7 +22,7 @@ resource "bigip_ltm_vlan" "test-vlan" {
 }
 `
 
-func TestBigipLtmvlan_create(t *testing.T) {
+func TestBigipNetvlan_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -34,17 +34,17 @@ func TestBigipLtmvlan_create(t *testing.T) {
 				Config: TEST_VLAN_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckvlanExists(TEST_VLAN_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_vlan.test-vlan", "name", "/Common/test-vlan"),
-					resource.TestCheckResourceAttr("bigip_ltm_vlan.test-vlan", "tag", "101"),
-					resource.TestCheckResourceAttr("bigip_ltm_vlan.test-vlan", "interfaces.0.vlanport", "1.2"),
-					resource.TestCheckResourceAttr("bigip_ltm_vlan.test-vlan", "interfaces.0.tagged", "false"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "name", "/Common/test-vlan"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "tag", "101"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.vlanport", "1.2"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.tagged", "false"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmvlan_import(t *testing.T) {
+func TestBigipNetvlan_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -86,7 +86,7 @@ func testCheckvlansDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ltm_vlan" {
+		if rs.Type != "bigip_net_vlan" {
 			continue
 		}
 

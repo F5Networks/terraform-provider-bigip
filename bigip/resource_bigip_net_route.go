@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmRoute() *schema.Resource {
+func resourceBigipNetRoute() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmRouteCreate,
-		Update: resourceBigipLtmRouteUpdate,
-		Read:   resourceBigipLtmRouteRead,
-		Delete: resourceBigipLtmRouteDelete,
+		Create: resourceBigipNetRouteCreate,
+		Update: resourceBigipNetRouteUpdate,
+		Read:   resourceBigipNetRouteRead,
+		Delete: resourceBigipNetRouteDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmRouteImporter,
+			State: resourceBigipNetRouteImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -41,7 +41,7 @@ func resourceBigipLtmRoute() *schema.Resource {
 
 }
 
-func resourceBigipLtmRouteCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -63,7 +63,7 @@ func resourceBigipLtmRouteCreate(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceBigipLtmRouteUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -78,12 +78,12 @@ func resourceBigipLtmRouteUpdate(d *schema.ResourceData, meta interface{}) error
 	return client.ModifyRoute(name, r)
 }
 
-func resourceBigipLtmRouteRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmRouteDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -92,6 +92,6 @@ func resourceBigipLtmRouteDelete(d *schema.ResourceData, meta interface{}) error
 	return client.DeleteRoute(name)
 }
 
-func resourceBigipLtmRouteImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipNetRouteImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }
