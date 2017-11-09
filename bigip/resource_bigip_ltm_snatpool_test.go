@@ -13,7 +13,7 @@ import (
 var TEST_SNATPOOL_NAME = fmt.Sprintf("/%s/test-snatpool", TEST_PARTITION)
 
 var TEST_SNATPOOL_RESOURCE = `
-resource "bigip_snatpool" "test-snatpool" {
+resource "bigip_ltm_snatpool" "test-snatpool" {
   name = "/Common/snatpool_sanjose"
   members = ["191.1.1.1","194.2.2.2"]
 }
@@ -32,11 +32,11 @@ func TestBigipLtmsnatpool_create(t *testing.T) {
 				Config: TEST_SNATPOOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_snatpool.test-snatpool", "name", "/Common/snatpool_sanjose"),
-					resource.TestCheckResourceAttr("bigip_snatpool.test-snatpool",
+					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool", "name", "/Common/snatpool_sanjose"),
+					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
 						fmt.Sprintf("members.%d", schema.HashString("191.1.1.1")),
 						"191.1.1.1"),
-					resource.TestCheckResourceAttr("bigip_snatpool.test-snatpool",
+					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
 						fmt.Sprintf("members.%d", schema.HashString("194.2.2.2")),
 						"194.2.2.2"),
 				),
@@ -87,7 +87,7 @@ func testChecksnatpoolsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_snatpool" {
+		if rs.Type != "bigip_ltm_snatpool" {
 			continue
 		}
 
