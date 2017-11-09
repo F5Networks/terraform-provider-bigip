@@ -6,8 +6,11 @@ ARCHS = amd64 386
 OS = windows darwin linux
 
 BIGIP_HOST := 10.192.74.73
+export BIGIP_HOST
 BIGIP_USER := admin
+export BIGIP_USER
 BIGIP_PASSWORD := admin
+export BIGIP_PASSWORD
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
 PKG_DIR = $(OUT_DIR)/pkg
