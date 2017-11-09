@@ -13,7 +13,7 @@ import (
 var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
 
 var TEST_SNAT_RESOURCE = `
-resource "bigip_snat" "test-snat" {
+resource "bigip_ltm_snat" "test-snat" {
  name = "/Common/NewSnatList"
  translation = "136.1.1.1"
  origins = ["2.2.2.2", "3.3.3.3"]
@@ -33,12 +33,12 @@ func TestBigipLtmsnat_create(t *testing.T) {
 				Config: TEST_SNAT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatExists(TEST_SNAT_NAME, true),
-					resource.TestCheckResourceAttr("bigip_snat.test-snat", "name", "/Common/NewSnatList"),
-					resource.TestCheckResourceAttr("bigip_snat.test-snat", "translation", "136.1.1.1"),
-					resource.TestCheckResourceAttr("bigip_snat.test-snat",
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "name", "/Common/NewSnatList"),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "translation", "136.1.1.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat",
 						fmt.Sprintf("origins.%d", schema.HashString("2.2.2.2")),
 						"2.2.2.2"),
-					resource.TestCheckResourceAttr("bigip_snat.test-snat",
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat",
 						fmt.Sprintf("origins.%d", schema.HashString("3.3.3.3")),
 						"3.3.3.3"),
 				),
@@ -89,7 +89,7 @@ func testChecksnatsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_snat" {
+		if rs.Type != "bigip_ltm_snat" {
 			continue
 		}
 

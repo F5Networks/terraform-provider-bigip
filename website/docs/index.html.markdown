@@ -322,6 +322,27 @@ resource "bigip_ltm_policy" "policy" {
  
  `condition` - Defines a single condition. Multiple conditions can exist per rule.
 
+## bigip_sys_snmp
+
+Manages a SNMP configuration and access
+
+### Example
+
+```
+resource "bigip_sys_snmp" "snmp" {
+  sys_contact = " NetOPsAdmin s.shitole@f5.com" 
+  sys_location = "SeattleHQ"
+  allowedaddresses = ["202.10.10.2"]
+}
+```
+
+### Reference
+
+`sys_contact` - (Optional) Contact Information
+
+`sys_location` - (Optional) Machine Location
+
+`allowedaddresses` - (Optional) Client Allow List
 
 # Building
 
