@@ -4,7 +4,7 @@ provider "bigip" {
   password = "admin"
 }
 
-resource "bigip_net_snmp" "snmp" {
+resource "bigip_sys_snmp" "snmp" {
   sys_contact = " NetOPsAdmin s.shitole@f5.com" 
   sys_location = "SeattleHQ"
   allowedaddresses = ["202.10.10.2"]
