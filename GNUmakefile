@@ -50,7 +50,7 @@ vet:
 	fi
 
 test: build
-	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
+	@TF_ACC=1 go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
 
 testacc: fmt build
 	@if [[ "$(BIGIP_USER)" == "admin" || "$(BIGIP_HOST)" == "13.57.25.130" || "-z $(BIGIP_PASSWORD)" == "cisco123" ]]; then \
