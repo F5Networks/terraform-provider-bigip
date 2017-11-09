@@ -5,6 +5,9 @@ PROJ = terraform-provider-bigip
 ARCHS = amd64 386
 OS = windows darwin linux
 
+BIGIP_HOST := 10.192.74.73
+BIGIP_USER := admin
+BIGIP_PASSWORD := admin
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
 PKG_DIR = $(OUT_DIR)/pkg
@@ -58,7 +61,6 @@ testacc: fmt build
 		exit 1; \
 	fi
 	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout 120m
-	BIGIP_HOST=10.192.74.73 BIGIP_USER=admin BIGIP_PASSWORD=admin make testacc
 
 
 
