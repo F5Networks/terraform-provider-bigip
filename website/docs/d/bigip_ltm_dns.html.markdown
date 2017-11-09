@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_dns"
+page_title: "BIG-IP: bigip_sys_dns"
 sidebar_current: "docs-bigip-datasource-dns-x"
 description: |-
-    Provides details about bigip_dns resource
+    Provides details about bigip_sys_dns resource
 ---
 
 # bigip\_dns

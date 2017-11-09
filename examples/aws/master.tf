@@ -11,7 +11,7 @@ provider "bigip" {
   username = "admin"
   password = "admin"
 }
-resource "bigip_provision" "provision-afm" {
+resource "bigip_sys_provision" "provision-afm" {
   name = "/Common/afm"
   full_path  = "afm"
   cpu_ratio = 0
@@ -20,21 +20,21 @@ resource "bigip_provision" "provision-afm" {
   memory_ratio = 0
 }
 
-resource "bigip_ntp" "ntp1" {
+resource "bigip_sys_ntp" "ntp1" {
   	description = "/Common/NTP1"
   	servers = ["time.google.com"]
   	timezone = "America/Los_Angeles"
-	depends_on = ["bigip_provision.provision-afm"]
+	depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
-resource "bigip_dns" "dns1" {
+resource "bigip_sys_dns" "dns1" {
    	description = "/Common/DNS1"
    	name_servers = ["8.8.8.8"]
    	numberof_dots = 2
    	search = ["f5.com"]
-   	depends_on = ["bigip_provision.provision-afm"]
+   	depends_on = ["bigip_sys_provision.provision-afm"]
 }
-resource "bigip_ltm_vlan" "vlan1" {
+resource "bigip_net_vlan" "vlan1" {
 	name = "/Common/internal"
 	tag = 101
 	interfaces = {
@@ -42,10 +42,10 @@ resource "bigip_ltm_vlan" "vlan1" {
 		tagged = false
 	}	
 
-        depends_on = ["bigip_provision.provision-afm"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
-resource "bigip_ltm_vlan" "vlan2" {
+resource "bigip_net_vlan" "vlan2" {
         name = "/Common/external"
         tag = 102
         interfaces = {
@@ -53,23 +53,23 @@ resource "bigip_ltm_vlan" "vlan2" {
                 tagged = false
         }
 
-        depends_on = ["bigip_provision.provision-afm"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
-resource "bigip_ltm_selfip" "selfip1" {
+resource "bigip_net_selfip" "selfip1" {
 	name = "/Common/internalselfIP"
 	ip = "11.1.1.1/24"
 	vlan = "/Common/internal"
-	depends_on = ["bigip_ltm_vlan.vlan1"]
-        depends_on = ["bigip_provision.provision-afm"]
+	depends_on = ["bigip_net_vlan.vlan1"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
 	}
 
-resource "bigip_ltm_selfip" "selfip2" {
+resource "bigip_net_selfip" "selfip2" {
         name = "/Common/externalselfIP"
         ip = "100.1.1.1/24"
         vlan = "/Common/external"
-        depends_on = ["bigip_ltm_vlan.vlan2"]
-        depends_on = ["bigip_provision.provision-afm"]
+        depends_on = ["bigip_net_vlan.vlan2"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
         }
 
 
@@ -79,7 +79,7 @@ resource "bigip_ltm_monitor" "monitor" {
         send = "GET /some/path\r\n"
         timeout = "999"
         interval = "999"
-        depends_on = ["bigip_provision.provision-afm"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_ltm_pool"  "pool" {
@@ -88,7 +88,7 @@ resource "bigip_ltm_pool"  "pool" {
         nodes = ["11.1.1.101:80", "11.1.1.102:80"]
         monitors = ["/Common/terraform_monitor"]
         allow_snat = true
-        depends_on = ["bigip_provision.provision-afm"]
+        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_ltm_virtual_server" "http" {
