@@ -12,7 +12,7 @@ import (
 var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TEST_PARTITION)
 
 var TEST_ONECONNECT_RESOURCE = `
-resource "bigip_ltm_oneconnect" "test-oneconnect"
+resource "bigip_ltm_profile_oneconnect" "test-oneconnect"
         {
             name = "/Common/test-oneconnect"
             partition = "Common"
@@ -26,7 +26,7 @@ resource "bigip_ltm_oneconnect" "test-oneconnect"
         }
 `
 
-func TestBigipLtmoneconnect_create(t *testing.T) {
+func TestBigipLtmProfileoneconnect_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -38,21 +38,21 @@ func TestBigipLtmoneconnect_create(t *testing.T) {
 				Config: TEST_ONECONNECT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckoneconnectExists(TEST_ONECONNECT_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "name", "/Common/test-oneconnect"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "defaults_from", "/Common/oneconnect"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "idle_timeout_override", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "max_age", "3600"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "max_reuse", "1000"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "max_size", "1000"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "share_pools", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_oneconnect.test-oneconnect", "source_mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "name", "/Common/test-oneconnect"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "defaults_from", "/Common/oneconnect"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "idle_timeout_override", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "max_age", "3600"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "max_reuse", "1000"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "max_size", "1000"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "share_pools", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_oneconnect.test-oneconnect", "source_mask", "255.255.255.255"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmoneconnect_import(t *testing.T) {
+func TestBigipLtmProfileoneconnect_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -81,10 +81,10 @@ func testCheckoneconnectExists(name string, exists bool) resource.TestCheckFunc 
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("oneconnects", name, " was not created.")
+			return fmt.Errorf("oneconnects %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("oneconnects ", name, " still exists.")
+			return fmt.Errorf("oneconnects %s was not created.", name)
 		}
 		return nil
 	}
@@ -94,7 +94,7 @@ func testCheckoneconnectsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ltm_oneconnect" {
+		if rs.Type != "bigip_ltm_profile_oneconnect" {
 			continue
 		}
 
@@ -104,7 +104,7 @@ func testCheckoneconnectsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if oneconnect == nil {
-			return fmt.Errorf("oneconnects ", name, " not destroyed.")
+			return fmt.Errorf("oneconnects %s was not created.", name)
 		}
 	}
 	return nil

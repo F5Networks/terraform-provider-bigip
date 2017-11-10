@@ -12,18 +12,18 @@ import (
 var TEST_HTTP2_NAME = fmt.Sprintf("/%s/test-http2", TEST_PARTITION)
 
 var TEST_HTTP2_RESOURCE = `
-resource "bigip_http2_profile" "test-http2"
+resource "bigip_ltm_profile_http2" "test-http2"
 
         {
             name = "/Common/sanjose-http2"
-						defaults_from = "/Common/http2"
+			defaults_from = "/Common/http2"
             concurrent_streams_per_connection = 10
             connection_idle_timeout = 30
             activation_modes = ["alpn","npn"]
         }
 `
 
-func TestBigipLtmHttp2_create(t *testing.T) {
+func TestBigipLtmProfileHttp2_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -35,17 +35,17 @@ func TestBigipLtmHttp2_create(t *testing.T) {
 				Config: TEST_HTTP2_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TEST_HTTP2_NAME, true),
-					resource.TestCheckResourceAttr("bigip_http2_profile.test-http2", "name", "/Common/sanjose-http2"),
-					resource.TestCheckResourceAttr("bigip_http2_profile.test-http2", "defaults_from", "/Common/http2"),
-					resource.TestCheckResourceAttr("bigip_http2_profile.test-http2", "concurrent_streams_per_connection", "10"),
-					resource.TestCheckResourceAttr("bigip_http2_profile.test-http2", "connection_idle_timeout", "30"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "name", "/Common/sanjose-http2"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "defaults_from", "/Common/http2"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "concurrent_streams_per_connection", "10"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "connection_idle_timeout", "30"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmHttp2_import(t *testing.T) {
+func TestBigipLtmProfileHttp2_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -74,10 +74,10 @@ func testCheckHttp2Exists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("fastl4 ", name, " was not created.")
+			return fmt.Errorf("http2 %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fastl4 ", name, " still exists.")
+			return fmt.Errorf("http2 %s was not created.", name)
 		}
 		return nil
 	}
@@ -87,7 +87,7 @@ func testCheckHttp2sDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_http2_profile" {
+		if rs.Type != "bigip_ltm_profile_http2" {
 			continue
 		}
 
@@ -97,7 +97,7 @@ func testCheckHttp2sDestroyed(s *terraform.State) error {
 			return err
 		}
 		if http2 == nil {
-			return fmt.Errorf("fasthttp ", name, " not destroyed.")
+			return fmt.Errorf("http2 %s was not created.", name)
 		}
 	}
 	return nil

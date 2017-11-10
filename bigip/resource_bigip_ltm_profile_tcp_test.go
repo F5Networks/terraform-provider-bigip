@@ -12,7 +12,7 @@ import (
 var TEST_TCP_NAME = fmt.Sprintf("/%s/test-tcp", TEST_PARTITION)
 
 var TEST_TCP_RESOURCE = `
-resource "bigip_tcp_profile" "test-tcp"
+resource "bigip_ltm_profile_tcp" "test-tcp"
 
         {
             name = "/Common/sanjose-tcp-wan-profile"
@@ -27,7 +27,7 @@ resource "bigip_tcp_profile" "test-tcp"
         }
 `
 
-func TestBigipLtmTcp_create(t *testing.T) {
+func TestBigipLtmProfileTcp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -39,22 +39,22 @@ func TestBigipLtmTcp_create(t *testing.T) {
 				Config: TEST_TCP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTcpExists(TEST_TCP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "name", "/Common/sanjose-tcp-wan-profile"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "defaults_from", "/Common/tcp-wan-optimized"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "idle_timeout", "300"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "close_wait_timeout", "5"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "finwait_2timeout", "5"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "finwait_timeout", "300"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "keepalive_interval", "1700"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "deferred_accept", "enabled"),
-					resource.TestCheckResourceAttr("bigip_tcp_profile.test-tcp", "fast_open", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "name", "/Common/sanjose-tcp-wan-profile"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "defaults_from", "/Common/tcp-wan-optimized"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "idle_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "close_wait_timeout", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_2timeout", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "keepalive_interval", "1700"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "deferred_accept", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "fast_open", "enabled"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmTcp_import(t *testing.T) {
+func TestBigipLtmProfileTcp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -83,10 +83,10 @@ func testCheckTcpExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("fastl4 ", name, " was not created.")
+			return fmt.Errorf("tcp %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fastl4 ", name, " still exists.")
+			return fmt.Errorf("tcp %s was not created.", name)
 		}
 		return nil
 	}
@@ -96,7 +96,7 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_tcp_profile" {
+		if rs.Type != "bigip_ltm_profile_tcp" {
 			continue
 		}
 
@@ -106,7 +106,7 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if tcp == nil {
-			return fmt.Errorf("fasthttp ", name, " not destroyed.")
+			return fmt.Errorf("tcp %s was not created.", name)
 		}
 	}
 	return nil

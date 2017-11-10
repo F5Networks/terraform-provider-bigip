@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmTcp() *schema.Resource {
+func resourceBigipLtmProfileTcp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmTcpCreate,
-		Update: resourceBigipLtmTcpUpdate,
-		Read:   resourceBigipLtmTcpRead,
-		Delete: resourceBigipLtmTcpDelete,
+		Create: resourceBigipLtmProfileTcpCreate,
+		Update: resourceBigipLtmProfileTcpUpdate,
+		Read:   resourceBigipLtmProfileTcpRead,
+		Delete: resourceBigipLtmProfileTcpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmTcpImporter,
+			State: resourceBigipLtmProfileTcpImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -80,7 +80,7 @@ func resourceBigipLtmTcp() *schema.Resource {
 
 }
 
-func resourceBigipLtmTcpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileTcpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -115,7 +115,7 @@ func resourceBigipLtmTcpCreate(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmTcpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -138,12 +138,12 @@ func resourceBigipLtmTcpUpdate(d *schema.ResourceData, meta interface{}) error {
 	return client.ModifyTcp(name, r)
 }
 
-func resourceBigipLtmTcpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmTcpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -152,6 +152,6 @@ func resourceBigipLtmTcpDelete(d *schema.ResourceData, meta interface{}) error {
 	return client.DeleteTcp(name)
 }
 
-func resourceBigipLtmTcpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmProfileTcpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

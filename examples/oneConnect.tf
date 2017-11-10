@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_ltm_oneconnect" "oneconnect-sanjose"
+resource "bigip_ltm_profile_oneconnect" "oneconnect-sanjose"
 
         {  
             name = "sanjose"

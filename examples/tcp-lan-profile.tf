@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_tcp_profile" "sanjose-tcp-lan-profile"
+resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile"
 
         {  
             name = "sanjose-tcp-lan-profile"

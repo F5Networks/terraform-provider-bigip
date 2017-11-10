@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_http2_profile" "nyhttp2"
+resource "bigip_ltm_profile_http2" "nyhttp2"
 
         {
             name = "/Common/NewYork_http2"

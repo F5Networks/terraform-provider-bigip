@@ -12,12 +12,12 @@ import (
 var TEST_FASTL4_NAME = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
 
 var TEST_FASTL4_RESOURCE = `
-resource "bigip_fastl4_profile" "test-fastl4" {
+resource "bigip_ltm_profile_fastl4" "test-fastl4" {
             name = "` + TEST_FASTL4_NAME + `"
             partition = "Common"
             defaults_from = "fastL4"
-						client_timeout = 40
-						idle_timeout = "200"
+			client_timeout = 40
+			idle_timeout = "200"
             explicitflow_migration = "enabled"
             hardware_syncookie = "enabled"
             iptos_toclient = "pass-through"
@@ -26,7 +26,7 @@ resource "bigip_fastl4_profile" "test-fastl4" {
  }
 `
 
-func TestBigipLtmFastl4_create(t *testing.T) {
+func TestBigipLtmProfileFastl4_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -38,24 +38,24 @@ func TestBigipLtmFastl4_create(t *testing.T) {
 				Config: TEST_FASTL4_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TEST_FASTL4_NAME, true),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "name", TEST_FASTL4_NAME),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "partition", "Common"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "defaults_from", "fastL4"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "client_timeout", "40"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "explicitflow_migration", "enabled"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "hardware_syncookie", "enabled"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "idle_timeout", "200"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "hardware_syncookie", "enabled"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "iptos_toclient", "pass-through"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "iptos_toserver", "pass-through"),
-					resource.TestCheckResourceAttr("bigip_fastl4_profile.test-fastl4", "keepalive_interval", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "name", TEST_FASTL4_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "defaults_from", "fastL4"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "client_timeout", "40"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "explicitflow_migration", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "hardware_syncookie", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "idle_timeout", "200"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "hardware_syncookie", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "iptos_toclient", "pass-through"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "iptos_toserver", "pass-through"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "keepalive_interval", "disabled"),
 				),
 			},
 		},
 	})
 }
 
-func TestBigipLtmfastl4_import(t *testing.T) {
+func TestBigipLtmProfilefastl4_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -84,10 +84,10 @@ func testCheckfastl4Exists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("fastl4 ", name, " was not created.")
+			return fmt.Errorf("fastl4 %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fastl4 ", name, " still exists.")
+			return fmt.Errorf("fastl4 %s was not created.", name)
 		}
 		return nil
 	}
@@ -97,7 +97,7 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_fastl4_profile" {
+		if rs.Type != "bigip_ltm_profile_fastl4" {
 			continue
 		}
 
@@ -107,7 +107,7 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 			return err
 		}
 		if fastl4 == nil {
-			return fmt.Errorf("fastl4 tata ", name, " not destroyed.")
+			return fmt.Errorf("fastl4 %s was not created.", name)
 		}
 	}
 	return nil

@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmFasthttp() *schema.Resource {
+func resourceBigipLtmProfileFasthttp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmFasthttpCreate,
-		Update: resourceBigipLtmFasthttpUpdate,
-		Read:   resourceBigipLtmFasthttpRead,
-		Delete: resourceBigipLtmFasthttpDelete,
+		Create: resourceBigipLtmProfileFasthttpCreate,
+		Update: resourceBigipLtmProfileFasthttpUpdate,
+		Read:   resourceBigipLtmProfileFasthttpRead,
+		Delete: resourceBigipLtmProfileFasthttpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmFasthttpImporter,
+			State: resourceBigipLtmProfileFasthttpImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -88,7 +88,7 @@ func resourceBigipLtmFasthttp() *schema.Resource {
 
 }
 
-func resourceBigipLtmFasthttpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -122,10 +122,10 @@ func resourceBigipLtmFasthttpCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 	d.SetId(name)
-	return resourceBigipLtmFasthttpRead(d, meta)
+	return resourceBigipLtmProfileFasthttpRead(d, meta)
 }
 
-func resourceBigipLtmFasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -149,12 +149,12 @@ func resourceBigipLtmFasthttpUpdate(d *schema.ResourceData, meta interface{}) er
 	return client.ModifyFasthttp(name, r)
 }
 
-func resourceBigipLtmFasthttpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmFasthttpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -163,6 +163,6 @@ func resourceBigipLtmFasthttpDelete(d *schema.ResourceData, meta interface{}) er
 	return client.DeleteFasthttp(name)
 }
 
-func resourceBigipLtmFasthttpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmProfileFasthttpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }
