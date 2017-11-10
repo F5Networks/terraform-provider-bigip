@@ -80,10 +80,10 @@ func testCheckselfipExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("selfip ", name, " was not created.")
+			return fmt.Errorf("selfip %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("selfip ", name, " still exists.")
+			return fmt.Errorf("selfip %s still exists.", name)
 		}
 		return nil
 	}
@@ -103,7 +103,7 @@ func testCheckselfipsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if selfip == nil {
-			return fmt.Errorf("selfip ", name, " not destroyed.")
+			return fmt.Errorf("selfip %s not destroyed.", name)
 		}
 	}
 	return nil

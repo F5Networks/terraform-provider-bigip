@@ -74,10 +74,10 @@ func testChecksnatpoolExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("snatpool ", name, " was not created.")
+			return fmt.Errorf("snatpool %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("snatpool ", name, " still exists.")
+			return fmt.Errorf("snatpool %s still exists.", name)
 		}
 		return nil
 	}
@@ -97,7 +97,7 @@ func testChecksnatpoolsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if snatpool == nil {
-			return fmt.Errorf("snatpool ", name, " not destroyed.")
+			return fmt.Errorf("snatpool %s not destroyed.", name)
 		}
 	}
 	return nil

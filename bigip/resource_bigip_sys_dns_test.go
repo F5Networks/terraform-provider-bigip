@@ -78,11 +78,11 @@ func testCheckdnsExists(description string, exists bool) resource.TestCheckFunc 
 			return err
 		}
 		if exists && dns == nil {
-			return fmt.Errorf("dns ", description, " was not created.")
+			return fmt.Errorf("dns %s was not created.", description)
 
 		}
 		if !exists && dns != nil {
-			return fmt.Errorf("dns ", description, " still exists.")
+			return fmt.Errorf("dns %s still exists.", description)
 
 		}
 		return nil
