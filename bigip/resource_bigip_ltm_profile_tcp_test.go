@@ -86,7 +86,7 @@ func testCheckTcpExists(name string, exists bool) resource.TestCheckFunc {
 			return fmt.Errorf("tcp %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("tcp %s was not created.", name)
+			return fmt.Errorf("tcp %s still exists.", name)
 		}
 		return nil
 	}
@@ -106,7 +106,7 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if tcp == nil {
-			return fmt.Errorf("tcp %s was not created.", name)
+			return fmt.Errorf("tcp %s not destroyed.", name)
 		}
 	}
 	return nil

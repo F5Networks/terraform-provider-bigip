@@ -77,7 +77,7 @@ func testCheckHttp2Exists(name string, exists bool) resource.TestCheckFunc {
 			return fmt.Errorf("http2 %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("http2 %s was not created.", name)
+			return fmt.Errorf("http2 %s still exists.", name)
 		}
 		return nil
 	}
@@ -97,7 +97,7 @@ func testCheckHttp2sDestroyed(s *terraform.State) error {
 			return err
 		}
 		if http2 == nil {
-			return fmt.Errorf("http2 %s was not created.", name)
+			return fmt.Errorf("fast2 %s not destroyed.", name)
 		}
 	}
 	return nil

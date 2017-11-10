@@ -74,11 +74,11 @@ func testCheckntpExists(description string, exists bool) resource.TestCheckFunc 
 			return err
 		}
 		if exists && ntp == nil {
-			return fmt.Errorf("ntp ", description, " was not created.")
+			return fmt.Errorf("ntp %s was not created.", description)
 
 		}
 		if !exists && ntp != nil {
-			return fmt.Errorf("ntp ", description, " still exists.")
+			return fmt.Errorf("ntp %s still exists.", description)
 
 		}
 		return nil

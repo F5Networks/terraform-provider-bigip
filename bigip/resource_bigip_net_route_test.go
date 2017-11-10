@@ -88,10 +88,10 @@ func testCheckrouteExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("route ", name, " was not created.")
+			return fmt.Errorf("route %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("route ", name, " still exists.")
+			return fmt.Errorf("route %s still exists.", name)
 		}
 		return nil
 	}
@@ -111,7 +111,7 @@ func testCheckroutesDestroyed(s *terraform.State) error {
 			return err
 		}
 		if route == nil {
-			return fmt.Errorf("route ", name, " not destroyed.")
+			return fmt.Errorf("route %s not destroyed.", name)
 		}
 	}
 	return nil
