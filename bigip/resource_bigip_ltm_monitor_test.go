@@ -92,7 +92,7 @@ func testCheckMonitorExists(name string) resource.TestCheckFunc {
 				return nil
 			}
 		}
-		return fmt.Errorf("Monitor ", name, " was not created.")
+		return fmt.Errorf("Monitor %s was not created.", name)
 	}
 }
 
@@ -112,7 +112,7 @@ func testMonitorsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		for _, m := range monitors {
 			if m.FullPath == name {
-				return fmt.Errorf("Monitor ", name, " not destroyed.")
+				return fmt.Errorf("Monitor %s not destroyed.", name)
 			}
 		}
 	}

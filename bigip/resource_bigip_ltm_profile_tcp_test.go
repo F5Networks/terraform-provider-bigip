@@ -83,10 +83,10 @@ func testCheckTcpExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("fastl4 ", name, " was not created.")
+			return fmt.Errorf("fastl4 %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fastl4 ", name, " still exists.")
+			return fmt.Errorf("fastl4 %s still exists.", name)
 		}
 		return nil
 	}
@@ -106,7 +106,7 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if tcp == nil {
-			return fmt.Errorf("fasthttp ", name, " not destroyed.")
+			return fmt.Errorf("fasthttp %s not destroyed.", name)
 		}
 	}
 	return nil

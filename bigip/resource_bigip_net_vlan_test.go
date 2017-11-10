@@ -73,10 +73,10 @@ func testCheckvlanExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("vlan ", name, " was not created.")
+			return fmt.Errorf("vlan %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("vlan ", name, " still exists.")
+			return fmt.Errorf("vlan %s still exists.", name)
 		}
 		return nil
 	}
@@ -96,7 +96,7 @@ func testCheckvlansDestroyed(s *terraform.State) error {
 			return err
 		}
 		if vlan == nil {
-			return fmt.Errorf("vlan ", name, " not destroyed.")
+			return fmt.Errorf("vlan %s not destroyed.", name)
 		}
 	}
 	return nil
