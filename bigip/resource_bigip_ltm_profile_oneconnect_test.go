@@ -81,10 +81,11 @@ func testCheckoneconnectExists(name string, exists bool) resource.TestCheckFunc 
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("oneconnects %s was not created.", name)
+			return fmt.Errorf("oneconnect %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("oneconnects %s still exists.", name)
+
+			return fmt.Errorf("oneconnect %s still exists.", name)
 		}
 		return nil
 	}
