@@ -17,7 +17,7 @@ resource "bigip_net_vlan" "test-vlan" {
 	name = "` + TEST_VLAN_NAME + `"
 	tag = 101
 	interfaces = {
-		vlanport = 1.2,
+		vlanport = 1.1,
 		tagged = false
 	}
 }
