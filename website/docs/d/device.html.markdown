@@ -1,6 +1,6 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_device"
+page_title: "BIG-IP: bigip_cm_device"
 sidebar_current: "docs-bigip-datasource-device-x"
 description: |-
     Provides details about bigip device 
@@ -8,7 +8,7 @@ description: |-
 
 # bigip\_device
 
-`bigip_device` provides details about a specific bigip
+`bigip_cm_device` provides details about a specific bigip
 
 This resource is helpful when configuring the BIG-IP device in cluster or in HA mode. 
 ## Example Usage
@@ -22,7 +22,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_device" "my_new_device"
+resource "bigip_cm_device" "my_new_device"
 
         {
             name = "bigip300.f5.com"

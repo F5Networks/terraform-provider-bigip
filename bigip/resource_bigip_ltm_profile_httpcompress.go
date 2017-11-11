@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmHttpcompress() *schema.Resource {
+func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmHttpcompressCreate,
-		Update: resourceBigipLtmHttpcompressUpdate,
-		Read:   resourceBigipLtmHttpcompressRead,
-		Delete: resourceBigipLtmHttpcompressDelete,
+		Create: resourceBigipLtmProfileHttpcompressCreate,
+		Update: resourceBigipLtmProfileHttpcompressUpdate,
+		Read:   resourceBigipLtmProfileHttpcompressRead,
+		Delete: resourceBigipLtmProfileHttpcompressDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmHttpcompressImporter,
+			State: resourceBigipLtmProfileHttpcompressImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -49,7 +49,7 @@ func resourceBigipLtmHttpcompress() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmHttpcompressCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -73,7 +73,7 @@ func resourceBigipLtmHttpcompressCreate(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceBigipLtmHttpcompressUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -90,11 +90,11 @@ func resourceBigipLtmHttpcompressUpdate(d *schema.ResourceData, meta interface{}
 	return client.ModifyHttpcompress(name, r)
 }
 
-func resourceBigipLtmHttpcompressRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmHttpcompressDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -103,6 +103,6 @@ func resourceBigipLtmHttpcompressDelete(d *schema.ResourceData, meta interface{}
 	return client.DeleteHttpcompress(name)
 }
 
-func resourceBigipLtmHttpcompressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmProfileHttpcompressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

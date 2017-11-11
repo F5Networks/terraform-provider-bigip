@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_httpcompress_profile" "sjhttpcompression"
+resource "bigip_ltm_profile_httpcompress" "sjhttpcompression"
 
         {
             name = "/Common/sjhttpcompression2"

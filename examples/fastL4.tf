@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_fastl4_profile" "sjfastl4profile"
+resource "bigip_ltm_profile_fastl4" "sjfastl4profile"
 
         {
             name = "/Common/sjfastl4profile"

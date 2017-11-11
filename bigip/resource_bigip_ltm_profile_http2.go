@@ -7,14 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmHttp2() *schema.Resource {
+func resourceBigipLtmProfileHttp2() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmHttp2Create,
-		Update: resourceBigipLtmHttp2Update,
-		Read:   resourceBigipLtmHttp2Read,
-		Delete: resourceBigipLtmHttp2Delete,
+		Create: resourceBigipLtmProfileHttp2Create,
+		Update: resourceBigipLtmProfileHttp2Update,
+		Read:   resourceBigipLtmProfileHttp2Read,
+		Delete: resourceBigipLtmProfileHttp2Delete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmHttp2Importer,
+			State: resourceBigipLtmProfileHttp2Importer,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -59,7 +59,7 @@ func resourceBigipLtmHttp2() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmHttp2Create(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -87,7 +87,7 @@ func resourceBigipLtmHttp2Create(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceBigipLtmHttp2Update(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -106,11 +106,11 @@ func resourceBigipLtmHttp2Update(d *schema.ResourceData, meta interface{}) error
 	return client.ModifyHttp2(name, r)
 }
 
-func resourceBigipLtmHttp2Read(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmHttp2Delete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -119,6 +119,6 @@ func resourceBigipLtmHttp2Delete(d *schema.ResourceData, meta interface{}) error
 	return client.DeleteHttp2(name)
 }
 
-func resourceBigipLtmHttp2Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmProfileHttp2Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

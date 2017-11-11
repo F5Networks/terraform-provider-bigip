@@ -1,6 +1,6 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_device_name"
+page_title: "BIG-IP: bigip_cm_device_name"
 sidebar_current: "docs-bigip-datasource-device_name-x"
 description: |-
     Provides details about bigip device_name 

@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_device" "my_new_device"
+resource "bigip_cm_device" "my_new_device"
 
         {
             name = "bigip200.f5.com"
