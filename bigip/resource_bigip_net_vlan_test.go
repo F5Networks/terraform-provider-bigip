@@ -16,7 +16,7 @@ resource "bigip_net_vlan" "test-vlan" {
 	name = "/Common/test-vlan"
 	tag = 101
 	interfaces = {
-		vlanport = 1.2,
+		vlanport = 1.1,
 		tagged = false
 	}
 }
@@ -36,7 +36,7 @@ func TestBigipNetvlan_create(t *testing.T) {
 					testCheckvlanExists(TEST_VLAN_NAME, true),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "name", "/Common/test-vlan"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "tag", "101"),
-					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.vlanport", "1.2"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.vlanport", "1.1"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.tagged", "false"),
 				),
 			},
