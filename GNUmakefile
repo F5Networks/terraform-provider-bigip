@@ -5,7 +5,9 @@ PROJ = terraform-provider-bigip
 ARCHS = amd64 386
 OS = windows darwin linux
 
-BIGIP_HOST := 13.57.108.243:8443
+BIGIP_HOST := 54.215.236.111:8443
+
+
 export BIGIP_HOST
 BIGIP_USER := admin
 export BIGIP_USER
