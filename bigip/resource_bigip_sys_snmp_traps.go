@@ -11,7 +11,7 @@ import (
 func resourceBigipSysSnmpTraps() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBigipSysSnmpTrapsCreate,
-		Update: resourceBigipSysSnmpTrapsUpdate,
+		//Update: resourceBigipSysSnmpTrapsUpdate,
 		Read:   resourceBigipSysSnmpTrapsRead,
 		Delete: resourceBigipSysSnmpTrapsDelete,
 		Importer: &schema.ResourceImporter{

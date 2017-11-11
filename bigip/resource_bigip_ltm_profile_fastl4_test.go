@@ -87,7 +87,7 @@ func testCheckfastl4Exists(name string, exists bool) resource.TestCheckFunc {
 			return fmt.Errorf("fastl4 %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("fastl4 %s was not created.", name)
+			return fmt.Errorf("fastl4 %s still exists.", name)
 		}
 		return nil
 	}
@@ -107,7 +107,7 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 			return err
 		}
 		if fastl4 == nil {
-			return fmt.Errorf("fastl4 %s was not created.", name)
+			return fmt.Errorf("fastl4 %s not destroyed.", name)
 		}
 	}
 	return nil

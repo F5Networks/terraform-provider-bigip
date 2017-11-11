@@ -76,7 +76,7 @@ func testCheckHttpcompressExists(name string, exists bool) resource.TestCheckFun
 			return fmt.Errorf("httpcompress %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("httpcompress %s was not created.", name)
+			return fmt.Errorf("httpcompress %s still exists.", name)
 		}
 		return nil
 	}
@@ -96,7 +96,7 @@ func testCheckHttpcompresssDestroyed(s *terraform.State) error {
 			return err
 		}
 		if httpcompress == nil {
-			return fmt.Errorf("httpcompress %s was not created.", name)
+			return fmt.Errorf("httpcompress %s not destroyed.", name)
 		}
 	}
 	return nil

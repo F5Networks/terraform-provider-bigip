@@ -84,7 +84,7 @@ func testCheckoneconnectExists(name string, exists bool) resource.TestCheckFunc 
 			return fmt.Errorf("oneconnects %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("oneconnects %s was not created.", name)
+			return fmt.Errorf("oneconnects %s still exists.", name)
 		}
 		return nil
 	}
@@ -104,7 +104,7 @@ func testCheckoneconnectsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if oneconnect == nil {
-			return fmt.Errorf("oneconnects %s was not created.", name)
+			return fmt.Errorf("oneconnect %s not destroyed.", name)
 		}
 	}
 	return nil
