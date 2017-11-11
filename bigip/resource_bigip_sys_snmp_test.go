@@ -72,10 +72,10 @@ func testChecksnmpExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("snmp ", name, " was not created.")
+			return fmt.Errorf("snmp %s was not created.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("snmp ", name, " still exists.")
+			return fmt.Errorf("snmp %s still exists.", name)
 		}
 		return nil
 	}
