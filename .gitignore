@@ -34,7 +34,9 @@ website/node_modules
 website/vendor
 keymap
 *.pem
+*.pub
 *.sh
+*.back
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
