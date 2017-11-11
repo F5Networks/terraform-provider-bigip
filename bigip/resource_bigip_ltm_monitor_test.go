@@ -17,7 +17,7 @@ resource "bigip_ltm_monitor" "test-monitor" {
 	parent = "/Common/http"
 	send = "GET /some/path\r\n"
 	timeout = 999
-	interval = 999
+	interval = 998
 	receive = "HTTP 1.1 302 Found"
 	receive_disable = "HTTP/1.1 429"
 	reverse = false
@@ -43,7 +43,7 @@ func TestBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "parent", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "send", "GET /some/path\\r\\n"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "timeout", "999"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "interval", "999"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "interval", "998"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive", "HTTP 1.1 302 Found"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive_disable", "HTTP/1.1 429"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "reverse", "false"),

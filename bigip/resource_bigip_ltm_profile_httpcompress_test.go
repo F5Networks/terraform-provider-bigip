@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/scottdware/go-bigip"
 )
@@ -15,10 +16,10 @@ var TEST_HTTPCOMPRESS_RESOURCE = `
 resource "bigip_ltm_profile_httpcompress" "test-httpcompress"
 
         {
-            name = "/Common/sanjose-httpcompress"
-			defaults_from = "/Common/httpcompression"
-            uri_exclude = "/ABCD"
-            uri_include = "/XYZ"
+            name = "/Common/test-httpcompress"
+			      defaults_from = "/Common/httpcompression"
+            uri_exclude = ["f5.com"]
+            uri_include = ["cisco.com"]
         }
 `
 
@@ -34,10 +35,14 @@ func TestBigipLtmProfileHttpcompress_create(t *testing.T) {
 				Config: TEST_HTTPCOMPRESS_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttpcompressExists(TEST_HTTPCOMPRESS_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "name", "/Common/sanjose-httpcompress"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "name", "/Common/test-httpcompress"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "defaults_from", "/Common/httpcompression"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "uri_exclude", "/ABCD"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "uri_include", "/XYZ"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
+						fmt.Sprintf("uri_exclude.%d", schema.HashString("f5.com")),
+						"f5.com"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
+						fmt.Sprintf("uri_include.%d", schema.HashString("cisco.com")),
+						"cisco.com"),
 				),
 			},
 		},

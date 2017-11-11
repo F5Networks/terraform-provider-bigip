@@ -1806,7 +1806,7 @@ func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
 		config.ParentMonitor = "gateway_icmp"
 	}
-
+	log.Println("[INFO] Creating snat -- %v\n ", config)
 	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
 }
 
