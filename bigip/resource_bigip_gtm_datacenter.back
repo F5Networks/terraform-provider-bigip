@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 )
 
 var NODE_VALIDATION = regexp.MustCompile(":\\d{2,5}$")

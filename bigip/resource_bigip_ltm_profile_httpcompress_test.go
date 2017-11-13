@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/scottdware/go-bigip"
 )
 
 var TEST_HTTPCOMPRESS_NAME = fmt.Sprintf("/%s/test-httpcompress", TEST_PARTITION)

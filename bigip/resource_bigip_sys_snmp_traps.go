@@ -3,15 +3,15 @@ package bigip
 import (
 	"log"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 )
 
 // this module does not have DELETE function as there is no API for Delete
 func resourceBigipSysSnmpTraps() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBigipSysSnmpTrapsCreate,
-		//Update: resourceBigipSysSnmpTrapsUpdate,
+		Update: resourceBigipSysSnmpTrapsUpdate,
 		Read:   resourceBigipSysSnmpTrapsRead,
 		Delete: resourceBigipSysSnmpTrapsDelete,
 		Importer: &schema.ResourceImporter{

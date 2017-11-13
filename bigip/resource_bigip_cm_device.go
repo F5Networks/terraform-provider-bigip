@@ -3,8 +3,8 @@ package bigip
 import (
 	"log"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipCmDevice() *schema.Resource {

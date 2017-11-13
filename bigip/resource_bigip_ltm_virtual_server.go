@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmVirtualServer() *schema.Resource {

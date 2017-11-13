@@ -1,5 +1,5 @@
 provider "bigip" {
-  address = "10.192.74.73"
+  address = "10.192.74.61"
   username = "admin"
   password = "admin"
 }
@@ -79,7 +79,8 @@ resource "bigip_ltm_pool"  "pool" {
         load_balancing_mode = "round-robin"
         nodes = ["11.1.1.101:80", "11.1.1.102:80"]
         monitors = ["/Common/terraform_monitor"]
-        allow_snat = true
+        allow_snat = "yes"
+        allow_nat = "yes"
         depends_on = ["bigip_sys_provision.provision-afm"]
 }
 

@@ -30,7 +30,7 @@ type ServerSSLProfile struct {
 	CacheTimeout                 int      `json:"cacheTimeout,omitempty"`
 	Cert                         string   `json:"cert,omitempty"`
 	Chain                        string   `json:"chain,omitempty"`
-	Ciphers                      string   `json:"Ciphers,omitempty"`
+	Ciphers                      string   `json:"ciphers,omitempty"`
 	DefaultsFrom                 string   `json:"defaultsFrom,omitempty"`
 	ExpireCertResponseControl    string   `json:"expireCertResponseControl,omitempty"`
 	GenericAlert                 string   `json:"genericAlert,omitempty"`
@@ -1218,6 +1218,7 @@ const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
 	uriPool           = "pool"
+	uriPoolMember     = "members"
 	uriProfile        = "profile"
 	uriServerSSL      = "server-ssl"
 	uriClientSSL      = "client-ssl"
@@ -1549,22 +1550,15 @@ func (b *BigIP) Pools() (*Pools, error) {
 	return &pools, nil
 }
 
-// PoolMembers returns a list of pool members for the given pool. Contained within the PoolMember
-// struct are the name and state fields.
-func (b *BigIP) PoolMembers(name string) ([]PoolMember, error) {
-	var nodes Nodes
-	members := []PoolMember{}
-	err, _ := b.getForEntity(&nodes, uriLtm, uriPool, name, "members")
+// PoolMembers returns a list of pool members for the given pool.
+func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
+	var poolMembers PoolMembers
+	err, _ := b.getForEntity(&poolMembers, uriLtm, uriPool, name, uriPoolMember)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, m := range nodes.Nodes {
-		member := &PoolMember{Name: m.Name, State: m.State}
-		members = append(members, *member)
-	}
-
-	return members, nil
+	return &poolMembers, nil
 }
 
 // AddPoolMember adds a node/member to the given pool. <member> must be in the form
@@ -1574,19 +1568,67 @@ func (b *BigIP) AddPoolMember(pool, member string) error {
 		Name: member,
 	}
 
-	return b.post(config, uriLtm, uriPool, pool, "members")
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
+// GetPoolMember returns the details of a member in the specified pool.
+func (b *BigIP) GetPoolMember(pool string, member string) (*PoolMember, error) {
+	var poolMember PoolMember
+	err, ok := b.getForEntity(&poolMember, uriLtm, uriPool, pool, uriPoolMember, member)
+
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &poolMember, nil
+}
+
+// CreatePoolMember creates a pool member for the specified pool.
+func (b *BigIP) CreatePoolMember(pool string, config *PoolMember) error {
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
+// ModifyPoolMember will update the configuration of a particular pool member.
+func (b *BigIP) ModifyPoolMember(pool string, config *PoolMember) error {
+	member := config.FullPath
+	// These fields are not used when modifying a pool member; so omit them.
+	config.Name = ""
+	config.Partition = ""
+	config.FullPath = ""
+
+	// This cannot be modified for an existing pool member.
+	config.Address = ""
+
+	return b.put(config, uriLtm, uriPool, pool, uriPoolMember, member)
+}
+
+// UpdatePoolMembers does a replace-all-with for the members of a pool.
+func (b *BigIP) UpdatePoolMembers(pool string, pm *[]PoolMember) error {
+	config := &poolMembers{
+		Members: *pm,
+	}
+	return b.put(config, uriLtm, uriPool, pool)
+}
+
+// RemovePoolMember removes a pool member from the specified pool.
+func (b *BigIP) RemovePoolMember(pool string, config *PoolMember) error {
+	member := config.FullPath
+	return b.delete(uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
 // DeletePoolMember removes a member from the given pool. <member> must be in the form
 // of <node>:<port>, i.e.: "web-server1:443".
-func (b *BigIP) DeletePoolMember(pool, member string) error {
-	return b.delete(uriLtm, uriPool, pool, "members", member)
+func (b *BigIP) DeletePoolMember(pool string, member string) error {
+	return b.delete(uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
 // PoolMemberStatus changes the status of a pool member. <state> can be either
 // "enable" or "disable". <member> must be in the form of <node>:<port>,
 // i.e.: "web-server1:443".
-func (b *BigIP) PoolMemberStatus(pool, member, state string) error {
+func (b *BigIP) PoolMemberStatus(pool string, member string, state string) error {
 	config := &Node{}
 
 	switch state {
@@ -1601,15 +1643,20 @@ func (b *BigIP) PoolMemberStatus(pool, member, state string) error {
 		// 	config.Session = "user-disabled"
 	}
 
-	return b.put(config, uriLtm, uriPool, pool, "members", member)
+	return b.put(config, uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
-// CreatePool adds a new pool to the BIG-IP system.
+// CreatePool adds a new pool to the BIG-IP system by name.
 func (b *BigIP) CreatePool(name string) error {
 	config := &Pool{
 		Name: name,
 	}
 
+	return b.post(config, uriLtm, uriPool)
+}
+
+// AddPool creates a new pool on the BIG-IP system.
+func (b *BigIP) AddPool(config *Pool) error {
 	return b.post(config, uriLtm, uriPool)
 }
 
@@ -1669,7 +1716,12 @@ func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, port i
 	return b.post(config, uriLtm, uriVirtual)
 }
 
-// Get a VirtualServer by name. Returns nil if the VirtualServer does not exist
+// AddVirtualServer adds a new virtual server by config to the BIG-IP system.
+func (b *BigIP) AddVirtualServer(config *VirtualServer) error {
+	return b.post(config, uriLtm, uriVirtual)
+}
+
+// GetVirtualServer retrieves a virtual server by name. Returns nil if the virtual server does not exist
 func (b *BigIP) GetVirtualServer(name string) (*VirtualServer, error) {
 	var vs VirtualServer
 	err, ok := b.getForEntity(&vs, uriLtm, uriVirtual, name)
@@ -1806,8 +1858,23 @@ func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
 		config.ParentMonitor = "gateway_icmp"
 	}
-	log.Println("[INFO] Creating snat -- %v\n ", config)
+
 	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
+}
+
+// GetVirtualServer retrieves a monitor by name. Returns nil if the monitor does not exist
+func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
+	// Add a verification that type is an accepted monitor type
+	var monitor Monitor
+	err, ok := b.getForEntity(&monitor, uriLtm, uriMonitor, parent, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &monitor, nil
 }
 
 // DeleteMonitor removes a monitor.

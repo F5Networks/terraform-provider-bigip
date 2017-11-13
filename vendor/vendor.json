@@ -494,7 +494,7 @@
 		},
 		{
 			"checksumSHA1": "Ho3eP1KzKKsuLssSGk5kF5k5+Ss=",
-			"path": "github.com/scottdware/go-bigip",
+			"path": "github.com/f5devcentral/go-bigip",
 			"revision": "a9a0d888f9f09e011964c930519ec35534bfb4ab",
 			"revisionTime": "2017-03-14T11:13:28Z"
 		},

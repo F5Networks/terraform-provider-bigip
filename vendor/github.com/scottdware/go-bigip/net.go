@@ -1,7 +1,6 @@
 package bigip
 
 import (
-	"log"
 	"strings"
 )
 
@@ -319,13 +318,13 @@ func (b *BigIP) Routes() (*Routes, error) {
 
 // CreateRoute adds a new static route to the BIG-IP system. <dest> must include the
 // subnet mask in CIDR notation, i.e.: "10.1.1.0/24".
-func (b *BigIP) CreateRoute(name, network, gateway string) error {
+func (b *BigIP) CreateRoute(name, dest, gateway string) error {
 	config := &Route{
 		Name:    name,
-		Network: network,
+		Network: dest,
 		Gateway: gateway,
 	}
-	log.Println("[INFO] route stuff.", config)
+
 	return b.post(config, uriNet, uriRoute)
 }
 

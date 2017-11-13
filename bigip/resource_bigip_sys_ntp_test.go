@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/scottdware/go-bigip"
 )
 
 var TEST_NTP_NAME = fmt.Sprintf("/%s/test-ntp", TEST_PARTITION)

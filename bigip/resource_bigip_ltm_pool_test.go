@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/scottdware/go-bigip"
 )
 
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
@@ -15,8 +15,8 @@ var TEST_POOL_RESOURCE = `
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
 	monitors = ["/Common/http"]
-	allow_nat = true
-	allow_snat = true
+	allow_nat = "yes"
+	allow_snat = "yes"
 	load_balancing_mode = "round-robin"
 }
 `
@@ -34,8 +34,8 @@ func TestBigipLtmPool_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "name", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_nat", "true"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_nat", "yes"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "load_balancing_mode", "round-robin"),
 				),
 			},
@@ -84,7 +84,7 @@ func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {
 	}
 }
 
-func testCheckPoolMember(poolName, memberName string) resource.TestCheckFunc {
+/* func testCheckPoolMember(poolName, memberName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -117,6 +117,7 @@ func testCheckEmptyPool(poolName string) resource.TestCheckFunc {
 		return nil
 	}
 }
+*/
 
 func testCheckPoolsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)

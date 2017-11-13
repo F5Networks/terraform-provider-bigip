@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/scottdware/go-bigip"
 )
 
 var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)

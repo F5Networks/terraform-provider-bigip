@@ -5,8 +5,8 @@ import (
 
 	"regexp"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/scottdware/go-bigip"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -21,7 +21,7 @@ func resourceBigipLtmNode() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the node",
@@ -29,7 +29,7 @@ func resourceBigipLtmNode() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"address": {
+			"address": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Address of the node",
@@ -118,7 +118,7 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	err := client.DeleteNode(name)
 	regex := regexp.MustCompile("referenced by a member of pool '\\/\\w+/([\\w-_.]+)")
 	for err != nil {
-		log.Printf("[INFO] Deleting %s from pools...\n", name)
+		log.Println("[INFO] Deleting %s from pools...", name)
 		parts := regex.FindStringSubmatch(err.Error())
 		if len(parts) > 1 {
 			poolName := parts[1]
@@ -126,7 +126,7 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 			if e != nil {
 				return e
 			}
-			for _, member := range members {
+			for _, member := range members.PoolMembers {
 				e = client.DeletePoolMember(poolName, member.Name)
 				if e != nil {
 					return e

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/scottdware/go-bigip"
 )
 
 var TEST_FASTL4_NAME = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
