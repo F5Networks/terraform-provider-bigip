@@ -7,6 +7,7 @@ before_install:
 - go get github.com/hashicorp/terraform
 - go get github.com/mitchellh/gox
 - go get github.com/aws/aws-sdk-go/aws
+- go get github.com//f5devcentral/go-bigip
 - go get github.com/aws/aws-sdk-go/aws/ec2metadata
 - go get github.com/aws/aws-sdk-go/aws/session
 - go get github.com/aws/aws-sdk-go/service/s3
