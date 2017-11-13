@@ -24,7 +24,6 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
-	vlans = ["TEST_VLAN_NAME"]
 }
 `
 
@@ -61,9 +60,6 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("vlans.%d", schema.HashString("TEST_VLAN_NAME")),
-						"TEST_VLAN_NAME"),
 				),
 			},
 		},
@@ -102,10 +98,10 @@ func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && vs == nil {
-			return fmt.Errorf("Virtual server ", name, " does not exist.")
+			return fmt.Errorf("Virtual server %s does not exist.", name)
 		}
 		if !exists && vs != nil {
-			return fmt.Errorf("Virtual server ", name, " exists.")
+			return fmt.Errorf("Virtual server %s exists.", name)
 		}
 		return nil
 	}
@@ -125,7 +121,7 @@ func testCheckVSsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if vs != nil {
-			return fmt.Errorf("Virtual server ", name, " not destroyed.")
+			return fmt.Errorf("Virtual server %s not destroyed.", name)
 		}
 	}
 	return nil

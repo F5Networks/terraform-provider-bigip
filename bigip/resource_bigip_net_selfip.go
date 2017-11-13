@@ -7,17 +7,16 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmSelfIP() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipNetSelfIP() *schema.Resource {
 
 	return &schema.Resource{
-		Create: resourceBigipLtmSelfIPCreate,
-		Read:   resourceBigipLtmSelfIPRead,
-		Update: resourceBigipLtmSelfIPUpdate,
-		Delete: resourceBigipLtmSelfIPDelete,
-		//Exists: resourceBigipLtmSelfIPExists,
+		Create: resourceBigipNetSelfIPCreate,
+		Read:   resourceBigipNetSelfIPRead,
+		Update: resourceBigipNetSelfIPUpdate,
+		Delete: resourceBigipNetSelfIPDelete,
+		//Exists: resourceBigipNetSelfIPExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSelfIPImporter,
+			State: resourceBigipNetSelfIPImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -44,7 +43,7 @@ func resourceBigipLtmSelfIP() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmSelfIPCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -62,11 +61,11 @@ func resourceBigipLtmSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 
 	d.SetId(name)
 
-	return resourceBigipLtmSelfIPRead(d, meta)
+	return resourceBigipNetSelfIPRead(d, meta)
 	// return nil
 }
 
-func resourceBigipLtmSelfIPRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -86,7 +85,7 @@ func resourceBigipLtmSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipLtmSelfIPExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+func resourceBigipNetSelfIPExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -107,7 +106,7 @@ func resourceBigipLtmSelfIPExists(d *schema.ResourceData, meta interface{}) (boo
 
 }
 
-func resourceBigipLtmSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -124,7 +123,7 @@ func resourceBigipLtmSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 
 }
 
-func resourceBigipLtmSelfIPDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -133,6 +132,6 @@ func resourceBigipLtmSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	return client.DeleteSelfIP(name)
 }
 
-func resourceBigipLtmSelfIPImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipNetSelfIPImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

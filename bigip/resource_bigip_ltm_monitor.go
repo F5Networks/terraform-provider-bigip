@@ -154,7 +154,9 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 	}
+	log.Println("I am printing whole thing   ", monitors)
 	return fmt.Errorf("Couldn't find monitor %s", name)
+
 }
 
 func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error) {

@@ -32,6 +32,11 @@ website/node_modules
 *.iml
 *.tf
 website/vendor
+keymap
+*.pem
+*.pub
+*.sh
+*.back
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate

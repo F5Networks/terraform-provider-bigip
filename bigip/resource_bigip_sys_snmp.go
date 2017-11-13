@@ -8,15 +8,14 @@ import (
 )
 
 // this module does not have DELETE function as there is no API for Delete
-func resourceBigipLtmSnmp() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipSysSnmp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmSnmpCreate,
-		Update: resourceBigipLtmSnmpUpdate,
-		Read:   resourceBigipLtmSnmpRead,
-		Delete: resourceBigipLtmSnmpDelete,
+		Create: resourceBigipSysSnmpCreate,
+		Update: resourceBigipSysSnmpUpdate,
+		Read:   resourceBigipSysSnmpRead,
+		Delete: resourceBigipSysSnmpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSnmpImporter,
+			State: resourceBigipSysSnmpImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -43,7 +42,7 @@ func resourceBigipLtmSnmp() *schema.Resource {
 
 }
 
-func resourceBigipLtmSnmpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Get("sys_contact").(string)
@@ -65,7 +64,7 @@ func resourceBigipLtmSnmpCreate(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -81,7 +80,7 @@ func resourceBigipLtmSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 	return client.ModifySNMP(r)
 }
 
-func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -100,11 +99,11 @@ func resourceBigipLtmSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmSnmpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpDelete(d *schema.ResourceData, meta interface{}) error {
 	// No API support for Delete
 	return nil
 }
 
-func resourceBigipLtmSnmpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipSysSnmpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

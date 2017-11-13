@@ -7,15 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmDevice() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipCmDevice() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmDeviceCreate,
-		Update: resourceBigipLtmDeviceUpdate,
-		Read:   resourceBigipLtmDeviceRead,
-		Delete: resourceBigipLtmDeviceDelete,
+		Create: resourceBigipCmDeviceCreate,
+		Update: resourceBigipCmDeviceUpdate,
+		Read:   resourceBigipCmDeviceRead,
+		Delete: resourceBigipCmDeviceDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmDeviceImporter,
+			State: resourceBigipCmDeviceImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -47,7 +46,7 @@ func resourceBigipLtmDevice() *schema.Resource {
 
 }
 
-func resourceBigipLtmDeviceCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	configsyncIp := d.Get("configsync_ip").(string)
@@ -71,7 +70,7 @@ func resourceBigipLtmDeviceCreate(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func resourceBigipLtmDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -88,7 +87,7 @@ func resourceBigipLtmDeviceUpdate(d *schema.ResourceData, meta interface{}) erro
 	return client.ModifyDevice(r)
 }
 
-func resourceBigipLtmDeviceRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -107,11 +106,11 @@ func resourceBigipLtmDeviceRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipLtmDeviceDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmDeviceImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipCmDeviceImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

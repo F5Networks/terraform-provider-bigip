@@ -7,15 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmDevicegroup() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipCmDevicegroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmDevicegroupCreate,
-		Update: resourceBigipLtmDevicegroupUpdate,
-		Read:   resourceBigipLtmDevicegroupRead,
-		Delete: resourceBigipLtmDevicegroupDelete,
+		Create: resourceBigipCmDevicegroupCreate,
+		Update: resourceBigipCmDevicegroupUpdate,
+		Read:   resourceBigipCmDevicegroupRead,
+		Delete: resourceBigipCmDevicegroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmDevicegroupImporter,
+			State: resourceBigipCmDevicegroupImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -46,7 +45,7 @@ func resourceBigipLtmDevicegroup() *schema.Resource {
 
 }
 
-func resourceBigipLtmDevicegroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	autoSync := d.Get("auto_sync").(string)
@@ -70,7 +69,7 @@ func resourceBigipLtmDevicegroupCreate(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceBigipLtmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -87,7 +86,7 @@ func resourceBigipLtmDevicegroupUpdate(d *schema.ResourceData, meta interface{})
 	return client.ModifyDevicegroup(r)
 }
 
-func resourceBigipLtmDevicegroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -106,11 +105,11 @@ func resourceBigipLtmDevicegroupRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBigipLtmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipCmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

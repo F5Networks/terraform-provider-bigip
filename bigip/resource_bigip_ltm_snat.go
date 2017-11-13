@@ -8,7 +8,6 @@ import (
 )
 
 func resourceBigipLtmSnat() *schema.Resource {
-	log.Println("Resource schema")
 	return &schema.Resource{
 		Create: resourceBigipLtmSnatCreate,
 		Update: resourceBigipLtmSnatUpdate,

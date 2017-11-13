@@ -5,6 +5,14 @@ PROJ = terraform-provider-bigip
 ARCHS = amd64 386
 OS = windows darwin linux
 
+BIGIP_HOST := 54.215.236.111:8443
+
+
+export BIGIP_HOST
+BIGIP_USER := admin
+export BIGIP_USER
+BIGIP_PASSWORD := cisco123
+export BIGIP_PASSWORD
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
 PKG_DIR = $(OUT_DIR)/pkg
@@ -53,13 +61,13 @@ test: build
 	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
 
 testacc: fmt build
-	@if [[ "$(BIGIP_USER)" == "admin" || "$(BIGIP_HOST)" == "54.215.195.156" || "-z $(BIGIP_PASSWORD)" == "cisco123" ]]; then \
+	@if [[ "$(BIGIP_USER)" == "" || "$(BIGIP_HOST)" == "" || "-z $(BIGIP_PASSWORD)" == "" ]]; then \
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
 		exit 1; \
 	fi
-	@TF_ACC=1 go test $(TEST) $(TESTARGS) -timeout 120m
-	e2etest: generate
-		TF_ACC=1 go test -v ./command/e2etest
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout 120m
+
+
 
 test-compile: fmtcheck generate
 		@if [ "$(TEST)" = "./..." ]; then \

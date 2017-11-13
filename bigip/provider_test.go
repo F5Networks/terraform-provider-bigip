@@ -13,6 +13,10 @@ var TEST_PARTITION = "Common"
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
+var testProviders = map[string]terraform.ResourceProvider{
+	"bigip": Provider(),
+}
+
 func init() {
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{

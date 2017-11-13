@@ -7,15 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmDns() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipSysDns() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmDnsCreate,
-		Update: resourceBigipLtmDnsUpdate,
-		Read:   resourceBigipLtmDnsRead,
-		Delete: resourceBigipLtmDnsDelete,
+		Create: resourceBigipSysDnsCreate,
+		Update: resourceBigipSysDnsUpdate,
+		Read:   resourceBigipSysDnsRead,
+		Delete: resourceBigipSysDnsDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmDnsImporter,
+			State: resourceBigipSysDnsImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -52,7 +51,7 @@ func resourceBigipLtmDns() *schema.Resource {
 
 }
 
-func resourceBigipLtmDnsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
@@ -74,10 +73,10 @@ func resourceBigipLtmDnsCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.SetId(description)
 
-	return resourceBigipLtmDnsRead(d, meta)
+	return resourceBigipSysDnsRead(d, meta)
 }
 
-func resourceBigipLtmDnsUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -94,7 +93,7 @@ func resourceBigipLtmDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 	return client.ModifyDNS(r)
 }
 
-func resourceBigipLtmDnsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -114,11 +113,11 @@ func resourceBigipLtmDnsRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipLtmDnsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmDnsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipSysDnsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 
-resource "bigip_fasthttp_profile" "sjfasthttpprofile"
+resource "bigip_ltm_profile_fasthttp" "sjfasthttpprofile"
 
         {
             name = "sjfasthttpprofile"

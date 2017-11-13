@@ -26,7 +26,7 @@ resource "bigip_ltm_dns" "dns1" {
    	search = ["f5.com"]
    	depends_on = ["bigip_ltm_provision.provision-afm"]
 }
-resource "bigip_ltm_vlan" "vlan1" {
+resource "bigip_net_vlan" "vlan1" {
 	name = "/Common/internal"
 	tag = 101
 	interfaces = {
@@ -37,7 +37,7 @@ resource "bigip_ltm_vlan" "vlan1" {
         depends_on = ["bigip_ltm_provision.provision-afm"]
 }
 
-resource "bigip_ltm_vlan" "vlan2" {
+resource "bigip_net_vlan" "vlan2" {
         name = "/Common/external"
         tag = 102
         interfaces = {
@@ -48,19 +48,19 @@ resource "bigip_ltm_vlan" "vlan2" {
         depends_on = ["bigip_ltm_provision.provision-afm"]
 }
 
-resource "bigip_ltm_selfip" "selfip1" {
+resource "bigip_net_selfip" "selfip1" {
 	name = "/Common/internalselfIP"
 	ip = "10.0.1.21/24"
 	vlan = "/Common/internal"
-	depends_on = ["bigip_ltm_vlan.vlan1"]
+	depends_on = ["bigip_net_vlan.vlan1"]
         depends_on = ["bigip_ltm_provision.provision-afm"]
 	}
 
-resource "bigip_ltm_selfip" "selfip2" {
+resource "bigip_net_selfip" "selfip2" {
         name = "/Common/externalselfIP"
         ip = "100.1.1.1/24"
         vlan = "/Common/external"
-        depends_on = ["bigip_ltm_vlan.vlan2"]
+        depends_on = ["bigip_net_vlan.vlan2"]
         depends_on = ["bigip_ltm_provision.provision-afm"]
         }
 

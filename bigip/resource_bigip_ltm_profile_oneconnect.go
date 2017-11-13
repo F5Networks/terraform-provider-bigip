@@ -7,15 +7,14 @@ import (
 	"github.com/scottdware/go-bigip"
 )
 
-func resourceBigipLtmOneconnect() *schema.Resource {
-	log.Println("Resource schema")
+func resourceBigipLtmProfileOneconnect() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmOneconnectCreate,
-		Update: resourceBigipLtmOneconnectUpdate,
-		Read:   resourceBigipLtmOneconnectRead,
-		Delete: resourceBigipLtmOneconnectDelete,
+		Create: resourceBigipLtmProfileOneconnectCreate,
+		Update: resourceBigipLtmProfileOneconnectUpdate,
+		Read:   resourceBigipLtmProfileOneconnectRead,
+		Delete: resourceBigipLtmProfileOneconnectDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmOneconnectImporter,
+			State: resourceBigipLtmProfileOneconnectImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -73,7 +72,7 @@ func resourceBigipLtmOneconnect() *schema.Resource {
 
 }
 
-func resourceBigipLtmOneconnectCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -107,7 +106,7 @@ func resourceBigipLtmOneconnectCreate(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceBigipLtmOneconnectUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -129,12 +128,12 @@ func resourceBigipLtmOneconnectUpdate(d *schema.ResourceData, meta interface{}) 
 	return client.ModifyOneconnect(name, r)
 }
 
-func resourceBigipLtmOneconnectRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
 
-func resourceBigipLtmOneconnectDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -143,6 +142,6 @@ func resourceBigipLtmOneconnectDelete(d *schema.ResourceData, meta interface{}) 
 	return client.DeleteOneconnect(name)
 }
 
-func resourceBigipLtmOneconnectImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmProfileOneconnectImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }

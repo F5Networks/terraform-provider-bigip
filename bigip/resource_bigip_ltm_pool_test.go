@@ -75,10 +75,10 @@ func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("Pool ", name, " does not exist.")
+			return fmt.Errorf("Pool %s does not exist.", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("Pool ", name, " exists.")
+			return fmt.Errorf("Pool %s exists.", name)
 		}
 		return nil
 	}
@@ -132,7 +132,7 @@ func testCheckPoolsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if pool != nil {
-			return fmt.Errorf("Pool ", name, " not destroyed.")
+			return fmt.Errorf("Pool %s not destroyed.", name)
 		}
 	}
 	return nil

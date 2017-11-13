@@ -103,10 +103,10 @@ func testCheckNodeExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && node == nil {
-			return fmt.Errorf("Node ", name, " was not created.")
+			return fmt.Errorf("Node %s was not created.", name)
 		}
 		if !exists && node != nil {
-			return fmt.Errorf("Node ", name, " still exists.")
+			return fmt.Errorf("Node %s still exists.", name)
 		}
 		return nil
 	}
@@ -126,7 +126,7 @@ func testCheckNodesDestroyed(s *terraform.State) error {
 			return err
 		}
 		if node != nil {
-			return fmt.Errorf("Node ", name, " not destroyed.")
+			return fmt.Errorf("Node %s not destroyed.", name)
 		}
 	}
 	return nil
