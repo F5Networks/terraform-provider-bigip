@@ -5,13 +5,13 @@ PROJ = terraform-provider-bigip
 ARCHS = amd64 386
 OS = windows darwin linux
 
-BIGIP_HOST := 10.192.74.61
+BIGIP_HOST := 13.56.242.22
 
 
 export BIGIP_HOST
 BIGIP_USER := admin
 export BIGIP_USER
-BIGIP_PASSWORD := admin
+BIGIP_PASSWORD := cisco123
 export BIGIP_PASSWORD
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
@@ -58,14 +58,14 @@ vet:
 	fi
 
 test: build
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=300s -parallel=1
 
 testacc: fmt build
 	@if [[ "$(BIGIP_USER)" == "" || "$(BIGIP_HOST)" == "" || "-z $(BIGIP_PASSWORD)" == "" ]]; then \
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
 		exit 1; \
 	fi
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout 120m
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout 120m
 
 
 
