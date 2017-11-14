@@ -5,13 +5,13 @@ PROJ = terraform-provider-bigip
 ARCHS = amd64 386
 OS = windows darwin linux
 
-BIGIP_HOST :=
+BIGIP_HOST := 10.192.74.61
 
 
 export BIGIP_HOST
 BIGIP_USER := admin
 export BIGIP_USER
-BIGIP_PASSWORD := cisco123
+BIGIP_PASSWORD := admin
 export BIGIP_PASSWORD
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
