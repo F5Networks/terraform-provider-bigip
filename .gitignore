@@ -37,6 +37,7 @@ keymap
 *.pub
 *.sh
 *.back
+*.goback
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
