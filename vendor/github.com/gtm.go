@@ -121,6 +121,20 @@ type serverDTO struct {
 	}
 
 
+	type Pool_as struct {
+		Pool_as []Pool_a `json:"items"`
+	}
+
+	type Pool_a struct {
+		Name string   `json:"name,omitempty"`
+		Monitor string   `json:"monitor,omitempty"`
+		Load_balancing_mode string   `json:"load_balancing_mode,omitempty"`
+		Max_answers_returned int   `json:"max_answers_returned,omitempty"`
+		Alternate_mode string   `json:"alternate_mode,omitempty"`
+		Fallback_ip string   `json:"fallback_ip,omitempty"`
+		Fallback_mode string   `json:"fallback_mode,omitempty"`
+		Members     []string `json:"members,omitempty"`
+	}
 
 
 
@@ -130,6 +144,7 @@ const (
 	uriDatacenter = "datacenter"
 	uriGtmmonitor    = "monitor"
 	uriHttp       = "http"
+	uriPool_a     = "pool/a"
 )
 
 func (b *BigIP) Datacenters() (*Datacenter, error) {
@@ -228,4 +243,35 @@ func (b *BigIP) GetGtmserver(name string) (*Server, error) {
  }
 
  return &p, nil
+ }
+
+
+ func (b *BigIP) CreatePool_a(name, monitor, load_balancing_mode string, max_answers_returned int, alternate_mode, fallback_ip, fallback_mode string, members []string) error {
+ 	config := &Pool_a{
+ 		Name: name,
+		Monitor: monitor,
+		Load_balancing_mode: load_balancing_mode,
+		Max_answers_returned: max_answers_returned,
+		Alternate_mode: alternate_mode,
+		Fallback_ip: fallback_ip,
+		Fallback_mode: fallback_mode,
+ 		Members:     members,
+ 	}
+
+ 	return b.patch(config, uriGtm, uriPool_a)
+ }
+
+ func (b *BigIP) ModifyPool_a(config *Pool_a) error {
+ 	return b.put(config, uriGtm, uriPool_a)
+ }
+
+ func (b *BigIP) Pool_as() (*Pool_a, error) {
+ 	var pool_a Pool_a
+ 	err, _ := b.getForEntity(&pool_a, uriGtm, uriPool_a)
+
+ 	if err != nil {
+ 		return nil, err
+ 	}
+
+ 	return &pool_a, nil
  }
