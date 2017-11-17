@@ -2,55 +2,61 @@ package bigip
 
 import (
 	"log"
-	"regexp"
-	"strings"
 
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
-
-var NODE_VALIDATION = regexp.MustCompile(":\\d{2,5}$")
 
 func resourceBigipGtmDatacenter() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBigipGtmDatacenterCreate,
-		Read:   resourceBigipGtmDatacenterRead,
 		Update: resourceBigipGtmDatacenterUpdate,
+		Read:   resourceBigipGtmDatacenterRead,
 		Delete: resourceBigipGtmDatacenterDelete,
-		Exists: resourceBigipGtmDatacenterExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigIpGtmDatacenterImporter,
+			State: resourceBigipGtmDatacenterImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
+
 			"name": &schema.Schema{
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:    true,
 				Description:  "Name of the datacenter",
-				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-			"metadata": &schema.Schema{
-				Type:        schema.TypeSet,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Set:         schema.HashString,
-				Optional:    true,
-				Description: "meta data value array ",
-			},
-
 			"description": &schema.Schema{
-				Type:        schema.TypeSet,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Set:         schema.HashString,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Assign monitors to a datacenter.",
+				Description: "User defined description.",
 			},
 
-			"proberpool": &schema.Schema{
+			"contact": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Contact person",
+			},
+
+
+			"prober_pool": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Optional prober pool used to monitor the data center's virtual servers.",
+			},
+		"app_service": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The application service that the object belongs",
+			},
+			"disabled": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     true,
-				Description: "Allow NAT",
+				Description: "Specifies that the data center and its resources are not available for load balancing.",
+			},
+			"enabled": &schema.Schema{
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Specifies that the data center and its resources are available for load balancing.",
 			},
 		},
 	}
@@ -58,22 +64,29 @@ func resourceBigipGtmDatacenter() *schema.Resource {
 
 func resourceBigipGtmDatacenterCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
+	description := d.Get("description").(string)
+	contact := d.Get("contact").(string)
+	app_service := d.Get("app_service").(string)
+	enabled := d.Get("enabled").(bool)
+	disabled := d.Get("disabled").(bool)
+	prober_pool := d.Get("prober_pool").(string)
+	log.Println("[INFO] Creating Datacenter ", name)
 
-	log.Println("[INFO] Creating DataCenter " + name)
-	err := client.CreateDatacenter(name)
+	err := client.CreateDatacenter(
+		name,
+		description,
+		contact,
+		app_service,
+		enabled,
+		disabled,
+		prober_pool,
+	)
+
 	if err != nil {
 		return err
 	}
 	d.SetId(name)
-
-	err = resourceBigipGtmDatacenterUpdate(d, meta)
-	if err != nil {
-		client.DeleteDatacenter(name)
-		return err
-	}
-
 	return resourceBigipGtmDatacenterRead(d, meta)
 }
 
@@ -84,26 +97,19 @@ func resourceBigipGtmDatacenterRead(d *schema.ResourceData, meta interface{}) er
 
 	log.Println("[INFO] Reading Datacenter " + name)
 
-	datacenter, err := client.GetDatacenter(name)
-	if err != nil {
-		return err
-	}
-	nodes, err := client.DatacenterMembers(name)
+	datacenter, err := client.Datacenters()
 	if err != nil {
 		return err
 	}
 
-	d.Set("allow_nat", datacenter.AllowNAT)
-	d.Set("allow_snat", datacenter.AllowSNAT)
-	d.Set("load_balancing_mode", datacenter.LoadBalancingMode)
-	d.Set("nodes", makeStringSet(&nodes))
-	d.Set("name", name)
-
-	monitors := strings.Split(strings.TrimSpace(datacenter.Monitor), " and ")
-	d.Set("monitors", makeStringSet(&monitors))
+	d.Set("name", datacenter.Name)
+	d.Set("description", datacenter.Description)
+	d.Set("contact", datacenter.Contact)
+	d.Set("prober_pool", datacenter.Prober_pool)
 
 	return nil
 }
+
 
 func resourceBigipGtmDatacenterExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
@@ -111,14 +117,18 @@ func resourceBigipGtmDatacenterExists(d *schema.ResourceData, meta interface{}) 
 	name := d.Id()
 	log.Println("[INFO] Checking Datacenter " + name + " exists.")
 
-	datacenter, err := client.GetDatacenter(name)
+	datacenter, err := client.Datacenters()
 	if err != nil {
 		return false, err
 	}
 
-	if datacenter == nil {
-		d.SetId("")
-	}
+	d.Set("name", datacenter.Name)
+	d.Set("description", datacenter.Description)
+	d.Set("contact", datacenter.Contact)
+	d.Set("app_service", datacenter.App_service)
+	d.Set("enabled", datacenter.Enabled)
+	d.Set("disabled", datacenter.Disabled)
+	d.Set("prober_pool", datacenter.Prober_pool)
 
 	return datacenter != nil, nil
 }
@@ -128,47 +138,19 @@ func resourceBigipGtmDatacenterUpdate(d *schema.ResourceData, meta interface{}) 
 
 	name := d.Id()
 
-	//monitors
-	var monitors []string
-	if m, ok := d.GetOk("monitors"); ok {
-		for _, monitor := range m.(*schema.Set).List() {
-			monitors = append(monitors, monitor.(string))
-		}
+	log.Println("[INFO] Updating Datacenter " + name)
+
+	r := &bigip.Datacenter{
+		Name:    name,
+		Description: d.Get("description").(string),
+		Contact: d.Get("contact").(string),
+		App_service:  d.Get("app_service").(string),
+		Enabled:  d.Get("enabled").(bool),
+		Disabled:  d.Get("disabled").(bool),
+		Prober_pool:  d.Get("prober_pool").(string),
 	}
 
-	datacenter := &bigip.Datacenter{
-		AllowNAT:          d.Get("allow_nat").(bool),
-		AllowSNAT:         d.Get("allow_snat").(bool),
-		LoadBalancingMode: d.Get("load_balancing_mode").(string),
-		Monitor:           strings.Join(monitors, " and "),
-	}
-
-	err := client.ModifyDatacenter(name, datacenter)
-	if err != nil {
-		return err
-	}
-
-	//members
-	nodes, err := client.DatacenterMembers(name)
-	if err != nil {
-		return err
-	}
-	existing := makeStringSet(&nodes)
-	incoming := d.Get("nodes").(*schema.Set)
-	delete := existing.Difference(incoming)
-	add := incoming.Difference(existing)
-	if delete.Len() > 0 {
-		for _, d := range delete.List() {
-			client.DeleteDatacenterMember(name, d.(string))
-		}
-	}
-	if add.Len() > 0 {
-		for _, d := range add.List() {
-			client.AddDatacenterMember(name, d.(string))
-		}
-	}
-
-	return nil
+	return client.ModifyDatacenter(r)
 }
 
 func resourceBigipGtmDatacenterDelete(d *schema.ResourceData, meta interface{}) error {
@@ -180,6 +162,6 @@ func resourceBigipGtmDatacenterDelete(d *schema.ResourceData, meta interface{}) 
 	return client.DeleteDatacenter(name)
 }
 
-func resourceBigIpGtmDatacenterImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipGtmDatacenterImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }
