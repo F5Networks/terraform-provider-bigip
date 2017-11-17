@@ -3,6 +3,8 @@ provider "bigip" {
   username = "admin"
   password = "admin"
 }
+
+
 resource "bigip_sys_provision" "provision-afm" {
   name = "/Common/afm"
   full_path  = "afm"
@@ -92,6 +94,5 @@ resource "bigip_ltm_virtual_server" "http" {
 	source_address_translation = "automap"
         depends_on = ["bigip_ltm_pool.pool"]
 }
-
 
 

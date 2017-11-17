@@ -38,7 +38,7 @@ keymap
 *.sh
 *.back
 *.goback
-
+bigip/*.back
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
 !command/test-fixtures/**/.terraform/
