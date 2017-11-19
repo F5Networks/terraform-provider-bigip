@@ -1,8 +1,6 @@
 package terraform
 
 import (
-	"log"
-
 	"github.com/hashicorp/terraform/config"
 	"github.com/hashicorp/terraform/config/module"
 	"github.com/hashicorp/terraform/dag"
@@ -58,16 +56,8 @@ func (b *RefreshGraphBuilder) Steps() []GraphTransformer {
 		}
 	}
 
-	concreteManagedResource := func(a *NodeAbstractResource) dag.Vertex {
-		return &NodeRefreshableManagedResource{
-			NodeAbstractCountResource: &NodeAbstractCountResource{
-				NodeAbstractResource: a,
-			},
-		}
-	}
-
-	concreteManagedResourceInstance := func(a *NodeAbstractResource) dag.Vertex {
-		return &NodeRefreshableManagedResourceInstance{
+	concreteResource := func(a *NodeAbstractResource) dag.Vertex {
+		return &NodeRefreshableResource{
 			NodeAbstractResource: a,
 		}
 	}
@@ -81,40 +71,19 @@ func (b *RefreshGraphBuilder) Steps() []GraphTransformer {
 	}
 
 	steps := []GraphTransformer{
-		// Creates all the managed resources that aren't in the state, but only if
-		// we have a state already. No resources in state means there's not
-		// anything to refresh.
-		func() GraphTransformer {
-			if b.State.HasResources() {
-				return &ConfigTransformer{
-					Concrete:   concreteManagedResource,
-					Module:     b.Module,
-					Unique:     true,
-					ModeFilter: true,
-					Mode:       config.ManagedResourceMode,
-				}
-			}
-			log.Println("[TRACE] No managed resources in state during refresh, skipping managed resource transformer")
-			return nil
-		}(),
+		// Creates all the resources represented in the state
+		&StateTransformer{
+			Concrete: concreteResource,
+			State:    b.State,
+		},
 
-		// Creates all the data resources that aren't in the state. This will also
-		// add any orphans from scaling in as destroy nodes.
+		// Creates all the data resources that aren't in the state
 		&ConfigTransformer{
 			Concrete:   concreteDataResource,
 			Module:     b.Module,
 			Unique:     true,
 			ModeFilter: true,
 			Mode:       config.DataResourceMode,
-		},
-
-		// Add any fully-orphaned resources from config (ones that have been
-		// removed completely, not ones that are just orphaned due to a scaled-in
-		// count.
-		&OrphanResourceTransformer{
-			Concrete: concreteManagedResourceInstance,
-			State:    b.State,
-			Module:   b.Module,
 		},
 
 		// Attach the state
@@ -133,9 +102,6 @@ func (b *RefreshGraphBuilder) Steps() []GraphTransformer {
 		&ParentProviderTransformer{},
 		&AttachProviderConfigTransformer{Module: b.Module},
 
-		// Add the local values
-		&LocalTransformer{Module: b.Module},
-
 		// Add the outputs
 		&OutputTransformer{Module: b.Module},
 
@@ -147,18 +113,7 @@ func (b *RefreshGraphBuilder) Steps() []GraphTransformer {
 		&ReferenceTransformer{},
 
 		// Target
-		&TargetsTransformer{
-			Targets: b.Targets,
-
-			// Resource nodes from config have not yet been expanded for
-			// "count", so we must apply targeting without indices. Exact
-			// targeting will be dealt with later when these resources
-			// DynamicExpand.
-			IgnoreIndices: true,
-		},
-
-		// Close opened plugin connections
-		&CloseProviderTransformer{},
+		&TargetsTransformer{Targets: b.Targets},
 
 		// Single root
 		&RootTransformer{},
