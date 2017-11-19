@@ -62,9 +62,6 @@ func (b *ImportGraphBuilder) Steps() []GraphTransformer {
 		// This validates that the providers only depend on variables
 		&ImportProviderValidateTransformer{},
 
-		// Close opened plugin connections
-		&CloseProviderTransformer{},
-
 		// Single root
 		&RootTransformer{},
 

@@ -26,13 +26,9 @@ func (n *NodeValidatableResource) DynamicExpand(ctx EvalContext) (*Graph, error)
 	defer lock.RUnlock()
 
 	// Expand the resource count which must be available by now from EvalTree
-	count := 1
-	if n.Config.RawCount.Value() != unknownValue() {
-		var err error
-		count, err = n.Config.Count()
-		if err != nil {
-			return nil, err
-		}
+	count, err := n.Config.Count()
+	if err != nil {
+		return nil, err
 	}
 
 	// The concrete resource factory we'll use
@@ -129,29 +125,17 @@ func (n *NodeValidatableResourceInstance) EvalTree() EvalNode {
 	// Validate all the provisioners
 	for _, p := range n.Config.Provisioners {
 		var provisioner ResourceProvisioner
-		var connConfig *ResourceConfig
-		seq.Nodes = append(
-			seq.Nodes,
-			&EvalGetProvisioner{
-				Name:   p.Type,
-				Output: &provisioner,
-			},
-			&EvalInterpolate{
-				Config:   p.RawConfig.Copy(),
-				Resource: resource,
-				Output:   &config,
-			},
-			&EvalInterpolate{
-				Config:   p.ConnInfo.Copy(),
-				Resource: resource,
-				Output:   &connConfig,
-			},
-			&EvalValidateProvisioner{
-				Provisioner: &provisioner,
-				Config:      &config,
-				ConnConfig:  &connConfig,
-			},
-		)
+		seq.Nodes = append(seq.Nodes, &EvalGetProvisioner{
+			Name:   p.Type,
+			Output: &provisioner,
+		}, &EvalInterpolate{
+			Config:   p.RawConfig.Copy(),
+			Resource: resource,
+			Output:   &config,
+		}, &EvalValidateProvisioner{
+			Provisioner: &provisioner,
+			Config:      &config,
+		})
 	}
 
 	return seq

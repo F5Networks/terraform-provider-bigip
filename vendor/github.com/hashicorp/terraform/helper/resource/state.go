@@ -2,10 +2,9 @@ package resource
 
 import (
 	"log"
+	"sync/atomic"
 	"time"
 )
-
-var refreshGracePeriod = 30 * time.Second
 
 // StateRefreshFunc is a function type used for StateChangeConf that is
 // responsible for refreshing the item being watched for a state change.
@@ -63,76 +62,58 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 		conf.ContinuousTargetOccurence = 1
 	}
 
+	// We can't safely read the result values if we timeout, so store them in
+	// an atomic.Value
 	type Result struct {
 		Result interface{}
 		State  string
 		Error  error
-		Done   bool
 	}
+	var lastResult atomic.Value
+	lastResult.Store(Result{})
 
-	// Read every result from the refresh loop, waiting for a positive result.Done.
-	resCh := make(chan Result, 1)
-	// cancellation channel for the refresh loop
-	cancelCh := make(chan struct{})
-
-	result := Result{}
-
+	doneCh := make(chan struct{})
 	go func() {
-		defer close(resCh)
+		defer close(doneCh)
 
+		// Wait for the delay
 		time.Sleep(conf.Delay)
 
-		// start with 0 delay for the first loop
-		var wait time.Duration
+		wait := 100 * time.Millisecond
 
 		for {
-			// store the last result
-			resCh <- result
-
-			// wait and watch for cancellation
-			select {
-			case <-cancelCh:
-				return
-			case <-time.After(wait):
-				// first round had no wait
-				if wait == 0 {
-					wait = 100 * time.Millisecond
-				}
-			}
-
 			res, currentState, err := conf.Refresh()
-			result = Result{
+			result := Result{
 				Result: res,
 				State:  currentState,
 				Error:  err,
 			}
+			lastResult.Store(result)
 
 			if err != nil {
-				resCh <- result
 				return
 			}
 
 			// If we're waiting for the absence of a thing, then return
 			if res == nil && len(conf.Target) == 0 {
-				targetOccurence++
+				targetOccurence += 1
 				if conf.ContinuousTargetOccurence == targetOccurence {
-					result.Done = true
-					resCh <- result
 					return
+				} else {
+					continue
 				}
-				continue
 			}
 
 			if res == nil {
 				// If we didn't find the resource, check if we have been
 				// not finding it for awhile, and if so, report an error.
-				notfoundTick++
+				notfoundTick += 1
 				if notfoundTick > conf.NotFoundChecks {
 					result.Error = &NotFoundError{
 						LastError: err,
 						Retries:   notfoundTick,
 					}
-					resCh <- result
+					lastResult.Store(result)
 					return
 				}
 			} else {
@@ -143,13 +124,12 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 				for _, allowed := range conf.Target {
 					if currentState == allowed {
 						found = true
-						targetOccurence++
+						targetOccurence += 1
 						if conf.ContinuousTargetOccurence == targetOccurence {
-							result.Done = true
-							resCh <- result
 							return
+						} else {
+							continue
 						}
-						continue
 					}
 				}
 
@@ -161,21 +141,15 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 					}
 				}
 
-				if !found && len(conf.Pending) > 0 {
+				if !found {
 					result.Error = &UnexpectedStateError{
 						LastError:     err,
 						State:         result.State,
 						ExpectedState: conf.Target,
 					}
-					resCh <- result
+					lastResult.Store(result)
 					return
 				}
-			}
-
-			// Wait between refreshes using exponential backoff, except when
-			// waiting for the target state to reoccur.
-			if targetOccurence == 0 {
-				wait *= 2
 			}
 
 			// If a poll interval has been specified, choose that interval.
@@ -191,69 +165,27 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 			}
 
 			log.Printf("[TRACE] Waiting %s before next try", wait)
+			time.Sleep(wait)
+
+			// Wait between refreshes using exponential backoff, except when
+			// waiting for the target state to reoccur.
+			if targetOccurence == 0 {
+				wait *= 2
+			}
 		}
 	}()
 
-	// store the last value result from the refresh loop
-	lastResult := Result{}
-
-	timeout := time.After(conf.Timeout)
-	for {
-		select {
-		case r, ok := <-resCh:
-			// channel closed, so return the last result
-			if !ok {
-				return lastResult.Result, lastResult.Error
-			}
-
-			// we reached the intended state
-			if r.Done {
-				return r.Result, r.Error
-			}
-
-			// still waiting, store the last result
-			lastResult = r
-
-		case <-timeout:
-			log.Printf("[WARN] WaitForState timeout after %s", conf.Timeout)
-			log.Printf("[WARN] WaitForState starting %s refresh grace period", refreshGracePeriod)
-
-			// cancel the goroutine and start our grace period timer
-			close(cancelCh)
-			timeout := time.After(refreshGracePeriod)
-
-			// we need a for loop and a label to break on, because we may have
-			// an extra response value to read, but still want to wait for the
-			// channel to close.
-		forSelect:
-			for {
-				select {
-				case r, ok := <-resCh:
-					if r.Done {
-						// the last refresh loop reached the desired state
-						return r.Result, r.Error
-					}
-
-					if !ok {
-						// the goroutine returned
-						break forSelect
-					}
-
-					// target state not reached, save the result for the
-					// TimeoutError and wait for the channel to close
-					lastResult = r
-				case <-timeout:
-					log.Println("[ERROR] WaitForState exceeded refresh grace period")
-					break forSelect
-				}
-			}
-
-			return nil, &TimeoutError{
-				LastError:     lastResult.Error,
-				LastState:     lastResult.State,
-				Timeout:       conf.Timeout,
-				ExpectedState: conf.Target,
-			}
+	select {
+	case <-doneCh:
+		r := lastResult.Load().(Result)
+		return r.Result, r.Error
+	case <-time.After(conf.Timeout):
+		r := lastResult.Load().(Result)
+		return nil, &TimeoutError{
+			LastError:     r.Error,
+			LastState:     r.State,
+			Timeout:       conf.Timeout,
+			ExpectedState: conf.Target,
 		}
 	}
 }

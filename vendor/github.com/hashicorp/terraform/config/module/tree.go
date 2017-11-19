@@ -92,25 +92,6 @@ func (t *Tree) Children() map[string]*Tree {
 	return t.children
 }
 
-// DeepEach calls the provided callback for the receiver and then all of
-// its descendents in the tree, allowing an operation to be performed on
-// all modules in the tree.
-//
-// Parents will be visited before their children but otherwise the order is
-// not defined.
-func (t *Tree) DeepEach(cb func(*Tree)) {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-	t.deepEach(cb)
-}
-
-func (t *Tree) deepEach(cb func(*Tree)) {
-	cb(t)
-	for _, c := range t.children {
-		c.deepEach(cb)
-	}
-}
-
 // Loaded says whether or not this tree has been loaded or not yet.
 func (t *Tree) Loaded() bool {
 	t.lock.RLock()
@@ -278,7 +259,7 @@ func (t *Tree) Validate() error {
 	}
 
 	// If something goes wrong, here is our error template
-	newErr := &treeError{Name: []string{t.Name()}}
+	newErr := &TreeError{Name: []string{t.Name()}}
 
 	// Terraform core does not handle root module children named "root".
 	// We plan to fix this in the future but this bug was brought up in
@@ -290,14 +271,15 @@ func (t *Tree) Validate() error {
 
 	// Validate our configuration first.
 	if err := t.config.Validate(); err != nil {
-		newErr.Add(err)
+		newErr.Err = err
+		return newErr
 	}
 
 	// If we're the root, we do extra validation. This validation usually
 	// requires the entire tree (since children don't have parent pointers).
 	if len(t.path) == 0 {
 		if err := t.validateProviderAlias(); err != nil {
-			newErr.Add(err)
+			return err
 		}
 	}
 
@@ -311,7 +293,7 @@ func (t *Tree) Validate() error {
 			continue
 		}
 
-		verr, ok := err.(*treeError)
+		verr, ok := err.(*TreeError)
 		if !ok {
 			// Unknown error, just return...
 			return err
@@ -319,7 +301,7 @@ func (t *Tree) Validate() error {
 
 		// Append ourselves to the error and then return
 		verr.Name = append(verr.Name, t.Name())
-		newErr.AddChild(verr)
+		return verr
 	}
 
 	// Go over all the modules and verify that any parameters are valid
@@ -345,9 +327,10 @@ func (t *Tree) Validate() error {
 		// Compare to the keys in our raw config for the module
 		for k, _ := range m.RawConfig.Raw {
 			if _, ok := varMap[k]; !ok {
-				newErr.Add(fmt.Errorf(
+				newErr.Err = fmt.Errorf(
 					"module %s: %s is not a valid parameter",
-					m.Name, k))
+					m.Name, k)
+				return newErr
 			}
 
 			// Remove the required
@@ -356,9 +339,10 @@ func (t *Tree) Validate() error {
 
 		// If we have any required left over, they aren't set.
 		for k, _ := range requiredMap {
-			newErr.Add(fmt.Errorf(
-				"module %s: required variable %q not set",
-				m.Name, k))
+			newErr.Err = fmt.Errorf(
+				"module %s: required variable %s not set",
+				m.Name, k)
+			return newErr
 		}
 	}
 
@@ -373,10 +357,8 @@ func (t *Tree) Validate() error {
 
 			tree, ok := children[mv.Name]
 			if !ok {
-				newErr.Add(fmt.Errorf(
-					"%s: undefined module referenced %s",
-					source, mv.Name))
-				continue
+				// This should never happen because Load watches us
+				panic("module not found in children: " + mv.Name)
 			}
 
 			found := false
@@ -387,61 +369,33 @@ func (t *Tree) Validate() error {
 				}
 			}
 			if !found {
-				newErr.Add(fmt.Errorf(
+				newErr.Err = fmt.Errorf(
 					"%s: %s is not a valid output for module %s",
-					source, mv.Field, mv.Name))
+					source, mv.Field, mv.Name)
+				return newErr
 			}
 		}
 	}
 
-	return newErr.ErrOrNil()
-}
-
-// treeError is an error use by Tree.Validate to accumulates all
-// validation errors.
-type treeError struct {
-	Name     []string
-	Errs     []error
-	Children []*treeError
-}
-
-func (e *treeError) Add(err error) {
-	e.Errs = append(e.Errs, err)
-}
-
-func (e *treeError) AddChild(err *treeError) {
-	e.Children = append(e.Children, err)
-}
-
-func (e *treeError) ErrOrNil() error {
-	if len(e.Errs) > 0 || len(e.Children) > 0 {
-		return e
-	}
 	return nil
 }
 
-func (e *treeError) Error() string {
-	name := strings.Join(e.Name, ".")
-	var out bytes.Buffer
-	fmt.Fprintf(&out, "module %s: ", name)
+// TreeError is an error returned by Tree.Validate if an error occurs
+// with validation.
+type TreeError struct {
+	Name []string
+	Err  error
+}
 
-	if len(e.Errs) == 1 {
-		// single like error
-		out.WriteString(e.Errs[0].Error())
-	} else {
-		// multi-line error
-		for _, err := range e.Errs {
-			fmt.Fprintf(&out, "\n    %s", err)
-		}
+func (e *TreeError) Error() string {
+	// Build up the name
+	var buf bytes.Buffer
+	for _, n := range e.Name {
+		buf.WriteString(n)
+		buf.WriteString(".")
 	}
+	buf.Truncate(buf.Len() - 1)
 
-	if len(e.Children) > 0 {
-		// start the next error on a new line
-		out.WriteString("\n  ")
-	}
-	for _, child := range e.Children {
-		out.WriteString(child.Error())
-	}
-
-	return out.String()
+	// Format the value
+	return fmt.Sprintf("module %s: %s", buf.String(), e.Err)
 }

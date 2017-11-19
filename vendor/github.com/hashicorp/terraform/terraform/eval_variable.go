@@ -114,6 +114,7 @@ type EvalVariableBlock struct {
 	VariableValues map[string]interface{}
 }
 
+// TODO: test
 func (n *EvalVariableBlock) Eval(ctx EvalContext) (interface{}, error) {
 	// Clear out the existing mapping
 	for k, _ := range n.VariableValues {
@@ -123,27 +124,22 @@ func (n *EvalVariableBlock) Eval(ctx EvalContext) (interface{}, error) {
 	// Get our configuration
 	rc := *n.Config
 	for k, v := range rc.Config {
-		vKind := reflect.ValueOf(v).Type().Kind()
+		var vString string
+		if err := hilmapstructure.WeakDecode(v, &vString); err == nil {
+			n.VariableValues[k] = vString
+			continue
+		}
 
-		switch vKind {
-		case reflect.Slice:
-			var vSlice []interface{}
-			if err := hilmapstructure.WeakDecode(v, &vSlice); err == nil {
-				n.VariableValues[k] = vSlice
-				continue
-			}
-		case reflect.Map:
-			var vMap map[string]interface{}
-			if err := hilmapstructure.WeakDecode(v, &vMap); err == nil {
-				n.VariableValues[k] = vMap
-				continue
-			}
-		default:
-			var vString string
-			if err := hilmapstructure.WeakDecode(v, &vString); err == nil {
-				n.VariableValues[k] = vString
-				continue
-			}
+		var vMap map[string]interface{}
+		if err := hilmapstructure.WeakDecode(v, &vMap); err == nil {
+			n.VariableValues[k] = vMap
+			continue
+		}
+
+		var vSlice []interface{}
+		if err := hilmapstructure.WeakDecode(v, &vSlice); err == nil {
+			n.VariableValues[k] = vSlice
+			continue
 		}
 
 		return nil, fmt.Errorf("Variable value for %s is not a string, list or map type", k)
@@ -178,15 +174,9 @@ func (n *EvalVariableBlock) setUnknownVariableValueForPath(path string) error {
 	// Otherwise find the correct point in the tree and then set to unknown
 	var current interface{} = n.VariableValues[pathComponents[0]]
 	for i := 1; i < len(pathComponents); i++ {
-		switch tCurrent := current.(type) {
-		case []interface{}:
-			index, err := strconv.Atoi(pathComponents[i])
-			if err != nil {
-				return fmt.Errorf("Cannot convert %s to slice index in path %s",
-					pathComponents[i], path)
-			}
-			current = tCurrent[index]
-		case []map[string]interface{}:
+		switch current.(type) {
+		case []interface{}, []map[string]interface{}:
+			tCurrent := current.([]interface{})
 			index, err := strconv.Atoi(pathComponents[i])
 			if err != nil {
 				return fmt.Errorf("Cannot convert %s to slice index in path %s",
@@ -194,6 +184,7 @@ func (n *EvalVariableBlock) setUnknownVariableValueForPath(path string) error {
 			}
 			current = tCurrent[index]
 		case map[string]interface{}:
+			tCurrent := current.(map[string]interface{})
 			if val, hasVal := tCurrent[pathComponents[i]]; hasVal {
 				current = val
 				continue

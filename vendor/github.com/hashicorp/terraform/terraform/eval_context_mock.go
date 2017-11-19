@@ -9,9 +9,6 @@ import (
 // MockEvalContext is a mock version of EvalContext that can be used
 // for tests.
 type MockEvalContext struct {
-	StoppedCalled bool
-	StoppedValue  <-chan struct{}
-
 	HookCalled bool
 	HookHook   Hook
 	HookError  error
@@ -86,11 +83,6 @@ type MockEvalContext struct {
 	StateCalled bool
 	StateState  *State
 	StateLock   *sync.RWMutex
-}
-
-func (c *MockEvalContext) Stopped() <-chan struct{} {
-	c.StoppedCalled = true
-	return c.StoppedValue
 }
 
 func (c *MockEvalContext) Hook(fn func(Hook) (HookAction, error)) error {

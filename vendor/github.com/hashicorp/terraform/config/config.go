@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
+	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hil"
 	"github.com/hashicorp/hil/ast"
 	"github.com/hashicorp/terraform/helper/hilmapstructure"
-	"github.com/hashicorp/terraform/plugin/discovery"
 	"github.com/mitchellh/reflectwalk"
 )
 
@@ -34,7 +34,6 @@ type Config struct {
 	ProviderConfigs []*ProviderConfig
 	Resources       []*Resource
 	Variables       []*Variable
-	Locals          []*Local
 	Outputs         []*Output
 
 	// The fields below can be filled in by loaders for validation
@@ -66,7 +65,6 @@ type Module struct {
 type ProviderConfig struct {
 	Name      string
 	Alias     string
-	Version   string
 	RawConfig *RawConfig
 }
 
@@ -148,18 +146,12 @@ func (p *Provisioner) Copy() *Provisioner {
 	}
 }
 
-// Variable is a module argument defined within the configuration.
+// Variable is a variable defined within the configuration.
 type Variable struct {
 	Name         string
 	DeclaredType string `mapstructure:"type"`
 	Default      interface{}
 	Description  string
-}
-
-// Local is a local value defined within the configuration.
-type Local struct {
-	Name      string
-	RawConfig *RawConfig
 }
 
 // Output is an output defined within the configuration. An output is
@@ -220,14 +212,7 @@ func (r *Module) Id() string {
 
 // Count returns the count of this resource.
 func (r *Resource) Count() (int, error) {
-	raw := r.RawCount.Value()
-	count, ok := r.RawCount.Value().(string)
-	if !ok {
-		return 0, fmt.Errorf(
-			"expected count to be a string or int, got %T", raw)
-	}
-
-	v, err := strconv.ParseInt(count, 0, 0)
+	v, err := strconv.ParseInt(r.RawCount.Value().(string), 0, 0)
 	if err != nil {
 		return 0, err
 	}
@@ -247,33 +232,6 @@ func (r *Resource) Id() string {
 	}
 }
 
-// ProviderFullName returns the full name of the provider for this resource,
-// which may either be specified explicitly using the "provider" meta-argument
-// or implied by the prefix on the resource type name.
-func (r *Resource) ProviderFullName() string {
-	return ResourceProviderFullName(r.Type, r.Provider)
-}
-
-// ResourceProviderFullName returns the full (dependable) name of the
-// provider for a hypothetical resource with the given resource type and
-// explicit provider string. If the explicit provider string is empty then
-// the provider name is inferred from the resource type name.
-func ResourceProviderFullName(resourceType, explicitProvider string) string {
-	if explicitProvider != "" {
-		return explicitProvider
-	}
-
-	idx := strings.IndexRune(resourceType, '_')
-	if idx == -1 {
-		// If no underscores, the resource name is assumed to be
-		// also the provider name, e.g. if the provider exposes
-		// only a single resource of each type.
-		return resourceType
-	}
-
-	return resourceType[:idx]
-}
-
 // Validate does some basic semantic checking of the configuration.
 func (c *Config) Validate() error {
 	if c == nil {
@@ -289,7 +247,26 @@ func (c *Config) Validate() error {
 
 	// Validate the Terraform config
 	if tf := c.Terraform; tf != nil {
-		errs = append(errs, c.Terraform.Validate()...)
+		if raw := tf.RequiredVersion; raw != "" {
+			// Check that the value has no interpolations
+			rc, err := NewRawConfig(map[string]interface{}{
+				"root": raw,
+			})
+			if err != nil {
+				errs = append(errs, fmt.Errorf(
+					"terraform.required_version: %s", err))
+			} else if len(rc.Interpolations) > 0 {
+				errs = append(errs, fmt.Errorf(
+					"terraform.required_version: cannot contain interpolations"))
+			} else {
+				// Check it is valid
+				_, err := version.NewConstraint(raw)
+				if err != nil {
+					errs = append(errs, fmt.Errorf(
+						"terraform.required_version: invalid syntax: %s", err))
+				}
+			}
+		}
 	}
 
 	vars := c.InterpolatedVariables()
@@ -321,15 +298,8 @@ func (c *Config) Validate() error {
 		}
 
 		interp := false
-		fn := func(n ast.Node) (interface{}, error) {
-			// LiteralNode is a literal string (outside of a ${ ... } sequence).
-			// interpolationWalker skips most of these. but in particular it
-			// visits those that have escaped sequences (like $${foo}) as a
-			// signal that *some* processing is required on this string. For
-			// our purposes here though, this is fine and not an interpolation.
-			if _, ok := n.(*ast.LiteralNode); !ok {
-				interp = true
-			}
+		fn := func(ast.Node) (interface{}, error) {
+			interp = true
 			return "", nil
 		}
 
@@ -385,8 +355,7 @@ func (c *Config) Validate() error {
 		}
 	}
 
-	// Check that providers aren't declared multiple times and that their
-	// version constraints, where present, are syntactically valid.
+	// Check that providers aren't declared multiple times.
 	providerSet := make(map[string]struct{})
 	for _, p := range c.ProviderConfigs {
 		name := p.FullName()
@@ -395,16 +364,6 @@ func (c *Config) Validate() error {
 				"provider.%s: declared multiple times, you can only declare a provider once",
 				name))
 			continue
-		}
-
-		if p.Version != "" {
-			_, err := discovery.ConstraintStr(p.Version).Parse()
-			if err != nil {
-				errs = append(errs, fmt.Errorf(
-					"provider.%s: invalid version constraint %q: %s",
-					name, p.Version, err,
-				))
-			}
 		}
 
 		providerSet[name] = struct{}{}
@@ -546,23 +505,25 @@ func (c *Config) Validate() error {
 					"%s: resource count can't reference count variable: %s",
 					n,
 					v.FullKey()))
+			case *ModuleVariable:
+				errs = append(errs, fmt.Errorf(
+					"%s: resource count can't reference module variable: %s",
+					n,
+					v.FullKey()))
+			case *ResourceVariable:
+				errs = append(errs, fmt.Errorf(
+					"%s: resource count can't reference resource variable: %s",
+					n,
+					v.FullKey()))
 			case *SimpleVariable:
 				errs = append(errs, fmt.Errorf(
 					"%s: resource count can't reference variable: %s",
 					n,
 					v.FullKey()))
-
-			// Good
-			case *ModuleVariable:
-			case *ResourceVariable:
-			case *TerraformVariable:
 			case *UserVariable:
-			case *LocalVariable:
-
+				// Good
 			default:
-				errs = append(errs, fmt.Errorf(
-					"Internal error. Unknown type in count var in %s: %T",
-					n, v))
+				panic(fmt.Sprintf("Unknown type in count var in %s: %T", n, v))
 			}
 		}
 
@@ -593,7 +554,7 @@ func (c *Config) Validate() error {
 
 		// Verify provisioners
 		for _, p := range r.Provisioners {
-			// This validation checks that there are no splat variables
+			// This validation checks that there are now splat variables
 			// referencing ourself. This currently is not allowed.
 
 			for _, v := range p.ConnInfo.Variables {
@@ -688,29 +649,6 @@ func (c *Config) Validate() error {
 		}
 	}
 
-	// Check that all locals are valid
-	{
-		found := make(map[string]struct{})
-		for _, l := range c.Locals {
-			if _, ok := found[l.Name]; ok {
-				errs = append(errs, fmt.Errorf(
-					"%s: duplicate local. local value names must be unique",
-					l.Name,
-				))
-				continue
-			}
-			found[l.Name] = struct{}{}
-
-			for _, v := range l.RawConfig.Variables {
-				if _, ok := v.(*CountVariable); ok {
-					errs = append(errs, fmt.Errorf(
-						"local %s: count variables are only valid within resources", l.Name,
-					))
-				}
-			}
-		}
-	}
-
 	// Check that all outputs are valid
 	{
 		found := make(map[string]struct{})
@@ -773,6 +711,17 @@ func (c *Config) Validate() error {
 						"%s: count variables are only valid within resources", o.Name))
 				}
 			}
+		}
+	}
+
+	// Check that all variables are in the proper context
+	for source, rc := range c.rawConfigs() {
+		walker := &interpolationWalker{
+			ContextF: c.validateVarContextFn(source, &errs),
+		}
+		if err := reflectwalk.Walk(rc.Raw, walker); err != nil {
+			errs = append(errs, fmt.Errorf(
+				"%s: error reading config: %s", source, err))
 		}
 	}
 
@@ -845,6 +794,57 @@ func (c *Config) rawConfigs() map[string]*RawConfig {
 	}
 
 	return result
+}
+
+func (c *Config) validateVarContextFn(
+	source string, errs *[]error) interpolationWalkerContextFunc {
+	return func(loc reflectwalk.Location, node ast.Node) {
+		// If we're in a slice element, then its fine, since you can do
+		// anything in there.
+		if loc == reflectwalk.SliceElem {
+			return
+		}
+
+		// Otherwise, let's check if there is a splat resource variable
+		// at the top level in here. We do this by doing a transform that
+		// replaces everything with a noop node unless its a variable
+		// access or concat. This should turn the AST into a flat tree
+		// of Concat(Noop, ...). If there are any variables left that are
+		// multi-access, then its still broken.
+		node = node.Accept(func(n ast.Node) ast.Node {
+			// If it is a concat or variable access, we allow it.
+			switch n.(type) {
+			case *ast.Output:
+				return n
+			case *ast.VariableAccess:
+				return n
+			}
+
+			// Otherwise, noop
+			return &noopNode{}
+		})
+
+		vars, err := DetectVariables(node)
+		if err != nil {
+			// Ignore it since this will be caught during parse. This
+			// actually probably should never happen by the time this
+			// is called, but its okay.
+			return
+		}
+
+		for _, v := range vars {
+			rv, ok := v.(*ResourceVariable)
+			if !ok {
+				return
+			}
+
+			if rv.Multi && rv.Index == -1 {
+				*errs = append(*errs, fmt.Errorf(
+					"%s: use of the splat ('*') operator must be wrapped in a list declaration",
+					source))
+			}
+		}
+	}
 }
 
 func (c *Config) validateDependsOn(
@@ -1026,16 +1026,7 @@ func (v *Variable) ValidateTypeAndDefault() error {
 	// If an explicit type is declared, ensure it is valid
 	if v.DeclaredType != "" {
 		if _, ok := typeStringMap[v.DeclaredType]; !ok {
-			validTypes := []string{}
-			for k := range typeStringMap {
-				validTypes = append(validTypes, k)
-			}
-			return fmt.Errorf(
-				"Variable '%s' type must be one of [%s] - '%s' is not a valid type",
-				v.Name,
-				strings.Join(validTypes, ", "),
-				v.DeclaredType,
-			)
+			return fmt.Errorf("Variable '%s' must be of type string or map - '%s' is not a valid type", v.Name, v.DeclaredType)
 		}
 	}
 

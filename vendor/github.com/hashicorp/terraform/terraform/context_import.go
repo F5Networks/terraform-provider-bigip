@@ -40,7 +40,8 @@ type ImportTarget struct {
 // imported.
 func (c *Context) Import(opts *ImportOpts) (*State, error) {
 	// Hold a lock since we can modify our own state here
-	defer c.acquireRun("import")()
+	v := c.acquireRun("import")
+	defer c.releaseRun(v)
 
 	// Copy our own state
 	c.state = c.state.DeepCopy()
@@ -66,7 +67,7 @@ func (c *Context) Import(opts *ImportOpts) (*State, error) {
 	}
 
 	// Walk it
-	if _, err := c.walk(graph, walkImport); err != nil {
+	if _, err := c.walk(graph, nil, walkImport); err != nil {
 		return c.state, err
 	}
 

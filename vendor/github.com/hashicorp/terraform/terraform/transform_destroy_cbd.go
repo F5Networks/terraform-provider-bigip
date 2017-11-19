@@ -89,20 +89,9 @@ func (t *CBDEdgeTransformer) Transform(g *Graph) error {
 			g.Connect(&DestroyEdge{S: de.Target(), T: de.Source()})
 		}
 
-		// If the address has an index, we strip that. Our depMap creation
-		// graph doesn't expand counts so we don't currently get _exact_
-		// dependencies. One day when we limit dependencies more exactly
-		// this will have to change. We have a test case covering this
-		// (depNonCBDCountBoth) so it'll be caught.
-		addr := dn.DestroyAddr()
-		if addr.Index >= 0 {
-			addr = addr.Copy() // Copy so that we don't modify any pointers
-			addr.Index = -1
-		}
-
 		// Add this to the list of nodes that we need to fix up
 		// the edges for (step 2 above in the docs).
-		key := addr.String()
+		key := dn.DestroyAddr().String()
 		destroyMap[key] = append(destroyMap[key], v)
 	}
 
@@ -145,19 +134,9 @@ func (t *CBDEdgeTransformer) Transform(g *Graph) error {
 
 		// Get the address
 		addr := rn.CreateAddr()
-
-		// If the address has an index, we strip that. Our depMap creation
-		// graph doesn't expand counts so we don't currently get _exact_
-		// dependencies. One day when we limit dependencies more exactly
-		// this will have to change. We have a test case covering this
-		// (depNonCBDCount) so it'll be caught.
-		if addr.Index >= 0 {
-			addr = addr.Copy() // Copy so that we don't modify any pointers
-			addr.Index = -1
-		}
+		key := addr.String()
 
 		// If there is nothing this resource should depend on, ignore it
-		key := addr.String()
 		dns, ok := depMap[key]
 		if !ok {
 			continue
