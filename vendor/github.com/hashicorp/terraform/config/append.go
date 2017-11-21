@@ -35,8 +35,13 @@ func Append(c1, c2 *Config) (*Config, error) {
 		c.Atlas = c2.Atlas
 	}
 
-	c.Terraform = c1.Terraform
-	if c2.Terraform != nil {
+	// merge Terraform blocks
+	if c1.Terraform != nil {
+		c.Terraform = c1.Terraform
+		if c2.Terraform != nil {
+			c.Terraform.Merge(c2.Terraform)
+		}
+	} else {
 		c.Terraform = c2.Terraform
 	}
 
@@ -75,6 +80,12 @@ func Append(c1, c2 *Config) (*Config, error) {
 			[]*Variable, 0, len(c1.Variables)+len(c2.Variables))
 		c.Variables = append(c.Variables, c1.Variables...)
 		c.Variables = append(c.Variables, c2.Variables...)
+	}
+
+	if len(c1.Locals) > 0 || len(c2.Locals) > 0 {
+		c.Locals = make([]*Local, 0, len(c1.Locals)+len(c2.Locals))
+		c.Locals = append(c.Locals, c1.Locals...)
+		c.Locals = append(c.Locals, c2.Locals...)
 	}
 
 	return c, nil

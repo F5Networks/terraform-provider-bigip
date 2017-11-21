@@ -17,22 +17,6 @@ func init() {
 	// have left-to-right associativity.
 	binaryOps = []map[scanner.TokenType]ast.ArithmeticOp{
 		{
-			scanner.OR: ast.ArithmeticOpLogicalOr,
-		},
-		{
-			scanner.AND: ast.ArithmeticOpLogicalAnd,
-		},
-		{
-			scanner.EQUAL:    ast.ArithmeticOpEqual,
-			scanner.NOTEQUAL: ast.ArithmeticOpNotEqual,
-		},
-		{
-			scanner.GT:  ast.ArithmeticOpGreaterThan,
-			scanner.GTE: ast.ArithmeticOpGreaterThanOrEqual,
-			scanner.LT:  ast.ArithmeticOpLessThan,
-			scanner.LTE: ast.ArithmeticOpLessThanOrEqual,
-		},
-		{
 			scanner.PLUS:  ast.ArithmeticOpAdd,
 			scanner.MINUS: ast.ArithmeticOpSub,
 		},
