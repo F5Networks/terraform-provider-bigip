@@ -5,20 +5,9 @@ type ArithmeticOp int
 
 const (
 	ArithmeticOpInvalid ArithmeticOp = 0
-
-	ArithmeticOpAdd ArithmeticOp = iota
+	ArithmeticOpAdd     ArithmeticOp = iota
 	ArithmeticOpSub
 	ArithmeticOpMul
 	ArithmeticOpDiv
 	ArithmeticOpMod
-
-	ArithmeticOpLogicalAnd
-	ArithmeticOpLogicalOr
-
-	ArithmeticOpEqual
-	ArithmeticOpNotEqual
-	ArithmeticOpLessThan
-	ArithmeticOpLessThanOrEqual
-	ArithmeticOpGreaterThan
-	ArithmeticOpGreaterThanOrEqual
 )
