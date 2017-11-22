@@ -1,8 +1,6 @@
 package terraform
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // EvalReadState is an EvalNode implementation that reads the
 // primary InstanceState for a specific resource out of the state.
