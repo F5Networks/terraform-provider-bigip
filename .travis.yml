@@ -11,6 +11,7 @@ testacc:
 - make test
 
 script:
+- go vet ./...
 - make test
 - make bin
 
