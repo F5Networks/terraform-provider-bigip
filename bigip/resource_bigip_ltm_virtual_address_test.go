@@ -72,9 +72,8 @@ func testCheckVAExists(name string, exists bool) resource.TestCheckFunc {
 			if va.FullPath == name {
 				if !exists {
 					return fmt.Errorf("Virtual address %s exists.", name)
-				} else {
-					return nil
 				}
+				return nil
 			}
 		}
 		if exists {
