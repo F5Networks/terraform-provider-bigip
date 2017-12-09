@@ -8,7 +8,7 @@ import (
 )
 
 // ServerSSLProfiles
-// Documentation : https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_ltm_profile_server-ssl.ashx
+// Documentation: https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_ltm_profile_server-ssl.ashx
 
 // ServerSSLProfiles contains a list of every server-ssl profile on the BIG-IP system.
 type ServerSSLProfiles struct {
