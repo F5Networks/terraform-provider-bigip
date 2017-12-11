@@ -1,0 +1,107 @@
+<% wrap_layout :inner do %>
+    <% content_for :sidebar do %>
+        <div class="docs-sidebar hidden-print affix-top" role="complementary">
+            <ul class="nav docs-sidenav">
+                <li<%= sidebar_current("docs-home") %>>
+                    <a href="/docs/providers/index.html">All Providers</a>
+                </li>
+
+                <li<%= sidebar_current("docs-bigip-index") %>>
+                    <a href="/docs/providers/bigip/index.html">bigip Provider</a>
+                </li>
+
+                <li<%= sidebar_current("docs-bigip-datasource") %>>
+                <a href="#">Data Sources</a>
+                    <ul class="nav nav-visible">
+
+                        <li<%= sidebar_current("docs-bigip-datasource-dns-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_sys_dns.html">bigip_ltm_dns</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-irule-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_irule.html">bigip_ltm_irule</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-monitor-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_monitor.html">bigip_ltm_monitor</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-node-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_node.html">bigip_ltm_node</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-pool-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_pool.html">bigip_ltm_pool</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-virtual_address-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_virtual_address.html">bigip_ltm_virtual_address</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-virtual_server-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_virtual_server.html">bigip_ltm_virtual_server</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-ntp-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_sys_ntp.html">bigip_sys_ntp</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-provision-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_sys_provision.html">bigip_sys_provision</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-bigip-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip.html">bigip</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-profile_fasthttp-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_ltm_profile_fasthttp.html">bigip_ltm_profile_fasthttp</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-profile_fastl4") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_profile_fastl4.html">bigip_ltm_profile_fastl4</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-profile_http2") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_profile_http2.html">bigip_ltm_profile_http2</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-profile_oneconnect") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_profile_oneconnect.html">bigip_ltm_profile_oneconnect</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-profile_tcp-x") %>>
+                            <a href="/docs/providers/bigip/d/bigip_ltm_profile_tcp.html">bigip_ltm_profile_tcp</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-snat-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_ltm_snat.html">bigip_ltm_snat</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-snat_list-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_ltm_snat.html">bigip_ltm_snat</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-route-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_net_route.html">bigip_net_route</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-selfip-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_net_selfip.html">bigip_net_selfip</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-vlan-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_net_vlan.html">bigip_net_vlan</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-snmp-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_sys_snmp.html">bigip_sys_snmp</a>
+                        </li>
+                        <li<%= sidebar_current("docs-bigip-datasource-snmp_traps-x") %>>
+                          <a href="/docs/providers/bigip/d/bigip_sys_snmp_traps.html">bigip_sys_snmp_traps</a>
+                        </li>
+                        </li>
+                    </ul>
+                </li>
+
+                  
+
+
+
+                    </ul>
+                </li>
+
+
+                    </ul>
+                </li>
+
+
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    <% end %>
+
+    <%= yield %>
+<% end %>

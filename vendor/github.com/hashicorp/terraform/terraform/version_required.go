@@ -8,17 +8,17 @@ import (
 	"github.com/hashicorp/terraform/config/module"
 )
 
-// CheckRequiredVersion verifies that any version requirements specified by
+// checkRequiredVersion verifies that any version requirements specified by
 // the configuration are met.
 //
 // This checks the root module as well as any additional version requirements
 // from child modules.
 //
 // This is tested in context_test.go.
-func CheckRequiredVersion(m *module.Tree) error {
+func checkRequiredVersion(m *module.Tree) error {
 	// Check any children
 	for _, c := range m.Children() {
-		if err := CheckRequiredVersion(c); err != nil {
+		if err := checkRequiredVersion(c); err != nil {
 			return err
 		}
 	}
