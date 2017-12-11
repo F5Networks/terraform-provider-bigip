@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_datagroup"
-sidebar_current: "docs-bigip-datasource-datagroup-x"
+sidebar_current: "docs-bigip-resource-datagroup-x"
 description: |-
     Provides details about bigip_ltm_datagroup resource
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_provision"
-sidebar_current: "docs-bigip-datasource-provision-x"
+sidebar_current: "docs-bigip-resource-provision-x"
 description: |-
     Provides details about bigip  provision resource for BIG-IP
 ---
@@ -27,7 +27,7 @@ resource "bigip_sys_provision" "provision-ilx" {
   level = "nominal"
   memoryRatio = 0
 }
-``` 
+```
 
 ## Argument Reference
 
@@ -36,7 +36,3 @@ resource "bigip_sys_provision" "provision-ilx" {
 * `cpuRatio` - how much cpu resources you need for this resource
 * `diskRatio` - how much disk space you want to allocate for this resource.
 * `memoryRatio` - how much memory you want to deidcate for this resource
-
-
-
-      

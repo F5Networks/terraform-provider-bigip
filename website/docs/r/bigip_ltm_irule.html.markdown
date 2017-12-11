@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_irule"
-sidebar_current: "docs-bigip-datasource-irule-x"
+sidebar_current: "docs-bigip-resource-irule-x"
 description: |-
     Provides details about bigip_ltm_irule resource
 ---
@@ -46,7 +46,7 @@ when HTTP_REQUEST {
     log local0. "[IP::client_addr] - Regular HTTP request. ASM-checks and HTTP protocol enabled. Traffic is deep-inspected at L7."
   }
 }
- 
+
 
 ```      
 

@@ -1,16 +1,16 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_cm_device_name"
-sidebar_current: "docs-bigip-datasource-device_name-x"
+sidebar_current: "docs-bigip-resource-device_name-x"
 description: |-
-    Provides details about bigip device_name 
+    Provides details about bigip device_name
 ---
 
 # bigip\_device_name
 
 `bigip_device_name` provides details about a specific bigip
 
-This resource is helpful when configuring the BIG-IP device_name in cluster or in HA mode. 
+This resource is helpful when configuring the BIG-IP device_name in cluster or in HA mode.
 ## Example Usage
 
 
@@ -37,6 +37,6 @@ resource "bigip_device_name" "my_new_device_name"
 
 * `bigip1i00.f5.com` - Is the existing name of the BIG-IP device
 
-* `mv` - Is the tmsh move instruction which is attribute of command 
+* `mv` - Is the tmsh move instruction which is attribute of command
 
 * `target` - Is the new name of the BIG-IP

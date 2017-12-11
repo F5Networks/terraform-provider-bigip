@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_http2"
-sidebar_current: "docs-bigip-datasource-profile_http2-x"
+sidebar_current: "docs-bigip-resource-profile_http2-x"
 description: |-
     Provides details about bigip_ltm_profile_http2 resource
 ---

@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP Provider : bigip"
-sidebar_current: "docs-bigip-datasource-bigip-x"
+sidebar_current: "docs-bigip-resource-bigip-x"
 description: |-
-    Provides details about provider  bigip
+    Provides details about provider bigip
 ---
 
 # bigip

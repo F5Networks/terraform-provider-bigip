@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_snmp"
-sidebar_current: "docs-bigip-datasource-snmp-x"
+sidebar_current: "docs-bigip-resource-snmp-x"
 description: |-
     Provides details about bigip  snmp resource for BIG-IP
 ---

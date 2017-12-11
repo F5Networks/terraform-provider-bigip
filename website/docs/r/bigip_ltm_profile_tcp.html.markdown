@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_tcp"
-sidebar_current: "docs-bigip-datasource-profile_tcp-x"
+sidebar_current: "docs-bigip-resource-profile_tcp-x"
 description: |-
     Provides details about bigip_ltm_profile_tcp resource
 ---

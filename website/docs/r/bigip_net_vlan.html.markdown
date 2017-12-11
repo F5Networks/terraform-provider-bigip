@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_vlan"
-sidebar_current: "docs-bigip-datasource-vlan-x"
+sidebar_current: "docs-bigip-resource-vlan-x"
 description: |-
     Provides details about bigip_net_vlan resource
 ---

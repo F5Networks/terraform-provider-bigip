@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_oneconnect"
-sidebar_current: "docs-bigip-datasource-profile_oneconnect-x"
+sidebar_current: "docs-bigip-resource-profile_oneconnect-x"
 description: |-
     Provides details about bigip_ltm_profile_oneconnect resource
 ---
