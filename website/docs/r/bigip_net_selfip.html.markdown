@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_selfip"
-sidebar_current: "docs-bigip-datasource-selfip-x"
+sidebar_current: "docs-bigip-resource-selfip-x"
 description: |-
     Provides details about bigip_net_selfip resource
 ---

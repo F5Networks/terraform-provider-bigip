@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_monitor"
-sidebar_current: "docs-bigip-datasource-monitor-x"
+sidebar_current: "docs-bigip-resource-monitor-x"
 description: |-
     Provides details about bigip_ltm_monitor resource
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_route"
-sidebar_current: "docs-bigip-datasource-route-x"
+sidebar_current: "docs-bigip-resource-route-x"
 description: |-
     Provides details about bigip_net_route resource
 ---

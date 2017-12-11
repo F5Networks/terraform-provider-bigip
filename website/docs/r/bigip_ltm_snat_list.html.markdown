@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_snat"
-sidebar_current: "docs-bigip-datasource-snat-x"
+sidebar_current: "docs-bigip-resource-snat-x"
 description: |-
     Provides details about bigip_ltm_snat resource
 ---

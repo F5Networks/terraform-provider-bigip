@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_fastl4"
-sidebar_current: "docs-bigip-datasource-profile_fastl4-x"
+sidebar_current: "docs-bigip-resource-profile_fastl4-x"
 description: |-
     Provides details about bigip_ltm_profile_fastl4 resource
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_snmp_traps"
-sidebar_current: "docs-bigip-datasource-snmp_traps-x"
+sidebar_current: "docs-bigip-resource-snmp_traps-x"
 description: |-
     Provides details about bigip  snmp_traps resource for BIG-IP
 ---

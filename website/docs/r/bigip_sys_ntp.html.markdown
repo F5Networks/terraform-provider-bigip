@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_ntp"
-sidebar_current: "docs-bigip-datasource-ntp-x"
+sidebar_current: "docs-bigip-resource-ntp-x"
 description: |-
     Provides details about bigip ntp
 ---
@@ -10,7 +10,7 @@ description: |-
 
 `bigip_sys_ntp` provides details about a specific bigip
 
-This resource is helpful when configuring NTP server on the BIG-IP. 
+This resource is helpful when configuring NTP server on the BIG-IP.
 ## Example Usage
 
 
@@ -38,7 +38,3 @@ description = "/Common/NTP1"
 * `/Common/NTP1` - Is the description of the NTP server in the main or common partition of BIG-IP.
 
 * `time.facebook.com` - Is the  NTP server configured on the BIG-IP.
-
-
-
-
