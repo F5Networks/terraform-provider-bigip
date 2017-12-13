@@ -37,7 +37,6 @@ website/vendor
 keymap
 *.pem
 *.pub
-*.sh
 *.back
 *.goback
 bigip/*.back
