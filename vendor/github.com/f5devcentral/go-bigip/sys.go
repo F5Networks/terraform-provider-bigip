@@ -71,6 +71,7 @@ func (p *Syslog) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+
 type RemoteServer struct {
 	Name       string `json:"name,omitempty"`
 	Host       string `json:"host,omitempty"`
@@ -136,6 +137,25 @@ type TRAP struct {
 	Version                  string `json:"version,omitempty"`
 }
 
+
+
+type Iapps struct {
+	Iapps []Iapp `json:"items"`
+}
+
+type Iapp struct {
+	Name string
+	Template string
+	Partition string
+	TemplateBody string
+}
+
+type iappDTO struct {
+	Name string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	TemplateBody string `json:"template_body,omitempty"`
+}
+
 const (
 	uriSys       = "sys"
 	uriNtp       = "ntp"
@@ -149,6 +169,8 @@ const (
 	uriSyslog    = "syslog"
 	uriSnmp      = "snmp"
 	uriTraps     = "traps"
+	uriApp      = "application"
+	uriService  = "service"
 )
 
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
@@ -336,4 +358,23 @@ func (b *BigIP) TRAPs() (*TRAP, error) {
 
 func (b *BigIP) DeleteTRAP(name string) error {
 	return b.delete(uriSys, uriSnmp, uriTraps, name)
+}
+
+
+func (b *BigIP) GetIapp(name string) (*Iapp, error) {
+ var p Iapp
+ err, ok := b.getForEntity(&p, uriSys, uriApp, uriService, name)
+ if err != nil {
+	 return nil, err
+ }
+ if !ok {
+	 return nil, nil
+ }
+
+ return &p, nil
+ }
+
+func (b *BigIP) CreateIapp(p *Iapp) error {
+	log.Println(" what is the complete payload    ", p)
+	return b.post(p, uriSys, uriApp, uriService)
 }
