@@ -213,7 +213,7 @@ func (b *BigIP) delete(path ...string) error {
 }
 
 func (b *BigIP) post(body interface{}, path ...string) error {
-	marshalJSON, err := json.Marshal(body)
+	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
 		return err
 	}
@@ -247,7 +247,7 @@ func (b *BigIP) put(body interface{}, path ...string) error {
 }
 
 func (b *BigIP) patch(body interface{}, path ...string) error {
-	marshalJSON, err := json.Marshal(body)
+	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
 		return err
 	}

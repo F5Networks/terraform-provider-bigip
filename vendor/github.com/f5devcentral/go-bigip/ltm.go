@@ -1054,7 +1054,7 @@ func (p *Monitor) MarshalJSON() ([]byte, error) {
 	if strings.Contains(dto.SendString, "\r\n") {
 		dto.SendString = strings.Replace(dto.SendString, "\r\n", "\\r\\n", -1)
 	}
-	return json.Marshal(dto)
+	return jsonMarshal(dto)
 }
 
 func (p *Monitor) UnmarshalJSON(b []byte) error {

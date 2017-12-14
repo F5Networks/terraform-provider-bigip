@@ -1,6 +1,7 @@
 ## go-bigip
-[![GoDoc](https://godoc.org/github.com/scottdware/go-bigip?status.svg)](https://godoc.org/github.com/scottdware/go-bigip) [![Travis-CI](https://travis-ci.org/scottdware/go-bigip.svg?branch=master)](https://travis-ci.org/scottdware/go-bigip)
-[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/scottdware/go-bigip/master/LICENSE)
+[![GoDoc](https://godoc.org/github.com/f5devcentral/go-bigip?status.svg)](https://godoc.org/github.com/f5devcentral/go-bigip) [![Travis-CI](https://travis-ci.org/f5devcentral/go-bigip.svg?branch=master)](https://travis-ci.org/f5devcentral/go-bigip)
+[![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/go-bigip)](https://goreportcard.com/report/github.com/f5devcentral/go-bigip)
+[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/f5devcentral/go-bigip/master/LICENSE)
 
 A Go package that interacts with F5 BIG-IP systems using the REST API.
 
@@ -24,6 +25,6 @@ A very special thanks to the following who have helped contribute to this softwa
 * [Adam Burnett](https://github.com/aburnett)
 * [Michael D. Ivey](https://github.com/ivey)
 
-[godoc-go-bigip]: http://godoc.org/github.com/scottdware/go-bigip
-[license]: https://github.com/scottdware/go-bigip/blob/master/LICENSE
+[godoc-go-bigip]: http://godoc.org/github.com/f5devcentral/go-bigip
+[license]: https://github.com/f5devcentral/go-bigip/blob/master/LICENSE
 [blog]: http://sdubs.org/go-big-ip-or-go-home/

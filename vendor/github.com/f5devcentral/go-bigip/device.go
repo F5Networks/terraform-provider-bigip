@@ -102,7 +102,7 @@ func (b *BigIP) getLicensePool() (*LicensePool, error) {
 	// for loop over all returned license pools to check which one has available licenses
 	// getAvailablePool(member[index_of_array].Uuid)
 	// At the end change return statement to return only the UUID string of the one where license
-	// is availble
+	// is available
 	return &licensePool, nil
 }
 

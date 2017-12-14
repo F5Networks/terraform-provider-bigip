@@ -3,6 +3,7 @@ package bigip
 import "encoding/json"
 import "log"
 
+//ooo
 
 
 type Datacenters struct {
@@ -167,7 +168,6 @@ func (b *BigIP) CreateDatacenter(name, description,contact, app_service string, 
 		Disabled: disabled,
 		Prober_pool: prober_pool,
 	}
-	log.Printf("I am %#v\n  here %s   ", config)
 	return b.post(config, uriGtm, uriDatacenter)
 }
 
@@ -201,7 +201,6 @@ func (b *BigIP) CreateGtmmonitor(name, defaults_from string, interval, probeTime
 		Recv: recv,
 		Send: send,
 	}
-	log.Printf("I am %#v\n  here %s   ", config)
 	return b.post(config, uriGtm, uriGtmmonitor, uriHttp)
 }
 
