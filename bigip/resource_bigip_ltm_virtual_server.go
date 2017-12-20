@@ -126,6 +126,18 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Set:      schema.HashString,
 				Optional: true,
 			},
+			"translate_address": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable Address translation",
+			},
+			"translate_port": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable port translation",
+			},
 		},
 	}
 }
@@ -135,6 +147,8 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 
 	name := d.Get("name").(string)
 	port := d.Get("port").(int)
+	TranslateAddress := d.Get("translate_port").(string)
+	TranslatePort := d.Get("translate_port").(string)
 
 	log.Println("[INFO] Creating virtual server " + name)
 	err := client.CreateVirtualServer(
@@ -143,6 +157,8 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 		d.Get("mask").(string),
 		d.Get("pool").(string),
 		port,
+		TranslateAddress,
+		TranslatePort,
 	)
 	if err != nil {
 		return err
@@ -192,6 +208,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("snatpool", vs.SourceAddressTranslation.Pool)
 	d.Set("policies", vs.Policies)
 	d.Set("vlans", vs.Vlans)
+	d.Set("translate_address", vs.TranslateAddress)
+	d.Set("translate_port", vs.TranslatePort)
 
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
@@ -300,6 +318,8 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 			Type: d.Get("source_address_translation").(string),
 			Pool: d.Get("snatpool").(string),
 		},
+		TranslatePort:    d.Get("translate_port").(string),
+		TranslateAddress: d.Get("translate_address").(string),
 	}
 
 	err := client.ModifyVirtualServer(name, vs)

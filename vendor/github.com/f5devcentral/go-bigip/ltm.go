@@ -1199,8 +1199,18 @@ func (p *Snat) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
+
+	p.Name = dto.Name
+	p.Partition = dto.Partition
+	p.FullPath = dto.FullPath
+	p.AutoLasthop = dto.AutoLasthop
+	p.Mirror = dto.Mirror
+	p.SourcePort = dto.SourcePort
+	p.Translation = dto.Translation
+	p.Snatpool = dto.Snatpool
+	p.VlansDisabled = dto.VlansDisabled
 	p.Origins = dto.Origins
-	//return marshal(p, &dto)
+
 	return nil
 }
 
@@ -1723,7 +1733,7 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 // CreateVirtualServer adds a new virtual server to the BIG-IP system. <mask> can either be
 // in CIDR notation or decimal, i.e.: "24" or "255.255.255.0". A CIDR mask of "0" is the same
 // as "0.0.0.0".
-func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, port int) error {
+func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, port int, translate_address, translate_port string) error {
 	subnetMask := cidr[mask]
 
 	if strings.Contains(mask, ".") {
@@ -1731,10 +1741,12 @@ func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, port i
 	}
 
 	config := &VirtualServer{
-		Name:        name,
-		Destination: fmt.Sprintf("%s:%d", destination, port),
-		Mask:        subnetMask,
-		Pool:        pool,
+		Name:             name,
+		Destination:      fmt.Sprintf("%s:%d", destination, port),
+		Mask:             subnetMask,
+		Pool:             pool,
+		TranslateAddress: translate_address,
+		TranslatePort:    translate_port,
 	}
 
 	return b.post(config, uriLtm, uriVirtual)

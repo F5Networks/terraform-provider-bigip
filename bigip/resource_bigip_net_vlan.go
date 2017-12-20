@@ -95,24 +95,24 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
-	/*	client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
-		name := d.Id()
+	name := d.Id()
 
-		log.Println("[INFO] Reading vlan " + name)
+	log.Println("[INFO] Reading vlan " + name)
 
-		vlans, err := client.Vlans()
-		if err != nil {
-			return err
+	vlans, err := client.Vlans()
+	if err != nil {
+		return err
+	}
+
+	for _, vlan := range vlans.Vlans {
+		log.Println(vlan.Name)
+		if vlan.Name == name {
+			d.Set("name", vlan.Name)
 		}
+	}
 
-		for _, vlan := range vlans.Vlans {
-			log.Println(vlan.Name)
-			if vlan.Name == name {
-				d.Set("name", vlan.Name)
-			}
-		}
-	*/
 	return nil
 }
 
