@@ -1166,7 +1166,7 @@ type Snat struct {
 	Partition     string
 	FullPath      string
 	AutoLasthop   string
-	Mirror        bool
+	Mirror        string
 	SourcePort    string
 	Translation   string
 	Snatpool      string
@@ -1179,7 +1179,7 @@ type snatDTO struct {
 	Partition     string   `json:"partition,omitempty"`
 	FullPath      string   `json:"fullPath,omitempty"`
 	AutoLasthop   string   `json:"autoLastHop,omitempty"`
-	Mirror        bool     `json:"mirror,omitempty" bool:"disabled"`
+	Mirror        string   `json:"mirror,omitempty"`
 	SourcePort    string   `json:"sourePort,omitempty"`
 	Translation   string   `json:"translation,omitempty"`
 	Snatpool      string   `json:"snatpool,omitempty"`
@@ -2329,7 +2329,7 @@ func (b *BigIP) Snats(name string) (*Snats, error) {
 	return &snats, nil
 }
 
-func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool string, vlansDisabled, mirror bool, origins []string) error {
+func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool, mirror string, vlansDisabled bool, origins []string) error {
 	snat := &Snat{
 		Name:          name,
 		Partition:     partition,

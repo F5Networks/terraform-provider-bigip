@@ -37,7 +37,7 @@ func resourceBigipLtmSnat() *schema.Resource {
 				Description: "BIG-IP autolasthop",
 			},
 			"mirror": {
-				Type:        schema.TypeBool,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
@@ -79,7 +79,7 @@ func resourceBigipLtmSnatCreate(d *schema.ResourceData, meta interface{}) error 
 	Name := d.Get("name").(string)
 	Partition := d.Get("partition").(string)
 	AutoLasthop := d.Get("autolasthop").(string)
-	Mirror := d.Get("mirror").(bool)
+	Mirror := d.Get("mirror").(string)
 	SourcePort := d.Get("sourceport").(string)
 	Translation := d.Get("translation").(string)
 	Snatpool := d.Get("snatpool").(string)
@@ -117,7 +117,7 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 		Name:          d.Get("name").(string),
 		Partition:     d.Get("partition").(string),
 		AutoLasthop:   d.Get("autolasthop").(string),
-		Mirror:        d.Get("mirror").(bool),
+		Mirror:        d.Get("mirror").(string),
 		SourcePort:    d.Get("sourceport").(string),
 		Translation:   d.Get("translation").(string),
 		Snatpool:      d.Get("snatpool").(string),
@@ -129,7 +129,7 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
-	/*client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
@@ -141,7 +141,7 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("origins", snat.Origins)
 	d.Set("name", name)
-	*/
+
 	return nil
 }
 
