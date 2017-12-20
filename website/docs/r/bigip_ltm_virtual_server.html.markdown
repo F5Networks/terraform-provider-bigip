@@ -32,6 +32,8 @@ resource "bigip_ltm_virtual_server" "https" {
   pool = "${var.pool}"
   profiles = ["/Common/tcp","/Common/my-awesome-ssl-cert","/Common/http"]
   source_address_translation = "automap"
+  translate_address = "enabled"
+  translate_port = "enabled"
 }
 
 # A Virtual server with separate client and server profiles
@@ -62,6 +64,10 @@ resource "bigip_ltm_virtual_server" "https" {
 * `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: 24 or 255.255.255.0. A CIDR mask of 0 is the same as 0.0.0.0
 
 * `source_address_translation` - (Optional) Can be either omitted for none or the values automap or snat
+
+* `translate_address` - Enables or disables address translation for the virtual server. Turn address translation off for a virtual server if you want to use the virtual server to load balance connections to any address. This option is useful when the system is load balancing devices that have the same IP address.
+
+* `translate_port` - Enables or disables port translation. Turn port translation off for a virtual server if you want to use the virtual server to load balance connections to any service
 
 * `ip_protocol`- (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
 
