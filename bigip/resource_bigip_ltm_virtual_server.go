@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -194,12 +193,11 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Unknown virtual server destination: " + vs.Destination)
 	}
 
-	pool := strings.Split(vs.Pool, "/")
 	d.Set("destination", destination[2])
 	d.Set("source", vs.Source)
 	d.Set("protocol", vs.IPProtocol)
 	d.Set("name", name)
-	d.Set("pool", pool[len(pool)-1])
+	d.Set("pool", vs.Pool)
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
 	d.Set("irules", makeStringSet(&vs.Rules))
