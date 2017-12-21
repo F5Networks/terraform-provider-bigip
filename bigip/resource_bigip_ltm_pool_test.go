@@ -6,18 +6,27 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
+var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
+var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
 
 var TEST_POOL_RESOURCE = `
+resource "bigip_ltm_node" "test-node" {
+	name = "` + TEST_NODE_NAME + `"
+	address = "10.10.10.10"
+}
+
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
 	monitors = ["/Common/http"]
 	allow_nat = "yes"
 	allow_snat = "yes"
 	load_balancing_mode = "round-robin"
+	nodes = ["` + TEST_POOLNODE_NAMEPORT + `"]
 }
 `
 
@@ -37,6 +46,10 @@ func TestBigipLtmPool_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_nat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "load_balancing_mode", "round-robin"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "nodes.#", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool",
+						fmt.Sprintf("nodes.%d", schema.HashString(TEST_POOLNODE_NAMEPORT)),
+						TEST_POOLNODE_NAMEPORT),
 				),
 			},
 		},
