@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"log"
-
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipLtmSnat() *schema.Resource {
@@ -29,6 +29,12 @@ func resourceBigipLtmSnat() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Which partition on BIG-IP",
+			},
+
+			"full_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Fullpath ",
 			},
 
 			"autolasthop": {
@@ -63,11 +69,24 @@ func resourceBigipLtmSnat() *schema.Resource {
 			},
 
 			"origins": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Optional:    true,
-				Description: "Origin IP addresses",
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Name of origin",
+							//ValidateFunc: validateF5Name,
+						},
+						"app_service": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "app service",
+							//ValidateFunc: validateF5Name,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -75,83 +94,123 @@ func resourceBigipLtmSnat() *schema.Resource {
 
 func resourceBigipLtmSnatCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	name := d.Get("name").(string)
+	log.Println("[INFO] Creating Snat" + name)
 
-	Name := d.Get("name").(string)
-	Partition := d.Get("partition").(string)
-	AutoLasthop := d.Get("autolasthop").(string)
-	Mirror := d.Get("mirror").(string)
-	SourcePort := d.Get("sourceport").(string)
-	Translation := d.Get("translation").(string)
-	Snatpool := d.Get("snatpool").(string)
-	VlansDisabled := d.Get("vlansdisabled").(bool)
-	Origins := setToStringSlice(d.Get("origins").(*schema.Set))
-	log.Println("[INFO] Creating Snat ")
-
-	err := client.CreateSnat(
-		Name,
-		Partition,
-		AutoLasthop,
-		SourcePort,
-		Translation,
-		Snatpool,
-		Mirror,
-		VlansDisabled,
-		Origins,
-	)
-
+	p := dataToSnat(name, d)
+	d.SetId(name)
+	err := client.CreateSnat(&p)
 	if err != nil {
 		return err
 	}
-	d.SetId(Name)
-	return nil
-}
-
-func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-
-	log.Println("[INFO] Updating SNAT " + name)
-
-	r := &bigip.Snat{
-		Name:          d.Get("name").(string),
-		Partition:     d.Get("partition").(string),
-		AutoLasthop:   d.Get("autolasthop").(string),
-		Mirror:        d.Get("mirror").(string),
-		SourcePort:    d.Get("sourceport").(string),
-		Translation:   d.Get("translation").(string),
-		Snatpool:      d.Get("snatpool").(string),
-		VlansDisabled: d.Get("vlansdisabled").(bool),
-		Origins:       setToStringSlice(d.Get("origins").(*schema.Set)),
-	}
-
-	return client.ModifySnat(r)
+	return resourceBigipLtmSnatRead(d, meta)
 }
 
 func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
 
-	log.Println("[INFO] Fetching snatlist " + name)
+	log.Println("[INFO] Fetching Ltm Snat " + name)
+	p, err := client.GetSnat(name)
+	d.Set("partition", p.Partition)
+	d.Set("full_path", p.FullPath)
+	d.Set("autolasthop", p.AutoLasthop)
+	d.Set("mirror", p.Mirror)
+	d.Set("sourceport", p.SourcePort)
+	d.Set("translation", p.Translation)
+	d.Set("snatpool", p.Snatpool)
+	d.Set("vlansdisabled", p.VlansDisabled)
 
-	snat, err := client.GetSnat(name)
 	if err != nil {
 		return err
 	}
-	d.Set("origins", snat.Origins)
-	d.Set("name", name)
 
-	return nil
+	return SnatToData(p, d)
+}
+
+func resourceBigipLtmSnatExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client := meta.(*bigip.BigIP)
+
+	name := d.Id()
+	log.Println("[INFO] Fetching LtmSnat " + name)
+
+	p, err := client.GetSnat(name)
+
+	d.Set("partition", p.Partition)
+	d.Set("full_path", p.FullPath)
+	d.Set("autolasthop", p.AutoLasthop)
+	d.Set("mirror", p.Mirror)
+	d.Set("sourceport", p.SourcePort)
+	d.Set("translation", p.Translation)
+	d.Set("snatpool", p.Snatpool)
+	d.Set("vlansdisabled", p.VlansDisabled)
+
+	if err != nil {
+		return false, err
+	}
+
+	return p != nil, nil
+}
+
+func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	log.Println("[INFO] Updating LtmSnat " + name)
+	p := dataToSnat(name, d)
+	return client.UpdateSnat(name, &p)
 }
 
 func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	return client.DeleteSnat(name)
-	//return nil
 }
 
 func resourceBigipLtmSnatImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
+}
+
+func dataToSnat(name string, d *schema.ResourceData) bigip.Snat {
+	var p bigip.Snat
+
+	p.Name = name
+	p.Partition = d.Get("partition").(string)
+	p.FullPath = d.Get("full_path").(string)
+	p.AutoLasthop = d.Get("autolasthop").(string)
+	p.Mirror = d.Get("mirror").(string)
+	p.SourcePort = d.Get("sourceport").(string)
+	p.Translation = d.Get("translation").(string)
+	p.Snatpool = d.Get("snatpool").(string)
+	p.VlansDisabled = d.Get("vlansdisabled").(bool)
+
+	originsCount := d.Get("origins.#").(int)
+	p.Origins = make([]bigip.Originsrecord, 0, originsCount)
+	for i := 0; i < originsCount; i++ {
+		var r bigip.Originsrecord
+		log.Println("I am in dattosnat policy ", p, originsCount, i)
+		prefix := fmt.Sprintf("origins.%d", i)
+		r.Name = d.Get(prefix + ".name").(string)
+		p.Origins = append(p.Origins, r)
+	}
+
+	log.Println("I am in DatatoSnat value of p                                                   ", p)
+
+	return p
+}
+
+func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
+	d.Set("partition", p.Partition)
+	d.Set("full_path", p.FullPath)
+	d.Set("autolasthop", p.AutoLasthop)
+	d.Set("mirror", p.Mirror)
+	d.Set("sourceport", p.SourcePort)
+	d.Set("translation", p.Translation)
+	d.Set("snatpool", p.Snatpool)
+	d.Set("vlansdisabled", p.VlansDisabled)
+
+	for i, r := range p.Origins {
+		origins := fmt.Sprintf("origins.%d", i)
+		d.Set(fmt.Sprintf("%s.name", origins), r.Name)
+	}
+	return nil
 }

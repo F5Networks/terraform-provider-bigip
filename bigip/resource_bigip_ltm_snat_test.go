@@ -3,10 +3,8 @@ package bigip
 import (
 	"fmt"
 	"testing"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -14,11 +12,11 @@ var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
 
 var TEST_SNAT_RESOURCE = `
 resource "bigip_ltm_snat" "test-snat" {
- name = "/Common/NewSnatList"
- translation = "136.1.1.1"
- origins = ["2.2.2.2", "3.3.3.3"]
+ name = "` + TEST_SNAT_NAME + `"
+ translation = "/Common/136.1.1.1"
+ origins = { name = "2.2.2.2" }
+ origins = { name = "3.3.3.3" }
 }
-
 `
 
 func TestBigipLtmsnat_create(t *testing.T) {
@@ -33,14 +31,10 @@ func TestBigipLtmsnat_create(t *testing.T) {
 				Config: TEST_SNAT_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatExists(TEST_SNAT_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "name", "/Common/NewSnatList"),
-					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "translation", "136.1.1.1"),
-					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat",
-						fmt.Sprintf("origins.%d", schema.HashString("2.2.2.2")),
-						"2.2.2.2"),
-					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat",
-						fmt.Sprintf("origins.%d", schema.HashString("3.3.3.3")),
-						"3.3.3.3"),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "name", TEST_SNAT_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "translation", "/Common/136.1.1.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "origins.0.name", "2.2.2.2"),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "origins.1.name", "3.3.3.3"),
 				),
 			},
 		},
@@ -71,14 +65,14 @@ func TestBigipLtmsnat_import(t *testing.T) {
 func testChecksnatExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Snats(name)
+		p, err := client.GetSnat(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if exists && p != nil {
 			return fmt.Errorf("Snat %s was not created.", name)
 		}
-		if !exists && p != nil {
+		if !exists && p == nil {
 			return fmt.Errorf("Snat %s still exists.", name)
 		}
 		return nil
@@ -94,7 +88,7 @@ func testChecksnatsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		snat, err := client.Snats(name)
+		snat, err := client.GetSnat(name)
 		if err != nil {
 			return err
 		}

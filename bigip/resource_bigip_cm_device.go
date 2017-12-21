@@ -107,8 +107,9 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error {
-
-	return nil
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	return client.DeleteDevice(name)
 }
 
 func resourceBigipCmDeviceImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

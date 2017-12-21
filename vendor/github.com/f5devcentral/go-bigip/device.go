@@ -198,6 +198,10 @@ func (b *BigIP) ModifyDevice(config *Device) error {
 	return b.put(config, uriCm, uriDiv)
 }
 
+func (b *BigIP) DeleteDevice(name string) error {
+	return b.delete(uriCm, uriDiv, name)
+}
+
 func (b *BigIP) Devices() (*Device, error) {
 	var device Device
 	err, _ := b.getForEntity(&device, uriCm, uriDiv)

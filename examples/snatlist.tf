@@ -4,17 +4,10 @@ provider "bigip" {
   password = "admin"
 }
 
-resource "bigip_ltm_snat" "snat3" {
-  // this is using snatpool translation is not required
-  name = "snat3"
-  origins = ["6.1.6.6"]
-  mirror = "false"
-  snatpool = "/Common/sanjaysnatpool"
-}
-
 resource "bigip_ltm_snat" "snat_list" {
  name = "NewSnatList"
  translation = "136.1.1.1"
- origins = ["2.2.2.2", "3.3.3.3"]
+ origins =  {name = "2.2.2.2"}
+ origins =  {name = "3.3.3.3"} 
 }
 

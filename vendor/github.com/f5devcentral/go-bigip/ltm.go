@@ -1171,26 +1171,47 @@ type Snat struct {
 	Translation   string
 	Snatpool      string
 	VlansDisabled bool
-	Origins       []string
+	Origins       []Originsrecord
 }
 
 type snatDTO struct {
-	Name          string   `json:"name"`
-	Partition     string   `json:"partition,omitempty"`
-	FullPath      string   `json:"fullPath,omitempty"`
-	AutoLasthop   string   `json:"autoLastHop,omitempty"`
-	Mirror        string   `json:"mirror,omitempty"`
-	SourcePort    string   `json:"sourePort,omitempty"`
-	Translation   string   `json:"translation,omitempty"`
-	Snatpool      string   `json:"snatpool,omitempty"`
-	VlansDisabled bool     `json:"vlansDisabled,omitempty" bool:"disabled"`
-	Origins       []string `json:"origins,omitempty"`
+	Name          string `json:"name"`
+	Partition     string `json:"partition,omitempty"`
+	FullPath      string `json:"fullPath,omitempty"`
+	AutoLasthop   string `json:"autoLastHop,omitempty"`
+	Mirror        string `json:"mirror,omitempty"`
+	SourcePort    string `json:"sourePort,omitempty"`
+	Translation   string `json:"translation,omitempty"`
+	Snatpool      string `json:"snatpool,omitempty"`
+	VlansDisabled bool   `json:"vlansDisabled,omitempty" bool:"disabled"`
+	Origins       struct {
+		Items []Originsrecord `json:"items,omitempty"`
+	} `json:"originsReference,omitempty"`
+}
+
+type Originsrecords struct {
+	Items []Originsrecord `json:"items,omitempty"`
+}
+
+type Originsrecord struct {
+	Name        string `json:"name"`
+	app_service string `json:"appService,omitempty"`
 }
 
 func (p *Snat) MarshalJSON() ([]byte, error) {
-	var dto snatDTO
-	marshal(&dto, p)
-	return json.Marshal(dto)
+	return json.Marshal(snatDTO{
+		Name:          p.Name,
+		Partition:     p.Partition,
+		FullPath:      p.FullPath,
+		Mirror:        p.Mirror,
+		SourcePort:    p.SourcePort,
+		Translation:   p.Translation,
+		Snatpool:      p.Snatpool,
+		VlansDisabled: p.VlansDisabled,
+		Origins: struct {
+			Items []Originsrecord `json:"items,omitempty"`
+		}{Items: p.Origins},
+	})
 }
 
 func (p *Snat) UnmarshalJSON(b []byte) error {
@@ -1209,7 +1230,7 @@ func (p *Snat) UnmarshalJSON(b []byte) error {
 	p.Translation = dto.Translation
 	p.Snatpool = dto.Snatpool
 	p.VlansDisabled = dto.VlansDisabled
-	p.Origins = dto.Origins
+	p.Origins = dto.Origins.Items
 
 	return nil
 }
@@ -2330,7 +2351,7 @@ func (b *BigIP) AddRecords(name, rname, data string) error {
 }
 
 // Snats returns a list of snat
-func (b *BigIP) Snats(name string) (*Snats, error) {
+/*func (b *BigIP) Snats(name string) (*Snats, error) {
 	var snats Snats
 	err, _ := b.getForEntity(&snats, uriLtm, uriSnat, name)
 
@@ -2339,9 +2360,9 @@ func (b *BigIP) Snats(name string) (*Snats, error) {
 	}
 
 	return &snats, nil
-}
+}*/
 
-func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool, mirror string, vlansDisabled bool, origins []string) error {
+/*func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool, mirror string, vlansDisabled bool, origins []string) error {
 	snat := &Snat{
 		Name:          name,
 		Partition:     partition,
@@ -2355,6 +2376,10 @@ func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation
 	}
 	log.Println("[INFO] Creating snat  ", snat)
 	return b.post(snat, uriLtm, uriSnat)
+} */
+func (b *BigIP) CreateSnat(p *Snat) error {
+	log.Println(" what is the complete payload    ", p)
+	return b.post(p, uriLtm, uriSnat)
 }
 
 func (b *BigIP) ModifySnat(config *Snat) error {
@@ -2377,6 +2402,10 @@ func (b *BigIP) GetSnat(name string) (*Snat, error) {
 
 func (b *BigIP) DeleteSnat(name string) error {
 	return b.delete(uriLtm, uriSnat, name)
+}
+
+func (b *BigIP) UpdateSnat(name string, p *Snat) error {
+	return b.put(p, uriLtm, uriSnat, name)
 }
 
 // Snats returns a list of snat
