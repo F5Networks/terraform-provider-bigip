@@ -110,7 +110,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	nodeNames := make([]string, 0, len(nodes.PoolMembers))
 
 	for _, node := range nodes.PoolMembers {
-		nodeNames = append(nodeNames, node.Name)
+		nodeNames = append(nodeNames, node.FullPath)
 	}
 
 	d.Set("allow_nat", pool.AllowNAT)
