@@ -202,9 +202,9 @@ func (b *BigIP) DeleteDevice(name string) error {
 	return b.delete(uriCm, uriDiv, name)
 }
 
-func (b *BigIP) Devices() (*Device, error) {
+func (b *BigIP) Devices(name string) (*Device, error) {
 	var device Device
-	err, _ := b.getForEntity(&device, uriCm, uriDiv)
+	err, _ := b.getForEntity(&device, uriCm, uriDiv, name)
 
 	if err != nil {
 		return nil, err

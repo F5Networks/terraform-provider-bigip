@@ -70,7 +70,7 @@ func TestBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
-						resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "pool", TEST_VSPOOL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "pool", TEST_VSPOOL_NAME),
 				),
 			},
 		},

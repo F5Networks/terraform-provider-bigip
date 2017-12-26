@@ -94,7 +94,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Println("[INFO] Reading Device " + name)
 
-	members, err := client.Devices()
+	members, err := client.Devices(name)
 	if err != nil {
 		return err
 	}

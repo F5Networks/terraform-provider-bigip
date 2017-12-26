@@ -58,14 +58,14 @@ vet:
 	fi
 
 test: build
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout=600s -parallel=1
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout=600s -parallel=1
 
 testacc: fmt build
 	@if [[ "$(BIGIP_USER)" == "" || "$(BIGIP_HOST)" == "" || "-z $(BIGIP_PASSWORD)" == "" ]]; then \
 		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
 		exit 1; \
 	fi
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout 170m
+	@TF_ACC=true go test $(TEST) $(TESTARGS) -timeout 170m
 
 
 
