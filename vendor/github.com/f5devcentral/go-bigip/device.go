@@ -238,3 +238,6 @@ func (b *BigIP) Devicegroups() (*Devicegroup, error) {
 
 	return &devicegroup, nil
 }
+func (b *BigIP) DeleteDevicegroup(name string) error {
+	return b.delete(uriCm, uriDiv, name)
+}

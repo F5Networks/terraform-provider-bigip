@@ -126,7 +126,6 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return SnatToData(p, d)
-	return nil
 }
 
 func resourceBigipLtmSnatExists(d *schema.ResourceData, meta interface{}) (bool, error) {

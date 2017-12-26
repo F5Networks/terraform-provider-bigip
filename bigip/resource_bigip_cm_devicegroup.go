@@ -106,8 +106,9 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
-
-	return nil
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	return client.DeleteDevicegroup(name)
 }
 
 func resourceBigipCmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
