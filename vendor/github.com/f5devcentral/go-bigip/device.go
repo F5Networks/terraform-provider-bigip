@@ -228,9 +228,9 @@ func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
 	return b.put(config, uriCm, uriDiv)
 }
 
-func (b *BigIP) Devicegroups() (*Devicegroup, error) {
+func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 	var devicegroup Devicegroup
-	err, _ := b.getForEntity(&devicegroup, uriCm, uriDiv)
+	err, _ := b.getForEntity(&devicegroup, uriCm, uriDiv, name)
 
 	if err != nil {
 		return nil, err

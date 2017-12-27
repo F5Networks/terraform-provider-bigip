@@ -28,16 +28,19 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 			"auto_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "disabled",
 				Description: "BIG-IP password",
 			},
 			"type": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "sync-only",
 				Description: "BIG-IP password",
 			},
 			"full_load_on_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default: "false",
 				Description: "BIG-IP password",
 			},
 		},
@@ -93,7 +96,7 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 	log.Println("[INFO] Reading Devicegroup " + name)
 
-	members, err := client.Devicegroups()
+	members, err := client.Devicegroups(name)
 	if err != nil {
 		return err
 	}
