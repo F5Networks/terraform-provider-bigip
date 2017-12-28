@@ -49,7 +49,6 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"bigip_device_name":              resourceBigipLtmDevicename(),
 			"bigip_cm_device":                resourceBigipCmDevice(),
 			"bigip_cm_devicegroup":           resourceBigipCmDevicegroup(),
 			"bigip_net_route":                resourceBigipNetRoute(),

@@ -106,6 +106,8 @@ func (b *BigIP) getLicensePool() (*LicensePool, error) {
 	return &licensePool, nil
 }
 
+
+
 // VirtualAddresses returns a list of virtual addresses.
 func (b *BigIP) LIC() (*LIC, error) {
 	var va LIC
@@ -119,6 +121,8 @@ func (b *BigIP) LIC() (*LIC, error) {
 	}
 	return &va, nil
 }
+
+
 
 func (b *BigIP) CreateLIC(deviceAddress string, username string, password string) error {
 	config := &LIC{
@@ -134,6 +138,7 @@ func (b *BigIP) CreateLIC(deviceAddress string, username string, password string
 
 	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 }
+
 
 func (b *BigIP) ModifyLIC(config *LIC) error {
 	licensePool, licensePoolErr := b.getLicensePool()
@@ -158,30 +163,6 @@ func (b *BigIP) LICs() (*LIC, error) {
 	return &members, nil
 }
 
-func (b *BigIP) CreateDevicename(command, name, target string) error {
-	config := &Devicename{
-		Command: command,
-		Name:    name,
-		Target:  target,
-	}
-
-	return b.post(config, uriCm, uriDiv)
-}
-
-func (b *BigIP) ModifyDevicename(config *Devicename) error {
-	return b.put(config, uriCm, uriDiv)
-}
-
-func (b *BigIP) Devicenames() (*Devicename, error) {
-	var devicename Devicename
-	err, _ := b.getForEntity(&devicename, uriCm, uriDiv)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &devicename, nil
-}
 
 func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp string) error {
 	config := &Device{

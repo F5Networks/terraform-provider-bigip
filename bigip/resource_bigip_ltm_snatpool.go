@@ -90,10 +90,13 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
-	d.Set("origins", Snatpool.Origins)
-	d.Set("name", name)
-	*/
+	//d.Set("origins", Snatpool.Origins)
+	d.Set("name", name) */
 	return nil
+
+
+
+
 }
 
 func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) error {
