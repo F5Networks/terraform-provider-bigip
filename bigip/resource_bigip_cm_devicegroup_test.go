@@ -50,7 +50,6 @@ func TestBigipCmDevicegroup_create(t *testing.T) {
 			},
 		},
 	})
-	log.Printf("I am in create value of t ======================  %v ", t)
 
 }
 
@@ -91,7 +90,6 @@ func testCheckCmDevicegroupExists(name string, exists bool) resource.TestCheckFu
 		if !exists && devicegroup != nil {
 			return fmt.Errorf("devicegroup %s still exists.", name)
 		}
-		log.Printf("I am in Exists  ======================  %v ", name)
 
 		return nil
 
@@ -109,7 +107,6 @@ func testCheckCmDevicegroupsDestroyed(s *terraform.State) error {
 
 		name := rs.Primary.ID
 		devicegroup, err := client.Devicegroups(name)
-		log.Printf("I am in destroyed ====================== &v ", devicegroup)
 
 		if err != nil {
 			return err
