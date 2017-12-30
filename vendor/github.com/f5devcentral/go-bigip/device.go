@@ -1,6 +1,9 @@
 package bigip
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+)
 
 //  LIC contains device license for BIG-IP system.
 type LICs struct {
@@ -58,8 +61,12 @@ type Devicegroups struct {
 type Devicegroup struct {
 	AutoSync       string `json:"autoSync,omitempty"`
 	Name           string `json:"name,omitempty"`
+	Description           string `json:"description,omitempty"`
 	Type           string `json:"type,omitempty"`
 	FullLoadOnSync string `json:"fullLoadOnSync,omitempty"`
+  SaveOnAutoSync string `json:"saveOnAutoSync,omitempty"`
+	NetworkFailover string `json:"networkFailover,omitempty"`
+	IncrementalConfigSyncSizeMax int `json:"incrementalConfigSyncSizeMax,omitempty"`
 }
 
 // https://10.192.74.80/mgmt/cm/device/licensing/pool/purchased-pool/licenses
@@ -68,6 +75,7 @@ const (
 	uriMgmt          = "mgmt"
 	uriCm            = "cm"
 	uriDiv           = "device"
+	uriDG            = "device-group"
 	uriLins          = "licensing"
 	uriPoo           = "pool"
 	uriPur           = "purchased-pool"
@@ -106,8 +114,6 @@ func (b *BigIP) getLicensePool() (*LicensePool, error) {
 	return &licensePool, nil
 }
 
-
-
 // VirtualAddresses returns a list of virtual addresses.
 func (b *BigIP) LIC() (*LIC, error) {
 	var va LIC
@@ -121,8 +127,6 @@ func (b *BigIP) LIC() (*LIC, error) {
 	}
 	return &va, nil
 }
-
-
 
 func (b *BigIP) CreateLIC(deviceAddress string, username string, password string) error {
 	config := &LIC{
@@ -138,7 +142,6 @@ func (b *BigIP) CreateLIC(deviceAddress string, username string, password string
 
 	return b.post(config, uriMgmt, uriCm, uriDiv, uriLins, uriPoo, uriPur, uriLicn, licensePool.Items[0].Uuid, uriMemb)
 }
-
 
 func (b *BigIP) ModifyLIC(config *LIC) error {
 	licensePool, licensePoolErr := b.getLicensePool()
@@ -162,7 +165,6 @@ func (b *BigIP) LICs() (*LIC, error) {
 
 	return &members, nil
 }
-
 
 func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp string) error {
 	config := &Device{
@@ -194,19 +196,23 @@ func (b *BigIP) Devices(name string) (*Device, error) {
 	return &device, nil
 }
 
-func (b *BigIP) CreateDevicegroup(name, autoSync, typo, fullLoadOnSync string) error {
+func (b *BigIP) CreateDevicegroup(name, description, autoSync, typo, fullLoadOnSync, saveOnAutoSync, networkFailover string, incrementalConfigSyncSizeMax int) error {
 	config := &Devicegroup{
 		Name:           name,
+		Description:    description,
 		AutoSync:       autoSync,
 		Type:           typo,
 		FullLoadOnSync: fullLoadOnSync,
+		SaveOnAutoSync: saveOnAutoSync,
+		NetworkFailover: networkFailover,
+		IncrementalConfigSyncSizeMax: incrementalConfigSyncSizeMax,
 	}
-
-	return b.post(config, uriCm, uriDiv)
+	log.Println("I am here &v ", config)
+	return b.post(config, uriCm, uriDG)
 }
 
 func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
-	return b.put(config, uriCm, uriDiv)
+	return b.put(config, uriCm, uriDG)
 }
 
 func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
@@ -219,6 +225,17 @@ func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 
 	return &devicegroup, nil
 }
+
+/* func (b *BigIP) Devicegroups() (*Devicegroup, error) {
+	var devicegroup Devicegroup
+	err, _ := b.getForEntity(&devicegroup, uriCm, uriDG)
+
+	if err != nil {
+		return nil, err
+	}
+	return &devicegroup, nil
+}
+*/
 func (b *BigIP) DeleteDevicegroup(name string) error {
-	return b.delete(uriCm, uriDiv, name)
+	return b.delete(uriCm, uriDG, name)
 }

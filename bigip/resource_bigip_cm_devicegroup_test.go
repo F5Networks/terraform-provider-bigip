@@ -3,88 +3,103 @@ package bigip
 import (
 	"fmt"
 	"testing"
-
+ "log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
-var TEST_DEVICEGROUP_NAME = fmt.Sprintf("/%s/test-devicegroup1", TEST_PARTITION)
+var TEST_DG_NAME = fmt.Sprintf("/%s/test-devicegroup", TEST_PARTITION)
+//var TEST_DG_NAME = "test-devicegroup"
 
-var TEST_DEVICEGROUP_RESOURCE = `
+var TEST_DG_RESOURCE = `
 resource "bigip_cm_devicegroup" "test-devicegroup"
-
         {
-            name = "/Common/test-devicegroup1"
-            auto_sync = "enabled"
-            full_load_on_sync = "true"
+            name = "/Common/test-devicegroup"
+						description = "whatiknow"
+            auto_sync = "disabled"
+            full_load_on_sync = "false"
             type = "sync-only"
+						save_on_auto_sync = "false"
+						network_failover = "enabled"
+						incremental_config = 1024
         }
 `
 
-func TestBigipCmdevicegroup_create(t *testing.T) {
+func TestBigipCmDevicegroup_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicegroupsDestroyed,
+		CheckDestroy: testCheckCmDevicegroupsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DEVICEGROUP_RESOURCE,
+				Config: TEST_DG_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckdevicegroupExists(TEST_DEVICEGROUP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "name", "/Common/test-devicegroup1"),
-					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "auto_sync", "enabled"),
-					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "full_load_on_sync", "true"),
+					testCheckCmDevicegroupExists(TEST_DG_NAME, true),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "name", "/Common/test-devicegroup"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "description", "whatiknow"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "auto_sync", "disabled"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "full_load_on_sync", "false"),
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "type", "sync-only"),
-
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "save_on_auto_sync", "false"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "network_failover", "enabled"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "incremental_config", "1024"),
 				),
 			},
 		},
 	})
+	log.Printf("I am in create value of t ======================  %v ", t)
+
 }
 
-func TestBigipLtmCmdevicegroup_import(t *testing.T) {
+func TestBigipCmDevicegroup_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicegroupsDestroyed,
+		CheckDestroy: testCheckCmDevicegroupsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DEVICEGROUP_RESOURCE,
+				Config: TEST_DG_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckdevicegroupExists(TEST_DEVICEGROUP_NAME, true),
+					testCheckCmDevicegroupExists(TEST_DG_NAME, true),
 				),
-				ResourceName:      TEST_DEVICEGROUP_NAME,
+				ResourceName:      TEST_DG_NAME,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
 		},
 	})
+
 }
 
-func testCheckdevicegroupExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckCmDevicegroupExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Devicegroups(name)
+
+		devicegroup, err := client.Devicegroups(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+
+		if exists && devicegroup == nil {
 			return fmt.Errorf("devicegroup %s was not created.", name)
 		}
-		if !exists && p != nil {
-
+		if !exists && devicegroup != nil {
 			return fmt.Errorf("devicegroup %s still exists.", name)
 		}
+		log.Printf("I am in Exists  ======================  %v ", name)
+
 		return nil
+
 	}
 }
 
-func testCheckdevicegroupsDestroyed(s *terraform.State) error {
+
+func testCheckCmDevicegroupsDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
@@ -94,6 +109,8 @@ func testCheckdevicegroupsDestroyed(s *terraform.State) error {
 
 		name := rs.Primary.ID
 		devicegroup, err := client.Devicegroups(name)
+		log.Printf("I am in destroyed ====================== &v ", devicegroup)
+
 		if err != nil {
 			return err
 		}

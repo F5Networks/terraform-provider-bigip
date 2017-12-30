@@ -94,9 +94,6 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("name", name) */
 	return nil
 
-
-
-
 }
 
 func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) error {

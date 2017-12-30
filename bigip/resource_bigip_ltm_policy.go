@@ -4,14 +4,13 @@ import (
 	"log"
 
 	"fmt"
-	"reflect"
-	"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"reflect"
+	"strings"
 )
 
-var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adaptation", "server-ssl"})
+var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})
 var REQUIRES = schema.NewSet(schema.HashString, []interface{}{"client-ssl", "ssl-persistence", "tcp", "http"})
 
 func resourceBigipLtmPolicy() *schema.Resource {
@@ -26,7 +25,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Policy",
@@ -34,7 +33,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				//ValidateFunc: validateF5Name,
 			},
 
-			"controls": {
+			"controls": &schema.Schema{
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -42,7 +41,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				//ValidateFunc: validateSetValues(CONTROLS),
 			},
 
-			"requires": {
+			"requires": &schema.Schema{
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -50,536 +49,536 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				//ValidateFunc: validateSetValues(REQUIRES),
 			},
 
-			"strategy": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/first-match",
-				Description: "Policy Strategy (i.e. /Common/first-match)",
-				//ValidateFunc: validateF5Name,
+			"strategy": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "/Common/first-match",
+				Description:  "Policy Strategy (i.e. /Common/first-match)",
+				ValidateFunc: validateF5Name,
 			},
 
-			"rule": {
+			"rule": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "Rule name",
-							//ValidateFunc: validateF5Name,
+						"name": &schema.Schema{
+							Type:         schema.TypeString,
+							Required:     true,
+							Description:  "Rule name",
+							ValidateFunc: validateF5Name,
 						},
-						"action": {
+						"action": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"app_service": {
+									"app_service": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"application": {
+									"application": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"asm": {
+									"asm": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"avr": {
+									"avr": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cache": {
+									"cache": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"carp": {
+									"carp": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"category": {
+									"category": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"classify": {
+									"classify": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"clone_pool": {
+									"clone_pool": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"code": {
+									"code": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"compress": {
+									"compress": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"content": {
+									"content": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"cookie_hash": {
+									"cookie_hash": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookie_insert": {
+									"cookie_insert": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookie_passive": {
+									"cookie_passive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cookie_rewrite": {
+									"cookie_rewrite": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"decompress": {
+									"decompress": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"defer": {
+									"defer": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"destination_address": {
+									"destination_address": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"disable": {
+									"disable": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"domain": {
+									"domain": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"enable": {
+									"enable": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"expiry": {
+									"expiry": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"expiry_secs": {
+									"expiry_secs": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"expression": {
+									"expression": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"extension": {
+									"extension": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"facility": {
+									"facility": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"forward": {
+									"forward": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"from_profile": {
+									"from_profile": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"hash": {
+									"hash": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"host": {
+									"host": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"http": {
+									"http": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_basicauth": {
+									"http_basic_auth": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_cookie": {
+									"http_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_header": {
+									"http_header": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_host": {
+									"http_host": &schema.Schema{
+										Type:     schema.TypeBool,
+										Optional: true,
+										//Computed: true,
+									},
+									"http_referer": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_referer": {
+									"http_reply": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_reply": {
+									"http_set_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpset_cookie": {
+									"http_uri": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_uri": {
-										Type:     schema.TypeBool,
-										Optional: true,
-										Computed: true,
-									},
-									"ifile": {
+									"ifile": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"insert": {
+									"insert": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"internal_virtual": {
+									"internal_virtual": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"ip_address": {
+									"ip_address": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"key": {
+									"key": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"l7dos": {
+									"l7dos": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"length": {
+									"length": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"location": {
+									"location": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"log": {
+									"log": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ltm_policy": {
+									"ltm_policy": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"member": {
+									"member": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"message": {
+									"message": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"tm_name": {
+									"tm_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"netmask": {
+									"netmask": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"nexthop": {
+									"nexthop": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"node": {
+									"node": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"offset": {
+									"offset": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"path": {
+									"path": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"pem": {
+									"pem": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"persist": {
+									"persist": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"pin": {
+									"pin": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"policy": {
+									"policy": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"pool": {
+									"pool": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"port": {
+									"port": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"priority": {
+									"priority": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"profile": {
+									"profile": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"protocol": {
+									"protocol": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"query_string": {
+									"query_string": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"rateclass": {
+									"rateclass": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"redirect": {
+									"redirect": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"remove": {
+									"remove": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"replace": {
+									"replace": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"request": {
+									"request": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"request_adapt": {
+									"request_adapt": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"reset": {
+									"reset": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"response": {
+									"response": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"response_adapt": {
+									"response_adapt": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"scheme": {
+									"scheme": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"script": {
+									"script": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"select": {
+									"select": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"server_ssl": {
+									"server_ssl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"set_variable": {
+									"set_variable": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"snat": {
+									"snat": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"snatpool": {
+									"snatpool": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"source_address": {
+									"source_address": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_clienthello": {
+									"ssl_client_hello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_server_handshake": {
+									"ssl_server_handshake": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_serverhello": {
+									"ssl_server_hello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_session_id": {
+									"ssl_session_id": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"status": {
+									"status": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"tcl": {
+									"tcl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"tcp_nagle": {
+									"tcp_nagle": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"text": {
+									"text": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"timeout": {
+									"timeout": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"uie": {
+									"uie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"universal": {
+									"universal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"value": {
+									"value": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"virtual": {
+									"virtual": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"vlan": {
+									"vlan": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"vlan_id": {
+									"vlan_id": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"wam": {
+									"wam": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"write": {
+									"write": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -587,458 +586,458 @@ func resourceBigipLtmPolicy() *schema.Resource {
 								},
 							},
 						},
-						"condition": {
+						"condition": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"address": {
+									"address": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"all": {
+									"all": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"app_service": {
+									"app_service": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"browser_type": {
+									"browser_type": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"browser_version": {
+									"browser_version": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"case_insensitive": {
+									"case_insensitive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"case_sensitive": {
+									"case_sensitive": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cipher": {
+									"cipher": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cipher_bits": {
+									"cipher_bits": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"client_ssl": {
+									"client_ssl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"code": {
+									"code": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"common_name": {
+									"common_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"contains": {
+									"contains": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"continent": {
+									"continent": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"country_code": {
+									"country_code": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"country_name": {
+									"country_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"cpu_usage": {
+									"cpu_usage": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"device_make": {
+									"device_make": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"device_model": {
+									"device_model": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"domain": {
+									"domain": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ends_with": {
+									"ends_with": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"equals": {
+									"equals": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"expiry": {
+									"expiry": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"extension": {
+									"extension": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"external": {
+									"external": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"geoip": {
+									"geoip": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"greater": {
+									"greater": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"greateror_equal": {
+									"greater_or_equal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"host": {
+									"host": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_basicauth": {
+									"http_basic_auth": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_cookie": {
+									"http_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_header": {
+									"http_header": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_host": {
+									"http_host": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_method": {
+									"http_method": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_referer": {
+									"http_referer": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"httpset_cookie": {
+									"http_set_cookie": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_status": {
+									"http_status": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_uri": {
+									"http_uri": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_user_agent": {
+									"http_user_agent": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"http_version": {
+									"http_version": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"index": {
+									"index": &schema.Schema{
 										Type:     schema.TypeInt,
 										Optional: true,
 										Computed: true,
 									},
-									"internal": {
+									"internal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"isp": {
+									"isp": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"last_15secs": {
+									"last_15secs": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"last_1min": {
+									"last_1min": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"last_5mins": {
+									"last_5mins": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"less": {
+									"less": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"less_or_equal": {
+									"less_or_equal": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"local": {
+									"local": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"major": {
+									"major": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"matches": {
+									"matches": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"minor": {
+									"minor": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"missing": {
+									"missing": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"mss": {
+									"mss": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"tm_name": {
+									"tm_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 										Computed: true,
 									},
-									"not": {
+									"not": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"org": {
+									"org": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"password": {
+									"password": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"path": {
+									"path": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"path_segment": {
+									"path_segment": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"port": {
+									"port": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"present": {
+									"present": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"protocol": {
+									"protocol": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"query_parameter": {
+									"query_parameter": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"query_string": {
+									"query_string": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"region_code": {
+									"region_code": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"region_name": {
+									"region_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"remote": {
+									"remote": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"request": {
+									"request": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"response": {
+									"response": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"route_domain": {
+									"route_domain": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"rtt": {
+									"rtt": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"scheme": {
+									"scheme": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"server_name": {
+									"server_name": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_cert": {
+									"ssl_cert": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_clienthello": {
+									"ssl_client_hello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_extension": {
+									"ssl_extension": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_server_handshake": {
+									"ssl_server_handshake": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"ssl_serverhello": {
+									"ssl_server_hello": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"starts_with": {
+									"starts_with": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"tcp": {
+									"tcp": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"text": {
+									"text": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"unnamed_queryparameter": {
+									"unnamed_query_parameter": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"user_agent_token": {
+									"user_agent_token": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"username": {
+									"username": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"value": {
+									"value": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"values": {
+									"values": &schema.Schema{
 										Type:     schema.TypeList,
 										Optional: true,
 										Computed: true,
 										Elem:     &schema.Schema{Type: schema.TypeString},
 									},
-									"version": {
+									"version": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"vlan": {
+									"vlan": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 									},
-									"vlan_id": {
+									"vlan_id": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
@@ -1117,7 +1116,6 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	p.Strategy = d.Get("strategy").(string)
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
-
 	ruleCount := d.Get("rule.#").(int)
 	p.Rules = make([]bigip.PolicyRule, 0, ruleCount)
 	for i := 0; i < ruleCount; i++ {
@@ -1150,11 +1148,12 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 	d.Set("strategy", p.Strategy)
 	d.Set("controls", makeStringSet(&p.Controls))
 	d.Set("requires", makeStringSet(&p.Requires))
+	log.Println(" after policy in rule loop *****************")
 
 	for i, r := range p.Rules {
 		rule := fmt.Sprintf("rule.%d", i)
 		d.Set(fmt.Sprintf("%s.name", rule), r.FullPath)
-
+		log.Println(" after policy in rule loop *****************")
 		for x, a := range r.Actions {
 			action := fmt.Sprintf("%s.action.%d", rule, x)
 			interfaceToResourceData(a, d, action)
