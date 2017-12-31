@@ -80,18 +80,18 @@ func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) error {
-	/*client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
 	log.Println("[INFO] Fetching Snatpoollist " + name)
 
-	Snatpool, err := client.GetSnatpool(name)
+	snatpool, err := client.GetSnatpool(name)
 	if err != nil {
 		return err
 	}
-	//d.Set("origins", Snatpool.Origins)
-	d.Set("name", name) */
+	d.Set("name", name)
+	d.Set("partition", snatpool.Partition)
 	return nil
 
 }

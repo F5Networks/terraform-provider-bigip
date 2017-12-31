@@ -1366,13 +1366,13 @@ func (b *BigIP) AddSnatPool(config *SnatPool) error {
 // GetSnatPool retrieves a SnatPool by name. Returns nil if the snatpool does not exist
 func (b *BigIP) GetSnatPool(name string) (*SnatPool, error) {
 	var snatPool SnatPool
-	err, ok := b.getForEntity(&snatPool, uriLtm, uriSnatPool, name)
+	err, _ := b.getForEntity(&snatPool, uriLtm, uriSnatPool, name)
 	if err != nil {
 		return nil, err
 	}
-	if !ok {
-		return nil, nil
-	}
+	//if !ok {
+	//	return nil, nil
+	//}
 
 	return &snatPool, nil
 }
