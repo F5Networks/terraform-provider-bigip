@@ -133,19 +133,27 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	log.Println("[INFO] Reading Devicegroup " + name)
 
 	p, err := client.Devicegroups(name)
-
 	if err != nil {
 		return err
 	}
 	d.Set("name", p.Name)
 
-	return nil
+		return nil
 
 }
 
 func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
+	deviceCount := d.Get("device.#").(int)
+	for i := 0; i < deviceCount; i++ {
+		var r bigip.Devicerecord
+		prefix := fmt.Sprintf("device.%d", i)
+		r.Name = d.Get(prefix + ".name").(string)
+   Rname := r.Name
+	 log.Println(" my rname is  ", Rname)
+	 client.DeleteDevicegroupDevices(name, Rname)
+	}
 	return client.DeleteDevicegroup(name)
 }
 

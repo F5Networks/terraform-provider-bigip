@@ -82,7 +82,7 @@ type devicegroupDTO struct {
 	IncrementalConfigSyncSizeMax int    `json:"incrementalConfigSyncSizeMax,omitempty"`
 	Deviceb                      struct {
 		Items []Devicerecord `json:"items,omitempty"`
-	} `json:"deviceReference,omitempty"`
+	} `json:"devicesReference,omitempty"`
 }
 
 type Devicerecords struct {
@@ -138,6 +138,7 @@ const (
 	uriMgmt          = "mgmt"
 	uriCm            = "cm"
 	uriDiv           = "device"
+	uriDevices       = "devices"
 	uriDG            = "device-group"
 	uriLins          = "licensing"
 	uriPoo           = "pool"
@@ -294,4 +295,8 @@ func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 */
 func (b *BigIP) DeleteDevicegroup(name string) error {
 	return b.delete(uriCm, uriDG, name)
+}
+
+func (b *BigIP) DeleteDevicegroupDevices(name, rname string) error {
+	return b.delete(uriCm, uriDG, name, uriDevices, rname)
 }
