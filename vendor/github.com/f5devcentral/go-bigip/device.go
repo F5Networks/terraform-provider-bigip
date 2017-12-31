@@ -59,14 +59,77 @@ type Devicegroups struct {
 }
 
 type Devicegroup struct {
-	AutoSync       string `json:"autoSync,omitempty"`
-	Name           string `json:"name,omitempty"`
-	Description           string `json:"description,omitempty"`
-	Type           string `json:"type,omitempty"`
-	FullLoadOnSync string `json:"fullLoadOnSync,omitempty"`
-  SaveOnAutoSync string `json:"saveOnAutoSync,omitempty"`
-	NetworkFailover string `json:"networkFailover,omitempty"`
-	IncrementalConfigSyncSizeMax int `json:"incrementalConfigSyncSizeMax,omitempty"`
+	AutoSync                     string
+	Name                         string
+	Partition                    string
+	Description                  string
+	Type                         string
+	FullLoadOnSync               string
+	SaveOnAutoSync               string
+	NetworkFailover              string
+	IncrementalConfigSyncSizeMax int
+	Deviceb                      []Devicerecord
+}
+type devicegroupDTO struct {
+	AutoSync                     string `json:"autoSync,omitempty"`
+	Name                         string `json:"name,omitempty"`
+	Partition                    string `json:"partition,omitempty"`
+	Description                  string `json:"description,omitempty"`
+	Type                         string `json:"type,omitempty"`
+	FullLoadOnSync               string `json:"fullLoadOnSync,omitempty"`
+	SaveOnAutoSync               string `json:"saveOnAutoSync,omitempty"`
+	NetworkFailover              string `json:"networkFailover,omitempty"`
+	IncrementalConfigSyncSizeMax int    `json:"incrementalConfigSyncSizeMax,omitempty"`
+	Deviceb                      struct {
+		Items []Devicerecord `json:"items,omitempty"`
+	} `json:"deviceReference,omitempty"`
+}
+
+type Devicerecords struct {
+	Items []Originsrecord `json:"items,omitempty"`
+}
+
+type Devicerecord struct {
+	SetSyncLeader bool   `json:"setSyncLeader"`
+	Name          string `json:"name"`
+}
+
+func (p *Devicegroup) MarshalJSON() ([]byte, error) {
+	return json.Marshal(devicegroupDTO{
+		Name:                         p.Name,
+		Partition:                    p.Partition,
+		AutoSync:                     p.AutoSync,
+		Description:                  p.Description,
+		Type:                         p.Type,
+		FullLoadOnSync:               p.FullLoadOnSync,
+		SaveOnAutoSync:               p.SaveOnAutoSync,
+		NetworkFailover:              p.NetworkFailover,
+		IncrementalConfigSyncSizeMax: p.IncrementalConfigSyncSizeMax,
+		Deviceb: struct {
+			Items []Devicerecord `json:"items,omitempty"`
+		}{Items: p.Deviceb},
+	})
+}
+
+func (p *Devicegroup) UnmarshalJSON(b []byte) error {
+	var dto devicegroupDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+
+	p.Name = dto.Name
+	p.Partition = dto.Partition
+	p.AutoSync = dto.AutoSync
+	p.Description = dto.Description
+	p.Type = dto.Type
+	p.FullLoadOnSync = dto.FullLoadOnSync
+	p.SaveOnAutoSync = dto.SaveOnAutoSync
+	p.NetworkFailover = dto.NetworkFailover
+	p.IncrementalConfigSyncSizeMax = dto.IncrementalConfigSyncSizeMax
+	p.Deviceb = dto.Deviceb.Items
+
+	return nil
 }
 
 // https://10.192.74.80/mgmt/cm/device/licensing/pool/purchased-pool/licenses
@@ -196,21 +259,14 @@ func (b *BigIP) Devices(name string) (*Device, error) {
 	return &device, nil
 }
 
-func (b *BigIP) CreateDevicegroup(name, description, autoSync, typo, fullLoadOnSync, saveOnAutoSync, networkFailover string, incrementalConfigSyncSizeMax int) error {
-	config := &Devicegroup{
-		Name:           name,
-		Description:    description,
-		AutoSync:       autoSync,
-		Type:           typo,
-		FullLoadOnSync: fullLoadOnSync,
-		SaveOnAutoSync: saveOnAutoSync,
-		NetworkFailover: networkFailover,
-		IncrementalConfigSyncSizeMax: incrementalConfigSyncSizeMax,
-	}
-	log.Println("I am here &v ", config)
-	return b.post(config, uriCm, uriDG)
+func (b *BigIP) CreateDevicegroup(p *Devicegroup) error {
+	log.Println(" what is the complete payload    ", p)
+	return b.post(p, uriCm, uriDG)
 }
 
+func (b *BigIP) UpdateDevicegroup(name string, p *Devicegroup) error {
+	return b.put(p, uriCm, uriDG, name)
+}
 func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
 	return b.put(config, uriCm, uriDG)
 }

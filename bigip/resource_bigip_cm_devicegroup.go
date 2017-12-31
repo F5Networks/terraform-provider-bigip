@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"log"
-
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipCmDevicegroup() *schema.Resource {
@@ -20,6 +20,12 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 
 			"name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
+			},
+
+			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
@@ -69,36 +75,40 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 				Default:     1024,
 				Description: "BIG-IP password",
 			},
+			"device": {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"set_sync_leader": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Name of origin",
+							//ValidateFunc: validateF5Name,
+						},
+						"name": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Name of origin",
+							//ValidateFunc: validateF5Name,
+						},
+					},
+				},
+			},
 		},
 	}
-
 }
 
 func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
-	autoSync := d.Get("auto_sync").(string)
 	name := d.Get("name").(string)
-	description := d.Get("description").(string)
-	typo := d.Get("type").(string)
-	fullLoadOnSync := d.Get("full_load_on_sync").(string)
-	saveOnAutoSync := d.Get("save_on_auto_sync").(string)
-	networkFailover := d.Get("network_failover").(string)
-	incrementalConfigSyncSizeMax := d.Get("incremental_config").(int)
+	log.Println("[INFO] Creating Device Group" + name)
 
+	p := dataToDevicegroup(name, d)
+	d.SetId(name)
+	err := client.CreateDevicegroup(&p)
 
 	log.Println("[INFO] Creating Devicegroup ")
-
-	err := client.CreateDevicegroup(
-		name,
-		description,
-		autoSync,
-		typo,
-		fullLoadOnSync,
-		saveOnAutoSync,
-		networkFailover,
-		incrementalConfigSyncSizeMax,
-	)
 
 	if err != nil {
 		return err
@@ -109,23 +119,10 @@ func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) 
 
 func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
 	log.Println("[INFO] Updating Devicegroup " + name)
-
-	r := &bigip.Devicegroup{
-		Name:           name,
-		Description:    d.Get("description").(string),
-		AutoSync:       d.Get("auto_sync").(string),
-		Type:           d.Get("type").(string),
-		FullLoadOnSync: d.Get("full_load_on_sync").(string),
-		SaveOnAutoSync: d.Get("save_on_auto_sync").(string),
-		NetworkFailover: d.Get("network_failover").(string),
-		IncrementalConfigSyncSizeMax: d.Get("incremental_config").(int),
-	}
-
-	return client.ModifyDevicegroup(r)
+	p := dataToDevicegroup(name, d)
+	return client.UpdateDevicegroup(name, &p)
 }
 
 func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) error {
@@ -135,20 +132,15 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 	log.Println("[INFO] Reading Devicegroup " + name)
 
-	members, err := client.Devicegroups(name)
+	p, err := client.Devicegroups(name)
+
 	if err != nil {
 		return err
 	}
-log.Println("i am in read @@@@@ @@@@@@@@@@@@@@@@ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   ", members)
-	d.Set("name", members.Name)
-	d.Set("description", members.Description)
-	d.Set("auto_sync", members.AutoSync)
-	d.Set("type", members.Type)
-	d.Set("full_load_on_sync", members.FullLoadOnSync)
-	d.Set("save_on_auto_sync", members.SaveOnAutoSync)
-	d.Set("network_failover", members.NetworkFailover)
-	d.Set("incremental_config", members.IncrementalConfigSyncSizeMax)
-	 return nil
+	d.Set("name", p.Name)
+
+	return nil
+
 }
 
 func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
@@ -159,4 +151,52 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 
 func resourceBigipCmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
+}
+
+func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
+	var p bigip.Devicegroup
+
+	p.Name = name
+	p.Partition = d.Get("partition").(string)
+	p.AutoSync = d.Get("auto_sync").(string)
+	p.Description = d.Get("description").(string)
+	p.Type = d.Get("type").(string)
+	p.FullLoadOnSync = d.Get("full_load_on_sync").(string)
+	p.SaveOnAutoSync = d.Get("save_on_auto_sync").(string)
+	p.NetworkFailover = d.Get("network_failover").(string)
+	p.IncrementalConfigSyncSizeMax = d.Get("incremental_config").(int)
+	deviceCount := d.Get("device.#").(int)
+	p.Deviceb = make([]bigip.Devicerecord, 0, deviceCount)
+	for i := 0; i < deviceCount; i++ {
+		var r bigip.Devicerecord
+		log.Println("I am in dattodevicegroup policy ", p, deviceCount, i)
+		prefix := fmt.Sprintf("device.%d", i)
+		r.Name = d.Get(prefix + ".name").(string)
+		p.Deviceb = append(p.Deviceb, r)
+	}
+
+	log.Println("I am in DatatoDevicegroup value of p                                                   ", p)
+
+	return p
+}
+
+func DevicegroupToData(p *bigip.Devicegroup, d *schema.ResourceData) error {
+	d.Set("name", p.Name)
+	d.Set("partition", p.Partition)
+	d.Set("auto_sync", p.AutoSync)
+	d.Set("description", p.Description)
+	d.Set("type", p.Type)
+	d.Set("full_load_on_sync", p.FullLoadOnSync)
+	d.Set("save_on_auto_sync", p.SaveOnAutoSync)
+	d.Set("network_failover", p.NetworkFailover)
+	d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
+
+	for i, r := range p.Deviceb {
+		device := fmt.Sprintf("device.%d", i)
+
+		d.Set(fmt.Sprintf("%s.name", device), r.Name)
+		d.Set(fmt.Sprintf("%s.set_sync_leader", device), r.SetSyncLeader)
+
+	}
+	return nil
 }
