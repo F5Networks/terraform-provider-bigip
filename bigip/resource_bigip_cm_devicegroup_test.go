@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"testing"
+	"log"
 )
 
 //var TEST_DG_NAME = fmt.Sprintf("/%s/test-devicegroup", TEST_PARTITION)
@@ -105,16 +106,17 @@ func testCheckCmDevicegroupsDestroyed(s *terraform.State) error {
 		if rs.Type != "bigip_cm_devicegroup" {
 			continue
 		}
-
 		name := rs.Primary.ID
 		devicegroup, err := client.Devicegroups(name)
-
+     log.Println("the state file is =================  ", rs.Type)
 		if err != nil {
 			return err
 		}
 		if devicegroup == nil {
 			return fmt.Errorf("devicegroup %s not destroyed.", name)
 		}
+		
+
 	}
 	return nil
 }
