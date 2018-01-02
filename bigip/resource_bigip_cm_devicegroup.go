@@ -131,12 +131,46 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 
 	log.Println("[INFO] Reading Devicegroup " + name)
+	deviceCount := d.Get("device.#").(int)
+	for i := 0; i < deviceCount; i++ {
+		var r bigip.Devicerecord
+		prefix := fmt.Sprintf("device.%d", i)
+		r.Name = d.Get(prefix + ".name").(string)
+	 Rname := r.Name
+	 log.Println(" my rname is  ", Rname)
+	 client.DevicegroupsDevices(name, Rname)
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	p, err := client.Devicegroups(name)
 	if err != nil {
 		return err
 	}
 	d.Set("name", p.Name)
+  d.Set("description", p.Description)
+  d.Set("type", p.Type)
+	d.Set("fullLoadOnSync", p.FullLoadOnSync)
+  d.Set("saveOnAutoSync", p.SaveOnAutoSync)
+	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
+	d.Set("networkFailover", p.NetworkFailover)
+
+
+
 
 		return nil
 
@@ -183,7 +217,6 @@ func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
 		p.Deviceb = append(p.Deviceb, r)
 	}
 
-	log.Println("I am in DatatoDevicegroup value of p                                                   ", p)
 
 	return p
 }

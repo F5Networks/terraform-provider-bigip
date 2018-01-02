@@ -235,11 +235,11 @@ func (b *BigIP) CreateProvision(name string, fullPath string, cpuRatio int, disk
 }
 
 func (b *BigIP) ModifyProvision(config *Provision) error {
-
 	return b.put(config, uriSys, uriProvision, uriAfm)
 }
 
 func (b *BigIP) DeleteProvision(name string) error {
+	// Delete API does not exists for resource Provision
 	return b.delete(uriSys, uriProvision, uriIlx, name)
 }
 

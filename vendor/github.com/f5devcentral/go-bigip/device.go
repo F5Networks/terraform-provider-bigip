@@ -2,7 +2,6 @@ package bigip
 
 import (
 	"encoding/json"
-	"log"
 )
 
 //  LIC contains device license for BIG-IP system.
@@ -230,6 +229,8 @@ func (b *BigIP) LICs() (*LIC, error) {
 	return &members, nil
 }
 
+
+
 func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp string) error {
 	config := &Device{
 		Name:              name,
@@ -261,7 +262,6 @@ func (b *BigIP) Devices(name string) (*Device, error) {
 }
 
 func (b *BigIP) CreateDevicegroup(p *Devicegroup) error {
-	log.Println(" what is the complete payload    ", p)
 	return b.post(p, uriCm, uriDG)
 }
 
@@ -274,8 +274,7 @@ func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
 
 func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 	var devicegroup Devicegroup
-	err, _ := b.getForEntity(&devicegroup, uriCm, uriDiv, name)
-
+	err, _ := b.getForEntity(&devicegroup, uriCm, uriDG, name)
 	if err != nil {
 		return nil, err
 	}
@@ -283,20 +282,21 @@ func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 	return &devicegroup, nil
 }
 
-/* func (b *BigIP) Devicegroups() (*Devicegroup, error) {
-	var devicegroup Devicegroup
-	err, _ := b.getForEntity(&devicegroup, uriCm, uriDG)
 
-	if err != nil {
-		return nil, err
-	}
-	return &devicegroup, nil
-}
-*/
 func (b *BigIP) DeleteDevicegroup(name string) error {
 	return b.delete(uriCm, uriDG, name)
 }
 
 func (b *BigIP) DeleteDevicegroupDevices(name, rname string) error {
 	return b.delete(uriCm, uriDG, name, uriDevices, rname)
+}
+
+func (b *BigIP) DevicegroupsDevices(name, rname string) (*Devicegroup, error) {
+	var devicegroup Devicegroup
+	err, _ := b.getForEntity(&devicegroup, uriCm, uriDG, name, uriDevices, rname)
+	if err != nil {
+		return nil, err
+	}
+
+	return &devicegroup, nil
 }
