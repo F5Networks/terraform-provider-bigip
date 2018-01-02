@@ -2,7 +2,6 @@ package bigip
 
 import (
 	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -22,7 +21,7 @@ func resourceBigipSysProvision() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the module to be provisioned",
-				ValidateFunc: validateF5Name,
+				//ValidateFunc: validateF5Name,
 			},
 
 			"full_path": {
@@ -63,7 +62,7 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	fullPath := d.Get("full_path").(string)
+	FullPath := d.Get("full_path").(string)
 	cpuRatio := d.Get("cpu_ratio").(int)
 	diskRatio := d.Get("disk_ratio").(int)
 	level := d.Get("level").(string)
@@ -73,7 +72,7 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.CreateProvision(
 		name,
-		fullPath,
+		FullPath,
 		cpuRatio,
 		diskRatio,
 		level,
@@ -84,7 +83,7 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipSysProvisionRead(d, meta)
 }
 
 func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -111,22 +110,20 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 
 	name := d.Id()
 
-	log.Println("[INFO] Reading Provision " + name)
+	log.Println("[INFO] Reading Provisions " + name)
 
-	provision, err := client.Provisions()
+	p, err := client.Provisions(name)
 	if err != nil {
 		return err
 	}
+	//d.Set("name", p.Name)
+	d.Set("full_path", p.FullPath)
+	 p.Name = name
+	log.Println("[INFO] Reading name after reading ****************** ", p)
 
-	d.Set("name", provision.Name)
-	d.Set("full_path", provision.FullPath)
-	d.Set("cpu_ratio", provision.CpuRatio)
-	d.Set("disk_ratio", provision.DiskRatio)
-	d.Set("level", provision.Level)
-	d.Set("memory_ratio", provision.MemoryRatio)
-
-	return nil
+return nil
 }
+
 
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
 
