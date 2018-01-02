@@ -189,7 +189,7 @@ func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots
 func (b *BigIP) ModifyDNS(config *DNS) error {
 	return b.put(config, uriSys, uriDNS)
 }
-
+// DNS & NTP resource does not support Delete API
 func (b *BigIP) DNSs() (*DNS, error) {
 	var dns DNS
 	err, _ := b.getForEntity(&dns, uriSys, uriDNS)
