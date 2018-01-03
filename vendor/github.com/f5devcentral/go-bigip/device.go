@@ -85,7 +85,7 @@ type devicegroupDTO struct {
 }
 
 type Devicerecords struct {
-	Items []Originsrecord `json:"items,omitempty"`
+	Items []Devicerecord `json:"items,omitempty"`
 }
 
 type Devicerecord struct {

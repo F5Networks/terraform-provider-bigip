@@ -17,7 +17,7 @@ This provider uses the iControlREST API. Make sure that is installed and enabled
  - Copy somewhere on your path, or update `.terraformrc` in your home directory like so:
 ```
 providers {
-	bigip = "/path/to/terraform-provider-bigip"
+	bigip = "/path/to/terraform-provider-bigip/bigip/provider.go"
 }
 ```
 

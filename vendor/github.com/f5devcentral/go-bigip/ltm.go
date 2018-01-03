@@ -168,6 +168,12 @@ type DataGroup struct {
 	Records    []DataGroupRecord
 }
 
+type DataGroupRecords struct {
+	Items []DataGroupRecord `json:"items,omitempty"`
+
+}
+
+
 type DataGroupRecord struct {
 	Name string `json:"name,omitempty"`
 	Data string `json:"data,omitempty"`
@@ -179,13 +185,22 @@ type dataGroupDTO struct {
 	FullPath   string            `json:"fullPath,omitempty"`
 	Generation int               `json:"generation,omitempty"`
 	Type       string            `json:"type,omitempty"`
-	Records    []DataGroupRecord `json:"records,omitempty"`
+	Records    struct {
+		Items []DataGroupRecord `json:"items,omitempty"`
+	} `json:"recordsReference,omitempty"`
 }
 
 func (p *DataGroup) MarshalJSON() ([]byte, error) {
-	var dto dataGroupDTO
-	marshal(&dto, p)
-	return json.Marshal(dto)
+	return json.Marshal(dataGroupDTO{
+		Name:                         p.Name,
+		Partition:                    p.Partition,
+		FullPath:                     p.FullPath,
+		Generation:                   p.Generation,
+		Type:                         p.Type,
+		Records: struct {
+			Items []DataGroupRecord `json:"items,omitempty"`
+		}{Items: p.Records},
+	})
 }
 
 func (p *DataGroup) UnmarshalJSON(b []byte) error {
@@ -194,8 +209,16 @@ func (p *DataGroup) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	return marshal(p, &dto)
+
+	p.Name = dto.Name
+	p.Partition = dto.Partition
+	p.Type = dto.Type
+	p.FullPath = dto.FullPath
+	p.Generation = dto.Generation
+	p.Records = dto.Records.Items
+	return nil
 }
+
 
 // SnatPools contains a list of every snatpool on the BIG-IP system.
 type SnatPools struct {
