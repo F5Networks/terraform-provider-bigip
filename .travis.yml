@@ -20,13 +20,12 @@ after_success:
 
 deploy:
   provider: releases
-  api_key:
-    secure:
-      "oSQ3rmjQURBEm6TkXLh4w3a7pm2W3Znkf5cUmJ/lz3ZzJ1RfXyYCPH15hgPLHFBxgLuYm5+cA+y3GsNZlRbQdSGJIiFM8JMpE8HI3dVzyMs+EN3KxWJpJEXShq2xAVPg6V5oKqA0s1gJm0c+i+t8ZM5f4BNVVob2tgv7604ofA8mmtWriBeh+0GVsPXLGC21xLHFdEHip+xkptKJ0RVnLTSmkggYdnP5RftYCe3R4/Z8p9TNPa9E790FymreEwgKjYeEI8+lqxUnz6Ehr90EDQcL4G4nvn+4N3G4oTtT6u/0DWNeAnCuBR50nLgd3MGA2a05anq+inOvLKohdgb8okvHWbZuJt/l7TeO0TH5+5x9uM+5NxZSldh8JPxlsZYPKVgjrILEAp9cjtdhY/UQ2iZhSHZ63VybDez1v9ZN0qolsMvhaXRWsYL+mZswWN35RInOlRzLGsJs34CFOkeFdbIoAMN8xt8hSNMm1MNw758MquA9RiM+DpmWMOsYXk2PpYToaC+X8ZFJ6DeJDF4PVuZWI1L2qqKdL4pONy/aO+w7XDVpJPCdxrW670HQ1NNdV9IueAgUzd/Xz/icBzzOupPREmOU0k+xOK6cXP2d/QfVZGS+lV0W5Mg2rIsFoyC1GTEofPDEpEsEimCegKZ8yY1HqH80ydunGQw9ScDkmDs="
+  api_key: "GITHUB OAUTH TOKEN"
+  skip_cleanup: true
   file_glob: true
   file: target/pkg/*.tar.gz
   on:
     tags: true
 env:
   global:
-    secure: hEAB2nV1hOPAh3mxj3MlwJ6EVSf4M+QbiljYwafp+uINQbveYhexCWK9me92hpjzvWprd9zts0As8DGeI+V0GcKCWO9JgGwCLGoYZF9xT7QWrH4xg7XlSMuQkQ2xAQFJSmPUiRd7d/9iGTiD1mbeQtO9WgKm8+mnwrizGx5dwd8dY/e/CXiEBYef07/DX0n2boz3LUfHwa0GZvBNZ16hf9T7U09zxd0MaKbZlxFJCShv/Zen1QU/w71GvCpZfl0EeShazQDfnr4lVATiQKF7TFA0KRPCXx3EvsUTg3yJS/Zdclp9H5g4/LybpCFAvTkmZYp7UUDVd98cNmDVhhCPpFX+LvpZf0+1gfEcLeFquTK7/rorvNTACNW94pFxGRu1IrA88OXZ8NrKuQ13hTpYZolG1ZURdTT1VmmXhKNeEHyZBthP5xY7jeQ2BkTqfddT/I1D69/SnFKShEtquVUUmCCP6uDeZeb++pCEIkn5cNselYKVlbIZ/lSsqL003oBeBYIZg1xsvO9U1hLIJRMxWL4wIr6RjOy71CwHj78uQSY5fIcDBqwrKWtnhvEAcXZBZqAtdviEGj1OiN7AMPzffqFjfUDtVaz2nDk9l1RMj183hDRlFKww61hNUa3s3VALofz+DWAxYJXxQ9Cbhnhl/pY2bqb6AP39t/WqFGypTm4=
+    
