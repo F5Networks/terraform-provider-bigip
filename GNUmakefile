@@ -11,7 +11,7 @@ BIGIP_HOST := 10.192.74.73
 export BIGIP_HOST
 BIGIP_USER := admin
 export BIGIP_USER
-BIGIP_PASSWORD := admin
+BIGIP_PASSWORD := cisco123
 export BIGIP_PASSWORD
 OUT_DIR = target
 BIN_DIR = $(OUT_DIR)/bin
