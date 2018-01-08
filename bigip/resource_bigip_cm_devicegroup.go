@@ -77,7 +77,7 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 			},
 			"device": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"set_sync_leader": {
@@ -140,21 +140,6 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	 log.Println(" my rname is  ", Rname)
 	 client.DevicegroupsDevices(name, Rname)
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	p, err := client.Devicegroups(name)

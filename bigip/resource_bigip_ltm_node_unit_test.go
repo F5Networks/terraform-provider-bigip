@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"regexp"
 	"testing"
+	"log"
 )
 
 func testBigipLtmNodeInvalid(resourceName string) string {
@@ -61,6 +62,7 @@ func TestBigipLtmNodeCreate(t *testing.T) {
 	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println(r)
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		log.Println(" value of t  ")
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		fmt.Fprintf(w, `{
 }`)

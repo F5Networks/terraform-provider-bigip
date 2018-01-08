@@ -11,16 +11,6 @@ A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently avail
 
 This provider uses the iControlREST API. Make sure that is installed and enabled on your F5 before proceeding.
 
-# Installation
-
- - Download the latest [release](https://github.com/f5devcentral/terraform-provider-bigip/releases) for your platform.
- - Copy somewhere on your path, or update `.terraformrc` in your home directory like so:
-```
-providers {
-	bigip = "/path/to/terraform-provider-bigip"
-}
-```
-
 # Provider Configuration
 
 ### Example
