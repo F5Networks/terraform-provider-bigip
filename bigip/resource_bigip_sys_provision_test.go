@@ -2,10 +2,10 @@ package bigip
 
 import (
 	"fmt"
-	"testing"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"testing"
 )
 
 //var TEST_PROVISION_NAME = fmt.Sprintf("/%s/test-provision", TEST_PARTITION)
@@ -27,7 +27,7 @@ func TestBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		Providers:    testAccProviders,
 		CheckDestroy: testCheckProvisionsDestroyed,
 		Steps: []resource.TestStep{
 			{
@@ -40,7 +40,6 @@ func TestBigipSysProvision_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "level", "nominal"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "memory_ratio", "0"),
-
 				),
 			},
 		},

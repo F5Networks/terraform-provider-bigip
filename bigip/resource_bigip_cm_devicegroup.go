@@ -77,7 +77,7 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 			},
 			"device": {
 				Type:     schema.TypeList,
-				Optional:    true,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"set_sync_leader": {
@@ -136,28 +136,24 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 		var r bigip.Devicerecord
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
-	 Rname := r.Name
-	 log.Println(" my rname is  ", Rname)
-	 client.DevicegroupsDevices(name, Rname)
+		Rname := r.Name
+		log.Println(" my rname is  ", Rname)
+		client.DevicegroupsDevices(name, Rname)
 	}
-
 
 	p, err := client.Devicegroups(name)
 	if err != nil {
 		return err
 	}
 	d.Set("name", p.Name)
-  d.Set("description", p.Description)
-  d.Set("type", p.Type)
+	d.Set("description", p.Description)
+	d.Set("type", p.Type)
 	d.Set("fullLoadOnSync", p.FullLoadOnSync)
-  d.Set("saveOnAutoSync", p.SaveOnAutoSync)
+	d.Set("saveOnAutoSync", p.SaveOnAutoSync)
 	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
 	d.Set("networkFailover", p.NetworkFailover)
 
-
-
-
-		return nil
+	return nil
 
 }
 
@@ -169,9 +165,9 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		var r bigip.Devicerecord
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
-   Rname := r.Name
-	 log.Println(" my rname is  ", Rname)
-	 client.DeleteDevicegroupDevices(name, Rname)
+		Rname := r.Name
+		log.Println(" my rname is  ", Rname)
+		client.DeleteDevicegroupDevices(name, Rname)
 	}
 	return client.DeleteDevicegroup(name)
 }
@@ -201,7 +197,6 @@ func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
 		r.Name = d.Get(prefix + ".name").(string)
 		p.Deviceb = append(p.Deviceb, r)
 	}
-
 
 	return p
 }

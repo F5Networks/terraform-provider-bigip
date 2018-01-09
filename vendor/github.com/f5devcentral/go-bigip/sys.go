@@ -1,9 +1,10 @@
 package bigip
 
-import  (
+import (
 	"encoding/json"
-"log"
+	"log"
 )
+
 type NTPs struct {
 	NTPs []NTP `json:"items"`
 }
@@ -189,6 +190,7 @@ func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots
 func (b *BigIP) ModifyDNS(config *DNS) error {
 	return b.put(config, uriSys, uriDNS)
 }
+
 // DNS & NTP resource does not support Delete API
 func (b *BigIP) DNSs() (*DNS, error) {
 	var dns DNS
@@ -245,52 +247,52 @@ func (b *BigIP) DeleteProvision(name string) error {
 
 func (b *BigIP) Provisions(name string) (*Provision, error) {
 	var provision Provision
-if name == "afm" {
-	err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAfm)
+	if name == "afm" {
+		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAfm)
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
-}
-if name == "asm" {
-	err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAsm)
+	if name == "asm" {
+		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAsm)
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
-}
 	if name == "gtm" {
 		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriGtm)
 
 		if err != nil {
 			return nil, err
 		}
-}
-		if name == "apm" {
-			err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriApm)
+	}
+	if name == "apm" {
+		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriApm)
 
-			if err != nil {
-				return nil, err
-			}
+		if err != nil {
+			return nil, err
 		}
-			if name == "avr" {
-				err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAvr)
+	}
+	if name == "avr" {
+		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriAvr)
 
-				if err != nil {
-					return nil, err
-				}
+		if err != nil {
+			return nil, err
+		}
 
-			}
-				if name == "ilx" {
-					err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriIlx)
+	}
+	if name == "ilx" {
+		err, _ := b.getForEntity(&provision, uriSys, uriProvision, uriIlx)
 
-					if err != nil {
-						return nil, err
-					}
+		if err != nil {
+			return nil, err
+		}
 
-}
+	}
 
-  log.Println("Display ****************** provision  ", provision)
+	log.Println("Display ****************** provision  ", provision)
 	return &provision, nil
 }
 

@@ -229,8 +229,6 @@ func (b *BigIP) LICs() (*LIC, error) {
 	return &members, nil
 }
 
-
-
 func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp string) error {
 	config := &Device{
 		Name:              name,
@@ -281,7 +279,6 @@ func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 
 	return &devicegroup, nil
 }
-
 
 func (b *BigIP) DeleteDevicegroup(name string) error {
 	return b.delete(uriCm, uriDG, name)

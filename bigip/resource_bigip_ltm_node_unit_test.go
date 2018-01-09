@@ -5,11 +5,11 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/stretchr/testify/assert"
 	//"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
-	"log"
 )
 
 func testBigipLtmNodeInvalid(resourceName string) string {

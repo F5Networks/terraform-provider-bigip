@@ -1,9 +1,9 @@
 package bigip
 
 import (
-	"log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
@@ -18,9 +18,9 @@ func resourceBigipSysProvision() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the module to be provisioned",
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the module to be provisioned",
 				//ValidateFunc: validateF5Name,
 			},
 
@@ -118,12 +118,11 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	}
 	//d.Set("name", p.Name)
 	d.Set("full_path", p.FullPath)
-	 p.Name = name
+	p.Name = name
 	log.Println("[INFO] Reading name after reading ****************** ", p)
 
-return nil
+	return nil
 }
-
 
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
 
