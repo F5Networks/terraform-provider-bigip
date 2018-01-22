@@ -12,7 +12,15 @@ import (
 //var TEST_DG_NAME = fmt.Sprintf("/%s/test-devicegroup", TEST_PARTITION)
 var TEST_DG_NAME = "test-devicegroup"
 
-var TEST_DG_RESOURCE = `
+var TEST_DG_RESOURCE =  `
+
+resource "bigip_cm_device" "test-device"
+        {
+            name = "` + TEST_DEVICE_NAME + `"
+            configsync_ip = "2.2.2.2"
+            mirror_ip = "10.10.10.10"
+            mirror_secondary_ip = "11.11.11.11"
+        }
 resource "bigip_cm_devicegroup" "test-devicegroup"
         {
             name = "` + TEST_DG_NAME + `"
@@ -24,7 +32,8 @@ resource "bigip_cm_devicegroup" "test-devicegroup"
 						save_on_auto_sync = "false"
 						network_failover = "enabled"
 						incremental_config = 1024
-						device = { name = "bigip1.cisco.com" }
+						device = { name = "/Common/test-device"}
+						depends_on = ["bigip_cm_device.test-device"]
         }
 `
 
@@ -49,7 +58,7 @@ func TestBigipCmDevicegroup_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "save_on_auto_sync", "false"),
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "network_failover", "enabled"),
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "incremental_config", "1024"),
-					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "device.0.name", "bigip1.cisco.com"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup",  "device.0.name", "/Common/test-device"),
 				),
 			},
 		},
