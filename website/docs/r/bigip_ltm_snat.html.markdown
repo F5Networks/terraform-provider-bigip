@@ -31,8 +31,18 @@ resource "bigip_ltm_snat" "snat3" {
 
 * `name` - (Required) Name of the snat
 
+* `partition` - (Optional) Displays the administrative partition within which this profile resides
+
 * `origins` - (Optional) IP or hostname of the snat
 
 * `snatpool` - (Optional) Specifies the name of a SNAT pool. You can only use this option when automap and translation are not used.
 
 * `mirror` - (Optional) Enables or disables mirroring of SNAT connections.
+
+* `autolasthop` -(Optional) Specifies whether to automatically map last hop for pools or not. The default is to use next level's default.
+
+* `sourceport` - (Optional) Specifies whether the system preserves the source port of the connection. The default is preserve. Use of the preserve-strict setting should be restricted to UDP only under very special circumstances such as nPath or transparent (that is, no translation of any other L3/L4 field), where there is a 1:1 relationship between virtual IP addresses and node addresses, or when clustered multi-processing (CMP) is disabled. The change setting is useful for obfuscating internal network addresses.
+
+* `translation` - (Optional) Specifies the name of a translated IP address. Note that translated addresses are outside the traffic management system. You can only use this option when automap and snatpool are not used.
+
+* `vlansdisabled` - (Optional) Disables the SNAT on all VLANs.

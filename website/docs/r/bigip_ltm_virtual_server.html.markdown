@@ -37,13 +37,12 @@ resource "bigip_ltm_virtual_server" "https" {
 }
 
 # A Virtual server with separate client and server profiles
-resource "bigip_ltm_virtual_server" "https" {
+ resource "bigip_ltm_virtual_server" "https" {
   name = "/Common/terraform_vs_https"
-  destination = "${var.vip_ip}"
+  destination = "10.255.255.254"
   port = 443
-  pool = "${var.pool}"
-  client_profiles = ["/Common/tcp"]
-  server_profiles = ["/Common/tcp-lan-optimized"]
+  client_profiles = ["/Common/clientssl"]
+  server_profiles = ["/Common/serverssl"]
   source_address_translation = "automap"
 }
 
@@ -76,3 +75,12 @@ resource "bigip_ltm_virtual_server" "https" {
 * `client_profiles` - (Optional) List of client context profiles associated on the virtual server. Not mutually exclusive with profiles and server_profiles
 
 * `server_profiles` - (Optional) List of server context profiles associated on the virtual server. Not mutually exclusive with profiles and client_profiles
+
+* `source` -  (Optional) Specifies an IP address or network from which the virtual server will accept traffic.
+
+* `rules` - (Optional) The iRules you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
+
+* `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs. DEPRECATED - see Virtual Server Property Groups source-address-translation
+
+* `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs. See vlans-disabled and vlans-enabled.
+

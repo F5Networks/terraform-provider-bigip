@@ -38,3 +38,7 @@ description = "/Common/NTP1"
 * `/Common/NTP1` - Is the description of the NTP server in the main or common partition of BIG-IP.
 
 * `time.facebook.com` - Is the  NTP server configured on the BIG-IP.
+
+* `servers` - (Optional) Adds NTP servers to or deletes NTP servers from the BIG-IP system.
+
+* `timezone` - (Optional) Specifies the time zone that you want to use for the system time.

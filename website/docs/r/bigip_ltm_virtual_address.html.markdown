@@ -18,8 +18,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_virtual_address" "vs_va" {
-
-    name = "/Common/${bigip_ltm_virtual_server.vs.destination}"
+    name = "/Common/vs_va"
     advertize_route = true
 }
 
