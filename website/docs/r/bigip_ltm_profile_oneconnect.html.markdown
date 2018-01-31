@@ -36,9 +36,13 @@ resource "bigip_ltm_profile_oneconnect" "oneconnect-sanjose"
 
 * `name` (Required) Name of the profile_oneconnect
 
-* `defaults_from` - (Required) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `partition` - (Optional) Displays the administrative partition within which this profile resides
+
+* `defaults_from` - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
 * `idle_timeout_override` - (Optional) Specifies the number of seconds that a connection is idle before the connection flow is eligible for deletion. Possible values are disabled, indefinite, or a numeric value that you specify. The default value is disabled.
+
+* `share_pools` - (Optional) Specify if you want to share the pool, default value is "disabled"
 
 * `max_age` - (Optional) Specifies the maximum age in number of seconds allowed for a connection in the connection reuse pool. For any connection with an age higher than this value, the system removes that connection from the reuse pool. The default value is 86400.
 

@@ -34,6 +34,11 @@ resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile"
 
 * `name` (Required) Name of the profile_tcp
 
+* `partition` - (Optional) Displays the administrative partition within which this profile resides
+
+* `defaults_from` - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+
+
 * `idle_timeout` - (Optional) Specifies the number of seconds that a connection is idle before the connection is eligible for deletion. The default value is 300 seconds.
 
 * `close_wait_timeout` - (Optional) Specifies the number of seconds that a connection remains in a LAST-ACK state before quitting. A value of 0 represents a term of forever (or until the maxrtx of the FIN state). The default value is 5 seconds.

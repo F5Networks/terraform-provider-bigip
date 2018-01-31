@@ -9,7 +9,7 @@ A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently avail
 
 # F5 Requirements
 
-This provider uses the iControlREST API. Make sure that is installed and enabled on your F5 before proceeding.
+This provider uses the iControlREST API. Make sure that is installed and enabled on your F5 before proceeding. All the resources are validated with BIGIP-12.1.1.0.0.184.iso
 
 # Provider Configuration
 

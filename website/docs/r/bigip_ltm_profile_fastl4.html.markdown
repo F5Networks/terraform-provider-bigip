@@ -35,7 +35,9 @@ resource "bigip_ltm_profile_fastl4" "profile_fastl4" {
 
 * `name` (Required) Name of the profile_fastl4
 
-* `defaults_from` - (Required) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+
+* `partition` - (Optional) Displays the administrative partition within which this profile resides
 
 * `client_timeout` - (Optional) Specifies late binding client timeout in seconds. This setting specifies the number of seconds allowed for a client to transmit enough data to select a server when late binding is enabled. If it expires timeout-recovery mode will dictate what action to take.
 
