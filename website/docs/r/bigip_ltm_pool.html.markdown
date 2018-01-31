@@ -22,7 +22,8 @@ resource "bigip_ltm_pool" "pool" {
   load_balancing_mode = "round-robin"
   nodes = ["${bigip_ltm_node.node.name}:80"]
   monitors = ["${bigip_ltm_monitor.monitor.name}","${bigip_ltm_monitor.monitor2.name}"]
-  allow_snat = false
+  allow_snat = "yes"
+  allow_nat = "yes"
 }
 
 ```      
