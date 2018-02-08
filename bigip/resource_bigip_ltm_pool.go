@@ -74,13 +74,12 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-
+	d.SetId(name)
 	log.Println("[INFO] Creating pool " + name)
 	err := client.CreatePool(name)
 	if err != nil {
 		return err
 	}
-	d.SetId(name)
 
 	err = resourceBigipLtmPoolUpdate(d, meta)
 	if err != nil {
@@ -95,7 +94,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-
+	d.Set("name", name)
 	log.Println("[INFO] Reading pool " + name)
 
 	pool, err := client.GetPool(name)
@@ -112,24 +111,21 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	for _, node := range nodes.PoolMembers {
 		nodeNames = append(nodeNames, node.FullPath)
 	}
-
 	d.Set("allow_nat", pool.AllowNAT)
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
-	d.Set("nodes", makeStringSet(&nodeNames))
-	d.Set("name", name)
+	//d.Set("nodes", makeStringSet(&nodeNames))
 
-	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
-	d.Set("monitors", makeStringSet(&monitors))
+	//monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
+	//d.Set("monitors", makeStringSet(&monitors))
 
 	return nil
 }
 
 func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-	log.Println("[INFO] Checking pool " + name + " exists.")
+	log.Println("[INFO]   Checking pool " + name + " exists.")
 
 	pool, err := client.GetPool(name)
 	if err != nil {
