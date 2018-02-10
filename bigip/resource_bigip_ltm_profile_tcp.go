@@ -146,11 +146,8 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	 d.SetId("")
  	return err
  }
-	//d.Set("partition", obj.partition)
 	d.Set("name", name)
 	d.Set("idle_timeout", obj.IdleTimeout)
-	d.Set("partition", obj.Partition)
-//	d.Set("defaults_from", obj.DefaultsFrom)
 	d.Set("close_wait_timeout", obj.CloseWaitTimeout)
 	d.Set("finwait_2timeout", obj.FinWait_2Timeout)
 	d.Set("finwait_timeout", obj.FinWaitTimeout)

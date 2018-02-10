@@ -78,11 +78,11 @@ func TestBigipLtmProfileTcp_import(t *testing.T) {
 func testCheckTcpExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Tcp(name)
+		p, err := client.GetTcp(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if exists && p != nil {
 			return fmt.Errorf("tcp %s was not created.", name)
 		}
 		if !exists && p != nil {
@@ -101,11 +101,11 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		tcp, err := client.Tcp(name)
+		tcp, err := client.GetTcp(name)
 		if err != nil {
 			return err
 		}
-		if tcp == nil {
+		if tcp != nil {
 			return fmt.Errorf("tcp %s not destroyed.", name)
 		}
 	}
