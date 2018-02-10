@@ -139,7 +139,27 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+ obj, err := client.GetTcp(name)
+ if err != nil {
+	 d.SetId("")
+ 	return err
+ }
+	//d.Set("partition", obj.partition)
+	d.Set("name", name)
+	d.Set("idle_timeout", obj.IdleTimeout)
+	d.Set("partition", obj.Partition)
+//	d.Set("defaults_from", obj.DefaultsFrom)
+	d.Set("close_wait_timeout", obj.CloseWaitTimeout)
+	d.Set("finwait_2timeout", obj.FinWait_2Timeout)
+	d.Set("finwait_timeout", obj.FinWaitTimeout)
+	d.Set("keepalive_interval", obj.KeepAliveInterval)
+	d.Set("deferred_accept", obj.DeferredAccept)
+	d.Set("fast_open", obj.FastOpen)
 
+
+	 //d.Set("idle_timeout", obj.IdleTimeout)
 	return nil
 }
 

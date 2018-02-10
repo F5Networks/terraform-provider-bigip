@@ -2167,15 +2167,17 @@ func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
-func (b *BigIP) Tcp(name string) (*Tcps, error) {
-	var tcps Tcps
-	err, _ := b.getForEntity(&tcps, uriLtm, uriProfile, uriTcp)
-
+func (b *BigIP) GetTcp(name string) (*Tcp, error) {
+	var tcp Tcp
+	err, ok := b.getForEntity(&tcp, uriLtm, uriProfile, uriTcp, name)
 	if err != nil {
 		return nil, err
 	}
+	if !ok {
+		return nil, nil
+	}
 
-	return &tcps, nil
+	return &tcp, nil
 }
 
 func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {
