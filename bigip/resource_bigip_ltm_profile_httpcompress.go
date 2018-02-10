@@ -91,6 +91,17 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 }
 
 func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	obj, err := client.GetHttpcompress(name)
+	if err != nil {
+	 d.SetId("")
+	return err
+	}
+	d.Set("name", name)
+	d.Set("uri_include", obj.UriInclude)
+	//d.Set("uri_exclude", obj.UriInclude)
+
 	return nil
 }
 

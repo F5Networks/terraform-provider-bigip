@@ -73,14 +73,14 @@ func TestBigipLtmProfileHttpcompress_import(t *testing.T) {
 func testCheckHttpcompressExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Httpcompress()
+		p, err := client.GetHttpcompress(name)
 		if err != nil {
 			return err
 		}
 		if exists && p == nil {
 			return fmt.Errorf("httpcompress %s was not created.", name)
 		}
-		if !exists && p != nil {
+		if !exists && p == nil {
 			return fmt.Errorf("httpcompress %s still exists.", name)
 		}
 		return nil
@@ -96,11 +96,11 @@ func testCheckHttpcompresssDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		httpcompress, err := client.Httpcompress()
+		httpcompress, err := client.GetHttpcompress(name)
 		if err != nil {
 			return err
 		}
-		if httpcompress == nil {
+		if httpcompress != nil {
 			return fmt.Errorf("httpcompress %s not destroyed.", name)
 		}
 	}

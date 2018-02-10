@@ -129,7 +129,20 @@ func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interf
 }
 
 func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interface{}) error {
-
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	obj, err := client.GetOneconnect(name)
+	if err != nil {
+	 d.SetId("")
+	return err
+	}
+	d.Set("name", name)
+	d.Set("share_pools", obj.SharePools)
+	d.Set("source_mask", obj.SourceMask)
+	d.Set("max_age", obj.MaxAge)
+	d.Set("max_size", obj.MaxSize)
+	d.Set("max_reuse", obj.MaxReuse)
+	d.Set("idle_timeout_override", obj.IdleTimeoutOverride)
 	return nil
 }
 

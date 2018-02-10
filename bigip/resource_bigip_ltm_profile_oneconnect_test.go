@@ -76,7 +76,7 @@ func TestBigipLtmProfileoneconnect_import(t *testing.T) {
 func testCheckoneconnectExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Oneconnect(name)
+		p, err := client.GetOneconnect(name)
 		if err != nil {
 			return err
 		}
@@ -100,11 +100,11 @@ func testCheckoneconnectsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		oneconnect, err := client.Oneconnect(name)
+		oneconnect, err := client.GetOneconnect(name)
 		if err != nil {
 			return err
 		}
-		if oneconnect == nil {
+		if oneconnect != nil {
 			return fmt.Errorf("oneconnect %s not destroyed.", name)
 		}
 	}

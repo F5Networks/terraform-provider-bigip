@@ -2116,16 +2116,22 @@ func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsF
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
-func (b *BigIP) Oneconnect(name string) (*Oneconnects, error) {
-	var oneconnects Oneconnects
-	err, _ := b.getForEntity(&oneconnects, uriLtm, uriProfile, uriOneconnect)
+ 
 
+func (b *BigIP) GetOneconnect(name string) (*Oneconnect, error) {
+	var oneconnect Oneconnect
+	err, ok := b.getForEntity(&oneconnect, uriLtm, uriProfile, uriOneconnect, name)
 	if err != nil {
 		return nil, err
 	}
+	if !ok {
+		return nil, nil
+	}
 
-	return &oneconnects, nil
+	return &oneconnect, nil
 }
+
+
 
 // DeleteOneconnect removes an OneConnect profile from the system.
 func (b *BigIP) DeleteOneconnect(name string) error {
@@ -2280,15 +2286,17 @@ func (b *BigIP) ModifyHttpcompress(name string, httpcompress *Httpcompress) erro
 	return b.put(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
 }
 
-func (b *BigIP) Httpcompress() (*Httpcompresss, error) {
-	var httpcompresss Httpcompresss
-	err, _ := b.getForEntity(&httpcompresss, uriLtm, uriProfile, uriHttpcompress)
+func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
+ var httpcompress Httpcompress
+ err, ok := b.getForEntity(&httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
+ if err != nil {
+	 return nil, err
+ }
+ if !ok {
+	 return nil, nil
+ }
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &httpcompresss, nil
+ return &httpcompress, nil
 }
 
 func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
