@@ -2314,15 +2314,17 @@ func (b *BigIP) ModifyHttp2(name string, http2 *Http2) error {
 	return b.put(http2, uriLtm, uriProfile, uriHttp2, name)
 }
 
-func (b *BigIP) Http2() (*Http2s, error) {
-	var http2s Http2s
-	err, _ := b.getForEntity(&http2s, uriLtm, uriProfile, uriHttp2)
-
+func (b *BigIP) GetHttp2(name string) (*Http2, error) {
+	var http2 Http2
+	err, ok := b.getForEntity(&http2, uriLtm, uriProfile, uriHttp2, name)
 	if err != nil {
 		return nil, err
 	}
+	if !ok {
+		return nil, nil
+	}
 
-	return &http2s, nil
+	return &http2, nil
 }
 
 // Datagroups returns a list of datagroups.

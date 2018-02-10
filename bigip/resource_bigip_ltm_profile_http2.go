@@ -107,6 +107,17 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 }
 
 func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+ obj, err := client.GetHttp2(name)
+ if err != nil {
+	 d.SetId("")
+ 	return err
+ }
+	d.Set("name", name)
+	d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
+	d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
+	d.Set("activation_modes", obj.ActivationModes)
 	return nil
 }
 

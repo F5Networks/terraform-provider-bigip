@@ -15,7 +15,7 @@ var TEST_HTTP2_RESOURCE = `
 resource "bigip_ltm_profile_http2" "test-http2"
 
         {
-            name = "/Common/sanjose-http2"
+            name = "/Common/test-http2"
 			defaults_from = "/Common/http2"
             concurrent_streams_per_connection = 10
             connection_idle_timeout = 30
@@ -35,7 +35,7 @@ func TestBigipLtmProfileHttp2_create(t *testing.T) {
 				Config: TEST_HTTP2_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TEST_HTTP2_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "name", "/Common/sanjose-http2"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "name", "/Common/test-http2"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "defaults_from", "/Common/http2"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "concurrent_streams_per_connection", "10"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http2.test-http2", "connection_idle_timeout", "30"),
@@ -69,14 +69,14 @@ func TestBigipLtmProfileHttp2_import(t *testing.T) {
 func testCheckHttp2Exists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Http2()
+		p, err := client.GetHttp2(name)
 		if err != nil {
 			return err
 		}
 		if exists && p == nil {
 			return fmt.Errorf("http2 %s was not created.", name)
 		}
-		if !exists && p != nil {
+		if !exists && p == nil {
 			return fmt.Errorf("http2 %s still exists.", name)
 		}
 		return nil
@@ -92,11 +92,11 @@ func testCheckHttp2sDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		http2, err := client.Http2()
+		http2, err := client.GetHttp2(name)
 		if err != nil {
 			return err
 		}
-		if http2 == nil {
+		if http2 != nil {
 			return fmt.Errorf("http2 %s not destroyed.", name)
 		}
 	}
