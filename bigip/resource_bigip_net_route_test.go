@@ -30,7 +30,7 @@ resource "bigip_net_selfip" "test-selfip" {
 		}
 
 resource "bigip_net_route" "test-route" {
-  name = "/Common/test-route"
+  name = "test-route"
   network = "10.10.10.0/24"
   gw      = "11.1.1.2"
 	depends_on = ["bigip_net_selfip.test-selfip"]
@@ -49,7 +49,7 @@ func TestBigipNetroute_create(t *testing.T) {
 				Config: TEST_ROUTE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckrouteExists(TEST_ROUTE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_net_route.test-route", "name", TEST_ROUTE_NAME),
+					resource.TestCheckResourceAttr("bigip_net_route.test-route", "name", "test-route"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "network", "10.10.10.0/24"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.2"),
 				),
@@ -83,11 +83,11 @@ func testCheckrouteExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		p, err := client.Routes()
+		p, err := client.GetRoute(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if exists && p != nil {
 			return fmt.Errorf("route %s was not created.", name)
 		}
 		if !exists && p != nil {
@@ -106,11 +106,11 @@ func testCheckroutesDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		route, err := client.Routes()
+		route, err := client.GetRoute(name)
 		if err != nil {
 			return err
 		}
-		if route == nil {
+		if route != nil {
 			return fmt.Errorf("route %s not destroyed.", name)
 		}
 	}

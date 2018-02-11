@@ -79,7 +79,16 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
-
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	obj, err := client.GetRoute(name)
+	if err != nil {
+	 d.SetId("")
+	return err
+	}
+	d.Set("name", name)
+	d.Set("network", obj.Network)
+	d.Set("gw", obj.Gateway)
 	return nil
 }
 
