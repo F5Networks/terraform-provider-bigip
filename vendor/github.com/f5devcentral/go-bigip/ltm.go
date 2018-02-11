@@ -2116,7 +2116,7 @@ func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsF
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
- 
+
 
 func (b *BigIP) GetOneconnect(name string) (*Oneconnect, error) {
 	var oneconnect Oneconnect
@@ -2214,15 +2214,15 @@ func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
 	return b.put(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
-func (b *BigIP) Fasthttp() (*Fasthttps, error) {
-	var fasthttps Fasthttps
-	err, _ := b.getForEntity(&fasthttps, uriLtm, uriProfile, uriFasthttp)
+func (b *BigIP) GetFasthttp(name string) (*Fasthttp, error) {
+	var fasthttp Fasthttp
+	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &fasthttps, nil
+	return &fasthttp, nil
 }
 
 func (b *BigIP) CreateFastl4(name, partition, defaultsFrom string, clientTimeout int, explicitFlowMigration, hardwareSynCookie string, idleTimeout string, ipTosToClient, ipTosToServer, keepAliveInterval string) error {

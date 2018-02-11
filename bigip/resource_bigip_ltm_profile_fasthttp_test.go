@@ -77,46 +77,12 @@ func TestBigipLtmProfilefasthttp_import(t *testing.T) {
 	})
 }
 
-//var TEST_FASTHTTP_IN_POOL_RESOURCE = `
-//resource "bigip_ltm_pool" "test-pool" {
-//	name = "` + TEST_POOL_NAME + `"
-//  	load_balancing_mode = "round-robin"
-//  	fasthttps = ["${formatlist("%s:80", bigip_ltm_profile_fasthttp.*.name)}"]
-//  	allow_snat = false
-//}
-//`
-//func TestBigipLtmProfilefasthttp_removefasthttp(t *testing.T) {
-//	resource.Test(t, resource.TestCase{
-//		PreCheck: func() {
-//			testAcctPreCheck(t)
-//		},
-//		Providers: testAccProviders,
-//		CheckDestroy: testCheckfasthttpsDestroyed,
-//		Steps: []resource.TestStep{
-//			resource.TestStep{
-//				Config: TEST_FASTHTTP_RESOURCE + TEST_FASTHTTP_IN_POOL_RESOURCE,
-//				Check: resource.ComposeTestCheckFunc(
-//					testCheckfasthttpProfileExists(TEST_FASTHTTP_NAME, true),
-//					testCheckPoolExists(TEST_POOL_NAME, true),
-//					testCheckPoolMember(TEST_POOL_NAME, TEST_FASTHTTP_NAME),
-//				),
-//			},
-//			resource.TestStep{
-//				Config: TEST_FASTHTTP_IN_POOL_RESOURCE,
-//				Check: resource.ComposeTestCheckFunc(
-//					testCheckfasthttpProfileExists(fmt.Sprintf("%s:%s", TEST_FASTHTTP_NAME, "80"), false),
-//					testCheckEmptyPool(TEST_POOL_NAME),
-//				),
-//			},
-//		},
-//	})
-//}
 
 func testCheckfasthttpProfileExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		p, err := client.Fasthttp()
+		p, err := client.GetFasthttp(name)
 		if err != nil {
 			return err
 		}
@@ -139,7 +105,7 @@ func testCheckfasthttpsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		fasthttp, err := client.Fasthttp()
+		fasthttp, err := client.GetFasthttp(name)
 		if err != nil {
 			return err
 		}

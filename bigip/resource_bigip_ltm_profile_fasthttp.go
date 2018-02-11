@@ -150,6 +150,24 @@ func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	obj, err := client.GetFasthttp(name)
+	if err != nil {
+	 d.SetId("")
+	return err
+	}
+	d.Set("name", name)
+	//d.Set("idle_timeout", obj.IdleTimeout)
+	d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride)
+	//d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse)
+//	d.Set("connpool_maxsize", obj.ConnpoolMaxSize)
+	d.Set("connpool_minsize", obj.ConnpoolMinSize)
+	//d.Set("connpool_replenish", obj.ConnpoolReplenish)
+	//d.Set("connpool_step", obj.ConnpoolStep)
+	//d.Set("forcehttp_10response", obj.ForceHttp_10Response)
+	//d.Set("maxheader_size", obj.MaxHeaderSize)
+
 
 	return nil
 }
