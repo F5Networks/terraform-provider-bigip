@@ -55,7 +55,7 @@ func TestBigipLtmProfileFastl4_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfilefastl4_import(t *testing.T) {
+func TestBigipLtmProfileFastl4_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -79,7 +79,7 @@ func TestBigipLtmProfilefastl4_import(t *testing.T) {
 func testCheckfastl4Exists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Fastl4(name)
+		p, err := client.GetFastl4(name)
 		if err != nil {
 			return err
 		}
@@ -102,11 +102,11 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		fastl4, err := client.Fastl4(name)
+		fastl4, err := client.GetFastl4(name)
 		if err != nil {
 			return err
 		}
-		if fastl4 == nil {
+		if fastl4 != nil {
 			return fmt.Errorf("fastl4 %s not destroyed.", name)
 		}
 	}

@@ -134,6 +134,22 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 }
 
 func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	obj, err := client.GetFastl4(name)
+	if err != nil {
+	 d.SetId("")
+	return err
+	}
+	d.Set("name", name)
+	d.Set("client_timeout", obj.ClientTimeout)
+	d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
+	d.Set("hardware_syncookie", obj.HardwareSynCookie)
+	d.Set("idle_timeout", obj.IdleTimeout)
+	d.Set("iptos_toclient", obj.IpTosToClient)
+	d.Set("iptos_toserver", obj.IpTosToServer)
+	d.Set("keepalive_interval", obj.KeepAliveInterval)
+
 	return nil
 }
 

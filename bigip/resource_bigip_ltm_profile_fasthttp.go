@@ -158,15 +158,8 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	return err
 	}
 	d.Set("name", name)
-	//d.Set("idle_timeout", obj.IdleTimeout)
 	d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride)
-	//d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse)
-//	d.Set("connpool_maxsize", obj.ConnpoolMaxSize)
 	d.Set("connpool_minsize", obj.ConnpoolMinSize)
-	//d.Set("connpool_replenish", obj.ConnpoolReplenish)
-	//d.Set("connpool_step", obj.ConnpoolStep)
-	//d.Set("forcehttp_10response", obj.ForceHttp_10Response)
-	//d.Set("maxheader_size", obj.MaxHeaderSize)
 
 
 	return nil

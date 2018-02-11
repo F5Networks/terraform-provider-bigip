@@ -2252,15 +2252,17 @@ func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
 }
 
-func (b *BigIP) Fastl4(name string) (*Fastl4s, error) {
-	var fastl4s Fastl4s
-	err, _ := b.getForEntity(&fastl4s, uriLtm, uriProfile, uriFastl4)
+func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
+ var fastl4 Fastl4
+ err, ok := b.getForEntity(&fastl4, uriLtm, uriProfile, uriFastl4, name)
+ if err != nil {
+	 return nil, err
+ }
+ if !ok {
+	 return nil, nil
+ }
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &fastl4s, nil
+ return &fastl4, nil
 }
 
 // ===============
