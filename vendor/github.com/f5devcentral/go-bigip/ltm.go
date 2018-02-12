@@ -342,6 +342,145 @@ func (p *Pool) UnmarshalJSON(b []byte) error {
 	return marshal(p, &dto)
 }
 
+// PersistenceProfiles contains of list of persistence profiles
+type PersistenceProfiles struct {
+	PersistenceProfiles []PersistenceProfile `json:"items"`
+}
+
+// PersistenceProfile is a base for all persistence profiles
+type PersistenceProfile struct {
+	AppService              string `json:"appService,omitempty"`
+	DefaultsFrom            string `json:"defaultsFrom,omitempty"`
+	Description             string `json:"description,omitempty"`
+	FullPath                string `json:"fullPath,omitempty"`
+	MatchAcrossPools        string `json:"matchAcrossPools,omitempty"`
+	MatchAcrossServices     string `json:"matchAcrossServices,omitempty"`
+	MatchAcrossVirtuals     string `json:"matchAcrossVirtuals,omitempty"`
+	Method                  string `json:"method,omitempty"`
+	Mirror                  string `json:"mirror,omitempty"`
+	Mode                    string `json:"mode,omitempty"`
+	Name                    string `json:"name,omitempty"`
+	OverrideConnectionLimit string `json:"overrideConnectionLimit,omitempty"`
+	Partition               string `json:"partition,omitempty"`
+	TmPartition             string `json:"tmPartition,omitempty"`
+	Timeout                 string `json:"timeout,omitempty"`
+}
+
+// CookiePersistenceProfiles contains a list of all cookies profiles
+type CookiePersistenceProfiles struct {
+	CookiePersistenceProfiles []CookiePersistenceProfile `json:"items"`
+}
+
+// CookiePersistenceProfile Defines a single cookie profile
+type CookiePersistenceProfile struct {
+	PersistenceProfile
+	AlwaysSend                 string `json:"alwaysSend,omitempty"`
+	CookieEncryption           string `json:"cookieEncryption,omitempty"`
+	CookieEncryptionPassphrase string `json:"cookieEncryptionPassphrase,omitempty"`
+	CookieName                 string `json:"cookieName,omitempty"`
+	Expiration                 string `json:"expiration,omitempty"`
+	HashLength                 int    `json:"hashLength,omitempty"`
+	HashOffset                 int    `json:"hashOffset,omitempty"`
+	HTTPOnly                   string `json:"httponly,omitempty"`
+	Secure                     string `json:"secure,omitempty"`
+}
+
+// DestAddrPersistenceProfiles contains a list of all dest-addr profiles
+type DestAddrPersistenceProfiles struct {
+	DestAddrPersistenceProfiles []DestAddrPersistenceProfile `json:"items"`
+}
+
+// DestAddrPersistenceProfile Defines a single dest-addr profile
+type DestAddrPersistenceProfile struct {
+	PersistenceProfile
+	HashAlgorithm string `json:"hashAlgorithm,omitempty"`
+	Mask          string `json:"mask,omitempty"`
+}
+
+// HashPersistenceProfiles contains a list of all hash profiles
+type HashPersistenceProfiles struct {
+	HashPersistenceProfiles []HashPersistenceProfile `json:"items"`
+}
+
+// HashPersistenceProfile Defines a single hash profile
+type HashPersistenceProfile struct {
+	PersistenceProfile
+	HashAlgorithm    string `json:"hashAlgorithm,omitempty"`
+	HashBufferLimit  int    `json:"hashBufferLimit,omitempty"`
+	HashEndPattern   int    `json:"hashEndPattern,omitempty"`
+	HashLength       int    `json:"hashLength,omitempty"`
+	HashOffset       int    `json:"hashOffset,omitempty"`
+	HashStartPattern int    `json:"hashStartPattern,omitempty"`
+}
+
+// HostPersistenceProfiles contains a list of all host profiles
+type HostPersistenceProfiles struct {
+	HostPersistenceProfiles []HostPersistenceProfile `json:"items"`
+}
+
+// HostPersistenceProfile Defines a single host profile
+type HostPersistenceProfile struct {
+	PersistenceProfile
+}
+
+// MSRDPPersistenceProfiles contains a list of all msrdp profiles
+type MSRDPPersistenceProfiles struct {
+	MSRDPPersistenceProfiles []MSRDPPersistenceProfile `json:"items"`
+}
+
+// MSRDPPersistenceProfile Defines a single msrdp profile
+type MSRDPPersistenceProfile struct {
+	PersistenceProfile
+	HasSessionDir string `json:"hasSessionDir,omitempty"`
+}
+
+// SIPPersistenceProfiles contains a list of all sip profiles
+type SIPPersistenceProfiles struct {
+	SIPPersistenceProfiles []SIPPersistenceProfile `json:"items"`
+}
+
+// SIPPersistenceProfile Defines a single sip profile
+type SIPPersistenceProfile struct {
+	PersistenceProfile
+	SIPInfo string `json:"sipInfo,omitempty"`
+}
+
+// SourceAddrPersistenceProfiles contains a list of all source-addr profiles
+type SourceAddrPersistenceProfiles struct {
+	SourceAddrPersistenceProfiles []SourceAddrPersistenceProfile `json:"items"`
+}
+
+// SourceAddrPersistenceProfile Defines a single source-addr profile
+type SourceAddrPersistenceProfile struct {
+	PersistenceProfile
+	HashAlgorithm   string `json:"hashAlgorithm,omitempty"`
+	MapProxies      string `json:"mapProxies,omitempty"`
+	MapProxyAddress string `json:"mapProxyAddress,omitempty"`
+	MapProxyClass   string `json:"mapProxyClass,omitempty"`
+	Mask            string `json:"mask,omitempty"`
+}
+
+// SSLPersistenceProfiles contains a list of all ssl profiles
+type SSLPersistenceProfiles struct {
+	SSLPersistenceProfiles []SSLPersistenceProfile `json:"items"`
+}
+
+// SSLPersistenceProfile Defines a single ssl profile
+type SSLPersistenceProfile struct {
+	PersistenceProfile
+}
+
+// UniversalPersistenceProfiles contains a list of all universal profiles
+type UniversalPersistenceProfiles struct {
+	SSLPersistenceProfiles []UniversalPersistenceProfile `json:"items"`
+}
+
+// UniversalPersistenceProfile Defines a single universal profile
+type UniversalPersistenceProfile struct {
+	PersistenceProfile
+	Rule string `json:"rule,omitempty"`
+}
+
 // VirtualServers contains a list of all virtual servers on the BIG-IP system.
 type VirtualServers struct {
 	VirtualServers []VirtualServer `json:"items"`
@@ -349,43 +488,45 @@ type VirtualServers struct {
 
 // VirtualServer contains information about each individual virtual server.
 type VirtualServer struct {
-	Name                     string `json:"name,omitempty"`
-	Partition                string `json:"partition,omitempty"`
-	FullPath                 string `json:"fullPath,omitempty"`
-	Generation               int    `json:"generation,omitempty"`
-	AddressStatus            string `json:"addressStatus,omitempty"`
-	AutoLastHop              string `json:"autoLastHop,omitempty"`
-	CMPEnabled               string `json:"cmpEnabled,omitempty"`
-	ConnectionLimit          int    `json:"connectionLimit,omitempty"`
-	Destination              string `json:"destination,omitempty"`
-	Enabled                  bool   `json:"enabled,omitempty"`
-	GTMScore                 int    `json:"gtmScore,omitempty"`
-	IPProtocol               string `json:"ipProtocol,omitempty"`
-	Mask                     string `json:"mask,omitempty"`
-	Mirror                   string `json:"mirror,omitempty"`
-	MobileAppTunnel          string `json:"mobileAppTunnel,omitempty"`
-	NAT64                    string `json:"nat64,omitempty"`
-	Pool                     string `json:"pool,omitempty"`
-	RateLimit                string `json:"rateLimit,omitempty"`
-	RateLimitDestinationMask int    `json:"rateLimitDstMask,omitempty"`
-	RateLimitMode            string `json:"rateLimitMode,omitempty"`
-	RateLimitSourceMask      int    `json:"rateLimitSrcMask,omitempty"`
-	Source                   string `json:"source,omitempty"`
-	SourceAddressTranslation struct {
+	Name                       string `json:"name,omitempty"`
+	Partition                  string `json:"partition,omitempty"`
+	FullPath                   string `json:"fullPath,omitempty"`
+	Generation                 int    `json:"generation,omitempty"`
+	AddressStatus              string `json:"addressStatus,omitempty"`
+	AutoLastHop                string `json:"autoLastHop,omitempty"`
+	CMPEnabled                 string `json:"cmpEnabled,omitempty"`
+	ConnectionLimit            int    `json:"connectionLimit,omitempty"`
+	Destination                string `json:"destination,omitempty"`
+	Enabled                    bool   `json:"enabled,omitempty"`
+	GTMScore                   int    `json:"gtmScore,omitempty"`
+	FallbackPersistenceProfile string `json:"fallbackPersistence,omitempty"`
+	IPProtocol                 string `json:"ipProtocol,omitempty"`
+	Mask                       string `json:"mask,omitempty"`
+	Mirror                     string `json:"mirror,omitempty"`
+	MobileAppTunnel            string `json:"mobileAppTunnel,omitempty"`
+	NAT64                      string `json:"nat64,omitempty"`
+	Pool                       string `json:"pool,omitempty"`
+	RateLimit                  string `json:"rateLimit,omitempty"`
+	RateLimitDestinationMask   int    `json:"rateLimitDstMask,omitempty"`
+	RateLimitMode              string `json:"rateLimitMode,omitempty"`
+	RateLimitSourceMask        int    `json:"rateLimitSrcMask,omitempty"`
+	Source                     string `json:"source,omitempty"`
+	SourceAddressTranslation   struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`
 	} `json:"sourceAddressTranslation,omitempty"`
-	SourcePort       string    `json:"sourcePort,omitempty"`
-	SYNCookieStatus  string    `json:"synCookieStatus,omitempty"`
-	TranslateAddress string    `json:"translateAddress,omitempty"`
-	TranslatePort    string    `json:"translatePort,omitempty"`
-	VlansEnabled     bool      `json:"vlansEnabled,omitempty"`
-	VlansDisabled    bool      `json:"vlansDisabled,omitempty"`
-	VSIndex          int       `json:"vsIndex,omitempty"`
-	Vlans            []string  `json:"vlans,omitempty"`
-	Rules            []string  `json:"rules,omitempty"`
-	Profiles         []Profile `json:"profiles,omitempty"`
-	Policies         []string  `json:"policies,omitempty"`
+	SourcePort          string    `json:"sourcePort,omitempty"`
+	SYNCookieStatus     string    `json:"synCookieStatus,omitempty"`
+	TranslateAddress    string    `json:"translateAddress,omitempty"`
+	TranslatePort       string    `json:"translatePort,omitempty"`
+	VlansEnabled        bool      `json:"vlansEnabled,omitempty"`
+	VlansDisabled       bool      `json:"vlansDisabled,omitempty"`
+	VSIndex             int       `json:"vsIndex,omitempty"`
+	Vlans               []string  `json:"vlans,omitempty"`
+	Rules               []string  `json:"rules,omitempty"`
+	PersistenceProfiles []Profile `json:"persist,omitempty"`
+	Profiles            []Profile `json:"profiles,omitempty"`
+	Policies            []string  `json:"policies,omitempty"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
@@ -1306,6 +1447,7 @@ const (
 	uriInternal       = "internal"
 	uriPolicy         = "policy"
 	uriOneconnect     = "one-connect"
+	uriPersistence    = "persistence"
 	ENABLED           = "enable"
 	DISABLED          = "disable"
 	CONTEXT_SERVER    = "serverside"
@@ -1318,6 +1460,15 @@ const (
 	uriHttp2          = "http2"
 	uriSnat           = "snat"
 	uriSnatpool       = "snatpool"
+	uriCookie         = "cookie"
+	uriDestAddr       = "dest-addr"
+	uriHash           = "hash"
+	uriHost           = "host"
+	uriMSRDP          = "msrdp"
+	uriSIP            = "sip"
+	uriSourceAddr     = "source-addr"
+	uriSSL            = "ssl"
+	uriUniversal      = "universal"
 )
 
 var cidr = map[string]string{
@@ -2484,4 +2635,472 @@ func (b *BigIP) GetSnatpool(name string) (*Snatpool, error) {
 
 func (b *BigIP) DeleteSnatpool(name string) error {
 	return b.delete(uriLtm, uriSnatpool, name)
+}
+
+// CookiePersistenceProfiles returns a list of cookie persist profiles
+func (b *BigIP) CookiePersistenceProfiles() (*CookiePersistenceProfiles, error) {
+	var cookiePersistenceProfiles CookiePersistenceProfiles
+	err, _ := b.getForEntity(&cookiePersistenceProfiles, uriLtm, uriPersistence, uriCookie)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cookiePersistenceProfiles, nil
+}
+
+// GetCookiePersistenceProfile gets a single cookie persist profile by name
+func (b *BigIP) GetCookiePersistenceProfile(name string) (*CookiePersistenceProfile, error) {
+	var cookiePersistenceProfile CookiePersistenceProfile
+	err, ok := b.getForEntity(&cookiePersistenceProfile, uriLtm, uriPersistence, uriCookie, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &cookiePersistenceProfile, nil
+}
+
+// CreateCookiePersistenceProfile creates a new cookie persist profile on the BIG-IP system.
+func (b *BigIP) CreateCookiePersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriCookie)
+}
+
+// AddCookiePersistenceProfile adds a cookie persist profile to the BIG-IP system
+func (b *BigIP) AddCookiePersistenceProfile(config *CookiePersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriCookie)
+}
+
+// DeleteCookiePersistenceProfile removes a cookie persist profile.
+func (b *BigIP) DeleteCookiePersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriCookie, name)
+}
+
+// ModifyCookiePersistenceProfile allows you to change any attribute of a cookie persist profile.
+// Fields that can be modified are referenced in the CookiePersistenceProfile struct.
+func (b *BigIP) ModifyCookiePersistenceProfile(name string, config *CookiePersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriCookie, name)
+}
+
+// DestAddrPersistenceProfiles returns a list of dest-addr persist profiles
+func (b *BigIP) DestAddrPersistenceProfiles() (*DestAddrPersistenceProfiles, error) {
+	var destAddrPersistenceProfiles DestAddrPersistenceProfiles
+	err, _ := b.getForEntity(&destAddrPersistenceProfiles, uriLtm, uriPersistence, uriDestAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &destAddrPersistenceProfiles, nil
+}
+
+// GetDestAddrPersistenceProfile gets a single dest-addr persist profile by name
+func (b *BigIP) GetDestAddrPersistenceProfile(name string) (*DestAddrPersistenceProfile, error) {
+	var destAddrPersistenceProfile DestAddrPersistenceProfile
+	err, ok := b.getForEntity(&destAddrPersistenceProfile, uriLtm, uriPersistence, uriDestAddr, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &destAddrPersistenceProfile, nil
+}
+
+// CreateDestAddrPersistenceProfile creates a new dest-addr persist profile on the BIG-IP system.
+func (b *BigIP) CreateDestAddrPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriDestAddr)
+}
+
+// AddDestAddrPersistenceProfile adds a dest-addr persist profile to the BIG-IP system
+func (b *BigIP) AddDestAddrPersistenceProfile(config *DestAddrPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriDestAddr)
+}
+
+// DeleteDestAddrPersistenceProfile removes a dest-addr persist profile.
+func (b *BigIP) DeleteDestAddrPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriDestAddr, name)
+}
+
+// ModifyDestAddrPersistenceProfile allows you to change any attribute of a dest-addr persist profile.
+// Fields that can be modified are referenced in the DestAddrPersistenceProfile struct.
+func (b *BigIP) ModifyDestAddrPersistenceProfile(name string, config *DestAddrPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriDestAddr, name)
+}
+
+// HashPersistenceProfiles returns a list of hash persist profiles
+func (b *BigIP) HashPersistenceProfiles() (*HashPersistenceProfiles, error) {
+	var hashPersistenceProfiles HashPersistenceProfiles
+	err, _ := b.getForEntity(&hashPersistenceProfiles, uriLtm, uriPersistence, uriHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hashPersistenceProfiles, nil
+}
+
+// GetHashPersistenceProfile gets a single hash persist profile by name
+func (b *BigIP) GetHashPersistenceProfile(name string) (*HashPersistenceProfile, error) {
+	var hashPersistenceProfile HashPersistenceProfile
+	err, ok := b.getForEntity(&hashPersistenceProfile, uriLtm, uriPersistence, uriHash, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &hashPersistenceProfile, nil
+}
+
+// CreateHashPersistenceProfile creates a new hash persist profile on the BIG-IP system.
+func (b *BigIP) CreateHashPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriHash)
+}
+
+// AddHashPersistenceProfile adds a hash persist profile to the BIG-IP system
+func (b *BigIP) AddHashPersistenceProfile(config *HashPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriHash)
+}
+
+// DeleteHashPersistenceProfile removes a dest-addr persist profile.
+func (b *BigIP) DeleteHashPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriHash, name)
+}
+
+// ModifyHashPersistenceProfile allows you to change any attribute of a hash persist profile.
+// Fields that can be modified are referenced in the HashPersistenceProfile struct.
+func (b *BigIP) ModifyHashPersistenceProfile(name string, config *HashPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriHash, name)
+}
+
+// HostPersistenceProfiles returns a list of host persist profiles
+func (b *BigIP) HostPersistenceProfiles() (*HostPersistenceProfiles, error) {
+	var hostPersistenceProfiles HostPersistenceProfiles
+	err, _ := b.getForEntity(&hostPersistenceProfiles, uriLtm, uriPersistence, uriHost)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hostPersistenceProfiles, nil
+}
+
+// GetHostPersistenceProfile gets a single host persist profile by name
+func (b *BigIP) GetHostPersistenceProfile(name string) (*HostPersistenceProfile, error) {
+	var hostPersistenceProfile HostPersistenceProfile
+	err, ok := b.getForEntity(&hostPersistenceProfile, uriLtm, uriPersistence, uriHost, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &hostPersistenceProfile, nil
+}
+
+// CreateHostPersistenceProfile creates a new host persist profile on the BIG-IP system.
+func (b *BigIP) CreateHostPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriHost)
+}
+
+// AddHostPersistenceProfile adds a host persist profile to the BIG-IP system
+func (b *BigIP) AddHostPersistenceProfile(config *HostPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriHost)
+}
+
+// DeleteHashHostPersistenceProfile removes a host persist profile.
+func (b *BigIP) DeleteHashHostPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriHost, name)
+}
+
+// ModifyHostPersistenceProfile allows you to change any attribute of a host persist profile.
+// Fields that can be modified are referenced in the HostPersistenceProfile struct.
+func (b *BigIP) ModifyHostPersistenceProfile(name string, config *HostPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriHost, name)
+}
+
+// MSRDPPersistenceProfiles returns a list of msrdp persist profiles
+func (b *BigIP) MSRDPPersistenceProfiles() (*MSRDPPersistenceProfiles, error) {
+	var msrdpPersistenceProfiles MSRDPPersistenceProfiles
+	err, _ := b.getForEntity(&msrdpPersistenceProfiles, uriLtm, uriPersistence, uriMSRDP)
+	if err != nil {
+		return nil, err
+	}
+
+	return &msrdpPersistenceProfiles, nil
+}
+
+// GetMSRDPPersistenceProfile gets a single msrdp persist profile by name
+func (b *BigIP) GetMSRDPPersistenceProfile(name string) (*MSRDPPersistenceProfile, error) {
+	var msrdpPersistenceProfile MSRDPPersistenceProfile
+	err, ok := b.getForEntity(&msrdpPersistenceProfile, uriLtm, uriPersistence, uriMSRDP, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &msrdpPersistenceProfile, nil
+}
+
+// CreateMSRDPPersistenceProfile creates a new msrdp persist profile on the BIG-IP system.
+func (b *BigIP) CreateMSRDPPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriMSRDP)
+}
+
+// AddMSRDPPersistenceProfile adds a msrdp persist profile to the BIG-IP system
+func (b *BigIP) AddMSRDPPersistenceProfile(config *MSRDPPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriMSRDP)
+}
+
+// DeleteMSRDPPersistenceProfile removes a msrdp persist profile.
+func (b *BigIP) DeleteMSRDPPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriMSRDP, name)
+}
+
+// ModifyMSRDPPersistenceProfile allows you to change any attribute of a msrdp persist profile.
+// Fields that can be modified are referenced in the MSRDPPersistenceProfile struct.
+func (b *BigIP) ModifyMSRDPPersistenceProfile(name string, config *MSRDPPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriMSRDP, name)
+}
+
+// SIPPersistenceProfiles returns a list of sip persist profiles
+func (b *BigIP) SIPPersistenceProfiles() (*SIPPersistenceProfiles, error) {
+	var sipPersistenceProfiles SIPPersistenceProfiles
+	err, _ := b.getForEntity(&sipPersistenceProfiles, uriLtm, uriPersistence, uriSIP)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sipPersistenceProfiles, nil
+}
+
+// GetSIPPersistenceProfile gets a single sip persist profile by name
+func (b *BigIP) GetSIPPersistenceProfile(name string) (*SIPPersistenceProfile, error) {
+	var sipPersistenceProfile SIPPersistenceProfile
+	err, ok := b.getForEntity(&sipPersistenceProfile, uriLtm, uriPersistence, uriSIP, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &sipPersistenceProfile, nil
+}
+
+// CreateSIPPersistenceProfile creates a new sip persist profile on the BIG-IP system.
+func (b *BigIP) CreateSIPPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriSIP)
+}
+
+// AddSIPPersistenceProfile adds a sip persist profile to the BIG-IP system
+func (b *BigIP) AddSIPPersistenceProfile(config *SIPPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriSIP)
+}
+
+// DeleteSIPPersistenceProfile removes a sip persist profile.
+func (b *BigIP) DeleteSIPPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriSIP, name)
+}
+
+// ModifySIPPersistenceProfile allows you to change any attribute of a sip persist profile.
+// Fields that can be modified are referenced in the SIPPersistenceProfile struct.
+func (b *BigIP) ModifySIPPersistenceProfile(name string, config *SIPPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriSIP, name)
+}
+
+// SourceAddrPersistenceProfiles returns a list of source-addr persist profiles
+func (b *BigIP) SourceAddrPersistenceProfiles() (*SourceAddrPersistenceProfiles, error) {
+	var sourceAddrPersistenceProfiles SourceAddrPersistenceProfiles
+	err, _ := b.getForEntity(&sourceAddrPersistenceProfiles, uriLtm, uriPersistence, uriSourceAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sourceAddrPersistenceProfiles, nil
+}
+
+// GetSourceAddrPersistenceProfile gets a single source-addr persist profile by name
+func (b *BigIP) GetSourceAddrPersistenceProfile(name string) (*SourceAddrPersistenceProfile, error) {
+	var sourceAddrPersistenceProfile SourceAddrPersistenceProfile
+	err, ok := b.getForEntity(&sourceAddrPersistenceProfile, uriLtm, uriPersistence, uriSourceAddr, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &sourceAddrPersistenceProfile, nil
+}
+
+// CreateSourceAddrPersistenceProfile creates a new source-addr persist profile on the BIG-IP system.
+func (b *BigIP) CreateSourceAddrPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriSourceAddr)
+}
+
+// AddSourceAddrPersistenceProfile adds a source-addr persist profile to the BIG-IP system
+func (b *BigIP) AddSourceAddrPersistenceProfile(config *SourceAddrPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriSourceAddr)
+}
+
+// DeleteSourceAddrPersistenceProfile removes a source-addr persist profile.
+func (b *BigIP) DeleteSourceAddrPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriSourceAddr, name)
+}
+
+// ModifySourceAddrPersistenceProfile allows you to change any attribute of a source-addr persist profile.
+// Fields that can be modified are referenced in the SourceAddrPersistenceProfile struct.
+func (b *BigIP) ModifySourceAddrPersistenceProfile(name string, config *SourceAddrPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriSourceAddr, name)
+}
+
+// SSLPersistenceProfiles returns a list of ssl persist profiles
+func (b *BigIP) SSLPersistenceProfiles() (*SSLPersistenceProfiles, error) {
+	var sslPersistenceProfiles SSLPersistenceProfiles
+	err, _ := b.getForEntity(&sslPersistenceProfiles, uriLtm, uriPersistence, uriSSL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sslPersistenceProfiles, nil
+}
+
+// GetSSLPersistenceProfile gets a single ssl persist profile by name
+func (b *BigIP) GetSSLPersistenceProfile(name string) (*SSLPersistenceProfile, error) {
+	var sslPersistenceProfile SSLPersistenceProfile
+	err, ok := b.getForEntity(&sslPersistenceProfile, uriLtm, uriPersistence, uriSSL, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &sslPersistenceProfile, nil
+}
+
+// CreateSSLPersistenceProfile creates a new ssl persist profile on the BIG-IP system.
+func (b *BigIP) CreateSSLPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriSSL)
+}
+
+// AddSSLPersistenceProfile adds a ssl persist profile to the BIG-IP system
+func (b *BigIP) AddSSLPersistenceProfile(config *SSLPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriSSL)
+}
+
+// DeleteSSLPersistenceProfile removes a ssl persist profile.
+func (b *BigIP) DeleteSSLPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriSSL, name)
+}
+
+// ModifySSLPersistenceProfile allows you to change any attribute of a ssl persist profile.
+// Fields that can be modified are referenced in the SSLPersistenceProfile struct.
+func (b *BigIP) ModifySSLPersistenceProfile(name string, config *SSLPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriSSL, name)
+}
+
+// UniversalPersistenceProfiles returns a list of universal persist profiles
+func (b *BigIP) UniversalPersistenceProfiles() (*UniversalPersistenceProfiles, error) {
+	var universalPersistenceProfiles UniversalPersistenceProfiles
+	err, _ := b.getForEntity(&universalPersistenceProfiles, uriLtm, uriPersistence, uriUniversal)
+	if err != nil {
+		return nil, err
+	}
+
+	return &universalPersistenceProfiles, nil
+}
+
+// GetUniversalPersistenceProfile gets a single universal persist profile by name
+func (b *BigIP) GetUniversalPersistenceProfile(name string) (*UniversalPersistenceProfile, error) {
+	var universalPersistenceProfile UniversalPersistenceProfile
+	err, ok := b.getForEntity(&universalPersistenceProfile, uriLtm, uriPersistence, uriUniversal, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &universalPersistenceProfile, nil
+}
+
+// CreateUniversalPersistenceProfile creates a new universal persist profile on the BIG-IP system.
+func (b *BigIP) CreateUniversalPersistenceProfile(name string, parent string) error {
+	config := &PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriPersistence, uriUniversal)
+}
+
+// AddUniversalPersistenceProfile adds a universal persist profile to the BIG-IP system
+func (b *BigIP) AddUniversalPersistenceProfile(config *UniversalPersistenceProfile) error {
+	return b.post(config, uriLtm, uriPersistence, uriUniversal)
+}
+
+// DeleteUniversalPersistenceProfile removes a universal persist profile.
+func (b *BigIP) DeleteUniversalPersistenceProfile(name string) error {
+	return b.delete(uriLtm, uriPersistence, uriUniversal, name)
+}
+
+// ModifyUniversalPersistenceProfile allows you to change any attribute of a universal persist profile.
+// Fields that can be modified are referenced in the UniversalPersistenceProfile struct.
+func (b *BigIP) ModifyUniversalPersistenceProfile(name string, config *UniversalPersistenceProfile) error {
+	return b.put(config, uriLtm, uriPersistence, uriUniversal, name)
 }
