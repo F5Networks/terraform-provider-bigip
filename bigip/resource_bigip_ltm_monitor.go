@@ -137,6 +137,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return err
 	}
+	if monitors == nil {
+			log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	for _, m := range monitors {
 		if m.FullPath == name {
 			d.Set("interval", m.Interval)
@@ -205,7 +210,16 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	name := d.Id()
 	parent := monitorParent(d.Get("parent").(string))
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
-	return client.DeleteMonitor(name, parent)
+	err := client.DeleteMonitor(name, parent)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func validateParent(v interface{}, k string) ([]string, []error) {

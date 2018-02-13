@@ -101,10 +101,21 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	if pool == nil {
+			log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	nodes, err := client.PoolMembers(name)
 	if err != nil {
 		return err
 	}
+
+	if nodes == nil {
+			log.Printf("[WARN] Pool Member (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 
 	nodeNames := make([]string, 0, len(nodes.PoolMembers))
 
@@ -200,7 +211,16 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	log.Println("[INFO] Deleting pool " + name)
 
-	return client.DeletePool(name)
+	err := client.DeletePool(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Pool  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigIpLtmPoolImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
