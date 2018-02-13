@@ -98,6 +98,12 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	if members == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+
 
 	d.Set("name", members.Name)
 	d.Set("mirror_ip", members.MirrorIp)
