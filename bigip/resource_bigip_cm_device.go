@@ -115,7 +115,16 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	return client.DeleteDevice(name)
+	err := client.DeleteDevice(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+return nil
 }
 
 func resourceBigipCmDeviceImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

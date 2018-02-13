@@ -240,6 +240,7 @@ func (b *BigIP) CreateDevice(name, configsyncIp, mirrorIp, mirrorSecondaryIp str
 	return b.post(config, uriCm, uriDiv)
 }
 
+// API does not work, you cannot modify API issue 
 func (b *BigIP) ModifyDevice(config *Device) error {
 	return b.put(config, uriCm, uriDiv)
 }
