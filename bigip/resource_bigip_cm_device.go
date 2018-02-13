@@ -99,7 +99,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if members == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Device (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -120,7 +120,7 @@ func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	if err == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Device (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
