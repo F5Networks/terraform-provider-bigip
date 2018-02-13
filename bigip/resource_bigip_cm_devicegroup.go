@@ -145,6 +145,12 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
+
+	if p == nil {
+			log.Printf("[WARN] Devicegroup (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", p.Name)
 	d.Set("description", p.Description)
 	d.Set("type", p.Type)
@@ -169,7 +175,17 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		log.Println(" my rname is  ", Rname)
 		client.DeleteDevicegroupDevices(name, Rname)
 	}
-	return client.DeleteDevicegroup(name)
+
+	err := client.DeleteDevicegroup(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Devicegroup  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipCmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
