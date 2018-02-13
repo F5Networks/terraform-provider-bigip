@@ -62,6 +62,11 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	if irule == nil {
+			log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("irule", irule.Rule)
 	d.Set("name", name)
 	return nil
@@ -97,7 +102,16 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	return client.DeleteIRule(name)
+	err := client.DeleteIRule(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] iRule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmIRuleImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
