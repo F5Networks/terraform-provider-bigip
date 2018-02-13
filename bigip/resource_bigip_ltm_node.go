@@ -48,11 +48,21 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Get("name").(string)
 	address := d.Get("address").(string)
 
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
+
 	log.Println("[INFO] Creating node " + name + "::" + address)
-	err := client.CreateNode(
-		name,
-		address,
-	)
+	var err error
+	if r.MatchString(address) {
+		err = client.CreateNode(
+			name,
+			address,
+		)
+	} else {
+		err = client.CreateFQDNNode(
+			name,
+			address,
+		)
+	}
 	if err != nil {
 		return err
 	}
@@ -74,7 +84,11 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("address", node.Address)
+	if node.FQDN.Name != "" {
+		d.Set("address", node.FQDN.Name)
+	} else {
+		d.Set("address", node.Address)
+	}
 	d.Set("name", name)
 
 	return nil

@@ -151,6 +151,13 @@ type Node struct {
 	Ratio           int    `json:"ratio,omitempty"`
 	Session         string `json:"session,omitempty"`
 	State           string `json:"state,omitempty"`
+	FQDN            struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
 }
 
 // DataGroups contains a list of data groups on the BIG-IP system.
@@ -1672,12 +1679,22 @@ func (b *BigIP) Nodes() (*Nodes, error) {
 	return &nodes, nil
 }
 
-// CreateNode adds a new node to the BIG-IP system.
+// CreateNode adds a new IP based node to the BIG-IP system.
 func (b *BigIP) CreateNode(name, address string) error {
 	config := &Node{
 		Name:    name,
 		Address: address,
 	}
+
+	return b.post(config, uriLtm, uriNode)
+}
+
+// CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
+func (b *BigIP) CreateFQDNNode(name, address string) error {
+	config := &Node{
+		Name: name,
+	}
+	config.FQDN.Name = address
 
 	return b.post(config, uriLtm, uriNode)
 }
@@ -2267,8 +2284,6 @@ func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsF
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
-
-
 func (b *BigIP) GetOneconnect(name string) (*Oneconnect, error) {
 	var oneconnect Oneconnect
 	err, ok := b.getForEntity(&oneconnect, uriLtm, uriProfile, uriOneconnect, name)
@@ -2281,8 +2296,6 @@ func (b *BigIP) GetOneconnect(name string) (*Oneconnect, error) {
 
 	return &oneconnect, nil
 }
-
-
 
 // DeleteOneconnect removes an OneConnect profile from the system.
 func (b *BigIP) DeleteOneconnect(name string) error {
@@ -2404,16 +2417,16 @@ func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 }
 
 func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
- var fastl4 Fastl4
- err, ok := b.getForEntity(&fastl4, uriLtm, uriProfile, uriFastl4, name)
- if err != nil {
-	 return nil, err
- }
- if !ok {
-	 return nil, nil
- }
+	var fastl4 Fastl4
+	err, ok := b.getForEntity(&fastl4, uriLtm, uriProfile, uriFastl4, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
 
- return &fastl4, nil
+	return &fastl4, nil
 }
 
 // ===============
@@ -2440,16 +2453,16 @@ func (b *BigIP) ModifyHttpcompress(name string, httpcompress *Httpcompress) erro
 }
 
 func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
- var httpcompress Httpcompress
- err, ok := b.getForEntity(&httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
- if err != nil {
-	 return nil, err
- }
- if !ok {
-	 return nil, nil
- }
+	var httpcompress Httpcompress
+	err, ok := b.getForEntity(&httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
 
- return &httpcompress, nil
+	return &httpcompress, nil
 }
 
 func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
