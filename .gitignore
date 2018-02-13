@@ -44,6 +44,6 @@ bigip/*.back
 !command/test-fixtures/**/.terraform/
 
 # Allow
-! examples/bigip*
+examples/bigip*
 # Keep windows files with windows line endings
 *.winfile eol=crlf
