@@ -84,6 +84,21 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 
+			"persistence_profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"fallback_persistence_profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Fallback persistence profile",
+			},
+
 			"irules": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -208,6 +223,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("vlans", vs.Vlans)
 	d.Set("translate_address", vs.TranslateAddress)
 	d.Set("translate_port", vs.TranslatePort)
+	d.Set("persistence_profiles", vs.PersistenceProfiles)
+	d.Set("fallbacl_persistence_profile", vs.FallbackPersistenceProfile)
 
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
@@ -284,6 +301,13 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		}
 	}
 
+	var persistenceProfiles []bigip.Profile
+	if p, ok := d.GetOk("persistence_profiles"); ok {
+		for _, profile := range p.(*schema.Set).List() {
+			persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
+		}
+	}
+
 	var policies []string
 	if p, ok := d.GetOk("policies"); ok {
 		policies = setToStringSlice(p.(*schema.Set))
@@ -300,15 +324,17 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	}
 
 	vs := &bigip.VirtualServer{
-		Destination: fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
-		Source:      d.Get("source").(string),
-		Pool:        d.Get("pool").(string),
-		Mask:        d.Get("mask").(string),
-		Rules:       rules,
-		Profiles:    profiles,
-		Policies:    policies,
-		Vlans:       vlans,
-		IPProtocol:  d.Get("ip_protocol").(string),
+		Destination:                fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
+		FallbackPersistenceProfile: d.Get("fallback_persistence_profile").(string),
+		Source:              d.Get("source").(string),
+		Pool:                d.Get("pool").(string),
+		Mask:                d.Get("mask").(string),
+		Rules:               rules,
+		PersistenceProfiles: persistenceProfiles,
+		Profiles:            profiles,
+		Policies:            policies,
+		Vlans:               vlans,
+		IPProtocol:          d.Get("ip_protocol").(string),
 		SourceAddressTranslation: struct {
 			Type string `json:"type,omitempty"`
 			Pool string `json:"pool,omitempty"`
