@@ -90,6 +90,11 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
+	if snatpool == nil {
+			log.Printf("[WARN] Snatpool (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("partition", snatpool.Partition)
 	return nil
@@ -99,8 +104,14 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	return client.DeleteSnatpool(name)
-	//return nil
+	err := client.DeleteSnatpool(name)
+	if err == nil {
+		log.Printf("[WARN] Snat pool  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
+
 }
 
 func resourceBigipLtmSnatpoolImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
