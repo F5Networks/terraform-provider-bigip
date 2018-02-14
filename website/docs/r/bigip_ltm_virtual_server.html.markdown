@@ -34,6 +34,7 @@ resource "bigip_ltm_virtual_server" "https" {
   source_address_translation = "automap"
   translate_address = "enabled"
   translate_port = "enabled"
+  vlans_disabled = true
 }
 
 # A Virtual server with separate client and server profiles
@@ -84,3 +85,6 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs. See vlans-disabled and vlans-enabled.
 
+* `vlans_enabled` - (Optional Bool) Enables the virtual server on the VLANs specified by the VLANs option.
+
+* `vlans_disabled` - (Optional Bool) Disables the virtual server on the VLANs specified by the VLANs option.

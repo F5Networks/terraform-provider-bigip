@@ -152,6 +152,18 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed:    true,
 				Description: "To enable _ disable port translation",
 			},
+			"vlans_disabled" : {
+				Type:         schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Disables the virtual server on the VLANs specified by the VLANs option.",
+			},
+			"vlans_enabled" : {
+				Type:         schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Enables the virtual server on the VLANs specified by the VLANs option.",
+			},
 		},
 	}
 }
@@ -170,6 +182,8 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 		d.Get("destination").(string),
 		d.Get("mask").(string),
 		d.Get("pool").(string),
+		d.Get("vlans_enabled").(bool),
+		d.Get("vlans_disabled").(bool),
 		port,
 		TranslateAddress,
 		TranslatePort,
@@ -229,6 +243,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("translate_port", vs.TranslatePort)
 	d.Set("persistence_profiles", vs.PersistenceProfiles)
 	d.Set("fallbacl_persistence_profile", vs.FallbackPersistenceProfile)
+	d.Set("vlans_enabled", vs.VlansEnabled)
+	d.Set("vlans_disabled", vs.VlansDisabled)
 
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
@@ -348,6 +364,8 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		},
 		TranslatePort:    d.Get("translate_port").(string),
 		TranslateAddress: d.Get("translate_address").(string),
+		VlansEnabled: d.Get("vlans_enabled").(bool),
+		VlansDisabled: d.Get("vlans_disabled").(bool),
 	}
 
 	err := client.ModifyVirtualServer(name, vs)
