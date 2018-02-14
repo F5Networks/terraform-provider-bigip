@@ -184,10 +184,10 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 	if traps == nil {
-			log.Printf("[WARN] SNMP traps (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] SNMP traps (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	d.Set("name", traps.Name)
 	d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted)

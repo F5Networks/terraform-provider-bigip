@@ -145,10 +145,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	if monitors == nil {
-			log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	for _, m := range monitors {
 		if m.FullPath == name {
 			d.Set("interval", m.Interval)

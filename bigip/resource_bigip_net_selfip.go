@@ -76,10 +76,10 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 	if selfIPs == nil {
-			log.Printf("[WARN] SelfIP (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] SelfIP (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	for _, selfip := range selfIPs.SelfIPs {
 		log.Println(selfip.Name)
 		if selfip.Name == name {

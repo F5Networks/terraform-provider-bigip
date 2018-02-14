@@ -91,10 +91,10 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 	if snatpool == nil {
-			log.Printf("[WARN] Snatpool (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Snatpool (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("partition", snatpool.Partition)
 	return nil

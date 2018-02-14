@@ -141,16 +141,16 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
- obj, err := client.GetTcp(name)
- if err != nil {
-	 d.SetId("")
- 	return err
- }
- if obj == nil {
-			log.Printf("[WARN] tcp  Profile (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+	obj, err := client.GetTcp(name)
+	if err != nil {
+		d.SetId("")
+		return err
+	}
+	if obj == nil {
+		log.Printf("[WARN] tcp  Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("idle_timeout", obj.IdleTimeout)
 	d.Set("close_wait_timeout", obj.CloseWaitTimeout)
@@ -160,8 +160,7 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("deferred_accept", obj.DeferredAccept)
 	d.Set("fast_open", obj.FastOpen)
 
-
-	 //d.Set("idle_timeout", obj.IdleTimeout)
+	//d.Set("idle_timeout", obj.IdleTimeout)
 	return nil
 }
 

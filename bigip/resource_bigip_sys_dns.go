@@ -105,10 +105,10 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if dns == nil {
-				log.Printf("[WARN] DNS (%s) not found, removing from state", d.Id())
-				d.SetId("")
-				return nil
-			}
+		log.Printf("[WARN] DNS (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("description", dns.Description)
 	d.Set("name_servers", dns.NameServers)
 	d.Set("numberof_dots", dns.NumberOfDots)
@@ -118,7 +118,7 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
-	 // There is no Delete API for this operation
+	// There is no Delete API for this operation
 
 	return nil
 }

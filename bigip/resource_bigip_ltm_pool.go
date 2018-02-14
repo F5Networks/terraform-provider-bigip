@@ -102,20 +102,20 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if pool == nil {
-			log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	nodes, err := client.PoolMembers(name)
 	if err != nil {
 		return err
 	}
 
 	if nodes == nil {
-			log.Printf("[WARN] Pool Member (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Pool Member (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	nodeNames := make([]string, 0, len(nodes.PoolMembers))
 

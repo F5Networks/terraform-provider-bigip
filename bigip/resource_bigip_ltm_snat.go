@@ -113,14 +113,14 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Fetching Ltm Snat " + name)
 	p, err := client.GetSnat(name)
 	if err != nil {
- 	 d.SetId("")
-  	return err
-  }
-  if p == nil {
- 			log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
- 			d.SetId("")
- 			return nil
- 		}
+		d.SetId("")
+		return err
+	}
+	if p == nil {
+		log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("partition", p.Partition)
 	d.Set("full_path", p.FullPath)
 	d.Set("autolasthop", p.AutoLasthop)

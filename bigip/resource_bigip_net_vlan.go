@@ -106,10 +106,10 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if vlans == nil {
-				log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-				d.SetId("")
-				return nil
-			}
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	for _, vlan := range vlans.Vlans {
 		log.Println(vlan.Name)
@@ -169,7 +169,7 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 		d.SetId("")
 		return nil
 	}
-return nil
+	return nil
 }
 
 func resourceBigipNetVlanImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

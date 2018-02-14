@@ -105,10 +105,10 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	if vas == nil {
-			log.Printf("[WARN] VirtualAddress (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] VirtualAddress (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	for _, va = range vas.VirtualAddresses {
 		if va.FullPath == name {
 			break

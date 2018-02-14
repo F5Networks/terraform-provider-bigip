@@ -261,10 +261,10 @@ func resourceBigipSysIappRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if p == nil {
-				log.Printf("[WARN] IApp (%s) not found, removing from state", d.Id())
-				d.SetId("")
-				return nil
-			}
+		log.Printf("[WARN] IApp (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("partition", p.Partition)
 	//d.Set("description", p.Description)

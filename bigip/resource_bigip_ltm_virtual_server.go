@@ -201,10 +201,10 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 	if vs == nil {
-				log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
-				d.SetId("")
-				return nil
-			}
+		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	// /Common/virtual_server_name:80
 	regex := regexp.MustCompile("(/\\w+/)?([\\w._-]+)(:\\d+)?")
 	destination := regex.FindStringSubmatch(vs.Destination)

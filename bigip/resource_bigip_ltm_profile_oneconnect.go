@@ -133,14 +133,14 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	name := d.Id()
 	obj, err := client.GetOneconnect(name)
 	if err != nil {
-	 d.SetId("")
-	return err
+		d.SetId("")
+		return err
 	}
 	if obj == nil {
- 			log.Printf("[WARN] Onceconnect Profile (%s) not found, removing from state", d.Id())
- 			d.SetId("")
- 			return nil
- 		}
+		log.Printf("[WARN] Onceconnect Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("share_pools", obj.SharePools)
 	d.Set("source_mask", obj.SourceMask)
