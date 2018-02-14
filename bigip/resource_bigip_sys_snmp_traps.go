@@ -183,6 +183,11 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	if traps == nil {
+			log.Printf("[WARN] SNMP traps (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 
 	d.Set("name", traps.Name)
 	d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted)
@@ -208,7 +213,16 @@ func resourceBigipSysSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) e
 	name := d.Id()
 	log.Println("[INFO] Deleting snmp host " + name)
 
-	return client.DeleteTRAP(name)
+	err := client.DeleteTRAP(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] SNP Traps (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipSysSnmpTrapsImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

@@ -91,7 +91,11 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-
+	if snmp == nil {
+				log.Printf("[WARN] SNMP (%s) not found, removing from state", d.Id())
+				d.SetId("")
+				return nil
+			}
 	d.Set("sys_contact", snmp.SysContact)
 	d.Set("sys_location", snmp.SysLocation)
 	d.Set("allowedaddresses", snmp.AllowedAddresses)
