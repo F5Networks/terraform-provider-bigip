@@ -75,6 +75,11 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return err
 	}
+	if selfIPs == nil {
+			log.Printf("[WARN] SelfIP (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	for _, selfip := range selfIPs.SelfIPs {
 		log.Println(selfip.Name)
 		if selfip.Name == name {
@@ -129,7 +134,13 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 
 	log.Println("[INFO] Deleting selfIP " + name)
 
-	return client.DeleteSelfIP(name)
+	err := client.DeleteSelfIP(name)
+	if err == nil {
+		log.Printf("[WARN] Selfip (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipNetSelfIPImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

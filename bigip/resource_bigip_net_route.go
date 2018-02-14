@@ -86,6 +86,11 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	 d.SetId("")
 	return err
 	}
+	if obj == nil {
+			log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("network", obj.Network)
 	d.Set("gw", obj.Gateway)
@@ -98,7 +103,13 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	log.Println("[INFO] Deleting Route " + name)
 
-	return client.DeleteRoute(name)
+	err := client.DeleteRoute(name)
+	if err == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipNetRouteImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

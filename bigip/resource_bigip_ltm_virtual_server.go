@@ -200,7 +200,11 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return err
 	}
-
+	if vs == nil {
+				log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
+				d.SetId("")
+				return nil
+			}
 	// /Common/virtual_server_name:80
 	regex := regexp.MustCompile("(/\\w+/)?([\\w._-]+)(:\\d+)?")
 	destination := regex.FindStringSubmatch(vs.Destination)
@@ -360,7 +364,13 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 	name := d.Id()
 	log.Println("[INFO] Deleting virtual server " + name)
 
-	return client.DeleteVirtualServer(name)
+	err := client.DeleteVirtualServer(name)
+	if err == nil {
+		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmVirtualServerImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
