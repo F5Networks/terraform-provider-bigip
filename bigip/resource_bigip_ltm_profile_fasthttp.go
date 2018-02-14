@@ -157,6 +157,11 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	 d.SetId("")
 	return err
 	}
+	if obj == nil {
+			log.Printf("[WARN] Fasthttp profile  (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride)
 	d.Set("connpool_minsize", obj.ConnpoolMinSize)
@@ -171,7 +176,16 @@ func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interfac
 	name := d.Id()
 	log.Println("[INFO] Deleting Fasthttp Profile " + name)
 
-	return client.DeleteFasthttp(name)
+	err := client.DeleteFasthttp(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Fasthttp Profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmProfileFasthttpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

@@ -98,6 +98,11 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	 d.SetId("")
 	return err
 	}
+	if obj == nil {
+ 			log.Printf("[WARN] Httpcompress Profile (%s) not found, removing from state", d.Id())
+ 			d.SetId("")
+ 			return nil
+ 		}
 	d.Set("name", name)
 	d.Set("uri_include", obj.UriInclude)
 	//d.Set("uri_exclude", obj.UriInclude)
@@ -111,7 +116,16 @@ func resourceBigipLtmProfileHttpcompressDelete(d *schema.ResourceData, meta inte
 	name := d.Id()
 	log.Println("[INFO] Deleting Httpcompress Profile " + name)
 
-	return client.DeleteHttpcompress(name)
+	err := client.DeleteHttpcompress(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Httpcompress profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmProfileHttpcompressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

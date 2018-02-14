@@ -136,6 +136,11 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	 d.SetId("")
 	return err
 	}
+	if obj == nil {
+ 			log.Printf("[WARN] Onceconnect Profile (%s) not found, removing from state", d.Id())
+ 			d.SetId("")
+ 			return nil
+ 		}
 	d.Set("name", name)
 	d.Set("share_pools", obj.SharePools)
 	d.Set("source_mask", obj.SourceMask)
@@ -152,7 +157,16 @@ func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interf
 	name := d.Id()
 	log.Println("[INFO] Deleting OneConnect Profile " + name)
 
-	return client.DeleteOneconnect(name)
+	err := client.DeleteOneconnect(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] OneConnect profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmProfileOneconnectImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

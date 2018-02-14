@@ -141,6 +141,11 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	 d.SetId("")
 	return err
 	}
+	if obj == nil {
+			log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("client_timeout", obj.ClientTimeout)
 	d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
@@ -159,7 +164,16 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 	name := d.Id()
 	log.Println("[INFO] Deleting Fastl4 Profile " + name)
 
-	return client.DeleteFastl4(name)
+	err := client.DeleteFastl4(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmProfileFastl4Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

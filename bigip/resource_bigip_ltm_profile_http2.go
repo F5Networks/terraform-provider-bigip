@@ -114,6 +114,11 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	 d.SetId("")
  	return err
  }
+ if obj == nil {
+			log.Printf("[WARN] Http2 Profile (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
 	d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
@@ -127,8 +132,19 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 	name := d.Id()
 	log.Println("[INFO] Deleting Http2 Profile " + name)
 
-	return client.DeleteHttp2(name)
+	err := client.DeleteHttp2(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Http2 profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
+
+
 
 func resourceBigipLtmProfileHttp2Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil

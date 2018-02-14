@@ -112,6 +112,15 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Println("[INFO] Fetching Ltm Snat " + name)
 	p, err := client.GetSnat(name)
+	if err != nil {
+ 	 d.SetId("")
+  	return err
+  }
+  if p == nil {
+ 			log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
+ 			d.SetId("")
+ 			return nil
+ 		}
 	d.Set("partition", p.Partition)
 	d.Set("full_path", p.FullPath)
 	d.Set("autolasthop", p.AutoLasthop)
@@ -163,7 +172,16 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	return client.DeleteSnat(name)
+	err := client.DeleteSnat(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmSnatImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

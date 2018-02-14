@@ -146,6 +146,11 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	 d.SetId("")
  	return err
  }
+ if obj == nil {
+			log.Printf("[WARN] tcp  Profile (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	d.Set("name", name)
 	d.Set("idle_timeout", obj.IdleTimeout)
 	d.Set("close_wait_timeout", obj.CloseWaitTimeout)
@@ -166,7 +171,16 @@ func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) 
 	name := d.Id()
 	log.Println("[INFO] Deleting Tcp Profile " + name)
 
-	return client.DeleteTcp(name)
+	err := client.DeleteTcp(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] tcp profile  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	return nil
 }
 
 func resourceBigipLtmProfileTcpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
