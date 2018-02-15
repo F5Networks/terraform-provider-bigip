@@ -14,8 +14,7 @@ var TEST_PPDSTADDR_NAME = fmt.Sprintf("/%s/test-ppdstaddr", TEST_PARTITION)
 var TEST_PPDSTADDR_RESOURCE = `
 resource "bigip_ltm_persistence_profile_dstaddr" "test_ppdstaddr" {
 	name = "` + TEST_PPDSTADDR_NAME + `"
-	app_service = "none"
-	defaults_from = "/Common/source_addr"
+	defaults_from = "/Common/dest_addr"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
 	match_across_virtuals = "enabled"
@@ -41,7 +40,7 @@ func TestBigipLtmPersistenceProfileDstAddrCreate(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testBigipLtmPersistenceProfileDstAddrExists(TEST_PPDSTADDR_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "name", TEST_PPDSTADDR_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "defaults_from", "/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "defaults_from", "/Common/dest_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "match_across_services", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "match_across_virtuals", "enabled"),

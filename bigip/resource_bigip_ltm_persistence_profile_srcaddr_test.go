@@ -14,7 +14,6 @@ var TEST_PPSRCADDR_NAME = fmt.Sprintf("/%s/test-ppsrcaddr", TEST_PARTITION)
 var TEST_PPSRCADDR_RESOURCE = `
 resource "bigip_ltm_persistence_profile_srcaddr" "test_ppsrcaddr" {
 	name = "` + TEST_PPSRCADDR_NAME + `"
-	app_service = "none"
 	defaults_from = "/Common/source_addr"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
