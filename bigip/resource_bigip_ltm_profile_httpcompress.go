@@ -95,14 +95,14 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	name := d.Id()
 	obj, err := client.GetHttpcompress(name)
 	if err != nil {
-	 d.SetId("")
-	return err
+		d.SetId("")
+		return err
 	}
 	if obj == nil {
- 			log.Printf("[WARN] Httpcompress Profile (%s) not found, removing from state", d.Id())
- 			d.SetId("")
- 			return nil
- 		}
+		log.Printf("[WARN] Httpcompress Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("uri_include", obj.UriInclude)
 	//d.Set("uri_exclude", obj.UriInclude)

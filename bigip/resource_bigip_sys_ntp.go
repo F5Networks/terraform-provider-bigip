@@ -92,6 +92,11 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	if ntp == nil {
+		log.Printf("[WARN] NTP (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	d.Set("description", ntp.Description)
 	d.Set("servers", ntp.Servers)

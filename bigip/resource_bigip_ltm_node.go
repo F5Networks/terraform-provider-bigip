@@ -84,10 +84,10 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if node == nil {
-			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if node.FQDN.Name != "" {
 		d.Set("address", node.FQDN.Name)
 	} else {
@@ -133,12 +133,12 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	log.Println("[INFO] Deleting node " + name)
 
-	 err := client.DeleteNode(name)
-	 if err == nil {
-	 		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-	 		d.SetId("")
-	 		return nil
-	 	}
+	err := client.DeleteNode(name)
+	if err == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	regex := regexp.MustCompile("referenced by a member of pool '\\/\\w+/([\\w-_.]+)")
 	for err != nil {
 		log.Printf("[INFO] Deleting %s from pools...\n", name)

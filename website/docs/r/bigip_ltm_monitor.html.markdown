@@ -22,6 +22,7 @@ resource "bigip_ltm_monitor" "monitor" {
   send = "GET /some/path\r\n"
   timeout = "999"
   interval = "999"
+  destination = "1.2.3.4:1234"
 }
 
 ```      
@@ -50,4 +51,6 @@ resource "bigip_ltm_monitor" "monitor" {
 
 * `ip_dscp` - (Optional)
 
-* `ime_until_up` - (Optional)
+* `time_until_up` - (Optional)
+
+* `destination` - (Optional) Specify an alias address for monitoring

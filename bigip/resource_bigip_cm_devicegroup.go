@@ -147,10 +147,10 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if p == nil {
-			log.Printf("[WARN] Devicegroup (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Devicegroup (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", p.Name)
 	d.Set("description", p.Description)
 	d.Set("type", p.Type)

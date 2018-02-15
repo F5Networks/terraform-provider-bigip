@@ -116,6 +116,11 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	if p == nil {
+		log.Printf("[WARN] Provision (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	//d.Set("name", p.Name)
 	d.Set("full_path", p.FullPath)
 	p.Name = name
@@ -125,7 +130,7 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
-
+	//API is not supported for Deleting
 	return nil
 }
 

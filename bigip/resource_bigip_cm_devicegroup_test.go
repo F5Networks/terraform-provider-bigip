@@ -12,7 +12,7 @@ import (
 //var TEST_DG_NAME = fmt.Sprintf("/%s/test-devicegroup", TEST_PARTITION)
 var TEST_DG_NAME = "test-devicegroup"
 
-var TEST_DG_RESOURCE =  `
+var TEST_DG_RESOURCE = `
 
 resource "bigip_cm_device" "test-device"
         {
@@ -58,7 +58,7 @@ func TestBigipCmDevicegroup_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "save_on_auto_sync", "false"),
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "network_failover", "enabled"),
 					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "incremental_config", "1024"),
-					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup",  "device.0.name", "/Common/test-device"),
+					resource.TestCheckResourceAttr("bigip_cm_devicegroup.test-devicegroup", "device.0.name", "/Common/test-device"),
 				),
 			},
 		},

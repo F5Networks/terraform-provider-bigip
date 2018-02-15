@@ -104,7 +104,6 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-
 	d.Set("name", members.Name)
 	d.Set("mirror_ip", members.MirrorIp)
 	d.Set("configsync_ip", members.ConfigsyncIp)
@@ -124,7 +123,7 @@ func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error
 		d.SetId("")
 		return nil
 	}
-return nil
+	return nil
 }
 
 func resourceBigipCmDeviceImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

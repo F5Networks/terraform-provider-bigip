@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"strings"
 )
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -103,6 +104,12 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Default:     0,
 				Description: "Time in seconds",
 			},
+
+			"destination": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Alias for the destination",
+			},
 		},
 	}
 }
@@ -138,10 +145,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	if monitors == nil {
-			log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	for _, m := range monitors {
 		if m.FullPath == name {
 			d.Set("interval", m.Interval)
@@ -155,6 +162,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("parent", m.ParentMonitor)
+			d.Set("destination", m.Destination)
 			d.Set("name", name)
 			return nil
 		}
@@ -200,6 +208,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		IPDSCP:         d.Get("ip_dscp").(int),
 		TimeUntilUp:    d.Get("time_until_up").(int),
 		ManualResume:   d.Get("manual_resume").(bool),
+		Destination:    d.Get("destination").(string),
 	}
 
 	return client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)

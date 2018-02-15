@@ -83,14 +83,14 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	obj, err := client.GetRoute(name)
 	if err != nil {
-	 d.SetId("")
-	return err
+		d.SetId("")
+		return err
 	}
 	if obj == nil {
-			log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("network", obj.Network)
 	d.Set("gw", obj.Gateway)

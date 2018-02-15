@@ -109,16 +109,16 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
- obj, err := client.GetHttp2(name)
- if err != nil {
-	 d.SetId("")
- 	return err
- }
- if obj == nil {
-			log.Printf("[WARN] Http2 Profile (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+	obj, err := client.GetHttp2(name)
+	if err != nil {
+		d.SetId("")
+		return err
+	}
+	if obj == nil {
+		log.Printf("[WARN] Http2 Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
 	d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
@@ -143,8 +143,6 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 	}
 	return nil
 }
-
-
 
 func resourceBigipLtmProfileHttp2Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil

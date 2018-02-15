@@ -63,10 +63,10 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if irule == nil {
-			log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("irule", irule.Rule)
 	d.Set("name", name)
 	return nil

@@ -25,6 +25,7 @@ resource "bigip_ltm_monitor" "test-monitor" {
 	manual_resume = false
 	ip_dscp = 0
 	time_until_up = 0
+	destination = "1.2.3.4:1234"
 }
 `
 
@@ -51,6 +52,7 @@ func TestBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "manual_resume", "false"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "ip_dscp", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "destination", "1.2.3.4:1234"),
 				),
 			},
 		},
