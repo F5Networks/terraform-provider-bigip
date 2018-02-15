@@ -9,12 +9,11 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-var TEST_PPSSL_NAME = fmt.Sprintf("/%s/test-PPSSL", TEST_PARTITION)
+var TEST_PPSSL_NAME = fmt.Sprintf("/%s/test-ppssl", TEST_PARTITION)
 
 var TEST_PPSSL_RESOURCE = `
-resource "bigip_ltm_persistence_profile_ssl" "test_PPSSL" {
+resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
 	name = "` + TEST_PPSSL_NAME + `"
-	app_service = "none"
 	defaults_from = "/Common/ssl"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
@@ -38,14 +37,14 @@ func TestBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
 				Config: TEST_PPSSL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testBigipLtmPersistenceProfileSSLExists(TEST_PPSSL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "name", TEST_PPSSL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "defaults_from", "/Common/source_addr"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "match_across_pools", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "match_across_services", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "match_across_virtuals", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "mirror", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "timeout", "3600"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_PPSSL", "override_conn_limit", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "name", TEST_PPSSL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "defaults_from", "/Common/ssl"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "match_across_pools", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "match_across_services", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "match_across_virtuals", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "mirror", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "timeout", "3600"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "override_conn_limit", "enabled"),
 				),
 			},
 		},
@@ -78,7 +77,7 @@ func testBigipLtmPersistenceProfileSSLExists(name string, exists bool) resource.
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		pp, err := client.GetSourceAddrPersistenceProfile(name)
+		pp, err := client.GetSSLPersistenceProfile(name)
 		if err != nil {
 			return err
 		}

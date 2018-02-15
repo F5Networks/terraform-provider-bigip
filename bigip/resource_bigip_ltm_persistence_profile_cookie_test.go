@@ -14,19 +14,16 @@ var TEST_PPCOOKIE_NAME = fmt.Sprintf("/%s/test-ppcookie", TEST_PARTITION)
 var TEST_PPCOOKIE_RESOURCE = `
 resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
 	name = "` + TEST_PPCOOKIE_NAME + `"
-	app_service = "none"
-	defaults_from = "/Common/source_addr"
+	defaults_from = "/Common/cookie"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
 	match_across_virtuals = "enabled"
-	mirror = "enabled"
 	timeout = 3600
 	override_conn_limit = "enabled"
 	always_send = "enabled"
-	cookie_encryption = "required"
-	cookie_encryption_passphrase = "iloveham"
+	cookie_encryption = "disabled"
 	cookie_name = "ham"
-	expiration = "0:1:0:0"
+	expiration = "1:0:0"
 	hash_length = 0
 }
 
@@ -45,19 +42,18 @@ func TestBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testBigipLtmPersistenceProfileCookieExists(TEST_PPCOOKIE_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "name", TEST_PPCOOKIE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "defaults_from", "/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "defaults_from", "/Common/cookie"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "match_across_services", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "match_across_virtuals", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "mirror", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "timeout", "3600"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "override_conn_limit", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "always_send", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "cookie_encryption", "required"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "cookie_encryption", "disabled"),
 					// unable to validate since value is encrypted
 					// resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "cookie_encryption_passphrase", "iloveham"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "cookie_name", "ham"),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "expiration", "0:1:0:0"),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "expiration", "1:0:0"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "hash_length", "0"),
 				),
 			},
@@ -91,7 +87,7 @@ func testBigipLtmPersistenceProfileCookieExists(name string, exists bool) resour
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		pp, err := client.GetSourceAddrPersistenceProfile(name)
+		pp, err := client.GetCookiePersistenceProfile(name)
 		if err != nil {
 			return err
 		}
