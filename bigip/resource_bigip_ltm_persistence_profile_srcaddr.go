@@ -2,20 +2,21 @@ package bigip
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceBigipSourceAddrPersistenceProfile() *schema.Resource {
+func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSourceAddrPersistenceProfileCreate,
-		Read:   resourceBigipSourceAddrPersistenceProfileRead,
-		Update: resourceBigipSourceAddrPersistenceProfileUpdate,
-		Delete: resourceBigipSourceAddrPersistenceProfileDelete,
-		Exists: resourceBigipSourceAddrPersistenceProfileExists,
+		Create: resourceBigipLtmPersistenceProfileSrcAddrCreate,
+		Read:   resourceBigipLtmPersistenceProfileSrcAddrRead,
+		Update: resourceBigipLtmPersistenceProfileSrcAddrUpdate,
+		Delete: resourceBigipLtmPersistenceProfileSrcAddrDelete,
+		Exists: resourceBigipLtmPersistenceProfileSrcAddrExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipSourceAddrPersistenceProfileImporter,
+			State: resourceBigipPersistenceProfileSrcAddrImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -26,34 +27,45 @@ func resourceBigipSourceAddrPersistenceProfile() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
+			"app_service": {
+				Type:     schema.TypeString,
+				Default:  "",
+				Optional: true,
+			},
+
 			"defaults_from": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Inherit defaults from parent profile",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Inherit defaults from parent profile",
+				ValidateFunc: validateF5Name,
 			},
 
 			"match_across_pools": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "To enable _ disable match across pools with given persistence record",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "To enable _ disable match across pools with given persistence record",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_services": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "To enable _ disable match across services with given persistence record",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "To enable _ disable match across services with given persistence record",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_virtuals": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "To enable _ disable match across services with given persistence record",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "To enable _ disable match across services with given persistence record",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			"mirror": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "To enable _ disable ??",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "To enable _ disable",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			"timeout": {
@@ -63,10 +75,11 @@ func resourceBigipSourceAddrPersistenceProfile() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type:        schema.TypeString,
-				Default:     false,
-				Optional:    true,
-				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
+				Type:         schema.TypeString,
+				Default:      false,
+				Optional:     true,
+				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			// Specific to SourceAddrPersistenceProfile
@@ -78,10 +91,11 @@ func resourceBigipSourceAddrPersistenceProfile() *schema.Resource {
 			},
 
 			"map_proxies": {
-				Type:        schema.TypeString,
-				Default:     true,
-				Optional:    true,
-				Description: "To enable _ disable directs all to the same single pool member",
+				Type:         schema.TypeString,
+				Default:      true,
+				Optional:     true,
+				Description:  "To enable _ disable directs all to the same single pool member",
+				ValidateFunc: validateEnabledDisabled,
 			},
 
 			"mask": {
@@ -93,7 +107,7 @@ func resourceBigipSourceAddrPersistenceProfile() *schema.Resource {
 	}
 }
 
-func resourceBigipSourceAddrPersistenceProfileCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -106,17 +120,17 @@ func resourceBigipSourceAddrPersistenceProfileCreate(d *schema.ResourceData, met
 
 	d.SetId(name)
 
-	err = resourceBigipSourceAddrPersistenceProfileUpdate(d, meta)
+	err = resourceBigipLtmPersistenceProfileSrcAddrUpdate(d, meta)
 	if err != nil {
 		client.DeleteSourceAddrPersistenceProfile(name)
 		return err
 	}
 
-	return resourceBigipSourceAddrPersistenceProfileRead(d, meta)
+	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
 
 }
 
-func resourceBigipSourceAddrPersistenceProfileRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -129,6 +143,7 @@ func resourceBigipSourceAddrPersistenceProfileRead(d *schema.ResourceData, meta 
 	}
 
 	d.Set("name", name)
+	d.Set("app_service", pp.AppService)
 	d.Set("defaults_from", pp.DefaultsFrom)
 	d.Set("match_across_pools", pp.MatchAcrossPools)
 	d.Set("match_across_services", pp.MatchAcrossServices)
@@ -145,20 +160,21 @@ func resourceBigipSourceAddrPersistenceProfileRead(d *schema.ResourceData, meta 
 	return nil
 }
 
-func resourceBigipSourceAddrPersistenceProfileUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
 	pp := &bigip.SourceAddrPersistenceProfile{
 		PersistenceProfile: bigip.PersistenceProfile{
+			AppService:              d.Get("app_service").(string),
 			DefaultsFrom:            d.Get("defaults_from").(string),
 			MatchAcrossPools:        d.Get("match_across_pools").(string),
 			MatchAcrossServices:     d.Get("match_across_services").(string),
 			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
 			Mirror:                  d.Get("mirror").(string),
 			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			Timeout:                 d.Get("timeout").(string),
+			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
 		},
 
 		// Specific to SourceAddrPersistenceProfile
@@ -175,7 +191,7 @@ func resourceBigipSourceAddrPersistenceProfileUpdate(d *schema.ResourceData, met
 	return nil
 }
 
-func resourceBigipSourceAddrPersistenceProfileDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -184,7 +200,7 @@ func resourceBigipSourceAddrPersistenceProfileDelete(d *schema.ResourceData, met
 	return client.DeleteSourceAddrPersistenceProfile(name)
 }
 
-func resourceBigipSourceAddrPersistenceProfileExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -202,6 +218,6 @@ func resourceBigipSourceAddrPersistenceProfileExists(d *schema.ResourceData, met
 	return pp != nil, nil
 }
 
-func resourceBigipSourceAddrPersistenceProfileImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipPersistenceProfileSrcAddrImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }
