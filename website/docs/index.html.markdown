@@ -41,12 +41,7 @@ provider "bigip" {
 ### Reference
 
 - `address` - (Required) Address of the device
-- 
 - `username` - (Required) Username for authentication
-- 
 - `password` - (Required) Password for authentication
-- 
 - `token_auth` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
-- 
 - `login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
-
