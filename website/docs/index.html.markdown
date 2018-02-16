@@ -1,3 +1,11 @@
+---
+layout: "bigip"
+page_title: "BIG-IP Provider : Index"
+sidebar_current: "docs-bigip-index"
+description: |-
+    Provides details about provider bigip
+---
+
 # Overview
 
 A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
