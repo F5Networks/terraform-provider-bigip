@@ -1,5 +1,4 @@
-TEST = ./bigip
-TESTARGS = -v
+TEST?=./...
 PROJ = terraform-provider-bigip
 
 ARCHS = amd64 386
@@ -57,17 +56,11 @@ vet:
 		exit 1; \
 	fi
 
-test: build
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout=600s -parallel=1
+test: 
+	@TF_ACC= go test $(TEST) -v $(TESTARGS) -timeout=600s -parallel=1
 
-testacc: fmt build
-	@if [[ "$(BIGIP_USER)" == "" || "$(BIGIP_HOST)" == "" || "-z $(BIGIP_PASSWORD)" == "" ]]; then \
-		echo "ERROR: BIGIP_USER, BIGIP_PASSWORD and BIGIP_HOST must be set."; \
-		exit 1; \
-	fi
-	@TF_ACC= go test $(TEST) $(TESTARGS) -timeout 170m
-
-
+testacc: fmt 
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 170m
 
 test-compile: fmtcheck generate
 		@if [ "$(TEST)" = "./..." ]; then \
@@ -75,7 +68,7 @@ test-compile: fmtcheck generate
 			echo "  make test-compile TEST=./builtin/providers/bigip"; \
 			exit 1; \
 		fi
-		go test -c $(TEST) $(TESTARGS)
+		go test -c $(TEST) -v $(TESTARGS)
 
 clean:
 	@go clean
