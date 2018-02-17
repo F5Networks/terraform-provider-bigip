@@ -388,11 +388,11 @@ var TEST_IAPP_RESOURCE = `
 			  }
 			]
 		  }
-		  
+
 EOF
 	}`
 
-func TestBigipSysIapp_create(t *testing.T) {
+func TestAccBigipSysIapp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -410,7 +410,7 @@ func TestBigipSysIapp_create(t *testing.T) {
 	})
 }
 
-func TestBigipSysIapp_import(t *testing.T) {
+func TestAccBigipSysIapp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

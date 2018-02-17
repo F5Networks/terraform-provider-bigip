@@ -22,7 +22,7 @@ resource "bigip_sys_dns" "test-dns" {
 
 `
 
-func TestBigipSysdns_create(t *testing.T) {
+func TestAccBigipSysdns_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -48,7 +48,7 @@ func TestBigipSysdns_create(t *testing.T) {
 	})
 }
 
-func TestBigipSysdns_import(t *testing.T) {
+func TestAccBigipSysdns_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

@@ -23,7 +23,7 @@ resource "bigip_ltm_profile_http2" "test-http2"
         }
 `
 
-func TestBigipLtmProfileHttp2_create(t *testing.T) {
+func TestAccBigipLtmProfileHttp2_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -45,7 +45,7 @@ func TestBigipLtmProfileHttp2_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfileHttp2_import(t *testing.T) {
+func TestAccBigipLtmProfileHttp2_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

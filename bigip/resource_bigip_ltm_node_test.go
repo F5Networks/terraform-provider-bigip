@@ -18,7 +18,7 @@ resource "bigip_ltm_node" "test-node" {
 }
 `
 
-func TestBigipLtmNode_create(t *testing.T) {
+func TestAccBigipLtmNode_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -38,7 +38,7 @@ func TestBigipLtmNode_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmNode_import(t *testing.T) {
+func TestAccBigipLtmNode_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -67,7 +67,7 @@ func TestBigipLtmNode_import(t *testing.T) {
 //  	allow_snat = false
 //}
 //`
-//func TestBigipLtmNode_removeNode(t *testing.T) {
+//func TestAccBigipLtmNode_removeNode(t *testing.T) {
 //	resource.Test(t, resource.TestCase{
 //		PreCheck: func() {
 //			testAcctPreCheck(t)

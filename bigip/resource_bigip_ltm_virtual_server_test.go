@@ -30,7 +30,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 }
 `
 
-func TestBigipLtmVS_create(t *testing.T) {
+func TestAccBigipLtmVS_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -70,7 +70,7 @@ func TestBigipLtmVS_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmVS_import(t *testing.T) {
+func TestAccBigipLtmVS_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

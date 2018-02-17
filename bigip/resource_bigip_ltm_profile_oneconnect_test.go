@@ -26,7 +26,7 @@ resource "bigip_ltm_profile_oneconnect" "test-oneconnect"
         }
 `
 
-func TestBigipLtmProfileoneconnect_create(t *testing.T) {
+func TestAccBigipLtmProfileoneconnect_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -52,7 +52,7 @@ func TestBigipLtmProfileoneconnect_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfileoneconnect_import(t *testing.T) {
+func TestAccBigipLtmProfileoneconnect_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

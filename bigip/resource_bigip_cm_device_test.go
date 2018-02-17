@@ -22,7 +22,7 @@ resource "bigip_cm_device" "test-device"
         }
 `
 
-func TestBigipCmDevice_create(t *testing.T) {
+func TestAccBigipCmDevice_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -44,7 +44,7 @@ func TestBigipCmDevice_create(t *testing.T) {
 	})
 }
 
-func TestBigipCmDevice_import(t *testing.T) {
+func TestAccBigipCmDevice_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

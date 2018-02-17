@@ -23,7 +23,7 @@ resource "bigip_ltm_profile_httpcompress" "test-httpcompress"
         }
 `
 
-func TestBigipLtmProfileHttpcompress_create(t *testing.T) {
+func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -49,7 +49,7 @@ func TestBigipLtmProfileHttpcompress_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfileHttpcompress_import(t *testing.T) {
+func TestAccBigipLtmProfileHttpcompress_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

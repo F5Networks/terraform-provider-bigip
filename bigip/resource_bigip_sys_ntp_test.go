@@ -20,7 +20,7 @@ resource "bigip_sys_ntp" "test-ntp" {
 }
 `
 
-func TestBigipSysNtp_create(t *testing.T) {
+func TestAccBigipSysNtp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -44,7 +44,7 @@ func TestBigipSysNtp_create(t *testing.T) {
 	})
 }
 
-func TestBigipSysNtp_import(t *testing.T) {
+func TestAccBigipSysNtp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

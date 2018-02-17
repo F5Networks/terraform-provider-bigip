@@ -22,7 +22,7 @@ resource "bigip_sys_provision" "test-provision" {
 }
 `
 
-func TestBigipSysProvision_create(t *testing.T) {
+func TestAccBigipSysProvision_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -46,7 +46,7 @@ func TestBigipSysProvision_create(t *testing.T) {
 	})
 }
 
-func TestBigipSysProvision_import(t *testing.T) {
+func TestAccBigipSysProvision_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

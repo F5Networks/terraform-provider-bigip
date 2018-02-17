@@ -20,7 +20,7 @@ resource "bigip_sys_snmp" "test-snmp" {
 }
 `
 
-func TestBigipSyssnmp_create(t *testing.T) {
+func TestAccBigipSyssnmp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -43,7 +43,7 @@ func TestBigipSyssnmp_create(t *testing.T) {
 	})
 }
 
-func TestBigipSyssnmp_import(t *testing.T) {
+func TestAccBigipSyssnmp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

@@ -27,7 +27,7 @@ resource "bigip_ltm_persistence_profile_dstaddr" "test_ppdstaddr" {
 
 `
 
-func TestBigipLtmPersistenceProfileDstAddrCreate(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileDstAddrCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -56,7 +56,7 @@ func TestBigipLtmPersistenceProfileDstAddrCreate(t *testing.T) {
 
 }
 
-func TestBigipLtmPersistenceProfileDstAddrImport(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileDstAddrImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

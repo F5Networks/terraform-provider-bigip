@@ -27,7 +27,7 @@ func testBigipLtmNodeInvalid(resourceName string) string {
 	`, resourceName)
 }
 
-func TestBigipLtmNodeInvalid(t *testing.T) {
+func TestAccBigipLtmNodeInvalid(t *testing.T) {
 	resourceName := "/Common/test-node"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -55,7 +55,7 @@ func testBigipLtmNodeCreate(resourceName string, url string, address string) str
 	`, resourceName, address, url)
 }
 
-func TestBigipLtmNodeCreate(t *testing.T) {
+func TestAccBigipLtmNodeCreate(t *testing.T) {
 	resourceName := "/Common/test-node"
 	address := "10.10.10.10"
 	setup()

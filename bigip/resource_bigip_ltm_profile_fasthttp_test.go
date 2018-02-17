@@ -27,7 +27,7 @@ resource "bigip_ltm_profile_fasthttp" "test-fasthttp" {
 }
 `
 
-func TestBigipLtmfasthttp_create(t *testing.T) {
+func TestAccBigipLtmfasthttp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -56,7 +56,7 @@ func TestBigipLtmfasthttp_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfilefasthttp_import(t *testing.T) {
+func TestAccBigipLtmProfilefasthttp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

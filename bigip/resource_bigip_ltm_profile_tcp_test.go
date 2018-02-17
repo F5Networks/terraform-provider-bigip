@@ -27,7 +27,7 @@ resource "bigip_ltm_profile_tcp" "test-tcp"
         }
 `
 
-func TestBigipLtmProfileTcp_create(t *testing.T) {
+func TestAccBigipLtmProfileTcp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -54,7 +54,7 @@ func TestBigipLtmProfileTcp_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfileTcp_import(t *testing.T) {
+func TestAccBigipLtmProfileTcp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

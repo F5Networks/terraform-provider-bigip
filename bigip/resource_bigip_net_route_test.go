@@ -37,7 +37,7 @@ resource "bigip_net_route" "test-route" {
 }
 `
 
-func TestBigipNetroute_create(t *testing.T) {
+func TestAccBigipNetroute_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -58,7 +58,7 @@ func TestBigipNetroute_create(t *testing.T) {
 	})
 }
 
-func TestBigipNetroute_import(t *testing.T) {
+func TestAccBigipNetroute_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

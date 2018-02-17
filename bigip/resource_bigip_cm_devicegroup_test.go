@@ -37,7 +37,7 @@ resource "bigip_cm_devicegroup" "test-devicegroup"
         }
 `
 
-func TestBigipCmDevicegroup_create(t *testing.T) {
+func TestAccBigipCmDevicegroup_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -65,7 +65,7 @@ func TestBigipCmDevicegroup_create(t *testing.T) {
 	})
 }
 
-func TestBigipCmDevicegroup_import(t *testing.T) {
+func TestAccBigipCmDevicegroup_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

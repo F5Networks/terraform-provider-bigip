@@ -23,7 +23,7 @@ func testBigipSysNtpInvalid(resourceName string) string {
 	`, resourceName)
 }
 
-func TestBigipSysNtpInvalid(t *testing.T) {
+func TestAccBigipSysNtpInvalid(t *testing.T) {
 	resourceName := "/Common/test-ntp"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,

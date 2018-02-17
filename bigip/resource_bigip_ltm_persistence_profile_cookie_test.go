@@ -29,7 +29,7 @@ resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
 
 `
 
-func TestBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -62,7 +62,7 @@ func TestBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
 
 }
 
-func TestBigipLtmPersistenceProfileCookieImport(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileCookieImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

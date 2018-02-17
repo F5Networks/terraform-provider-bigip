@@ -122,7 +122,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	}
 
 	d.Set("name", name)
-	d.Set("app_service", pp.AppService)
+	//d.Set("app_service", pp.AppService)
 	d.Set("defaults_from", pp.DefaultsFrom)
 	d.Set("match_across_pools", pp.MatchAcrossPools)
 	d.Set("match_across_services", pp.MatchAcrossServices)

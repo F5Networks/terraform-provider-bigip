@@ -26,7 +26,7 @@ resource "bigip_ltm_profile_fastl4" "test-fastl4" {
  }
 `
 
-func TestBigipLtmProfileFastl4_create(t *testing.T) {
+func TestAccBigipLtmProfileFastl4_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -55,7 +55,7 @@ func TestBigipLtmProfileFastl4_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmProfileFastl4_import(t *testing.T) {
+func TestAccBigipLtmProfileFastl4_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

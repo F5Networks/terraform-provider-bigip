@@ -23,7 +23,7 @@ resource "bigip_ltm_snat" "test-snat" {
  full_path = "/Common/test-snat"
 } `
 
-func TestBigipLtmsnat_create(t *testing.T) {
+func TestAccBigipLtmsnat_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -50,7 +50,7 @@ func TestBigipLtmsnat_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmsnat_import(t *testing.T) {
+func TestAccBigipLtmsnat_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

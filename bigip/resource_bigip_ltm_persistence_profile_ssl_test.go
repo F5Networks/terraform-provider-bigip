@@ -25,7 +25,7 @@ resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
 
 `
 
-func TestBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -52,7 +52,7 @@ func TestBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
 
 }
 
-func TestBigipLtmPersistenceProfileSSLImport(t *testing.T) {
+func TestAccBigipLtmPersistenceProfileSSLImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

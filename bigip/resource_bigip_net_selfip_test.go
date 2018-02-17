@@ -30,7 +30,7 @@ resource "bigip_net_selfip" "test-selfip" {
 		}
 `
 
-func TestBigipNetselfip_create(t *testing.T) {
+func TestAccBigipNetselfip_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -51,7 +51,7 @@ func TestBigipNetselfip_create(t *testing.T) {
 	})
 }
 
-func TestBigipNetselfip_import(t *testing.T) {
+func TestAccBigipNetselfip_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

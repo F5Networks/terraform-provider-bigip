@@ -21,7 +21,7 @@ when CLIENT_ACCEPTED {
 EOF
 	}`
 
-func TestBigipLtmIRule_create(t *testing.T) {
+func TestAccBigipLtmIRule_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -39,7 +39,7 @@ func TestBigipLtmIRule_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmIRule_import(t *testing.T) {
+func TestAccBigipLtmIRule_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

@@ -20,7 +20,7 @@ resource "bigip_ltm_snatpool" "test-snatpool" {
 
 `
 
-func TestBigipLtmsnatpool_create(t *testing.T) {
+func TestAccBigipLtmsnatpool_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -45,7 +45,7 @@ func TestBigipLtmsnatpool_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmsnatpool_import(t *testing.T) {
+func TestAccBigipLtmsnatpool_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

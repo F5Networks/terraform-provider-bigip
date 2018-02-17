@@ -29,7 +29,7 @@ resource "bigip_ltm_monitor" "test-monitor" {
 }
 `
 
-func TestBigipLtmMonitor_create(t *testing.T) {
+func TestAccBigipLtmMonitor_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -59,7 +59,7 @@ func TestBigipLtmMonitor_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmMonitor_import(t *testing.T) {
+func TestAccBigipLtmMonitor_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

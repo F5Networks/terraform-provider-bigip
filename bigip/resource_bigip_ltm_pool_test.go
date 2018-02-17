@@ -30,7 +30,7 @@ resource "bigip_ltm_pool" "test-pool" {
 }
 `
 
-func TestBigipLtmPool_create(t *testing.T) {
+func TestAccBigipLtmPool_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -56,7 +56,7 @@ func TestBigipLtmPool_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmPool_import(t *testing.T) {
+func TestAccBigipLtmPool_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

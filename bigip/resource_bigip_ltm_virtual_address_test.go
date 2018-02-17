@@ -20,7 +20,7 @@ resource "bigip_ltm_virtual_address" "test-va" {
 }
 `
 
-func TestBigipLtmVA_create(t *testing.T) {
+func TestAccBigipLtmVA_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -38,7 +38,7 @@ func TestBigipLtmVA_create(t *testing.T) {
 	})
 }
 
-func TestBigipLtmVA_import(t *testing.T) {
+func TestAccBigipLtmVA_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
