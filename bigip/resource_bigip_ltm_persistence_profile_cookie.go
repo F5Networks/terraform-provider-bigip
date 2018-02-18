@@ -235,7 +235,7 @@ func resourceBigipLtmPersistenceProfileCookieUpdate(d *schema.ResourceData, meta
 		return err
 	}
 
-	return nil
+	return resourceBigipLtmPersistenceProfileCookieRead(d, meta)
 }
 
 func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta interface{}) error {

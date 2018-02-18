@@ -188,7 +188,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 		return err
 	}
 
-	return nil
+	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
 }
 
 func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, meta interface{}) error {

@@ -211,7 +211,11 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		Destination:    d.Get("destination").(string),
 	}
 
-	return client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
+	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmMonitorRead(d, meta)
 }
 
 func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) error {

@@ -124,7 +124,11 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 		Address: d.Get("address").(string),
 	}
 
-	return client.ModifyNode(name, vs)
+	err := client.ModifyNode(name, vs)
+	if err != nil {
+		return nil
+	}
+	return resourceBigipLtmNodeRead(d, meta)
 }
 
 func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error {

@@ -157,7 +157,7 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 		return err
 	}
 
-	return nil
+	return resourceBigipLtmPersistenceProfileSSLRead(d, meta)
 }
 
 func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta interface{}) error {
