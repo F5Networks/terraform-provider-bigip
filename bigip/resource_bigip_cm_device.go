@@ -67,7 +67,8 @@ func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipCmDeviceRead(d, meta)
+
 }
 
 func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -84,7 +85,11 @@ func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error
 		MirrorSecondaryIp: d.Get("mirror_secondary_ip").(string),
 	}
 
-	return client.ModifyDevice(r)
+	 err := client.ModifyDevice(r)
+	 if err != nil {
+ 		return err
+ 	}
+	return resourceBigipCmDeviceRead(d, meta)
 }
 
 func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {

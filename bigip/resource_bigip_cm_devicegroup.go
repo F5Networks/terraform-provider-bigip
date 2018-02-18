@@ -122,7 +122,11 @@ func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) 
 	name := d.Id()
 	log.Println("[INFO] Updating Devicegroup " + name)
 	p := dataToDevicegroup(name, d)
-	return client.UpdateDevicegroup(name, &p)
+	err := client.UpdateDevicegroup(name, &p)
+	if err != nil {
+		return err
+	}
+	return resourceBigipCmDevicegroupRead(d, meta)
 }
 
 func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) error {
