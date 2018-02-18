@@ -112,7 +112,7 @@ func resourceBigipLtmProfileTcpCreate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipLtmProfileTcpRead(d, meta)
 }
 
 func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -135,7 +135,11 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 		FastOpen:          d.Get("fast_open").(string),
 	}
 
-	return client.ModifyTcp(name, r)
+	err := client.ModifyTcp(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmProfileOneconnectRead(d, meta)
 }
 
 func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) error {

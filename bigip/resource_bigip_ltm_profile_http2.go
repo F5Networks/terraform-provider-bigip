@@ -84,7 +84,7 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipLtmProfileHttp2Read(d, meta)
 }
 
 func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}) error {
@@ -103,7 +103,11 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 		ActivationModes:                setToStringSlice(d.Get("activation_modes").(*schema.Set)),
 	}
 
-	return client.ModifyHttp2(name, r)
+	err := client.ModifyHttp2(name, r)
+	if err != nil {
+		return err
+	}
+	 return resourceBigipLtmProfileHttp2Read(d, meta)
 }
 
 func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {

@@ -90,7 +90,11 @@ func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 		Search:       setToStringSlice(d.Get("search").(*schema.Set)),
 	}
 
-	return client.ModifyDNS(r)
+	err := client.ModifyDNS(r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipSysDnsRead(d, meta)
 }
 
 func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {

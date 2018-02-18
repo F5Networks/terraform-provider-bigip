@@ -61,7 +61,7 @@ func resourceBigipSysSnmpCreate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 	d.SetId(sysContact)
-	return nil
+	return resourceBigipSysSnmpRead(d, meta)
 }
 
 func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -77,7 +77,11 @@ func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowedAddresses: setToStringSlice(d.Get("allowedaddresses").(*schema.Set)),
 	}
 
-	return client.ModifySNMP(r)
+	err := client.ModifySNMP(r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipSysSnmpRead(d, meta)
 }
 
 func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {

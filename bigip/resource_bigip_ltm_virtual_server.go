@@ -373,7 +373,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	return nil
+	return resourceBigipLtmVirtualServerRead(d, meta)
 }
 
 func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{}) error {

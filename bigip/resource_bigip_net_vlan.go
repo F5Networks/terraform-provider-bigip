@@ -89,7 +89,7 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 	d.SetId(name)
 
-	return nil
+	return resourceBigipNetVlanRead(d, meta)
 
 	//	return resourceBigipNetVlanRead(d, meta)
 }
@@ -153,7 +153,11 @@ func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 		Tag:  d.Get("tag").(int),
 	}
 
-	return client.ModifyVlan(name, r)
+	err := client.ModifyVlan(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipNetVlanRead(d, meta)
 
 }
 

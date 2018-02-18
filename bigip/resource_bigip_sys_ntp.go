@@ -62,7 +62,7 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	d.SetId(description)
-	return nil
+	return resourceBigipSysNtpRead(d, meta)
 }
 
 func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -78,7 +78,11 @@ func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Timezone:    d.Get("timezone").(string),
 	}
 
-	return client.ModifyNTP(r)
+	err := client.ModifyNTP(r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipSysNtpRead(d, meta)
 }
 
 func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {

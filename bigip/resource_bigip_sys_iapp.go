@@ -243,7 +243,11 @@ func resourceBigipSysIappUpdate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	log.Println("[INFO] Updating Iapp " + name)
 	p := dataToIapp(name, d)
-	return client.UpdateIapp(name, &p)
+	err := client.UpdateIapp(name, &p)
+	if err != nil {
+		return err
+	}
+	return resourceBigipSysIappRead(d, meta)
 
 }
 

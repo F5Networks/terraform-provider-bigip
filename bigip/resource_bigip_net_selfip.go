@@ -124,7 +124,12 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 		Vlan:    d.Get("vlan").(string),
 	}
 
-	return client.ModifySelfIP(name, r)
+	err := client.ModifySelfIP(name, r)
+	if err != nil {
+		return err
+	}
+
+	return resourceBigipNetSelfIPRead(d, meta)
 
 }
 

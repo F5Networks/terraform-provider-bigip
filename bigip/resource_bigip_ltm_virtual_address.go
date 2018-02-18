@@ -167,7 +167,7 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	return nil
+	return resourceBigipLtmVirtualAddressRead(d, meta)
 }
 
 func hydrateVirtualAddress(d *schema.ResourceData) *bigip.VirtualAddress {

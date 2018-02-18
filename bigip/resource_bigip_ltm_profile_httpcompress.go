@@ -70,7 +70,7 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipLtmProfileHttpcompressRead(d, meta)
 }
 
 func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -87,7 +87,11 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 		UriInclude:   setToStringSlice(d.Get("uri_include").(*schema.Set)),
 	}
 
-	return client.ModifyHttpcompress(name, r)
+	err := client.ModifyHttpcompress(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmProfileHttpcompressRead(d, meta)
 }
 
 func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interface{}) error {
@@ -105,7 +109,7 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	}
 	d.Set("name", name)
 	d.Set("uri_include", obj.UriInclude)
-	//d.Set("uri_exclude", obj.UriInclude)
+	d.Set("uri_exclude", obj.UriExclude)
 
 	return nil
 }

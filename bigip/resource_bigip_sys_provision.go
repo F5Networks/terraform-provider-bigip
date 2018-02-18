@@ -102,7 +102,11 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 		MemoryRatio: d.Get("memory_ratio").(int),
 	}
 
-	return client.ModifyProvision(r)
+	err := client.ModifyProvision(r)
+	if err != nil {
+		return err 
+	}
+	return resourceBigipSysProvisionRead(d, meta)
 }
 
 func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) error {

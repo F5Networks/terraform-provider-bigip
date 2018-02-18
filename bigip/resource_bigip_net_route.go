@@ -60,7 +60,7 @@ func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipNetRouteRead(d, meta)
 }
 
 func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -75,7 +75,11 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 		Network: d.Get("network").(string),
 	}
 
-	return client.ModifyRoute(name, r)
+	err := client.ModifyRoute(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipNetRouteRead(d, meta)
 }
 
 func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {

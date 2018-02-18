@@ -60,7 +60,7 @@ func resourceBigipLtmSnatpoolCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 	d.SetId(Name)
-	return nil
+	return resourceBigipLtmSnatpoolRead(d, meta)
 }
 
 func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -76,7 +76,11 @@ func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) er
 		Members:   setToStringSlice(d.Get("members").(*schema.Set)),
 	}
 
-	return client.ModifySnatpool(r)
+	err := client.ModifySnatpool(r)
+	if err !=nil {
+		return err
+	}
+	return resourceBigipLtmSnatpoolRead(d, meta)
 }
 
 func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) error {

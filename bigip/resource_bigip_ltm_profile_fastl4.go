@@ -130,7 +130,11 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 		KeepAliveInterval:     d.Get("keepalive_interval").(string),
 	}
 
-	return client.ModifyFastl4(name, r)
+	err := client.ModifyFastl4(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmProfileFastl4Read(d, meta)
 }
 
 func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{}) error {

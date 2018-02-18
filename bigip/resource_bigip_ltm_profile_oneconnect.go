@@ -103,7 +103,7 @@ func resourceBigipLtmProfileOneconnectCreate(d *schema.ResourceData, meta interf
 		return err
 	}
 	d.SetId(name)
-	return nil
+	return resourceBigipLtmProfileOneconnectRead(d, meta)
 }
 
 func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -125,7 +125,11 @@ func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interf
 		MaxReuse:            d.Get("max_reuse").(int),
 	}
 
-	return client.ModifyOneconnect(name, r)
+	err := client.ModifyOneconnect(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmProfileOneconnectRead(d, meta)
 }
 
 func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interface{}) error {

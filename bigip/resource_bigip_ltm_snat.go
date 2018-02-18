@@ -166,7 +166,11 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	log.Println("[INFO] Updating LtmSnat " + name)
 	p := dataToSnat(name, d)
-	return client.UpdateSnat(name, &p)
+	err := client.UpdateSnat(name, &p)
+	if err != nil {
+		return err 
+	}
+	return resourceBigipLtmSnatRead(d, meta)
 }
 
 func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error {
