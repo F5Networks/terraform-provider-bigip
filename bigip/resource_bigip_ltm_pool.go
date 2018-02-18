@@ -125,10 +125,10 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("allow_nat", pool.AllowNAT)
 	d.Set("allow_snat", pool.AllowSNAT)
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
-	//d.Set("nodes", makeStringSet(&nodeNames))
+	d.Set("nodes", makeStringSet(&nodeNames))
 
-	//monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
-	//d.Set("monitors", makeStringSet(&monitors))
+	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
+	d.Set("monitors", makeStringSet(&monitors))
 
 	return nil
 }
@@ -202,7 +202,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		}
 	}
 
-	return nil
+	return resourceBigipLtmPoolRead(d, meta)
 }
 
 func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error {

@@ -146,7 +146,12 @@ func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interfac
 		MaxHeaderSize:               d.Get("maxheader_size").(int),
 	}
 
-	return client.ModifyFasthttp(name, r)
+	err := client.ModifyFasthttp(name, r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmProfileFasthttpRead(d, meta)
+
 }
 
 func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{}) error {
