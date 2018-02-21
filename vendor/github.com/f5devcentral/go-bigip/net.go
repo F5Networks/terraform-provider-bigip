@@ -3,6 +3,7 @@ package bigip
 import (
 	"strings"
 	"log"
+	"fmt"
 )
 
 // Interfaces contains a list of every interface on the BIG-IP system.
@@ -197,8 +198,9 @@ func (b *BigIP) AddInterfaceToVlan(vlan, iface string, tagged bool) error {
 // SelfIPs returns a list of self IP's.
 func (b *BigIP) SelfIPs() (*SelfIPs, error) {
 	var self SelfIPs
-	err, _ := b.getForEntity(&self, uriNet, uriSelf)
+	err, _:= b.getForEntity(&self, uriNet, uriSelf)
 	if err != nil {
+		fmt.Println(" Please check reachability ", err)
 		return nil, err
 	}
 

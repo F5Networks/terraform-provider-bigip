@@ -271,14 +271,30 @@ func resourceBigipSysIappRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("name", name)
 	d.Set("partition", p.Partition)
-	//d.Set("description", p.Description)
 	d.Set("devicegroup", p.DeviceGroup)
+	if err := d.Set("devicegroup", p.DeviceGroup); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving DeviceGroup  to state for Devicegroup  (%s): %s", d.Id(), err)
+	}
 	d.Set("execute_action", p.ExecuteAction)
+	if err := d.Set("execute_action", p.ExecuteAction); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving ExecuteAction  to state for ExecuteAction  (%s): %s", d.Id(), err)
+	}
 	d.Set("inherited_devicegroup", p.InheritedDevicegroup)
+	if err := d.Set("inherited_devicegroup", p.InheritedDevicegroup); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving InheritedDevicegroup  to state for InheritedDevicegroup  (%s): %s", d.Id(), err)
+	}
 	d.Set("inherited_traffic_group", p.InheritedTrafficGroup)
+	if err := d.Set("inherited_traffic_group", p.InheritedTrafficGroup); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving InheritedTrafficGroup  to state for inheritedTrafficGroup  (%s): %s", d.Id(), err)
+	}
 	d.Set("strict_updates", p.StrictUpdates)
-	//d.Set("template", p.Template)
+	if err := d.Set("strict_updates", p.StrictUpdates); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving StrictUpdates  to state for StrictUpdates  (%s): %s", d.Id(), err)
+	}
 	d.Set("template_modified", p.TemplateModified)
+	if err := d.Set("template_modified", p.TemplateModified); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving TemplateModified  to state for TemplateModified  (%s): %s", d.Id(), err)
+	}
 	d.Set("template_prerequisite_errors", p.TemplatePrerequisiteErrors)
 	d.Set("traffic_group", p.TrafficGroup)
 	d.Set("tables", p.Tables)

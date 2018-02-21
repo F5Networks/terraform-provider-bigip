@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -115,8 +115,19 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("description", dns.Description)
 	d.Set("name_servers", dns.NameServers)
+
+	if err := d.Set("name_servers", dns.NameServers); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for Name Servers  (%s): %s", d.Id(), err)
+	}
+
 	d.Set("numberof_dots", dns.NumberOfDots)
+	if err := d.Set("numberof_dots", dns.NumberOfDots); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Numbers of dot to state for Number of Dots  (%s): %s", d.Id(), err)
+	}
 	d.Set("search", dns.Search)
+	if err := d.Set("search", dns.Search); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Search  to state for Search  (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

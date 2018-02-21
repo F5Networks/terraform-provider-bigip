@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -101,8 +101,17 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	d.Set("sys_contact", snmp.SysContact)
+	if err := d.Set("sys_contact", snmp.SysContact); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving SysContact  to state for SysContact  (%s): %s", d.Id(), err)
+	}
 	d.Set("sys_location", snmp.SysLocation)
+	if err := d.Set("sys_location", snmp.SysLocation); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving SysLocation  to state for SysLocation  (%s): %s", d.Id(), err)
+	}
 	d.Set("allowedaddresses", snmp.AllowedAddresses)
+	if err := d.Set("allowedaddresses", snmp.AllowedAddresses); err != nil {
+		return fmt.Errorf("[DEBUG] Error Saving AllowedAddresses  to state for AllowedAddresses  (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

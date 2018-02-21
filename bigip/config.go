@@ -39,9 +39,16 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 }
 
 func (c *Config) validateConnection(client *bigip.BigIP) error {
-	_, err := client.SelfIPs()
+	t, err := client.SelfIPs()
+	log.Println(" I am here in connection valid +++++++++++++++++ ")
 	if err != nil {
+		log.Fatal(err)
 		return err
+	}
+
+	if t == nil {
+		log.Printf("[WARN] t (%s) not found, removing from state  ", t)
+		return nil
 	}
 	return nil
 }

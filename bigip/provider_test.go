@@ -2,7 +2,6 @@ package bigip
 
 import (
 	"testing"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"os"
@@ -27,7 +26,7 @@ func init() {
 	}
 }
 
-func TestProvider(t *testing.T) {
+func TestAccProvider(t *testing.T) {
 	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
