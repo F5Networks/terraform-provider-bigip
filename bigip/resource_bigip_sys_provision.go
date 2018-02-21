@@ -4,6 +4,7 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
+	"fmt"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
@@ -104,7 +105,7 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyProvision(r)
 	if err != nil {
-		return err 
+		return err
 	}
 	return resourceBigipSysProvisionRead(d, meta)
 }
@@ -125,10 +126,12 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 		d.SetId("")
 		return nil
 	}
-	//d.Set("name", p.Name)
 	d.Set("full_path", p.FullPath)
+	if err := d.Set("full_path", p.FullPath); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Provision  (%s): %s", d.Id(), err)
+	}
+
 	p.Name = name
-	log.Println("[INFO] Reading name after reading ****************** ", p)
 
 	return nil
 }

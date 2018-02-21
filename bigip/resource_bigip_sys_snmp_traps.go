@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -196,14 +196,29 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 
 	d.Set("name", traps.Name)
 	d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted)
+	if err := d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AuthPasswordEncrypted to state for Snmp Traps  (%s): %s", d.Id(), err)
+	}
 	d.Set("auth_protocol", traps.AuthProtocol)
+	if err := d.Set("auth_protocol", traps.AuthProtocol); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AuthProtocol to state for Snmp Traps (%s): %s", d.Id(), err)
+	}
 	d.Set("community", traps.Community)
+	if err := d.Set("community", traps.Community); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Community to state for Snmp Traps  (%s): %s", d.Id(), err)
+	}
 	d.Set("description", traps.Description)
 	d.Set("engine_id", traps.EngineId)
 	d.Set("host", traps.Host)
+	if err := d.Set("host", traps.Host); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Host to state for Snmp Traps  (%s): %s", d.Id(), err)
+	}
 	d.Set("port", traps.Port)
 	d.Set("privacy_password", traps.PrivacyPassword)
 	d.Set("privacy_password_encrypted", traps.PrivacyPasswordEncrypted)
+	if err := d.Set("privacy_password_encrypted", traps.PrivacyPasswordEncrypted); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving PrivacyPasswordEncrypted to state for Snmp Traps (%s): %s", d.Id(), err)
+	}
 	d.Set("privacy_protocol", traps.PrivacyProtocol)
 	d.Set("security_level", traps.SecurityLevel)
 	d.Set("security_name", traps.SecurityName)

@@ -116,7 +116,7 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		if vlan.Name == name {
 			d.Set("name", vlan.Name)
 			if err := d.Set("name", vlan.Name); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving Name to state for Name  (%s): %s", d.Id(), err)
+				return fmt.Errorf("[DEBUG] Error saving Name to state for Vlan (%s): %s", d.Id(), err)
 			}
 		}
 	}

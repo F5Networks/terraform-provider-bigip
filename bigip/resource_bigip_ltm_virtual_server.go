@@ -228,19 +228,48 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("destination", destination[2])
 	d.Set("source", vs.Source)
+	if err := d.Set("source", vs.Source); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("protocol", vs.IPProtocol)
+	if err := d.Set("protocol", vs.IPProtocol); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Protocol to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("name", name)
 	d.Set("pool", vs.Pool)
+	if err := d.Set("pool", vs.Pool); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Pool to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("mask", vs.Mask)
+	if err := d.Set("mask", vs.Mask); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("port", vs.SourcePort)
+
+	if err := d.Set("port", vs.SourcePort); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Port to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("irules", makeStringSet(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+	if err := d.Set("source_address_translation", vs.SourceAddressTranslation); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SourceAddressTranslation to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("snatpool", vs.SourceAddressTranslation.Pool)
+	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("policies", vs.Policies)
 	d.Set("vlans", vs.Vlans)
 	d.Set("translate_address", vs.TranslateAddress)
+	if err := d.Set("translate_address", vs.TranslateAddress); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving TranslateAddress to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("translate_port", vs.TranslatePort)
+
+	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("persistence_profiles", vs.PersistenceProfiles)
 	d.Set("fallbacl_persistence_profile", vs.FallbackPersistenceProfile)
 	d.Set("vlans_enabled", vs.VlansEnabled)

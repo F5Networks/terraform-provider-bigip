@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -97,7 +97,13 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("name", name)
 	d.Set("network", obj.Network)
+	if err := d.Set("network", obj.Network); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Network to state for Route  (%s): %s", d.Id(), err)
+	}
 	d.Set("gw", obj.Gateway)
+	if err := d.Set("gw", obj.Gateway); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Gateway to state for Route  (%s): %s", d.Id(), err)
+	}
 	return nil
 }
 
