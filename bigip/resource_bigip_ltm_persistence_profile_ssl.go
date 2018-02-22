@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"strconv"
 
 	"github.com/f5devcentral/go-bigip"
@@ -122,11 +122,19 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	}
 
 	d.Set("name", name)
-	//d.Set("app_service", pp.AppService)
 	d.Set("defaults_from", pp.DefaultsFrom)
 	d.Set("match_across_pools", pp.MatchAcrossPools)
+	if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MatchAcrossPools to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	}
 	d.Set("match_across_services", pp.MatchAcrossServices)
+	if err := d.Set("match_across_services", pp.MatchAcrossServices); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MatchAcrossServices to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	}
 	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	if err := d.Set("match_across_virtuals", pp.MatchAcrossPools); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MatchAcrossVirtuals to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	}
 	d.Set("mirror", pp.Mirror)
 	d.Set("timeout", pp.Timeout)
 	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
