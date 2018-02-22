@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -157,14 +157,27 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	}
 	d.Set("name", name)
 	d.Set("idle_timeout", obj.IdleTimeout)
+	if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("close_wait_timeout", obj.CloseWaitTimeout)
+	if err := d.Set("close_wait_timeout", obj.CloseWaitTimeout); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving CloseWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("finwait_2timeout", obj.FinWait_2Timeout)
+
+	if err := d.Set("finwait_2timeout", obj.FinWait_2Timeout); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving FinWait_2Timeout to state for tcp profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("finwait_timeout", obj.FinWaitTimeout)
+	if err := d.Set("finwait_timeout", obj.FinWaitTimeout); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving FinWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	}
+
 	d.Set("keepalive_interval", obj.KeepAliveInterval)
 	d.Set("deferred_accept", obj.DeferredAccept)
 	d.Set("fast_open", obj.FastOpen)
 
-	//d.Set("idle_timeout", obj.IdleTimeout)
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"fmt"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -123,12 +124,27 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		nodeNames = append(nodeNames, node.FullPath)
 	}
 	d.Set("allow_nat", pool.AllowNAT)
+	if err := d.Set("allow_nat", pool.AllowNAT); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AllowNAT to state for Pool  (%s): %s", d.Id(), err)
+	}
 	d.Set("allow_snat", pool.AllowSNAT)
+	if err := d.Set("allow_snat", pool.AllowSNAT); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AllowSNAT to state for Pool  (%s): %s", d.Id(), err)
+	}
 	d.Set("load_balancing_mode", pool.LoadBalancingMode)
+	if err := d.Set("load_balancing_mode", pool.LoadBalancingMode); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving LoadBalancingMode to state for Pool  (%s): %s", d.Id(), err)
+	}
 	d.Set("nodes", makeStringSet(&nodeNames))
+	if err := d.Set("nodes", makeStringSet(&nodeNames)); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Nodes to state for Pool  (%s): %s", d.Id(), err)
+	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
+	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Monitors to state for Pool  (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

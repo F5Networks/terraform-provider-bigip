@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -147,8 +147,17 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	}
 	d.Set("name", name)
 	d.Set("share_pools", obj.SharePools)
+	if err := d.Set("share_pools", obj.SharePools); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SharePools to state for Onceconnect profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("source_mask", obj.SourceMask)
+	if err := d.Set("source_mask", obj.SourceMask); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SourceMask to state for Onceconnect profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("max_age", obj.MaxAge)
+	if err := d.Set("max_age", obj.MaxAge); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MaxAge to state for Onceconnect profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("max_size", obj.MaxSize)
 	d.Set("max_reuse", obj.MaxReuse)
 	d.Set("idle_timeout_override", obj.IdleTimeoutOverride)

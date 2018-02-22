@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -125,8 +125,14 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	}
 	d.Set("name", name)
 	d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
+	if err := d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ConcurrentStreamsPerConnection to state for Http2 profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
 	d.Set("activation_modes", obj.ActivationModes)
+	if err := d.Set("activation_modes", obj.ActivationModes); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ActivationModes to state for Http2 profile  (%s): %s", d.Id(), err)
+	}
 	return nil
 }
 

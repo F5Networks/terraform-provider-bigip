@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -109,7 +109,13 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	}
 	d.Set("name", name)
 	d.Set("uri_include", obj.UriInclude)
+	if err := d.Set("uri_include", obj.UriInclude); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving UriInclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("uri_exclude", obj.UriExclude)
+	if err := d.Set("uri_exclude", obj.UriExclude); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving UriExclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

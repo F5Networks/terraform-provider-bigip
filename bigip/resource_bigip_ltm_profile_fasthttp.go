@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -169,7 +169,13 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	}
 	d.Set("name", name)
 	d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride)
+	if err := d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ConnpoolIdleTimeoutOverride to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("connpool_minsize", obj.ConnpoolMinSize)
+	if err := d.Set("connpool_minsize", obj.ConnpoolMinSize); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ConnpoolMinSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

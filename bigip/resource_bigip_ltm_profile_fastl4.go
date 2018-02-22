@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -152,7 +152,13 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	}
 	d.Set("name", name)
 	d.Set("client_timeout", obj.ClientTimeout)
+	if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
+	if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
+	}
 	d.Set("hardware_syncookie", obj.HardwareSynCookie)
 	d.Set("idle_timeout", obj.IdleTimeout)
 	d.Set("iptos_toclient", obj.IpTosToClient)
