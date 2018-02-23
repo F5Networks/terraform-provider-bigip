@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_persistence_profile_ssl"
-sidebar_current: "docs-bigip-resource-pool-x"
+sidebar_current: "docs-bigip-resource-persistence_profile_ssl-x"
 description: |-
     Provides details about bigip_ltm_persistence_profile_ssl resource
 ---
