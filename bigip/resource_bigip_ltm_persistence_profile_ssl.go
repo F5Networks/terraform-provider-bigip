@@ -1,8 +1,8 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
-"fmt"
 	"strconv"
 
 	"github.com/f5devcentral/go-bigip"

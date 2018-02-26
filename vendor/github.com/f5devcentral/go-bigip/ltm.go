@@ -590,8 +590,13 @@ type VirtualServerPolicies struct {
 	PolicyRef Policies `json:"policiesReference"`
 }
 
+type PolicyPublish struct {
+	Name string `json:"name"`
+	PublishCopy string `json:"publishedCopy"`
+}
 type Policy struct {
 	Name      string
+	PublishCopy string
 	Partition string
 	FullPath  string
 	Controls  []string
@@ -602,6 +607,7 @@ type Policy struct {
 
 type policyDTO struct {
 	Name      string   `json:"name"`
+	PublishCopy string `json:"publishedCopy"`
 	Partition string   `json:"partition,omitempty"`
 	Controls  []string `json:"controls,omitempty"`
 	Requires  []string `json:"requires,omitempty"`
@@ -615,6 +621,7 @@ type policyDTO struct {
 func (p *Policy) MarshalJSON() ([]byte, error) {
 	return json.Marshal(policyDTO{
 		Name:      p.Name,
+		PublishCopy: p.PublishCopy,
 		Partition: p.Partition,
 		Controls:  p.Controls,
 		Requires:  p.Requires,
@@ -634,6 +641,7 @@ func (p *Policy) UnmarshalJSON(b []byte) error {
 	}
 
 	p.Name = dto.Name
+	p.PublishCopy = dto.PublishCopy
 	p.Partition = dto.Partition
 	p.Controls = dto.Controls
 	p.Requires = dto.Requires
@@ -906,6 +914,8 @@ type PolicyRuleCondition struct {
 	Vlan                  bool     `json:"vlan,omitempty"`
 	VlanId                bool     `json:"vlanId,omitempty"`
 }
+
+
 
 func (p *VirtualAddress) MarshalJSON() ([]byte, error) {
 	var dto virtualAddressDTO
@@ -2204,7 +2214,12 @@ func (b *BigIP) Policies() (*Policies, error) {
 //Load a fully policy definition. Policies seem to be best dealt with as one big entity.
 func (b *BigIP) GetPolicy(name string) (*Policy, error) {
 	var p Policy
-	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, name)
+	values := []string{}
+	values = append(values, "Drafts/")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
+	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, result)
 	if err != nil {
 		return nil, err
 	}
@@ -2257,18 +2272,42 @@ func (b *BigIP) CreatePolicy(p *Policy) error {
 	return b.post(p, uriLtm, uriPolicy)
 }
 
+func (b *BigIP) PublishPolicy(name, publish string) error {
+	config := &Policy{
+		PublishCopy: publish,
+	}
+	values := []string{}
+ values = append(values, "~Common~Drafts~")
+ values = append(values, name)
+ // Join three strings into one.
+ result := strings.Join(values, "")
+
+	log.Println( "  ================== here in publish ", result, publish)
+
+ return b.patch(config, uriLtm, uriPolicy, result)
+}
+
 //Update an existing policy.
-func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
+ func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 	normalizePolicy(p)
-	return b.put(p, uriLtm, uriPolicy, name)
+	values := []string{}
+	values = append(values, "Drafts/")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
+	return b.put(p, uriLtm, uriPolicy, result)
 }
 
 //Delete a policy by name.
 func (b *BigIP) DeletePolicy(name string) error {
-	return b.delete(uriLtm, uriPolicy, name)
+	values := []string{}
+	values = append(values, "Drafts/")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
+return b.delete(uriLtm, uriPolicy, result)
 }
-
-// Oneconnect profile creation
+ // Oneconnect profile creation
 func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsFrom, sharePools, sourceMask string, maxAge, maxReuse, maxSize int) error {
 	oneconnect := &Oneconnect{
 		Name:                name,

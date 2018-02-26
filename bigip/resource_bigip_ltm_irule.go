@@ -96,8 +96,8 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 		Rule:     d.Get("irule").(string),
 	}
 
-	 err := client.ModifyIRule(name, r)
-	if err !=nil {
+	err := client.ModifyIRule(name, r)
+	if err != nil {
 		return err
 	}
 	return resourceBigipLtmIRuleRead(d, meta)

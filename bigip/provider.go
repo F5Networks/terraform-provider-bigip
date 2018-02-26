@@ -58,6 +58,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_monitor":                     resourceBigipLtmMonitor(),
 			"bigip_ltm_node":                        resourceBigipLtmNode(),
 			"bigip_ltm_pool":                        resourceBigipLtmPool(),
+			"bigip_ltm_policy":                      resourceBigipLtmPolicy(),
 			"bigip_ltm_profile_fasthttp":            resourceBigipLtmProfileFasthttp(),
 			"bigip_ltm_profile_fastl4":              resourceBigipLtmProfileFastl4(),
 			"bigip_ltm_profile_http2":               resourceBigipLtmProfileHttp2(),

@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"log"
-"fmt"
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 // this module does not have DELETE function as there is no API for Delete
@@ -169,13 +169,12 @@ func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 		Version:                  d.Get("version").(string),
 	}
 
-	 err := client.ModifyTRAP(r)
-		 if err != nil {
-			 return err
-		 }
-		 return resourceBigipSysSnmpTrapsRead(d, meta)
-	 }
-
+	err := client.ModifyTRAP(r)
+	if err != nil {
+		return err
+	}
+	return resourceBigipSysSnmpTrapsRead(d, meta)
+}
 
 func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)

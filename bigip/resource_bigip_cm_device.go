@@ -85,10 +85,10 @@ func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error
 		MirrorSecondaryIp: d.Get("mirror_secondary_ip").(string),
 	}
 
-	 err := client.ModifyDevice(r)
-	 if err != nil {
- 		return err
- 	}
+	err := client.ModifyDevice(r)
+	if err != nil {
+		return err
+	}
 	return resourceBigipCmDeviceRead(d, meta)
 }
 

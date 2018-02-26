@@ -77,7 +77,7 @@ func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	err := client.ModifySnatpool(r)
-	if err !=nil {
+	if err != nil {
 		return err
 	}
 	return resourceBigipLtmSnatpoolRead(d, meta)

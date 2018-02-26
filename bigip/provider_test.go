@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"testing"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"os"
+	"testing"
 )
 
 var TEST_PARTITION = "Common"

@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"strings"
 	"time"
+	"log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -258,7 +259,7 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 		Body:        string(marshalJSON),
 		ContentType: "application/json",
 	}
-
+  log.Println(" patch ----------------- ", req)
 	_, callErr := b.APICall(req)
 	return callErr
 }

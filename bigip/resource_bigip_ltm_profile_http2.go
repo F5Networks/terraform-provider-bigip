@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"log"
-"fmt"
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipLtmProfileHttp2() *schema.Resource {
@@ -107,7 +107,7 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return err
 	}
-	 return resourceBigipLtmProfileHttp2Read(d, meta)
+	return resourceBigipLtmProfileHttp2Read(d, meta)
 }
 
 func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {

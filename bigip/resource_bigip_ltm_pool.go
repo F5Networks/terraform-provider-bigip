@@ -1,10 +1,10 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
-	"fmt"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"

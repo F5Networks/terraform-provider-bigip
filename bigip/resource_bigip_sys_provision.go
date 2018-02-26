@@ -1,10 +1,10 @@
 package bigip
 
 import (
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
-	"fmt"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
