@@ -153,8 +153,12 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		if m.FullPath == name {
 			d.Set("interval", m.Interval)
 			d.Set("timeout", m.Timeout)
-			d.Set("send", m.SendString)
-			d.Set("receive", m.ReceiveString)
+			if err := d.Set("send", m.SendString); err != nil {
+	  		return fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err)
+	  	}
+			if err := d.Set("receive", m.ReceiveString); err != nil {
+	  		return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
+	  	}
 			d.Set("receive_disable", m.ReceiveDisable)
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
@@ -162,7 +166,9 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("parent", m.ParentMonitor)
-			d.Set("destination", m.Destination)
+			if err := d.Set("destination", m.Destination); err != nil {
+	  		return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
+	  	}
 			d.Set("name", name)
 			return nil
 		}

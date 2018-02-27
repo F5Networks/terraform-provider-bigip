@@ -57,11 +57,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 			},
 
 			"strategy": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "/Common/first-match",
-				Description:  "Policy Strategy (i.e. /Common/first-match)",
-			//	ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "/Common/first-match",
+				Description: "Policy Strategy (i.e. /Common/first-match)",
+				//	ValidateFunc: validateF5Name,
 			},
 
 			"rule": &schema.Schema{
@@ -70,9 +70,9 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": &schema.Schema{
-							Type:         schema.TypeString,
-							Required:     true,
-							Description:  "Rule name",
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Rule name",
 							//ValidateFunc: validateF5Name,
 						},
 
@@ -1068,15 +1068,15 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	p := dataToPolicy(name, d)
 
 	d.SetId(name)
-	 err := client.CreatePolicy(&p)
+	err := client.CreatePolicy(&p)
 	if err != nil {
 		return err
 	}
 	published_copy := d.Get("published_copy").(string)
-	 t := client.PublishPolicy(name, published_copy)
-	 if t != nil {
-		 return err
-	 }
+	t := client.PublishPolicy(name, published_copy)
+	if t != nil {
+		return err
+	}
 	return resourceBigipLtmPolicyRead(d, meta)
 }
 
@@ -1133,10 +1133,10 @@ func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	var p bigip.Policy
 	values := []string{}
- values = append(values, "Drafts/")
- values = append(values, name)
- // Join three strings into one.
- result := strings.Join(values, "")
+	values = append(values, "Drafts/")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
 	p.Name = result
 	p.Strategy = d.Get("strategy").(string)
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
@@ -1149,7 +1149,6 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		prefix := fmt.Sprintf("rule.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		log.Println(" ruleNAme is ------------------->   = ", r.Name)
-
 
 		actionCount := d.Get(prefix + ".action.#").(int)
 		r.Actions = make([]bigip.PolicyRuleAction, actionCount, actionCount)

@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+ "fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"strings"
@@ -67,7 +67,9 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	d.Set("irule", irule.Rule)
+	 if err := d.Set("irule", irule.Rule); err != nil {
+ 		return fmt.Errorf("[DEBUG] Error saving IRule  to state for IRule (%s): %s", d.Id(), err)
+ 	}
 	d.Set("name", name)
 	return nil
 }

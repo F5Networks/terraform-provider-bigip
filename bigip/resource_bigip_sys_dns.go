@@ -33,7 +33,7 @@ func resourceBigipSysDns() *schema.Resource {
 				Description: "Servers Address",
 			},
 
-			"numberof_dots": {
+			"number_of_dots": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "how many DNS Servers",
@@ -56,7 +56,7 @@ func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
 
 	description := d.Get("description").(string)
 	nameservers := setToStringSlice(d.Get("name_servers").(*schema.Set))
-	numberofdots := d.Get("numberof_dots").(int)
+	numberofdots := d.Get("number_of_dots").(int)
 	search := setToStringSlice(d.Get("search").(*schema.Set))
 
 	log.Println("[INFO] Creating Dns ")
@@ -86,7 +86,7 @@ func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 	r := &bigip.DNS{
 		Description:  description,
 		NameServers:  setToStringSlice(d.Get("name_servers").(*schema.Set)),
-		NumberOfDots: d.Get("numberof_dots").(int),
+		NumberOfDots: d.Get("number_of_dots").(int),
 		Search:       setToStringSlice(d.Get("search").(*schema.Set)),
 	}
 
@@ -114,19 +114,15 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	d.Set("description", dns.Description)
-	d.Set("name_servers", dns.NameServers)
 
 	if err := d.Set("name_servers", dns.NameServers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for Name Servers  (%s): %s", d.Id(), err)
+		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for DNS (%s): %s", d.Id(), err)
 	}
 
-	d.Set("numberof_dots", dns.NumberOfDots)
-	if err := d.Set("numberof_dots", dns.NumberOfDots); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Numbers of dot to state for Number of Dots  (%s): %s", d.Id(), err)
-	}
-	d.Set("search", dns.Search)
+	d.Set("number_of_dots", dns.NumberOfDots)
+
 	if err := d.Set("search", dns.Search); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Search  to state for Search  (%s): %s", d.Id(), err)
+		return fmt.Errorf("[DEBUG] Error saving Search  to state for DNS (%s): %s", d.Id(), err)
 	}
 
 	return nil

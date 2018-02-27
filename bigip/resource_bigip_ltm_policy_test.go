@@ -11,6 +11,7 @@ import (
 
 //var TEST_POLICY_NAME = "/" + TEST_PARTITION + "/test-policy"
 var TEST_POLICY_NAME = "test-policy"
+
 //var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
 //var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
 //var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
@@ -47,7 +48,6 @@ resource "bigip_ltm_policy" "test-policy" {
   }
 }
 `
-
 
 func TestAccBigipLtmPolicy_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -107,16 +107,14 @@ func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 
 		}
 		if exists && policy == nil {
-		 return fmt.Errorf("Policy %s was not created.", name)
-	 }
-	 if !exists && policy != nil {
-		 return fmt.Errorf("Policy %s still exists.", name)
-	 }
+			return fmt.Errorf("Policy %s was not created.", name)
+		}
+		if !exists && policy != nil {
+			return fmt.Errorf("Policy %s still exists.", name)
+		}
 		return nil
 	}
 }
-
-
 
 func testCheckPolicysDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)

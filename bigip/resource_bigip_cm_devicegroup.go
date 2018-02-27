@@ -41,39 +41,39 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "disabled",
-				Description: "BIG-IP password",
+				Description: "Specifies if the device-group will automatically sync configuration data to its members",
 			},
 			"type": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "sync-only",
-				Description: "BIG-IP password",
+				Description: "Specifies if the device-group will be used for failover or resource syncing",
 			},
 			"full_load_on_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "false",
-				Description: "BIG-IP password",
+				Description: "Specifies if the device-group will perform a full-load upon sync",
 			},
 			"save_on_auto_sync": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "false",
-				Description: "BIG-IP password",
+				Description: "Specifies whether the configuration should be saved upon auto-sync.",
 			},
 
 			"network_failover": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "enabled",
-				Description: "BIG-IP password",
+				Description: "Specifies if the device-group will use a network connection for failover",
 			},
 
 			"incremental_config": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Default:     1024,
-				Description: "BIG-IP password",
+				Description: "Specifies the maximum size (in KB) to devote to incremental config sync cached transactions. The default is 1024 KB.",
 			},
 			"device": {
 				Type:     schema.TypeList,
@@ -84,13 +84,11 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"name": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 					},
 				},
@@ -157,12 +155,18 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	}
 	d.Set("name", p.Name)
 	d.Set("description", p.Description)
-	d.Set("type", p.Type)
+	if err := d.Set("auto_sync", p.AutoSync); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AutoSync  to state for Devicegroup (%s): %s", d.Id(), err)
+	}
+
+	 if err := d.Set("type", p.Type); err != nil {
+ 		return fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err)
+ 	}
 	d.Set("fullLoadOnSync", p.FullLoadOnSync)
 	d.Set("saveOnAutoSync", p.SaveOnAutoSync)
 	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
 	d.Set("networkFailover", p.NetworkFailover)
-
+  d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
 	return nil
 
 }

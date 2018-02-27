@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+  "fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -110,9 +110,19 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", members.Name)
-	d.Set("mirror_ip", members.MirrorIp)
-	d.Set("configsync_ip", members.ConfigsyncIp)
-	d.Set("mirror_secondary_ip", members.MirrorSecondaryIp)
+
+	if err := d.Set("mirror_ip", members.MirrorIp); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving mirror_ip  to state for Device (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("configsync_ip", members.ConfigsyncIp); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving configsync_ip  to state for Device (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("mirror_secondary_ip", members.MirrorSecondaryIp); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving mirror_secondary_ip  to state for Device (%s): %s", d.Id(), err)
+	}
+
 	return nil
 }
 

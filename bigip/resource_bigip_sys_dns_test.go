@@ -16,7 +16,7 @@ var TEST_DNS_RESOURCE = `
 resource "bigip_sys_dns" "test-dns" {
    description = "` + TEST_DNS_NAME + `"
    name_servers = ["1.1.1.1"]
-   numberof_dots = 2
+   number_of_dots = 2
    search = ["f5.com"]
 }
 
@@ -35,7 +35,7 @@ func TestAccBigipSysdns_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckdnsExists(TEST_DNS_NAME, true),
 					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "description", TEST_DNS_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "numberof_dots", "2"),
+					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "number_of_dots", "2"),
 					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns",
 						fmt.Sprintf("name_servers.%d", schema.HashString("1.1.1.1")),
 						"1.1.1.1"),
