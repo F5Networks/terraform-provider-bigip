@@ -18,6 +18,10 @@ var TEST_POOL_RESOURCE = `
 resource "bigip_ltm_node" "test-node" {
 	name = "` + TEST_NODE_NAME + `"
 	address = "10.10.10.10"
+	connection_limit = "0"
+	dynamic_ratio = "1"
+	monitor = "default"
+	rate_limit = "disabled"
 }
 
 resource "bigip_ltm_pool" "test-pool" {

@@ -30,14 +30,12 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Required:    true,
 				Description: "Name of the Policy",
 				ForceNew:    true,
-				//ValidateFunc: validateF5Name,
 			},
 			"published_copy": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Publish the Policy",
 				ForceNew:    true,
-				//ValidateFunc: validateF5Name,
 			},
 
 			"controls": &schema.Schema{
@@ -45,7 +43,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Required: true,
-				//ValidateFunc: validateSetValues(CONTROLS),
 			},
 
 			"requires": &schema.Schema{
@@ -53,7 +50,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Required: true,
-				//ValidateFunc: validateSetValues(REQUIRES),
 			},
 
 			"strategy": &schema.Schema{
@@ -61,7 +57,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Optional:    true,
 				Default:     "/Common/first-match",
 				Description: "Policy Strategy (i.e. /Common/first-match)",
-				//	ValidateFunc: validateF5Name,
 			},
 
 			"rule": &schema.Schema{
@@ -73,7 +68,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "Rule name",
-							//ValidateFunc: validateF5Name,
 						},
 
 						"action": &schema.Schema{

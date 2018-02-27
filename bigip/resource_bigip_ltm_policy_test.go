@@ -9,17 +9,17 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-//var TEST_POLICY_NAME = "/" + TEST_PARTITION + "/test-policy"
 var TEST_POLICY_NAME = "test-policy"
 
-//var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
-//var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-//var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
 
 var TEST_POLICY_RESOURCE = `
 resource "bigip_ltm_node" "test-node" {
 	name = "` + TEST_NODE_NAME + `"
 	address = "10.10.10.10"
+	connection_limit = "0"
+	dynamic_ratio = "1"
+	monitor = "default"
+	rate_limit = "disabled"
 }
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
@@ -61,15 +61,6 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 				Config: TEST_POLICY_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TEST_POLICY_NAME, true),
-					/*resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "name", TEST_POLICY_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "strategy", "first-match"),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy",
-						fmt.Sprintf("requires.%d", schema.HashString("http")),
-						"http"),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy", "published_copy", "Drafts/test-policy"),
-					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy",
-						fmt.Sprintf("controls.%d", schema.HashString("forwarding")),
-						"forwarding"),  */
 				),
 			},
 		},

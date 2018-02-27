@@ -32,6 +32,6 @@ resource "bigip_ltm_dns" "dns1" {
 
 * `name_servers` - Name or IP address of the DNS server
 
-* `numberof_dots` - Provide the number 2
+* `number_of_dots` - Configures the number of dots needed in a name before an initial absolute query will be made.
 
 * `search` - Specify what domains you want to search
