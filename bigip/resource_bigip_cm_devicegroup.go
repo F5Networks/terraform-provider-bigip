@@ -139,7 +139,6 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		Rname := r.Name
-		log.Println(" my rname is  ", Rname)
 		client.DevicegroupsDevices(name, Rname)
 	}
 
@@ -166,7 +165,6 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("saveOnAutoSync", p.SaveOnAutoSync)
 	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
 	d.Set("networkFailover", p.NetworkFailover)
-  d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
 	return nil
 
 }
@@ -180,7 +178,6 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		Rname := r.Name
-		log.Println(" my rname is  ", Rname)
 		client.DeleteDevicegroupDevices(name, Rname)
 	}
 

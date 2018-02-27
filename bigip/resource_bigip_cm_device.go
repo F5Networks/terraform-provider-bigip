@@ -34,12 +34,12 @@ func resourceBigipCmDevice() *schema.Resource {
 			"mirror_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "IP address used for state mirroring",
 			},
 			"mirror_secondary_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Secondary IP address used for state mirroring",
 			},
 		},
 	}
