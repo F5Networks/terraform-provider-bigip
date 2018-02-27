@@ -1136,13 +1136,11 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
 	ruleCount := d.Get("rule.#").(int)
-	log.Println("I am here -------------------> reuleCount = ", ruleCount)
 	p.Rules = make([]bigip.PolicyRule, 0, ruleCount)
 	for i := 0; i < ruleCount; i++ {
 		var r bigip.PolicyRule
 		prefix := fmt.Sprintf("rule.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
-		log.Println(" ruleNAme is ------------------->   = ", r.Name)
 
 		actionCount := d.Get(prefix + ".action.#").(int)
 		r.Actions = make([]bigip.PolicyRuleAction, actionCount, actionCount)
@@ -1166,15 +1164,13 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 }
 
 func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
-	//d.Set("strategy", p.Strategy)
-	// d.Set("controls", makeStringSet(&p.Controls))
-	//d.Set("requires", makeStringSet(&p.Requires))
-	log.Println(" after policy in rule loop *****************")
+	d.Set("strategy", p.Strategy)
+	d.Set("controls", makeStringSet(&p.Controls))
+	d.Set("requires", makeStringSet(&p.Requires))
 
 	for i, r := range p.Rules {
 		rule := fmt.Sprintf("rule.%d", i)
 		d.Set(fmt.Sprintf("%s.name", rule), r.FullPath)
-		log.Println(" after policy in rule loop *****************")
 		for x, a := range r.Actions {
 			action := fmt.Sprintf("%s.action.%d", rule, x)
 			interfaceToResourceData(a, d, action)

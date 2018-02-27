@@ -3,7 +3,6 @@ package bigip
 import (
 	"fmt"
 	"testing"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -33,7 +32,7 @@ resource "bigip_ltm_pool" "test-pool" {
 resource "bigip_ltm_policy" "test-policy" {
 	depends_on = ["bigip_ltm_pool.test-pool"]
  name = "` + TEST_POLICY_NAME + `"
- strategy = "first-match"
+ strategy = "/Common/first-match"
   requires = ["http"]
  published_copy = "Drafts/test-policy"
   controls = ["forwarding"]
