@@ -159,7 +159,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			if err := d.Set("receive", m.ReceiveString); err != nil {
 	  		return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
 	  	}
-			d.Set("receive_disable", m.ReceiveDisable)
+			if err := d.Set("receive_disable", m.ReceiveDisable); err != nil {
+	  		return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
+	  	}
+
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
 			d.Set("ip_dscp", m.IPDSCP)

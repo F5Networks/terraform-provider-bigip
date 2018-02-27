@@ -3,7 +3,7 @@ package bigip
 import (
 	"log"
 	"strconv"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -181,19 +181,30 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	}
 
 	d.Set("name", name)
-	d.Set("app_service", pp.AppService)
-	d.Set("defaults_from", pp.DefaultsFrom)
-	d.Set("match_across_pools", pp.MatchAcrossPools)
+	if err := d.Set("app_service", pp.AppService); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	}
+	d.Set("match_across_pools", pp.MatchAcrossPools);
 	d.Set("match_across_services", pp.MatchAcrossServices)
 	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	d.Set("mirror", pp.Mirror)
+	if err := d.Set("mirror", pp.Mirror); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	}
 	d.Set("timeout", pp.Timeout)
 	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 
 	// Specific to CookiePersistenceProfile
 	d.Set("always_send", pp.AlwaysSend)
-	d.Set("cookie_encryption", pp.CookieEncryption)
-	d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase)
+	if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	}
 	d.Set("cookie_name", pp.CookieName)
 	d.Set("expiration", pp.Expiration)
 	d.Set("hash_length", pp.HashLength)
