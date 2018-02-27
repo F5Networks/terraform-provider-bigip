@@ -22,7 +22,6 @@ func resourceBigipNetRoute() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the route",
-				//ValidateFunc: validateF5Name,
 			},
 
 			"network": {

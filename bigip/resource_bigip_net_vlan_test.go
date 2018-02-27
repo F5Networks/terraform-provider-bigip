@@ -22,7 +22,7 @@ resource "bigip_net_vlan" "test-vlan" {
 }
 `
 
-func TestAccBigipLtmvlan_create(t *testing.T) {
+func TestAccBigipNetvlan_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -44,7 +44,7 @@ func TestAccBigipLtmvlan_create(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmvlan_import(t *testing.T) {
+func TestAccBigipNetvlan_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

@@ -53,7 +53,6 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	log.Println("[INFO] Creating SelfIP ")
 
 	err := client.CreateSelfIP(name, ip, vlan)
-	// err := client.CreateSelfIP(name+"-self", ip, vlan)
 
 	if err != nil {
 		return err
@@ -62,7 +61,6 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	d.SetId(name)
 
 	return resourceBigipNetSelfIPRead(d, meta)
-	// return nil
 }
 
 func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
@@ -75,6 +73,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return err
 	}
+	d.Set("name", name)
 	if selfIPs == nil {
 		log.Printf("[WARN] SelfIP (%s) not found, removing from state", d.Id())
 		d.SetId("")

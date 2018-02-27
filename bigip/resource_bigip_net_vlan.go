@@ -25,7 +25,6 @@ func resourceBigipNetVlan() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the vlan",
-				//			ValidateFunc: validateF5Name,
 			},
 
 			"tag": {
@@ -91,7 +90,6 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 	return resourceBigipNetVlanRead(d, meta)
 
-	//	return resourceBigipNetVlanRead(d, meta)
 }
 
 func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
@@ -110,7 +108,6 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-
 	for _, vlan := range vlans.Vlans {
 		log.Println(vlan.Name)
 		if vlan.Name == name {
@@ -118,14 +115,15 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 			if err := d.Set("name", vlan.Name); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving Name to state for Vlan (%s): %s", d.Id(), err)
 			}
-		}
+			d.Set("tag", vlan.Tag)
+			}
 	}
 
 	return nil
 }
 
 func resourceBigipNetVlanExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	/* client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 	log.Println("[INFO] Fetching Vlan " + name)
@@ -140,7 +138,7 @@ func resourceBigipNetVlanExists(d *schema.ResourceData, meta interface{}) (bool,
 			return true, nil
 		}
 	}
-	*/
+
 	return false, nil
 }
 
