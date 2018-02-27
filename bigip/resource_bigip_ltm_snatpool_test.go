@@ -15,7 +15,7 @@ var TEST_SNATPOOL_NAME = fmt.Sprintf("/%s/test-snatpool", TEST_PARTITION)
 var TEST_SNATPOOL_RESOURCE = `
 resource "bigip_ltm_snatpool" "test-snatpool" {
   name = "` + TEST_SNATPOOL_NAME + `"
-  members = ["191.1.1.1","194.2.2.2"]
+  members = ["/Common/191.1.1.1","/Common/194.2.2.2"]
 }
 
 `
@@ -34,11 +34,11 @@ func TestAccBigipLtmsnatpool_create(t *testing.T) {
 					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool", "name", TEST_SNATPOOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
-						fmt.Sprintf("members.%d", schema.HashString("191.1.1.1")),
-						"191.1.1.1"),
+						fmt.Sprintf("members.%d", schema.HashString("/Common/191.1.1.1")),
+						"/Common/191.1.1.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
-						fmt.Sprintf("members.%d", schema.HashString("194.2.2.2")),
-						"194.2.2.2"),
+						fmt.Sprintf("members.%d", schema.HashString("/Common/194.2.2.2")),
+						"/Common/194.2.2.2"),
 				),
 			},
 		},

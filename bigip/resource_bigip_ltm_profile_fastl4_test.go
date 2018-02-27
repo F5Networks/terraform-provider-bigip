@@ -15,7 +15,7 @@ var TEST_FASTL4_RESOURCE = `
 resource "bigip_ltm_profile_fastl4" "test-fastl4" {
             name = "` + TEST_FASTL4_NAME + `"
             partition = "Common"
-            defaults_from = "fastL4"
+            defaults_from = "/Common/fastL4"
 			client_timeout = 40
 			idle_timeout = "200"
             explicitflow_migration = "enabled"
@@ -40,7 +40,7 @@ func TestAccBigipLtmProfileFastl4_create(t *testing.T) {
 					testCheckfastl4Exists(TEST_FASTL4_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "name", TEST_FASTL4_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "partition", "Common"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "defaults_from", "fastL4"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "defaults_from", "/Common/fastL4"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "client_timeout", "40"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "explicitflow_migration", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "hardware_syncookie", "enabled"),

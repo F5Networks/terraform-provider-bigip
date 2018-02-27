@@ -14,16 +14,16 @@ var TEST_FASTHTTP_NAME = fmt.Sprintf("/%s/test-fasthttp", TEST_PARTITION)
 var TEST_FASTHTTP_RESOURCE = `
 resource "bigip_ltm_profile_fasthttp" "test-fasthttp" {
 	name = "` + TEST_FASTHTTP_NAME + `"
-	defaults_from = "fasthttp"
-            idle_timeout = 300
+	defaults_from = ""
+            idle_timeout = 0
             connpoolidle_timeoutoverride	= 0
-            connpool_maxreuse = 2
-            connpool_maxsize  = 2048
+            connpool_maxreuse = 0
+            connpool_maxsize  = 0
             connpool_minsize = 0
-            connpool_replenish = "enabled"
-            connpool_step = 4
+            connpool_replenish = ""
+            connpool_step = 0
             forcehttp_10response = "disabled"
-            maxheader_size = 32768
+            maxheader_size = 0
 }
 `
 
@@ -40,16 +40,16 @@ func TestAccBigipLtmfasthttp_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfasthttpProfileExists(TEST_FASTHTTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "name", TEST_FASTHTTP_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "defaults_from", "fasthttp"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "idle_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "defaults_from", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "idle_timeout", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpoolidle_timeoutoverride", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_maxreuse", "2"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_maxsize", "2048"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_maxreuse", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_maxsize", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_minsize", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_replenish", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_step", "4"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_replenish", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_step", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "forcehttp_10response", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "maxheader_size", "32768"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "maxheader_size", "0"),
 				),
 			},
 		},

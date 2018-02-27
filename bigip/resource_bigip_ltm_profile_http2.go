@@ -124,7 +124,9 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
+if err := d.Set("defaults_from", obj.DefaultsFrom);	err != nil {
+		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Http2 profile  (%s): %s", d.Id(), err)
+	}
 	if err := d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ConcurrentStreamsPerConnection to state for Http2 profile  (%s): %s", d.Id(), err)
 	}

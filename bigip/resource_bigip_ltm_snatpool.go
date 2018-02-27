@@ -2,7 +2,7 @@ package bigip
 
 import (
 	"log"
-
+"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -36,7 +36,7 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Description: "Origin IP addresses",
+				Description: "Specifies a translation address to add to or delete from a SNAT pool.",
 			},
 		},
 	}
@@ -101,6 +101,10 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	}
 	d.Set("name", name)
 	d.Set("partition", snatpool.Partition)
+	if err := d.Set("members", snatpool.Members); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Members to state for Snatpool  (%s): %s", d.Id(), err)
+	}
+
 	return nil
 
 }

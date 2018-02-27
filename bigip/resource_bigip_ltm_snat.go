@@ -40,32 +40,32 @@ func resourceBigipLtmSnat() *schema.Resource {
 			"autolasthop": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP autolasthop",
+				Description: "Specifies whether to automatically map last hop for pools or not. The default is to use next level's defaul",
 			},
 			"mirror": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Enables or disables mirroring of SNAT connections.",
 			},
 			"sourceport": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Specifies whether the system preserves the source port of the connection. ",
 			},
 			"translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Specifies the name of a translated IP address.",
 			},
 			"snatpool": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Specifies the name of a SNAT pool. You can only use this option when automap and translation are not used",
 			},
 			"vlansdisabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "BIG-IP password",
+				Description: "Disables the SNAT on all VLANs.",
 			},
 
 			"origins": {
@@ -122,24 +122,19 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	d.Set("partition", p.Partition)
-	d.Set("full_path", p.FullPath)
 	if err := d.Set("full_path", p.FullPath); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Snat  (%s): %s", d.Id(), err)
 	}
-	d.Set("autolasthop", p.AutoLasthop)
 	if err := d.Set("autolasthop", p.AutoLasthop); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AutoLasthop to state for Snat  (%s): %s", d.Id(), err)
 	}
 	d.Set("mirror", p.Mirror)
-	d.Set("sourceport", p.SourcePort)
 	if err := d.Set("sourceport", p.SourcePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SourcePort to state for Snat  (%s): %s", d.Id(), err)
 	}
-	d.Set("translation", p.Translation)
 	if err := d.Set("translation", p.Translation); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Translation to state for Snat  (%s): %s", d.Id(), err)
 	}
-	d.Set("snatpool", p.Snatpool)
 
 	if err := d.Set("snatpool", p.Snatpool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Snat  (%s): %s", d.Id(), err)

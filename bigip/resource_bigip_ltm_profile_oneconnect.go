@@ -146,15 +146,17 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("share_pools", obj.SharePools)
+	d.Set("partition", obj.Partition)
+	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Onceconnect profile  (%s): %s", d.Id(), err)
+	}
+
 	if err := d.Set("share_pools", obj.SharePools); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SharePools to state for Onceconnect profile  (%s): %s", d.Id(), err)
 	}
-	d.Set("source_mask", obj.SourceMask)
 	if err := d.Set("source_mask", obj.SourceMask); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SourceMask to state for Onceconnect profile  (%s): %s", d.Id(), err)
 	}
-	d.Set("max_age", obj.MaxAge)
 	if err := d.Set("max_age", obj.MaxAge); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving MaxAge to state for Onceconnect profile  (%s): %s", d.Id(), err)
 	}

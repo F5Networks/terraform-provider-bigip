@@ -17,6 +17,7 @@ resource "bigip_ltm_profile_tcp" "test-tcp"
         {
             name = "/Common/sanjose-tcp-wan-profile"
             defaults_from = "/Common/tcp-wan-optimized"
+						partition = "Common"
             idle_timeout = 300
             close_wait_timeout = 5
             finwait_2timeout = 5
@@ -42,6 +43,7 @@ func TestAccBigipLtmProfileTcp_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "name", "/Common/sanjose-tcp-wan-profile"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "defaults_from", "/Common/tcp-wan-optimized"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "idle_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "partition", "Common"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "close_wait_timeout", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_2timeout", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_timeout", "300"),

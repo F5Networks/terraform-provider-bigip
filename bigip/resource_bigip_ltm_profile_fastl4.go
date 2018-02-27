@@ -151,11 +151,11 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("client_timeout", obj.ClientTimeout)
+	d.Set("partition", obj.Partition)
+	d.Set("defaults_from", obj.DefaultsFrom)
 	if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
 	}
-	d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
 	if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
 	}
