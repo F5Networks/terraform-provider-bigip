@@ -1164,9 +1164,15 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 }
 
 func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
-	d.Set("strategy", p.Strategy)
-	d.Set("controls", makeStringSet(&p.Controls))
-	d.Set("requires", makeStringSet(&p.Requires))
+	if err := d.Set("strategy", p.Strategy); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Strategy   state for Policy (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("controls", makeStringSet(&p.Controls)); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Controls  state for Policy (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("requires", makeStringSet(&p.Requires)); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err)
+	}
 
 	for i, r := range p.Rules {
 		rule := fmt.Sprintf("rule.%d", i)
