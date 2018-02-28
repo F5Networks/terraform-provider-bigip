@@ -22,8 +22,7 @@ func resourceBigipCmDevice() *schema.Resource {
 			"configsync_ip": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Username of BIG-IP",
-				//	ValidateFunc: validateF5Name,
+				Description: "IP address used for config sync",
 			},
 			"name": {
 				Type:        schema.TypeString,

@@ -22,19 +22,19 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
+				Description: "Name of the Device group",
 			},
 
 			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
+				Description: "Device administrative partition",
 			},
 
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Address of the Devicegroup which needs to be Devicegroupensed",
+				Description: "Description of Device group",
 			},
 
 			"auto_sync": {
