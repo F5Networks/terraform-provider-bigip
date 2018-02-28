@@ -23,7 +23,6 @@ func resourceBigipSysSnmp() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Contact Person email",
-				//ValidateFunc: validateF5Name,
 			},
 			"sys_location": {
 				Type:        schema.TypeString,

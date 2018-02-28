@@ -22,7 +22,6 @@ func resourceBigipSysProvision() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the module to be provisioned",
-				//ValidateFunc: validateF5Name,
 			},
 
 			"full_path": {
@@ -47,6 +46,7 @@ func resourceBigipSysProvision() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "what level nominal or dedicated",
+				Default: "nominal",
 			},
 
 			"memory_ratio": {
@@ -130,8 +130,11 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	if err := d.Set("full_path", p.FullPath); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Provision  (%s): %s", d.Id(), err)
 	}
+  d.Set("cpu_ratio", p.CpuRatio)
+	d.Set("disk_ratio", p.DiskRatio)
+	d.Set("level", p.Level)
+	d.Set("memory_ratio", p.MemoryRatio)
 
-	p.Name = name
 
 	return nil
 }

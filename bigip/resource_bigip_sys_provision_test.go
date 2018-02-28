@@ -17,7 +17,7 @@ resource "bigip_sys_provision" "test-provision" {
  full_path  = "afm"
  cpu_ratio = 0
  disk_ratio = 0
- level = "nominal"
+ level = "none"
  memory_ratio = 0
 }
 `
@@ -38,7 +38,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "afm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "level", "nominal"),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "level", "none"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "memory_ratio", "0"),
 				),
 			},
