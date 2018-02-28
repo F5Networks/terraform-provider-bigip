@@ -35,7 +35,7 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default: 300,
+				Default:     300,
 			},
 
 			"connpoolidle_timeoutoverride": {
@@ -48,7 +48,7 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "connpool_maxreuse timer",
-				Default: 0,
+				Default:     0,
 			},
 
 			"connpool_maxsize": {
@@ -67,14 +67,14 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "enabled or disabled",
-				Default: "enabled",
+				Default:     "enabled",
 			},
 
 			"connpool_step": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default: 4,
+				Default:     4,
 			},
 			"forcehttp_10response": {
 				Type:        schema.TypeString,
@@ -86,7 +86,7 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default: 32768,
+				Default:     32768,
 			},
 		},
 	}

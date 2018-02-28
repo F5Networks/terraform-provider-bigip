@@ -2,14 +2,13 @@ package bigip
 
 import (
 	"fmt"
-	"testing"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"testing"
 )
 
 var TEST_POLICY_NAME = "test-policy"
-
 
 var TEST_POLICY_RESOURCE = `
 resource "bigip_ltm_node" "test-node" {

@@ -154,14 +154,14 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("interval", m.Interval)
 			d.Set("timeout", m.Timeout)
 			if err := d.Set("send", m.SendString); err != nil {
-	  		return fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err)
-	  	}
+				return fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err)
+			}
 			if err := d.Set("receive", m.ReceiveString); err != nil {
-	  		return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
-	  	}
+				return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
+			}
 			if err := d.Set("receive_disable", m.ReceiveDisable); err != nil {
-	  		return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
-	  	}
+				return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
+			}
 
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
@@ -170,8 +170,8 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("parent", m.ParentMonitor)
 			if err := d.Set("destination", m.Destination); err != nil {
-	  		return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
-	  	}
+				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
+			}
 			d.Set("name", name)
 			return nil
 		}

@@ -1,10 +1,10 @@
 package bigip
 
 import (
-	"log"
-"fmt"
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipLtmSnatpool() *schema.Resource {

@@ -1,11 +1,11 @@
 package bigip
 
 import (
-	"log"
-	"strconv"
-"fmt"
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
+	"strconv"
 )
 
 func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {

@@ -158,9 +158,9 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("[DEBUG] Error saving AutoSync  to state for Devicegroup (%s): %s", d.Id(), err)
 	}
 
-	 if err := d.Set("type", p.Type); err != nil {
- 		return fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err)
- 	}
+	if err := d.Set("type", p.Type); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err)
+	}
 	d.Set("fullLoadOnSync", p.FullLoadOnSync)
 	d.Set("saveOnAutoSync", p.SaveOnAutoSync)
 	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)

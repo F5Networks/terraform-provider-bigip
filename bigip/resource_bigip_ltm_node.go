@@ -1,8 +1,8 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
-"fmt"
 	"regexp"
 
 	"github.com/f5devcentral/go-bigip"
@@ -40,25 +40,25 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.",
-			 },
+			},
 
-      "connection_limit": &schema.Schema{
-		   Type:        schema.TypeInt,
-		   Optional:    true,
-		   Description: "Specifies the maximum number of connections allowed for the node or node address.",
-	     Default: 0,
-		   },
+			"connection_limit": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Specifies the maximum number of connections allowed for the node or node address.",
+				Default:     0,
+			},
 			"dynamic_ratio": &schema.Schema{
-		   Type:        schema.TypeInt,
-		   Optional:    true,
-		   Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
-	     Default: 0,
-		   },
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
+				Default:     0,
+			},
 			"monitor": &schema.Schema{
-		   Type:        schema.TypeString,
-		   Optional:    true,
-		   Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
-		   },
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
+			},
 		},
 	}
 }
@@ -72,8 +72,6 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	connection_limit := d.Get("connection_limit").(int)
 	dynamic_ratio := d.Get("dynamic_ratio").(int)
 	monitor := d.Get("monitor").(string)
-
-
 
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
@@ -134,10 +132,10 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("name", name)
 	if err := d.Set("monitor", node.Monitor); err != nil {
-	return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
+		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
-	return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
+		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
 
 	d.Set("connection_limit", node.ConnectionLimit)
@@ -168,11 +166,11 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	vs := &bigip.Node{
-		Address: d.Get("address").(string),
+		Address:         d.Get("address").(string),
 		ConnectionLimit: d.Get("connection_limit").(int),
-		DynamicRatio: d.Get("dynamic_ratio").(int),
-		Monitor: d.Get("monitor").(string),
-		RateLimit: d.Get("rate_limit").(string),
+		DynamicRatio:    d.Get("dynamic_ratio").(int),
+		Monitor:         d.Get("monitor").(string),
+		RateLimit:       d.Get("rate_limit").(string),
 	}
 
 	err := client.ModifyNode(name, vs)

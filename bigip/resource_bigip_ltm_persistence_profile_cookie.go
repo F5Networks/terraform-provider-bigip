@@ -1,11 +1,11 @@
 package bigip
 
 import (
-	"log"
-	"strconv"
-"fmt"
+	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
+	"strconv"
 )
 
 func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
@@ -188,7 +188,7 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
 	}
-	d.Set("match_across_pools", pp.MatchAcrossPools);
+	d.Set("match_across_pools", pp.MatchAcrossPools)
 	d.Set("match_across_services", pp.MatchAcrossServices)
 	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
 	if err := d.Set("mirror", pp.Mirror); err != nil {
