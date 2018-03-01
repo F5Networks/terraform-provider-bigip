@@ -1,5 +1,5 @@
 *.py
-examples/.keep
+examples/*
 terraform-provider-bigip
 .idea/
 bin/
