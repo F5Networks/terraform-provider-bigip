@@ -67,6 +67,13 @@ func resourceBigipLtmPool() *schema.Resource {
 				Default:     "round-robin",
 				Description: "Possible values: round-robin, ...",
 			},
+
+			"slow_ramp_time": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     10,
+				Description: "Slow ramp time for pool members",
+			},
 		},
 	}
 }
@@ -139,6 +146,10 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("nodes", makeStringSet(&nodeNames)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Nodes to state for Pool  (%s): %s", d.Id(), err)
 	}
+	d.Set("slow_ramp_time", pool.SlowRampTime)
+	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
+	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
@@ -183,6 +194,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowNAT:          d.Get("allow_nat").(string),
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
+		SlowRampTime:			 d.Get("slow_ramp_time").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
 
