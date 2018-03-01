@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_cloudformation_stack"  "network" {
  name = "networking-stack"
   parameters {
-   sshKey = "scs"
+   sshKey = "xxx"
    availabilityZone1 = "us-east-1a"
    adminPassword = "cisco123"
    imageName = "Best1000Mbps"
