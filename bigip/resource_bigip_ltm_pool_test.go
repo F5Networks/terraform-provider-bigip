@@ -31,6 +31,7 @@ resource "bigip_ltm_pool" "test-pool" {
 	allow_snat = "yes"
 	load_balancing_mode = "round-robin"
 	slow_ramp_time = "5"
+	service_down_action = "reset"
 	nodes = ["` + TEST_POOLNODE_NAMEPORT + `"]
 }
 `
@@ -52,6 +53,7 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "load_balancing_mode", "round-robin"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "slow_ramp_time", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "service_down_action", "reset"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "nodes.#", "1"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool",
 						fmt.Sprintf("nodes.%d", schema.HashString(TEST_POOLNODE_NAMEPORT)),

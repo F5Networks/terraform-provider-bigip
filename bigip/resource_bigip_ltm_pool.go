@@ -74,6 +74,13 @@ func resourceBigipLtmPool() *schema.Resource {
 				Default:     10,
 				Description: "Slow ramp time for pool members",
 			},
+
+			"service_down_action": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "none",
+				Description: "Possible values: none, reset, reselect, drop",
+			},
 		},
 	}
 }
@@ -150,6 +157,10 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
 	}
+	d.Set("service_down_action", pool.ServiceDownAction)
+	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
+
+	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
@@ -194,7 +205,8 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowNAT:          d.Get("allow_nat").(string),
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
-		SlowRampTime:			 d.Get("slow_ramp_time").(int),
+		SlowRampTime:      d.Get("slow_ramp_time").(int),
+		ServiceDownAction: d.Get("service_down_action").(string),
 		Monitor:           strings.Join(monitors, " and "),
 	}
 
