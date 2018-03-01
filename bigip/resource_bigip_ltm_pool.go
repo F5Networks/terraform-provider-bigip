@@ -159,7 +159,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("service_down_action", pool.ServiceDownAction)
 	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
-
+		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
 	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
