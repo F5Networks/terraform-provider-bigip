@@ -1,5 +1,6 @@
 *.py
 examples/*
+examples/aws/*.tf
 terraform-provider-bigip
 .idea/
 bin/
