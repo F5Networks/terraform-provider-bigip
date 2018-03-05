@@ -131,6 +131,12 @@ resource "bigip_ltm_pool" "pool" {
 
 `load_balancing_mode` - (Optional, Default = round-robin)
 
+`slow_ramp_time` - (Optional, Default = 10)
+
+`service_down_action` - (Optional, Default = none)
+
+`reselect_tries` - (Optional, Default = 0)
+
 ## bigip_ltm_virtual_server
 
 Configures a Virtual Server
