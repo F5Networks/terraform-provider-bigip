@@ -81,6 +81,13 @@ func resourceBigipLtmPool() *schema.Resource {
 				Default:     "none",
 				Description: "Possible values: none, reset, reselect, drop",
 			},
+
+			"reselect_tries": &schema.Schema{
+				Type:				 schema.TypeInt,
+				Optional:		 true,
+				Default: 		 0,
+				Description: "Number of times the system tries to select a new pool member after a failure.",
+			},
 		},
 	}
 }
@@ -161,6 +168,10 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
 	}
+	d.Set("reselect_tries", pool.ReselectTries)
+	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
+		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
+	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	d.Set("monitors", makeStringSet(&monitors))
@@ -207,6 +218,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
 		SlowRampTime:      d.Get("slow_ramp_time").(int),
 		ServiceDownAction: d.Get("service_down_action").(string),
+		ReselectTries:		 d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
 
