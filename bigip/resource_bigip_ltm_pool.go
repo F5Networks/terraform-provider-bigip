@@ -83,9 +83,9 @@ func resourceBigipLtmPool() *schema.Resource {
 			},
 
 			"reselect_tries": &schema.Schema{
-				Type:				 schema.TypeInt,
-				Optional:		 true,
-				Default: 		 0,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
 				Description: "Number of times the system tries to select a new pool member after a failure.",
 			},
 		},
@@ -218,7 +218,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
 		SlowRampTime:      d.Get("slow_ramp_time").(int),
 		ServiceDownAction: d.Get("service_down_action").(string),
-		ReselectTries:		 d.Get("reselect_tries").(int),
+		ReselectTries:     d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
 
