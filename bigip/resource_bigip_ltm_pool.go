@@ -160,15 +160,12 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("nodes", makeStringSet(&nodeNames)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Nodes to state for Pool  (%s): %s", d.Id(), err)
 	}
-	d.Set("slow_ramp_time", pool.SlowRampTime)
 	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
 	}
-	d.Set("service_down_action", pool.ServiceDownAction)
 	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
 	}
-	d.Set("reselect_tries", pool.ReselectTries)
 	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
 		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
 	}
