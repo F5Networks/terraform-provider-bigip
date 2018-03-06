@@ -102,15 +102,12 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("description", ntp.Description)
 	if err := d.Set("description", ntp.Description); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Description to state for NTP  (%s): %s", d.Id(), err)
 	}
-	d.Set("servers", ntp.Servers)
 	if err := d.Set("servers", ntp.Servers); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Servers to state for NTP  (%s): %s", d.Id(), err)
 	}
-	d.Set("timezone", ntp.Timezone)
 	if err := d.Set("timezone", ntp.Timezone); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Timezone  state for NTP  (%s): %s", d.Id(), err)
 	}

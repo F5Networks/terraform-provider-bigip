@@ -119,7 +119,6 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	}
 
 	d.Set("name", name)
-	d.Set("arp", va.ARP)
 	if err := d.Set("arp", va.ARP); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ARP to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
@@ -127,11 +126,9 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	d.Set("conn_limit", va.ConnectionLimit)
 	d.Set("enabled", va.Enabled)
 	d.Set("icmp_echo", va.ICMPEcho)
-	d.Set("advertize_route", va.RouteAdvertisement)
 	if err := d.Set("advertize_route", va.RouteAdvertisement); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving RouteAdvertisement to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
-	d.Set("traffic_group", va.TrafficGroup)
 	if err := d.Set("traffic_group", va.TrafficGroup); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TrafficGroup to state for Virtual Address  (%s): %s", d.Id(), err)
 	}

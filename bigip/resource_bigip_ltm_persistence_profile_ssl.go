@@ -123,16 +123,13 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 
 	d.Set("name", name)
 	d.Set("defaults_from", pp.DefaultsFrom)
-	d.Set("match_across_pools", pp.MatchAcrossPools)
 	if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving MatchAcrossPools to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
 	}
-	d.Set("match_across_services", pp.MatchAcrossServices)
 	if err := d.Set("match_across_services", pp.MatchAcrossServices); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving MatchAcrossServices to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
 	}
-	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	if err := d.Set("match_across_virtuals", pp.MatchAcrossPools); err != nil {
+	if err := d.Set("match_across_virtuals", pp.MatchAcrossVirtuals); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving MatchAcrossVirtuals to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
 	}
 	d.Set("mirror", pp.Mirror)

@@ -126,7 +126,6 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 		d.SetId("")
 		return nil
 	}
-	d.Set("full_path", p.FullPath)
 	if err := d.Set("full_path", p.FullPath); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Provision  (%s): %s", d.Id(), err)
 	}
