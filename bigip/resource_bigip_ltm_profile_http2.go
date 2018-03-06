@@ -131,7 +131,6 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("[DEBUG] Error saving ConcurrentStreamsPerConnection to state for Http2 profile  (%s): %s", d.Id(), err)
 	}
 	d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
-	d.Set("activation_modes", obj.ActivationModes)
 	if err := d.Set("activation_modes", obj.ActivationModes); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ActivationModes to state for Http2 profile  (%s): %s", d.Id(), err)
 	}

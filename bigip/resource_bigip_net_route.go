@@ -95,7 +95,6 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("network", obj.Network)
 	if err := d.Set("network", obj.Network); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Network to state for Route  (%s): %s", d.Id(), err)
 	}
