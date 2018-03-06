@@ -267,9 +267,9 @@ type Pool struct {
 	QueueDepthLimit        int    `json:"queueDepthLimit,omitempty"`
 	QueueOnConnectionLimit string `json:"queueOnConnectionLimit,omitempty"`
 	QueueTimeLimit         int    `json:"queueTimeLimit,omitempty"`
-	ReselectTries          int    `json:"reselectTries,omitempty"`
+	ReselectTries          int    `json:"reselectTries"`
 	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
-	SlowRampTime           int    `json:"slowRampTime,omitempty"`
+	SlowRampTime           int    `json:"slowRampTime"`
 }
 
 // Pool Members contains a list of pool members within a pool on the BIG-IP system.
@@ -329,9 +329,9 @@ type poolDTO struct {
 	QueueDepthLimit        int    `json:"queueDepthLimit,omitempty"`
 	QueueOnConnectionLimit string `json:"queueOnConnectionLimit,omitempty"`
 	QueueTimeLimit         int    `json:"queueTimeLimit,omitempty"`
-	ReselectTries          int    `json:"reselectTries,omitempty"`
+	ReselectTries          int    `json:"reselectTries"`
 	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
-	SlowRampTime           int    `json:"slowRampTime,omitempty"`
+	SlowRampTime           int    `json:"slowRampTime"`
 }
 
 func (p *Pool) MarshalJSON() ([]byte, error) {

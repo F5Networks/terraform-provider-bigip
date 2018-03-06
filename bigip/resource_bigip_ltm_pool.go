@@ -67,6 +67,27 @@ func resourceBigipLtmPool() *schema.Resource {
 				Default:     "round-robin",
 				Description: "Possible values: round-robin, ...",
 			},
+
+			"slow_ramp_time": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     10,
+				Description: "Slow ramp time for pool members",
+			},
+
+			"service_down_action": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "none",
+				Description: "Possible values: none, reset, reselect, drop",
+			},
+
+			"reselect_tries": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
+				Description: "Number of times the system tries to select a new pool member after a failure.",
+			},
 		},
 	}
 }
@@ -135,6 +156,15 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("nodes", makeStringSet(&nodeNames)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Nodes to state for Pool  (%s): %s", d.Id(), err)
 	}
+	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
+		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
+	}
 
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
@@ -178,6 +208,9 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowNAT:          d.Get("allow_nat").(string),
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
+		SlowRampTime:      d.Get("slow_ramp_time").(int),
+		ServiceDownAction: d.Get("service_down_action").(string),
+		ReselectTries:     d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
 
