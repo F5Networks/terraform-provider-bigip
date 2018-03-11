@@ -163,16 +163,29 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	address := d.Get("address").(string)
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
-	vs := &bigip.Node{
-		Address:         d.Get("address").(string),
-		ConnectionLimit: d.Get("connection_limit").(int),
-		DynamicRatio:    d.Get("dynamic_ratio").(int),
-		Monitor:         d.Get("monitor").(string),
-		RateLimit:       d.Get("rate_limit").(string),
+	var node *bigip.Node
+	if r.MatchString(address) {
+		node = &bigip.Node{
+			Address:         address,
+			ConnectionLimit: d.Get("connection_limit").(int),
+			DynamicRatio:    d.Get("dynamic_ratio").(int),
+			Monitor:         d.Get("monitor").(string),
+			RateLimit:       d.Get("rate_limit").(string),
+		}
+	} else {
+		node = &bigip.Node{
+			ConnectionLimit: d.Get("connection_limit").(int),
+			DynamicRatio:    d.Get("dynamic_ratio").(int),
+			Monitor:         d.Get("monitor").(string),
+			RateLimit:       d.Get("rate_limit").(string),
+		}
+		node.FQDN.Name = address
 	}
 
-	err := client.ModifyNode(name, vs)
+	err := client.ModifyNode(name, node)
 	if err != nil {
 		return nil
 	}
