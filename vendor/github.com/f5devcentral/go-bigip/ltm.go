@@ -941,6 +941,7 @@ type Monitors struct {
 type Monitor struct {
 	Name           string
 	Partition      string
+	DefaultsFrom   string
 	FullPath       string
 	Generation     int
 	ParentMonitor  string
@@ -948,22 +949,24 @@ type Monitor struct {
 	Destination    string
 	Interval       int
 	IPDSCP         int
-	ManualResume   bool
+	ManualResume   string
 	Password       string
 	ReceiveString  string
 	ReceiveDisable string
-	Reverse        bool
+	Reverse        string
 	SendString     string
 	TimeUntilUp    int
 	Timeout        int
-	Transparent    bool
+	Transparent    string
 	UpInterval     int
 	Username       string
+
 }
 
 type monitorDTO struct {
 	Name           string `json:"name,omitempty"`
 	Partition      string `json:"partition,omitempty"`
+	DefaultsFrom   string `json:"defaultsFrom,omitempty"`
 	FullPath       string `json:"fullPath,omitempty"`
 	Generation     int    `json:"generation,omitempty"`
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
@@ -971,15 +974,15 @@ type monitorDTO struct {
 	Destination    string `json:"destination,omitempty"`
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
-	ManualResume   string `json:"manualResume,omitempty" bool:"enabled"`
+	ManualResume   string `json:"manualResume,omitempty"`
 	Password       string `json:"password,omitempty"`
 	ReceiveString  string `json:"recv,omitempty"`
 	ReceiveDisable string `json:"recvDisable,omitempty"`
-	Reverse        string `json:"reverse,omitempty" bool:"enabled"`
+	Reverse        string `json:"reverse,omitempty"`
 	SendString     string `json:"send,omitempty"`
 	TimeUntilUp    int    `json:"timeUntilUp,omitempty"`
 	Timeout        int    `json:"timeout,omitempty"`
-	Transparent    string `json:"transparent,omitempty" bool:"enabled"`
+	Transparent    string `json:"transparent,omitempty"`
 	UpInterval     int    `json:"upInterval,omitempty"`
 	Username       string `json:"username,omitempty"`
 }
@@ -2086,7 +2089,7 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 // Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open"}
 
 	for _, name := range monitorUris {
 		var m Monitors
@@ -2104,14 +2107,16 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent string, interval, timeout int, send, receive string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable string) error {
 	config := &Monitor{
 		Name:          name,
 		ParentMonitor: parent,
+		DefaultsFrom: defaults_from,
 		Interval:      interval,
 		Timeout:       timeout,
 		SendString:    send,
 		ReceiveString: receive,
+		ReceiveDisable: receive_disable,
 	}
 
 	return b.AddMonitor(config)
@@ -2122,7 +2127,10 @@ func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
 		config.ParentMonitor = "gateway_icmp"
 	}
-
+	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
+		config.ParentMonitor = "tcp-half-open"
+	}
+	 log.Println( " value of config in create monitor ------------- %+v\n", *config, uriLtm, uriMonitor, config.ParentMonitor)
 	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
 }
 
@@ -2143,6 +2151,7 @@ func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 
 // DeleteMonitor removes a monitor.
 func (b *BigIP) DeleteMonitor(name, parent string) error {
+	log.Println( " in delete +++++++++++++++++ ", parent, name)
 	return b.delete(uriLtm, uriMonitor, parent, name)
 }
 
@@ -2151,7 +2160,10 @@ func (b *BigIP) DeleteMonitor(name, parent string) error {
 // can be modified are referenced in the Monitor struct.
 func (b *BigIP) ModifyMonitor(name, parent string, config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
-		config.ParentMonitor = "gateway_icmp"
+		config.ParentMonitor = "gatewayIcmp"
+	}
+	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
+		config.ParentMonitor = "tcp-half-open"
 	}
 
 	return b.put(config, uriLtm, uriMonitor, parent, name)

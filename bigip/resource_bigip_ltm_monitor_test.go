@@ -20,9 +20,9 @@ resource "bigip_ltm_monitor" "test-monitor" {
 	interval = 998
 	receive = "HTTP 1.1 302 Found"
 	receive_disable = "HTTP/1.1 429"
-	reverse = false
-	transparent = false
-	manual_resume = false
+	reverse = "disabled"
+	transparent = "disabled"
+	manual_resume = "disabled"
 	ip_dscp = 0
 	time_until_up = 0
 	destination = "1.2.3.4:1234"
@@ -47,9 +47,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "interval", "998"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive", "HTTP 1.1 302 Found"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive_disable", "HTTP/1.1 429"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "reverse", "false"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "transparent", "false"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "manual_resume", "false"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "reverse", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "transparent", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "manual_resume", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "ip_dscp", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "time_until_up", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "destination", "1.2.3.4:1234"),

@@ -37,6 +37,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				ForceNew:     true,
 				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
+			"defaults_from": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
+			},
 
 			"interval": {
 				Type:        schema.TypeInt,
@@ -75,21 +80,21 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			},
 
 			"reverse": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "disabled",
 			},
 
 			"transparent": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "disabled",
 			},
 
 			"manual_resume": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "disabled",
 			},
 
 			"ip_dscp": {
@@ -123,10 +128,12 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 	client.CreateMonitor(
 		name,
 		monitorParent(d.Get("parent").(string)),
+		d.Get("defaults_from").(string),
 		d.Get("interval").(int),
 		d.Get("timeout").(int),
 		d.Get("send").(string),
 		d.Get("receive").(string),
+		d.Get("receive_disable").(string),
 	)
 
 	d.SetId(name)
@@ -150,7 +157,9 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return nil
 	}
 	for _, m := range monitors {
+		log.Println(" value of fullpath    ++++++++++++++++++++++++", m.FullPath, name)
 		if m.FullPath == name {
+			d.Set("defaults_from", m.DefaultsFrom)
 			d.Set("interval", m.Interval)
 			d.Set("timeout", m.Timeout)
 			if err := d.Set("send", m.SendString); err != nil {
@@ -159,16 +168,17 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			if err := d.Set("receive", m.ReceiveString); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
 			}
-			if err := d.Set("receive_disable", m.ReceiveDisable); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
-			}
-
+			//if err := d.Set("receive_disable", m.ReceiveDisable); err != nil {
+				//return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
+			//}
+			d.Set("receive_disable", m.ReceiveDisable)
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
 			d.Set("ip_dscp", m.IPDSCP)
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
-			d.Set("parent", m.ParentMonitor)
+			//d.Set("parent", m.ParentMonitor)
+			//log.Println("value of parent ++++++++++++++++++++++++++++++ ", m.ParentMonitor)
 			if err := d.Set("destination", m.Destination); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
 			}
@@ -176,7 +186,6 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 	}
-	log.Println("I am printing whole thing   ", monitors)
 	return fmt.Errorf("Couldn't find monitor %s", name)
 
 }
@@ -212,11 +221,11 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		SendString:     d.Get("send").(string),
 		ReceiveString:  d.Get("receive").(string),
 		ReceiveDisable: d.Get("receive_disable").(string),
-		Reverse:        d.Get("reverse").(bool),
-		Transparent:    d.Get("transparent").(bool),
+		Reverse:        d.Get("reverse").(string),
+		Transparent:    d.Get("transparent").(string),
 		IPDSCP:         d.Get("ip_dscp").(int),
 		TimeUntilUp:    d.Get("time_until_up").(int),
-		ManualResume:   d.Get("manual_resume").(bool),
+		ManualResume:   d.Get("manual_resume").(string),
 		Destination:    d.Get("destination").(string),
 	}
 
@@ -231,6 +240,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	parent := monitorParent(d.Get("parent").(string))
+	log.Println(" value of PArent ++++++++++++++", parent)
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
@@ -246,11 +256,11 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" {
+	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, or /Common/tcp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, /Common/tcp-half-open,  or /Common/tcp")}
 }
 
 func monitorParent(s string) string {
