@@ -23,7 +23,7 @@ resource "bigip_ltm_node" "test-node" {
 }
 `
 var TEST_FQDN_NODE_RESOURCE = `
-resource "bigip_ltm_node" "test-node" {
+resource "bigip_ltm_node" "test-fqdn-node" {
 	name = "` + TEST_FQDN_NODE_NAME + `"
 	address = "f5.com"
 	connection_limit = "0"
@@ -67,12 +67,12 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 				Config: TEST_FQDN_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckNodeExists(TEST_FQDN_NODE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_FQDN_NODE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "f5.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "default"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "name", TEST_FQDN_NODE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "address", "f5.com"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "connection_limit", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "dynamic_ratio", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "monitor", "default"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 				),
 			},
 		},
@@ -107,7 +107,7 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_NODE_RESOURCE,
+				Config: TEST_FQDN_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckNodeExists(TEST_FQDN_NODE_NAME, true),
 				),
