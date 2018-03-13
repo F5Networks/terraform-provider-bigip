@@ -157,7 +157,6 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return nil
 	}
 	for _, m := range monitors {
-		log.Println(" value of fullpath    ++++++++++++++++++++++++", m.FullPath, name)
 		if m.FullPath == name {
 			d.Set("defaults_from", m.DefaultsFrom)
 			d.Set("interval", m.Interval)
@@ -168,17 +167,12 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			if err := d.Set("receive", m.ReceiveString); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
 			}
-			//if err := d.Set("receive_disable", m.ReceiveDisable); err != nil {
-				//return fmt.Errorf("[DEBUG] Error saving ReceiveDisable to state for Monitor (%s): %s", d.Id(), err)
-			//}
 			d.Set("receive_disable", m.ReceiveDisable)
 			d.Set("reverse", m.Reverse)
 			d.Set("transparent", m.Transparent)
 			d.Set("ip_dscp", m.IPDSCP)
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
-			//d.Set("parent", m.ParentMonitor)
-			//log.Println("value of parent ++++++++++++++++++++++++++++++ ", m.ParentMonitor)
 			if err := d.Set("destination", m.Destination); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
 			}
@@ -240,7 +234,6 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	parent := monitorParent(d.Get("parent").(string))
-	log.Println(" value of PArent ++++++++++++++", parent)
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
