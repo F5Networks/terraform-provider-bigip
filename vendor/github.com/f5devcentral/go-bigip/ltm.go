@@ -1707,7 +1707,6 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor string) error {
 	config := &Node{
 		Name: name,
-		Address: address,
 		RateLimit: rate_limit,
 		ConnectionLimit: connection_limit,
 		DynamicRatio: dynamic_ratio,
