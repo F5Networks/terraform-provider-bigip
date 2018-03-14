@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -58,6 +57,30 @@ func resourceBigipLtmNode() *schema.Resource {
 				Optional:    true,
 				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
 			},
+			"state": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "user-up",
+				Description: "Marks the node up or down. The default value is user-up.",
+			},
+			"fqdn": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"address_family": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Specifies the node's address family. The default is 'unspecified', or IP-agnostic",
+						},
+						"name": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Specifies the fully qualified domain name of the node.",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -71,6 +94,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	connection_limit := d.Get("connection_limit").(int)
 	dynamic_ratio := d.Get("dynamic_ratio").(int)
 	monitor := d.Get("monitor").(string)
+	state := d.Get("state").(string)
 
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
@@ -84,6 +108,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			connection_limit,
 			dynamic_ratio,
 			monitor,
+			state,
 		)
 	} else {
 		err = client.CreateFQDNNode(
@@ -93,6 +118,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			connection_limit,
 			dynamic_ratio,
 			monitor,
+			state,
 		)
 	}
 	if err != nil {
@@ -174,6 +200,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 			RateLimit:       d.Get("rate_limit").(string),
+			State:       d.Get("state").(string),
 		}
 	} else {
 		node = &bigip.Node{
@@ -181,6 +208,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 			RateLimit:       d.Get("rate_limit").(string),
+			State:       d.Get("state").(string),
 		}
 		node.FQDN.Name = address
 	}
