@@ -102,6 +102,8 @@ resource "bigip_ltm_node" "node" {
 
 `address` - (Required) IP or hostname of the node
 
+`state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
+
 ## bigip_ltm_pool
 
 ### Example
