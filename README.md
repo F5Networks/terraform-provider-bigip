@@ -283,30 +283,32 @@ are managed through iControlREST is recommended.
 ### Example
 
 ```
-resource "bigip_ltm_policy" "policy" {
-  name = "/Common/my_policy"
-  strategy = "/Common/first-match"
+resource "bigip_ltm_policy" "test-policy" {
+ name = "my_policy"
+ strategy = "first-match"
   requires = ["http"]
+ published_copy = "Drafts/my_policy"
   controls = ["forwarding"]
-  rule {
-    name = "/Common/rule1"
-
-    condition {
-      httpUri = true
-      startsWith = true
-      values = ["/foo"]
-    }
-
-    condition {
-      httpMethod = true
-      values = ["GET"]
-    }
-
-    action {
-      forward = true
-      pool = "/Common/my_pool"
-    }
+  rule  {
+  name = "rule6"
+  condition {
+    http_uri = true
+    starts_with = true
+    values = ["/foo"]
   }
+
+  condition {
+    http_method = true
+    values = ["GET"]
+  }
+
+   action = {
+     tm_name = "20"
+     forward = true
+      pool = "/Common/mypool"
+   }
+  }
+depends_on = ["bigip_ltm_pool.mypool"]
 }
 ```
 
@@ -361,7 +363,7 @@ resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
         ignore_changes = [ "cookie_encryption_passphrase" ]
     }
 }
- 
+
 
 ```
 
@@ -392,7 +394,7 @@ If this is configured specify `ignore_changes` under the `lifecycle` block to ig
 
 `cookie_name` (Optional) Name of the cookie to track persistence
 
-`expiration` (Optional) Expiration TTL for cookie specified in DAY:HOUR:MIN:SECONDS (Examples: 1:0:0:0 one day, 1:0:0 one hour, 30:0 thirty minutes) 
+`expiration` (Optional) Expiration TTL for cookie specified in DAY:HOUR:MIN:SECONDS (Examples: 1:0:0:0 one day, 1:0:0 one hour, 30:0 thirty minutes)
 
 `hash_length` (Optional) (Integer) Length of hash to apply to cookie
 
