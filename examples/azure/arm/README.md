@@ -18,4 +18,4 @@ variable "admin_password" {
   default = "xxxxx"
 }
 
-### If you would like to convert the some of the templates at https://github.com/F5Networks/f5-azure-arm-templates/tree/master/experimental/standalone always copy from the New_stack folder, you need some modifications to include extra '$' some places. Terraform plan will provide you that information on which vraiables need an extra '$'.
+Note -  If you would like to convert the some of the templates at https://github.com/F5Networks/f5-azure-arm-templates/tree/master/experimental/standalone always copy from the New_stack folder, you need some modifications to include extra '$' some places. Terraform plan will provide you that information on which vraiables need an extra '$'.
