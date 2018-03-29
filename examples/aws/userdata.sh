@@ -79,6 +79,7 @@ checkF5Ready
 sleep 150
 logger -p local0.info 'firstrun debug: starting-tmsh-config'
 tmsh modify auth user admin password \"adminadmin\"
+tmsh modify auth user admin { password admin }
 tmsh modify auth user admin shell bash
 tmsh save /sys config
 checkStatusnoret
