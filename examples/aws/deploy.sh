@@ -5,8 +5,8 @@
 terraform plan  # Terraform plan for BIG-IP in AWS uses master.tf
 terraform apply -auto-approve  >> dump    # Dump the creation in a file called dump
 cat dump
-cd ../main   # change path to use a different main.tf file for deploying VIPS, Pool etc, 
-bigip_management_ip=$(awk -F'f5public_ip =' '$2 ~ /[^[:blank:]]/ {print $2}' ../aws/dump) # Extract the Public IP as Management IP for BIG-IP
+cd ../..   # change path to use a different main.tf file for deploying VIPS, Pool etc, 
+bigip_management_ip=$(awk -F'SCS_F5public_ip =' '$2 ~ /[^[:blank:]]/ {print $2}' examples/aws/dump) # Extract the Public IP as Management IP for BIG-IP
 echo "BIG-IP is being deployed in AWS ...... hang on"
 echo "BIG-IP management is $bigip_management_ip will configure Apps once deployed in AWS as a instance"
 countdown()
@@ -31,7 +31,7 @@ perl -e 'use Term::ANSIColor; print color "white"; print "ABC\n"; print color "r
 terraform plan #Uses main.tf file to deploy applications VIP, Pools etc in main directory
 terraform apply -auto-approve
 rm test.txt  # Clean up 
-rm ../aws/dump # Remove the dump file 
+rm examples/aws/dump # Remove the dump file 
 
 
 

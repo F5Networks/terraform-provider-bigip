@@ -72,7 +72,7 @@ resource "aws_network_interface" "external" {
     private_ips = ["10.0.1.10", "10.0.1.100"]
     security_groups = ["${aws_security_group.allow_all.id}"]
     attachment {
-        instance = "${aws_instance.f5.id}"
+        instance = "${aws_instance.SCS_F5.id}"
         device_index = 1
     }
 }
@@ -82,7 +82,7 @@ resource "aws_network_interface" "internal" {
     private_ips = ["10.0.2.10", "10.0.2.183"]
     security_groups = ["${aws_security_group.allow_all.id}"]
     attachment {
-        instance = "${aws_instance.f5.id}"
+        instance = "${aws_instance.SCS_F5.id}"
         device_index = 2 
     }
 }
@@ -130,7 +130,7 @@ resource "aws_key_pair" "auth2" {
 }
 
 
-resource "aws_instance" "f5" {
+resource "aws_instance" "SCS_F5" {
     ami = "ami-73a92609"
     instance_type = "${var.instance_type}"
     associate_public_ip_address = true
@@ -143,11 +143,11 @@ resource "aws_instance" "f5" {
     key_name = "${var.key_name}"
     root_block_device { delete_on_termination = true }
     tags {
-        Name = "f5"
+        Name = "SCS_F5"
     }
 }
 
-resource "aws_instance" "appserver1" {
+resource "aws_instance" "SCS_appserver1" {
     ami = "ami-9be6f38c"
     instance_type = "t2.micro"
     associate_public_ip_address = true
@@ -160,11 +160,11 @@ resource "aws_instance" "appserver1" {
     key_name = "${var.key_name1}"
     root_block_device { delete_on_termination = true }
     tags {
-        Name = "appserver1"
+        Name = "SCS_appserver1"
     }
 }
 
-resource "aws_instance" "appserverr2" {
+resource "aws_instance" "SCS_appserver2" {
     ami = "ami-9be6f38c"
     instance_type = "t2.micro"
     associate_public_ip_address = true
@@ -177,19 +177,16 @@ resource "aws_instance" "appserverr2" {
     key_name = "${var.key_name2}"
     root_block_device { delete_on_termination = true }
     tags {
-        Name = "appserver2"
+        Name = "SCS_appserver2"
     }
 }
 
 
 
-output "f5public_ip" {
-value = "${aws_instance.f5.public_ip}"
+output "SCS_F5public_ip" {
+value = "${aws_instance.SCS_F5.public_ip}"
 }
 
-output "Serverpublic_ip" {
-value = "${aws_instance.appserver1.public_ip}"
-}
-output "f5_Virtual_Server_IP" {
+output "SCS_F5_Virtual_Server_IP" {
   value = "${aws_eip.eip_vip.public_ip}"
 }
