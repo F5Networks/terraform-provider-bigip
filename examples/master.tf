@@ -24,7 +24,7 @@ resource "bigip_sys_ntp" "ntp1" {
 resource "bigip_sys_dns" "dns1" {
    	description = "/Common/DNS1"
    	name_servers = ["8.8.8.8"]
-   	numberof_dots = 2
+   	number_of_dots = 2
    	search = ["f5.com"]
    	depends_on = ["bigip_sys_provision.provision-afm"]
 }
