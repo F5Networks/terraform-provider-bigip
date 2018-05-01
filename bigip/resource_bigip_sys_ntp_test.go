@@ -26,14 +26,12 @@ func TestAccBigipSysNtp_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testCheckntpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_NTP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckntpExists(TEST_NTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "description", TEST_NTP_NAME),
-					//resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "servers", "[10.10.10.10]"),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "timezone", "America/Los_Angeles"),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp",
 						fmt.Sprintf("servers.%d", schema.HashString("10.10.10.10")),
@@ -83,25 +81,4 @@ func testCheckntpExists(description string, exists bool) resource.TestCheckFunc 
 		}
 		return nil
 	}
-}
-
-func testCheckntpsDestroyed(s *terraform.State) error {
-	/* client := testAccProvider.Meta().(*bigip.BigIP)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_sys_ntp" {
-			continue
-		}
-
-		description := rs.Primary.ID
-		ntp, err := client.NTPs()
-		if err != nil {
-			return err
-		}
-		if ntp != nil {
-			return fmt.Errorf("ntp ", description, " not destroyed.")
-
-		}
-	}*/
-	return nil
 }

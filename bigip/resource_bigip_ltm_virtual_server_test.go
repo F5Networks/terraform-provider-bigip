@@ -63,7 +63,6 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
-					//resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "pool", TEST_VSPOOL_NAME),
 				),
 			},
 		},
@@ -91,7 +90,6 @@ func TestAccBigipLtmVS_import(t *testing.T) {
 	})
 }
 
-//TODO: test adding rules, profiles, policies, etc
 
 func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {

@@ -28,7 +28,6 @@ func TestAccBigipSysdns_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testCheckdnssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DNS_RESOURCE,
@@ -54,7 +53,6 @@ func TestAccBigipSysdns_import(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//	CheckDestroy: testCheckdnssDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DNS_RESOURCE,
@@ -89,23 +87,4 @@ func testCheckdnsExists(description string, exists bool) resource.TestCheckFunc 
 	}
 }
 
-func testCheckdnssDestroyed(s *terraform.State) error {
-	/* client := testAccProvider.Meta().(*bigip.BigIP)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_sys_dns" {
-			continue
-		}
-
-		description := rs.Primary.ID
-		dns, err := client.dnss()
-		if err != nil {
-			return err
-		}
-		if dns != nil {
-			return fmt.Errorf("dns ", description, " not destroyed.")
-
-		}
-	}*/
-	return nil
-}
+ 

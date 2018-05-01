@@ -26,7 +26,6 @@ func TestAccBigipSyssnmp_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testChecksnmpsDestroyed, (delete API not supported )
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
@@ -49,7 +48,6 @@ func TestAccBigipSyssnmp_import(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testChecksnmpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
@@ -81,23 +79,4 @@ func testChecksnmpExists(name string, exists bool) resource.TestCheckFunc {
 	}
 }
 
-/*func testChecksnmpsDestroyed(s *terraform.State) error {
-	client := testAccProvider.Meta().(*bigip.BigIP)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_sys_snmp" {
-			continue
-		}
-
-		name := rs.Primary.ID
-		snmp, err := client.snmps(name)
-		if err != nil {
-			return err
-		}
-		if snmp == nil {
-			return fmt.Errorf("snmp ", name, " not destroyed.")
-		}
-	}
-	return nil
-}
-*/
+ 

@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-//var TEST_PROVISION_NAME = fmt.Sprintf("/%s/test-provision", TEST_PARTITION)
 var TEST_PROVISION_NAME = "afm"
 
 var TEST_PROVISION_RESOURCE = `
@@ -28,7 +27,6 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckProvisionsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PROVISION_RESOURCE,
@@ -52,7 +50,6 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers: testAccProviders,
-		//CheckDestroy: testCheckProvisionsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PROVISION_RESOURCE,
@@ -85,25 +82,4 @@ func testCheckprovisionExists(name string, exists bool) resource.TestCheckFunc {
 		}
 		return nil
 	}
-}
-
-func testCheckProvisionsDestroyed(s *terraform.State) error {
-	/*client := testAccProvider.Meta().(*bigip.BigIP)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_sys_provision" {
-			continue
-		}
-
-		name := rs.Primary.ID
-		provision, err := client.Provisions(name)
-		if err != nil {
-			return err
-		}
-		if provision != nil {
-			return fmt.Errorf("provision ", name, " not destroyed.")
-
-		}
-	}*/
-	return nil
 }

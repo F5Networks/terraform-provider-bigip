@@ -12,7 +12,6 @@ import (
 
 var TEST_IAPP_NAME = "/" + TEST_PARTITION + "/test-iapp"
 
-//var TEST_IAPP_NAME = "test-iapp"
 
 var TEST_IAPP_RESOURCE = `
 	resource "bigip_sys_iapp" "test-iapp" {
