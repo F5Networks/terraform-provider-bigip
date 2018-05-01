@@ -109,6 +109,10 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 		name,
 		parent,
 	)
+	if err != nil {
+		return err
+		}
+
 
 	d.SetId(name)
 

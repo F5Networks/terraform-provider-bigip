@@ -148,29 +148,6 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	return SnatToData(p, d)
 }
 
-func resourceBigipLtmSnatExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching LtmSnat " + name)
-
-	p, err := client.GetSnat(name)
-
-	d.Set("partition", p.Partition)
-	d.Set("full_path", p.FullPath)
-	d.Set("autolasthop", p.AutoLasthop)
-	d.Set("mirror", p.Mirror)
-	d.Set("sourceport", p.SourcePort)
-	d.Set("translation", p.Translation)
-	d.Set("snatpool", p.Snatpool)
-	d.Set("vlansdisabled", p.VlansDisabled)
-
-	if err != nil {
-		return false, err
-	}
-
-	return p != nil, nil
-}
 
 func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)

@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-var NODE_VALIDATION = regexp.MustCompile(":\\d{2,5}$")
+var nodeVALIDATION = regexp.MustCompile(":\\d{2,5}$")
 
 func resourceBigipLtmPool() *schema.Resource {
 	return &schema.Resource{

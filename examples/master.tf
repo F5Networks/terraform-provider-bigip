@@ -5,20 +5,11 @@ provider "bigip" {
 }
 
 
-resource "bigip_sys_provision" "provision-afm" {
-  name = "/Common/afm"
-  full_path  = "afm"
-  cpu_ratio = 0
-  disk_ratio = 0
-  level = "nominal"
-  memory_ratio = 0
-}
 
 resource "bigip_sys_ntp" "ntp1" {
   	description = "/Common/NTP1"
   	servers = ["time.google.com"]
   	timezone = "America/Los_Angeles"
-	depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_sys_dns" "dns1" {
@@ -26,7 +17,6 @@ resource "bigip_sys_dns" "dns1" {
    	name_servers = ["8.8.8.8"]
    	number_of_dots = 2
    	search = ["f5.com"]
-   	depends_on = ["bigip_sys_provision.provision-afm"]
 }
 resource "bigip_net_vlan" "vlan1" {
 	name = "/Common/internal"
@@ -36,7 +26,6 @@ resource "bigip_net_vlan" "vlan1" {
 		tagged = false
 	}	
 
-        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_net_vlan" "vlan2" {
@@ -47,7 +36,6 @@ resource "bigip_net_vlan" "vlan2" {
                 tagged = false
         }
 
-        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_net_selfip" "selfip1" {
@@ -55,7 +43,6 @@ resource "bigip_net_selfip" "selfip1" {
 	ip = "11.1.1.1/24"
 	vlan = "/Common/internal"
 	depends_on = ["bigip_net_vlan.vlan1"]
-        depends_on = ["bigip_sys_provision.provision-afm"]
 	}
 
 resource "bigip_net_selfip" "selfip2" {
@@ -63,7 +50,6 @@ resource "bigip_net_selfip" "selfip2" {
         ip = "100.1.1.1/24"
         vlan = "/Common/external"
         depends_on = ["bigip_net_vlan.vlan2"]
-        depends_on = ["bigip_sys_provision.provision-afm"]
         }
 
 
@@ -73,7 +59,6 @@ resource "bigip_ltm_monitor" "monitor" {
         send = "GET /some/path\r\n"
         timeout = "999"
         interval = "999"
-        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_ltm_pool"  "pool" {
@@ -83,7 +68,6 @@ resource "bigip_ltm_pool"  "pool" {
         monitors = ["/Common/terraform_monitor"]
         allow_snat = "yes"
         allow_nat = "yes"
-        depends_on = ["bigip_sys_provision.provision-afm"]
 }
 
 resource "bigip_ltm_virtual_server" "http" {

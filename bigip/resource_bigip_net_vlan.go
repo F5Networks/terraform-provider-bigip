@@ -15,7 +15,6 @@ func resourceBigipNetVlan() *schema.Resource {
 		Read:   resourceBigipNetVlanRead,
 		Update: resourceBigipNetVlanUpdate,
 		Delete: resourceBigipNetVlanDelete,
-		//Exists: resourceBigipNetVlanExists,
 		Importer: &schema.ResourceImporter{
 			State: resourceBigipNetVlanImporter,
 		},
@@ -121,25 +120,6 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipNetVlanExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Vlan " + name)
-
-	vlans, err := client.Vlans()
-	if err != nil {
-		return false, err
-	}
-	for _, vlan := range vlans.Vlans {
-		log.Println(vlan.Name)
-		if vlan.Name == name {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
 
 func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)

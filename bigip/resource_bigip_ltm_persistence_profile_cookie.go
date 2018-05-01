@@ -151,10 +151,13 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	err := client.CreateCookiePersistenceProfile(
+ err := client.CreateCookiePersistenceProfile(
 		name,
 		parent,
 	)
+if err != nil {
+		return err
+	}
 
 	d.SetId(name)
 

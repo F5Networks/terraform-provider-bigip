@@ -96,7 +96,9 @@ func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta in
 		name,
 		parent,
 	)
-
+if err != nil {
+	return err
+}
 	d.SetId(name)
 
 	err = resourceBigipLtmPersistenceProfileSSLUpdate(d, meta)

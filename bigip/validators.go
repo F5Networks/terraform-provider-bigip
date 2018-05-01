@@ -63,7 +63,6 @@ func validateEnabledDisabled(value interface{}, field string) (ws []string, erro
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
 		break
@@ -91,16 +90,12 @@ func validateReqPrefDisabled(value interface{}, field string) (ws []string, erro
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateReqPrefDisabled", reflect.TypeOf(value)))
 	}
