@@ -23,7 +23,6 @@ func resourceBigipLtmSnat() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Snat list Name",
-				//	ValidateFunc: validateF5Name,
 			},
 			"partition": {
 				Type:        schema.TypeString,
@@ -77,13 +76,11 @@ func resourceBigipLtmSnat() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"app_service": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "app service",
-							//ValidateFunc: validateF5Name,
 						},
 					},
 				},

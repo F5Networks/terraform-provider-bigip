@@ -133,13 +133,11 @@ func resourceBigipSysIapp() *schema.Resource {
 							Optional:    true,
 							Default:     "true",
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"value": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 					},
 				},
@@ -154,7 +152,6 @@ func resourceBigipSysIapp() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"column_names": {
 							Type:     schema.TypeList,
@@ -166,7 +163,6 @@ func resourceBigipSysIapp() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 
 						"rows": {
@@ -197,7 +193,6 @@ func resourceBigipSysIapp() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 
 						"encrypted": {
@@ -205,13 +200,11 @@ func resourceBigipSysIapp() *schema.Resource {
 							Optional:    true,
 							Default:     "no",
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"value": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 					},
 				},

@@ -22,7 +22,6 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Http2 Profile",
-				//ValidateFunc: validateF5Name,
 			},
 
 			"defaults_from": {

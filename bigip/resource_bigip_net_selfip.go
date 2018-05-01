@@ -14,7 +14,6 @@ func resourceBigipNetSelfIP() *schema.Resource {
 		Read:   resourceBigipNetSelfIPRead,
 		Update: resourceBigipNetSelfIPUpdate,
 		Delete: resourceBigipNetSelfIPDelete,
-		//Exists: resourceBigipNetSelfIPExists,
 		Importer: &schema.ResourceImporter{
 			State: resourceBigipNetSelfIPImporter,
 		},
@@ -89,26 +88,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipNetSelfIPExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
 
-	name := d.Id()
-	log.Println("[INFO] Fetching SelfIP " + name)
-
-	selfIPs, err := client.SelfIPs()
-	if err != nil {
-		return false, err
-	}
-	for _, selfip := range selfIPs.SelfIPs {
-		log.Println(selfip.Name)
-		if selfip.Name == name {
-			return true, nil
-		}
-	}
-
-	return false, nil
-
-}
 
 func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)

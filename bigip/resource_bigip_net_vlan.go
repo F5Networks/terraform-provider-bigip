@@ -3,7 +3,6 @@ package bigip
 import (
 	"fmt"
 	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )

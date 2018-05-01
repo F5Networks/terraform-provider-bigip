@@ -22,7 +22,6 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Fasthttp Profile",
-				//ValidateFunc: validateF5Name,
 			},
 
 			"defaults_from": {

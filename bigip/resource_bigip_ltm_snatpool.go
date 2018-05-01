@@ -23,7 +23,6 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Snatpool list Name",
-				//	ValidateFunc: validateF5Name,
 			},
 			"partition": {
 				Type:        schema.TypeString,

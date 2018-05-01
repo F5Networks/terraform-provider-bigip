@@ -22,7 +22,6 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the Fastl4 Profile",
-				//ValidateFunc: validateF5Name,
 			},
 			"partition": {
 				Type:        schema.TypeString,
