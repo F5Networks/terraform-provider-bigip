@@ -14,8 +14,9 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 		Read:   resourceBigipLtmProfileHttpcompressRead,
 		Delete: resourceBigipLtmProfileHttpcompressDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProfileHttpcompressImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -135,6 +136,4 @@ func resourceBigipLtmProfileHttpcompressDelete(d *schema.ResourceData, meta inte
 	return nil
 }
 
-func resourceBigipLtmProfileHttpcompressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

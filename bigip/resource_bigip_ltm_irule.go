@@ -16,8 +16,9 @@ func resourceBigipLtmIRule() *schema.Resource {
 		Delete: resourceBigipLtmIRuleDelete,
 		Exists: resourceBigipLtmIRuleExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmIRuleImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -118,8 +119,4 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 		return nil
 	}
 	return nil
-}
-
-func resourceBigipLtmIRuleImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
 }

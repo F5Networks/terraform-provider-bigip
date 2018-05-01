@@ -15,15 +15,16 @@ func resourceBigipNetSelfIP() *schema.Resource {
 		Update: resourceBigipNetSelfIPUpdate,
 		Delete: resourceBigipNetSelfIPDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipNetSelfIPImporter,
-		},
+				State: schema.ImportStatePassthrough,
+			},
+
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the SelfIP",
-				//ValidateFunc: validateF5Name,
 			},
 
 			"ip": {
@@ -36,7 +37,6 @@ func resourceBigipNetSelfIP() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the vlan",
-				//ValidateFunc: validateF5Name,
 			},
 		},
 	}
@@ -127,6 +127,4 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func resourceBigipNetSelfIPImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

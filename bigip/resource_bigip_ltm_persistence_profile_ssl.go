@@ -17,8 +17,9 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 		Delete: resourceBigipLtmPersistenceProfileSSLDelete,
 		Exists: resourceBigipLtmPersistenceProfileSSLExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipPersistenceProfileSSLImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -194,6 +195,4 @@ func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta in
 	return pp != nil, nil
 }
 
-func resourceBigipPersistenceProfileSSLImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

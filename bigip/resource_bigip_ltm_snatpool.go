@@ -14,8 +14,9 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 		Read:   resourceBigipLtmSnatpoolRead,
 		Delete: resourceBigipLtmSnatpoolDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSnatpoolImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 
@@ -121,6 +122,4 @@ func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) er
 
 }
 
-func resourceBigipLtmSnatpoolImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

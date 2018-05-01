@@ -14,8 +14,9 @@ func resourceBigipLtmProfileOneconnect() *schema.Resource {
 		Read:   resourceBigipLtmProfileOneconnectRead,
 		Delete: resourceBigipLtmProfileOneconnectDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProfileOneconnectImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -183,6 +184,4 @@ func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interf
 	return nil
 }
 
-func resourceBigipLtmProfileOneconnectImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

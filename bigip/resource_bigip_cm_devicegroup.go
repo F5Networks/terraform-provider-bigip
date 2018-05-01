@@ -14,8 +14,9 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 		Read:   resourceBigipCmDevicegroupRead,
 		Delete: resourceBigipCmDevicegroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipCmDevicegroupImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 
@@ -193,10 +194,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceBigipCmDevicegroupImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
-
+ 
 func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
 	var p bigip.Devicegroup
 

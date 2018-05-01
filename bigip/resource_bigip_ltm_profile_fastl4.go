@@ -14,8 +14,8 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 		Read:   resourceBigipLtmProfileFastl4Read,
 		Delete: resourceBigipLtmProfileFastl4Delete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProfileFastl4Importer,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -185,6 +185,4 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 	return nil
 }
 
-func resourceBigipLtmProfileFastl4Importer(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

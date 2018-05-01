@@ -14,8 +14,9 @@ func resourceBigipNetRoute() *schema.Resource {
 		Read:   resourceBigipNetRouteRead,
 		Delete: resourceBigipNetRouteDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipNetRouteImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -120,6 +121,4 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceBigipNetRouteImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

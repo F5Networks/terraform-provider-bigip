@@ -14,8 +14,9 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 		Read:   resourceBigipLtmProfileTcpRead,
 		Delete: resourceBigipLtmProfileTcpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProfileTcpImporter,
+			State: schema.ImportStatePassthrough,
 		},
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -199,8 +200,4 @@ func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 	return nil
-}
-
-func resourceBigipLtmProfileTcpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
 }

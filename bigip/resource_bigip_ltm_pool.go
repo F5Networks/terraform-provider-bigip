@@ -20,8 +20,9 @@ func resourceBigipLtmPool() *schema.Resource {
 		Delete: resourceBigipLtmPoolDelete,
 		Exists: resourceBigipLtmPoolExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigIpLtmPoolImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -267,6 +268,4 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigIpLtmPoolImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

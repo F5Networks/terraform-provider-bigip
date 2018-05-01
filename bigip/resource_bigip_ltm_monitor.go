@@ -16,8 +16,9 @@ func resourceBigipLtmMonitor() *schema.Resource {
 		Delete: resourceBigipLtmMonitorDelete,
 		Exists: resourceBigipLtmMonitorExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmMonitorImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -258,6 +259,4 @@ func monitorParent(s string) string {
 	return strings.TrimPrefix(s, "/Common/")
 }
 
-func resourceBigipLtmMonitorImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

@@ -14,8 +14,9 @@ func resourceBigipLtmSnat() *schema.Resource {
 		Read:   resourceBigipLtmSnatRead,
 		Delete: resourceBigipLtmSnatDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmSnatImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 
@@ -173,9 +174,6 @@ func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipLtmSnatImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
 
 func dataToSnat(name string, d *schema.ResourceData) bigip.Snat {
 	var p bigip.Snat

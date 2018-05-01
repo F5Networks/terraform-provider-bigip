@@ -16,8 +16,9 @@ func resourceBigipSysIapp() *schema.Resource {
 		Read:   resourceBigipSysIappRead,
 		Delete: resourceBigipSysIappDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipSysIappImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 
@@ -302,10 +303,6 @@ func resourceBigipSysIappDelete(d *schema.ResourceData, meta interface{}) error 
 		return nil
 	}
 	return nil
-}
-
-func resourceBigipSysIappImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
 }
 
 // This function "IappToData...." helps to unmarshal json to Go struct

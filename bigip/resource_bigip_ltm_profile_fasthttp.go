@@ -14,8 +14,9 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 		Read:   resourceBigipLtmProfileFasthttpRead,
 		Delete: resourceBigipLtmProfileFasthttpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmProfileFasthttpImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -205,6 +206,4 @@ func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interfac
 	return nil
 }
 
-func resourceBigipLtmProfileFasthttpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

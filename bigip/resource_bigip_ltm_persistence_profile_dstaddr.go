@@ -16,8 +16,9 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 		Delete: resourceBigipLtmPersistenceProfileDstAddrDelete,
 		Exists: resourceBigipLtmPersistenceProfileDstAddrExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipPersistenceProfileDstAddrImporter,
-		},
+ 			State: schema.ImportStatePassthrough,
+ 		},
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -220,6 +221,4 @@ func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, met
 	return pp != nil, nil
 }
 
-func resourceBigipPersistenceProfileDstAddrImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

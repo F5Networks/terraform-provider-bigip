@@ -16,8 +16,9 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 		Delete: resourceBigipLtmPersistenceProfileCookieDelete,
 		Exists: resourceBigipLtmPersistenceProfileCookieExists,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipPersistenceProfileCookieImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -279,6 +280,4 @@ func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta
 	return pp != nil, nil
 }
 
-func resourceBigipPersistenceProfileCookieImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

@@ -15,8 +15,9 @@ func resourceBigipNetVlan() *schema.Resource {
 		Update: resourceBigipNetVlanUpdate,
 		Delete: resourceBigipNetVlanDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipNetVlanImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -155,6 +156,4 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipNetVlanImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

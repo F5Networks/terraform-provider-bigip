@@ -15,8 +15,9 @@ func resourceBigipSysSnmp() *schema.Resource {
 		Read:   resourceBigipSysSnmpRead,
 		Delete: resourceBigipSysSnmpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipSysSnmpImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"sys_contact": {
@@ -117,6 +118,4 @@ func resourceBigipSysSnmpDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipSysSnmpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 

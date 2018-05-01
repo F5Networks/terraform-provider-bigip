@@ -14,8 +14,9 @@ func resourceBigipSysNtp() *schema.Resource {
 		Read:   resourceBigipSysNtpRead,
 		Delete: resourceBigipSysNtpDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipSysNtpImporter,
-		},
+		 State: schema.ImportStatePassthrough,
+	 },
+
 
 		Schema: map[string]*schema.Schema{
 			"description": {
@@ -120,6 +121,4 @@ func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceBigipSysNtpImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
+ 
