@@ -532,6 +532,28 @@ resource "bigip_ltm_persistence_profile_ssl" "ppssl" {
 Create the distributable packages like so:
 
 ```
+mkdir workspace
+export GOPATH=$HOME/workspace
+mkdir -p $GOPATH/src/github.com/f5devcentral
+cd $GOPATH
+go get github.com/f5devcentral/terraform-provider-bigip
+cd src/github.com/f5devcentral/terraform-provider-bigip/
+go build
+create .tf
+terraform init
+Initializing provider plugins...
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+```
 make get-deps && make bin && make dist
 ```
 
