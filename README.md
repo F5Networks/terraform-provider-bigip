@@ -527,11 +527,13 @@ resource "bigip_ltm_persistence_profile_ssl" "ppssl" {
 
 `override_conn_limit` (Optional) (enabled or disabled) Enable or dissable pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.
 
-# Building
+# Quick Start on BIG-IP Provider
 
-Create the distributable packages like so:
-
+Install appropriate Go package from  https://golang.org/dl/ make sure your go version is 1.9 & above
 ```
+go version
+go version go1.9.2 darwin/amd64
+
 mkdir workspace
 export GOPATH=$HOME/workspace
 mkdir -p $GOPATH/src/github.com/f5devcentral
@@ -552,6 +554,11 @@ should now work.
 If you ever set or change modules or backend configuration for Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
+
+```
+# Building
+
+Create the distributable packages like so:
 
 ```
 make get-deps && make bin && make dist
