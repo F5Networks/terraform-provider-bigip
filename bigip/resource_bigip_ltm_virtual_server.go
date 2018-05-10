@@ -85,9 +85,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"irules": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
 				Optional: true,
 			},
 
@@ -200,7 +199,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("pool", vs.Pool)
 	d.Set("mask", vs.Mask)
 	d.Set("port", vs.SourcePort)
-	d.Set("irules", makeStringSet(&vs.Rules))
+	d.Set("irules", makeStringList(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	d.Set("snatpool", vs.SourceAddressTranslation.Pool)
@@ -296,7 +295,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 
 	var rules []string
 	if cfg_rules, ok := d.GetOk("irules"); ok {
-		rules = setToStringSlice(cfg_rules.(*schema.Set))
+		rules = listToStringSlice(cfg_rules.(*schema.Set))
 	}
 
 	vs := &bigip.VirtualServer{

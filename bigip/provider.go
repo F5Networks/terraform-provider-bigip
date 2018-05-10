@@ -92,6 +92,15 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	return config.Client()
 }
 
+//Convert slice of strings to schema.TypeSet
+func makeStringList(list *[]string) []interface{} {
+	ilist := make([]interface{}, len(*list))
+	for i, v := range *list {
+		ilist[i] = v
+	}
+	return ilist
+}
+
 //Convert slice of strings to schema.Set
 func makeStringSet(list *[]string) *schema.Set {
 	ilist := make([]interface{}, len(*list))
@@ -99,6 +108,15 @@ func makeStringSet(list *[]string) *schema.Set {
 		ilist[i] = v
 	}
 	return schema.NewSet(schema.HashString, ilist)
+}
+
+//Convert schema.TypeList to a slice of strings
+func listToStringSlice(s *schema.Set) []string {
+	list := make([]string, s.Len())
+	for i, v := range s.List() {
+		list[i] = v.(string)
+	}
+	return list
 }
 
 //Convert schema.Set to a slice of strings
