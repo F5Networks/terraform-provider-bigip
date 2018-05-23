@@ -87,7 +87,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "0ba1f902f00b1c777cd94783d05b86b351eed63c"
+  revision = "f965982c0fc150d7aa6e7d0f0cf2c1d23cdbe0e0"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -409,7 +409,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "88eb85aaee56831ad49eaf7aa80d73de9814cde2"
+  revision = "77b0e4315053a57ed2962443614bdb28db152054"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -436,7 +436,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "5d77454313cc91719bfc499a74ea16d395533d08"
+  revision = "694d95ba50e67b2e363f3483057db5d4910c18f9"
 
 [[projects]]
   name = "google.golang.org/grpc"

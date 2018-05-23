@@ -155,7 +155,7 @@ type Node struct {
 		AddressFamily string `json:"addressFamily,omitempty"`
 		AutoPopulate  string `json:"autopopulate,omitempty"`
 		DownInterval  int    `json:"downInterval,omitempty"`
-		Interval      int    `json:"interval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
 		Name          string `json:"tmName,omitempty"`
 	} `json:"fqdn,omitempty"`
 }
