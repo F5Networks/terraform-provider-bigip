@@ -152,7 +152,10 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
 		}
 	} else {
-		if err := d.Set("address", node.Address); err != nil {
+		// xxx.xxx.xxx.xxx(%x)
+		regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?`)
+		address := regex.FindStringSubmatch(node.Address)
+		if err := d.Set("address", address[1]); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
 		}
 	}

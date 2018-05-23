@@ -227,8 +227,13 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Unknown virtual server destination: " + vs.Destination)
 	}
 
+	// xxx.xxx.xxx.xxx(%x)/xx
+	regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
+	source := regex.FindStringSubmatch(vs.Source)
+	parsedSource := source[1] + source[2]
+
 	d.Set("destination", destination[2])
-	if err := d.Set("source", vs.Source); err != nil {
+	if err := d.Set("source", parsedSource); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	d.Set("protocol", vs.IPProtocol)
