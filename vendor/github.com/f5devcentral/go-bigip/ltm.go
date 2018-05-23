@@ -591,42 +591,42 @@ type VirtualServerPolicies struct {
 }
 
 type PolicyPublish struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
 	PublishCopy string `json:"publishedCopy"`
 }
 type Policy struct {
-	Name      string
+	Name        string
 	PublishCopy string
-	Partition string
-	FullPath  string
-	Controls  []string
-	Requires  []string
-	Strategy  string
-	Rules     []PolicyRule
+	Partition   string
+	FullPath    string
+	Controls    []string
+	Requires    []string
+	Strategy    string
+	Rules       []PolicyRule
 }
 
 type policyDTO struct {
-	Name      string   `json:"name"`
-	PublishCopy string `json:"publishedCopy"`
-	Partition string   `json:"partition,omitempty"`
-	Controls  []string `json:"controls,omitempty"`
-	Requires  []string `json:"requires,omitempty"`
-	Strategy  string   `json:"strategy,omitempty"`
-	FullPath  string   `json:"fullPath,omitempty"`
-	Rules     struct {
+	Name        string   `json:"name"`
+	PublishCopy string   `json:"publishedCopy"`
+	Partition   string   `json:"partition,omitempty"`
+	Controls    []string `json:"controls,omitempty"`
+	Requires    []string `json:"requires,omitempty"`
+	Strategy    string   `json:"strategy,omitempty"`
+	FullPath    string   `json:"fullPath,omitempty"`
+	Rules       struct {
 		Items []PolicyRule `json:"items,omitempty"`
 	} `json:"rulesReference,omitempty"`
 }
 
 func (p *Policy) MarshalJSON() ([]byte, error) {
 	return json.Marshal(policyDTO{
-		Name:      p.Name,
+		Name:        p.Name,
 		PublishCopy: p.PublishCopy,
-		Partition: p.Partition,
-		Controls:  p.Controls,
-		Requires:  p.Requires,
-		Strategy:  p.Strategy,
-		FullPath:  p.FullPath,
+		Partition:   p.Partition,
+		Controls:    p.Controls,
+		Requires:    p.Requires,
+		Strategy:    p.Strategy,
+		FullPath:    p.FullPath,
 		Rules: struct {
 			Items []PolicyRule `json:"items,omitempty"`
 		}{Items: p.Rules},
@@ -915,8 +915,6 @@ type PolicyRuleCondition struct {
 	VlanId                bool     `json:"vlanId,omitempty"`
 }
 
-
-
 func (p *VirtualAddress) MarshalJSON() ([]byte, error) {
 	var dto virtualAddressDTO
 	marshal(&dto, p)
@@ -960,7 +958,6 @@ type Monitor struct {
 	Transparent    string
 	UpInterval     int
 	Username       string
-
 }
 
 type monitorDTO struct {
@@ -1450,6 +1447,205 @@ func (p *Snatpool) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// TcpProfiles contains a list of every tcp profile on the BIG-IP system.
+type TcpProfiles struct {
+	TcpProfiles []TcpProfile `json:"items"`
+}
+
+type TcpProfile struct {
+	Abc                      string `json:"abc,omitempty"`
+	AckOnPush                string `json:"ackOnPush,omitempty"`
+	AppService               string `json:"appService,omitempty"`
+	AutoProxyBufferSize      string `json:"autoProxyBufferSize,omitempty"`
+	AutoReceiveWindowSize    string `json:"autoReceiveWindowSize,omitempty"`
+	AutoSendBufferSize       string `json:"autoSendBufferSize,omitempty"`
+	CloseWaitTimeout         int    `json:"closeWaitTimeout,omitempty"`
+	CmetricsCache            string `json:"cmetricsCache,omitempty"`
+	CmetricsCacheTimeout     int    `json:"cmetricsCacheTimeout,omitempty"`
+	CongestionControl        string `json:"congestionControl,omitempty"`
+	DefaultsFrom             string `json:"defaultsFrom,omitempty"`
+	DeferredAccept           string `json:"deferredAccept,omitempty"`
+	DelayWindowControl       string `json:"delayWindowControl,omitempty"`
+	DelayedAcks              string `json:"delayedAcks,omitempty"`
+	Description              string `json:"description,omitempty"`
+	Dsack                    string `json:"dsack,omitempty"`
+	EarlyRetransmit          string `json:"earlyRetransmit,omitempty"`
+	Ecn                      string `json:"ecn,omitempty"`
+	EnhancedLossRecovery     string `json:"enhancedLossRecovery,omitempty"`
+	FastOpen                 string `json:"fastOpen,omitempty"`
+	FastOpenCookieExpiration int    `json:"fastOpenCookieExpiration,omitempty"`
+	FinWait_2Timeout         int    `json:"finWait_2Timeout,omitempty"`
+	FinWaitTimeout           int    `json:"finWaitTimeout,omitempty"`
+	HardwareSynCookie        string `json:"hardwareSynCookie,omitempty"`
+	IdleTimeout              int    `json:"idleTimeout,omitempty"`
+	InitCwnd                 int    `json:"initCwnd,omitempty"`
+	InitRwnd                 int    `json:"initRwnd,omitempty"`
+	IpDfMode                 string `json:"ipDfMode,omitempty"`
+	IpTosToClient            string `json:"ipTosToClient,omitempty"`
+	IpTtlMode                string `json:"ipTtlMode,omitempty"`
+	IpTtlV4                  int    `json:"ipTtlV4,omitempty"`
+	IpTtlV6                  int    `json:"ipTtlV6,omitempty"`
+	KeepAliveInterval        int    `json:"keepAliveInterval,omitempty"`
+	LimitedTransmit          string `json:"limitedTransmit,omitempty"`
+	LinkQosToClient          string `json:"linkQosToClient,omitempty"`
+	MaxRetrans               int    `json:"maxRetrans,omitempty"`
+	MaxSegmentSize           int    `json:"maxSegmentSize,omitempty"`
+	Md5Signature             string `json:"md5Signature,omitempty"`
+	Md5SignaturePassphrase   string `json:"md5SignaturePassphrase,omitempty"`
+	MinimumRto               int    `json:"minimumRto,omitempty"`
+	Mptcp                    string `json:"mptcp,omitempty"`
+	MptcpCsum                string `json:"mptcpCsum,omitempty"`
+	MptcpCsumVerify          string `json:"mptcpCsumVerify,omitempty"`
+	MptcpDebug               string `json:"mptcpDebug,omitempty"`
+	MptcpFallback            string `json:"mptcpFallback,omitempty"`
+	MptcpFastjoin            string `json:"mptcpFastjoin,omitempty"`
+	MptcpIdleTimeout         int    `json:"mptcpIdleTimeout,omitempty"`
+	MptcpJoinMax             int    `json:"mptcpJoinMax,omitempty"`
+	MptcpMakeafterbreak      string `json:"mptcpMakeafterbreak,omitempty"`
+	MptcpNojoindssack        string `json:"mptcpNojoindssack,omitempty"`
+	MptcpRtomax              int    `json:"mptcpRtomax,omitempty"`
+	MptcpRxmitmin            int    `json:"mptcpRxmitmin,omitempty"`
+	MptcpSubflowmax          int    `json:"mptcpSubflowmax,omitempty"`
+	MptcpTimeout             int    `json:"mptcpTimeout,omitempty"`
+	Nagle                    string `json:"nagle,omitempty"`
+	Name                     string `json:"name,omitempty"`
+	TmPartition              string `json:"tmPartition,omitempty"`
+	PktLossIgnoreBurst       int    `json:"pktLossIgnoreBurst,omitempty"`
+	PktLossIgnoreRate        int    `json:"pktLossIgnoreRate,omitempty"`
+	ProxyBufferHigh          int    `json:"proxyBufferHigh,omitempty"`
+	ProxyBufferLow           int    `json:"proxyBufferLow,omitempty"`
+	ProxyMss                 string `json:"proxyMss,omitempty"`
+	ProxyOptions             string `json:"proxyOptions,omitempty"`
+	RatePace                 string `json:"ratePace,omitempty"`
+	RatePaceMaxRate          int    `json:"ratePaceMaxRate,omitempty"`
+	ReceiveWindowSize        int    `json:"receiveWindowSize,omitempty"`
+	ResetOnTimeout           string `json:"resetOnTimeout,omitempty"`
+	RexmtThresh              int    `json:"rexmtThresh,omitempty"`
+	SelectiveAcks            string `json:"selectiveAcks,omitempty"`
+	SelectiveNack            string `json:"selectiveNack,omitempty"`
+	SendBufferSize           int    `json:"sendBufferSize,omitempty"`
+	SlowStart                string `json:"slowStart,omitempty"`
+	SynCookieEnable          string `json:"synCookieEnable,omitempty"`
+	SynCookieWhitelist       string `json:"synCookieWhitelist,omitempty"`
+	SynMaxRetrans            int    `json:"synMaxRetrans,omitempty"`
+	SynRtoBase               int    `json:"synRtoBase,omitempty"`
+	TailLossProbe            string `json:"tailLossProbe,omitempty"`
+	TcpOptions               string `json:"tcpOptions,omitempty"`
+	TimeWaitRecycle          string `json:"timeWaitRecycle,omitempty"`
+	TimeWaitTimeout          string `json:"timeWaitTimeout,omitempty"`
+	Timestamps               string `json:"timestamps,omitempty"`
+	VerifiedAccept           string `json:"verifiedAccept,omitempty"`
+}
+
+// UdpProfiles contains a list of every tcp profile on the BIG-IP system.
+type UdpProfiles struct {
+	UdpProfiles []UdpProfile `json:"items"`
+}
+
+type UdpProfile struct {
+	AllowNoPayload        string `json:"allowNoPayload,omitempty"`
+	AppService            string `json:"appService,omitempty"`
+	BufferMaxBytes        int    `json:"bufferMaxBytes,omitempty"`
+	BufferMaxPackets      int    `json:"bufferMaxPackets,omitempty"`
+	DatagramLoadBalancing string `json:"datagramLoadBalancing,omitempty"`
+	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
+	Description           string `json:"description,omitempty"`
+	IdleTimeout           string `json:"idleTimeout,omitempty"`
+	IpDfMode              string `json:"ipDfMode,omitempty"`
+	IpTosToClient         string `json:"ipTosToClient,omitempty"`
+	IpTtlMode             string `json:"ipTtlMode,omitempty"`
+	IpTtlV4               int    `json:"ipTtlV4,omitempty"`
+	IpTtlV6               int    `json:"ipTtlV6,omitempty"`
+	LinkQosToClient       string `json:"linkQosToClient,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	NoChecksum            string `json:"noChecksum,omitempty"`
+	TmPartition           string `json:"tmPartition,omitempty"`
+	ProxyMss              string `json:"proxyMss,omitempty"`
+}
+
+type HttpProfiles struct {
+	HttpProfiles []HttpProfile `json:"items"`
+}
+
+type HttpProfile struct {
+	AcceptXff                 string `json:"acceptXff,omitempty"`
+	AppService                string `json:"appService,omitempty"`
+	BasicAuthRealm            string `json:"basicAuthRealm,omitempty"`
+	DefaultsFrom              string `json:"defaultsFrom,omitempty"`
+	Description               string `json:"description,omitempty"`
+	EncryptCookieSecret       string `json:"encryptCookieSecret,omitempty"`
+	EncryptCookies            string `json:"encryptCookies,omitempty"`
+	FallbackHost              string `json:"fallbackHost,omitempty"`
+	FallbackStatusCodes       string `json:"fallbackStatusCodes,omitempty"`
+	HeaderErase               string `json:"headerErase,omitempty"`
+	HeaderInsert              string `json:"headerInsert,omitempty"`
+	InsertXforwardedFor       string `json:"insertXforwardedFor,omitempty"`
+	LwsSeparator              string `json:"lwsSeparator,omitempty"`
+	LwsWidth                  int    `json:"lwsWidth,omitempty"`
+	Name                      string `json:"name,omitempty"`
+	OneconnectTransformations string `json:"oneconnectTransformations,omitempty"`
+	TmPartition               string `json:"tmPartition,omitempty"`
+	ProxyType                 string `json:"proxyType,omitempty"`
+	RedirectRewrite           string `json:"redirectRewrite,omitempty"`
+	RequestChunking           string `json:"requestChunking,omitempty"`
+	ResponseChunking          string `json:"responseChunking,omitempty"`
+	ResponseHeadersPermitted  string `json:"responseHeadersPermitted,omitempty"`
+	ServerAgentName           string `json:"serverAgentName,omitempty"`
+	ViaHostName               string `json:"viaHostName,omitempty"`
+	ViaRequest                string `json:"viaRequest,omitempty"`
+	ViaResponse               string `json:"viaResponse,omitempty"`
+	XffAlternativeNames       string `json:"xffAlternativeNames,omitempty"`
+}
+
+type OneconnectProfiles struct {
+	OneconnectProfiles []OneconnectProfile `json:"items"`
+}
+
+type OneconnectProfile struct {
+	AppService          string `json:"appService,omitempty"`
+	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
+	Description         string `json:"description,omitempty"`
+	IdleTimeoutOverride string `json:"idleTimeoutOverride,omitempty"`
+	LimitType           string `json:"limitType,omitempty"`
+	MaxAge              int    `json:"maxAge,omitempty"`
+	MaxReuse            int    `json:"maxReuse,omitempty"`
+	MaxSize             int    `json:"maxSize,omitempty"`
+	Name                string `json:"name,omitempty"`
+	TmPartition         string `json:"tmPartition,omitempty"`
+	SharePools          string `json:"sharePools,omitempty"`
+	SourceMask          string `json:"sourceMask,omitempty"`
+}
+
+type HttpCompressionProfiles struct {
+	HttpCompressionProfiles []HttpCompressionProfile `json:"items"`
+}
+
+type HttpCompressionProfile struct {
+	AllowHttp_10       string   `json:"allowHttp_10,omitempty"`
+	AppService         string   `json:"appService,omitempty"`
+	BrowserWorkarounds string   `json:"browserWorkarounds,omitempty"`
+	BufferSize         int      `json:"bufferSize,omitempty"`
+	ContentTypeExclude []string `json:"contentTypeExclude,omitempty"`
+	ContentTypeInclude []string `json:"contentTypeInclude,omitempty"`
+	CpuSaver           string   `json:"cpuSaver,omitempty"`
+	CpuSaverHigh       int      `json:"cpuSaverHigh,omitempty"`
+	CpuSaverLow        int      `json:"cpuSaverLow,omitempty"`
+	DefaultsFrom       string   `json:"defaultsFrom,omitempty"`
+	Description        string   `json:"description,omitempty"`
+	GzipLevel          int      `json:"gzipLevel,omitempty"`
+	GzipMemoryLevel    int      `json:"gzipMemoryLevel,omitempty"`
+	GzipWindowSize     int      `json:"gzipWindowSize,omitempty"`
+	KeepAcceptEncoding string   `json:"keepAcceptEncoding,omitempty"`
+	MethodPrefer       string   `json:"methodPrefer,omitempty"`
+	MinSize            int      `json:"minSize,omitempty"`
+	Name               string   `json:"name,omitempty"`
+	TmPartition        string   `json:"tmPartition,omitempty"`
+	Selective          string   `json:"selective,omitempty"`
+	UriExclude         []string `json:"uriExclude,omitempty"`
+	UriInclude         []string `json:"uriInclude,omitempty"`
+	VaryHeader         string   `json:"varyHeader,omitempty"`
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -1695,13 +1891,13 @@ func (b *BigIP) Nodes() (*Nodes, error) {
 // CreateNode adds a new IP based node to the BIG-IP system.
 func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state string) error {
 	config := &Node{
-		Name:    name,
-		Address: address,
-		RateLimit: rate_limit,
+		Name:            name,
+		Address:         address,
+		RateLimit:       rate_limit,
 		ConnectionLimit: connection_limit,
-		DynamicRatio: dynamic_ratio,
-		Monitor: monitor,
-		State: state,
+		DynamicRatio:    dynamic_ratio,
+		Monitor:         monitor,
+		State:           state,
 	}
 
 	return b.post(config, uriLtm, uriNode)
@@ -1710,12 +1906,12 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
 func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state string) error {
 	config := &Node{
-		Name: name,
-		RateLimit: rate_limit,
+		Name:            name,
+		RateLimit:       rate_limit,
 		ConnectionLimit: connection_limit,
-		DynamicRatio: dynamic_ratio,
-		Monitor: monitor,
-		State: state,
+		DynamicRatio:    dynamic_ratio,
+		Monitor:         monitor,
+		State:           state,
 	}
 	config.FQDN.Name = address
 
@@ -2110,13 +2306,13 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 // "icmp", "gateway icmp", or "tcp".
 func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable string) error {
 	config := &Monitor{
-		Name:          name,
-		ParentMonitor: parent,
-		DefaultsFrom: defaults_from,
-		Interval:      interval,
-		Timeout:       timeout,
-		SendString:    send,
-		ReceiveString: receive,
+		Name:           name,
+		ParentMonitor:  parent,
+		DefaultsFrom:   defaults_from,
+		Interval:       interval,
+		Timeout:        timeout,
+		SendString:     send,
+		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
 	}
 
@@ -2131,7 +2327,6 @@ func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
 		config.ParentMonitor = "tcp-half-open"
 	}
-	 log.Println( " value of config in create monitor ------------- %+v\n", *config, uriLtm, uriMonitor, config.ParentMonitor)
 	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
 }
 
@@ -2152,7 +2347,7 @@ func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 
 // DeleteMonitor removes a monitor.
 func (b *BigIP) DeleteMonitor(name, parent string) error {
-	log.Println( " in delete +++++++++++++++++ ", parent, name)
+	log.Println(" in delete +++++++++++++++++ ", parent, name)
 	return b.delete(uriLtm, uriMonitor, parent, name)
 }
 
@@ -2299,18 +2494,18 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 		PublishCopy: publish,
 	}
 	values := []string{}
- values = append(values, "~Common~Drafts~")
- values = append(values, name)
- // Join three strings into one.
- result := strings.Join(values, "")
+	values = append(values, "~Common~Drafts~")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
 
-	log.Println( "  ================== here in publish ", result, publish)
+	log.Println("  ================== here in publish ", result, publish)
 
- return b.patch(config, uriLtm, uriPolicy, result)
+	return b.patch(config, uriLtm, uriPolicy, result)
 }
 
 //Update an existing policy.
- func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
+func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
 	values = append(values, "Drafts/")
@@ -2327,9 +2522,10 @@ func (b *BigIP) DeletePolicy(name string) error {
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
-return b.delete(uriLtm, uriPolicy, result)
+	return b.delete(uriLtm, uriPolicy, result)
 }
- // Oneconnect profile creation
+
+// Oneconnect profile creation
 func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsFrom, sharePools, sourceMask string, maxAge, maxReuse, maxSize int) error {
 	oneconnect := &Oneconnect{
 		Name:                name,
@@ -3177,4 +3373,154 @@ func (b *BigIP) DeleteUniversalPersistenceProfile(name string) error {
 // Fields that can be modified are referenced in the UniversalPersistenceProfile struct.
 func (b *BigIP) ModifyUniversalPersistenceProfile(name string, config *UniversalPersistenceProfile) error {
 	return b.put(config, uriLtm, uriPersistence, uriUniversal, name)
+}
+
+// HttpProfiles returns a list of HTTP profiles
+func (b *BigIP) HttpProfiles() (*HttpProfiles, error) {
+	var httpProfiles HttpProfiles
+	err, _ := b.getForEntity(&httpProfiles, uriLtm, uriProfile, uriHttp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &httpProfiles, nil
+}
+
+func (b *BigIP) GetHttpProfile(name string) (*HttpProfile, error) {
+	var httpProfile HttpProfile
+	err, ok := b.getForEntity(&httpProfile, uriLtm, uriProfile, uriHttp, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &httpProfile, nil
+}
+
+// CreateHttpProfile creates a new http profile on the BIG-IP system.
+func (b *BigIP) CreateHttpProfile(name string, parent string) error {
+	config := &HttpProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriProfile, uriHttp)
+}
+
+func (b *BigIP) AddHttpProfile(config *HttpProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriHttp)
+}
+
+// DeleteHttpProfile removes a http profile.
+func (b *BigIP) DeleteHttpProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriHttp, name)
+}
+
+// ModifyHttpProfile allows you to change any attribute of a http profile.
+// Fields that can be modified are referenced in the HttpProfile struct.
+func (b *BigIP) ModifyHttpProfile(name string, config *HttpProfile) error {
+	return b.put(config, uriLtm, uriProfile, uriHttp, name)
+}
+
+// OneconnectProfiles returns a list of HTTP profiles
+func (b *BigIP) OneconnectProfiles() (*OneconnectProfiles, error) {
+	var oneconnectProfiles OneconnectProfiles
+	err, _ := b.getForEntity(&oneconnectProfiles, uriLtm, uriProfile, uriOneconnect)
+	if err != nil {
+		return nil, err
+	}
+
+	return &oneconnectProfiles, nil
+}
+
+func (b *BigIP) GetOneconnectProfile(name string) (*OneconnectProfile, error) {
+	var oneconnectProfile OneconnectProfile
+	err, ok := b.getForEntity(&oneconnectProfile, uriLtm, uriProfile, uriOneconnect, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &oneconnectProfile, nil
+}
+
+// CreateOneconnectProfile creates a new http profile on the BIG-IP system.
+func (b *BigIP) CreateOneconnectProfile(name string, parent string) error {
+	config := &OneconnectProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriProfile, uriOneconnect)
+}
+
+func (b *BigIP) AddOneconnectProfile(config *OneconnectProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriOneconnect)
+}
+
+// DeleteOneconnectProfile removes a http profile.
+func (b *BigIP) DeleteOneconnectProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriOneconnect, name)
+}
+
+// ModifyOneconnectProfile allows you to change any attribute of a http profile.
+// Fields that can be modified are referenced in the OneconnectProfile struct.
+func (b *BigIP) ModifyOneconnectProfile(name string, config *OneconnectProfile) error {
+	return b.put(config, uriLtm, uriProfile, uriOneconnect, name)
+}
+
+// HttpCompressionProfiles returns a list of HTTP profiles
+func (b *BigIP) HttpCompressionProfiles() (*HttpCompressionProfiles, error) {
+	var httpCompressionProfiles HttpCompressionProfiles
+	err, _ := b.getForEntity(&httpCompressionProfiles, uriLtm, uriProfile, uriHttpcompress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &httpCompressionProfiles, nil
+}
+
+func (b *BigIP) GetHttpCompressionProfile(name string) (*HttpCompressionProfile, error) {
+	var httpCompressionProfile HttpCompressionProfile
+	err, ok := b.getForEntity(&httpCompressionProfile, uriLtm, uriProfile, uriHttpcompress, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &httpCompressionProfile, nil
+}
+
+// CreateHttpCompressionProfile creates a new http profile on the BIG-IP system.
+func (b *BigIP) CreateHttpCompressionProfile(name string, parent string) error {
+	config := &HttpCompressionProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	return b.post(config, uriLtm, uriProfile, uriHttpcompress)
+}
+
+func (b *BigIP) AddHttpCompressionProfile(config *HttpCompressionProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriHttpcompress)
+}
+
+// DeleteHttpCompressionProfile removes a http profile.
+func (b *BigIP) DeleteHttpCompressionProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriHttpcompress, name)
+}
+
+// ModifyHttpCompressionProfile allows you to change any attribute of a http profile.
+// Fields that can be modified are referenced in the HttpCompressionProfile struct.
+func (b *BigIP) ModifyHttpCompressionProfile(name string, config *HttpCompressionProfile) error {
+	return b.put(config, uriLtm, uriProfile, uriHttpcompress, name)
 }
