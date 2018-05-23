@@ -2,8 +2,6 @@ package bigip
 
 import (
 	"strings"
-	"log"
-	"fmt"
 )
 
 // Interfaces contains a list of every interface on the BIG-IP system.
@@ -198,9 +196,8 @@ func (b *BigIP) AddInterfaceToVlan(vlan, iface string, tagged bool) error {
 // SelfIPs returns a list of self IP's.
 func (b *BigIP) SelfIPs() (*SelfIPs, error) {
 	var self SelfIPs
-	err, _:= b.getForEntity(&self, uriNet, uriSelf)
+	err, _ := b.getForEntity(&self, uriNet, uriSelf)
 	if err != nil {
-		fmt.Println(" Please check reachability ", err)
 		return nil, err
 	}
 
@@ -356,13 +353,7 @@ func (b *BigIP) DeleteRoute(name string) error {
 // ModifyRoute allows you to change any attribute of a static route. Fields that
 // can be modified are referenced in the Route struct.
 func (b *BigIP) ModifyRoute(name string, config *Route) error {
-	values := []string{}
-	values = append(values, "~Common~")
-	values = append(values, name)
-	// Join three strings into one.
-	result := strings.Join(values, "")
-	log.Println("value of result +======================", result)
-	return b.put(config, uriNet, uriRoute, result)
+	return b.put(config, uriNet, uriRoute, name)
 }
 
 // RouteDomains returns a list of route domains.
