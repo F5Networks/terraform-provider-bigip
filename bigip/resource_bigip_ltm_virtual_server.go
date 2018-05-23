@@ -228,7 +228,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	}
 
 	// xxx.xxx.xxx.xxx(%x)/xx
-	regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
+	regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
 	source := regex.FindStringSubmatch(vs.Source)
 	parsedSource := source[1] + source[2]
 
