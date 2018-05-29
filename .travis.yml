@@ -1,24 +1,25 @@
 sudo: false
 language: go
 go:
-- 1.9
+  - 1.9
 go_import_path: github.com/f5devcentral/terraform-provider-bigip
 testacc:
-- make test
+  - make test
 script:
-- go vet ./...
-- make test
-- make bin
+  - go vet ./...
+  - make test
+  - make bin
 after_success:
-- make dist
+  - make dist
+
+
 deploy:
-  provider: releases
-  api_key:
-  -  secure: "KOjy4TUxiR1XKvK8wKois/VaBZxJkNBiSwHCqZaHxQ2txxS3vulFk5YBp9yCwhSL5FDgXWHlKr/p+XpM1s+CH2g4lA7YrjpuiW81wimtX5h6fVH6WWaP98mz5zlnOVfzP+X+FMOhTkq0nL6TGlVivZnEWbHBgV1RNbYsC4/FBFF/jI4KPmhd8KikJXTAx7RoB456hx3nwdbK1GdVE285VgNM5Ou9kc/JxrM8qaZT9mZSOSmpfNq1LOHS1fvKflAJ8GMTDDBEDvgSn553oNHhQxULH431Pi2D4PeXxSMA5eoIoXYhckVPIJm4+nWsIR0Q1VtQYkunHPkvjL79mzrXioObIszPP/iLobZiZCpj6mHnA9gZrnw1oO9ov45EaWpWwvscCmNcJ5fphjLm5Y+sac2896OBeeIGE6enXFLDpZAwyNHRV37+Z3Y+ZGX16VuwWQPQ7MF7lvlYAM5sPKGOr8F9T1IUPGznLvC+KJmwZU/3+meNej5zFSp8v5W4V9Z1Qdfv8GqJUpfwk1nV64GgDN1/+6JHrxpgfayNIc8gUZ+YPzfQcMTCJRTIyxuxtDv5QD5zQtNItSmaISCctSqHuZnBOsUtDiu8u2RM16B6RKQWVXHEKu4A3pNzcppVYAHvvka42XsgVH94A6HJPfPfiqLKW1YM9HYDQjA/E27M3So="
-  file: target/pkg/*.tar.gz
-  on:
-    tags: true
-    repo: f5devcentral/terraform-provider-bigip
+  - provider: script
+    script: curl -sL https://git.io/goreleaser | bash
+    on:
+      tags: true
+      condition: $TRAVIS_OS_NAME = linux
+
 env:
   global:
   -  secure: "KOjy4TUxiR1XKvK8wKois/VaBZxJkNBiSwHCqZaHxQ2txxS3vulFk5YBp9yCwhSL5FDgXWHlKr/p+XpM1s+CH2g4lA7YrjpuiW81wimtX5h6fVH6WWaP98mz5zlnOVfzP+X+FMOhTkq0nL6TGlVivZnEWbHBgV1RNbYsC4/FBFF/jI4KPmhd8KikJXTAx7RoB456hx3nwdbK1GdVE285VgNM5Ou9kc/JxrM8qaZT9mZSOSmpfNq1LOHS1fvKflAJ8GMTDDBEDvgSn553oNHhQxULH431Pi2D4PeXxSMA5eoIoXYhckVPIJm4+nWsIR0Q1VtQYkunHPkvjL79mzrXioObIszPP/iLobZiZCpj6mHnA9gZrnw1oO9ov45EaWpWwvscCmNcJ5fphjLm5Y+sac2896OBeeIGE6enXFLDpZAwyNHRV37+Z3Y+ZGX16VuwWQPQ7MF7lvlYAM5sPKGOr8F9T1IUPGznLvC+KJmwZU/3+meNej5zFSp8v5W4V9Z1Qdfv8GqJUpfwk1nV64GgDN1/+6JHrxpgfayNIc8gUZ+YPzfQcMTCJRTIyxuxtDv5QD5zQtNItSmaISCctSqHuZnBOsUtDiu8u2RM16B6RKQWVXHEKu4A3pNzcppVYAHvvka42XsgVH94A6HJPfPfiqLKW1YM9HYDQjA/E27M3So="
