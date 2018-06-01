@@ -26,24 +26,27 @@ resource "bigip_ltm_pool" "test-pool" {
 	allow_snat = "yes"
 	load_balancing_mode = "round-robin"
 	depends_on = ["bigip_ltm_node.test-node"]
-	nodes = ["` + TEST_POOLNODE_NAMEPORT + `"]
+}
+resource "bigip_ltm_pool_attachment" "test-node" {
+	pool = "` + TEST_POOL_NAME + `"
+	node = "` + TEST_POOLNODE_NAMEPORT + `"
+	depends_on = ["bigip_ltm_node.test-node", "bigip_ltm_pool.test-pool"]
 }
 resource "bigip_ltm_policy" "test-policy" {
 	depends_on = ["bigip_ltm_pool.test-pool"]
- name = "` + TEST_POLICY_NAME + `"
- strategy = "/Common/first-match"
-  requires = ["http"]
- published_copy = "Drafts/test-policy"
-  controls = ["forwarding"]
-  rule  {
-  name = "rule6"
-
-   action = {
-     tm_name = "20"
-     forward = true
-      pool = "/Common/test-pool"
-   }
-  }
+	name = "` + TEST_POLICY_NAME + `"
+	strategy = "/Common/first-match"
+	requires = ["http"]
+	published_copy = "Drafts/test-policy"
+	controls = ["forwarding"]
+	rule  {
+	      name = "rule6"
+		      action = {
+			      tm_name = "20"
+			      forward = true
+			      pool = "/Common/test-pool"
+		      }
+	}
 }
 `
 

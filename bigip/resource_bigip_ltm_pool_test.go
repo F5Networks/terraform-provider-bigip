@@ -6,7 +6,6 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -33,7 +32,12 @@ resource "bigip_ltm_pool" "test-pool" {
 	slow_ramp_time = "5"
 	service_down_action = "reset"
 	reselect_tries = "2"
-	nodes = ["` + TEST_POOLNODE_NAMEPORT + `"]
+}
+
+resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
+	pool = "` + TEST_POOL_NAME + `"
+	node = "` + TEST_POOLNODE_NAMEPORT + `"
+	depends_on = ["bigip_ltm_node.test-node", "bigip_ltm_pool.test-pool"]
 }
 `
 
@@ -56,10 +60,8 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "slow_ramp_time", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "service_down_action", "reset"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "reselect_tries", "2"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "nodes.#", "1"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool",
-						fmt.Sprintf("nodes.%d", schema.HashString(TEST_POOLNODE_NAMEPORT)),
-						TEST_POOLNODE_NAMEPORT),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
 				),
 			},
 		},
