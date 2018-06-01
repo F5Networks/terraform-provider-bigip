@@ -32,7 +32,6 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				ForceNew:    true,
 				Description: "Node to add/remove to/from the pool. Format /partition/node_name:port. e.g. /Common/node01:443",
 			},
-
 		},
 	}
 }
@@ -62,21 +61,20 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	// only add the instance that was previously defined for this resource
 	expected := d.Get("node").(string)
 
-        pool, err := client.GetPool(poolName)
-        if err != nil {
+	pool, err := client.GetPool(poolName)
+	if err != nil {
 		return fmt.Errorf("Error retrieving pool (%s): %s", poolName, err)
-        }
-        if pool == nil {
-                log.Printf("[WARN] Pool (%s) not found, removing from state", poolName)
-                d.SetId("")
-                return nil
-        }
+	}
+	if pool == nil {
+		log.Printf("[WARN] Pool (%s) not found, removing from state", poolName)
+		d.SetId("")
+		return nil
+	}
 
-
-        nodes, err := client.PoolMembers(poolName)
-        if err != nil {
-                return fmt.Errorf("Error retrieving pool (%s) members: %s", poolName, err)
-        }
+	nodes, err := client.PoolMembers(poolName)
+	if err != nil {
+		return fmt.Errorf("Error retrieving pool (%s) members: %s", poolName, err)
+	}
 
 	// only set the instance Id that this resource manages
 	found := false
@@ -85,7 +83,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 			d.Set("node", expected)
 			found = true
 		}
-        }
+	}
 
 	if !found {
 		log.Printf("[WARN] Node %s is not a member of pool %s", expected, poolName)
@@ -103,8 +101,8 @@ func resourceBigipLtmPoolAttachmentDelete(d *schema.ResourceData, meta interface
 
 	log.Printf("[INFO] Removing node %s from pool: %s", nodeName, poolName)
 
-        err := client.DeletePoolMember(poolName, nodeName)
-        if err != nil {
+	err := client.DeletePoolMember(poolName, nodeName)
+	if err != nil {
 		return fmt.Errorf("Failure removing node %s from pool %s: %s", nodeName, poolName, err)
 	}
 
