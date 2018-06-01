@@ -3,7 +3,6 @@ package bigip
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"strings"
 
 	"github.com/f5devcentral/go-bigip"
