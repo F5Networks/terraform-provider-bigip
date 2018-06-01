@@ -27,7 +27,7 @@ resource "bigip_ltm_pool" "test-pool" {
 	load_balancing_mode = "round-robin"
 	depends_on = ["bigip_ltm_node.test-node"]
 }
-resource "bigip_ltm_pool_attachment" "test-node" {
+resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
 	pool = "` + TEST_POOL_NAME + `"
 	node = "` + TEST_POOLNODE_NAMEPORT + `"
 	depends_on = ["bigip_ltm_node.test-node", "bigip_ltm_pool.test-pool"]
