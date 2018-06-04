@@ -2,10 +2,10 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"regexp"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
+	"regexp"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -16,9 +16,8 @@ func resourceBigipLtmNode() *schema.Resource {
 		Delete: resourceBigipLtmNodeDelete,
 		Exists: resourceBigipLtmNodeExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -204,7 +203,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 			RateLimit:       d.Get("rate_limit").(string),
-			State:       d.Get("state").(string),
+			State:           d.Get("state").(string),
 		}
 	} else {
 		node = &bigip.Node{
@@ -212,7 +211,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 			RateLimit:       d.Get("rate_limit").(string),
-			State:       d.Get("state").(string),
+			State:           d.Get("state").(string),
 		}
 		node.FQDN.Name = address
 	}
@@ -231,33 +230,10 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	log.Println("[INFO] Deleting node " + name)
 
 	err := client.DeleteNode(name)
-	if err == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-	regex := regexp.MustCompile("referenced by a member of pool '\\/\\w+/([\\w-_.]+)")
-	for err != nil {
-		log.Printf("[INFO] Deleting %s from pools...\n", name)
-		parts := regex.FindStringSubmatch(err.Error())
-		if len(parts) > 1 {
-			poolName := parts[1]
-			members, e := client.PoolMembers(poolName)
-			if e != nil {
-				return e
-			}
-			for _, member := range members.PoolMembers {
-				e = client.DeletePoolMember(poolName, member.Name)
-				if e != nil {
-					return e
-				}
-			}
-			err = client.DeleteNode(name)
-		} else {
-			break
-		}
-	}
-	return err
-}
 
- 
+	if err != nil {
+		return fmt.Errorf("Error deleting node %s: %s", name, err)
+	}
+
+	return nil
+}
