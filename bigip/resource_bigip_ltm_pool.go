@@ -3,14 +3,11 @@ package bigip
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"strings"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
-
-var nodeVALIDATION = regexp.MustCompile(":\\d{2,5}$")
 
 func resourceBigipLtmPool() *schema.Resource {
 	return &schema.Resource{
@@ -20,9 +17,8 @@ func resourceBigipLtmPool() *schema.Resource {
 		Delete: resourceBigipLtmPoolDelete,
 		Exists: resourceBigipLtmPoolExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -32,14 +28,6 @@ func resourceBigipLtmPool() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-			"nodes": &schema.Schema{
-				Type:        schema.TypeSet,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Set:         schema.HashString,
-				Optional:    true,
-				Description: "Nodes to add to the pool. Format node_name:port. e.g. node01:443",
-			},
-
 			"monitors": &schema.Schema{
 				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -129,22 +117,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	nodes, err := client.PoolMembers(name)
-	if err != nil {
-		return err
-	}
 
-	if nodes == nil {
-		log.Printf("[WARN] Pool Member (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-
-	nodeNames := make([]string, 0, len(nodes.PoolMembers))
-
-	for _, node := range nodes.PoolMembers {
-		nodeNames = append(nodeNames, node.FullPath)
-	}
 	if err := d.Set("allow_nat", pool.AllowNAT); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AllowNAT to state for Pool  (%s): %s", d.Id(), err)
 	}
@@ -153,9 +126,6 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err := d.Set("load_balancing_mode", pool.LoadBalancingMode); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving LoadBalancingMode to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("nodes", makeStringSet(&nodeNames)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Nodes to state for Pool  (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
@@ -178,7 +148,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Println("[INFO]   Checking pool " + name + " exists.")
+	log.Println("[INFO] Checking pool " + name + " exists.")
 
 	pool, err := client.GetPool(name)
 	if err != nil {
@@ -220,33 +190,6 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	//members
-	nodes, err := client.PoolMembers(name)
-	if err != nil {
-		return err
-	}
-
-	nodeNames := make([]string, 0, len(nodes.PoolMembers))
-
-	for _, node := range nodes.PoolMembers {
-		nodeNames = append(nodeNames, node.Name)
-	}
-
-	existing := makeStringSet(&nodeNames)
-	incoming := d.Get("nodes").(*schema.Set)
-	delete := existing.Difference(incoming)
-	add := incoming.Difference(existing)
-	if delete.Len() > 0 {
-		for _, d := range delete.List() {
-			client.DeletePoolMember(name, d.(string))
-		}
-	}
-	if add.Len() > 0 {
-		for _, d := range add.List() {
-			client.AddPoolMember(name, d.(string))
-		}
-	}
-
 	return resourceBigipLtmPoolRead(d, meta)
 }
 
@@ -261,11 +204,9 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 	if err == nil {
-		log.Printf("[WARN] Pool  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
 	return nil
 }
-
- 
