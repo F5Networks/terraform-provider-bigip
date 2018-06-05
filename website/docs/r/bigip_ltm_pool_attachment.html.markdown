@@ -28,4 +28,4 @@ resource "bigip_ltm_pool_attachment" "node-terraform_pool" {
 
 * `pool` - (Required) Name of the pool in /Partition/Name format
 
-* `nodes` - (Optional) Node to add to the pool in /Partition/NodeName:Port format (e.g. /Common/Node01:80)
+* `node` - (Required) Node to add to the pool in /Partition/NodeName:Port format (e.g. /Common/Node01:80)
