@@ -112,7 +112,6 @@ resource "bigip_ltm_node" "node" {
 resource "bigip_ltm_pool" "pool" {
   name = "/Common/terraform-pool"
   load_balancing_mode = "round-robin"
-  nodes = ["${bigip_ltm_node.node.name}:80"]
   monitors = ["${bigip_ltm_monitor.monitor.name}","${bigip_ltm_monitor.monitor2.name}"]
   allow_snat = "no"
   allow_nat = "no"
@@ -122,8 +121,6 @@ resource "bigip_ltm_pool" "pool" {
 ### Reference
 
 `name` - (Required) Name of the pool
-
-`nodes` - (Optional) Nodes to add to the pool. Format node_name:port. e.g. `node01:443`
 
 `monitors` - (Optional) List of monitor names to associate with the pool
 
@@ -138,6 +135,25 @@ resource "bigip_ltm_pool" "pool" {
 `service_down_action` - (Optional, Default = none)
 
 `reselect_tries` - (Optional, Default = 0)
+
+
+## bigip_ltm_pool_attachment
+
+### Example
+
+```
+resource "bigip_ltm_pool" "node-terraform_pool" {
+  pool = "/Common/terraform-pool"
+  node = "${bigip_ltm_node.node.name}:80"
+}
+```
+
+### Reference
+
+* `pool` - (Required) Name of the pool in /Partition/Name format
+
+* `node` - (Required) Node to add to the pool in /Partition/NodeName:Port format (e.g. /Common/Node01:80)
+
 
 ## bigip_ltm_virtual_server
 
