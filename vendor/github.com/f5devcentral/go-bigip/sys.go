@@ -151,6 +151,7 @@ const (
 	uriSyslog    = "syslog"
 	uriSnmp      = "snmp"
 	uriTraps     = "traps"
+	uriLicense   = "license"
 )
 
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
@@ -378,4 +379,28 @@ func (b *BigIP) TRAPs() (*TRAP, error) {
 
 func (b *BigIP) DeleteTRAP(name string) error {
 	return b.delete(uriSys, uriSnmp, uriTraps, name)
+}
+
+func (b *BigIP) Bigiplicenses() (*Bigiplicense, error) {
+	var bigiplicense Bigiplicense
+	err, _ := b.getForEntity(&bigiplicense, uriSys, uriLicense)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &bigiplicense, nil
+}
+
+func (b *BigIP) CreateBigiplicense(command, registration_key string) error {
+	config := &Bigiplicense{
+		Command:          command,
+		Registration_key: registration_key,
+	}
+
+	return b.post(config, uriSys, uriLicense)
+}
+
+func (b *BigIP) ModifyBigiplicense(config *Bigiplicense) error {
+	return b.put(config, uriSys, uriLicense)
 }
