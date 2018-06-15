@@ -87,7 +87,7 @@ func testCheckrouteExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return err
 		}
-		if exists && p != nil {
+		if exists && p == nil {
 			return fmt.Errorf("route %s was not created.", name)
 		}
 		if !exists && p != nil {
