@@ -80,6 +80,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_sys_provision":                   resourceBigipSysProvision(),
 			"bigip_sys_snmp":                        resourceBigipSysSnmp(),
 			"bigip_sys_snmp_traps":                  resourceBigipSysSnmpTraps(),
+			"bigip_sys_bigiplicense":                resourceBigipSysBigiplicense(),
 		},
 
 		ConfigureFunc: providerConfigure,

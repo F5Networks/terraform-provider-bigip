@@ -90,7 +90,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "6b592e5587cca6b997c4f7b6e13d8b52080770a9"
+  revision = "516d8470f371405cb5dcc4f1f1cf3789b9c9a25b"
 
 [[projects]]
   name = "github.com/fatih/color"

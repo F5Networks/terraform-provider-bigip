@@ -138,6 +138,15 @@ type TRAP struct {
 	Version                  string `json:"version,omitempty"`
 }
 
+type Bigiplicenses struct {
+	Bigiplicenses []Bigiplicense `json:"items"`
+}
+
+type Bigiplicense struct {
+	Registration_key string `json:"registrationKey,omitempty"`
+	Command          string `json:"command,omitempty"`
+}
+
 const (
 	uriSys       = "sys"
 	uriNtp       = "ntp"
