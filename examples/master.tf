@@ -64,12 +64,17 @@ resource "bigip_ltm_monitor" "monitor" {
 resource "bigip_ltm_pool"  "pool" {
         name = "/Common/terraform-pool"
         load_balancing_mode = "round-robin"
-        nodes = ["11.1.1.101:80", "11.1.1.102:80"]
         monitors = ["/Common/terraform_monitor"]
         allow_snat = "yes"
         allow_nat = "yes"
 }
 
+resource "bigip_ltm_pool_attachment" "attach_node" {
+        pool = "/Common/terraform-pool"
+	node = "/Common/11.1.1.101:80"
+	depends_on = ["bigip_ltm_pool.pool"]
+
+}
 resource "bigip_ltm_virtual_server" "http" {
 	pool = "/Common/terraform-pool"
         name = "/Common/terraform_vs_http"
