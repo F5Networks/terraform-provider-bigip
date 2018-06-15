@@ -1,6 +1,7 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
@@ -50,7 +51,7 @@ func resourceBigipSysBigiplicenseCreate(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	d.SetId(registration_key)
-	return nil
+	return resourceBigipSysBigiplicenseRead(d, meta)
 }
 
 func resourceBigipSysBigiplicenseUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -79,9 +80,22 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		return err
 	}
+	if members == nil {
+		log.Printf("[WARN] License (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	d.Set("registration_key", members.Registration_key)
+
+	if err := d.Set("registration_key", members.Registration_key); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving registration key  to state for License (%s): %s", d.Id(), err)
+	}
 	d.Set("command", members.Command)
+
+	if err := d.Set("command", members.Command); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Command  to state for License (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }
@@ -89,8 +103,4 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 func resourceBigipSysBigiplicenseDelete(d *schema.ResourceData, meta interface{}) error {
 	//API does not Exists
 	return nil
-}
-
-func resourceBigipSysBigiplicenseImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
 }
