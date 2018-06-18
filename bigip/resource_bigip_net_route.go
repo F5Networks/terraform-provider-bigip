@@ -5,6 +5,7 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
+	"regexp"
 )
 
 func resourceBigipNetRoute() *schema.Resource {
@@ -14,9 +15,8 @@ func resourceBigipNetRoute() *schema.Resource {
 		Read:   resourceBigipNetRouteRead,
 		Delete: resourceBigipNetRouteDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -34,7 +34,7 @@ func resourceBigipNetRoute() *schema.Resource {
 			"gw": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Gw address",
+				Description: "Gateway address",
 			},
 		},
 	}
@@ -96,12 +96,19 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	d.Set("name", name)
-	if err := d.Set("network", obj.Network); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Network to state for Route  (%s): %s", d.Id(), err)
+
+	regex := regexp.MustCompile(`(default|(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2})(?:\%\d+)?`)
+	network := regex.FindStringSubmatch(obj.Network)
+
+	regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?`)
+	gw := regex.FindStringSubmatch(obj.Gateway)
+
+	if err := d.Set("network", network[1]); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Network to state for Route (%s): %s", d.Id(), err)
 	}
-	d.Set("gw", obj.Gateway)
-	if err := d.Set("gw", obj.Gateway); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Gateway to state for Route  (%s): %s", d.Id(), err)
+
+	if err := d.Set("gw", gw[1]); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Gateway to state for Route (%s): %s", d.Id(), err)
 	}
 	return nil
 }
@@ -114,11 +121,9 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 
 	err := client.DeleteRoute(name)
 	if err == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
 	return nil
 }
-
- 
