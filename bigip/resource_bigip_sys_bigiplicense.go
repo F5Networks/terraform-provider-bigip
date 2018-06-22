@@ -1,8 +1,8 @@
 package bigip
 
 import (
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -46,7 +46,7 @@ func resourceBigipSysBigiplicenseCreate(d *schema.ResourceData, meta interface{}
 		command,
 		registration_key,
 	)
-
+	time.Sleep(300 * time.Second)
 	if err != nil {
 		return err
 	}
@@ -84,17 +84,6 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 		log.Printf("[WARN] License (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
-	}
-
-	d.Set("registration_key", members.Registration_key)
-
-	if err := d.Set("registration_key", members.Registration_key); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving registration key  to state for License (%s): %s", d.Id(), err)
-	}
-	d.Set("command", members.Command)
-
-	if err := d.Set("command", members.Command); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Command  to state for License (%s): %s", d.Id(), err)
 	}
 
 	return nil
