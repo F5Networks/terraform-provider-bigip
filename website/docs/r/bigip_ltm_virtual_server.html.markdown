@@ -88,3 +88,7 @@ resource "bigip_ltm_virtual_server" "https" {
 * `vlans_enabled` - (Optional Bool) Enables the virtual server on the VLANs specified by the VLANs option.
 
 * `vlans_disabled` - (Optional Bool) Disables the virtual server on the VLANs specified by the VLANs option.
+
+* `persistence_profiles` - (Optional) List of persistence profiles associated with the Virtual Server.
+
+* `fallback_persistence_profile` - (Optional) Specifies a fallback persistence profile for the Virtual Server to use when the default persistence profile is not available.
