@@ -26,6 +26,8 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
+	persistence_profiles = ["/Common/source_addr"]
+	fallback_persistence_profile = "/Common/dest_addr"
 
 }
 `
@@ -61,6 +63,10 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
 						"/Common/tcp-lan-optimized"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
+						"/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
 		},
