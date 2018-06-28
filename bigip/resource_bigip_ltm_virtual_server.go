@@ -258,9 +258,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	if err := d.Set("persistence_profiles", vs.PersistenceProfiles); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PersistenceProfiles to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
+	d.Set("persistence_profiles", vs.PersistenceProfiles)
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
