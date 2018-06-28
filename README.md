@@ -142,7 +142,7 @@ resource "bigip_ltm_pool" "pool" {
 ### Example
 
 ```
-resource "bigip_ltm_pool_attachement" "node-terraform_pool" {
+resource "bigip_ltm_pool_attachment" "node-terraform_pool" {
   pool = "/Common/terraform-pool"
   node = "${bigip_ltm_node.node.name}:80"
 }
