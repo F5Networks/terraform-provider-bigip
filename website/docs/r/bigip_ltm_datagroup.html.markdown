@@ -44,4 +44,4 @@ resource "bigip_ltm_datagroup" "datagroup" {
 
   * `name` - (Required if `record` defined), sets the value of the record's `name` attribute, must be of type defined in `type` attribute
 
-  * `data` - (Optional if `record` defined), sets the value of the record's `data` attribute, speecifying a value here will create a record in the form of `name := data`
+  * `data` - (Optional if `record` defined), sets the value of the record's `data` attribute, specifying a value here will create a record in the form of `name := data`
