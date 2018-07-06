@@ -108,27 +108,3 @@ func validateReqPrefDisabled(value interface{}, field string) (ws []string, erro
 	}
 	return
 }
-
-func validateDataGroupType(value interface{}, field string) (ws []string, errors []error) {
-        var values []string
-        switch value.(type) {
-        case *schema.Set:
-                values = setToStringSlice(value.(*schema.Set))
-        case []string:
-                values = value.([]string)
-        case *[]string:
-                values = *(value.(*[]string))
-        case string:
-                values = []string{value.(string)}
-        default:
-                errors = append(errors, fmt.Errorf("Unknown type %v in validateDataGroupType", reflect.TypeOf(value)))
-        }
-
-        for _, v := range values {
-                match, _ := regexp.MatchString("^string$|^ip$|^integer$", v)
-                if !match {
-                        errors = append(errors, fmt.Errorf("%q must match as string, ip, or integer", field))
-                }
-        }
-        return
-}
