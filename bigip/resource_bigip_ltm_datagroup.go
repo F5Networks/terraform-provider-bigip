@@ -95,7 +95,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 
 	name := d.Id()
 
-	datagroup, err := client.GetDatagroup(name)
+	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
 		return err
 	}
@@ -116,8 +116,7 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 	name := d.Id()
 	log.Println("[INFO] Fetching Data Group " + name)
 
-	datagroup, err := client.GetDatagroup(name)
-	//datagroup, err := client.GetInternalDataGroupRecords(name)
+	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
 		return false, err
 	}

@@ -166,7 +166,7 @@ func testCheckDataGroupExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		datagroup, err := client.GetDatagroup(name)
+		datagroup, err := client.GetInternalDataGroup(name)
 		if err != nil {
 			return fmt.Errorf("Error while fetching Data Group: %v", err)
 
@@ -189,7 +189,7 @@ func testCheckDataGroupDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		datagroup, err := client.GetDatagroup(name)
+		datagroup, err := client.GetInternalDataGroup(name)
 
 		if err != nil {
 			return nil
