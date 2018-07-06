@@ -46,7 +46,7 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 
 						"data": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 						},
 					},
 				},
