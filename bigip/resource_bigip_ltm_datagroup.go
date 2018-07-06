@@ -27,10 +27,11 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 			},
 
 			"type": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "The Data Group type (string, ip, integer)",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				Description:  "The Data Group type (string, ip, integer)",
+				ValidateFunc: validateDataGroupType,
 			},
 
 			"record": {
