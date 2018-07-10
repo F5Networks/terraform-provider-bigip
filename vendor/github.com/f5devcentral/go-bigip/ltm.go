@@ -1983,11 +1983,25 @@ func (b *BigIP) DeleteInternalDataGroup(name string) error {
 }
 
 // Modify a named internal data group, REPLACING all the records
-func (b *BigIP) ModifyInternalDataGroupRecords(name string, records *[]DataGroupRecord) error {
+func (b *BigIP) ModifyInternalDataGroupRecords(name string, records []DataGroupRecord) error {
 	config := &DataGroup{
-		Records: *records,
+		Records: records,
 	}
 	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
+}
+
+// Get an internal data group by name, returns nil if the data group does not exist
+func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
+        var datagroup DataGroup
+        err, ok := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriInternal, name)
+        if err != nil {
+                return nil, err
+        }
+        if !ok {
+                return nil, nil
+        }
+
+        return &datagroup, nil
 }
 
 // Get the internal data group records for a named internal data group
