@@ -8,9 +8,9 @@ description: |-
 
 # bigip\_ltm\_datagroup
 
-`bigip_ltm_datagroup` Manages a datagroup configuration
+`bigip_ltm_datagroup` Manages internal (in-line) datagroup configuration
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-datagroup.
+Resource should be named with their "full path". The full path is the combination of the partition + name of the resource, for example /Common/my-datagroup.
 
 
 ## Example Usage
@@ -18,12 +18,18 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_datagroup" "datagroup" {
-  name = "dgx2"
+  name = "/Common/dgx2"
   type = "string"
-  records  {
-   name = "abc.com"
-   data = "pool1"
-   }
+
+  record {
+    name = "abc.com"
+    data = "pool1"
+  }
+
+  record {
+    name = "test"
+    value = "123"
+  }
 }
 
 ```      
@@ -32,10 +38,10 @@ resource "bigip_ltm_datagroup" "datagroup" {
 
 * `name` - (Required) Name of the datagroup
 
-* `type` -  datagroup is string or address  Format
+* `type` - (Required) datagroup type (applies to the `name` field of the record), supports: `string`, `ip` or `integer`
 
-* `records` - Collections of Data and Value
+* `record` - (Optional) a set of `name` and `data` attributes, name must be of type specified by the `type` attributed (`string`, `ip` and `integer`), data is optional and can take any value, multiple `record` sets can be specified as needed.
 
-* `name` - Data Value, this can be URL like www.abc.com
+  * `name` - (Required if `record` defined), sets the value of the record's `name` attribute, must be of type defined in `type` attribute
 
-* `data` - This data can be a pool or virtual server etc.
+  * `data` - (Optional if `record` defined), sets the value of the record's `data` attribute, specifying a value here will create a record in the form of `name := data`
