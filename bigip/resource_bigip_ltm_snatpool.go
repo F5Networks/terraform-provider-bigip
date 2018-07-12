@@ -21,6 +21,7 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				Description:  "SNAT Pool list Name, format /partition/name. e.g. /Common/snat_pool",
 				ValidateFunc: validateF5Name,
 			},
