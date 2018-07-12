@@ -29,7 +29,7 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Required     true,
+				Required:    true,
 				Description: "Specifies a translation address to add to or delete from a SNAT pool, at least one IP is required.",
 			},
 		},
