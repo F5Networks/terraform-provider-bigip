@@ -16,7 +16,7 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 # F5 BigIP LTM requirements
 
-- This provider uses the iControlREST API, make sure that is installed and enabled on your F5 before proceeding.
+- This provider uses the iControlREST API, make sure that it is installed and enabled on your F5 device before proceeding.
 - All the resources are validated with BigIP v12.1.1
 
 # Dcoumentation
