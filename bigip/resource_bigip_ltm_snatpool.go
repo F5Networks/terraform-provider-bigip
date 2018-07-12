@@ -14,21 +14,15 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 		Read:   resourceBigipLtmSnatpoolRead,
 		Delete: resourceBigipLtmSnatpoolDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Snatpool list Name",
-			},
-			"partition": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Which partition on BIG-IP",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "SNAT Pool list Name, format /partition/name. e.g. /Common/snat_pool",
+				ValidateFunc: validateF5Name,
 			},
 
 			"members": {
@@ -45,21 +39,18 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 func resourceBigipLtmSnatpoolCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	Name := d.Get("name").(string)
-	Partition := d.Get("partition").(string)
-	Members := setToStringSlice(d.Get("members").(*schema.Set))
-	log.Println("[INFO] Creating Snatpool ")
+	name := d.Get("name").(string)
+	members := setToStringSlice(d.Get("members").(*schema.Set))
 
-	err := client.CreateSnatpool(
-		Name,
-		Partition,
-		Members,
-	)
+	log.Println("[INFO] Creating SNAT Pool " + name)
 
+	err := client.CreateSnatPool(name, members)
 	if err != nil {
 		return err
 	}
+
 	d.SetId(Name)
+
 	return resourceBigipLtmSnatpoolRead(d, meta)
 }
 
@@ -68,18 +59,18 @@ func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 	name := d.Id()
 
-	log.Println("[INFO] Updating Snatpool " + name)
+	log.Println("[INFO] Updating SNAT Pool " + name)
 
-	r := &bigip.Snatpool{
-		Name:      d.Get("name").(string),
-		Partition: d.Get("partition").(string),
-		Members:   setToStringSlice(d.Get("members").(*schema.Set)),
+	r := &bigip.SnatPool{
+		Name:    d.Get("name").(string),
+		Members: setToStringSlice(d.Get("members").(*schema.Set)),
 	}
 
-	err := client.ModifySnatpool(r)
+	err := client.ModifySnatPool(name, r)
 	if err != nil {
 		return err
 	}
+
 	return resourceBigipLtmSnatpoolRead(d, meta)
 }
 
@@ -88,21 +79,20 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 
 	name := d.Id()
 
-	log.Println("[INFO] Fetching Snatpoollist " + name)
+	log.Println("[INFO] Fetching SNAT Pool " + name)
 
-	snatpool, err := client.GetSnatpool(name)
+	snatpool, err := client.GetSnatPool(name)
 	if err != nil {
 		return err
 	}
 	if snatpool == nil {
-		log.Printf("[WARN] Snatpool (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("partition", snatpool.Partition)
 	if err := d.Set("members", snatpool.Members); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Members to state for Snatpool  (%s): %s", d.Id(), err)
+		return fmt.Errorf("[DEBUG] Error saving Members to state for SNAT Pool (%s): %s", d.Id(), err)
 	}
 
 	return nil
@@ -111,15 +101,15 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+
 	name := d.Id()
-	err := client.DeleteSnatpool(name)
+
+	err := client.DeleteSnatPool(name)
 	if err == nil {
-		log.Printf("[WARN] Snat pool  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
+
 	return nil
-
 }
-
- 
