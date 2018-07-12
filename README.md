@@ -1,6 +1,6 @@
 # Overview
 
-A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently available for LTM.
+A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 [![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-bigip)
 [![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-bigip)
@@ -11,8 +11,6 @@ A [Terraform](terraform.io) provider for F5 BigIP. Resources are currently avail
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 # Requirements
-
-This provider uses the iControlREST API. Make sure that is installed and enabled on your F5 before proceeding. All the resources are validated with BIGIP-12.1.1.0.0.184.iso
 -	[Terraform](https://www.terraform.io/downloads.html) 0.10.x
 -	[Go](https://golang.org/doc/install) 1.9 (to build the provider plugin)
 
