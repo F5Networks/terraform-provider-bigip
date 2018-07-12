@@ -31,7 +31,8 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Required:    true,
-				Description: "Specifies a translation address to add to or delete from a SNAT pool, at least one IP is required.",
+				MinItems:    1,
+				Description: "Specifies a translation address to add to or delete from a SNAT pool, at least one address is required.",
 			},
 		},
 	}
