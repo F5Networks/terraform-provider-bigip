@@ -49,7 +49,7 @@ func resourceBigipLtmSnatpoolCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	d.SetId(Name)
+	d.SetId(name)
 
 	return resourceBigipLtmSnatpoolRead(d, meta)
 }
