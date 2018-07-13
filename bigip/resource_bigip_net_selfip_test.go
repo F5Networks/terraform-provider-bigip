@@ -10,24 +10,32 @@ import (
 )
 
 var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
+var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float_selfip", TEST_PARTITION)
 
 var TEST_SELFIP_RESOURCE = `
-
 resource "bigip_net_vlan" "test-vlan" {
-	name = "` + TEST_VLAN_NAME + `"
-	tag = 101
-	interfaces = {
-		vlanport = 1.1,
-		tagged = false
-	}
+  name = "` + TEST_VLAN_NAME + `"
+  tag = 101
+  interfaces = {
+    vlanport = 1.1,
+    tagged = false
+  }
 }
 
 resource "bigip_net_selfip" "test-selfip" {
-	name = "/Common/test-selfip"
-	ip = "11.1.1.1/24"
-	vlan = "/Common/test-vlan"
-	depends_on = ["bigip_net_vlan.test-vlan"]
-		}
+  name = "/Common/test-selfip"
+  ip = "11.1.1.1/24"
+  vlan = "/Common/test-vlan"
+  depends_on = ["bigip_net_vlan.test-vlan"]
+}
+
+resource "bigip_net_selfip" "test-float-selfip" {
+  name = "/Common/test-float-selfip"
+  ip = "11.1.1.2/24"
+  vlan = "/Common/test-vlan"
+  depends_on = ["bigip_net_vlan.test-vlan"]
+  traffic_group = "traffic-group-1"
+}
 `
 
 func TestAccBigipNetselfip_create(t *testing.T) {
@@ -42,9 +50,14 @@ func TestAccBigipNetselfip_create(t *testing.T) {
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckselfipExists(TEST_SELFIP_NAME, true),
+					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", "/Common/test-selfip"),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "ip", "11.1.1.1/24"),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", "/Common/test-vlan"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "name", "/Common/test-float-selfip"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "ip", "11.1.1.2/24"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "vlan", "/Common/test-vlan"),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "traffic_group", "traffic-group-1"),
 				),
 			},
 		},

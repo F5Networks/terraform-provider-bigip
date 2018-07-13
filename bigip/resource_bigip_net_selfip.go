@@ -15,21 +15,21 @@ func resourceBigipNetSelfIP() *schema.Resource {
 		Update: resourceBigipNetSelfIPUpdate,
 		Delete: resourceBigipNetSelfIPDelete,
 		Importer: &schema.ResourceImporter{
-				State: schema.ImportStatePassthrough,
-			},
-
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of the SelfIP",
 			},
 
 			"ip": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "SelfIP IP address",
 			},
 
@@ -37,6 +37,13 @@ func resourceBigipNetSelfIP() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the vlan",
+			},
+
+			"traffic_group": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Name of the traffic group, defaults to traffic-group-local-only if not specified",
+				Default:     "traffic-group-local-only",
 			},
 		},
 	}
@@ -59,7 +66,7 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 
 	d.SetId(name)
 
-	return resourceBigipNetSelfIPRead(d, meta)
+	return resourceBigipNetSelfIPUpdate(d, meta)
 }
 
 func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
@@ -88,8 +95,6 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-
-
 func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
@@ -98,9 +103,10 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 	log.Println("[INFO] Updating SelfIP " + name)
 
 	r := &bigip.SelfIP{
-		Name:    name,
-		Address: d.Get("ip").(string),
-		Vlan:    d.Get("vlan").(string),
+		Name:         name,
+		Address:      d.Get("ip").(string),
+		Vlan:         d.Get("vlan").(string),
+		TrafficGroup: d.Get("traffic_group").(string),
 	}
 
 	err := client.ModifySelfIP(name, r)
@@ -126,5 +132,3 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	}
 	return nil
 }
-
- 
