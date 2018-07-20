@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
+        "log"
 )
 
-// this module does not have DELETE function as there is no API for Delete
+// this module does not have DELETE function as there is no API for Delete.
 func resourceBigipSysSnmp() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBigipSysSnmpCreate,
