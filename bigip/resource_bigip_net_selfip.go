@@ -125,6 +125,9 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	log.Println("[INFO] Deleting selfIP " + name)
 
 	err := client.DeleteSelfIP(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] Selfip (%s) not found, removing from state", d.Id())
 		d.SetId("")
