@@ -41,7 +41,6 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 func (c *Config) validateConnection(client *bigip.BigIP) error {
 	t, err := client.SelfIPs()
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
