@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-        "log"
+	"log"
 )
 
 // this module does not have DELETE function as there is no API for Delete.
@@ -15,9 +15,8 @@ func resourceBigipSysSnmp() *schema.Resource {
 		Read:   resourceBigipSysSnmpRead,
 		Delete: resourceBigipSysSnmpDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"sys_contact": {
@@ -117,5 +116,3 @@ func resourceBigipSysSnmpDelete(d *schema.ResourceData, meta interface{}) error 
 	// No API support for Delete
 	return nil
 }
-
- 

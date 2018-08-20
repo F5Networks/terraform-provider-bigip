@@ -71,36 +71,36 @@ func TestAccBigipLtmDataGroup_create(t *testing.T) {
 	})
 
 	resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckDataGroupDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_DATAGROUP_IP_RESOURCE,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckDataGroupExists(TEST_DATAGROUP_NAME),
-                                ),
-                        },
-                },
-        })
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_DATAGROUP_IP_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+				),
+			},
+		},
+	})
 
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckDataGroupDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_DATAGROUP_INTEGER_RESOURCE,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckDataGroupExists(TEST_DATAGROUP_NAME),
-                                ),
-                        },
-                },
-        })
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_DATAGROUP_INTEGER_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+				),
+			},
+		},
+	})
 }
 
 func TestAccBigipLtmDataGroup_import(t *testing.T) {
@@ -123,43 +123,43 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		},
 	})
 
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckDataGroupDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_DATAGROUP_IP_RESOURCE,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckDataGroupExists(TEST_DATAGROUP_NAME),
-                                ),
-                                ResourceName:      TEST_DATAGROUP_NAME,
-                                ImportState:       false,
-                                ImportStateVerify: true,
-                        },
-                },
-        })
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_DATAGROUP_IP_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+				),
+				ResourceName:      TEST_DATAGROUP_NAME,
+				ImportState:       false,
+				ImportStateVerify: true,
+			},
+		},
+	})
 
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckDataGroupDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_DATAGROUP_INTEGER_RESOURCE,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckDataGroupExists(TEST_DATAGROUP_NAME),
-                                ),
-                                ResourceName:      TEST_DATAGROUP_NAME,
-                                ImportState:       false,
-                                ImportStateVerify: true,
-                        },
-                },
-        })
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_DATAGROUP_INTEGER_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+				),
+				ResourceName:      TEST_DATAGROUP_NAME,
+				ImportState:       false,
+				ImportStateVerify: true,
+			},
+		},
+	})
 }
 
 func testCheckDataGroupExists(name string) resource.TestCheckFunc {

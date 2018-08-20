@@ -78,5 +78,3 @@ func testChecksnmpExists(name string, exists bool) resource.TestCheckFunc {
 		return nil
 	}
 }
-
- 

@@ -58,7 +58,7 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	name   := d.Get("name").(string)
+	name := d.Get("name").(string)
 	log.Println("[INFO] Creating Data Group List " + name)
 
 	dgtype := d.Get("type").(string)
@@ -75,15 +75,15 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	dg := &bigip.DataGroup{
-	  Name: name,
-	  Type: dgtype,
-	  Records: records,
+		Name:    name,
+		Type:    dgtype,
+		Records: records,
 	}
 
 	err := client.AddInternalDataGroup(dg)
-        if err != nil {
-                return err
-        }
+	if err != nil {
+		return err
+	}
 
 	d.SetId(name)
 
@@ -125,28 +125,28 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 }
 
 func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
-        name := d.Id()
+	name := d.Id()
 	log.Println("[INFO] Modifying Data Group " + name)
 
 	rs := d.Get("record").(*schema.Set)
 
-        var records []bigip.DataGroupRecord
-        if rs.Len() > 0 {
-                for _, r := range rs.List() {
-                        record := r.(map[string]interface{})
-                        records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
-                }
-        } else {
-                records = nil
-        }
+	var records []bigip.DataGroupRecord
+	if rs.Len() > 0 {
+		for _, r := range rs.List() {
+			record := r.(map[string]interface{})
+			records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
+		}
+	} else {
+		records = nil
+	}
 
-        err := client.ModifyInternalDataGroupRecords(name, records)
-        if err != nil {
-                return err
-        }
-        return resourceBigipLtmDataGroupRead(d, meta)
+	err := client.ModifyInternalDataGroupRecords(name, records)
+	if err != nil {
+		return err
+	}
+	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
 func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) error {

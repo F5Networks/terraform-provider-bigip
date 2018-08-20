@@ -21,9 +21,8 @@ func resourceBigipLtmPolicy() *schema.Resource {
 		Delete: resourceBigipLtmPolicyDelete,
 		Exists: resourceBigipLtmPolicyExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -1203,5 +1202,3 @@ func interfaceToResourceData(obj interface{}, d *schema.ResourceData, prefix str
 		}
 	}
 }
-
- 

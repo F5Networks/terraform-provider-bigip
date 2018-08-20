@@ -14,9 +14,8 @@ func resourceBigipSysNtp() *schema.Resource {
 		Read:   resourceBigipSysNtpRead,
 		Delete: resourceBigipSysNtpDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"description": {
@@ -120,5 +119,3 @@ func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
 	/* This function is not supported on BIG-IP, you cannot DELETE NTP API is not supported */
 	return nil
 }
-
- 

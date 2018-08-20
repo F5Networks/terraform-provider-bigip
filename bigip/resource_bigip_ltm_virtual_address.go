@@ -16,8 +16,8 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 		Delete: resourceBigipLtmVirtualAddressDelete,
 		Exists: resourceBigipLtmVirtualAddressExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -201,5 +201,3 @@ func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface
 	}
 	return nil
 }
-
- 

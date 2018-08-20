@@ -14,9 +14,8 @@ func resourceBigipSysDns() *schema.Resource {
 		Read:   resourceBigipSysDnsRead,
 		Delete: resourceBigipSysDnsDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"description": {
@@ -134,5 +133,3 @@ func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
-
- 

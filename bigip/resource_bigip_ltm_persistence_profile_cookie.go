@@ -16,9 +16,8 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 		Delete: resourceBigipLtmPersistenceProfileCookieDelete,
 		Exists: resourceBigipLtmPersistenceProfileCookieExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -152,11 +151,11 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
- err := client.CreateCookiePersistenceProfile(
+	err := client.CreateCookiePersistenceProfile(
 		name,
 		parent,
 	)
-if err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -279,5 +278,3 @@ func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta
 
 	return pp != nil, nil
 }
-
- 

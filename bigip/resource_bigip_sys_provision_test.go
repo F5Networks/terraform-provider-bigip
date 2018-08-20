@@ -26,7 +26,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PROVISION_RESOURCE,

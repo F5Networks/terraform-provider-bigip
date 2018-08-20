@@ -86,5 +86,3 @@ func testCheckdnsExists(description string, exists bool) resource.TestCheckFunc 
 		return nil
 	}
 }
-
- 

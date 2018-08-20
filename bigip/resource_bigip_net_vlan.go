@@ -2,9 +2,9 @@ package bigip
 
 import (
 	"fmt"
-	"log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipNetVlan() *schema.Resource {
@@ -15,9 +15,8 @@ func resourceBigipNetVlan() *schema.Resource {
 		Update: resourceBigipNetVlanUpdate,
 		Delete: resourceBigipNetVlanDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -120,7 +119,6 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-
 func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
@@ -155,5 +153,3 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 	}
 	return nil
 }
-
- 

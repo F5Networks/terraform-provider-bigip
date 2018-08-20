@@ -15,9 +15,8 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 		Read:   resourceBigipSysSnmpTrapsRead,
 		Delete: resourceBigipSysSnmpTrapsDelete,
 		Importer: &schema.ResourceImporter{
- 			State: schema.ImportStatePassthrough,
- 		},
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -239,5 +238,3 @@ func resourceBigipSysSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) e
 	}
 	return nil
 }
-
- 

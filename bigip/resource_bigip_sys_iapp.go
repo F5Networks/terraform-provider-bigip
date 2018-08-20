@@ -16,9 +16,8 @@ func resourceBigipSysIapp() *schema.Resource {
 		Read:   resourceBigipSysIappRead,
 		Delete: resourceBigipSysIappDelete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 

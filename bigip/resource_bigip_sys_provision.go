@@ -14,10 +14,8 @@ func resourceBigipSysProvision() *schema.Resource {
 		Read:   resourceBigipSysProvisionRead,
 		Delete: resourceBigipSysProvisionDelete,
 		Importer: &schema.ResourceImporter{
-	 			State: schema.ImportStatePassthrough,
-	 		},
-
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -143,5 +141,3 @@ func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) e
 	//API is not supported for Deleting
 	return nil
 }
-
- 

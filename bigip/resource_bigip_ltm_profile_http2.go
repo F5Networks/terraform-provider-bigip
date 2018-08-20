@@ -14,9 +14,8 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 		Read:   resourceBigipLtmProfileHttp2Read,
 		Delete: resourceBigipLtmProfileHttp2Delete,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -154,5 +153,3 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 	}
 	return nil
 }
-
- 

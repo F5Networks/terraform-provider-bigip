@@ -2,10 +2,10 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"strings"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
+	"strings"
 )
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -16,9 +16,8 @@ func resourceBigipLtmMonitor() *schema.Resource {
 		Delete: resourceBigipLtmMonitorDelete,
 		Exists: resourceBigipLtmMonitorExists,
 		Importer: &schema.ResourceImporter{
-		 State: schema.ImportStatePassthrough,
-	 },
-
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -37,9 +36,9 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
 			"defaults_from": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
 
 			"interval": {
@@ -258,5 +257,3 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 func monitorParent(s string) string {
 	return strings.TrimPrefix(s, "/Common/")
 }
-
- 

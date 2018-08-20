@@ -121,7 +121,6 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 	})
 }
 
-
 func testCheckNodeExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
