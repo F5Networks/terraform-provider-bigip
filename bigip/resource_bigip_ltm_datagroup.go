@@ -1,9 +1,10 @@
 package bigip
 
 import (
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmDataGroup() *schema.Resource {
@@ -120,7 +121,11 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 	if err != nil {
 		return false, err
 	}
-
+	if datagroup == nil {
+		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return false, nil
+	}
 	return datagroup != nil, nil
 }
 
@@ -145,6 +150,11 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	err := client.ModifyInternalDataGroupRecords(name, records)
 	if err != nil {
 		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
 	}
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
