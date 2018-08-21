@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -123,7 +124,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Println("[INFO] Creating monitor " + name + " :: " + monitorParent(d.Get("parent").(string)))
 
-	client.CreateMonitor(
+	err := client.CreateMonitor(
 		name,
 		monitorParent(d.Get("parent").(string)),
 		d.Get("defaults_from").(string),
@@ -133,6 +134,9 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
 	)
+	if err != nil {
+		return err
+	}
 
 	d.SetId(name)
 
@@ -192,7 +196,11 @@ func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bo
 	if err != nil {
 		return false, err
 	}
-
+	if monitors == nil {
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return false, nil
+	}
 	for _, m := range monitors {
 		if m.FullPath == name {
 			return true, nil
@@ -225,6 +233,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+
 	return resourceBigipLtmMonitorRead(d, meta)
 }
 
