@@ -8,7 +8,7 @@ testacc:
 script:
   - go vet ./...
   - make test
-  - make bin
+  - make build
 after_success:
   - make dist
 
