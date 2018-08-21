@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmIRule() *schema.Resource {
@@ -46,7 +47,10 @@ func resourceBigipLtmIRuleCreate(d *schema.ResourceData, meta interface{}) error
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating iRule " + name)
 
-	client.CreateIRule(name, d.Get("irule").(string))
+	err := client.CreateIRule(name, d.Get("irule").(string))
+	if err != nil {
+		return err
+	}
 
 	d.SetId(name)
 
@@ -84,7 +88,11 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 	if err != nil {
 		return false, err
 	}
-
+	if irule == nil {
+		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return false, nil
+	}
 	return irule != nil, nil
 }
 
@@ -101,6 +109,11 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 	err := client.ModifyIRule(name, r)
 	if err != nil {
 		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
 	}
 	return resourceBigipLtmIRuleRead(d, meta)
 }
