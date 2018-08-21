@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"regexp"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -183,7 +184,9 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 	}
 
 	if node == nil {
+		log.Printf("[WARN] node (%s) not found, removing from state", d.Id())
 		d.SetId("")
+		return false, nil
 	}
 	return node != nil, nil
 }
@@ -220,6 +223,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return nil
 	}
+
 	return resourceBigipLtmNodeRead(d, meta)
 }
 
