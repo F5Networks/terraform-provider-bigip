@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"strconv"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
@@ -257,8 +258,15 @@ func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta
 
 	name := d.Id()
 	log.Println("[INFO] Deleting Cookie Persistence Profile " + name)
-
-	return client.DeleteCookiePersistenceProfile(name)
+	err := client.DeleteCookiePersistenceProfile(name)
+	if err != nil {
+		return fmt.Errorf("Error deleting CookiePersistence profile  %s: %s", name, err)
+	}
+	if err == nil {
+		log.Printf("[WARN] persistance profile cookie (%s) not found, removing from state", d.Id())
+		d.SetId("")
+	}
+	return nil
 }
 
 func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -273,6 +281,7 @@ func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta
 	}
 
 	if pp == nil {
+		log.Printf("[WARN] oersistance profile cookie (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 
