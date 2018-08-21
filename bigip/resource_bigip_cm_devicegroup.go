@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipCmDevicegroup() *schema.Resource {
@@ -178,7 +179,15 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		Rname := r.Name
-		client.DeleteDevicegroupDevices(name, Rname)
+		err := client.DeleteDevicegroupDevices(name, Rname)
+		if err != nil {
+			return err
+		}
+		if err == nil {
+			log.Printf("[WARN] DevicegroupDevices  (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 	}
 
 	err := client.DeleteDevicegroup(name)
