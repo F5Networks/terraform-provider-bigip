@@ -1,75 +1,63 @@
-TEST?=./...
-PROJ = terraform-provider-bigip
+TEST?=$$(go list ./... |grep -v 'vendor')
+GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+WEBSITE_REPO=github.com/hashicorp/terraform-website
+PKG_NAME=bigip
 
-ARCHS = amd64 386
-OS = windows darwin linux
+default: build
 
-// BIGIP_HOST := 13.56.242.22
-BIGIP_HOST := 10.192.74.73
+build: fmtcheck
+	go install
 
-export BIGIP_HOST
-BIGIP_USER := admin
-export BIGIP_USER
-BIGIP_PASSWORD := cisco123
-export BIGIP_PASSWORD
-OUT_DIR = target
-BIN_DIR = $(OUT_DIR)/bin
-PKG_DIR = $(OUT_DIR)/pkg
+test: fmtcheck
+	go test -i $(TEST) || exit 1
+	echo $(TEST) | \
+		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
-PKGS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(PKG_DIR)/$(PROJ)_$(os)_$(arch)$(PKG_SUFFIX)))
-BINS = $(foreach arch,$(ARCHS),$(foreach os,$(OS),$(BIN_DIR)/$(os)_$(arch)/$(PROJ)))
+testacc: fmtcheck
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
 
-default: bin
-
-build:
-	@go build ./...
-
-bin: test
-	@gox -help >/dev/null 2>&1 ; if [ $$? -ne 2 ]; then \
-		go get github.com/mitchellh/gox; \
-	fi
-	@gox -output="$(BIN_DIR)/{{.OS}}_{{.Arch}}/terraform-{{.Dir}}" -arch="$(ARCHS)" -os="$(OS)" "github.com/f5devcentral/terraform-provider-bigip"
-
-dist:
-	@mkdir -p $(PKG_DIR) 2>/dev/null
-	@for arch in $(ARCHS); do \
-		for os in $(OS); do \
-			echo "$(PKG_DIR)/$(PROJ)_$${os}_$${arch}.tar.gz"; \
-			tar czf $(PKG_DIR)/$(PROJ)_$${os}_$${arch}.tar.gz -C $(BIN_DIR)/$${os}_$${arch} .; \
-		done \
-	done
-
-fmt:
-	@gofmt -l -w . bigip/
-
-# vet runs the Go source code static analysis tool `vet` to find
-# any common errors.
 vet:
-	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \
-		go get golang.org/x/tools/cmd/vet; \
-	fi
-	@echo "go tool vet $(VETARGS) ."
-	@go tool vet $(VETARGS) $$(ls -d */ | grep -v vendor) ; if [ $$? -eq 1 ]; then \
+	@echo "go vet ."
+	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
 		echo ""; \
 		echo "Vet found suspicious constructs. Please check the reported constructs"; \
 		echo "and fix them if necessary before submitting the code for review."; \
 		exit 1; \
 	fi
 
-test: 
-	@TF_ACC= go test $(TEST) -v $(TESTARGS) -timeout=600s -parallel=1
+fmt:
+	gofmt -w $(GOFMT_FILES)
 
-testacc: fmt 
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 170m
+fmtcheck:
+	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
-test-compile: fmtcheck generate
-		@if [ "$(TEST)" = "./..." ]; then \
-			echo "ERROR: Set TEST to a specific package. For example,"; \
-			echo "  make test-compile TEST=./builtin/providers/bigip"; \
-			exit 1; \
-		fi
-		go test -c $(TEST) -v $(TESTARGS)
+errcheck:
+	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-clean:
-	@go clean
-	@rm -rf target/
+vendor-status:
+	@govendor status
+
+test-compile:
+	@if [ "$(TEST)" = "./..." ]; then \
+		echo "ERROR: Set TEST to a specific package. For example,"; \
+		echo "  make test-compile TEST=./$(PKG_NAME)"; \
+		exit 1; \
+	fi
+	go test -c $(TEST) $(TESTARGS)
+
+website:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+endif
+	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+website-test:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+endif
+	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile website website-test
+
