@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"strconv"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
@@ -207,8 +208,16 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 
 	name := d.Id()
 	log.Println("[INFO] Deleting Source Address Persistence Profile " + name)
+	err := client.DeleteSourceAddrPersistenceProfile(name)
+	if err != nil {
+		return err
+	}
 
-	return client.DeleteSourceAddrPersistenceProfile(name)
+	if err == nil {
+		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+	}
+	return nil
 }
 
 func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -223,6 +232,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, met
 	}
 
 	if pp == nil {
+		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 
