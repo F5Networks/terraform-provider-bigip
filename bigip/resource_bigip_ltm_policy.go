@@ -4,10 +4,11 @@ import (
 	"log"
 
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"reflect"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})
@@ -1103,6 +1104,11 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 	if err != nil {
 		return false, err
 	}
+	if p == nil {
+		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return false, nil
+	}
 	return p != nil, nil
 }
 
@@ -1115,13 +1121,29 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
+	if err == nil {
+		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+
 	return resourceBigipLtmPolicyRead(d, meta)
 }
 
 func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	return client.DeletePolicy(name)
+	err := client.DeletePolicy(name)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+
+	return nil
 }
 
 func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
