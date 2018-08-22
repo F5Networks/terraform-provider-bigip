@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileTcp() *schema.Resource {
@@ -136,7 +137,7 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 
 	err := client.ModifyTcp(name, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error create profile tcp (%s): %s", name, err)
 	}
 	return resourceBigipLtmProfileOneconnectRead(d, meta)
 }
@@ -191,7 +192,7 @@ func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) 
 
 	err := client.DeleteTcp(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error Deleting  profile tcp (%s): %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] tcp profile  (%s) not found, removing from state", d.Id())
