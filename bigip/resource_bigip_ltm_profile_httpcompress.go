@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileHttpcompress() *schema.Resource {
@@ -66,7 +67,7 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Error retrieving profile Http compress (%s): %s", name, err)
 	}
 	d.SetId(name)
 	return resourceBigipLtmProfileHttpcompressRead(d, meta)
@@ -88,7 +89,7 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 
 	err := client.ModifyHttpcompress(name, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error modifying  profile Http compress (%s): %s", name, err)
 	}
 	return resourceBigipLtmProfileHttpcompressRead(d, meta)
 }

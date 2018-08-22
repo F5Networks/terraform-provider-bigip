@@ -89,7 +89,7 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 	log.Println("[INFO] Creating pool " + name)
 	err := client.CreatePool(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error retrieving pool (%s): %s", name, err)
 	}
 
 	err = resourceBigipLtmPoolUpdate(d, meta)
@@ -156,6 +156,7 @@ func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool,
 	}
 
 	if pool == nil {
+		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

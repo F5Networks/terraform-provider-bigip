@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileFastl4() *schema.Resource {
@@ -101,10 +102,10 @@ func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{
 		ipTosToServer,
 		keepAliveInterval,
 	)
-
 	if err != nil {
-		return err
+		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s", name, err)
 	}
+
 	d.SetId(name)
 	return resourceBigipLtmProfileFastl4Read(d, meta)
 }
@@ -175,7 +176,7 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteFastl4(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())

@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileHttp2() *schema.Resource {
@@ -78,9 +79,8 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 		headerTableSize,
 		activationModes,
 	)
-
 	if err != nil {
-		return err
+		return fmt.Errorf("Error creating profile Http2 (%s): %s", name, err)
 	}
 	d.SetId(name)
 	return resourceBigipLtmProfileHttp2Read(d, meta)
@@ -104,7 +104,7 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 
 	err := client.ModifyHttp2(name, r)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error modifying profile Http2 (%s): %s", name, err)
 	}
 	return resourceBigipLtmProfileHttp2Read(d, meta)
 }
@@ -144,7 +144,7 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 
 	err := client.DeleteHttp2(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error deleting  profile Http2 (%s): %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] Http2 profile  (%s) not found, removing from state", d.Id())

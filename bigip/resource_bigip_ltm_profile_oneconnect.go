@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileOneconnect() *schema.Resource {
@@ -99,7 +100,7 @@ func resourceBigipLtmProfileOneconnectCreate(d *schema.ResourceData, meta interf
 	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Error create profile oneConnect (%s): %s", name, err)
 	}
 	d.SetId(name)
 	return resourceBigipLtmProfileOneconnectRead(d, meta)
@@ -173,7 +174,7 @@ func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interf
 
 	err := client.DeleteOneconnect(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error Deleting profile oneConnect (%s): %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] OneConnect profile  (%s) not found, removing from state", d.Id())
