@@ -183,11 +183,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		if err != nil {
 			return err
 		}
-		if err == nil {
-			log.Printf("[WARN] DevicegroupDevices  (%s) not found, removing from state", d.Id())
-			d.SetId("")
-			return nil
-		}
+
 	}
 
 	err := client.DeleteDevicegroup(name)

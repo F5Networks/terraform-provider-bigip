@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmSnatpool() *schema.Resource {
@@ -107,6 +108,9 @@ func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 
 	err := client.DeleteSnatPool(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")

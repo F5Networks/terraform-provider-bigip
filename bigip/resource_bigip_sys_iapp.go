@@ -296,6 +296,9 @@ func resourceBigipSysIappDelete(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	err := client.DeleteIapp(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] IApp (%s) not found, removing from state", d.Id())
 		d.SetId("")

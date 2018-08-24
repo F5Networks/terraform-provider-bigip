@@ -3,6 +3,7 @@ package bigip
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -84,7 +85,7 @@ func testCheckvlanExists(name string, exists bool) resource.TestCheckFunc {
 
 func testCheckvlansDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
-
+	time.Sleep(2 * time.Second)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "bigip_net_vlan" {
 			continue

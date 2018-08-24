@@ -2,10 +2,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"regexp"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipNetRoute() *schema.Resource {
@@ -120,6 +121,9 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 	log.Println("[INFO] Deleting Route " + name)
 
 	err := client.DeleteRoute(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
 		d.SetId("")

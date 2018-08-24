@@ -194,6 +194,9 @@ func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface
 	log.Printf("[INFO] Deleting virtual address " + name)
 	client := meta.(*bigip.BigIP)
 	err := client.DeleteVirtualAddress(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
 		d.SetId("")

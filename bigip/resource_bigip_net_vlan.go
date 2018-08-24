@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipNetVlan() *schema.Resource {
@@ -146,6 +147,10 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 	log.Println("[INFO] Deleting vlan " + name)
 
 	err := client.DeleteVlan(name)
+	if err != nil {
+		return fmt.Errorf("Error Deleting Vlan : %s", err)
+	}
+
 	if err == nil {
 		log.Printf("[WARN] Vlan (%s) not found, removing from state", d.Id())
 		d.SetId("")

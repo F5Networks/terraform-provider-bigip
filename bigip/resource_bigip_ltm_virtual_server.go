@@ -401,6 +401,9 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 	log.Println("[INFO] Deleting virtual server " + name)
 
 	err := client.DeleteVirtualServer(name)
+	if err != nil {
+		return err
+	}
 	if err == nil {
 		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
 		d.SetId("")

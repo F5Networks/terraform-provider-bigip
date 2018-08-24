@@ -128,6 +128,7 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Selfip (%s) not found, removing from state", d.Id())
 		d.SetId("")
