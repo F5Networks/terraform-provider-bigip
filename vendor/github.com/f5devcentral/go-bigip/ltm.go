@@ -527,7 +527,6 @@ type VirtualServer struct {
 	TranslateAddress    string    `json:"translateAddress,omitempty"`
 	TranslatePort       string    `json:"translatePort,omitempty"`
 	VlansEnabled        bool      `json:"vlansEnabled,omitempty"`
-	VlansDisabled       bool      `json:"vlansDisabled,omitempty"`
 	VSIndex             int       `json:"vsIndex,omitempty"`
 	Vlans               []string  `json:"vlans,omitempty"`
 	Rules               []string  `json:"rules,omitempty"`
@@ -1992,16 +1991,16 @@ func (b *BigIP) ModifyInternalDataGroupRecords(name string, records []DataGroupR
 
 // Get an internal data group by name, returns nil if the data group does not exist
 func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
-        var datagroup DataGroup
-        err, ok := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriInternal, name)
-        if err != nil {
-                return nil, err
-        }
-        if !ok {
-                return nil, nil
-        }
+	var datagroup DataGroup
+	err, ok := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriInternal, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
 
-        return &datagroup, nil
+	return &datagroup, nil
 }
 
 // Get the internal data group records for a named internal data group
@@ -2175,7 +2174,7 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 // CreateVirtualServer adds a new virtual server to the BIG-IP system. <mask> can either be
 // in CIDR notation or decimal, i.e.: "24" or "255.255.255.0". A CIDR mask of "0" is the same
 // as "0.0.0.0".
-func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled, vlans_disabled bool, port int, translate_address, translate_port string) error {
+func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
 	subnetMask := cidr[mask]
 
 	if strings.Contains(mask, ".") {
