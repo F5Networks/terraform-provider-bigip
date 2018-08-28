@@ -243,6 +243,9 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	d.Set("policies", vs.Policies)
+	if err := d.Set("policies", vs.Policies); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Policies to state for Virtual Server  (%s): %s", d.Id(), err)
+	}
 	d.Set("vlans", vs.Vlans)
 	if err := d.Set("translate_address", vs.TranslateAddress); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslateAddress to state for Virtual Server  (%s): %s", d.Id(), err)
