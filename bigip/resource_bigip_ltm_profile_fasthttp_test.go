@@ -22,7 +22,6 @@ resource "bigip_ltm_profile_fasthttp" "test-fasthttp" {
             connpool_minsize = 0
             connpool_replenish = ""
             connpool_step = 0
-            forcehttp_10response = "disabled"
             maxheader_size = 0
 }
 `
@@ -48,7 +47,6 @@ func TestAccBigipLtmfasthttp_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_minsize", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_replenish", ""),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpool_step", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "forcehttp_10response", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "maxheader_size", "0"),
 				),
 			},
