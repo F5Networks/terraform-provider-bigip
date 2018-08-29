@@ -165,8 +165,10 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	name := d.Id()
 	obj, err := client.GetFasthttp(name)
 	if err != nil {
+		log.Printf("Error reading Fasthttp profile : %s", err)
 		d.SetId("")
-		return err
+		return nil
+
 	}
 	if obj == nil {
 		log.Printf("[WARN] Fasthttp profile  (%s) not found, removing from state", d.Id())
