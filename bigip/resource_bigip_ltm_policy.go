@@ -1070,7 +1070,7 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	published_copy := d.Get("published_copy").(string)
 	t := client.PublishPolicy(name, published_copy)
 	if t != nil {
-		return err
+		return t
 	}
 	return resourceBigipLtmPolicyRead(d, meta)
 }
