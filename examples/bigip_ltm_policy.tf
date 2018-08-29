@@ -22,17 +22,11 @@ resource "bigip_ltm_policy" "test-policy" {
 depends_on = ["bigip_ltm_pool.mypool"]
 }
 
-resource "bigip_ltm_node" "sanjose_node" {
-    name = "/Common/sanjose_node"
-    address = "10.10.10.10"
-}
 resource "bigip_ltm_pool" "mypool" {
     name = "/Common/mypool"
     monitors = ["/Common/http"]
     allow_nat = "yes"
     allow_snat = "yes"
     load_balancing_mode = "round-robin"
-    depends_on = ["bigip_ltm_node.sanjose_node"]
-    nodes = ["sanjose_node:443"]
 }
 
