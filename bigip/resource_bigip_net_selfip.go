@@ -91,6 +91,15 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 			return nil
 		}
 	}
+	vlans, err := client.Vlans()
+	if err != nil {
+		return err
+	}
+	if vlans == nil {
+		log.Printf("[WARN] Vlan (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	return nil
 }
