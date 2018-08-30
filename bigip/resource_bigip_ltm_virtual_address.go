@@ -102,7 +102,9 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	var va bigip.VirtualAddress
 	vas, err := client.VirtualAddresses()
 	if err != nil {
-		return err
+		log.Printf("Error Reading  Virtual Address %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if vas == nil {
 		log.Printf("[WARN] VirtualAddress (%s) not found, removing from state", d.Id())
@@ -195,7 +197,9 @@ func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface
 	client := meta.(*bigip.BigIP)
 	err := client.DeleteVirtualAddress(name)
 	if err != nil {
-		return err
+		log.Printf("Error deleting Virtual Address  %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if err == nil {
 		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())

@@ -1081,11 +1081,11 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 
 	log.Println("[INFO] Fetching policy " + name)
 	p, err := client.GetPolicy(name)
-
 	if err != nil {
-		return err
+		log.Printf("Error Reading Policy %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
-
 	if p == nil {
 		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
 		d.SetId("")
@@ -1135,7 +1135,9 @@ func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 	err := client.DeletePolicy(name)
 	if err != nil {
-		return err
+		log.Printf("Error deleting Policy   %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if err == nil {
 		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())

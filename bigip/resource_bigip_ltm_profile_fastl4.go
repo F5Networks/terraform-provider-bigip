@@ -142,8 +142,9 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	name := d.Id()
 	obj, err := client.GetFastl4(name)
 	if err != nil {
+		log.Printf("Error Reading FastL4 profile  %s: %s", name, err)
 		d.SetId("")
-		return err
+		return nil
 	}
 	if obj == nil {
 		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
@@ -176,8 +177,11 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteFastl4(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s", name, err)
+		log.Printf("Error deleting profile fastL4 %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
 		d.SetId("")

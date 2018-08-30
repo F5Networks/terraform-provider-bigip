@@ -204,7 +204,9 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 
 	vs, err := client.GetVirtualServer(name)
 	if err != nil {
-		return err
+		log.Printf("Error Reading  Virtual Server  %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if vs == nil {
 		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
@@ -395,7 +397,9 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteVirtualServer(name)
 	if err != nil {
-		return err
+		log.Printf("Error deleting Virtual Server %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if err == nil {
 		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())

@@ -137,8 +137,9 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	name := d.Id()
 	obj, err := client.GetOneconnect(name)
 	if err != nil {
+		log.Printf("Error Reading OneConnect profile  %s: %s", name, err)
 		d.SetId("")
-		return err
+		return nil
 	}
 	if obj == nil {
 		log.Printf("[WARN] Onceconnect Profile (%s) not found, removing from state", d.Id())
@@ -174,7 +175,9 @@ func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interf
 
 	err := client.DeleteOneconnect(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting profile oneConnect (%s): %s", name, err)
+		log.Printf("Error deleting OneConnect profile  %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if err == nil {
 		log.Printf("[WARN] OneConnect profile  (%s) not found, removing from state", d.Id())

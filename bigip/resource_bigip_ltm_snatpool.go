@@ -86,7 +86,9 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 
 	snatpool, err := client.GetSnatPool(name)
 	if err != nil {
-		return err
+		log.Printf("Error Reading  SnatPool  %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if snatpool == nil {
 		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
@@ -109,7 +111,9 @@ func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) er
 
 	err := client.DeleteSnatPool(name)
 	if err != nil {
-		return err
+		log.Printf("Error deleting Snat Pool  %s: %s", name, err)
+		d.SetId("")
+		return nil
 	}
 	if err == nil {
 		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
