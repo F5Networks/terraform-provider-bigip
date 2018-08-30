@@ -98,6 +98,11 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
+		log.Printf("Error reading Internal Data group : %s", err)
+		d.SetId("")
+		return nil
+	}
+	if err != nil {
 		return err
 	}
 
@@ -166,8 +171,11 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
-		return err
+		log.Printf("Error Destroying  Internal Data Group : %s", err)
+		d.SetId("")
+		return nil
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Datag Group (%s) not found, removing from state", d.Id())
 		d.SetId("")

@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipCmDevice() *schema.Resource {
@@ -100,7 +101,9 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 
 	members, err := client.Devices(name)
 	if err != nil {
-		return err
+		log.Printf("Error reading Device  : %s", err)
+		d.SetId("")
+		return nil
 	}
 	if members == nil {
 		log.Printf("[WARN] Device (%s) not found, removing from state", d.Id())
@@ -130,8 +133,11 @@ func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	err := client.DeleteDevice(name)
 	if err != nil {
-		return err
+		log.Printf("Error Destroying Device  : %s", err)
+		d.SetId("")
+		return nil
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Device (%s) not found, removing from state", d.Id())
 		d.SetId("")

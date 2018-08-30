@@ -151,8 +151,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 	monitors, err := client.Monitors()
 	if err != nil {
-		return err
+		log.Printf("Error reading monitor: %s", err)
+		d.SetId("")
+		return nil
 	}
+
 	if monitors == nil {
 		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")
@@ -244,8 +247,11 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
-		return err
+		log.Printf("Error Destroying  Fasthttp profile : %s", err)
+		d.SetId("")
+		return nil
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")

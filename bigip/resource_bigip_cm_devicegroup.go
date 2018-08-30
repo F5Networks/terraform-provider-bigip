@@ -145,7 +145,9 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 	p, err := client.Devicegroups(name)
 	if err != nil {
-		return err
+		log.Printf("Error reading Device groups : %s", err)
+		d.SetId("")
+		return nil
 	}
 
 	if p == nil {
@@ -188,8 +190,11 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 
 	err := client.DeleteDevicegroup(name)
 	if err != nil {
-		return err
+		log.Printf("Error Destroying Device group : %s", err)
+		d.SetId("")
+		return nil
 	}
+
 	if err == nil {
 		log.Printf("[WARN] Devicegroup  (%s) not found, removing from state", d.Id())
 		d.SetId("")
