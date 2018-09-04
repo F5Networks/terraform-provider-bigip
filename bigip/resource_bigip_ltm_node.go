@@ -238,6 +238,11 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return fmt.Errorf("Error deleting node %s: %s", name, err)
 	}
+	if err == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	return nil
 }

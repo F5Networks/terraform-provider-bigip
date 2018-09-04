@@ -2,9 +2,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmSnat() *schema.Resource {
@@ -110,7 +111,6 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Fetching Ltm Snat " + name)
 	p, err := client.GetSnat(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if p == nil {
