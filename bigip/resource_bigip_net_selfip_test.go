@@ -34,7 +34,6 @@ resource "bigip_net_selfip" "test-float-selfip" {
   ip = "11.1.1.2/24"
   traffic_group = "traffic-group-1"
   vlan = "/Common/test-vlan"
-  depends_on = ["bigip_net_vlan.test-vlan"]
   depends_on = ["bigip_net_selfip.test-selfip"]
 }
 `
