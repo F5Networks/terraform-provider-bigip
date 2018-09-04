@@ -168,6 +168,7 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 		log.Printf("Error reading Fasthttp profile : %s", err)
 		d.SetId("")
 		return nil
+
 	}
 	if obj == nil {
 		log.Printf("[WARN] Fasthttp profile  (%s) not found, removing from state", d.Id())
@@ -217,11 +218,8 @@ func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interfac
 
 	err := client.DeleteFasthttp(name)
 	if err != nil {
-		log.Printf("Error Destroying  Fasthttp profile : %s", err)
-		d.SetId("")
-		return nil
+		return err
 	}
-
 	if err == nil {
 		log.Printf("[WARN] Fasthttp Profile  (%s) not found, removing from state", d.Id())
 		d.SetId("")
