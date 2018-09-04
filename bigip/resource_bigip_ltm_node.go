@@ -140,9 +140,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	node, err := client.GetNode(name)
 	if err != nil {
-		log.Printf("Error reading Node : %s", err)
-		d.SetId("")
-		return nil
+		return err
 	}
 	if node == nil {
 		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
@@ -236,15 +234,9 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	log.Println("[INFO] Deleting node " + name)
 
 	err := client.DeleteNode(name)
+
 	if err != nil {
-		log.Printf("Error Destroying Node : %s", err)
-		d.SetId("")
-		return nil
-	}
-	if err == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
+		return fmt.Errorf("Error deleting node %s: %s", name, err)
 	}
 
 	return nil

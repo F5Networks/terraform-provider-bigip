@@ -180,16 +180,8 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	log.Println("[INFO] Fetching Cookie Persistence Profile " + name)
 
 	pp, err := client.GetCookiePersistenceProfile(name)
-
 	if err != nil {
-		log.Printf("Error Reading  Cookie Persistence profile  %s: %s", name, err)
-		d.SetId("")
-		return nil
-	}
-	if pp == nil {
-		log.Printf("[WARN] Cookie Persistence profile (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
+		return err
 	}
 
 	d.Set("name", name)
@@ -268,9 +260,7 @@ func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta
 	log.Println("[INFO] Deleting Cookie Persistence Profile " + name)
 	err := client.DeleteCookiePersistenceProfile(name)
 	if err != nil {
-		log.Printf("Error deleting Cookie Persistence profile  %s: %s", name, err)
-		d.SetId("")
-		return nil
+		return fmt.Errorf("Error deleting Cookie Persistence profile  %s: %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] persistance profile cookie (%s) not found, removing from state", d.Id())

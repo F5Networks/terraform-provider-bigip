@@ -64,11 +64,8 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 
 	irule, err := client.IRule(name)
 	if err != nil {
-		log.Printf("Error reading Irule : %s", err)
-		d.SetId("")
-		return nil
+		return err
 	}
-
 	if irule == nil {
 		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
@@ -126,11 +123,8 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	err := client.DeleteIRule(name)
 	if err != nil {
-		log.Printf("Error Destroying Irule : %s", err)
-		d.SetId("")
-		return nil
+		return err
 	}
-
 	if err == nil {
 		log.Printf("[WARN] iRule (%s) not found, removing from state", d.Id())
 		d.SetId("")
