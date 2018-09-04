@@ -88,9 +88,8 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	obj, err := client.GetRoute(name)
 	if err != nil {
-		log.Printf("Error Reading Net Route %s: %s", name, err)
 		d.SetId("")
-		return nil
+		return err
 	}
 	if obj == nil {
 		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
@@ -123,9 +122,7 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 
 	err := client.DeleteRoute(name)
 	if err != nil {
-		log.Printf("Error deleting Net Route  %s: %s", name, err)
-		d.SetId("")
-		return nil
+		return err
 	}
 	if err == nil {
 		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())

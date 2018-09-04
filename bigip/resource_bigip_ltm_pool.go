@@ -110,9 +110,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 
 	pool, err := client.GetPool(name)
 	if err != nil {
-		log.Printf("Error Reading Pool Name  %s: %s", name, err)
-		d.SetId("")
-		return nil
+		return err
 	}
 	if pool == nil {
 		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
@@ -204,11 +202,8 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.DeletePool(name)
 	if err != nil {
-		log.Printf("Error deleting Pool %s: %s", name, err)
-		d.SetId("")
-		return nil
+		return err
 	}
-
 	if err == nil {
 		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")

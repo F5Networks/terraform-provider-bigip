@@ -135,14 +135,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("Error Reading  Persistence Profile Dest Address  %s: %s", name, err)
-		d.SetId("")
-		return nil
-	}
-	if pp == nil {
-		log.Printf("[WARN] ersistence profile Dest Address (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
+		return err
 	}
 
 	d.Set("name", name)
@@ -208,9 +201,7 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 
 	err := client.DeleteDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("Error deleting  Persistence profile Destination Address  %s: %s", name, err)
-		d.SetId("")
-		return nil
+		return fmt.Errorf("Error deleting DestAddPersistence profile  %s: %s", name, err)
 	}
 	if err == nil {
 		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
