@@ -214,10 +214,6 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	// Extract destination address from "/partition_name/(virtual_server_address)[%route_domain]:port"
 	regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\:\d+)`)
 	destination := regex.FindStringSubmatch(vs.Destination)
-
-	log.Printf("[DEBUG] Destination length is %d", len(destination))
-	log.Printf("[DEBUG] Extract destination address %s from %s", destination[2], vs.Destination)
-
 	if len(destination) < 3 {
 		return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
 	}
