@@ -221,7 +221,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyNode(name, node)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return resourceBigipLtmNodeRead(d, meta)
