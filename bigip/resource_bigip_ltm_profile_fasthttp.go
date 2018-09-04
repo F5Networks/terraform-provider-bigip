@@ -165,7 +165,6 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	name := d.Id()
 	obj, err := client.GetFasthttp(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {

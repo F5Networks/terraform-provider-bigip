@@ -122,7 +122,11 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	if err != nil {
 		return err
 	}
-
+	if pp == nil {
+		log.Printf("[WARN] SSL  Persistence Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	d.Set("defaults_from", pp.DefaultsFrom)
 	if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {

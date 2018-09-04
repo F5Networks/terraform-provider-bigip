@@ -145,7 +145,11 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	if err != nil {
 		return err
 	}
-
+	if pp == nil {
+		log.Printf("[WARN] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	d.Set("name", name)
 	if err := d.Set("app_service", pp.AppService); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
