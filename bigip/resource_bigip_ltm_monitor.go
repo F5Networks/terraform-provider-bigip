@@ -112,6 +112,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"destination": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "*:*",
 				Description: "Alias for the destination",
 			},
 		},
