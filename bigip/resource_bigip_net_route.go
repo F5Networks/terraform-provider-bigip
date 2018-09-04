@@ -88,7 +88,6 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	obj, err := client.GetRoute(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {

@@ -114,7 +114,6 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	name := d.Id()
 	obj, err := client.GetHttp2(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {
