@@ -32,9 +32,10 @@ resource "bigip_net_selfip" "test-selfip" {
 resource "bigip_net_selfip" "test-float-selfip" {
   name = "` + TEST_FLOAT_SELFIP_NAME + `"
   ip = "11.1.1.2/24"
+  traffic_group = "traffic-group-1"
   vlan = "/Common/test-vlan"
   depends_on = ["bigip_net_vlan.test-vlan"]
-  traffic_group = "traffic-group-1"
+  depends_on = ["bigip_net_selfip.test-selfip"]
 }
 `
 

@@ -147,7 +147,6 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 	obj, err := client.GetTcp(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {

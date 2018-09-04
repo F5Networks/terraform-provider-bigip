@@ -99,7 +99,6 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	name := d.Id()
 	obj, err := client.GetHttpcompress(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {

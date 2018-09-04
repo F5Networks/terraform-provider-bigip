@@ -137,7 +137,6 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	name := d.Id()
 	obj, err := client.GetOneconnect(name)
 	if err != nil {
-		d.SetId("")
 		return err
 	}
 	if obj == nil {
