@@ -211,22 +211,24 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		d.SetId("")
 		return nil
 	}
-	// /Common/virtual_server_name:80
-	regex := regexp.MustCompile("(/\\w+/)?([\\w._-]+)(:\\d+)?")
+	// Extract destination address from "/partition_name/(virtual_server_address)[%route_domain]:port"
+	regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\:\d+)`)
 	destination := regex.FindStringSubmatch(vs.Destination)
-	if len(destination) < 4 {
-		return fmt.Errorf("Unknown virtual server destination: " + vs.Destination)
+	if len(destination) < 3 {
+		return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
+	}
+	if err := d.Set("destination", destination[2]); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-	// xxx.xxx.xxx.xxx(%x)/xx
+	// Extract source address from "(source_address)[%route_domain](/mask)" groups 1 + 2
 	regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
 	source := regex.FindStringSubmatch(vs.Source)
 	parsedSource := source[1] + source[2]
-
-	d.Set("destination", destination[2])
 	if err := d.Set("source", parsedSource); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
+
 	d.Set("protocol", vs.IPProtocol)
 	d.Set("name", name)
 	if err := d.Set("pool", vs.Pool); err != nil {
