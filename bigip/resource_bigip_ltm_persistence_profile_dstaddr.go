@@ -111,6 +111,7 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 		parent,
 	)
 	if err != nil {
+		log.Printf("[WARN] Not able to create Dst Address Persistence profile (%s) ", err)
 		return err
 	}
 
@@ -135,6 +136,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[WARN] Not able to retrive DestAdd Persistence Profile (%s) ", err)
 		return err
 	}
 	if pp == nil {
@@ -192,9 +194,9 @@ func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, met
 
 	err := client.ModifyDestAddrPersistenceProfile(name, pp)
 	if err != nil {
+		log.Printf("[WARN] Not able to Modify DestAdd Persistence Profile (%s) ", err)
 		return err
 	}
-
 	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
 }
 
@@ -211,6 +213,7 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 	if err == nil {
 		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
 		d.SetId("")
+		return nil
 	}
 	return nil
 }
@@ -223,12 +226,14 @@ func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, met
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[WARN] Not able to retrive Destination Address Persistence Profile  (%s) ", err)
 		return false, err
 	}
 
 	if pp == nil {
 		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
 		d.SetId("")
+		return false, nil
 	}
 
 	return pp != nil, nil

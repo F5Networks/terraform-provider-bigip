@@ -110,6 +110,7 @@ func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) 
 	log.Println("[INFO] Creating Devicegroup ")
 
 	if err != nil {
+		log.Printf("[WARN] Not able to Create Devicegroup (%s) ", err)
 		return err
 	}
 	d.SetId(name)
@@ -123,6 +124,7 @@ func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) 
 	p := dataToDevicegroup(name, d)
 	err := client.UpdateDevicegroup(name, &p)
 	if err != nil {
+		log.Printf("[WARN] Not able to Update Devicegroup (%s) ", err)
 		return err
 	}
 	return resourceBigipCmDevicegroupRead(d, meta)
@@ -145,6 +147,7 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 	p, err := client.Devicegroups(name)
 	if err != nil {
+		log.Printf("[WARN] Not able to retrive Devicegroup (%s) ", err)
 		return err
 	}
 
@@ -181,6 +184,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		Rname := r.Name
 		err := client.DeleteDevicegroupDevices(name, Rname)
 		if err != nil {
+			log.Printf("[WARN] Not able to Delete Devicegroup (%s)  (%s) ", Rname, err)
 			return err
 		}
 
@@ -188,6 +192,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 
 	err := client.DeleteDevicegroup(name)
 	if err != nil {
+		log.Printf("[WARN] Not able to Delete Devicegroup (%s)  (%s) ", name, err)
 		return err
 	}
 	if err == nil {
