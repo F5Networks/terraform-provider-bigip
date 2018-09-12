@@ -103,6 +103,7 @@ func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{
 		keepAliveInterval,
 	)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create FastL4  (%s) (%v) ", name, err)
 		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s", name, err)
 	}
 
@@ -132,6 +133,7 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 
 	err := client.ModifyFastl4(name, r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify FastL4  (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipLtmProfileFastl4Read(d, meta)
@@ -142,6 +144,7 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	name := d.Id()
 	obj, err := client.GetFastl4(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve FastL4  (%s) (%v) ", name, err)
 		return err
 	}
 	if obj == nil {
@@ -175,12 +178,8 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteFastl4(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s", name, err)
+		return fmt.Errorf("Error retrieving profile fastl4 (%s): %v", name, err)
 	}
-	if err == nil {
-		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

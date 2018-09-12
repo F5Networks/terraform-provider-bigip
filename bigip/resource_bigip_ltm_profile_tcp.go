@@ -109,6 +109,7 @@ func resourceBigipLtmProfileTcpCreate(d *schema.ResourceData, meta interface{}) 
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create tcp Profile  (%s) (%v)", name, err)
 		return err
 	}
 	d.SetId(name)
@@ -147,6 +148,7 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 	obj, err := client.GetTcp(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrive tcp Profile  (%s) (%v)", name, err)
 		return err
 	}
 	if obj == nil {
@@ -193,10 +195,6 @@ func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		return fmt.Errorf("Error Deleting  profile tcp (%s): %s", name, err)
 	}
-	if err == nil {
-		log.Printf("[WARN] tcp profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

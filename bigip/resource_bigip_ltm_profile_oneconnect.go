@@ -127,6 +127,9 @@ func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interf
 
 	err := client.ModifyOneconnect(name, r)
 	if err != nil {
+
+		log.Printf("[ERROR] Unable to Modify OneConnect profile   (%s) (%v) ", name, err)
+
 		return err
 	}
 	return resourceBigipLtmProfileOneconnectRead(d, meta)
