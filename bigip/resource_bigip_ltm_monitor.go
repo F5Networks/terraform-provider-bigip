@@ -157,7 +157,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	if monitors == nil {
-		log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -201,7 +201,7 @@ func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bo
 		return false, err
 	}
 	if monitors == nil {
-		log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -252,7 +252,6 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 		log.Printf("[ERROR] Unable to Delete Monitor (%s) ", err)
 		return err
 	}
-	log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

@@ -104,7 +104,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if datagroup == nil {
-		log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -125,7 +125,7 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 		return false, err
 	}
 	if datagroup == nil {
-		log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -152,7 +152,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyInternalDataGroupRecords(name, records)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Access Data group  (%s)  (%s) ", name, err)
+		log.Printf("[WARN] Unable to Access Data group  (%s)  (%s) ", name, err)
 		return err
 	}
 	d.SetId("")
@@ -169,7 +169,6 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%s) ", name, err)
 		return err
 	}
-	log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

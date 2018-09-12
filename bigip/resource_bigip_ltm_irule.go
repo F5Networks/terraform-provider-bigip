@@ -69,7 +69,7 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if irule == nil {
-		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -92,7 +92,7 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 		return false, err
 	}
 	if irule == nil {
-		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -114,11 +114,6 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[ERROR] Unable to Modify iRule (%s) ", err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
 	return resourceBigipLtmIRuleRead(d, meta)
 }
 
@@ -130,7 +125,6 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[ERROR] Unable to Delete iRule (%s) ", err)
 		return err
 	}
-	log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

@@ -183,8 +183,8 @@ func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta in
 		log.Printf("[ERROR] Unable to Delete SSL Persistence Profile  (%s) ", err)
 		return err
 	}
-		log.Printf("[ERROR] persistance profile SSL  (%s) not found, removing from state", d.Id())
-		d.SetId("")
+	log.Printf("[ERROR] persistance profile SSL  (%s) not found, removing from state", d.Id())
+	d.SetId("")
 	return nil
 }
 

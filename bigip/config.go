@@ -48,7 +48,7 @@ func (c *Config) validateConnection(client *bigip.BigIP) error {
 	}
 
 	if t == nil {
-		log.Printf("[ERROR] Could not validate connection to BigIP")
+		log.Printf("[WARN] Could not validate connection to BigIP")
 		return nil
 	}
 	return nil
