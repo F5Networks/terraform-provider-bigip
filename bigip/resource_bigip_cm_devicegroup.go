@@ -192,7 +192,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 
 	err := client.DeleteDevicegroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete Devicegroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Delete Devicegroup (%s)  (%v) ", name, err)
 		return err
 	}
 	d.SetId("")

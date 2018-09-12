@@ -152,7 +152,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyInternalDataGroupRecords(name, records)
 	if err != nil {
-		log.Printf("[WARN] Unable to Access Data group  (%s)  (%s) ", name, err)
+		log.Printf("[WARN] Unable to Access Data group  (%s)  (%v) ", name, err)
 		return err
 	}
 	d.SetId("")
@@ -166,7 +166,7 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%v) ", name, err)
 		return err
 	}
 	d.SetId("")

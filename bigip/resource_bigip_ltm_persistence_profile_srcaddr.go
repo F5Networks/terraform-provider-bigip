@@ -148,7 +148,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 		return err
 	}
 	if pp == nil {
-		log.Printf("[ERROR] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -217,10 +217,9 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 	log.Println("[INFO] Deleting Source Address Persistence Profile " + name)
 	err := client.DeleteSourceAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete Source Address Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to Delete Source Address Persistence Profile (%s)  (%v) ", name, err)
 		return err
 	}
-	log.Printf("[ERROR] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }
@@ -238,7 +237,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, met
 	}
 
 	if pp == nil {
-		log.Printf("[ERROR] persistance profile src_addr  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

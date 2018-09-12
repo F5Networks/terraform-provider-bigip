@@ -125,6 +125,7 @@ func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interfac
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Fasthttp   (%s) (%v) ", name, err)
 		return err
 	}
 	d.SetId(name)
@@ -154,6 +155,7 @@ func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interfac
 
 	err := client.ModifyFasthttp(name, r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Fasthttp   (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipLtmProfileFasthttpRead(d, meta)
@@ -165,6 +167,7 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	name := d.Id()
 	obj, err := client.GetFasthttp(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Fasthttp   (%s) (%v) ", name, err)
 		return err
 	}
 	if obj == nil {
@@ -215,12 +218,9 @@ func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interfac
 
 	err := client.DeleteFasthttp(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Fasthttp   (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Fasthttp Profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

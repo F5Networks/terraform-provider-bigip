@@ -134,7 +134,7 @@ func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	err := client.DeleteDevice(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete Device (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Delete Device (%s)  (%v) ", name, err)
 		return err
 	}
 	d.SetId("")

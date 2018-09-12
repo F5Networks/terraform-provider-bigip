@@ -145,7 +145,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if node == nil {
-		log.Printf("[ERROR] Node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -187,7 +187,7 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 	}
 
 	if node == nil {
-		log.Printf("[ERROR] node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] node (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -241,7 +241,6 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return fmt.Errorf("Error deleting node %s: %s", name, err)
 	}
-	log.Printf("[ERROR] Node (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }
