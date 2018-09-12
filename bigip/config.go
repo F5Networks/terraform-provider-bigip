@@ -24,7 +24,7 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 		if c.LoginReference != "" {
 			client, err = bigip.NewTokenSession(c.Address, c.Username, c.Password, c.LoginReference, c.ConfigOptions)
 			if err != nil {
-				log.Printf("[WARN] Error creating New Token Session %s ", err)
+				log.Printf("[ERROR] Error creating New Token Session %s ", err)
 				return nil, err
 			}
 
@@ -43,12 +43,12 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 func (c *Config) validateConnection(client *bigip.BigIP) error {
 	t, err := client.SelfIPs()
 	if err != nil {
-		log.Printf("[WARN] Connection to BigIP device could not have been validated: %s ", err)
+		log.Printf("[ERROR] Connection to BigIP device could not have been validated: %v ", err)
 		return err
 	}
 
 	if t == nil {
-		log.Printf("[WARN] Could not validate connection to BigIP")
+		log.Printf("[ERROR] Could not validate connection to BigIP")
 		return nil
 	}
 	return nil

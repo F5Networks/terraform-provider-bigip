@@ -136,7 +136,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive_disable").(string),
 	)
 	if err != nil {
-		log.Printf("[WARN] Not able to Create Monitor (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Monitor (%s) ", err)
 		return err
 	}
 
@@ -153,11 +153,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 	monitors, err := client.Monitors()
 	if err != nil {
-		log.Printf("[WARN] Not able to retrieve Monitor (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve Monitor (%s) ", err)
 		return err
 	}
 	if monitors == nil {
-		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -197,11 +197,11 @@ func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bo
 
 	monitors, err := client.Monitors()
 	if err != nil {
-		log.Printf("[WARN] Not able to retrieve Monitor (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve Monitor (%s) ", err)
 		return false, err
 	}
 	if monitors == nil {
-		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -235,7 +235,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 
 	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
 	if err != nil {
-		log.Printf("[WARN] Not able to Update Monitor (%s) ", err)
+		log.Printf("[ERROR] Unable to Update Monitor (%s) ", err)
 		return err
 	}
 
@@ -249,14 +249,10 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
-		log.Printf("[WARN] Not able to Delete Monitor (%s) ", err)
+		log.Printf("[ERROR] Unable to Delete Monitor (%s) ", err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
 

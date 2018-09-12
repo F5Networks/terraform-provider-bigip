@@ -83,7 +83,7 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.AddInternalDataGroup(dg)
 	if err != nil {
-		log.Printf("[WARN] Not able to Create Data Group  (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Data Group  (%s) ", err)
 		return err
 	}
 
@@ -99,12 +99,12 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to Read Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Read Datagroup (%s)  (%s) ", name, err)
 		return err
 	}
 
 	if datagroup == nil {
-		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -121,11 +121,11 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to access Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to access Datagroup (%s)  (%s) ", name, err)
 		return false, err
 	}
 	if datagroup == nil {
-		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -152,14 +152,10 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyInternalDataGroupRecords(name, records)
 	if err != nil {
-		log.Printf("[WARN] Not able to Access Data group  (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Access Data group  (%s)  (%s) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
@@ -170,13 +166,9 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to Delete Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%s) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Datag Group (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

@@ -119,6 +119,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 		parent,
 	)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
 
@@ -143,10 +144,11 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetSourceAddrPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrive Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
-		log.Printf("[WARN] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -201,6 +203,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 
 	err := client.ModifySourceAddrPersistenceProfile(name, pp)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
 
@@ -214,13 +217,10 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 	log.Println("[INFO] Deleting Source Address Persistence Profile " + name)
 	err := client.DeleteSourceAddrPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
-
-	if err == nil {
-		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
+	d.SetId("")
 	return nil
 }
 
@@ -232,11 +232,12 @@ func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, met
 
 	pp, err := client.GetSourceAddrPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s) ", err)
 		return false, err
 	}
 
 	if pp == nil {
-		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] persistance profile src_addr  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

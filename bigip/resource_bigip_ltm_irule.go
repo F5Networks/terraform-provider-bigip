@@ -49,7 +49,7 @@ func resourceBigipLtmIRuleCreate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.CreateIRule(name, d.Get("irule").(string))
 	if err != nil {
-		log.Printf("[WARN] Not able to Create Irule (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Irule (%s) ", err)
 		return err
 	}
 
@@ -65,11 +65,11 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 
 	irule, err := client.IRule(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to retrive Irule (%s) ", err)
+		log.Printf("[ERROR] Unbale to retrive Irule (%s) ", err)
 		return err
 	}
 	if irule == nil {
-		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -88,11 +88,11 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 
 	irule, err := client.IRule(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to retrive iRule (%s) ", err)
+		log.Printf("[ERROR] Unable to retrive iRule (%s) ", err)
 		return false, err
 	}
 	if irule == nil {
-		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}
@@ -111,11 +111,11 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.ModifyIRule(name, r)
 	if err != nil {
-		log.Printf("[WARN] Not able to Modify iRule (%s) ", err)
+		log.Printf("[ERROR] Unable to Modify iRule (%s) ", err)
 		return err
 	}
 	if err == nil {
-		log.Printf("[WARN] irule (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -127,13 +127,9 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	err := client.DeleteIRule(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to Delete iRule (%s) ", err)
+		log.Printf("[ERROR] Unable to Delete iRule (%s) ", err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] iRule (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

@@ -111,7 +111,7 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 		parent,
 	)
 	if err != nil {
-		log.Printf("[WARN] Not able to create Dst Address Persistence profile (%s) ", err)
+		log.Printf("[ERROR] Unable to create Dst Address Persistence profile (%s) ", err)
 		return err
 	}
 
@@ -136,11 +136,11 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to retrive DestAdd Persistence Profile (%s) ", err)
+		log.Printf("[ERROR] Unable to retrive DestAdd Persistence Profile (%s) ", err)
 		return err
 	}
 	if pp == nil {
-		log.Printf("[WARN] Destination Address Persistence Profile (%s) not found, removing from state", d.Id())
+		log.Printf("[ERROR] Destination Address Persistence Profile (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -194,7 +194,7 @@ func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, met
 
 	err := client.ModifyDestAddrPersistenceProfile(name, pp)
 	if err != nil {
-		log.Printf("[WARN] Not able to Modify DestAdd Persistence Profile (%s) ", err)
+		log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile (%s) ", err)
 		return err
 	}
 	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
@@ -210,11 +210,7 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 	if err != nil {
 		return fmt.Errorf("Error deleting DestAddPersistence profile  %s: %s", name, err)
 	}
-	if err == nil {
-		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
 
@@ -226,7 +222,7 @@ func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, met
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[WARN] Not able to retrive Destination Address Persistence Profile  (%s) ", err)
+		log.Printf("[WARN] Unable to retrive Destination Address Persistence Profile  (%s) ", err)
 		return false, err
 	}
 
