@@ -130,6 +130,7 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[ERROR] Unable to Delete iRule (%s) ", err)
 		return err
 	}
+	log.Printf("[ERROR] irule (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

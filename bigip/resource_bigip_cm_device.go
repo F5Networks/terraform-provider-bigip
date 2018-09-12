@@ -137,6 +137,7 @@ func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[ERROR] Unable to Delete Device (%s)  (%s) ", name, err)
 		return err
 	}
+	log.Printf("[ERROR] Device (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

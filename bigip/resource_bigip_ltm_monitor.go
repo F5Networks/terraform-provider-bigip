@@ -252,6 +252,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 		log.Printf("[ERROR] Unable to Delete Monitor (%s) ", err)
 		return err
 	}
+	log.Printf("[ERROR] Monitor (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

@@ -210,6 +210,7 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 	if err != nil {
 		return fmt.Errorf("Error deleting DestAddPersistence profile  %s: %s", name, err)
 	}
+	log.Printf("[ERROR] Destination Address Persistence Profile (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

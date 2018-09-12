@@ -169,6 +169,7 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%s) ", name, err)
 		return err
 	}
+	log.Printf("[ERROR] Data Group List (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

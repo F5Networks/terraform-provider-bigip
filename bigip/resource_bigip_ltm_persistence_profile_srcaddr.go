@@ -220,6 +220,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 		log.Printf("[ERROR] Unable to Delete Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
+	log.Printf("[ERROR] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }

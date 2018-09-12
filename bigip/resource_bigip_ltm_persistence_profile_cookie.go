@@ -269,6 +269,7 @@ func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta
 	if err != nil {
 		return fmt.Errorf("Error deleting Cookie Persistence profile  %s: %s", name, err)
 	}
+	log.Printf("[ERROR] Cookie Persistence Profile (%s) not found, removing from state", d.Id())
 	d.SetId("")
 	return nil
 }
