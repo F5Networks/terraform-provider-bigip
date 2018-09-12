@@ -64,7 +64,7 @@ func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error
 	)
 
 	if err != nil {
-		log.Printf("[WARN] Not able to Create Device (%s) ", err)
+		log.Printf("[WARN] Unable to Create Device (%s) ", err)
 		return err
 	}
 	d.SetId(name)

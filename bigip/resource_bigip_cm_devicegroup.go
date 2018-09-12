@@ -200,6 +200,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		d.SetId("")
 		return nil
 	}
+	d.SetId("")
 	return nil
 }
 
