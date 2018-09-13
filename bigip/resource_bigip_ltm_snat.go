@@ -99,6 +99,7 @@ func resourceBigipLtmSnatCreate(d *schema.ResourceData, meta interface{}) error 
 	d.SetId(name)
 	err := client.CreateSnat(&p)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Snat  (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipLtmSnatRead(d, meta)
@@ -111,6 +112,7 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Fetching Ltm Snat " + name)
 	p, err := client.GetSnat(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Snat  (%s) (%v) ", name, err)
 		return err
 	}
 	if p == nil {
@@ -152,6 +154,7 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 	p := dataToSnat(name, d)
 	err := client.UpdateSnat(name, &p)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Snat  (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipLtmSnatRead(d, meta)
@@ -162,13 +165,10 @@ func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	err := client.DeleteSnat(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Snat  (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
 

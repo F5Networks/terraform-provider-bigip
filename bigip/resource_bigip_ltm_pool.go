@@ -152,6 +152,7 @@ func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool,
 
 	pool, err := client.GetPool(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
 		return false, err
 	}
 
@@ -188,6 +189,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyPool(name, pool)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Pool   (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -202,12 +204,9 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.DeletePool(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Pool   (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

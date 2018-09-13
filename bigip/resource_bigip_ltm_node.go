@@ -123,6 +123,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 		)
 	}
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve node (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -140,6 +141,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	node, err := client.GetNode(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
 		return err
 	}
 	if node == nil {
@@ -180,6 +182,7 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 
 	node, err := client.GetNode(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
 		return false, err
 	}
 
@@ -221,6 +224,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyNode(name, node)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Node %s  %v : ", name, err)
 		return err
 	}
 
@@ -232,17 +236,12 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	log.Println("[INFO] Deleting node " + name)
-
 	err := client.DeleteNode(name)
 
 	if err != nil {
-		return fmt.Errorf("Error deleting node %s: %s", name, err)
+		log.Printf("[ERROR] Unable to Delete Node %s  %v : ", name, err)
+		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-
+	d.SetId("")
 	return nil
 }

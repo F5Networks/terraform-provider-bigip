@@ -120,10 +120,11 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
-		log.Printf("[WARN] SSL  Persistence Profile (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] SSL  Persistence Profile (%s) not found, removing from state", name)
 		d.SetId("")
 		return nil
 	}
@@ -165,6 +166,7 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 
 	err := client.ModifySSLPersistenceProfile(name, pp)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
 		return err
 	}
 
@@ -178,12 +180,10 @@ func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta in
 	log.Println("[INFO] Deleting SSL Persistence Profile " + name)
 	err := client.DeleteSSLPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete SSL Persistence Profile  (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] persistance profile SSL  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
+	d.SetId("")
 	return nil
 }
 
@@ -195,6 +195,7 @@ func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta in
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile (%s) (%v) ", name, err)
 		return false, err
 	}
 

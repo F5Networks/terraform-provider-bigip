@@ -136,6 +136,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive_disable").(string),
 	)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -152,6 +153,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 	monitors, err := client.Monitors()
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
 		return err
 	}
 	if monitors == nil {
@@ -195,6 +197,7 @@ func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bo
 
 	monitors, err := client.Monitors()
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
 		return false, err
 	}
 	if monitors == nil {
@@ -232,6 +235,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 
 	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Update Monitor (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -245,13 +249,10 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	log.Println("[Info] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Monitor (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
 

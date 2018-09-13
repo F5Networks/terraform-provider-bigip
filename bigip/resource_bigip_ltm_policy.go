@@ -1083,6 +1083,7 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 	p, err := client.GetPolicy(name)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -1102,6 +1103,7 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 	log.Println("[INFO] Fetching policy " + name)
 	p, err := client.GetPolicy(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
 		return false, err
 	}
 	if p == nil {
@@ -1119,14 +1121,9 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	p := dataToPolicy(name, d)
 	err := client.UpdatePolicy(name, &p)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-
 	return resourceBigipLtmPolicyRead(d, meta)
 }
 
@@ -1135,14 +1132,10 @@ func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 	err := client.DeletePolicy(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Policy   (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-
+	d.SetId("")
 	return nil
 }
 

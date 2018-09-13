@@ -48,6 +48,7 @@ func resourceBigipSysBigiplicenseCreate(d *schema.ResourceData, meta interface{}
 	)
 	time.Sleep(300 * time.Second)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Apply License to Bigip  (%v) ", err)
 		return err
 	}
 	d.SetId(registration_key)
@@ -76,11 +77,12 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 
 	log.Println("[INFO] Reading Bigiplicense " + name)
 
-	members, err := client.Bigiplicenses()
+	licenses, err := client.Bigiplicenses()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Read License from Bigip  (%v) ", err)
 		return err
 	}
-	if members == nil {
+	if licenses == nil {
 		log.Printf("[WARN] License (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil

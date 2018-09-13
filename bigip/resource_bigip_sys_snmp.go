@@ -57,6 +57,7 @@ func resourceBigipSysSnmpCreate(d *schema.ResourceData, meta interface{}) error 
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Configure SNMP  (%v) ", err)
 		return err
 	}
 	d.SetId(sysContact)
@@ -78,6 +79,7 @@ func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifySNMP(r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify SNMP (%s) (%v) ", sysContact, err)
 		return err
 	}
 	return resourceBigipSysSnmpRead(d, meta)
@@ -92,6 +94,7 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 
 	snmp, err := client.SNMPs()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve SNMP  (%v) ", err)
 		return err
 	}
 	if snmp == nil {

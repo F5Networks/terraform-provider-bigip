@@ -70,6 +70,7 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Vlan  %s %v ", name, err)
 		return err
 	}
 
@@ -81,6 +82,7 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 		err = client.AddInterfaceToVlan(name, iface, tagged)
 		if err != nil {
+			log.Printf("[ERROR] Unable to Add Interface to Vlan  %s %v : ", name, err)
 			return err
 		}
 	}
@@ -100,6 +102,7 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 
 	vlans, err := client.Vlans()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Vlan  (%v) ", err)
 		return err
 	}
 	if vlans == nil {
@@ -119,6 +122,7 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	interfaces, err := client.Interfaces()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Interfaces  (%v) ", err)
 		return err
 	}
 	if interfaces == nil {
@@ -144,6 +148,7 @@ func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyVlan(name, r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Vlan  (%s) (%v)", name, err)
 		return err
 	}
 	return resourceBigipNetVlanRead(d, meta)
@@ -161,10 +166,6 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 		return fmt.Errorf("Error Deleting Vlan : %s", err)
 	}
 
-	if err == nil {
-		log.Printf("[WARN] Vlan (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

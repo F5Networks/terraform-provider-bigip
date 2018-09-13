@@ -114,6 +114,8 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	name := d.Id()
 	obj, err := client.GetHttp2(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve http2  (%s) (%v) ", name, err)
+
 		return err
 	}
 	if obj == nil {
@@ -145,10 +147,6 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return fmt.Errorf("Error deleting  profile Http2 (%s): %s", name, err)
 	}
-	if err == nil {
-		log.Printf("[WARN] Http2 profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
