@@ -181,6 +181,7 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 		TranslatePort,
 	)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
 		return err
 	}
 
@@ -204,6 +205,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 
 	vs, err := client.GetVirtualServer(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
 		return err
 	}
 	if vs == nil {
@@ -303,6 +305,7 @@ func resourceBigipLtmVirtualServerExists(d *schema.ResourceData, meta interface{
 
 	vs, err := client.GetVirtualServer(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
 		return false, err
 	}
 
@@ -397,12 +400,9 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteVirtualServer(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Virtual Server  (%s) (%v)", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

@@ -61,6 +61,7 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	err := client.CreateSelfIP(name, ip, vlan)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create SelfIP   (%s) (%v)", name, err)
 		return err
 	}
 
@@ -77,6 +78,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 
 	selfIPs, err := client.SelfIPs()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve SelfIP   (%s) (%v)", name, err)
 		return err
 	}
 	d.Set("name", name)
@@ -93,6 +95,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	}
 	vlans, err := client.Vlans()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Vlans   (%s) ", err)
 		return err
 	}
 	if vlans == nil {
@@ -120,6 +123,7 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.ModifySelfIP(name, r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve SelfIP   (%s) (%v)", name, err)
 		return err
 	}
 
@@ -135,13 +139,10 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.DeleteSelfIP(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete SelfIP   (%s) (%v)", name, err)
 		return err
 	}
 
-	if err == nil {
-		log.Printf("[WARN] Selfip (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

@@ -144,7 +144,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetSourceAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Source Address Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {

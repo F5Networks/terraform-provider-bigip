@@ -224,6 +224,7 @@ func resourceBigipSysIappCreate(d *schema.ResourceData, meta interface{}) error 
 	err := client.CreateIapp(&p)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Iapp  (%s) ", err)
 		return err
 	}
 	d.SetId(name)
@@ -237,6 +238,7 @@ func resourceBigipSysIappUpdate(d *schema.ResourceData, meta interface{}) error 
 	p := dataToIapp(name, d)
 	err := client.UpdateIapp(name, &p)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Iapp  (%s) ", err)
 		return err
 	}
 	return resourceBigipSysIappRead(d, meta)
@@ -254,6 +256,7 @@ func resourceBigipSysIappRead(d *schema.ResourceData, meta interface{}) error {
 	p, err := client.Iapp(name)
 	log.Println(" Value of result in Read for iApp   *************** ", name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Iapp  (%s) ", err)
 		return err
 	}
 	if p == nil {
@@ -297,13 +300,10 @@ func resourceBigipSysIappDelete(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 	err := client.DeleteIapp(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Iapp  (%s) ", err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] IApp (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
 

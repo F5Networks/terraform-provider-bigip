@@ -58,6 +58,7 @@ func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Route  (%s) (%v)", name, err)
 		return err
 	}
 	d.SetId(name)
@@ -78,6 +79,7 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.ModifyRoute(name, r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
 		return err
 	}
 	return resourceBigipNetRouteRead(d, meta)
@@ -88,6 +90,7 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	obj, err := client.GetRoute(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
 		return err
 	}
 	if obj == nil {
@@ -121,12 +124,9 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 
 	err := client.DeleteRoute(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete Route  (%s) (%v)", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }
