@@ -119,7 +119,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 		parent,
 	)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create Source Address Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Source Address Persistence Profile  (%s) (%v) ", name, err)
 		return err
 	}
 

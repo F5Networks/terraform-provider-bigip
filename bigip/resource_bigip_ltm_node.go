@@ -123,7 +123,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 		)
 	}
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve node (%s) (%v) ", name, err)
 		return err
 	}
 
@@ -141,7 +141,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	node, err := client.GetNode(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
 		return err
 	}
 	if node == nil {
@@ -182,7 +182,7 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 
 	node, err := client.GetNode(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
 		return false, err
 	}
 
@@ -224,7 +224,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyNode(name, node)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Modify Node (%s) ", err)
+		log.Printf("[ERROR] Unable to Modify Node %s  %v : ", name, err)
 		return err
 	}
 
@@ -239,7 +239,8 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 	err := client.DeleteNode(name)
 
 	if err != nil {
-		return fmt.Errorf("Error deleting node %s: %s", name, err)
+		log.Printf("[ERROR] Unable to Delete Node %s  %v : ", name, err)
+		return err
 	}
 	d.SetId("")
 	return nil

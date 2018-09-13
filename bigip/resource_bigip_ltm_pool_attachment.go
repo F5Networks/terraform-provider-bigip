@@ -63,11 +63,11 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 
 	pool, err := client.GetPool(poolName)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrive Pool (%s)  (%s) ", poolName, err)
-		return fmt.Errorf("Error retrieving pool (%s): %s", poolName, err)
+		log.Printf("[ERROR] Unable to Retrive Pool (%s)  (%v) ", poolName, err)
+		return err
 	}
 	if pool == nil {
-		log.Printf("[ERROR] Pool (%s) not found, removing from state", poolName)
+		log.Printf("[WARN] Pool (%s) not found, removing from state", poolName)
 		d.SetId("")
 		return nil
 	}
@@ -77,7 +77,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Error retrieving pool (%s) members: %s", poolName, err)
 	}
 	if nodes == nil {
-		log.Printf("[ERROR] Pool Members (%s) not found, removing from state", poolName)
+		log.Printf("[WARN] Pool Members (%s) not found, removing from state", poolName)
 		d.SetId("")
 		return nil
 	}

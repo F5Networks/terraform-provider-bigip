@@ -50,7 +50,7 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	servers := setToStringSlice(d.Get("servers").(*schema.Set))
 	timezone := d.Get("timezone").(string)
 
-	log.Println("[INFO] Creating Ntp ")
+	log.Println("[INFO] Configuring Ntp ")
 
 	err := client.CreateNTP(
 		description,
@@ -59,7 +59,7 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	)
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create NTP   (%s) ", err)
+		log.Printf("[ERROR] Unable to Configure  NTP   (%s) ", err)
 		return err
 	}
 	d.SetId(description)

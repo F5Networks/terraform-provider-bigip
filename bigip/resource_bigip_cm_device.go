@@ -64,7 +64,7 @@ func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error
 	)
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create Device (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Device %s %v ", name, err)
 		return err
 	}
 	d.SetId(name)
@@ -88,7 +88,7 @@ func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.ModifyDevice(r)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Modidy Device (%s) (%v) ", r, err)
+		log.Printf("[ERROR] Unable to Modidy Device (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipCmDeviceRead(d, meta)
@@ -103,7 +103,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 
 	members, err := client.Devices(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Device (%s) ", err)
+		log.Printf("[ERROR] Unable to retrive Device (%s) (%v) ", name, err)
 		return err
 	}
 	if members == nil {

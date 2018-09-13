@@ -124,7 +124,7 @@ func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) 
 	p := dataToDevicegroup(name, d)
 	err := client.UpdateDevicegroup(name, &p)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Update Devicegroup (%s)( %v) ", name, err)
+		log.Printf("[ERROR] Unable to Update Devicegroup (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipCmDevicegroupRead(d, meta)
@@ -184,7 +184,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		Rname := r.Name
 		err := client.DeleteDevicegroupDevices(name, Rname)
 		if err != nil {
-			log.Printf("[ERROR] Unable to Delete Devicegroup (%s)  (%s) ", Rname, err)
+			log.Printf("[ERROR] Unable to Delete Deviceg (%s)  (%v) ", Rname, err)
 			return err
 		}
 

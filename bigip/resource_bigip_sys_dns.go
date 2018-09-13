@@ -69,7 +69,7 @@ func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
 	)
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create DNS (%s) ", err)
+		log.Printf("[ERROR] Unable to Create DNS (%s) (%v) ", description, err)
 		return err
 	}
 	d.SetId(description)
@@ -93,7 +93,7 @@ func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	err := client.ModifyDNS(r)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Modify DNS (%s) ", err)
+		log.Printf("[ERROR] Unable to Modify DNS (%s) (%v) ", description, err)
 		return err
 	}
 	return resourceBigipSysDnsRead(d, meta)
@@ -108,7 +108,7 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 
 	dns, err := client.DNSs()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve DNS (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve DNS (%s) (%v) ", description, err)
 		return err
 	}
 	if dns == nil {

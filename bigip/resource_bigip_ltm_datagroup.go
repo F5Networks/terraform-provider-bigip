@@ -83,7 +83,7 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.AddInternalDataGroup(dg)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create Data Group  (%s) ", err)
+		log.Printf("[ERROR] Unable to Create Data Group %s %v ", name, err)
 		return err
 	}
 
@@ -99,7 +99,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Read Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to Read Datagroup (%s)  (%v) ", name, err)
 		return err
 	}
 
@@ -121,7 +121,7 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to access Datagroup (%s)  (%s) ", name, err)
+		log.Printf("[ERROR] Unable to access Datagroup (%s)  (%v) ", name, err)
 		return false, err
 	}
 	if datagroup == nil {
@@ -155,7 +155,6 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		log.Printf("[WARN] Unable to Access Data group  (%s)  (%v) ", name, err)
 		return err
 	}
-	d.SetId("")
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
