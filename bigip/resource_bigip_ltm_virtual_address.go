@@ -102,7 +102,7 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	var va bigip.VirtualAddress
 	vas, err := client.VirtualAddresses()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve Virtual Address (%s) (%v) ", name, err)
 		return err
 	}
 	if vas == nil {
@@ -146,7 +146,7 @@ func resourceBigipLtmVirtualAddressExists(d *schema.ResourceData, meta interface
 	var va *bigip.VirtualAddress
 	vas, err := client.VirtualAddresses()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) (%v) ", name, err)
 		return false, err
 	}
 	for _, cand := range vas.VirtualAddresses {
@@ -172,7 +172,7 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 
 	err := client.ModifyVirtualAddress(name, va)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) (%v)", name, err)
 		return err
 	}
 

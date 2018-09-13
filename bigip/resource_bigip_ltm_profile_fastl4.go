@@ -178,7 +178,8 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 
 	err := client.DeleteFastl4(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving profile fastl4 (%s): %v", name, err)
+		log.Printf("[ERROR] Unable to retrieve node (%s) (%v)", name, err)
+		return err
 	}
 	d.SetId("")
 	return nil

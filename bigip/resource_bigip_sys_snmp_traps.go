@@ -140,6 +140,7 @@ func resourceBigipSysSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) e
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create SNMP trap (%s) (%v) ", name, err)
 		return err
 	}
 	d.SetId(name)
@@ -171,6 +172,7 @@ func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyTRAP(r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify SNMP trap (%v) ", err)
 		return err
 	}
 	return resourceBigipSysSnmpTrapsRead(d, meta)
@@ -185,6 +187,7 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 
 	traps, err := client.TRAPs()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve SNMP trap (%v) ", err)
 		return err
 	}
 	if traps == nil {
@@ -229,12 +232,9 @@ func resourceBigipSysSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) e
 
 	err := client.DeleteTRAP(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to delete SNMP trap (%s) (%v) ", name, err)
 		return err
 	}
-	if err == nil {
-		log.Printf("[WARN] SNP Traps (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
+	d.SetId("")
 	return nil
 }

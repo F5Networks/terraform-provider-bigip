@@ -193,7 +193,8 @@ func resourceBigipLtmProfileTcpDelete(d *schema.ResourceData, meta interface{}) 
 
 	err := client.DeleteTcp(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting  profile tcp (%s): %s", name, err)
+		log.Printf("[ERROR] Unable to Delete tcp Profile (%s) (%v)", name, err)
+		return err
 	}
 	d.SetId("")
 	return nil

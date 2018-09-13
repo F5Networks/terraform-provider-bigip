@@ -81,6 +81,7 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create Provision  (%s) ", err)
 		return err
 	}
 	d.SetId(name)
@@ -105,6 +106,7 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyProvision(r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Provision (%v) ", err)
 		return err
 	}
 	return resourceBigipSysProvisionRead(d, meta)
@@ -119,6 +121,7 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 
 	p, err := client.Provisions(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", name, err)
 		return err
 	}
 	if p == nil {

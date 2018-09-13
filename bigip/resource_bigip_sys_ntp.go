@@ -59,6 +59,7 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	)
 
 	if err != nil {
+		log.Printf("[ERROR] Unable to Create NTP   (%s) ", err)
 		return err
 	}
 	d.SetId(description)
@@ -80,6 +81,7 @@ func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	err := client.ModifyNTP(r)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Modify  NTP  (%v) ", err)
 		return err
 	}
 	return resourceBigipSysNtpRead(d, meta)
@@ -94,6 +96,7 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 
 	ntp, err := client.NTPs()
 	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve NTP   (%s) ", err)
 		return err
 	}
 	if ntp == nil {

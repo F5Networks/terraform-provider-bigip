@@ -95,7 +95,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	}
 	vlans, err := client.Vlans()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Vlans   (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve Vlans   (%v) ", err)
 		return err
 	}
 	if vlans == nil {
