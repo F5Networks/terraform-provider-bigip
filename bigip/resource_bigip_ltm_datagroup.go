@@ -1,6 +1,7 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
@@ -60,7 +61,7 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	log.Println("[INFO] Creating Data Group List " + name)
+	log.Printf("[INFO] Creating Data Group List %s", name)
 
 	dgtype := d.Get("type").(string)
 	rs := d.Get("record").(*schema.Set)
@@ -83,8 +84,7 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.AddInternalDataGroup(dg)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create Data Group %s %v ", name, err)
-		return err
+		return fmt.Errorf("Error creating Data Group List %s: %v", name, err)
 	}
 
 	d.SetId(name)
@@ -94,22 +94,37 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	var records []map[string]interface{}
 
 	name := d.Id()
+	log.Printf("[INFO] Retrieving Data Group List %s", name)
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Read Datagroup (%s)  (%v) ", name, err)
-		return err
+		return fmt.Errorf("Error retrieving Data Group List %s: %v", name, err)
 	}
 
 	if datagroup == nil {
-		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[DEBUG] Data Group List (%s) not found, removing from state", name)
 		d.SetId("")
 		return nil
 	}
 
-	d.Set("name", name)
+	d.Set("name", datagroup.FullPath)
+	d.Set("type", datagroup.Type)
+
+	for _,record := range datagroup.Records {
+		dgRecord := map[string]interface{}{
+			"name": record.Name,
+			"data": record.Data,
+		}
+		records = append(records, dgRecord)
+	}
+
+	if err := d.Set("record", records); err != nil {
+		return fmt.Errorf("Error updating records of resource %s: %v", name, err)
+	}
+
 	return nil
 }
 
@@ -117,18 +132,19 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Println("[INFO] Fetching Data Group " + name)
+	log.Printf("[INFO] Checking if Data Group List (%s) exists", name)
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to access Datagroup (%s)  (%v) ", name, err)
-		return false, err
+		return false, fmt.Errorf("Error retrieving Data Group List %s: %v", name, err)
 	}
+
 	if datagroup == nil {
-		log.Printf("[WARN] Data Group List (%s) not found, removing from state", d.Id())
+		log.Printf("[DEBUG] Data Group List (%s) not found, removing from state", name)
 		d.SetId("")
 		return false, nil
 	}
+
 	return datagroup != nil, nil
 }
 
@@ -136,7 +152,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Println("[INFO] Modifying Data Group " + name)
+	log.Printf("[INFO] Modifying Data Group List %s", name)
 
 	rs := d.Get("record").(*schema.Set)
 
@@ -152,22 +168,23 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.ModifyInternalDataGroupRecords(name, records)
 	if err != nil {
-		log.Printf("[WARN] Unable to Access Data group  (%s)  (%v) ", name, err)
-		return err
+		return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
 	}
+
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
 func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+
 	name := d.Id()
-	log.Println("[INFO] Deleting Data Group " + name)
+	log.Printf("[INFO] Deleting Data Group List %s", name)
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete Datagroup (%s)  (%v) ", name, err)
-		return err
+		return fmt.Errorf("Error deleting Data Group List %s: %v", name, err)
 	}
+
 	d.SetId("")
 	return nil
 }
