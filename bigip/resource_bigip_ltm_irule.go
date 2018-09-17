@@ -83,7 +83,7 @@ func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[INFO] Retrieving iRule %s", name)
+	log.Printf("[INFO] Checking if iRule (%s) exists", name)
 
 	irule, err := client.IRule(name)
 	if err != nil {
