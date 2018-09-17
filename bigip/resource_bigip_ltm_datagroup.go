@@ -113,7 +113,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("name", datagroup.FullPath)
 	d.Set("type", datagroup.Type)
 
-	for _,record := range datagroup.Records {
+	for _, record := range datagroup.Records {
 		dgRecord := map[string]interface{}{
 			"name": record.Name,
 			"data": record.Data,

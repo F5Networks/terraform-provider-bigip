@@ -73,8 +73,8 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name",irule.FullPath)
-	d.Set("irule",irule.Rule)
+	d.Set("name", irule.FullPath)
+	d.Set("irule", irule.Rule)
 
 	return nil
 }
@@ -120,7 +120,7 @@ func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 	err := client.DeleteIRule(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting iRule %s: %v", name ,err)
+		return fmt.Errorf("Error deleting iRule %s: %v", name, err)
 	}
 	d.SetId("")
 	return nil
