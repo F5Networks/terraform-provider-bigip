@@ -14,14 +14,14 @@ var TEST_DATAGROUP_NAME = "/" + TEST_PARTITION + "/test-datagroup"
 var TEST_DATAGROUP_STRING_RESOURCE = `
         resource "bigip_ltm_datagroup" "test-datagroup-string" {
                 name = "` + TEST_DATAGROUP_NAME + `"
-                type = "ip"
+                type = "string"
 
                 record {
-                        name = "3.3.3.3"
-                        data = "1.1.1.1"
+                        name = "test-name1"
+                        data = "test-data1"
                 }
                 record {
-                        name = "2.2.2.2"
+                        name = "test-name2"
                 }
         }`
 
@@ -31,11 +31,11 @@ var TEST_DATAGROUP_IP_RESOURCE = `
 		type = "ip"
 
 		record {
-			name = "3.3.3.3"
+			name = "3.3.3.3/32"
 			data = "1.1.1.1"
 		}
 		record {
-			name = "2.2.2.2"
+			name = "2.2.2.2/32"
 		}
 	}`
 
