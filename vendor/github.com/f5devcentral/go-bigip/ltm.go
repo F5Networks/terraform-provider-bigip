@@ -175,24 +175,18 @@ type DataGroup struct {
 	Records    []DataGroupRecord
 }
 
-type DataGroupRecords struct {
-	Items []DataGroupRecord `json:"items,omitempty"`
-}
-
 type DataGroupRecord struct {
 	Name string `json:"name,omitempty"`
 	Data string `json:"data,omitempty"`
 }
 
 type dataGroupDTO struct {
-	Name       string `json:"name,omitempty"`
-	Partition  string `json:"partition,omitempty"`
-	FullPath   string `json:"fullPath,omitempty"`
-	Generation int    `json:"generation,omitempty"`
-	Type       string `json:"type,omitempty"`
-	Records    struct {
-		Items []DataGroupRecord `json:"items,omitempty"`
-	} `json:"recordsReference,omitempty"`
+	Name       string            `json:"name,omitempty"`
+	Partition  string            `json:"partition,omitempty"`
+	FullPath   string            `json:"fullPath,omitempty"`
+	Generation int               `json:"generation,omitempty"`
+	Type       string            `json:"type,omitempty"`
+	Records    []DataGroupRecord `json:"records,omitempty"`
 }
 
 func (p *DataGroup) MarshalJSON() ([]byte, error) {
@@ -202,9 +196,7 @@ func (p *DataGroup) MarshalJSON() ([]byte, error) {
 		FullPath:   p.FullPath,
 		Generation: p.Generation,
 		Type:       p.Type,
-		Records: struct {
-			Items []DataGroupRecord `json:"items,omitempty"`
-		}{Items: p.Records},
+		Records:    p.Records,
 	})
 }
 
@@ -220,7 +212,7 @@ func (p *DataGroup) UnmarshalJSON(b []byte) error {
 	p.Type = dto.Type
 	p.FullPath = dto.FullPath
 	p.Generation = dto.Generation
-	p.Records = dto.Records.Items
+	p.Records = dto.Records
 	return nil
 }
 
@@ -1887,6 +1879,11 @@ func (b *BigIP) Nodes() (*Nodes, error) {
 	return &nodes, nil
 }
 
+// AddNode adds a new node to the BIG-IP system using the Node Spec
+func (b *BigIP) AddNode(config *Node) error {
+	return b.post(config, uriLtm, uriNode)
+}
+
 // CreateNode adds a new IP based node to the BIG-IP system.
 func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state string) error {
 	config := &Node{
@@ -2273,6 +2270,16 @@ func (b *BigIP) VirtualAddresses() (*VirtualAddresses, error) {
 	return &va, nil
 }
 
+// GetVirtualAddress retrieves a VirtualAddress by name. Returns nil if the VirtualAddress does not exist
+func (b *BigIP) GetVirtualAddress(vaddr string) (*VirtualAddress, error) {
+	var virtualAddress VirtualAddress
+	err, _ := b.getForEntity(&virtualAddress, uriLtm, uriVirtualAddress, vaddr)
+	if err != nil {
+		return nil, err
+	}
+	return &virtualAddress, nil
+}
+
 func (b *BigIP) CreateVirtualAddress(vaddr string, config *VirtualAddress) error {
 	config.Name = vaddr
 	return b.post(config, uriLtm, uriVirtualAddress)
@@ -2335,7 +2342,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 // Create a monitor by supplying a config
 func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "gateway") {
-		config.ParentMonitor = "gateway_icmp"
+		config.ParentMonitor = "gatewayIcmp"
 	}
 	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
 		config.ParentMonitor = "tcp-half-open"
