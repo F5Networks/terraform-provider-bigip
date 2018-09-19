@@ -1,7 +1,8 @@
-# NEXT
 
-# 0.12.0 
-- Added couple of resources like snat, snmp,  profiles, test modules etc.
+
+# 0.12.0 (Unreleased)
+- Added couple of resources like snat, snmp, profiles, test modules etc.
+
 # 0.3.0
 - iRule creation support
 - **Breaking Change** - rules property on bigip_ltm_virtual_server renamed to irules
