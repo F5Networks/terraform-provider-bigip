@@ -246,7 +246,6 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("policies", vs.Policies)
 	if err := d.Set("policies", vs.Policies); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Policies to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
