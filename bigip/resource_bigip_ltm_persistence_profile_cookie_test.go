@@ -25,6 +25,7 @@ resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
 	cookie_name = "ham"
 	expiration = "1:0:0"
 	hash_length = 0
+	app_service = "none"
 }
 
 `

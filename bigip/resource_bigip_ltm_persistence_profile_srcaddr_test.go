@@ -24,6 +24,7 @@ resource "bigip_ltm_persistence_profile_srcaddr" "test_ppsrcaddr" {
 	hash_algorithm = "carp"
 	map_proxies = "enabled"
 	mask = "255.255.255.255"
+	app_service = "none"
 }
 
 `

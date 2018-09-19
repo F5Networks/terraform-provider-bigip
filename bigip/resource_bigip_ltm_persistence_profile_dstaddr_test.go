@@ -23,6 +23,7 @@ resource "bigip_ltm_persistence_profile_dstaddr" "test_ppdstaddr" {
 	override_conn_limit = "enabled"
 	hash_algorithm = "carp"
 	mask = "255.255.255.255"
+	app_service = "none"
 }
 
 `
