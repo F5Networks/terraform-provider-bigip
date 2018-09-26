@@ -31,7 +31,7 @@ func TestAccBigipNetvlan_create(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VLAN_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckvlanExists(TEST_VLAN_NAME, true),
@@ -53,7 +53,7 @@ func TestAccBigipNetvlan_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: TEST_VLAN_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckvlanExists(TEST_VLAN_NAME, true),

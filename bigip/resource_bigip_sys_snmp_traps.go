@@ -155,8 +155,8 @@ func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 	log.Println("[INFO] Updating SNMP Traps " + name)
 
 	r := &bigip.TRAP{
-		Name: name,
-		Host: d.Get("host").(string),
+		Name:                     name,
+		Host:                     d.Get("host").(string),
 		AuthPasswordEncrypted:    d.Get("auth_passwordencrypted").(string),
 		AuthProtocol:             d.Get("auth_protocol").(string),
 		Community:                d.Get("community").(string),

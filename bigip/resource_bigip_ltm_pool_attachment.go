@@ -18,7 +18,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"pool": &schema.Schema{
+			"pool": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the pool",
@@ -26,7 +26,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				ValidateFunc: validateF5Name,
 			},
 
-			"node": &schema.Schema{
+			"node": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
