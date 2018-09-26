@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_ltm_persistence_profile_dstaddr resource
 ---
 
-# bigip_ltm_persistence_profile_cookie
+# bigip_ltm_persistence_profile_dstaddr
 
 Configures a cookie persistence profile
 
@@ -47,7 +47,3 @@ resource "bigip_ltm_persistence_profile_dstaddr" "dstaddr" {
 `timeout` (Optional) (enabled or disabled) Timeout for persistence of the session in seconds
 
 `override_conn_limit` (Optional) (enabled or disabled) Enable or dissable pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.
-
-
-
- 

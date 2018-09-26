@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip  snmp_traps resource for BIG-IP
 ---
 
-# bigip\_snmp_traps
+# bigip\_sys\_snmp\_traps
 
 `bigip_sys_snmp_traps` provides details bout how to enable snmp_traps resource on BIG-IP
 ## Example Usage

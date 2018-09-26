@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip  iapp resource for BIG-IP
 ---
 
-# bigip\_iapp
+# bigip\_sys\_iapp
 
 `bigip_sys_iapp` resource helps you to deploy Application Services template that can be used to automate and orchestrate Layer 4-7 applications service deployments using F5 Network. More information on iApp 2.0 is at https://devcentral.f5.com/wiki/iApp.AppSvcsiApp_userguide_userguide.ashx This resource requires a iApp template already imported on BIG-IP, the template can be found at https://github.com/F5Networks/f5-application-services-integration-iApp/releases/download/v2.0.003/appsvcs_integration_v2.0.003.tmpl
 
@@ -488,4 +488,4 @@ description: |-
  * `lists` - string values
  * `metadata` - User defined generic data for the application service. It is a name and value pair.
  * `tables` - Values provided like pool name, nodes etc.
- * `variables` - Name, values, encrypted or not 
+ * `variables` - Name, values, encrypted or not

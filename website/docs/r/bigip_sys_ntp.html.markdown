@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip ntp
 ---
 
-# bigip\_ntp
+# bigip\_sys\_ntp
 
 `bigip_sys_ntp` provides details about a specific bigip
 

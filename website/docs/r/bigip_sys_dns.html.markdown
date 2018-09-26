@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_sys_dns resource
 ---
 
-# bigip\_dns
+# bigip\_ltm\_dns
 
 `bigip_ltm_dns` Configures DNS server on F5 BIG-IP
 

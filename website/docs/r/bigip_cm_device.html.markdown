@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip device
 ---
 
-# bigip\_device
+# bigip_cm_device
 
 `bigip_cm_device` provides details about a specific bigip
 

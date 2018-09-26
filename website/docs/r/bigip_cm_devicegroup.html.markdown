@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip device_name
 ---
 
-# bigip\_device_name
+# bigip_cm_devicegroup
 
 `bigip_cm_devicegroup` A device group is a collection of BIG-IP devices that are configured to securely synchronize their BIG-IP configuration data, and fail over when needed.
 

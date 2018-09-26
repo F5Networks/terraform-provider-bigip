@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_ltm_policy resource
 ---
 
-# bigip\_ltm\_virtual\_server
+# bigip\_ltm\_policy
 
 `bigip_ltm_policy` Configures Virtual Server
 

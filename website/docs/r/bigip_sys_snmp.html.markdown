@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip  snmp resource for BIG-IP
 ---
 
-# bigip\_snmp
+# bigip\_sys\_snmp
 
 `bigip_sys_snmp` provides details bout how to enable "ilx", "asm" "apm" resource on BIG-IP
 ## Example Usage
