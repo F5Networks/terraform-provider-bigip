@@ -19,52 +19,43 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 - This provider uses the iControlREST API, make sure that it is installed and enabled on your F5 device before proceeding.
 - All the resources are validated with BigIP v12.1.1
 
-# Dcoumentation
+# Documentation
 
 Provider documentation and reference can be found [here](website/docs).
 
-# Quick Start with BIG-IP Provider
+# Building the  Provider
 
-Install appropriate Go package from  https://golang.org/dl/ make sure your go version is 1.9 & above
-```
-go version
-go version go1.9.2 darwin/amd64
-
-mkdir workspace
-export GOPATH=$HOME/workspace
-mkdir -p $GOPATH/src/github.com/f5devcentral
-cd $GOPATH
-go get github.com/f5devcentral/terraform-provider-bigip
-cd src/github.com/f5devcentral/terraform-provider-bigip/
-go build
-create .tf
-terraform init
-Initializing provider plugins...
-
-Terraform has been successfully initialized!
-
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
-should now work.
-
-If you ever set or change modules or backend configuration for Terraform,
-rerun this command to reinitialize your working directory. If you forget, other
-commands will detect it and remind you to do so if necessary.
+Clone repository to: $GOPATH/src/github.com/terraform-providers/terraform-provider-bigip
 
 ```
-# Building
-
-Create the distributable packages like so:
+$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
+$ git clone git@github.com:terraform-providers/terraform-provider-bigip
 
 ```
-make get-deps && make bin && make dist
+Enter the provider directory and build the provider
+
 ```
+$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-aws
+$ make build
 
-See these pages for more information:
+```
+# Using the Provider
 
- * https://www.terraform.io/docs/internals/internal-plugins.html
- * https://github.com/hashicorp/terraform#developing-terraform
+If you're building the provider, follow the instructions to install it as a plugin. After placing it into your plugins directory, run terraform init to initialize it.
 
+# Developing the Provider
+
+If you wish to work on the provider, you'll first need Go installed on your machine (version 1.11+ is required). You'll also need to correctly setup a GOPATH, as well as adding $GOPATH/bin to your $PATH.
+
+To compile the provider, run make build. This will build the provider and put the provider binary in the $GOPATH/bin directory.
+
+```
+$ make build
+...
+$ $GOPATH/bin/terraform-provider-bigip
+...
+
+```
 # Testing
 
 Running the acceptance test suite requires an F5 to test against. Set `BIGIP_HOST`, `BIGIP_USER`
