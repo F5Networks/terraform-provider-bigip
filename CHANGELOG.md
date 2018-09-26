@@ -1,4 +1,4 @@
-## 0.12.0 (Unreleased)
+## 0.12.0 (September 26, 2018)
 - Added couple of resources like snat, snmp, profiles, test modules etc.
 
 ## 0.3.0
