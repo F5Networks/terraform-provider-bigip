@@ -68,7 +68,7 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 
 	d.SetId(name)
 
-	return resourceBigipNetSelfIPRead(d, meta)
+	return resourceBigipNetSelfIPUpdate(d, meta)
 }
 
 func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
@@ -77,43 +77,29 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 
 	log.Printf("[DEBUG] Reading SelfIP %s", name)
 
-	selfIPs, err := client.SelfIPs()
+	selfIP, err := client.SelfIP(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving SelfIPs: %v", err)
+		return fmt.Errorf("Error retrieving SelfIP %s: %v", name, err)
 	}
-	if selfIPs == nil {
-		log.Printf("[DEBUG] SelfIPs not found, removing SelfIP %s from state", name)
+	if selfIP == nil {
+		log.Printf("[DEBUG] SelfIP %s not found, removing from state", name)
 		d.SetId("")
 		return nil
 	}
 
-	found := false
-	for _, selfip := range selfIPs.SelfIPs {
-		if selfip.FullPath == name {
-			d.Set("name", selfip.FullPath)
-			d.Set("vlan", selfip.Vlan)
+	d.Set("name", selfIP.FullPath)
+	d.Set("vlan", selfIP.Vlan)
 
-			// Extract Self IP address from "(selfip_address)[%route_domain](/mask)" groups 1 + 2
-			regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
-			selfipAddress := regex.FindStringSubmatch(selfip.Address)
-			parsedSelfipAddress := selfipAddress[1] + selfipAddress[2]
-			d.Set("ip", parsedSelfipAddress)
+	// Extract Self IP address from "(selfip_address)[%route_domain](/mask)" groups 1 + 2
+	regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
+	selfipAddress := regex.FindStringSubmatch(selfIP.Address)
+	parsedSelfipAddress := selfipAddress[1] + selfipAddress[2]
+	d.Set("ip", parsedSelfipAddress)
 
-			// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
-			regex = regexp.MustCompile(`\/Common\/(.+)`)
-			trafficGroup := regex.FindStringSubmatch(selfip.TrafficGroup)
-			parsedTrafficGroup := trafficGroup[1]
-			d.Set("traffic_group", parsedTrafficGroup)
-
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		log.Printf("[DEBUG] SelfIP %s not found, removing from state", name)
-		d.SetId("")
-	}
+	// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
+	regex = regexp.MustCompile(`\/Common\/(.+)`)
+	trafficGroup := regex.FindStringSubmatch(selfIP.TrafficGroup)
+	d.Set("traffic_group", trafficGroup[1])
 
 	return nil
 }

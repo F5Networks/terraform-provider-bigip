@@ -76,9 +76,27 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckselfipExists(TEST_SELFIP_NAME, true),
-					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME, true),
 				),
 				ResourceName:      TEST_SELFIP_NAME,
+				ImportState:       false,
+				ImportStateVerify: true,
+			},
+		},
+	})
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckselfipsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_SELFIP_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME, true),
+				),
+				ResourceName:      TEST_FLOAT_SELFIP_NAME,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -89,7 +107,7 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 func testCheckselfipExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.SelfIPs()
+		p, err := client.SelfIP(name)
 		if err != nil {
 			return err
 		}
@@ -111,7 +129,7 @@ func testCheckselfipsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		selfip, err := client.SelfIPs()
+		selfip, err := client.SelfIP(name)
 		if err != nil {
 			return err
 		}

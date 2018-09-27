@@ -69,7 +69,7 @@ func TestAccBigipNetvlan_import(t *testing.T) {
 func testCheckvlanExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.Vlans()
+		p, err := client.Vlan(name)
 		if err != nil {
 			return err
 		}
@@ -92,7 +92,7 @@ func testCheckvlansDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		vlan, err := client.Vlans()
+		vlan, err := client.Vlan(name)
 		if err != nil {
 			return err
 		}

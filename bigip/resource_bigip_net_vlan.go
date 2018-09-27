@@ -106,30 +106,18 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Reading VLAN %s", name)
 
-	vlans, err := client.Vlans()
+	vlan, err := client.Vlan(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving VLANs: %v", err)
+		return fmt.Errorf("Error retrieving VLAN %s: %v", name, err)
 	}
-	if vlans == nil {
-		log.Printf("[DEBUG] VLANs not found, removing VLAN %s from state", name)
+	if vlan == nil {
+		log.Printf("[DEBUG] VLAN %s not found, removing from state", name)
 		d.SetId("")
 		return nil
 	}
 
-	found := false
-	for _, vlan := range vlans.Vlans {
-		if vlan.FullPath == name {
-			d.Set("name", vlan.FullPath)
-			d.Set("tag", vlan.Tag)
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		log.Printf("[DEBUG] VLAN %s not found, removing from state", name)
-		d.SetId("")
-	}
+	d.Set("name", vlan.FullPath)
+	d.Set("tag", vlan.Tag)
 
 	log.Printf("[DEBUG] Reading VLAN %s Interfaces", name)
 
