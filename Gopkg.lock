@@ -60,8 +60,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "34699de98eac41fa94737f6ce7b83d7a621c2634"
-  version = "v1.15.36"
+  revision = "a5158a897b80d434ed8704bb42fed46ff9bf8b91"
+  version = "v1.15.44"
 
 [[projects]]
   branch = "master"
@@ -91,7 +91,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "ac2f73035d72e74d6032da5ec7cfcce965db0f65"
+  revision = "165cdfa12e2674c98dd6a4b225bacc93be7dc900"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -201,7 +201,7 @@
     "hcldec",
     "hclparse"
   ]
-  revision = "864f97c8ab203ef9f72a47f231e7d10e52a33ce7"
+  revision = "cce5ae6cc5c890122f922573d6bf973eef0509f7"
 
 [[projects]]
   branch = "master"
@@ -375,7 +375,7 @@
     "cty/json",
     "cty/set"
   ]
-  revision = "cc054f996f8b732f7205fd6f1ef84c39f2720461"
+  revision = "d9b87d891d0b42399ce5bab2f87ad2860ca0239c"
 
 [[projects]]
   branch = "master"
@@ -391,7 +391,7 @@
     "openpgp/packet",
     "openpgp/s2k"
   ]
-  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
+  revision = "5295e8364332db77d75fce11f1d19c053919a9c9"
 
 [[projects]]
   branch = "master"
@@ -407,13 +407,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
+  revision = "4dfa2610cdf3b287375bbba5b8f2a14d3b01d8de"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
+  revision = "dad3d9fb7b6e83d0f9ac8f54670f6334c3a287b4"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -440,7 +440,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "4b56f30a1fd96a133a036b62cdd2a249883dd89b"
+  revision = "0e822944c569bf5c9afd034adaa56208bd2906ac"
 
 [[projects]]
   name = "google.golang.org/grpc"
