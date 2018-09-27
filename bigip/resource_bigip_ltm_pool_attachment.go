@@ -88,6 +88,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		if expected == node.FullPath {
 			d.Set("node", expected)
 			found = true
+			break
 		}
 	}
 

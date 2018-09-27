@@ -1,7 +1,9 @@
 package bigip
 
 import (
+	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -56,52 +58,61 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	ip := d.Get("ip").(string)
 	vlan := d.Get("vlan").(string)
 
-	log.Println("[INFO] Creating SelfIP ")
+	log.Printf("[DEBUG] Creating SelfIP %s", name)
 
 	err := client.CreateSelfIP(name, ip, vlan)
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create SelfIP   (%s) (%v)", name, err)
-		return err
+		return fmt.Errorf("Error creating SelfIP %s: %v", name, err)
 	}
 
 	d.SetId(name)
 
-	return resourceBigipNetSelfIPUpdate(d, meta)
+	return resourceBigipNetSelfIPRead(d, meta)
 }
 
 func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-	log.Println("[INFO] Fetching SelfIP " + name)
+
+	log.Printf("[DEBUG] Reading SelfIP %s", name)
 
 	selfIPs, err := client.SelfIPs()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve SelfIP   (%s) (%v)", name, err)
-		return err
+		return fmt.Errorf("Error retrieving SelfIPs: %v", err)
 	}
-	d.Set("name", name)
 	if selfIPs == nil {
-		log.Printf("[WARN] SelfIP (%s) not found, removing from state", d.Id())
+		log.Printf("[DEBUG] SelfIPs not found, removing SelfIP %s from state", name)
 		d.SetId("")
 		return nil
 	}
+
+	found := false
 	for _, selfip := range selfIPs.SelfIPs {
-		log.Println(selfip.Name)
-		if selfip.Name == name {
-			return nil
+		if selfip.FullPath == name {
+			d.Set("name", selfip.FullPath)
+			d.Set("vlan", selfip.Vlan)
+
+			// Extract Self IP address from "(selfip_address)[%route_domain](/mask)" groups 1 + 2
+			regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
+			selfipAddress := regex.FindStringSubmatch(selfip.Address)
+			parsedSelfipAddress := selfipAddress[1] + selfipAddress[2]
+			d.Set("ip", parsedSelfipAddress)
+
+			// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
+			regex = regexp.MustCompile(`\/Common\/(.+)`)
+			trafficGroup := regex.FindStringSubmatch(selfip.TrafficGroup)
+			parsedTrafficGroup := trafficGroup[1]
+			d.Set("traffic_group", parsedTrafficGroup)
+
+			found = true
+			break
 		}
 	}
-	vlans, err := client.Vlans()
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Vlans   (%v) ", err)
-		return err
-	}
-	if vlans == nil {
-		log.Printf("[WARN] Vlan (%s) not found, removing from state", d.Id())
+
+	if !found {
+		log.Printf("[DEBUG] SelfIP %s not found, removing from state", name)
 		d.SetId("")
-		return nil
 	}
 
 	return nil
@@ -112,7 +123,7 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	name := d.Id()
 
-	log.Println("[INFO] Updating SelfIP " + name)
+	log.Printf("[DEBUG] Updating SelfIP %s", name)
 
 	r := &bigip.SelfIP{
 		Name:         name,
@@ -123,8 +134,7 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.ModifySelfIP(name, r)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve SelfIP   (%s) (%v)", name, err)
-		return err
+		return fmt.Errorf("Error modifying SelfIP %s: %v", name, err)
 	}
 
 	return resourceBigipNetSelfIPRead(d, meta)
@@ -135,12 +145,11 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
-	log.Println("[INFO] Deleting selfIP " + name)
+	log.Printf("[DEBUG] Deleting SelfIP %s", name)
 
 	err := client.DeleteSelfIP(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Delete SelfIP   (%s) (%v)", name, err)
-		return err
+		return fmt.Errorf("Error deleting SelfIP %s: %v", name, err)
 	}
 
 	d.SetId("")
