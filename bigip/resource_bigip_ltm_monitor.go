@@ -59,7 +59,6 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"send": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "GET /\\r\\n",
 				Description: "Request string to send.",
 				StateFunc: func(s interface{}) string {
 					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
@@ -81,7 +80,6 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"reverse": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "disabled",
 			},
 
 			"transparent": {
