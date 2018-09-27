@@ -61,7 +61,7 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	log.Printf("[INFO] Creating Data Group List %s", name)
+	log.Printf("[DEBUG] Creating Data Group List %s", name)
 
 	dgtype := d.Get("type").(string)
 	rs := d.Get("record").(*schema.Set)
@@ -97,7 +97,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	var records []map[string]interface{}
 
 	name := d.Id()
-	log.Printf("[INFO] Retrieving Data Group List %s", name)
+	log.Printf("[DEBUG] Retrieving Data Group List %s", name)
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
@@ -105,7 +105,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if datagroup == nil {
-		log.Printf("[DEBUG] Data Group List (%s) not found, removing from state", name)
+		log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 		d.SetId("")
 		return nil
 	}
@@ -122,7 +122,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if err := d.Set("record", records); err != nil {
-		return fmt.Errorf("Error updating records of resource %s: %v", name, err)
+		return fmt.Errorf("Error updating records in state for Data Group List %s: %v", name, err)
 	}
 
 	return nil
@@ -132,7 +132,7 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[INFO] Checking if Data Group List (%s) exists", name)
+	log.Printf("[DEBUG] Checking if Data Group List (%s) exists", name)
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
@@ -152,7 +152,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[INFO] Modifying Data Group List %s", name)
+	log.Printf("[DEBUG] Modifying Data Group List %s", name)
 
 	rs := d.Get("record").(*schema.Set)
 
@@ -178,7 +178,7 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[INFO] Deleting Data Group List %s", name)
+	log.Printf("[DEBUG] Deleting Data Group List %s", name)
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
