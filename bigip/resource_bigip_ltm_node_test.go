@@ -30,6 +30,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 	dynamic_ratio = "1"
 	monitor = "default"
 	rate_limit = "disabled"
+	fqdn = { interval = "3000"}
 }
 `
 
@@ -75,6 +76,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "monitor", "default"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
 				),
 			},
 		},
