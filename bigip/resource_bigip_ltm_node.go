@@ -118,10 +118,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			state,
 		)
 	} else {
-		ifaceCount := d.Get("fqdn.#").(int)
-		for i := 0; i < ifaceCount; i++ {
-			prefix := fmt.Sprintf("fqdn.%d", i)
-			interval := d.Get(prefix + ".interval").(string)
+			interval := d.Get("fqdn.0" + ".interval").(string)
 			err = client.CreateFQDNNode(
 				name,
 				address,
@@ -133,10 +130,9 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 				interval,
 			)
 		}
-	}
+
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) (%v) ", name, err)
-		return err
+		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
 
 	d.SetId(name)
@@ -183,6 +179,8 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
+	d.Set(("fqdn.0" + ".interval"), node.FQDN)
+
 	return nil
 }
 
@@ -211,7 +209,6 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
-	//interval := d.Get("interval").(string)
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
 	var node *bigip.Node
@@ -235,8 +232,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 		err := client.ModifyNode(name, node)
 		if err != nil {
-			log.Printf("[ERROR] Unable to Modify Node %s  %v : ", name, err)
-			return err
+			return fmt.Errorf("Error modifying node %s: %v", name, err)
 		}
 	}
 	return resourceBigipLtmNodeRead(d, meta)
