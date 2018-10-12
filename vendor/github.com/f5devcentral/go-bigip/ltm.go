@@ -1900,7 +1900,7 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state string) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, interval string) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1910,6 +1910,7 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 		State:           state,
 	}
 	config.FQDN.Name = address
+	config.FQDN.Interval = interval
 
 	return b.post(config, uriLtm, uriNode)
 }
