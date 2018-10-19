@@ -67,6 +67,7 @@ func resourceBigipLtmNode() *schema.Resource {
 			"fqdn": {
 				Type:     schema.TypeList,
 				Optional: true,
+				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"address_family": {
@@ -118,18 +119,18 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			state,
 		)
 	} else {
-			interval := d.Get("fqdn.0" + ".interval").(string)
-			err = client.CreateFQDNNode(
-				name,
-				address,
-				rate_limit,
-				connection_limit,
-				dynamic_ratio,
-				monitor,
-				state,
-				interval,
-			)
-		}
+		interval := d.Get("fqdn.0.interval").(string)
+		err = client.CreateFQDNNode(
+			name,
+			address,
+			rate_limit,
+			connection_limit,
+			dynamic_ratio,
+			monitor,
+			state,
+			interval,
+		)
+	}
 
 	if err != nil {
 		return fmt.Errorf("Error modifying node %s: %v", name, err)
@@ -179,7 +180,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
-	d.Set(("fqdn.0" + ".interval"), node.FQDN)
+	d.Set(("fqdn.0.interval"), node.FQDN.Interval)
 
 	return nil
 }
