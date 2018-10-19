@@ -29,6 +29,7 @@ description: |-
 
 
 ## Example Usage of Json file
+```
 {  
 "fullPath":"/Common/simplehttp.app/simplehttp",
 "generation":222,
@@ -158,7 +159,7 @@ description: |-
    }
 ]
 }
-
+```
 
  * `description` - User defined description.
  * `deviceGroup` - The name of the device group that the application service is assigned to.
