@@ -41,8 +41,9 @@ resource "bigip_ltm_node" "node" {
 
  * `monitor` - (Optional) Specifies the name of the monitor or monitor rule that you want to associate with the node.
 
- * `dynamic_ratio` - (Optional) Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. The ratio weights are based on continuous monitoring of the servers and are therefore continually changing. Dynamic Ratio load balancing may currently be implemented on RealNetworks RealServer platforms, on Windows platforms equipped with Windows Management Instrumentation (WMI), or on a server equipped with either the UC Davis SNMP agent or Windows 2000 Server SNMP agent.
+ * `dynamic_ratio` - (Optional)  Specifies the ratio weight to assign to the node. Valid values range from 1 through 65535. The default is 1, which means that each node has an equal ratio proportion.
+
 
  * `rate_limit` - (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
 
- * `interval` - (Optional) Specifies the amount of time before sending the next DNS query. It can also take value as "ttl" when "ttl" is specified the interval option is disabled, vice versa.
+ * `interval` - (Optional) Specifies the amount of time before sending the next DNS query. It can also take value as "ttl" when "ttl" is specified the  it sets the Interval to the TTL of the DNS record.
