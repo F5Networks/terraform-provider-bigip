@@ -180,7 +180,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
-	d.Set(("fqdn.0.interval"), node.FQDN.Interval)
+	d.Set("fqdn.0.interval", node.FQDN.Interval)
 
 	return nil
 }
