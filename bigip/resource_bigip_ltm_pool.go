@@ -2,12 +2,14 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
+	"regexp"
+	"strings"
 )
+
+var nodeVALIDATION = regexp.MustCompile(":\\d{2,5}$")
 
 func resourceBigipLtmPool() *schema.Resource {
 	return &schema.Resource{
@@ -27,6 +29,13 @@ func resourceBigipLtmPool() *schema.Resource {
 				Description:  "Name of the pool",
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
+			},
+			"nodes": &schema.Schema{
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
+				Description: "Nodes to add to the pool. Format node_name:port. e.g. node01:443",
 			},
 			"monitors": {
 				Type:        schema.TypeSet,
@@ -117,7 +126,22 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
+	nodes, err := client.PoolMembers(name)
+	if err != nil {
+		return err
+	}
 
+	if nodes == nil {
+		log.Printf("[WARN] Pool Member (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+
+	nodeNames := make([]string, 0, len(nodes.PoolMembers))
+
+	for _, node := range nodes.PoolMembers {
+		nodeNames = append(nodeNames, node.FullPath)
+	}
 	if err := d.Set("allow_nat", pool.AllowNAT); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AllowNAT to state for Pool  (%s): %s", d.Id(), err)
 	}
@@ -193,6 +217,32 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
+	//members
+	nodes, err := client.PoolMembers(name)
+	if err != nil {
+		return err
+	}
+
+	nodeNames := make([]string, 0, len(nodes.PoolMembers))
+
+	for _, node := range nodes.PoolMembers {
+		nodeNames = append(nodeNames, node.Name)
+	}
+
+	existing := makeStringSet(&nodeNames)
+	incoming := d.Get("nodes").(*schema.Set)
+	delete := existing.Difference(incoming)
+	add := incoming.Difference(existing)
+	if delete.Len() > 0 {
+		for _, d := range delete.List() {
+			client.DeletePoolMember(name, d.(string))
+		}
+	}
+	if add.Len() > 0 {
+		for _, d := range add.List() {
+			client.AddPoolMember(name, d.(string))
+		}
+	}
 	return resourceBigipLtmPoolRead(d, meta)
 }
 
