@@ -131,9 +131,9 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			interval,
 		)
 	}
-
+ 
 	if err != nil {
-		return fmt.Errorf("Error modifying node %s: %v", name, err)
+		 		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
 
 	d.SetId(name)
@@ -177,11 +177,9 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
-
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
-	d.Set("fqdn.0.interval", node.FQDN.Interval)
-
+ 	d.Set("fqdn.0.interval", node.FQDN.Interval)
 	return nil
 }
 
@@ -210,6 +208,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
+	//interval := d.Get("interval").(string)
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
 	var node *bigip.Node
@@ -233,7 +232,8 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 		err := client.ModifyNode(name, node)
 		if err != nil {
-			return fmt.Errorf("Error modifying node %s: %v", name, err)
+			log.Printf("[ERROR] Unable to Modify Node %s  %v : ", name, err)
+			return err
 		}
 	}
 	return resourceBigipLtmNodeRead(d, meta)
