@@ -67,6 +67,7 @@ func resourceBigipLtmNode() *schema.Resource {
 			"fqdn": {
 				Type:     schema.TypeList,
 				Optional: true,
+				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"address_family": {
@@ -118,25 +119,21 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			state,
 		)
 	} else {
-		ifaceCount := d.Get("fqdn.#").(int)
-		for i := 0; i < ifaceCount; i++ {
-			prefix := fmt.Sprintf("fqdn.%d", i)
-			interval := d.Get(prefix + ".interval").(string)
-			err = client.CreateFQDNNode(
-				name,
-				address,
-				rate_limit,
-				connection_limit,
-				dynamic_ratio,
-				monitor,
-				state,
-				interval,
-			)
-		}
+		interval := d.Get("fqdn.0.interval").(string)
+		err = client.CreateFQDNNode(
+			name,
+			address,
+			rate_limit,
+			connection_limit,
+			dynamic_ratio,
+			monitor,
+			state,
+			interval,
+		)
 	}
+ 
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) (%v) ", name, err)
-		return err
+		 		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
 
 	d.SetId(name)
@@ -180,9 +177,9 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
-
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
+ 	d.Set("fqdn.0.interval", node.FQDN.Interval)
 	return nil
 }
 
