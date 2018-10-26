@@ -20,7 +20,6 @@ Resources should be named with their "full path". The full path is the combinati
 resource "bigip_ltm_pool" "pool" {
   name = "/Common/terraform-pool"
   load_balancing_mode = "round-robin"
-  nodes = ["11.1.1.101:80", "11.1.1.102:443"]
   monitors = ["${bigip_ltm_monitor.monitor.name}","${bigip_ltm_monitor.monitor2.name}"]
   allow_snat = "yes"
   allow_nat = "yes"
@@ -39,5 +38,3 @@ resource "bigip_ltm_pool" "pool" {
 * `allow_snat` - (Optional)
 
 * `load_balancing_mode` - (Optional, Default = round-robin)
-
-* `nodes` - (Optional) Nodes to add to the pool. Format node_name:port. e.g. node01:443
