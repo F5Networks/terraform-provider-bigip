@@ -30,6 +30,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
+				ValidateFunc: validateF5Name,
 				Description: "Node to add/remove to/from the pool. Format /partition/node_name:port. e.g. /Common/node01:443",
 			},
 		},
