@@ -80,7 +80,7 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 	for _, v := range values {
 		match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.]+:\\d+$", v)
 		if !match {
-			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [._-]. e.g. /Common/node1:80", field))
 		}
 	}
 	return
