@@ -37,6 +37,7 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
     "aws/credentials/stscreds",
     "aws/csm",
     "aws/defaults",
@@ -62,8 +63,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "ceab7b7ac6f535d1397f124620720b5145f1ad59"
-  version = "v1.15.88"
+  revision = "5f1ca23f3ded773a9ba214e6fac36acd9a965a53"
+  version = "v1.16.6"
 
 [[projects]]
   branch = "master"
@@ -143,7 +144,7 @@
     ".",
     "helper/url"
   ]
-  revision = "bd1edc22f8ea9d71b87fbdc0c07f0afb77ae39b6"
+  revision = "be39683deade1b3613258f751a2fad316d7b5e7c"
 
 [[projects]]
   branch = "master"
@@ -160,8 +161,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/go-plugin"
-  packages = ["."]
-  revision = "54b6ff97d8180dbbd93d2010dd4a92c86f604bb8"
+  packages = [
+    ".",
+    "internal/proto"
+  ]
+  revision = "f444068e8f5a19853177f7aa0aea7e7d95b5b528"
 
 [[projects]]
   name = "github.com/hashicorp/go-safetemp"
@@ -209,7 +213,7 @@
     "hclparse",
     "hclwrite"
   ]
-  revision = "4d82d52bfa4905585cc7c1a8e188afeca6e34035"
+  revision = "253da47fd604c8c6c857af9826021d65e50d9b4c"
 
 [[projects]]
   branch = "master"
@@ -257,8 +261,8 @@
     "tfdiags",
     "version"
   ]
-  revision = "17850e9a55d33c43d7c31fd6ac122ba97a51d899"
-  version = "v0.11.10"
+  revision = "ac4fff416318bf0915a0ab80e062a99ef3724334"
+  version = "v0.11.11"
 
 [[projects]]
   branch = "master"
@@ -269,7 +273,7 @@
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "0b12d6b5"
+  revision = "c2b33e84"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -383,7 +387,7 @@
     "cty/json",
     "cty/set"
   ]
-  revision = "88fbe721e0f8ab7b3ba2d11da5c79f4900b6d762"
+  revision = "3a13afc1279233ce3efad28cffaf1d20e7008118"
 
 [[projects]]
   branch = "master"
@@ -415,13 +419,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "351d144fa1fc0bd934e2408202be0c29f25e35a0"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "4ed8d59d0b35e1e29334a206d1b3f38b1e5dfb31"
+  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -448,7 +452,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "936bffa7f85bf0dd0ec21b13d4d1a022672eeb98"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -457,9 +461,11 @@
     "balancer",
     "balancer/base",
     "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
     "codes",
     "connectivity",
     "credentials",
+    "credentials/internal",
     "encoding",
     "encoding/proto",
     "grpclog",
@@ -467,9 +473,12 @@
     "health/grpc_health_v1",
     "internal",
     "internal/backoff",
+    "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
     "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
     "internal/transport",
     "keepalive",
     "metadata",
@@ -482,8 +491,8 @@
     "status",
     "tap"
   ]
-  revision = "2e463a05d100327ca47ac218281906921038fd95"
-  version = "v1.16.0"
+  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
+  version = "v1.17.0"
 
 [solve-meta]
   analyzer-name = "dep"
