@@ -1,6 +1,6 @@
 # Overview
 
-A [Terraform](terraform.io) provider for F5 BigIP LTM.
+A [Terraform](terraform.io) provider for F5 BIG-IP LTM.
 
 [![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-bigip)
 [![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-bigip)
