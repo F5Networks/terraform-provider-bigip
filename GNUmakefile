@@ -26,6 +26,10 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
+lint:
+	@echo "==> Checking source code against linters..."
+	@gometalinter ./$(PKG_NAME)
+
 
 tools:
 	go get -u github.com/kardianos/govendor
