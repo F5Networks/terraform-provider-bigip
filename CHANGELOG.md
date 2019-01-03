@@ -1,4 +1,10 @@
 ## 0.12.1 (Unreleased)
+- Added improvements for PoolMember Name
+- Fixed documentation for pool attachement
+- Improvements to node resource added downinterval, autopopulate fields, updated ltm.go and vendor
+- Simplified some parts with new utility methods (SelfIP & Vlan)
+- Fix SelfIP and VLAN Read methods + other minor fixes
+
 ## 0.12.0 (September 26, 2018)
 - Added couple of resources like snat, snmp, profiles, test modules etc.
 
