@@ -25,9 +25,8 @@ For resources should be named with their "full path". The full path is the combi
             uri_exclude   = ["www.abc.f5.com", "www.abc2.f5.com"]
             uri_include   = ["www.xyzbc.cisco.com"]
             content_type_include = ["nicecontent.com"]
-						content_type_exclude = ["nicecontentexclude.com"]
+            content_type_exclude = ["nicecontentexclude.com"]
         }
-
 
 ```      
 
