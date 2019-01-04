@@ -24,6 +24,8 @@ For resources should be named with their "full path". The full path is the combi
             defaults_from = "/Common/httpcompression"
             uri_exclude   = ["www.abc.f5.com", "www.abc2.f5.com"]
             uri_include   = ["www.xyzbc.cisco.com"]
+            content_type_include = ["nicecontent.com"]
+						content_type_exclude = ["nicecontentexclude.com"]
         }
 
 
@@ -36,4 +38,9 @@ For resources should be named with their "full path". The full path is the combi
 * `defaults_from` - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
 * `uri_exclude`  - (Optional) Disables compression on a specified list of HTTP Request-URI responses. Use a regular expression to specify a list of URIs you do not want to compress.
+
 * `uri_include`  - (Optional) Enables compression on a specified list of HTTP Request-URI responses. Use a regular expression to specify a list of URIs you want to compress.
+
+* `content_type_include` - (Optional) Specifies a list of content types for compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to compress.
+
+* `content_type_exclude` - (Optional) Excludes a specified list of content types from compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to compress.
