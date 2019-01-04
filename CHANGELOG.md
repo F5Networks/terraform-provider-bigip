@@ -1,4 +1,5 @@
 ## 0.12.1 (Unreleased)
+- Added include - exclude to the resource httpcompress profile
 - Added Valid function to node resource
 - Added  pool_attachement resource doc
 - Improvement to node resource , interval
