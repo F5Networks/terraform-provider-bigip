@@ -1117,10 +1117,12 @@ type Fastl4 struct {
 }
 
 type httpcompressDTO struct {
-	Name         string   `json:"name,omitempty"`
-	DefaultsFrom string   `json:"defaultsFrom,omitempty"`
-	UriExclude   []string `json:"uriExclude,omitempty"`
-	UriInclude   []string `json:"uriInclude,omitempty"`
+	Name               string   `json:"name,omitempty"`
+	DefaultsFrom       string   `json:"defaultsFrom,omitempty"`
+	UriExclude         []string `json:"uriExclude,omitempty"`
+	UriInclude         []string `json:"uriInclude,omitempty"`
+	ContentTypeInclude []string `json:"contentTypeInclude,omitempty"`
+	ContentTypeExclude []string `json:"contentTypeExclude,omitempty"`
 }
 
 type Httpcompresss struct {
@@ -1128,10 +1130,12 @@ type Httpcompresss struct {
 }
 
 type Httpcompress struct {
-	Name         string
-	DefaultsFrom string
-	UriExclude   []string
-	UriInclude   []string
+	Name               string
+	DefaultsFrom       string
+	UriExclude         []string
+	UriInclude         []string
+	ContentTypeInclude []string
+	ContentTypeExclude []string
 }
 
 type http2DTO struct {
@@ -2712,12 +2716,14 @@ func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
 
 // ===============
 
-func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude []string) error {
+func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude, contentTypeInclude, contentTypeExclude []string) error {
 	httpcompress := &Httpcompress{
-		Name:         name,
-		DefaultsFrom: defaultsFrom,
-		UriExclude:   uriExclude,
-		UriInclude:   uriInclude,
+		Name:               name,
+		DefaultsFrom:       defaultsFrom,
+		UriExclude:         uriExclude,
+		UriInclude:         uriInclude,
+		ContentTypeInclude: contentTypeInclude,
+		ContentTypeExclude: contentTypeExclude,
 	}
 	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
 }
