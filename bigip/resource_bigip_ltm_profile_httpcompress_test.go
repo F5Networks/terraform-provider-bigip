@@ -20,6 +20,8 @@ resource "bigip_ltm_profile_httpcompress" "test-httpcompress"
 			      defaults_from = "/Common/httpcompression"
             uri_exclude = ["f5.com"]
             uri_include = ["cisco.com"]
+						content_type_include = ["nicecontent.com"]
+						content_type_exclude = ["nicecontentexclude.com"]
         }
 `
 
@@ -43,6 +45,12 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
 						fmt.Sprintf("uri_include.%d", schema.HashString("cisco.com")),
 						"cisco.com"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
+						fmt.Sprintf("content_type_include.%d", schema.HashString("nicecontent.com")),
+						"nicecontent.com"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
+						fmt.Sprintf("content_type_exclude.%d", schema.HashString("nicecontentexclude.com")),
+						"nicecontentexclude.com"),
 				),
 			},
 		},
