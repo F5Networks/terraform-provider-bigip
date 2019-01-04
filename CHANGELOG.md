@@ -1,4 +1,10 @@
 ## 0.12.1 (Unreleased)
+- Added Valid function to node resource
+- Added  pool_attachement resource doc
+- Improvement to node resource , interval
+- Simplified some parts with new utility methods (SelfIP & Vlan)
+- Fix SelfIP and VLAN Read methods + other minor fixes
+
 ## 0.12.0 (September 26, 2018)
 - Added couple of resources like snat, snmp, profiles, test modules etc.
 
