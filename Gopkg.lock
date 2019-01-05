@@ -63,8 +63,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "d75ca9c91e5bcf0c3adb9672a786ac65e8073a6e"
-  version = "v1.16.13"
+  revision = "fb5f514796fc4fdc6afdcf5a675a5b2baa714b9f"
+  version = "v1.16.14"
 
 [[projects]]
   branch = "master"
@@ -94,7 +94,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "91447b7d4f4d5f7b32a930a93559a68b9e715ecf"
+  revision = "6bc0199d7291917deeb0511cbfd5f1abfaf51950"
 
 [[projects]]
   name = "github.com/fatih/color"
