@@ -216,7 +216,7 @@ func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
 	d.Set("snatpool", p.Snatpool)
 	d.Set("vlansdisabled", p.VlansDisabled)
 	if err := d.Set("vlans", p.Vlans); err != nil {
-		 return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
+		return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
 	}
 	for i, r := range p.Origins {
 		origins := fmt.Sprintf("origins.%d", i)
