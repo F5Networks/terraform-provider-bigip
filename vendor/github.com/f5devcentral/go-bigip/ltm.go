@@ -1344,6 +1344,7 @@ type Snat struct {
 	Translation   string
 	Snatpool      string
 	VlansDisabled bool
+	Vlans []string
 	Origins       []Originsrecord
 }
 
@@ -1356,6 +1357,7 @@ type snatDTO struct {
 	SourcePort    string `json:"sourePort,omitempty"`
 	Translation   string `json:"translation,omitempty"`
 	Snatpool      string `json:"snatpool,omitempty"`
+	Vlans    []string `json:"vlans,omitempty"`
 	VlansDisabled bool   `json:"vlansDisabled,omitempty" bool:"disabled"`
 	Origins       struct {
 		Items []Originsrecord `json:"items,omitempty"`
@@ -1381,6 +1383,7 @@ func (p *Snat) MarshalJSON() ([]byte, error) {
 		Translation:   p.Translation,
 		Snatpool:      p.Snatpool,
 		VlansDisabled: p.VlansDisabled,
+		Vlans: p.Vlans,
 		Origins: struct {
 			Items []Originsrecord `json:"items,omitempty"`
 		}{Items: p.Origins},
@@ -1403,6 +1406,7 @@ func (p *Snat) UnmarshalJSON(b []byte) error {
 	p.Translation = dto.Translation
 	p.Snatpool = dto.Snatpool
 	p.VlansDisabled = dto.VlansDisabled
+	p.Vlans = dto.Vlans
 	p.Origins = dto.Origins.Items
 
 	return nil
