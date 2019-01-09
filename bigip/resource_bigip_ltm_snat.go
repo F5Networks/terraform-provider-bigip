@@ -196,7 +196,6 @@ func dataToSnat(name string, d *schema.ResourceData) bigip.Snat {
 	p.Origins = make([]bigip.Originsrecord, 0, originsCount)
 	for i := 0; i < originsCount; i++ {
 		var r bigip.Originsrecord
-		log.Println("I am in dattosnat policy ", p, originsCount, i)
 		prefix := fmt.Sprintf("origins.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		p.Origins = append(p.Origins, r)
@@ -216,7 +215,9 @@ func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
 	d.Set("translation", p.Translation)
 	d.Set("snatpool", p.Snatpool)
 	d.Set("vlansdisabled", p.VlansDisabled)
-	d.Set("vlans", p.Vlans)
+	if err := d.Set("vlans", p.Vlans); err != nil {
+		 return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
+	}
 	for i, r := range p.Origins {
 		origins := fmt.Sprintf("origins.%d", i)
 		d.Set(fmt.Sprintf("%s.name", origins), r.Name)
