@@ -23,6 +23,7 @@ resource "bigip_ltm_snat" "snat3" {
   origins = ["6.1.6.6"]
   mirror = "false"
   snatpool = "/Common/sanjaysnatpool"
+  vlans = ["test-vlan"]
 }
 
 ```      
@@ -46,3 +47,5 @@ resource "bigip_ltm_snat" "snat3" {
 * `translation` - (Optional) Specifies the name of a translated IP address. Note that translated addresses are outside the traffic management system. You can only use this option when automap and snatpool are not used.
 
 * `vlansdisabled` - (Optional) Disables the SNAT on all VLANs.
+
+* `vlans` - (Optional) Specifies the name of the VLAN to which you want to assign the SNAT. The default is vlans-enabled.
