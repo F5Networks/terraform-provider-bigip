@@ -63,8 +63,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "fb5f514796fc4fdc6afdcf5a675a5b2baa714b9f"
-  version = "v1.16.14"
+  revision = "aabf189db35ba7eb5a35afe6d681fc0f70954fca"
+  version = "v1.16.18"
 
 [[projects]]
   branch = "master"
@@ -94,7 +94,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "6bc0199d7291917deeb0511cbfd5f1abfaf51950"
+  revision = "90b36a87a93bee6524af85a86d8c7324765955b5"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -144,13 +144,13 @@
     ".",
     "helper/url"
   ]
-  revision = "be39683deade1b3613258f751a2fad316d7b5e7c"
+  revision = "c68364a1fae197940532c487ce807eee5f890bec"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/go-hclog"
   packages = ["."]
-  revision = "61d530d6c27f994fb6c83b80f99a69c54125ec8a"
+  revision = "4783caec6f2e5cdd47fab8b2bb47ce2ce5c546b7"
 
 [[projects]]
   name = "github.com/hashicorp/go-multierror"
@@ -182,8 +182,8 @@
 [[projects]]
   name = "github.com/hashicorp/go-version"
   packages = ["."]
-  revision = "b5a281d3160aa11950a6182bd9a9dc2cb1e02d50"
-  version = "v1.0.0"
+  revision = "d40cf49b3a77bba84a7afdbd7f1dc295d114efb1"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/hashicorp/hcl"
@@ -213,7 +213,7 @@
     "hclparse",
     "hclwrite"
   ]
-  revision = "819a65acc453ba35681e287fa31f5f0bb084ddb9"
+  revision = "40e962e08e80f350603feac3ca64495a2fbfaa79"
 
 [[projects]]
   branch = "master"
@@ -361,8 +361,8 @@
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/ulikunitz/xz"
@@ -419,13 +419,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
+  revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "82a175fd1598e8a172e58ebdf5ed262bb29129e5"
+  revision = "2be51725563103c17124a318f1745b66f2347acb"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -452,7 +452,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
+  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
 
 [[projects]]
   name = "google.golang.org/grpc"
