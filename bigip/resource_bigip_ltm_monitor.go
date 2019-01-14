@@ -113,6 +113,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Default:     "*:*",
 				Description: "Alias for the destination",
 			},
+			"compatibility": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
+			},
 		},
 	}
 }
@@ -132,6 +137,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("send").(string),
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
+		d.Get("compatibility").(string),
 	)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
@@ -179,6 +185,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			if err := d.Set("destination", m.Destination); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
 			}
+			if err := d.Set("compatibility", m.Compatibility); err != nil {
+				return fmt.Errorf("[DEBUG] Error saving Compatibility to state for Monitor (%s): %s", d.Id(), err)
+			}
+
 			d.Set("name", name)
 			return nil
 		}
@@ -229,6 +239,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		TimeUntilUp:    d.Get("time_until_up").(int),
 		ManualResume:   d.Get("manual_resume").(string),
 		Destination:    d.Get("destination").(string),
+		Compatibility:  d.Get("compatibility").(string),
 	}
 
 	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
