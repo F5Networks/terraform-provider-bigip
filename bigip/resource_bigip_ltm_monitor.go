@@ -185,11 +185,9 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			if err := d.Set("destination", m.Destination); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
 			}
-			if err := d.Set("compatibility", m.Compatibility); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving Compatibility to state for Monitor (%s): %s", d.Id(), err)
-			}
-
+			d.Set("compatibility", m.Compatibility)
 			d.Set("name", name)
+
 			return nil
 		}
 	}
