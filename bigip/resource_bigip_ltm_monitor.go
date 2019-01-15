@@ -114,9 +114,10 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description: "Alias for the destination",
 			},
 			"compatibility": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
+				ValidateFunc: validateEnabledDisabled,
 			},
 		},
 	}
@@ -182,9 +183,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("ip_dscp", m.IPDSCP)
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
-			if err := d.Set("destination", m.Destination); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving Destination to state for Monitor (%s): %s", d.Id(), err)
-			}
+			d.Set("destination", m.Destination)
 			d.Set("compatibility", m.Compatibility)
 			d.Set("name", name)
 
