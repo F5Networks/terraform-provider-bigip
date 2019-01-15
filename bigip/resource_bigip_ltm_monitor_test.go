@@ -35,12 +35,12 @@ resource "bigip_ltm_monitor" "test-https-monitor" {
 	name = "` + TEST_HTTPS_MONITOR_NAME + `"
 	parent = "/Common/https"
 	interval          = 5
-time_until_up     = 0
-timeout           = 16
-send = "GET /some/path\r\n"
-reverse = "disabled"
-destination       = "*:8008"
-compatibility    = "enabled"
+	time_until_up     = 0
+	timeout           = 16
+	send = "GET /some/path\r\n"
+	reverse = "disabled"
+	destination       = "*:8008"
+	compatibility    = "enabled"
 }
 `
 
