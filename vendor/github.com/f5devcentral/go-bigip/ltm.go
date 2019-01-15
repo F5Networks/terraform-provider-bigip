@@ -949,6 +949,7 @@ type Monitor struct {
 	Transparent    string
 	UpInterval     int
 	Username       string
+	Compatibility  string
 }
 
 type monitorDTO struct {
@@ -973,6 +974,7 @@ type monitorDTO struct {
 	Transparent    string `json:"transparent,omitempty"`
 	UpInterval     int    `json:"upInterval,omitempty"`
 	Username       string `json:"username,omitempty"`
+	Compatibility  string `json:"compatibility,omitempty"`
 }
 
 type Profiles struct {
@@ -1344,21 +1346,21 @@ type Snat struct {
 	Translation   string
 	Snatpool      string
 	VlansDisabled bool
-	Vlans []string
+	Vlans         []string
 	Origins       []Originsrecord
 }
 
 type snatDTO struct {
-	Name          string `json:"name"`
-	Partition     string `json:"partition,omitempty"`
-	FullPath      string `json:"fullPath,omitempty"`
-	AutoLasthop   string `json:"autoLastHop,omitempty"`
-	Mirror        string `json:"mirror,omitempty"`
-	SourcePort    string `json:"sourePort,omitempty"`
-	Translation   string `json:"translation,omitempty"`
-	Snatpool      string `json:"snatpool,omitempty"`
-	Vlans    []string `json:"vlans,omitempty"`
-	VlansDisabled bool   `json:"vlansDisabled,omitempty" bool:"disabled"`
+	Name          string   `json:"name"`
+	Partition     string   `json:"partition,omitempty"`
+	FullPath      string   `json:"fullPath,omitempty"`
+	AutoLasthop   string   `json:"autoLastHop,omitempty"`
+	Mirror        string   `json:"mirror,omitempty"`
+	SourcePort    string   `json:"sourePort,omitempty"`
+	Translation   string   `json:"translation,omitempty"`
+	Snatpool      string   `json:"snatpool,omitempty"`
+	Vlans         []string `json:"vlans,omitempty"`
+	VlansDisabled bool     `json:"vlansDisabled,omitempty" bool:"disabled"`
 	Origins       struct {
 		Items []Originsrecord `json:"items,omitempty"`
 	} `json:"originsReference,omitempty"`
@@ -1383,7 +1385,7 @@ func (p *Snat) MarshalJSON() ([]byte, error) {
 		Translation:   p.Translation,
 		Snatpool:      p.Snatpool,
 		VlansDisabled: p.VlansDisabled,
-		Vlans: p.Vlans,
+		Vlans:         p.Vlans,
 		Origins: struct {
 			Items []Originsrecord `json:"items,omitempty"`
 		}{Items: p.Origins},
@@ -2336,7 +2338,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string) error {
 	config := &Monitor{
 		Name:           name,
 		ParentMonitor:  parent,
@@ -2346,6 +2348,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 		SendString:     send,
 		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
+		Compatibility:  compatibility,
 	}
 
 	return b.AddMonitor(config)
@@ -2379,7 +2382,6 @@ func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 
 // DeleteMonitor removes a monitor.
 func (b *BigIP) DeleteMonitor(name, parent string) error {
-	log.Println(" in delete +++++++++++++++++ ", parent, name)
 	return b.delete(uriLtm, uriMonitor, parent, name)
 }
 

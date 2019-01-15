@@ -10,6 +10,7 @@ import (
 )
 
 var TEST_MONITOR_NAME = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
+var TEST_HTTPS_MONITOR_NAME = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
 
 var TEST_MONITOR_RESOURCE = `
 resource "bigip_ltm_monitor" "test-monitor" {
@@ -26,6 +27,20 @@ resource "bigip_ltm_monitor" "test-monitor" {
 	ip_dscp = 0
 	time_until_up = 0
 	destination = "1.2.3.4:1234"
+}
+`
+
+var TEST_HTTPS_MONITOR_RESOURCE = `
+resource "bigip_ltm_monitor" "test-https-monitor" {
+	name = "` + TEST_HTTPS_MONITOR_NAME + `"
+	parent = "/Common/https"
+	interval          = 5
+	time_until_up     = 0
+	timeout           = 16
+	send = "GET /some/path\r\n"
+	reverse = "disabled"
+	destination       = "*:8008"
+	compatibility    = "enabled"
 }
 `
 
@@ -53,6 +68,30 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "ip_dscp", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "time_until_up", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "destination", "1.2.3.4:1234"),
+				),
+			},
+		},
+	})
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_HTTPS_MONITOR_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TEST_HTTPS_MONITOR_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "parent", "/Common/https"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "send", "GET /some/path\\r\\n"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "destination", "*:8008"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "compatibility", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "reverse", "disabled"),
 				),
 			},
 		},

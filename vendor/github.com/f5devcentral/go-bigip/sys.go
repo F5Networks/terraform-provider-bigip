@@ -411,7 +411,7 @@ func (b *BigIP) SNMPs() (*SNMP, error) {
 
 func (b *BigIP) CreateTRAP(name string, authPasswordEncrypted string, authProtocol string, community string, description string, engineId string, host string, port int, privacyPassword string, privacyPasswordEncrypted string, privacyProtocol string, securityLevel string, securityName string, version string) error {
 	config := &TRAP{
-		Name: name,
+		Name:                     name,
 		AuthPasswordEncrypted:    authPasswordEncrypted,
 		AuthProtocol:             authProtocol,
 		Community:                community,
