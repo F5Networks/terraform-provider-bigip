@@ -54,3 +54,5 @@ resource "bigip_ltm_monitor" "monitor" {
 * `time_until_up` - (Optional)
 
 * `destination` - (Optional) Specify an alias address for monitoring
+
+* `compatibility` -  (Optional) Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. Accepts 'enabled' or 'disabled' values, the default value is 'enabled'.
