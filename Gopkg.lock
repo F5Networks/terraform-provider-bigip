@@ -37,6 +37,7 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
     "aws/credentials/stscreds",
     "aws/csm",
     "aws/defaults",
@@ -45,6 +46,7 @@
     "aws/request",
     "aws/session",
     "aws/signer/v4",
+    "internal/ini",
     "internal/s3err",
     "internal/sdkio",
     "internal/sdkrand",
@@ -61,8 +63,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "4b4fb865e4e4a972645dba0b9677e623dd83a8a8"
-  version = "v1.15.53"
+  revision = "aabf189db35ba7eb5a35afe6d681fc0f70954fca"
+  version = "v1.16.18"
 
 [[projects]]
   branch = "master"
@@ -92,19 +94,13 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "16738c80d22ce6a697f57fb67a423dd51955099f"
+  revision = "90b36a87a93bee6524af85a86d8c7324765955b5"
 
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "5b77d2a35fb0ede96d138fc9a99f5c9b6aef11b4"
   version = "v1.7.0"
-
-[[projects]]
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  revision = "7b294651033cd7d9e7f0d9ffa1b75ed1e198e737"
-  version = "v1.38.3"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -117,6 +113,17 @@
   ]
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
+
+[[projects]]
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value"
+  ]
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
 
 [[projects]]
   name = "github.com/hashicorp/errwrap"
@@ -137,13 +144,13 @@
     ".",
     "helper/url"
   ]
-  revision = "4bda8fa99001c61db3cad96b421d4c12a81f256d"
+  revision = "c68364a1fae197940532c487ce807eee5f890bec"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/go-hclog"
   packages = ["."]
-  revision = "61d530d6c27f994fb6c83b80f99a69c54125ec8a"
+  revision = "4783caec6f2e5cdd47fab8b2bb47ce2ce5c546b7"
 
 [[projects]]
   name = "github.com/hashicorp/go-multierror"
@@ -154,8 +161,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/go-plugin"
-  packages = ["."]
-  revision = "314501b665e0b2cc71bbd829783179fc38840a85"
+  packages = [
+    ".",
+    "internal/proto"
+  ]
+  revision = "f444068e8f5a19853177f7aa0aea7e7d95b5b528"
 
 [[projects]]
   name = "github.com/hashicorp/go-safetemp"
@@ -172,8 +182,8 @@
 [[projects]]
   name = "github.com/hashicorp/go-version"
   packages = ["."]
-  revision = "b5a281d3160aa11950a6182bd9a9dc2cb1e02d50"
-  version = "v1.0.0"
+  revision = "d40cf49b3a77bba84a7afdbd7f1dc295d114efb1"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/hashicorp/hcl"
@@ -200,9 +210,10 @@
     "hcl/hclsyntax",
     "hcl/json",
     "hcldec",
-    "hclparse"
+    "hclparse",
+    "hclwrite"
   ]
-  revision = "3e4b7e0eb20ecc20e70dbd458f7a54daf0032830"
+  revision = "40e962e08e80f350603feac3ca64495a2fbfaa79"
 
 [[projects]]
   branch = "master"
@@ -250,8 +261,8 @@
     "tfdiags",
     "version"
   ]
-  revision = "6dfc4d748de9cda23835bc5704307ed45e839622"
-  version = "v0.11.8"
+  revision = "ac4fff416318bf0915a0ab80e062a99ef3724334"
+  version = "v0.11.11"
 
 [[projects]]
   branch = "master"
@@ -262,7 +273,7 @@
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "0b12d6b5"
+  revision = "c2b33e84"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -344,14 +355,14 @@
     "cmd/install",
     "match"
   ]
-  revision = "dcda3199365ca2a5f24aea4c42aa56f6a197d117"
-  version = "v1.1.2"
+  revision = "3ef9b31a6a0613ae832e7ecf208374027c3b2343"
+  version = "v1.2.1"
 
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/ulikunitz/xz"
@@ -361,8 +372,8 @@
     "internal/xlog",
     "lzma"
   ]
-  revision = "0c6b41e72360850ca4f98dc341fd999726ea007f"
-  version = "v0.5.4"
+  revision = "590df8077fbcb06ad62d7714da06c00e5dd2316d"
+  version = "v0.5.5"
 
 [[projects]]
   branch = "master"
@@ -376,7 +387,7 @@
     "cty/json",
     "cty/set"
   ]
-  revision = "1f835aab79c29c842f2e8624541053e8ff618cd8"
+  revision = "67e3da15e4309389854d5b28eaaede43da5ca9ad"
 
 [[projects]]
   branch = "master"
@@ -392,7 +403,7 @@
     "openpgp/packet",
     "openpgp/s2k"
   ]
-  revision = "a92615f3c49003920a58dedcf32cf55022cefb8d"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -408,13 +419,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "49bb7cea24b1df9410e1712aa6433dae904ff66a"
+  revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "2be51725563103c17124a318f1745b66f2347acb"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -441,7 +452,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "af9cb2a35e7f169ec875002c1829c9b315cddc04"
+  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -450,9 +461,11 @@
     "balancer",
     "balancer/base",
     "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
     "codes",
     "connectivity",
     "credentials",
+    "credentials/internal",
     "encoding",
     "encoding/proto",
     "grpclog",
@@ -460,9 +473,12 @@
     "health/grpc_health_v1",
     "internal",
     "internal/backoff",
+    "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
     "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
     "internal/transport",
     "keepalive",
     "metadata",
@@ -475,8 +491,8 @@
     "status",
     "tap"
   ]
-  revision = "8dea3dc473e90c8179e519d91302d0597c0ca1d1"
-  version = "v1.15.0"
+  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
+  version = "v1.17.0"
 
 [solve-meta]
   analyzer-name = "dep"

@@ -67,6 +67,13 @@ func resourceBigipLtmSnat() *schema.Resource {
 				Optional:    true,
 				Description: "Disables the SNAT on all VLANs.",
 			},
+			"vlans": {
+				Type:        schema.TypeSet,
+				Set:         schema.HashString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Description: "Vlans or Vlan list",
+			},
 
 			"origins": {
 				Type:     schema.TypeList,
@@ -184,12 +191,11 @@ func dataToSnat(name string, d *schema.ResourceData) bigip.Snat {
 	p.Translation = d.Get("translation").(string)
 	p.Snatpool = d.Get("snatpool").(string)
 	p.VlansDisabled = d.Get("vlansdisabled").(bool)
-
+	p.Vlans = setToStringSlice(d.Get("vlans").(*schema.Set))
 	originsCount := d.Get("origins.#").(int)
 	p.Origins = make([]bigip.Originsrecord, 0, originsCount)
 	for i := 0; i < originsCount; i++ {
 		var r bigip.Originsrecord
-		log.Println("I am in dattosnat policy ", p, originsCount, i)
 		prefix := fmt.Sprintf("origins.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		p.Origins = append(p.Origins, r)
@@ -209,7 +215,9 @@ func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
 	d.Set("translation", p.Translation)
 	d.Set("snatpool", p.Snatpool)
 	d.Set("vlansdisabled", p.VlansDisabled)
-
+	if err := d.Set("vlans", p.Vlans); err != nil {
+		return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
+	}
 	for i, r := range p.Origins {
 		origins := fmt.Sprintf("origins.%d", i)
 		d.Set(fmt.Sprintf("%s.name", origins), r.Name)

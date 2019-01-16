@@ -45,6 +45,20 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 				Optional:    true,
 				Description: "Servers Address",
 			},
+			"content_type_include": {
+				Type:        schema.TypeSet,
+				Set:         schema.HashString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Description: "Specifies a list of content types for compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to compress.",
+			},
+			"content_type_exclude": {
+				Type:        schema.TypeSet,
+				Set:         schema.HashString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Description: "Specifies a list of content types for compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to exclude.",
+			},
 		},
 	}
 }
@@ -56,6 +70,8 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 	defaultsFrom := d.Get("defaults_from").(string)
 	uriExclude := setToStringSlice(d.Get("uri_exclude").(*schema.Set))
 	uriInclude := setToStringSlice(d.Get("uri_include").(*schema.Set))
+	contentTypeInclude := setToStringSlice(d.Get("content_type_include").(*schema.Set))
+	contentTypeExclude := setToStringSlice(d.Get("content_type_exclude").(*schema.Set))
 
 	log.Println("[INFO] Creating Httpcompress profile")
 
@@ -64,6 +80,8 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 		defaultsFrom,
 		uriExclude,
 		uriInclude,
+		contentTypeInclude,
+		contentTypeExclude,
 	)
 
 	if err != nil {
@@ -78,13 +96,12 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 
 	name := d.Id()
 
-	//log.Println("[INFO] Updating Route " + description)
-
 	r := &bigip.Httpcompress{
-		Name:         name,
-		DefaultsFrom: d.Get("defaults_from").(string),
-		UriExclude:   setToStringSlice(d.Get("uri_exclude").(*schema.Set)),
-		UriInclude:   setToStringSlice(d.Get("uri_include").(*schema.Set)),
+		Name:               name,
+		DefaultsFrom:       d.Get("defaults_from").(string),
+		UriExclude:         setToStringSlice(d.Get("uri_exclude").(*schema.Set)),
+		UriInclude:         setToStringSlice(d.Get("uri_include").(*schema.Set)),
+		ContentTypeInclude: setToStringSlice(d.Get("content_type_include").(*schema.Set)),
 	}
 
 	err := client.ModifyHttpcompress(name, r)
@@ -113,6 +130,12 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 	}
 	if err := d.Set("uri_exclude", obj.UriExclude); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving UriExclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("content_type_include", obj.ContentTypeInclude); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ContentTypeInclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("content_type_exclude", obj.ContentTypeExclude); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving ContentTypeExclude to state for Http Compress profile  (%s): %s", d.Id(), err)
 	}
 
 	return nil

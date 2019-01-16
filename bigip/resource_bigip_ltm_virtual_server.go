@@ -362,15 +362,15 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	vs := &bigip.VirtualServer{
 		Destination:                fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
 		FallbackPersistenceProfile: d.Get("fallback_persistence_profile").(string),
-		Source:              d.Get("source").(string),
-		Pool:                d.Get("pool").(string),
-		Mask:                d.Get("mask").(string),
-		Rules:               rules,
-		PersistenceProfiles: persistenceProfiles,
-		Profiles:            profiles,
-		Policies:            policies,
-		Vlans:               vlans,
-		IPProtocol:          d.Get("ip_protocol").(string),
+		Source:                     d.Get("source").(string),
+		Pool:                       d.Get("pool").(string),
+		Mask:                       d.Get("mask").(string),
+		Rules:                      rules,
+		PersistenceProfiles:        persistenceProfiles,
+		Profiles:                   profiles,
+		Policies:                   policies,
+		Vlans:                      vlans,
+		IPProtocol:                 d.Get("ip_protocol").(string),
 		SourceAddressTranslation: struct {
 			Type string `json:"type,omitempty"`
 			Pool string `json:"pool,omitempty"`

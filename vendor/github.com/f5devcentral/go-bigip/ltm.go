@@ -949,6 +949,7 @@ type Monitor struct {
 	Transparent    string
 	UpInterval     int
 	Username       string
+	Compatibility  string
 }
 
 type monitorDTO struct {
@@ -973,6 +974,7 @@ type monitorDTO struct {
 	Transparent    string `json:"transparent,omitempty"`
 	UpInterval     int    `json:"upInterval,omitempty"`
 	Username       string `json:"username,omitempty"`
+	Compatibility  string `json:"compatibility,omitempty"`
 }
 
 type Profiles struct {
@@ -1117,10 +1119,12 @@ type Fastl4 struct {
 }
 
 type httpcompressDTO struct {
-	Name         string   `json:"name,omitempty"`
-	DefaultsFrom string   `json:"defaultsFrom,omitempty"`
-	UriExclude   []string `json:"uriExclude,omitempty"`
-	UriInclude   []string `json:"uriInclude,omitempty"`
+	Name               string   `json:"name,omitempty"`
+	DefaultsFrom       string   `json:"defaultsFrom,omitempty"`
+	UriExclude         []string `json:"uriExclude,omitempty"`
+	UriInclude         []string `json:"uriInclude,omitempty"`
+	ContentTypeInclude []string `json:"contentTypeInclude,omitempty"`
+	ContentTypeExclude []string `json:"contentTypeExclude,omitempty"`
 }
 
 type Httpcompresss struct {
@@ -1128,10 +1132,12 @@ type Httpcompresss struct {
 }
 
 type Httpcompress struct {
-	Name         string
-	DefaultsFrom string
-	UriExclude   []string
-	UriInclude   []string
+	Name               string
+	DefaultsFrom       string
+	UriExclude         []string
+	UriInclude         []string
+	ContentTypeInclude []string
+	ContentTypeExclude []string
 }
 
 type http2DTO struct {
@@ -1340,19 +1346,21 @@ type Snat struct {
 	Translation   string
 	Snatpool      string
 	VlansDisabled bool
+	Vlans         []string
 	Origins       []Originsrecord
 }
 
 type snatDTO struct {
-	Name          string `json:"name"`
-	Partition     string `json:"partition,omitempty"`
-	FullPath      string `json:"fullPath,omitempty"`
-	AutoLasthop   string `json:"autoLastHop,omitempty"`
-	Mirror        string `json:"mirror,omitempty"`
-	SourcePort    string `json:"sourePort,omitempty"`
-	Translation   string `json:"translation,omitempty"`
-	Snatpool      string `json:"snatpool,omitempty"`
-	VlansDisabled bool   `json:"vlansDisabled,omitempty" bool:"disabled"`
+	Name          string   `json:"name"`
+	Partition     string   `json:"partition,omitempty"`
+	FullPath      string   `json:"fullPath,omitempty"`
+	AutoLasthop   string   `json:"autoLastHop,omitempty"`
+	Mirror        string   `json:"mirror,omitempty"`
+	SourcePort    string   `json:"sourePort,omitempty"`
+	Translation   string   `json:"translation,omitempty"`
+	Snatpool      string   `json:"snatpool,omitempty"`
+	Vlans         []string `json:"vlans,omitempty"`
+	VlansDisabled bool     `json:"vlansDisabled,omitempty" bool:"disabled"`
 	Origins       struct {
 		Items []Originsrecord `json:"items,omitempty"`
 	} `json:"originsReference,omitempty"`
@@ -1377,6 +1385,7 @@ func (p *Snat) MarshalJSON() ([]byte, error) {
 		Translation:   p.Translation,
 		Snatpool:      p.Snatpool,
 		VlansDisabled: p.VlansDisabled,
+		Vlans:         p.Vlans,
 		Origins: struct {
 			Items []Originsrecord `json:"items,omitempty"`
 		}{Items: p.Origins},
@@ -1399,6 +1408,7 @@ func (p *Snat) UnmarshalJSON(b []byte) error {
 	p.Translation = dto.Translation
 	p.Snatpool = dto.Snatpool
 	p.VlansDisabled = dto.VlansDisabled
+	p.Vlans = dto.Vlans
 	p.Origins = dto.Origins.Items
 
 	return nil
@@ -1900,7 +1910,7 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, interval string) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, interval, address_family, autopopulate string, downinterval int) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1911,6 +1921,9 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 	}
 	config.FQDN.Name = address
 	config.FQDN.Interval = interval
+	config.FQDN.AddressFamily = address_family
+	config.FQDN.AutoPopulate = autopopulate
+	config.FQDN.DownInterval = downinterval
 
 	return b.post(config, uriLtm, uriNode)
 }
@@ -2325,7 +2338,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string) error {
 	config := &Monitor{
 		Name:           name,
 		ParentMonitor:  parent,
@@ -2335,6 +2348,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 		SendString:     send,
 		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
+		Compatibility:  compatibility,
 	}
 
 	return b.AddMonitor(config)
@@ -2368,7 +2382,6 @@ func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 
 // DeleteMonitor removes a monitor.
 func (b *BigIP) DeleteMonitor(name, parent string) error {
-	log.Println(" in delete +++++++++++++++++ ", parent, name)
 	return b.delete(uriLtm, uriMonitor, parent, name)
 }
 
@@ -2709,12 +2722,14 @@ func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
 
 // ===============
 
-func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude []string) error {
+func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude, contentTypeInclude, contentTypeExclude []string) error {
 	httpcompress := &Httpcompress{
-		Name:         name,
-		DefaultsFrom: defaultsFrom,
-		UriExclude:   uriExclude,
-		UriInclude:   uriInclude,
+		Name:               name,
+		DefaultsFrom:       defaultsFrom,
+		UriExclude:         uriExclude,
+		UriInclude:         uriInclude,
+		ContentTypeInclude: contentTypeInclude,
+		ContentTypeExclude: contentTypeExclude,
 	}
 	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
 }

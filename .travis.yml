@@ -5,7 +5,7 @@ services:
   - docker
 language: go
 go:
-- "1.11"
+  - "1.11.x"
 
 git:
   depth: 1
@@ -19,7 +19,6 @@ install:
 - make tools
 
 script:
-- make lint
 - make test
 - make vendor-status
 - make website-lint

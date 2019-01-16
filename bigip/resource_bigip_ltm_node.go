@@ -67,6 +67,7 @@ func resourceBigipLtmNode() *schema.Resource {
 			"fqdn": {
 				Type:     schema.TypeList,
 				Optional: true,
+				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"address_family": {
@@ -84,6 +85,18 @@ func resourceBigipLtmNode() *schema.Resource {
 							Optional:    true,
 							Default:     "3600",
 							Description: "Specifies the amount of time before sending the next DNS query.",
+						},
+						"downinterval": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     5,
+							Description: "Specifies the number of attempts to resolve a domain name. The default is 5.",
+						},
+						"autopopulate": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "disabled",
+							Description: "Specifies whether the node should scale to the IP address set returned by DNS.",
 						},
 					},
 				},
@@ -118,25 +131,28 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			state,
 		)
 	} else {
-		ifaceCount := d.Get("fqdn.#").(int)
-		for i := 0; i < ifaceCount; i++ {
-			prefix := fmt.Sprintf("fqdn.%d", i)
-			interval := d.Get(prefix + ".interval").(string)
-			err = client.CreateFQDNNode(
-				name,
-				address,
-				rate_limit,
-				connection_limit,
-				dynamic_ratio,
-				monitor,
-				state,
-				interval,
-			)
-		}
+		interval := d.Get("fqdn.0.interval").(string)
+		address_family := d.Get("fqdn.0.address_family").(string)
+		autopopulate := d.Get("fqdn.0.autopopulate").(string)
+		downinterval := d.Get("fqdn.0.downinterval").(int)
+
+		err = client.CreateFQDNNode(
+			name,
+			address,
+			rate_limit,
+			connection_limit,
+			dynamic_ratio,
+			monitor,
+			state,
+			interval,
+			address_family,
+			autopopulate,
+			downinterval,
+		)
 	}
+
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node (%s) (%v) ", name, err)
-		return err
+		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
 
 	d.SetId(name)
@@ -183,6 +199,11 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("dynamic_ratio", node.DynamicRatio)
+	d.Set("fqdn.0.interval", node.FQDN.Interval)
+	d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
+	d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
+	d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
+
 	return nil
 }
 
@@ -200,7 +221,6 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 
 	if node == nil {
 		log.Printf("[WARN] node (%s) not found, removing from state", d.Id())
-		d.SetId("")
 		return false, nil
 	}
 	return node != nil, nil
@@ -211,7 +231,6 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
-	//interval := d.Get("interval").(string)
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
 	var node *bigip.Node
@@ -235,8 +254,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 		err := client.ModifyNode(name, node)
 		if err != nil {
-			log.Printf("[ERROR] Unable to Modify Node %s  %v : ", name, err)
-			return err
+			return fmt.Errorf("Error modifying node %s: %v", name, err)
 		}
 	}
 	return resourceBigipLtmNodeRead(d, meta)

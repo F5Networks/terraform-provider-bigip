@@ -147,20 +147,79 @@ type Bigiplicense struct {
 	Command          string `json:"command,omitempty"`
 }
 
+type LogIPFIXs struct {
+	LogIPFIXs []LogIPFIX `json:"items"`
+}
+type LogIPFIX struct {
+	AppService                 string `json:"appService,omitempty"`
+	Name                       string `json:"name,omitempty"`
+	PoolName                   string `json:"poolName,omitempty"`
+	ProtocolVersion            string `json:"protocolVersion,omitempty"`
+	ServersslProfile           string `json:"serversslProfile,omitempty"`
+	TemplateDeleteDelay        int    `json:"templateDeleteDelay,omitempty"`
+	TemplateRetransmitInterval int    `json:"templateRetransmitInterval,omitempty"`
+	TransportProfile           string `json:"transportProfile,omitempty"`
+}
+type LogPublishers struct {
+	LogPublishers []LogPublisher `json:"items"`
+}
+type LogPublisher struct {
+	Name  string `json:"name,omitempty"`
+	Dests []Destinations
+}
+
+type Destinations struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+}
+
+type destinationsDTO struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	Dests     struct {
+		Items []Destinations `json:"items,omitempty"`
+	} `json:"destinationsReference,omitempty"`
+}
+
+func (p *LogPublisher) MarshalJSON() ([]byte, error) {
+	return json.Marshal(destinationsDTO{
+		Name: p.Name,
+		Dests: struct {
+			Items []Destinations `json:"items,omitempty"`
+		}{Items: p.Dests},
+	})
+}
+
+func (p *LogPublisher) UnmarshalJSON(b []byte) error {
+	var dto destinationsDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+
+	p.Name = dto.Name
+	p.Dests = dto.Dests.Items
+	return nil
+}
+
 const (
-	uriSys       = "sys"
-	uriNtp       = "ntp"
-	uriDNS       = "dns"
-	uriProvision = "provision"
-	uriAfm       = "afm"
-	uriAsm       = "asm"
-	uriApm       = "apm"
-	uriAvr       = "avr"
-	uriIlx       = "ilx"
-	uriSyslog    = "syslog"
-	uriSnmp      = "snmp"
-	uriTraps     = "traps"
-	uriLicense   = "license"
+	uriSys         = "sys"
+	uriNtp         = "ntp"
+	uriDNS         = "dns"
+	uriProvision   = "provision"
+	uriAfm         = "afm"
+	uriAsm         = "asm"
+	uriApm         = "apm"
+	uriAvr         = "avr"
+	uriIlx         = "ilx"
+	uriSyslog      = "syslog"
+	uriSnmp        = "snmp"
+	uriTraps       = "traps"
+	uriLicense     = "license"
+	uriLogConfig   = "logConfig"
+	uriDestination = "destination"
+	uriIPFIX       = "ipfix"
+	uriPublisher   = "publisher"
 )
 
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
@@ -352,7 +411,7 @@ func (b *BigIP) SNMPs() (*SNMP, error) {
 
 func (b *BigIP) CreateTRAP(name string, authPasswordEncrypted string, authProtocol string, community string, description string, engineId string, host string, port int, privacyPassword string, privacyPasswordEncrypted string, privacyProtocol string, securityLevel string, securityName string, version string) error {
 	config := &TRAP{
-		Name: name,
+		Name:                     name,
 		AuthPasswordEncrypted:    authPasswordEncrypted,
 		AuthProtocol:             authProtocol,
 		Community:                community,
@@ -412,4 +471,61 @@ func (b *BigIP) CreateBigiplicense(command, registration_key string) error {
 
 func (b *BigIP) ModifyBigiplicense(config *Bigiplicense) error {
 	return b.put(config, uriSys, uriLicense)
+}
+
+func (b *BigIP) LogIPFIXs() (*LogIPFIX, error) {
+	var logipfix LogIPFIX
+	err, _ := b.getForEntity(&logipfix, uriSys, uriLogConfig, uriDestination, uriIPFIX)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &logipfix, nil
+}
+
+func (b *BigIP) CreateLogIPFIX(name, appService, poolName, protocolVersion, serversslProfile string, templateDeleteDelay, templateRetransmitInterval int, transportProfile string) error {
+	config := &LogIPFIX{
+		Name:                       name,
+		AppService:                 appService,
+		PoolName:                   poolName,
+		ProtocolVersion:            protocolVersion,
+		ServersslProfile:           serversslProfile,
+		TemplateDeleteDelay:        templateDeleteDelay,
+		TemplateRetransmitInterval: templateRetransmitInterval,
+		TransportProfile:           transportProfile,
+	}
+
+	return b.post(config, uriSys, uriLogConfig, uriDestination, uriIPFIX)
+}
+
+func (b *BigIP) ModifyLogIPFIX(config *LogIPFIX) error {
+	return b.put(config, uriSys, uriLogConfig, uriDestination, uriIPFIX)
+}
+
+func (b *BigIP) DeleteLogIPFIX(name string) error {
+	return b.delete(uriSys, uriLogConfig, uriDestination, uriIPFIX, name)
+}
+
+func (b *BigIP) LogPublisher() (*LogPublisher, error) {
+	var logpublisher LogPublisher
+	err, _ := b.getForEntity(&logpublisher, uriSys, uriLogConfig, uriPublisher)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &logpublisher, nil
+}
+
+func (b *BigIP) CreateLogPublisher(r *LogPublisher) error {
+	return b.post(r, uriSys, uriLogConfig, uriPublisher)
+}
+
+func (b *BigIP) ModifyLogPublisher(r *LogPublisher) error {
+	return b.put(r, uriSys, uriLogConfig, uriPublisher)
+}
+
+func (b *BigIP) DeleteLogPublisher(name string) error {
+	return b.delete(uriSys, uriLogConfig, uriPublisher, name)
 }
