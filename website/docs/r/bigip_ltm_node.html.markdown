@@ -17,11 +17,16 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
+
 resource "bigip_ltm_node" "node" {
   name = "/Common/terraform_node1"
   address = "10.10.10.10"
+  connection_limit = "0"
+	dynamic_ratio = "1"
+	monitor = "default"
+	rate_limit = "disabled"
+	fqdn = { interval = "3000"}
 }
-
 ```      
 
 ## Argument Reference
@@ -29,5 +34,17 @@ resource "bigip_ltm_node" "node" {
 * `name` - (Required) Name of the node
 
 * `address` - (Required) IP or hostname of the node
+
+* `connection_limit` - (Optional) Specifies the maximum number of connections allowed for the node or node address.
+
+* `dynamic_ratio` - (Optional) Specifies the fixed ratio value used for a node during ratio load balancing.
+
+* `monitor` - (Optional) specifies the name of the monitor or monitor rule that you want to associate with the node.
+
+* `rate_limit`- (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
+
+* `interval` - (Optional) Specifies the amount of time before sending the next DNS query. Default is 3600. This needs to be specified inside the fqdn (fully qualified domain name).
+
+* `address_family` - (Optional) Specifies the node's address family. The default is 'unspecified', or IP-agnostic. This needs to be specified inside the fqdn (fully qualified domain name).
 
 * `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
