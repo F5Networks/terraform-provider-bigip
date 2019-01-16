@@ -43,18 +43,10 @@ resource "bigip_ltm_node" "node" {
 
 * `rate_limit`- (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
 
+* `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
+
+* Below attributes needs to be configured under fqdn option.
+
 * `interval` - (Optional) Specifies the amount of time before sending the next DNS query. Default is 3600. This needs to be specified inside the fqdn (fully qualified domain name).
 
 * `address_family` - (Optional) Specifies the node's address family. The default is 'unspecified', or IP-agnostic. This needs to be specified inside the fqdn (fully qualified domain name).
-
-* `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
-
-`connection_limit` - (Optional) Specifies the maximum number of connections allowed for the node or node address, default is 0
-
- * `monitor` - (Optional) Specifies the name of the monitor or monitor rule that you want to associate with the node.
-
- * `dynamic_ratio` - (Optional)  Specifies the ratio weight to assign to the node. Valid values range from 1 through 65535. The default is 1, which means that each node has an equal ratio proportion.
-
- * `rate_limit` - (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
-
- * `interval` - (Optional) Specifies the amount of time before sending the next DNS query. It can also take value as "ttl" when "ttl" is specified the  it sets the Interval to the TTL of the DNS record.
