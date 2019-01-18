@@ -17,16 +17,16 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
+
 resource "bigip_ltm_node" "node" {
   name = "/Common/terraform_node1"
   address = "10.10.10.10"
   connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-	fqdn = { interval = "3000"}
+  dynamic_ratio = "1"
+  monitor = "default"
+  rate_limit = "disabled"
+  fqdn = { address_family = "ipv4", interval = "3000" }
 }
-
 ```      
 
 ## Argument Reference
@@ -35,15 +35,18 @@ resource "bigip_ltm_node" "node" {
 
 * `address` - (Required) IP or hostname of the node
 
+* `connection_limit` - (Optional) Specifies the maximum number of connections allowed for the node or node address.
+
+* `dynamic_ratio` - (Optional) Specifies the fixed ratio value used for a node during ratio load balancing.
+
+* `monitor` - (Optional) specifies the name of the monitor or monitor rule that you want to associate with the node.
+
+* `rate_limit`- (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
+
 * `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
 
-`connection_limit` - (Optional) Specifies the maximum number of connections allowed for the node or node address, default is 0
+* Below attributes needs to be configured under fqdn option.
 
- * `monitor` - (Optional) Specifies the name of the monitor or monitor rule that you want to associate with the node.
+* `interval` - (Optional) Specifies the amount of time before sending the next DNS query. Default is 3600. This needs to be specified inside the fqdn (fully qualified domain name).
 
- * `dynamic_ratio` - (Optional)  Specifies the ratio weight to assign to the node. Valid values range from 1 through 65535. The default is 1, which means that each node has an equal ratio proportion.
-
-
- * `rate_limit` - (Optional) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
-
- * `interval` - (Optional) Specifies the amount of time before sending the next DNS query. It can also take value as "ttl" when "ttl" is specified the  it sets the Interval to the TTL of the DNS record.
+* `address_family` - (Optional) Specifies the node's address family. The default is 'unspecified', or IP-agnostic. This needs to be specified inside the fqdn (fully qualified domain name).
