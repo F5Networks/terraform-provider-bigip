@@ -34,17 +34,20 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 			"concurrent_streams_per_connection": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     10,
 				Description: "Use the parent Http2 profile",
 			},
 
 			"connection_idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     300,
 				Description: "Use the parent Http2 profile",
 			},
 			"header_table_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     4096,
 				Description: "Use the parent Http2 profile",
 			},
 
