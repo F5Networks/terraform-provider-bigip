@@ -38,12 +38,14 @@ func resourceBigipLtmProfileOneconnect() *schema.Resource {
 			"idle_timeout_override": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "0",
 				Description: "idleTimeoutOverride can be enabled or disabled",
 			},
 
 			"share_pools": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "disabled",
 				Description: "sharePools can be enabled or disabled",
 			},
 			"source_mask": {
@@ -55,16 +57,19 @@ func resourceBigipLtmProfileOneconnect() *schema.Resource {
 			"max_age": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     -1,
 				Description: "max_age has integer value typical 3600 sec",
 			},
 			"max_reuse": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     -1,
 				Description: "max_reuse has integer value typical 1000 sec",
 			},
 			"max_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     -1,
 				Description: "max_size has integer value typical 1000 sec",
 			},
 		},
