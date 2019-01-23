@@ -38,41 +38,48 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 			"idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     300,
 				Description: "idle_timeout can be given value",
 			},
 
 			"close_wait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     5,
 				Description: "close wait timer integer",
 			},
 
 			"finwait_2timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     300,
 				Description: "timer integer",
 			},
 
 			"finwait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     5,
 				Description: "fin wait timer integer",
 			},
 
 			"keepalive_interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     1800,
 				Description: "keepalive_interval timer integer",
 			},
 
 			"deferred_accept": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "disabled",
 				Description: "Defferred accept",
 			},
 			"fast_open": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "disabled",
 				Description: "fast_open value ",
 			},
 		},

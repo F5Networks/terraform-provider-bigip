@@ -37,36 +37,43 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 			"client_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Default:     30,
 				Description: "Use the parent Fastl4 profile",
 			},
 			"explicitflow_migration": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "disabled",
 				Description: "Use the parent Fastl4 profile",
 			},
 			"hardware_syncookie": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "enabled",
 				Description: "Use the parent Fastl4 profile",
 			},
 			"idle_timeout": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "300",
 				Description: "Use the parent Fastl4 profile",
 			},
 			"iptos_toclient": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "65535",
 				Description: "Use the parent Fastl4 profile",
 			},
 			"iptos_toserver": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "65535",
 				Description: "Use the parent Fastl4 profile",
 			},
 			"keepalive_interval": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     0,
 				Description: "Use the parent Fastl4 profile",
 			},
 		},
