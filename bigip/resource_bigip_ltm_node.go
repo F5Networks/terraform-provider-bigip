@@ -2,9 +2,9 @@ package bigip
 
 import (
 	"fmt"
-	"log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
+	"log"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -109,27 +109,24 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Get("name").(string)
 	p := dataToNode(name, d)
 	d.Partial(true)
-err := client.CreateNode(&p)
-if err != nil {
-	log.Printf("[ERROR] Unable to Create Node  (%s) (%v) ", name, err)
-	return err
-}
-return nil
+	err := client.CreateNode(&p)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Create Node  (%s) (%v) ", name, err)
+		return err
+	}
+	return nil
 	d.SetId(name)
-d.SetPartial("fqdn")
-d.Partial(false)
+	d.SetPartial("fqdn")
+	d.Partial(false)
 	return resourceBigipLtmNodeRead(d, meta)
 }
 
 func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
-
-
 	return nil
 }
 
 func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-
 
 	return true, nil
 }
