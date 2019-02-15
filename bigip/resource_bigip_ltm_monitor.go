@@ -119,6 +119,28 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
 				ValidateFunc: validateEnabledDisabled,
 			},
+			"filename": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the full path and file name of the file that the system attempts to download. The health check is successful if the system can download the file.",
+			},
+			"mode": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the data transfer process (DTP) mode. The default value is passive.",
+			},
+			"adaptive": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "disabled",
+				Description: "ftp adaptive",
+			},
+			"adaptive_limit": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     200,
+				Description: "Integer value",
+			},
 		},
 	}
 }
@@ -139,6 +161,10 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
 		d.Get("compatibility").(string),
+		/*d.Get("filename").(string),
+		d.Get("mode").(string),
+		d.Get("adaptive").(string),
+		d.Get("adaptive_limit").(int),*/
 	)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
@@ -185,6 +211,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("destination", m.Destination)
 			d.Set("compatibility", m.Compatibility)
+			d.Set("filename", m.Filename)
+			d.Set("mode", m.Mode)
+			d.Set("adaptive", m.Adaptive)
+			d.Set("adaptive_limit", m.AdaptiveLimit)
 			d.Set("name", name)
 
 			return nil
@@ -237,6 +267,10 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		ManualResume:   d.Get("manual_resume").(string),
 		Destination:    d.Get("destination").(string),
 		Compatibility:  d.Get("compatibility").(string),
+		Filename:       d.Get("filename").(string),
+		Mode:           d.Get("mode").(string),
+		Adaptive:       d.Get("adaptive").(string),
+		AdaptiveLimit:  d.Get("adaptive_limit").(int),
 	}
 
 	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
@@ -264,11 +298,11 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" {
+	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, /Common/tcp-half-open,  or /Common/tcp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
 }
 
 func monitorParent(s string) string {
