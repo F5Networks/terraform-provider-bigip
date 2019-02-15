@@ -161,10 +161,6 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
 		d.Get("compatibility").(string),
-		/*d.Get("filename").(string),
-		d.Get("mode").(string),
-		d.Get("adaptive").(string),
-		d.Get("adaptive_limit").(int),*/
 	)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
