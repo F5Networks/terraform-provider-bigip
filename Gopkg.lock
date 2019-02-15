@@ -63,8 +63,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "aabf189db35ba7eb5a35afe6d681fc0f70954fca"
-  version = "v1.16.18"
+  revision = "4e2e7c3c80cfb77d22990cadb2c17096d2614938"
+  version = "v1.16.35"
 
 [[projects]]
   branch = "master"
@@ -94,7 +94,7 @@
   branch = "master"
   name = "github.com/f5devcentral/go-bigip"
   packages = ["."]
-  revision = "90b36a87a93bee6524af85a86d8c7324765955b5"
+  revision = "400e5566eac053b131c3351bea8f1890211950b2"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -138,19 +138,19 @@
   version = "v0.5.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/hashicorp/go-getter"
   packages = [
     ".",
     "helper/url"
   ]
-  revision = "c68364a1fae197940532c487ce807eee5f890bec"
+  revision = "062101f97c304b1bd56c0dc1aa9f06574ce69d66"
+  version = "v1.0.3"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/go-hclog"
   packages = ["."]
-  revision = "4783caec6f2e5cdd47fab8b2bb47ce2ce5c546b7"
+  revision = "90f2fbc4844c54471c74c1395e1d06ce0582ec59"
 
 [[projects]]
   name = "github.com/hashicorp/go-multierror"
@@ -163,9 +163,9 @@
   name = "github.com/hashicorp/go-plugin"
   packages = [
     ".",
-    "internal/proto"
+    "internal/plugin"
   ]
-  revision = "f444068e8f5a19853177f7aa0aea7e7d95b5b528"
+  revision = "b838ffee39ce7c7c38226c1413aa4ecae61b4d27"
 
 [[projects]]
   name = "github.com/hashicorp/go-safetemp"
@@ -176,8 +176,8 @@
 [[projects]]
   name = "github.com/hashicorp/go-uuid"
   packages = ["."]
-  revision = "de160f5c59f693fed329e73e291bb751fe4ea4dc"
-  version = "v1.0.0"
+  revision = "4f571afc59f3043a65f8fe6bf46d887b10a01d43"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/hashicorp/go-version"
@@ -213,7 +213,7 @@
     "hclparse",
     "hclwrite"
   ]
-  revision = "40e962e08e80f350603feac3ca64495a2fbfaa79"
+  revision = "fb2bc46cdbe36e247dac0c7dc185b34eaeb54c21"
 
 [[projects]]
   branch = "master"
@@ -224,7 +224,7 @@
     "parser",
     "scanner"
   ]
-  revision = "fa9f258a92500514cc8e9c67020487709df92432"
+  revision = "97b3a9cdfa9349086cfad7ea2fe3165bfe3cbf63"
 
 [[projects]]
   name = "github.com/hashicorp/logutils"
@@ -302,8 +302,8 @@
 [[projects]]
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
-  revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
-  version = "v1.0.0"
+  revision = "af06845cf3004701891bf4fdb884bfe4920b3727"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/mitchellh/go-testing-interface"
@@ -387,7 +387,7 @@
     "cty/json",
     "cty/set"
   ]
-  revision = "67e3da15e4309389854d5b28eaaede43da5ca9ad"
+  revision = "19dda139b164a5503de2051225fa6b94f5d39e05"
 
 [[projects]]
   branch = "master"
@@ -403,7 +403,7 @@
     "openpgp/packet",
     "openpgp/s2k"
   ]
-  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
+  revision = "74369b46fc6756741c016591724fd1cb8e26845f"
 
 [[projects]]
   branch = "master"
@@ -419,13 +419,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
+  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "2be51725563103c17124a318f1745b66f2347acb"
+  revision = "e77772198cdc3dbfcf7f2de96630204df9fd3a0b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -452,7 +452,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
+  revision = "4b09977fb92221987e99d190c8f88f2c92727a29"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -491,8 +491,8 @@
     "status",
     "tap"
   ]
-  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
-  version = "v1.17.0"
+  revision = "a02b0774206b209466313a0b525d2c738fe407eb"
+  version = "v1.18.0"
 
 [solve-meta]
   analyzer-name = "dep"

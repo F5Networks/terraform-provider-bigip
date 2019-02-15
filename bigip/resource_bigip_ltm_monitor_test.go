@@ -11,6 +11,7 @@ import (
 
 var TEST_MONITOR_NAME = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
 var TEST_HTTPS_MONITOR_NAME = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
+var TEST_FTP_MONITOR_NAME = fmt.Sprintf("/%s/test-ftp-monitor", TEST_PARTITION)
 
 var TEST_MONITOR_RESOURCE = `
 resource "bigip_ltm_monitor" "test-monitor" {
@@ -41,6 +42,22 @@ resource "bigip_ltm_monitor" "test-https-monitor" {
 	reverse = "disabled"
 	destination       = "*:8008"
 	compatibility    = "enabled"
+}
+`
+
+var TEST_FTP_MONITOR_RESOURCE = `
+resource "bigip_ltm_monitor" "test-ftp-monitor" {
+	name = "` + TEST_FTP_MONITOR_NAME + `"
+	parent = "/Common/ftp"
+	interval          = 5
+	time_until_up     = 0
+	timeout           = 16
+	destination       = "*:8008"
+	filename = "somefile"
+	mode = "passive"
+	adaptive = ""
+	adaptive_limit = "0"
+	transparent = ""
 }
 `
 
@@ -96,6 +113,32 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_FTP_MONITOR_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TEST_FTP_MONITOR_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "parent", "/Common/ftp"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "destination", "*:8008"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "filename", "somefile"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "mode", "passive"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "adaptive", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "adaptive_limit", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "transparent", ""),
+				),
+			},
+		},
+	})
+
 }
 
 func TestAccBigipLtmMonitor_import(t *testing.T) {

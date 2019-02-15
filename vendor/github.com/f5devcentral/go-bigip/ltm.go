@@ -950,6 +950,10 @@ type Monitor struct {
 	UpInterval     int
 	Username       string
 	Compatibility  string
+	Filename       string
+	Mode           string
+	Adaptive       string
+	AdaptiveLimit  int
 }
 
 type monitorDTO struct {
@@ -975,6 +979,10 @@ type monitorDTO struct {
 	UpInterval     int    `json:"upInterval,omitempty"`
 	Username       string `json:"username,omitempty"`
 	Compatibility  string `json:"compatibility,omitempty"`
+	Filename       string `json:"filename,omitempty"`
+	Mode           string `json:"mode,omitempty"`
+	Adaptive       string `json:"adaptive,omitempty"`
+	AdaptiveLimit  int    `json:"adaptiveLimit,omitempty"`
 }
 
 type Profiles struct {
@@ -2320,7 +2328,7 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 // Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp"}
 
 	for _, name := range monitorUris {
 		var m Monitors
@@ -2362,6 +2370,9 @@ func (b *BigIP) AddMonitor(config *Monitor) error {
 	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
 		config.ParentMonitor = "tcp-half-open"
 	}
+	if strings.Contains(config.ParentMonitor, "ftp") {
+		config.ParentMonitor = "ftp"
+	}
 	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
 }
 
@@ -2394,6 +2405,9 @@ func (b *BigIP) ModifyMonitor(name, parent string, config *Monitor) error {
 	}
 	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
 		config.ParentMonitor = "tcp-half-open"
+	}
+	if strings.Contains(config.ParentMonitor, "ftp") {
+		config.ParentMonitor = "ftp"
 	}
 
 	return b.put(config, uriLtm, uriMonitor, parent, name)
