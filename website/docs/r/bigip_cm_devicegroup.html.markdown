@@ -15,12 +15,6 @@ description: |-
 
 
 ```hcl
-provider "bigip" {
-  address = "10.192.74.73"
-  username = "admin"
-  password = "admin"
-}
-
 
 resource "bigip_cm_devicegroup" "my_new_devicegroup"
 
