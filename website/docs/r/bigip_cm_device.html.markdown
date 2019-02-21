@@ -15,12 +15,6 @@ This resource is helpful when configuring the BIG-IP device in cluster or in HA 
 
 
 ```hcl
-provider "bigip" {
-  address = "10.192.74.73"
-  username = "admin"
-  password = "admin"
-}
-
 
 resource "bigip_cm_device" "my_new_device"
 
