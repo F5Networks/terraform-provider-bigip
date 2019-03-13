@@ -144,12 +144,12 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Specifies the password if the monitored target requires authentication.",
+				Description: "Specifies the password if the monitored target requires authentication",
 			},
 			"username": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Specifies the user name if the monitored target requires authentication.",
+				Description: "Specifies the user name if the monitored target requires authentication",
 			},
 		},
 	}
