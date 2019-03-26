@@ -49,7 +49,7 @@ github.com/bgentry/speakeasy
 github.com/blang/semver
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20190215010939-400e5566eac0
+# github.com/f5devcentral/go-bigip v0.0.0-20190322181632-33678a24794b
 github.com/f5devcentral/go-bigip
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
