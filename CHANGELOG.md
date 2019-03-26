@@ -1,4 +1,14 @@
-## 0.12.1 (Unreleased)
+## 0.12.1 (Unreleased) (March 2019)
+- Added http profile resource with documentation
+- Fixed #67 issue Unable to pass username and password to monitor
+- Fixed #63 added documentation for data datagroup
+- Fixed #59 Created Ftp monitor resource
+- Fixed #58 Ability to provision FTP virtual servers and monitors
+- Fixed #54  Switch to Go Modules
+- Fixed #49 Docs updated for ltm node resources
+- Fixed #46 Unable to set Alias Service Port on HTTPS monitor
+- Fixed #35 bigip_ltm_snat missing functionality
+- Fixed #25 add "content list" For bigip_ltm_profile_httpcompress resource
 - Added include - exclude to the resource httpcompress profile
 - Added Valid function to node resource
 - Added  pool_attachement resource doc
