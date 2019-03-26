@@ -258,7 +258,6 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("via_request", pp.ViaRequest)
 	d.Set("via_response", pp.ViaResponse)
 	d.Set("xff_alternative_names", pp.XffAlternativeNames)
-
 	return nil
 }
 
@@ -323,7 +322,6 @@ func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{})
 
 	name := d.Id()
 	log.Println("[INFO] Fetching HTTPProfile " + name)
-
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrive HTTPProfile (%s) (%v) ", name, err)
