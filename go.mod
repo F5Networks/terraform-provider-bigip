@@ -4,7 +4,7 @@ require (
 	github.com/apparentlymart/go-cidr v1.0.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
-	github.com/f5devcentral/go-bigip v0.0.0-20190215010939-400e5566eac0
+	github.com/f5devcentral/go-bigip v0.0.0-20190322181632-33678a24794b
 	github.com/hashicorp/go-getter v1.0.3 // indirect
 	github.com/hashicorp/go-hclog v0.7.0 // indirect
 	github.com/hashicorp/go-plugin v0.0.0-20190212232519-b838ffee39ce // indirect

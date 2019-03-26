@@ -200,7 +200,8 @@ func unifyObjectTypesToMap(types []cty.Type, unsafe bool) (cty.Type, []Conversio
 			conversions[i] = GetConversion(ty, retTy)
 		}
 		if conversions[i] == nil {
-			return cty.NilType, nil
+			// Shouldn't be reachable, since we were able to unify
+			return unifyObjectTypesToMap(types, unsafe)
 		}
 	}
 	return retTy, conversions
