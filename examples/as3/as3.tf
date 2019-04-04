@@ -8,7 +8,7 @@ provider "bigip" {
 }
 
 
-// As3 using terraform provisoner
+// Using  provisioner to install as3 rpm on bigip pass arguments as BIG-IP IP address, credentials and name of the rpm 
 resource "null_resource" "install_as3" {
   provisioner "local-exec" {
     command = "sh install_as3.sh X.X.X.X  admin:pass f5-appsvcs-3.9.0-3.noarch.rpm"
