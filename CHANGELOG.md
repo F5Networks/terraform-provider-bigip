@@ -15,6 +15,7 @@
 - Improvement to node resource , interval
 - Simplified some parts with new utility methods (SelfIP & Vlan)
 - Fix SelfIP and VLAN Read methods + other minor fixes
+- Implement import for pool attachement resource #84
 
 ## 0.12.0 (September 26, 2018)
 - Added couple of resources like snat, snmp, profiles, test modules etc.

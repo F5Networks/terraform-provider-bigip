@@ -1,6 +1,8 @@
 package bigip
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 
@@ -14,7 +16,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 		Read:   resourceBigipLtmPoolAttachmentRead,
 		Delete: resourceBigipLtmPoolAttachmentDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: resourceBigipLtmPoolAttachmentImport,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -116,4 +118,55 @@ func resourceBigipLtmPoolAttachmentDelete(d *schema.ResourceData, meta interface
 	}
 	d.SetId("")
 	return nil
+}
+
+func resourceBigipLtmPoolAttachmentImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*bigip.BigIP)
+
+	var data map[string]string
+	if err := json.Unmarshal([]byte(d.Id()), &data); err != nil {
+		return nil, err
+	}
+	poolName, ok := data["pool"]
+	if !ok {
+		return nil, errors.New("missing pool name in input data")
+	}
+	expectedNode, ok := data["node"]
+	if !ok {
+		return nil, errors.New("missing node name in input data")
+	}
+
+	id := poolName + "-" + expectedNode
+
+	pool, err := client.GetPool(poolName)
+	if err != nil {
+		return nil, fmt.Errorf("unable to retrieve pool %s from bigip: %v", poolName, err)
+	}
+	if pool == nil {
+		return nil, fmt.Errorf("unable to find the pool %s in bigip", poolName)
+	}
+
+	nodes, err := client.PoolMembers(poolName)
+	if err != nil {
+		return nil, errors.New("error retrieving pool members")
+	}
+
+	// only set the instance Id that this resource manages
+	found := false
+	for _, node := range nodes.PoolMembers {
+		if expectedNode == node.FullPath {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil, fmt.Errorf("cannot locate node %s in pool %s", expectedNode, poolName)
+	}
+
+	d.Set("pool", poolName)
+	d.Set("node", expectedNode)
+	d.SetId(id)
+
+	return []*schema.ResourceData{d}, nil
 }
