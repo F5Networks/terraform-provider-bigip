@@ -32,6 +32,7 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "/Common/tcp",
 				Description: "Use the parent tcp profile",
 			},
 
@@ -164,7 +165,6 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 		return nil
 	}
 	d.Set("name", name)
-	d.Set("partition", obj.Partition)
 	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for tcp profile  (%s): %s", d.Id(), err)
 	}
