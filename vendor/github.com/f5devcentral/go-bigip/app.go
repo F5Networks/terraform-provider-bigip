@@ -130,7 +130,7 @@ func (b *BigIP) CreateAppsvc01(p *Appsvc01) error {
 	log.Printf("++++++ Here is what terraform is sending to bigip ................ : %+v ", p)
 	err := b.post(p, uriMgmt, uriSha, uriAppsvcs, uriDecl)
 	if err != nil {
-		log.Println(" API call not successfull  %v ", err)
+		log.Println(" API call not successfull  ", err)
 	}
 	return nil
 }
@@ -138,7 +138,7 @@ func (b *BigIP) CreateAppsvc02(p *Appsvc02) error {
 	log.Printf("++++++ Here is what terraform is sending to bigip ................ : %+v ", p)
 	err := b.post(p, uriMgmt, uriSha, uriAppsvcs, uriDecl)
 	if err != nil {
-		log.Println(" API call not successfull  %v ", err)
+		log.Println(" API call not successfull  ", err)
 	}
 	return nil
 }
@@ -152,9 +152,9 @@ func (b *BigIP) DeleteAppsvc02() error {
 func (b *BigIP) ModifyAppsvc01(p *Appsvc01) error {
 	log.Printf("++++++ Here is what terraform is sending to bigip ................ : %+v ", p)
 	err := b.patch(p, uriMgmt, uriSha, uriAppsvcs, uriDecl)
-	log.Printf("value of p in modify +++++++++++++++", p)
+	log.Println("value of p in modify +++++++++++++++", p)
 	if err != nil {
-		log.Println(" API call not successfull  %v ", err)
+		log.Println(" API call not successfull  ", err)
 	}
 	return nil
 }
@@ -162,7 +162,7 @@ func (b *BigIP) ModifyAppsvc02(p *Appsvc02) error {
 	log.Printf("++++++ Here is what terraform is sending to bigip ................ : %+v ", p)
 	err := b.patch(p, uriMgmt, uriSha, uriAppsvcs, uriDecl)
 	if err != nil {
-		log.Println(" API call not successfull  %v ", err)
+		log.Println(" API call not successfull  ", err)
 	}
 	return nil
 }
