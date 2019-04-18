@@ -41,5 +41,6 @@ resource "bigip_ltm_pool_attachment" "node-pool-attach" {
 An existing pool attachment (i.e. pool membership) can be imported into this resource by supplying both the pool full path, and the node full path with the relevant port. If the pool or node membership is not found, an error will be returned. An example is below:
 
 ```sh
-$ terraform import bigip_ltm_pool_attachment.node-pool-attach '{"pool": "/Common/terraform-pool", "node": "/Common/node1:80"}'
+$ terraform import bigip_ltm_pool_attachment.node-pool-attach \
+	'{"pool": "/Common/terraform-pool", "node": "/Common/node1:80"}'
 ```
