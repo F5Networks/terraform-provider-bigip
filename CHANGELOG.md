@@ -1,4 +1,5 @@
-## 0.12.1 (Unreleased) (March 2019)
+## 0.12.1 (Unreleased) (April 2019)
+- Fixed #80 #81
 - Added http profile resource with documentation
 - Fixed #67 issue Unable to pass username and password to monitor
 - Fixed #63 added documentation for data datagroup
