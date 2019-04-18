@@ -32,6 +32,7 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "/Common/tcp",
 				Description: "Use the parent tcp profile",
 			},
 
@@ -147,7 +148,7 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		return fmt.Errorf("Error create profile tcp (%s): %s", name, err)
 	}
-	return resourceBigipLtmProfileOneconnectRead(d, meta)
+	return resourceBigipLtmProfileTcpRead(d, meta)
 }
 
 func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) error {
