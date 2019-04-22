@@ -163,11 +163,42 @@ type RouteDomain struct {
 	Vlans      []string `json:"vlans,omitempty"`
 }
 
+// Tunnels contains a list of tunnel objects on the BIG-IP system.
+type Tunnels struct {
+	Tunnels []Tunnel `json:"items"`
+}
+
+// Tunnel contains information on the tunnel.
+// https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_net_tunnels_tunnel.ashx
+type Tunnel struct {
+	Name             string `json:"name,omitempty"`
+	AppService       string `json:"appService,omitempty"`
+	AutoLasthop      string `json:"autoLasthop,omitempty"`
+	Description      string `json:"description,omitempty"`
+	IdleTimeout      int    `json:"idleTimeout,omitempty"`
+	IfIndex          int    `json:"ifIndex,omitempty"`
+	Key              int    `json:"key,omitempty"`
+	LocalAddress     string `json:"localAddress,omitempty"`
+	Mode             string `json:"mode,omitempty"`
+	Mtu              int    `json:"mtu,omitempty"`
+	Partition        string `json:"partition,omitempty"`
+	Profile          string `json:"profile,omitempty"`
+	RemoteAddress    string `json:"remoteAddress,omitempty"`
+	SecondaryAddress string `json:"secondaryAddress,omitempty"`
+	Tos              string `json:"tos,omitempty"`
+	TrafficGroup     string `json:"trafficGroup,omitempty"`
+	Transparent      string `json:"transparent,omitempty"`
+	UsePmtu          string `json:"usePmtu,omitempty"`
+}
+
 const (
 	uriNet            = "net"
 	uriInterface      = "interface"
 	uriSelf           = "self"
 	uriTrunk          = "trunk"
+	uriTunnels        = "tunnels"
+	uriTunnel         = "tunnel"
+	uriVxlan          = "vxlan"
 	uriVlan           = "vlan"
 	uriVlanInterfaces = "interfaces"
 	uriRoute          = "route"
@@ -447,4 +478,58 @@ func (b *BigIP) DeleteRouteDomain(name string) error {
 // can be modified are referenced in the RouteDomain struct.
 func (b *BigIP) ModifyRouteDomain(name string, config *RouteDomain) error {
 	return b.put(config, uriNet, uriRouteDomain, name)
+}
+
+// Tunnels returns a list of tunnels.
+func (b *BigIP) Tunnels() (*Tunnels, error) {
+	var tunnels Tunnels
+	err, _ := b.getForEntity(&tunnels, uriNet, uriTunnels, uriTunnel)
+	if err != nil {
+		return nil, err
+	}
+
+	return &tunnels, nil
+}
+
+// GetTunnel fetches the tunnel by it's name.
+func (b *BigIP) GetTunnel(name string) (*Tunnel, error) {
+	var tunnel Tunnel
+	values := []string{}
+	regex := regexp.MustCompile(`^(\/.+\/)?(.+)`)
+	match := regex.FindStringSubmatch(name)
+	if match[1] == "" {
+		values = append(values, "~Common~")
+	}
+	values = append(values, name)
+	// Join the strings into one.
+	result := strings.Join(values, "")
+	err, ok := b.getForEntity(&tunnel, uriNet, uriTunnels, uriTunnel, result)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &tunnel, nil
+}
+
+// CreateTunnel adds a new tunnel to the BIG-IP system.
+func (b *BigIP) CreateTunnel(name, profile string) error {
+	config := &Tunnel{
+		Name:    name,
+		Profile: profile,
+	}
+
+	return b.post(config, uriNet, uriTunnels, uriTunnel)
+}
+
+// DeleteTunnel removes a tunnel.
+func (b *BigIP) DeleteTunnel(name string) error {
+	return b.delete(uriNet, uriTunnels, uriTunnel, name)
+}
+
+// ModifyTunnel allows you to change any attribute of a tunnel.
+func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
+	return b.put(config, uriNet, uriTunnels, uriTunnel, name)
 }
