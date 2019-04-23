@@ -1,4 +1,4 @@
-## 0.12.1 (Unreleased) (April 2019)
+## 0.12.1 (April 23, 2019) (April 2019)
 - Fixed #80 #81
 - Added http profile resource with documentation
 - Fixed #67 issue Unable to pass username and password to monitor
