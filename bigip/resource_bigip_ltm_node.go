@@ -39,6 +39,7 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.",
+				Computed:    true,
 			},
 
 			"connection_limit": {
@@ -51,12 +52,13 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
-				Default:     0,
+				Computed:    true,
 			},
 			"monitor": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
+				Computed:    true,
 			},
 			"state": {
 				Type:        schema.TypeString,
