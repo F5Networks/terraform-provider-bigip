@@ -39,24 +39,26 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.",
+				Computed:    true,
 			},
 
 			"connection_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Specifies the maximum number of connections allowed for the node or node address.",
-				Default:     0,
+				Computed:    true,
 			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
-				Default:     0,
+				Computed:    true,
 			},
 			"monitor": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
+				Computed:    true,
 			},
 			"state": {
 				Type:        schema.TypeString,
@@ -83,19 +85,19 @@ func resourceBigipLtmNode() *schema.Resource {
 						"interval": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     "3600",
+							Computed:    true,
 							Description: "Specifies the amount of time before sending the next DNS query.",
 						},
 						"downinterval": {
 							Type:        schema.TypeInt,
 							Optional:    true,
-							Default:     5,
+							Computed:    true,
 							Description: "Specifies the number of attempts to resolve a domain name. The default is 5.",
 						},
 						"autopopulate": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     "disabled",
+							Computed:    true,
 							Description: "Specifies whether the node should scale to the IP address set returned by DNS.",
 						},
 					},
