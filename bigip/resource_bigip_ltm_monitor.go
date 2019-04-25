@@ -117,6 +117,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"compatibility": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
 				ValidateFunc: validateEnabledDisabled,
 			},
@@ -128,6 +129,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the data transfer process (DTP) mode. The default value is passive.",
 			},
 			"adaptive": {
