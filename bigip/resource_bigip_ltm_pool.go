@@ -32,6 +32,7 @@ func resourceBigipLtmPool() *schema.Resource {
 				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Set:         schema.HashString,
+				Computed:    true,
 				Optional:    true,
 				Description: "Assign monitors to a pool.",
 			},
@@ -39,42 +40,42 @@ func resourceBigipLtmPool() *schema.Resource {
 			"allow_nat": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     true,
+				Computed:    true,
 				Description: "Allow NAT",
 			},
 
 			"allow_snat": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     true,
+				Computed:    true,
 				Description: "Allow SNAT",
 			},
 
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "round-robin",
+				Computed:    true,
 				Description: "Possible values: round-robin, ...",
 			},
 
 			"slow_ramp_time": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     10,
+				Computed:    true,
 				Description: "Slow ramp time for pool members",
 			},
 
 			"service_down_action": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "none",
+				Computed:    true,
 				Description: "Possible values: none, reset, reselect, drop",
 			},
 
 			"reselect_tries": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     0,
+				Computed:    true,
 				Description: "Number of times the system tries to select a new pool member after a failure.",
 			},
 		},
