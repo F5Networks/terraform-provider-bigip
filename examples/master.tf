@@ -58,7 +58,7 @@ resource "bigip_ltm_monitor" "monitor" {
         parent = "/Common/http"
         send = "GET /some/path\r\n"
         timeout = "999"
-        interval = "999"
+        interval = "998"
 }
 
 resource "bigip_ltm_pool"  "pool" {

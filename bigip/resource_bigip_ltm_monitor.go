@@ -46,14 +46,14 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Check interval in seconds",
-				Default:     3,
+				Computed:    true,
 			},
 
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Timeout in seconds",
-				Default:     16,
+				Computed:    true,
 			},
 
 			"send": {
@@ -80,37 +80,38 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"reverse": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 
 			"transparent": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "disabled",
+				Computed: true,
 			},
 
 			"manual_resume": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "disabled",
+				Computed: true,
 			},
 
 			"ip_dscp": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  0,
+				Computed: true,
 			},
 
 			"time_until_up": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     0,
+				Computed:    true,
 				Description: "Time in seconds",
 			},
 
 			"destination": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "*:*",
+				Computed:    true,
 				Description: "Alias for the destination",
 			},
 			"compatibility": {
@@ -132,13 +133,13 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"adaptive": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "disabled",
+				Computed:    true,
 				Description: "ftp adaptive",
 			},
 			"adaptive_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     200,
+				Computed:    true,
 				Description: "Integer value",
 			},
 			"password": {
