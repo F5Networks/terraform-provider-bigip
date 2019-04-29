@@ -191,6 +191,24 @@ type Tunnel struct {
 	UsePmtu          string `json:"usePmtu,omitempty"`
 }
 
+// Vxlans contains a list of vlxan profiles on the BIG-IP system.
+type Vxlans struct {
+	Vxlans []Vxlan `json:"items"`
+}
+
+// Vxlan is the structure for the VXLAN profile on the bigip.
+// https://devcentral.f5.com/wiki/iControlREST.APIRef_tm_net_tunnels_vxlan.ashx
+type Vxlan struct {
+	Name              string `json:"name,omitempty"`
+	AppService        string `json:"appService,omitempty"`
+	DefaultsFrom      string `json:"defaultsFrom,omitempty"`
+	Description       string `json:"description,omitempty"`
+	EncapsulationType string `json:"encapsulationType,omitempty"`
+	FloodingType      string `json:"floodingType,omitempty"`
+	Partition         string `json:"partition,omitempty"`
+	Port              int    `json:"port,omitempty"`
+}
+
 const (
 	uriNet            = "net"
 	uriInterface      = "interface"
@@ -204,6 +222,21 @@ const (
 	uriRoute          = "route"
 	uriRouteDomain    = "route-domain"
 )
+
+// formatResourceID takes the resource name to
+// ensure theres a partition for the Resource ID
+func formatResourceID(name string) string {
+	// If the name specifies the partition already, then
+	// just hand it back.
+	regex := regexp.MustCompile(`^~([a-zA-Z0-9-.]+)~`)
+	if regex.MatchString(name) {
+		return name
+	}
+
+	// Otherwise, tack on the Common partition
+	// for best practices with the resource_id.
+	return "~Common~" + name
+}
 
 // Interfaces returns a list of interfaces.
 func (b *BigIP) Interfaces() (*Interfaces, error) {
@@ -494,15 +527,7 @@ func (b *BigIP) Tunnels() (*Tunnels, error) {
 // GetTunnel fetches the tunnel by it's name.
 func (b *BigIP) GetTunnel(name string) (*Tunnel, error) {
 	var tunnel Tunnel
-	values := []string{}
-	regex := regexp.MustCompile(`^(\/.+\/)?(.+)`)
-	match := regex.FindStringSubmatch(name)
-	if match[1] == "" {
-		values = append(values, "~Common~")
-	}
-	values = append(values, name)
-	// Join the strings into one.
-	result := strings.Join(values, "")
+	result := formatResourceID(name)
 	err, ok := b.getForEntity(&tunnel, uriNet, uriTunnels, uriTunnel, result)
 	if err != nil {
 		return nil, err
@@ -512,6 +537,11 @@ func (b *BigIP) GetTunnel(name string) (*Tunnel, error) {
 	}
 
 	return &tunnel, nil
+}
+
+// AddTunnel adds a new tunnel to the BIG-IP system from a config.
+func (b *BigIP) AddTunnel(config *Tunnel) error {
+	return b.post(config, uriNet, uriTunnels, uriTunnel)
 }
 
 // CreateTunnel adds a new tunnel to the BIG-IP system.
@@ -532,4 +562,54 @@ func (b *BigIP) DeleteTunnel(name string) error {
 // ModifyTunnel allows you to change any attribute of a tunnel.
 func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
 	return b.put(config, uriNet, uriTunnels, uriTunnel, name)
+}
+
+// Vxlans returns a list of vxlan profiles.
+func (b *BigIP) Vxlans() ([]Vxlan, error) {
+	var vxlans Vxlans
+	err, _ := b.getForEntity(&vxlans, uriNet, uriTunnels, uriVxlan)
+	if err != nil {
+		return nil, err
+	}
+
+	return vxlans.Vxlans, nil
+}
+
+// GetVxlan fetches the vxlan profile by it's name.
+func (b *BigIP) GetVxlan(name string) (*Vxlan, error) {
+	var vxlan Vxlan
+	result := formatResourceID(name)
+	err, ok := b.getForEntity(&vxlan, uriNet, uriTunnels, uriVxlan, result)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &vxlan, nil
+}
+
+// AddVxlan adds a new vxlan profile to the BIG-IP system.
+func (b *BigIP) AddVxlan(config *Vxlan) error {
+	return b.post(config, uriNet, uriTunnels, uriVxlan)
+}
+
+// CreateVxlan adds a new vxlan profile to the BIG-IP system.
+func (b *BigIP) CreateVxlan(name string) error {
+	config := &Vxlan{
+		Name: name,
+	}
+
+	return b.post(config, uriNet, uriTunnels, uriVxlan)
+}
+
+// DeleteVxlan removes a vxlan profile.
+func (b *BigIP) DeleteVxlan(name string) error {
+	return b.delete(uriNet, uriTunnels, uriVxlan, name)
+}
+
+// ModifyVxlan allows you to change any attribute of a vxlan profile.
+func (b *BigIP) ModifyVxlan(name string, config *Vxlan) error {
+	return b.put(config, uriNet, uriTunnels, uriVxlan, name)
 }
