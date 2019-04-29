@@ -46,11 +46,53 @@ type Devices struct {
 	Devices []Device `json:"items"`
 }
 
+// UnicastAddress is an abstraction and used by Device
+type UnicastAddress struct {
+	EffectiveIP   string `json:"effectiveIp"`
+	EffectivePort int    `json:"effectivePort"`
+	IP            string `json:"ip"`
+	Port          int    `json:"port"`
+}
+
+// Device represents an individual bigip as viewed from the cluster
+// see:	https://devcentral.f5.com/Wiki/iControlREST.APIRef_tm_cm_device.ashx
 type Device struct {
-	ConfigsyncIp      string `json:"configsyncIp,omitempty"`
-	Name              string `json:"name,omitempty"`
-	MirrorIp          string `json:"mirrorIp,omitempty"`
-	MirrorSecondaryIp string `json:"mirrorSecondaryIp,omitempty"`
+	ConfigsyncIp       string   `json:"configsyncIp,omitempty"`
+	Name               string   `json:"name,omitempty"`
+	MirrorIp           string   `json:"mirrorIp,omitempty"`
+	MirrorSecondaryIp  string   `json:"mirrorSecondaryIp,omitempty"`
+	ActiveModules      []string `json:"activeModules,omitempty"`
+	AppService         string   `json:"appService,omitempty"`
+	BaseMac            string   `json:"baseMac,omitempty"`
+	Build              string   `json:"build,omitempty"`
+	Cert               string   `json:"cert,omitempty"`
+	ChassisID          string   `json:"chassisId,omitempty"`
+	ChassisType        string   `json:"chassisType,omitempty"`
+	Comment            string   `json:"comment,omitempty"`
+	ConfigsyncIP       string   `json:"configsyncIp,omitempty"`
+	Contact            string   `json:"contact,omitempty"`
+	Description        string   `json:"description,omitempty"`
+	Edition            string   `json:"edition,omitempty"`
+	FailoverState      string   `json:"failoverState,omitempty"`
+	HaCapacity         int      `json:"haCapacity,omitempty"`
+	Hostname           string   `json:"hostname,omitempty"`
+	InactiveModules    string   `json:"inactiveModules,omitempty"`
+	Key                string   `json:"key,omitempty"`
+	Location           string   `json:"location,omitempty"`
+	ManagementIP       string   `json:"managementIp,omitempty"`
+	MarketingName      string   `json:"marketingName,omitempty"`
+	MulticastInterface string   `json:"multicastInterface,omitempty"`
+	MulticastIP        string   `json:"multicastIp,omitempty"`
+	MulticastPort      int      `json:"multicastPort,omitempty"`
+	OptionalModules    []string `json:"optionalModules,omitempty"`
+	Partition          string   `json:"partition,omitempty"`
+	PlatformID         string   `json:"platformId,omitempty"`
+	Product            string   `json:"product,omitempty"`
+	SelfDevice         string   `json:"selfDevice,omitempty"`
+	TimeLimitedModules []string `json:"timeLimitedModules,omitempty"`
+	TimeZone           string   `json:"timeZone,omitempty"`
+	Version            string   `json:"version,omitempty"`
+	UnicastAddress     []UnicastAddress
 }
 
 type Devicegroups struct {
@@ -258,6 +300,18 @@ func (b *BigIP) Devices(name string) (*Device, error) {
 	}
 
 	return &device, nil
+}
+
+// GetDevices returns a list of the bigip's in the cluster.
+func (b *BigIP) GetDevices() ([]Device, error) {
+	var devices Devices
+	err, _ := b.getForEntity(&devices, uriCm, uriDiv)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return devices.Devices, nil
 }
 
 func (b *BigIP) CreateDevicegroup(p *Devicegroup) error {
