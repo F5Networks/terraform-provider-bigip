@@ -1,4 +1,7 @@
-## 0.12.1 (Unreleased) (April 2019)
+## 0.13.0 (Unreleased)
+- go-bigip vendor update for vxlan, tunnel interfaces
+- Changed defaults to Computed for couple of resources
+## 0.12.1 (released) (April 23rd  2019)
 - Fixed #80 #81
 - Added http profile resource with documentation
 - Fixed #67 issue Unable to pass username and password to monitor
