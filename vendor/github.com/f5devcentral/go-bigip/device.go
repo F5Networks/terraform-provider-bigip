@@ -57,7 +57,6 @@ type UnicastAddress struct {
 // Device represents an individual bigip as viewed from the cluster
 // see:	https://devcentral.f5.com/Wiki/iControlREST.APIRef_tm_cm_device.ashx
 type Device struct {
-	ConfigsyncIp       string   `json:"configsyncIp,omitempty"`
 	Name               string   `json:"name,omitempty"`
 	MirrorIp           string   `json:"mirrorIp,omitempty"`
 	MirrorSecondaryIp  string   `json:"mirrorSecondaryIp,omitempty"`
@@ -68,8 +67,8 @@ type Device struct {
 	Cert               string   `json:"cert,omitempty"`
 	ChassisID          string   `json:"chassisId,omitempty"`
 	ChassisType        string   `json:"chassisType,omitempty"`
+	ConfigsyncIp       string   `json:"configsyncIp,omitempty"`
 	Comment            string   `json:"comment,omitempty"`
-	ConfigsyncIP       string   `json:"configsyncIp,omitempty"`
 	Contact            string   `json:"contact,omitempty"`
 	Description        string   `json:"description,omitempty"`
 	Edition            string   `json:"edition,omitempty"`
