@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -239,7 +240,18 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("mask", vs.Mask); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("port", vs.SourcePort)
+
+	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
+	   so we need to extract it
+	*/
+	regex = regexp.MustCompile(`\:(\d+)`)
+	port := regex.FindStringSubmatch(vs.Destination)
+	if len(port) < 2 {
+		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+	}
+	parsedPort, _ := strconv.Atoi(port[1])
+	d.Set("port", parsedPort)
+
 	d.Set("irules", makeStringList(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
