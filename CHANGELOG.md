@@ -1,4 +1,4 @@
-## 0.12.2 (Unreleased)
+## 0.12.2 (May 02, 2019)
 - go-bigip vendor update for vxlan, tunnel interfaces
 - Changed defaults to Computed for couple of resources
 ## 0.12.1 (April 23, 2019) (April 2019)
