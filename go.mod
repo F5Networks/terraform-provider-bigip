@@ -1,30 +1,29 @@
 module github.com/terraform-providers/terraform-provider-bigip
 
 require (
-	github.com/apparentlymart/go-cidr v1.0.0 // indirect
-	github.com/armon/go-radix v1.0.0 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/chzyer/logex v1.1.11-0.20160617073814-96a4d311aa9b // indirect
+	github.com/coreos/bbolt v1.3.1-coreos.1 // indirect
 	github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1
-	github.com/hashicorp/go-getter v1.0.3 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
+	github.com/hashicorp/atlas-go v0.0.0-20161107204910-1792bd8de119 // indirect
+	github.com/hashicorp/aws-sdk-go-base v0.3.0 // indirect
 	github.com/hashicorp/go-hclog v0.7.0 // indirect
-	github.com/hashicorp/go-plugin v0.0.0-20190212232519-b838ffee39ce // indirect
-	github.com/hashicorp/go-uuid v1.0.1 // indirect
+	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
+	github.com/hashicorp/go-sockaddr v1.0.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/hcl2 v0.0.0-20190214115825-fb2bc46cdbe3 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
-	github.com/hashicorp/logutils v1.0.0 // indirect
-	github.com/hashicorp/terraform v0.11.14-0.20190313165547-28810e6c0c0a
+	github.com/hashicorp/serf v0.8.2-0.20171022020050-c20a0b1b1ea9 // indirect
+	github.com/hashicorp/terraform v0.12.0
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
-	github.com/mitchellh/cli v1.0.0 // indirect
-	github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/masterzen/azure-sdk-for-go v0.0.0-20161014135628-ee4f0065d00c // indirect
+	github.com/miekg/dns v1.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
-	github.com/mitchellh/hashstructure v1.0.0 // indirect
-	github.com/posener/complete v1.2.1 // indirect
+	github.com/prometheus/common v0.0.0-20181126121408-4724e9255275 // indirect
+	github.com/prometheus/procfs v0.0.0-20181204211112-1dc9a6cbc91a // indirect
+	github.com/ryanuber/columnize v0.0.0-20161220214920-0fbbb3f0e3fb // indirect
+	github.com/satori/uuid v0.0.0-20160927100844-b061729afc07 // indirect
+	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
+	github.com/smartystreets/goconvey v0.0.0-20181108003508-044398e4856c // indirect
 	github.com/stretchr/testify v1.3.0
-	github.com/zclconf/go-cty v0.0.0-20190212192503-19dda139b164 // indirect
-	golang.org/x/crypto v0.0.0-20190211182817-74369b46fc67 // indirect
-	golang.org/x/sys v0.0.0-20190214214411-e77772198cdc // indirect
-	golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2 // indirect
 	google.golang.org/genproto v0.0.0-20190306203927-b5d61aea6440 // indirect
 )
