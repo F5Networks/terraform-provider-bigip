@@ -13,8 +13,7 @@ import (
 var TEST_DEVICE_NAME = "test-device"
 
 var TEST_DEVICE_RESOURCE = `
-resource "bigip_cm_device" "test-device"
-        {
+resource "bigip_cm_device" "test-device" {
             name = "` + TEST_DEVICE_NAME + `"
             configsync_ip = "2.2.2.2"
             mirror_ip = "10.10.10.10"
@@ -68,7 +67,6 @@ func TestAccBigipCmDevice_import(t *testing.T) {
 func testCheckdeviceExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-
 		device, err := client.Devices(name)
 		if err != nil {
 			return err

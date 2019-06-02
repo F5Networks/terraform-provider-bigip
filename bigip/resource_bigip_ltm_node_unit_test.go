@@ -17,7 +17,7 @@ func testBigipLtmNodeInvalid(resourceName string) string {
 		resource "bigip_ltm_node" "test-node" {
 			name = "%s"
 			address = "10.10.10.10"
-	        invalidkey = "foo"
+	                invalidkey = "foo"
 		}
 		provider "bigip" {
 			address = "10.10.10.1"
@@ -35,7 +35,7 @@ func TestAccBigipLtmNodeInvalid(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmNodeInvalid(resourceName),
-				ExpectError: regexp.MustCompile("invalid or unknown key: invalidkey"),
+				ExpectError: regexp.MustCompile("Unsupported argument: An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})

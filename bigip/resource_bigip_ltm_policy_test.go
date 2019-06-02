@@ -41,7 +41,7 @@ resource "bigip_ltm_policy" "test-policy" {
 	controls = ["forwarding"]
 	rule  {
 	      name = "rule6"
-		      action = {
+		      action {
 			      tm_name = "20"
 			      forward = true
 			      pool = "/Common/test-pool"

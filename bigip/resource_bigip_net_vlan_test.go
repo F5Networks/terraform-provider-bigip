@@ -16,8 +16,8 @@ var TEST_VLAN_RESOURCE = `
 resource "bigip_net_vlan" "test-vlan" {
 	name = "/Common/test-vlan"
 	tag = 101
-	interfaces = {
-		vlanport = 1.1,
+	interfaces {
+		vlanport = 1.1
 		tagged = false
 	}
 }

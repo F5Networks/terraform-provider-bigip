@@ -14,26 +14,26 @@ var TEST_DG_NAME = "test-devicegroup"
 
 var TEST_DG_RESOURCE = `
 
-resource "bigip_cm_device" "test-device"
-        {
+resource "bigip_cm_device" "test-device" {
             name = "` + TEST_DEVICE_NAME + `"
             configsync_ip = "2.2.2.2"
             mirror_ip = "10.10.10.10"
             mirror_secondary_ip = "11.11.11.11"
         }
-resource "bigip_cm_devicegroup" "test-devicegroup"
-        {
+resource "bigip_cm_devicegroup" "test-devicegroup" {
             name = "` + TEST_DG_NAME + `"
-						partition = "Common"
-						description = "whatiknow"
+	    partition = "Common"
+	    description = "whatiknow"
             auto_sync = "disabled"
             full_load_on_sync = "false"
             type = "sync-only"
-						save_on_auto_sync = "false"
-						network_failover = "enabled"
-						incremental_config = 1024
-						device = { name = "/Common/test-device"}
-						depends_on = ["bigip_cm_device.test-device"]
+	    save_on_auto_sync = "false"
+	    network_failover = "enabled"
+	    incremental_config = 1024
+	    device {
+               name = "/Common/test-device"
+             }
+	    depends_on = ["bigip_cm_device.test-device"]
         }
 `
 

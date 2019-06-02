@@ -12,9 +12,7 @@ import (
 var TEST_HTTP2_NAME = fmt.Sprintf("/%s/test-http2", TEST_PARTITION)
 
 var TEST_HTTP2_RESOURCE = `
-resource "bigip_ltm_profile_http2" "test-http2"
-
-        {
+resource "bigip_ltm_profile_http2" "test-http2" {
             name = "/Common/test-http2"
  	    defaults_from = "/Common/http2"
             concurrent_streams_per_connection = 10

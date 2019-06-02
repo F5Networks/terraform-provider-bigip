@@ -12,9 +12,7 @@ import (
 var TEST_TCP_NAME = fmt.Sprintf("/%s/test-tcp", TEST_PARTITION)
 
 var TEST_TCP_RESOURCE = `
-resource "bigip_ltm_profile_tcp" "test-tcp"
-
-        {
+resource "bigip_ltm_profile_tcp" "test-tcp" {
             name = "/Common/sanjose-tcp-wan-profile"
             defaults_from = "/Common/tcp-wan-optimized"
 						partition = "Common"
