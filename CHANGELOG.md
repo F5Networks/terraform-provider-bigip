@@ -1,4 +1,4 @@
-## 0.12.3 (Unreleased)
+## 0.12.3 (June 06, 2019)
 - Fix for terraform 0.12 
 - Fix the test TF files for terraform 12
 ## 0.12.2 (May 02, 2019)
