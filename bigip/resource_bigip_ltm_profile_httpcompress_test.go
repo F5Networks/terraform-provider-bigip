@@ -13,15 +13,13 @@ import (
 var TEST_HTTPCOMPRESS_NAME = fmt.Sprintf("/%s/test-httpcompress", TEST_PARTITION)
 
 var TEST_HTTPCOMPRESS_RESOURCE = `
-resource "bigip_ltm_profile_httpcompress" "test-httpcompress"
-
-        {
+resource "bigip_ltm_profile_httpcompress" "test-httpcompress" {
             name = "/Common/test-httpcompress"
-			      defaults_from = "/Common/httpcompression"
+	    defaults_from = "/Common/httpcompression"
             uri_exclude = ["f5.com"]
             uri_include = ["cisco.com"]
-						content_type_include = ["nicecontent.com"]
-						content_type_exclude = ["nicecontentexclude.com"]
+	    content_type_include = ["nicecontent.com"]
+	    content_type_exclude = ["nicecontentexclude.com"]
         }
 `
 

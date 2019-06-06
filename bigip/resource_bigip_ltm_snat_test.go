@@ -14,8 +14,8 @@ var TEST_SNAT_RESOURCE = `
 resource "bigip_ltm_snat" "test-snat" {
  name = "` + TEST_SNAT_NAME + `"
  translation = "/Common/136.1.1.1"
- origins = { name = "2.2.2.2" }
- origins = { name = "3.3.3.3" }
+ origins { name = "2.2.2.2" }
+ origins { name = "3.3.3.3" }
  vlansdisabled = true
  autolasthop = "default"
  mirror = "disabled"

@@ -13,8 +13,7 @@ import (
 var TEST_HTTP_NAME = fmt.Sprintf("/%s/test-http", TEST_PARTITION)
 
 var TEST_HTTP_RESOURCE = `
-resource "bigip_ltm_profile_http" "test-http"
-{
+resource "bigip_ltm_profile_http" "test-http" {
   name = "/Common/test-http"
   defaults_from = "/Common/http"
   description = "some http"

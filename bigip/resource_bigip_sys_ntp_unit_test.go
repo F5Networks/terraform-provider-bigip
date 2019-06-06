@@ -12,7 +12,7 @@ func testBigipSysNtpInvalid(resourceName string) string {
 		resource "bigip_sys_ntp" "test-ntp" {
 			description = "%s"
 			servers = ["10.10.10.10"]
-	    timezone = "America/Los_Angeles"
+	                timezone = "America/Los_Angeles"
 			invalidkey = "foo"
 		}
 		provider "bigip" {
@@ -31,7 +31,7 @@ func TestAccBigipSysNtpInvalid(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSysNtpInvalid(resourceName),
-				ExpectError: regexp.MustCompile("invalid or unknown key: invalidkey"),
+				ExpectError: regexp.MustCompile("Unsupported argument: An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})

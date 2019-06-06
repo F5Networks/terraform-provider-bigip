@@ -16,19 +16,17 @@ var TEST_SELFIP_RESOURCE = `
 resource "bigip_net_vlan" "test-vlan" {
   name = "` + TEST_VLAN_NAME + `"
   tag = 101
-  interfaces = {
-    vlanport = 1.1,
+  interfaces {
+    vlanport = 1.1
     tagged = false
   }
 }
-
 resource "bigip_net_selfip" "test-selfip" {
   name = "` + TEST_SELFIP_NAME + `"
   ip = "11.1.1.1/24"
   vlan = "/Common/test-vlan"
   depends_on = ["bigip_net_vlan.test-vlan"]
 }
-
 resource "bigip_net_selfip" "test-float-selfip" {
   name = "` + TEST_FLOAT_SELFIP_NAME + `"
   ip = "11.1.1.2/24"

@@ -12,8 +12,7 @@ import (
 var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TEST_PARTITION)
 
 var TEST_ONECONNECT_RESOURCE = `
-resource "bigip_ltm_profile_oneconnect" "test-oneconnect"
-        {
+resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {
             name = "/Common/test-oneconnect"
             partition = "Common"
             defaults_from = "/Common/oneconnect"

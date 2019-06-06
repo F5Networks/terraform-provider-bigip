@@ -30,7 +30,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 	dynamic_ratio = "1"
 	monitor = "default"
 	rate_limit = "disabled"
-	fqdn = { interval = "3000"}
+	fqdn { interval = "3000"}
 }
 `
 
