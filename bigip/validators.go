@@ -50,9 +50,9 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	}
 
 	for _, v := range values {
-		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.]+$", v)
+		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+$", v)
 		if !match {
-			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:]. e.g. /Common/my-pool", field))
 		}
 	}
 	return
