@@ -34,7 +34,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Required:    true,
 				Description: "Listen port for the virtual server",
 			},
-			
+
 			"source": {
 				Type:        schema.TypeString,
 				Optional:    true,
