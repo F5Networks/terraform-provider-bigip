@@ -155,6 +155,10 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
+			if field == "http_reply" {
+				f := val.FieldByName(strings.Title("httpReply"))
+				f.Set(reflect.ValueOf(d[field]))
+			}
 			log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
 		}
 	}
