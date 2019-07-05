@@ -15,6 +15,22 @@ var TEST_VS_NAME = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
 var TEST_VS_RESOURCE = TEST_IRULE_RESOURCE + `
 
 
+resource "bigip_ltm_policy" "http_to_https_redirect" {
+  name = "http_to_https_redirect"
+  strategy = "/Common/first-match"
+  requires = ["http"]
+  published_copy = "Drafts/http_to_https_redirect"
+  controls = ["forwarding"]
+  rule  {
+    name = "http_to_https_redirect_rule"
+    action {
+      tm_name = "http_to_https_redirect"
+      redirect = true
+      location = "tcl:https://[HTTP::host][HTTP::uri]"
+      http_reply = true
+    }
+  }
+}
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TEST_VS_NAME + `"
 	destination = "10.255.255.254"
@@ -28,6 +44,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	server_profiles = ["/Common/tcp-lan-optimized"]
 	persistence_profiles = ["/Common/source_addr"]
 	fallback_persistence_profile = "/Common/dest_addr"
+        policies = ["${bigip_ltm_policy.http_to_https_redirect.name}"]
 
 }
 `
@@ -66,6 +83,9 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
 						"/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
+						"http_to_https_redirect"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
