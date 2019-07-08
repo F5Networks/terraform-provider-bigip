@@ -1,9 +1,10 @@
 package bigip
 
 import (
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
@@ -116,7 +117,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Type:        schema.TypeString,
 				Default:     "enabled",
 				Optional:    true,
-				Description: "Enables the system to perform HTTP header transformations for the purpose of  keeping server-side connections open. This feature requires configuration of a OneConnect profile.",
+				Description: "Enables the system to perform HTTP header transformations for the purpose of keeping server-side connections open. This feature requires configuration of a OneConnect profile.",
 			},
 			"tm_partition": {
 				Type:        schema.TypeString,
