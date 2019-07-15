@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pirotrav/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/pirotrav/go-bigip"
 )
 
 var TEST_ClientSsl_NAME = fmt.Sprintf("/%s/test-ClientSsl", TEST_PARTITION)
@@ -135,8 +135,8 @@ func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ssl_sign_hash", "any"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "strict_resume", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ClientSsl",
-					fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")),
-					"dont-insert-empty-fragments"),
+						fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")),
+						"dont-insert-empty-fragments"),
 
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "unclean_shutdown", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_key_chain.0.name", "default"),
