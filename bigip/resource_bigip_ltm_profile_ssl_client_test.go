@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pirotrav/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -88,57 +89,59 @@ func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
 					testCheckClientSslExists(TEST_ClientSsl_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "name", "/Common/test-ClientSsl"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "defaults_from", "/Common/ClientSsl"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "alert_timeout", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "allow_non_ssl", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "authenticate", "once"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "authenticate_depth", "9"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "ca_file", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cache_size", "262144"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cache_timeout", "3600"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cert", "/Common/default.crt"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cert_extension_includes", ["basic-constraints","subject-alternative-name",]),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cert_life_span", "30"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cert_lookup_by_ipaddr_port", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "chain", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "ciphers", "DEFAULT"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "client_cert_ca", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "crl_file", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "defaults_from", "/Common/clientssl"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "forward_proxy_bypass_default_action", "intercept"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "generic_alert", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "handshake_timeout", "10"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "id", "terraform_test_client"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "inherit_cert_keychain", "FALSE"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "key", "/Common/default.key"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "mod_ssl_methods", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "mode", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "name", "terraform_test_client"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "partition", "Common"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "peer_cert_mode", "ignore"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "proxy_ca_cert", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "proxy_ca_key", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "proxy_ssl", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "proxy_ssl_passthrough", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "renegotiate_period", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "renegotiate_size", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "renegotiation", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "retain_certificate", "TRUE"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "secure_renegotiation", "require"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "server_name", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "session_mirroring", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "session_ticket", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "sni_default", "FALSE"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "sni_require", "FALSE"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "ssl_forward_proxy", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "ssl_forward_proxy_bypass", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "ssl_sign_hash", "any"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "strict_resume", "disabled"
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "m_options", "["dont-insert-empty-fragments",]"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "unclean_shutdown", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-Client", "cert_key_chain", {cert="/Common/default.crt"
-						key  = "/Common/default.key"
-						name = "default"
-					}),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "alert_timeout", "indefinite"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "allow_non_ssl", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "authenticate", "once"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "authenticate_depth", "9"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ca_file", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cache_size", "262144"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cache_timeout", "3600"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert", "/Common/default.crt"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_extension_includes", "['basic-constraints','subject-alternative-name']"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_life_span", "30"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_lookup_by_ipaddr_port", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "chain", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ciphers", "DEFAULT"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "client_cert_ca", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "crl_file", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "forward_proxy_bypass_default_action", "intercept"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "generic_alert", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "handshake_timeout", "10"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "id", "terraform_test_client"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "inherit_cert_keychain", "FALSE"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "key", "/Common/default.key"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "mod_ssl_methods", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "mode", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "name", "terraform_test_client"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "peer_cert_mode", "ignore"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "proxy_ca_cert", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "proxy_ca_key", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "proxy_ssl", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "proxy_ssl_passthrough", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "renegotiate_period", "indefinite"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "renegotiate_size", "indefinite"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "renegotiation", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "retain_certificate", "TRUE"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "secure_renegotiation", "require"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "server_name", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "session_mirroring", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "session_ticket", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "sni_default", "FALSE"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "sni_require", "FALSE"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ssl_forward_proxy", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ssl_forward_proxy_bypass", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ssl_sign_hash", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "strict_resume", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ClientSsl",
+					fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")),
+					"dont-insert-empty-fragments"),
+
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "unclean_shutdown", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_key_chain.0.name", "default"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_key_chain.0.cry", "/Common/default.crt"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert_key_chain.0.key", "/Common/default.key"),
 				),
 			},
 		},
@@ -169,15 +172,15 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 func testCheckClientSslExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.GetClientSsl(name)
+		p, err := client.GetClientSSLProfile(name)
 		if err != nil {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("ClientSsl %s was not created.", name)
+			return fmt.Errorf("ClientSsl Profile %s was not created.", name)
 		}
 		if !exists && p == nil {
-			return fmt.Errorf("ClientSsl %s still exists.", name)
+			return fmt.Errorf("ClientSsl Profile %s still exists.", name)
 		}
 		return nil
 	}
@@ -192,12 +195,12 @@ func testCheckClientSslsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		Client, err := client.GetClientSsl(name)
+		ClientSsl, err := client.GetClientSSLProfile(name)
 		if err != nil {
 			return err
 		}
 		if ClientSsl != nil {
-			return fmt.Errorf("ClientSsl %s not destroyed.", name)
+			return fmt.Errorf("ClientSsl Profile %s not destroyed.", name)
 		}
 	}
 	return nil

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pirotrav/go-bigip"
@@ -45,7 +46,7 @@ resource "bigip_ltm_profile_server_ssl" "profile_mutualssl" {
 	ssl_sign_hash                   = "any"
 	strict_resume                   = "disabled"
     tm_options                      = [
-	  - "dont-insert-empty-fragments",
+	  "dont-insert-empty-fragments",
 	]
 	unclean_shutdown                = "enabled"
 	untrusted_cert_response_control = "drop"
@@ -96,7 +97,11 @@ func TestAccBigipLtmProfileServerSsl_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ssl_forward_proxy_bypass", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ssl_sign_hash", "any"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "strict_resume", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "tm_options", "[dont-insert-empty-fragments,]"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "tm_options", "dont-insert-empty-fragments"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl",
+						fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")),
+						"dont-insert-empty-fragments"),
+
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "unclean_shutdown", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "untrusted_cert_response_control", "drop"),
 				),
@@ -129,15 +134,15 @@ func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 func testCheckServerSslExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.GetServerSsl(name)
+		p, err := client.GetServerSSLProfile(name)
 		if err != nil {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("ServerSsl %s was not created.", name)
+			return fmt.Errorf("ServerSsl Profile %s was not created.", name)
 		}
 		if !exists && p == nil {
-			return fmt.Errorf("ServerSsl %s still exists.", name)
+			return fmt.Errorf("ServerSsl Profile %s still exists.", name)
 		}
 		return nil
 	}
@@ -152,12 +157,12 @@ func testCheckServerSslsDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		ServerSsl, err := client.GetServerSsl(name)
+		ServerSsl, err := client.GetServerSSLProfile(name)
 		if err != nil {
 			return err
 		}
 		if ServerSsl != nil {
-			return fmt.Errorf("ServerSsl %s not destroyed.", name)
+			return fmt.Errorf("ServerSsl Profile %s not destroyed.", name)
 		}
 	}
 	return nil
