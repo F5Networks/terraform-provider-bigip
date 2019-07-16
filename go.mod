@@ -1,7 +1,7 @@
-module github.com/f5devcentral/terraform-provider-bigip
+module github.com/pirotrav/terraform-provider-bigip
 
 require (
-	github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1
+	github.com/pirotrav/go-bigip v0.0.0-20190501191628-90a141f856d1
 	github.com/hashicorp/go-hclog v0.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
