@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/pirotrav/terraform-provider-bigip/bigip"
 	"github.com/hashicorp/terraform/plugin"
+	"github.com/pirotrav/terraform-provider-bigip/bigip"
 )
 
 func main() {
