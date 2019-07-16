@@ -85,6 +85,10 @@ github.com/dylanmei/iso8601 v0.1.0/go.mod h1:w9KhXSgIyROl1DefbMYIE7UVSIvELTbMrCf
 github.com/dylanmei/winrmtest v0.0.0-20190225150635-99b7fe2fddf1/go.mod h1:lcy9/2gH1jn/VCLouHA6tOEwLoNVd4GW6zhuKLmHC2Y=
 github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1 h1:KUsCxFbh6QfIvpAjD16LKvYXjALFDqx1uJWp++qHrw8=
 github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/go-bigip v0.0.0-20190510221651-e2c35dc383b2 h1:A9HpgIhzqgVbtbSGvGYrng5bEYnAsBQ9c6bDbyUgIgM=
+github.com/f5devcentral/go-bigip v0.0.0-20190510221651-e2c35dc383b2/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/terraform-provider-bigip v0.0.0-20181108171352-358ef110ef33 h1:g7XkOQwbhkk6VxXgUyFrKU1utAOPHpyGNi3AhBfFaFA=
+github.com/f5devcentral/terraform-provider-bigip v0.0.0-20181108171352-358ef110ef33/go.mod h1:6SgZwfgbm/fsNwNWDHr3JEwN2jLJxyuffNJ6IqSasAs=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
@@ -290,6 +294,8 @@ github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTm
 github.com/packer-community/winrmcp v0.0.0-20180102160824-81144009af58 h1:m3CEgv3ah1Rhy82L+c0QG/U3VyY1UsvsIdkh0/rU97Y=
 github.com/packer-community/winrmcp v0.0.0-20180102160824-81144009af58/go.mod h1:f6Izs6JvFTdnRbziASagjZ2vmf55NSIkC/weStxCHqk=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
+github.com/pirotrav/go-bigip v0.0.0-20190501191628-90a141f856d1 h1:3ZUCZ4+/o5Th+0eoyTqecc5IZJbN8B/0IaCf5Abl4l0=
+github.com/pirotrav/go-bigip v0.0.0-20190501191628-90a141f856d1/go.mod h1:8y35pKBSR4+mFtYTNo/rYw+P2pg3kwtRiaHVjr3K3Qs=
 github.com/pkg/errors v0.0.0-20170505043639-c605e284fe17 h1:chPfVn+gpAM5CTpTyVU9j8J+xgRGwmoDlNDLjKnJiYo=
 github.com/pkg/errors v0.0.0-20170505043639-c605e284fe17/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

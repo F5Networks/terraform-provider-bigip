@@ -40,6 +40,7 @@ keymap
 *.pub
 *.back
 *.goback
+*.exe
 bigip/*.back
 examples1
 # Test exclusions
