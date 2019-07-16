@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-bigip
+module github.com/f5devcentral/terraform-provider-bigip
 
 require (
 	github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1
