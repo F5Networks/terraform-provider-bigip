@@ -99,7 +99,7 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 	r := &bigip.Http2{
 		Name:                           name,
 		DefaultsFrom:                   d.Get("defaults_from").(string),
-		ConcurrentStreamsPerConnection: d.Get("concurrentr_streams_perr_connection").(int),
+		ConcurrentStreamsPerConnection: d.Get("concurrent_streams_per_connection").(int),
 		ConnectionIdleTimeout:          d.Get("connection_idle_timeout").(int),
 		HeaderTableSize:                d.Get("header_table_size").(int),
 		ActivationModes:                setToStringSlice(d.Get("activation_modes").(*schema.Set)),

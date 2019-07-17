@@ -5,6 +5,7 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"log"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ resource "bigip_ltm_policy" "test-policy" {
 	name = "` + TEST_POLICY_NAME + `"
 	strategy = "/Common/first-match"
 	requires = ["http"]
-	published_copy = "Drafts/test-policy"
+	published_copy = "Drafts/` + TEST_POLICY_NAME + `"
 	controls = ["forwarding"]
 	rule  {
 	      name = "rule6"
@@ -47,6 +48,22 @@ resource "bigip_ltm_policy" "test-policy" {
 			      pool = "/Common/test-pool"
 		      }
 	}
+}
+resource "bigip_ltm_policy" "http_to_https_redirect" {
+  name = "http_to_https_redirect"
+  strategy = "/Common/first-match"
+  requires = ["http"]
+  published_copy = "Drafts/http_to_https_redirect"
+  controls = ["forwarding"]
+  rule  {
+    name = "http_to_https_redirect_rule"
+    action {
+      tm_name = "http_to_https_redirect"
+      redirect = true
+      location = "tcl:https://[HTTP::host][HTTP::uri]"
+      http_reply = true
+    }
+  }
 }
 `
 
@@ -62,6 +79,7 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 				Config: TEST_POLICY_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					testCheckPolicyExists("http_to_https_redirect", true),
 				),
 			},
 		},
@@ -104,6 +122,7 @@ func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 		if !exists && policy != nil {
 			return fmt.Errorf("Policy %s still exists.", name)
 		}
+		log.Printf("[DEBUG] Policy \"%s\" Created ", name)
 		return nil
 	}
 }
