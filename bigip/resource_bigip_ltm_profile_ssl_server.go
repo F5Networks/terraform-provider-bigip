@@ -157,8 +157,9 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			},
 
 			"tm_options": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				Optional: true,
 			},
 

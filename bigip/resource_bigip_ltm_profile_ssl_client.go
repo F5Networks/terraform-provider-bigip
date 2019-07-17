@@ -160,8 +160,9 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			},
 
 			"cert_extension_includes": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
 				Optional:    true,
 				Description: "Cert extension includes for ssl forward proxy",
 			},
@@ -251,8 +252,9 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			},
 
 			"tm_options": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				Optional: true,
 			},
 
