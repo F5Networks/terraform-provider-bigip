@@ -294,8 +294,8 @@ github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTm
 github.com/packer-community/winrmcp v0.0.0-20180102160824-81144009af58 h1:m3CEgv3ah1Rhy82L+c0QG/U3VyY1UsvsIdkh0/rU97Y=
 github.com/packer-community/winrmcp v0.0.0-20180102160824-81144009af58/go.mod h1:f6Izs6JvFTdnRbziASagjZ2vmf55NSIkC/weStxCHqk=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
-github.com/pirotrav/go-bigip v0.0.0-20190501191628-90a141f856d1 h1:3ZUCZ4+/o5Th+0eoyTqecc5IZJbN8B/0IaCf5Abl4l0=
-github.com/pirotrav/go-bigip v0.0.0-20190501191628-90a141f856d1/go.mod h1:8y35pKBSR4+mFtYTNo/rYw+P2pg3kwtRiaHVjr3K3Qs=
+github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1 h1:3ZUCZ4+/o5Th+0eoyTqecc5IZJbN8B/0IaCf5Abl4l0=
+github.com/f5devcentral/go-bigip v0.0.0-20190501191628-90a141f856d1/go.mod h1:8y35pKBSR4+mFtYTNo/rYw+P2pg3kwtRiaHVjr3K3Qs=
 github.com/pkg/errors v0.0.0-20170505043639-c605e284fe17 h1:chPfVn+gpAM5CTpTyVU9j8J+xgRGwmoDlNDLjKnJiYo=
 github.com/pkg/errors v0.0.0-20170505043639-c605e284fe17/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

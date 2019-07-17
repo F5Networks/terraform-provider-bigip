@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pirotrav/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {

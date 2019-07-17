@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/pirotrav/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 )
 
 var TEST_SERVERSSL_NAME = fmt.Sprintf("/%s/test-ServerSsl", TEST_PARTITION)
