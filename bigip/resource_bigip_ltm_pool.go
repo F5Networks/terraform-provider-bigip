@@ -50,6 +50,11 @@ func resourceBigipLtmPool() *schema.Resource {
 				Computed:    true,
 				Description: "Allow SNAT",
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "Test-Pool",
+			},
 
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
@@ -182,6 +187,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowNAT:          d.Get("allow_nat").(string),
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
+		Description:       d.Get("description").(string),
 		SlowRampTime:      d.Get("slow_ramp_time").(int),
 		ServiceDownAction: d.Get("service_down_action").(string),
 		ReselectTries:     d.Get("reselect_tries").(int),

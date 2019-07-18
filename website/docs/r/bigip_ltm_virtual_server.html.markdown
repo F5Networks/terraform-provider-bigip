@@ -28,6 +28,7 @@ resource "bigip_ltm_virtual_server" "http" {
 resource "bigip_ltm_virtual_server" "https" {
   name = "/Common/terraform_vs_https"
   destination = "${var.vip_ip}"
+  description = "VirtualServer-test"
   port = 443
   pool = "${var.pool}"
   profiles = ["/Common/tcp","/Common/my-awesome-ssl-cert","/Common/http"]
@@ -41,6 +42,7 @@ resource "bigip_ltm_virtual_server" "https" {
  resource "bigip_ltm_virtual_server" "https" {
   name = "/Common/terraform_vs_https"
   destination = "10.255.255.254"
+  description = "VirtualServer-test"
   port = 443
   client_profiles = ["/Common/clientssl"]
   server_profiles = ["/Common/serverssl"]
@@ -58,6 +60,8 @@ resource "bigip_ltm_virtual_server" "https" {
 * `port` - (Required) Listen port for the virtual server
 
 * `destination` - (Required) Destination IP
+
+* `description` - (Optional) Description of Virtual server
 
 * `pool` - (Optional) Default pool name
 

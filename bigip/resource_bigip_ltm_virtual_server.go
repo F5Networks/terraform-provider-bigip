@@ -41,6 +41,11 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Default:     "0.0.0.0/0",
 				Description: "Source IP and mask for the virtual server",
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "VirtualServer-test",
+			},
 
 			"destination": {
 				Type:     schema.TypeString,
@@ -378,6 +383,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Source:                     d.Get("source").(string),
 		Pool:                       d.Get("pool").(string),
 		Mask:                       d.Get("mask").(string),
+		Description:                d.Get("description").(string),
 		Rules:                      rules,
 		PersistenceProfiles:        persistenceProfiles,
 		Profiles:                   profiles,

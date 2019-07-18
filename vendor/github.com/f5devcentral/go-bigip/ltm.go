@@ -141,6 +141,7 @@ type Node struct {
 	Name            string `json:"name,omitempty"`
 	Partition       string `json:"partition,omitempty"`
 	FullPath        string `json:"fullPath,omitempty"`
+	Description     string `json:"description,omitempty"`
 	Generation      int    `json:"generation,omitempty"`
 	Address         string `json:"address,omitempty"`
 	ConnectionLimit int    `json:"connectionLimit,omitempty"`
@@ -242,6 +243,7 @@ type Pool struct {
 	Name                   string `json:"name,omitempty"`
 	Partition              string `json:"partition,omitempty"`
 	FullPath               string `json:"fullPath,omitempty"`
+	Description            string `json:"description,omitempty"`
 	Generation             int    `json:"generation,omitempty"`
 	AllowNAT               string `json:"allowNat,omitempty"`
 	AllowSNAT              string `json:"allowSnat,omitempty"`
@@ -304,6 +306,7 @@ type poolDTO struct {
 	Name                   string `json:"name,omitempty"`
 	Partition              string `json:"partition,omitempty"`
 	FullPath               string `json:"fullPath,omitempty"`
+	Description            string `json:"description,omitempty"`
 	Generation             int    `json:"generation,omitempty"`
 	AllowNAT               string `json:"allowNat,omitempty"`
 	AllowSNAT              string `json:"allowSnat,omitempty"`
@@ -491,6 +494,7 @@ type VirtualServer struct {
 	Partition                  string `json:"partition,omitempty"`
 	FullPath                   string `json:"fullPath,omitempty"`
 	Generation                 int    `json:"generation,omitempty"`
+	Description                string `json:"description,omitempty"`
 	AddressStatus              string `json:"addressStatus,omitempty"`
 	AutoLastHop                string `json:"autoLastHop,omitempty"`
 	CMPEnabled                 string `json:"cmpEnabled,omitempty"`
@@ -1933,7 +1937,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state string) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -1942,13 +1946,14 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 		DynamicRatio:    dynamic_ratio,
 		Monitor:         monitor,
 		State:           state,
+		Description:     description,
 	}
 
 	return b.post(config, uriLtm, uriNode)
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, interval, address_family, autopopulate string, downinterval int) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description, interval, address_family, autopopulate string, downinterval int) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1956,6 +1961,7 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 		DynamicRatio:    dynamic_ratio,
 		Monitor:         monitor,
 		State:           state,
+		Description:     description,
 	}
 	config.FQDN.Name = address
 	config.FQDN.Interval = interval
