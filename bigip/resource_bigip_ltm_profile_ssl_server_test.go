@@ -4,31 +4,37 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/f5devcentral/go-bigip"
 )
 
 var TEST_SERVERSSL_NAME = fmt.Sprintf("/%s/test-ServerSsl", TEST_PARTITION)
 
 var TEST_SERVERSSL_RESOURCE = `
 resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
+	name                            = "/Common/test-ServerSsl"
+	partition                       = "Common"
+	defaults_from                   = "/Common/serverssl"
 	alert_timeout                   = "indefinite"
 	authenticate                    = "once"
 	authenticate_depth              = 9
-	ca_file                         = "none"
 	cache_size                      = 262144
+	cache_timeout					= 3600
+	ca_file							= "none"
+	cert 							= "none"
 	chain                           = "none"
-	ciphers                         = "DEFAULT"
-	defaults_from                   = "/Common/serverssl"
+	ciphers                         = "ALL"
 	expire_cert_response_control    = "drop"
+	full_path						= "/Common/test-ServerSsl"
+	generic_alert					= "enabled"
 	handshake_timeout               = "10"
 	key                             = "none"
 	mod_ssl_methods                 = "disabled"
 	mode                            = "enabled"
-	name                            = "/Common/test-ServerSsl"
-    partition                       = "Common"
+	passphrase						= ""
+	peer_cert_mode					= "ignore"
 	proxy_ssl                       = "disabled"
 	renegotiate_period              = "indefinite"
 	renegotiate_size                = "indefinite"
@@ -65,20 +71,25 @@ func TestAccBigipLtmProfileServerSsl_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckServerSslExists(TEST_SERVERSSL_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "name", "/Common/test-ServerSsl"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "partition", "Common"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "defaults_from", "/Common/serverssl"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "alert_timeout", "indefinite"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "authenticate", "once"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "authenticate_depth", "9"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ca_file", "none"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cache_size", "262144"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cache_timeout", "3600"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ca_file", "none"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cert", "none"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "chain", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ciphers", "DEFAULT"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ciphers", "ALL"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "expire_cert_response_control", "drop"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "generic_alert", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "handshake_timeout", "10"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "key", "none"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "mod_ssl_methods", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "mode", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "passphrase", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "peer_cert_mode", "ignore"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "proxy_ssl", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "renegotiate_period", "indefinite"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "renegotiate_size", "indefinite"),

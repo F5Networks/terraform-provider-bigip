@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmProfileClientSsl() *schema.Resource {
@@ -46,83 +46,63 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			"alert_timeout": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Alert time out",
 			},
 
 			"allow_non_ssl": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Allow non ssl",
 			},
 
 			"authenticate": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Server authentication once / always (default is once).",
 			},
 
 			"authenticate_depth": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Client certificate chain traversal depth.  Default 9.",
 			},
 
 			"ca_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Client certificate file path.  Default None.",
 			},
 
 			"cache_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Cache size (sessions).",
 			},
 
 			"cache_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Cache time out",
 			},
 
 			"cert": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of the server certificate.",
 			},
-			/*
-				"cert_key_chain_name": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Description: "Name of the chain.",
-				},
-				"cert_key_chain_cert": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Description: "Name of the certificate.",
-				},
 
-				"cert_key_chain_key": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Description: "Name of the key.",
-				},
-
-				"cert_key_chain_chain": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Description: "Name of the chain.",
-				},
-
-				"cert_key_chain_passphrase": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Description: "Passphrase for the key.",
-				},
-			*/
 			"cert_key_chain": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 
@@ -164,90 +144,105 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Set:         schema.HashString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Cert extension includes for ssl forward proxy",
 			},
 
 			"cert_life_span": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Life span of the certificate in days for ssl forward proxy",
 			},
 
 			"cert_lookup_by_ipaddr_port": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Cert lookup by ip address and port enabled / disabled",
 			},
 
 			"chain": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Client certificate chain name.",
 			},
 
 			"ciphers": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "BigIP cipher string.",
+				Computed:    true,
+				Description: "BigIP Cipher string.",
 			},
 
 			"client_cert_ca": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "client certificate name",
 			},
 
 			"crl_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Certificate revocation file name",
 			},
 
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Profile name that this profile defaults from.",
 			},
 
 			"forward_proxy_bypass_default_action": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Forward proxy bypass default action. (enabled / disabled)",
 			},
 
 			"generic_alert": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Generic alerts enabled / disabled.",
 			},
 
 			"handshake_timeout": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Handshake time out (seconds)",
 			},
 
 			"inherit_cert_keychain": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Inherit cert key chain",
 			},
 
 			"key": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of the Server SSL profile key",
 			},
 
 			"mod_ssl_methods": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "ModSSL Methods enabled / disabled.  Default is disabled.",
 			},
 
 			"mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "ModSSL Methods enabled / disabled.  Default is disabled.",
 			},
 
@@ -256,137 +251,160 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
+				Computed: true,
 			},
 
 			"passphrase": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Client Certificate Constrained Delegation CA passphrase",
 			},
 
 			"peer_cert_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Peer Cert Mode",
 			},
 
 			"proxy_ca_cert": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Proxy CA Cert",
 			},
 
 			"proxy_ca_key": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Proxy CA Key",
 			},
 
 			"proxy_ca_passphrase": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Proxy CA Passphrase",
 			},
 
 			"proxy_ssl": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Proxy SSL enabled / disabled.  Default is disabled.",
 			},
 
 			"proxy_ssl_passthrough": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Proxy SSL passthrough enabled / disabled.  Default is disabled.",
 			},
 
 			"renegotiate_period": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Renogotiate Period (seconds)",
 			},
 
 			"renegotiate_size": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Renogotiate Size",
 			},
 
 			"renegotiation": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Renegotiation (enabled / disabled)",
 			},
 
 			"retain_certificate": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Retain certificate.",
 			},
 
 			"secure_renegotiation": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Secure reneogotiaton (request / require / require-strict).",
 			},
 
 			"server_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Server name",
 			},
 
 			"session_mirroring": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Session Mirroring (enabled / disabled)",
 			},
 
 			"session_ticket": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Session Ticket (enabled / disabled)",
 			},
 
 			"sni_default": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SNI Default (true / false)",
 			},
 
 			"sni_require": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SNI Require (true / false)",
 			},
 
 			"ssl_forward_proxy": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SSL forward Proxy (enabled / disabled)",
 			},
 
 			"ssl_forward_proxy_bypass": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SSL forward Proxy Bypass (enabled / disabled)",
 			},
 
 			"ssl_sign_hash": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SSL sign hash (any, sha1, sha256, sha384)",
 			},
 
 			"strict_resume": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Strict Resume (enabled / disabled)",
 			},
 
 			"unclean_shutdown": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Unclean Shutdown (enabled / disabled)",
 			},
 		},
@@ -453,20 +471,6 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		Key        string "json:\"key,omitempty\""
 		Passphrase string "json:\"passphrase,omitempty\""
 	}
-	/*
-		if ckc, ok := d.GetOk("cert_key_chain"); ok {
-			for _, c := range ckc.(*schema.Set).List() {
-				certKeyChains = append(certKeyChains, certKeyChain{
-				Name: c.Get("name").(string),
-				Cert: c.Get("cert").(string),
-				Chain: c.Get("chain").(string),
-				Key: c.Get("key").(string),
-				Passphrase: c.Get("passphrase").(string),
-				})
-			}
-
-		}
-	*/
 
 	certKeyChainCount := d.Get("cert_key_chain.#").(int)
 	for i := 0; i < certKeyChainCount; i++ {
@@ -479,14 +483,6 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 			Passphrase: d.Get(prefix + ".passphrase").(string),
 		})
 	}
-	/*
-		var persistenceProfiles []bigip.Profile
-		if p, ok := d.GetOk("persistence_profiles"); ok {
-			for _, profile := range p.(*schema.Set).List() {
-				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
-			}
-		}
-	*/
 
 	pss := &bigip.ClientSSLProfile{
 		Name:                            d.Get("name").(string),
@@ -606,10 +602,6 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
-	/*if err := d.Set("cert_key_chain", obj.CertKeyChain); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CertKeyChain to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-	*/
 	for i, c := range obj.CertKeyChain {
 		ckc := fmt.Sprintf("cert_key_chain.%d", i)
 		d.Set(fmt.Sprintf("%s.name", ckc), c.Name)
@@ -617,42 +609,8 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		d.Set(fmt.Sprintf("%s.chain", ckc), c.Chain)
 		d.Set(fmt.Sprintf("%s.key", ckc), c.Key)
 		d.Set(fmt.Sprintf("%s.passphrase", ckc), c.Passphrase)
-		/*
-			for x, y := range c.CertKeyChains {
-				cert := fmt.Sprintf("%s.cert.%d", CertKeyChain, x)
-				interfaceToResourceData(y, d, cert)
 
-				chain := fmt.Sprintf("%s.chain.%d", CertKeyChain, x)
-				interfaceToResourceData(y, d, chain)
-
-				key := fmt.Sprintf("%s.key.%d", CertKeyChain, x)
-				interfaceToResourceData(y, d, key)
-
-				cert := fmt.Sprintf("%s.cert.%d", CertKeyChain, x)
-				interfaceToResourceData(y, d, cert)
-
-				passphrase := fmt.Sprintf("%s.passphrase.%d", CertKeyChain, x)
-				interfaceToResourceData(y, d, passphrase)
-			}*/
 	}
-
-	/*
-		for i, r := range p.Rules {
-			rule := fmt.Sprintf("rule.%d", i)
-			d.Set(fmt.Sprintf("%s.name", rule), r.FullPath)
-			for x, a := range r.Actions {
-				action := fmt.Sprintf("%s.action.%d", rule, x)
-				interfaceToResourceData(a, d, action)
-			}
-
-			for x, c := range r.Conditions {
-				condition := fmt.Sprintf("%s.condition.%d", rule, x)
-				interfaceToResourceData(c, d, condition)
-			}
-		}
-	*/
-
-	//d.Set("cert_extension_includes", obj.CertExtensionIncludes.Type)
 
 	if err := d.Set("cert_extension_includes", obj.CertExtensionIncludes); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving CertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
@@ -803,28 +761,6 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	return nil
 }
-
-/*
-func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	obj, err := client.GetClientSSLProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Ssl Profile  (%s) (%v)", name, err)
-		return err
-	}
-	if obj == nil {
-		log.Printf("[WARN] Ssl  Profile (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-	d.Set("name", name)
-	d.Set("partition", obj.Partition)
-
-
-	return nil
-}
-*/
 
 func resourceBigipLtmProfileClientSSLDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)

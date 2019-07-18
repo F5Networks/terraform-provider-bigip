@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
@@ -20,9 +20,8 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Name of the Ssl Profile",
 			},
 
@@ -160,6 +159,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
+				Computed: true,
 				Optional: true,
 			},
 
@@ -408,13 +408,10 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	}
 
 	d.Set("name", name)
+	d.Set("partition", obj.Partition)
 
 	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("partition", obj.Partition); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Partition to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("alert_timeout", obj.AlertTimeout); err != nil {
