@@ -12,28 +12,26 @@ Configures a cookie persistence profile
 
 ## Example
 
-```
+```hcl
 resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
-    name = "/Common/terraform_cookie"
-    defaults_from = "/Common/cookie"
-    match_across_pools = "enabled"
-    match_across_services = "enabled"
-    match_across_virtuals = "enabled"
-    timeout = 3600
-    override_conn_limit = "enabled"
-    always_send = "enabled"
-    cookie_encryption = "required"
-    cookie_encryption_passphrase = "iam"
-    cookie_name = "ham"
-    expiration = "1:0:0"
-    hash_length = 0
+  name                         = "/Common/terraform_cookie"
+  defaults_from                = "/Common/cookie"
+  match_across_pools           = "enabled"
+  match_across_services        = "enabled"
+  match_across_virtuals        = "enabled"
+  timeout                      = 3600
+  override_conn_limit          = "enabled"
+  always_send                  = "enabled"
+  cookie_encryption            = "required"
+  cookie_encryption_passphrase = "iam"
+  cookie_name                  = "ham"
+  expiration                   = "1:0:0"
+  hash_length                  = 0
 
-    lifecycle {
-        ignore_changes = [ "cookie_encryption_passphrase" ]
-    }
+  lifecycle {
+    ignore_changes = ["cookie_encryption_passphrase"]
+  }
 }
-
-
 ```
 
 ## Reference

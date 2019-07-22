@@ -17,24 +17,23 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
-  name = "/Common/terraform_monitor"
-  parent = "/Common/http"
-  send = "GET /some/path\r\n"
-  timeout = "999"
-  interval = "999"
+  name        = "/Common/terraform_monitor"
+  parent      = "/Common/http"
+  send        = "GET /some/path\r\n"
+  timeout     = "999"
+  interval    = "999"
   destination = "1.2.3.4:1234"
 }
 
 resource "bigip_ltm_monitor" "test-ftp-monitor" {
-	name = "/Common/ftp-test"
-	parent = "/Common/ftp"
-	interval          = 5
-	time_until_up     = 0
-	timeout           = 16
-	destination       = "*:8008"
-	filename = "somefile"
+  name          = "/Common/ftp-test"
+  parent        = "/Common/ftp"
+  interval      = 5
+  time_until_up = 0
+  timeout       = 16
+  destination   = "*:8008"
+  filename      = "somefile"
 }
-
 ```      
 
 ## Argument Reference

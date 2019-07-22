@@ -16,15 +16,13 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
-resource "bigip_ltm_profile_http" "sanjose-http"
-
-        {
-          name = "/Common/sanjose-http"
-          defaults_from = "/Common/http"
-          description = "some http"
-          fallback_host = "titanic"
-          fallback_status_codes = ["400","500","300"]
-        }
+resource "bigip_ltm_profile_http" "sanjose-http" {
+  name                  = "/Common/sanjose-http"
+  defaults_from         = "/Common/http"
+  description           = "some http"
+  fallback_host         = "titanic"
+  fallback_status_codes = ["400", "500", "300"]
+}
 ```      
 
 ## Argument Reference

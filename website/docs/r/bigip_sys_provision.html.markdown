@@ -14,17 +14,17 @@ description: |-
 
 ```hcl
 provider "bigip" {
-  address = "10.192.74.73"
+  address  = "10.192.74.73"
   username = "admin"
   password = "admin"
 }
 
 resource "bigip_sys_provision" "provision-ilx" {
-  name = "/Common/ilx"
-  fullPath  = "ilx"
-  cpuRatio = 0
-  diskRatio = 0
-  level = "nominal"
+  name        = "/Common/ilx"
+  fullPath    = "ilx"
+  cpuRatio    = 0
+  diskRatio   = 0
+  level       = "nominal"
   memoryRatio = 0
 }
 ```

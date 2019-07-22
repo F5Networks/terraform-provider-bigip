@@ -19,12 +19,12 @@ For resources should be named with their "full path". The full path is the combi
 ```hcl
 # Loading from a file is the preferred method
 resource "bigip_ltm_irule" "rule" {
-  name = "/Common/terraform_irule"
+  name  = "/Common/terraform_irule"
   irule = "${file("myirule.tcl")}"
 }
 
 resource "bigip_ltm_irule" "rule2" {
-  name = "/Common/terraform_irule2"
+  name  = "/Common/terraform_irule2"
   irule = <<EOF
 when CLIENT_ACCEPTED {
      log local0. "test"
