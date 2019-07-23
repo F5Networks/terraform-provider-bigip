@@ -19,8 +19,7 @@ install:
 - make tools
 
 script:
-- make testacc
-- make test -v
+- make test
 - make website-lint
 - make website-test
 

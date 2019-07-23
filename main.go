@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform/plugin"
-	"github.com/pirotrav/terraform-provider-bigip/bigip"
+	"github.com/terraform-providers/terraform-provider-bigip/bigip"
 )
 
 func main() {
