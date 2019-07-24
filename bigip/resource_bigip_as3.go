@@ -17,6 +17,7 @@ func resourceBigipAs3() *schema.Resource {
                 Read:   resourceBigipAs3Read,
                 Update: resourceBigipAs3Update,
                 Delete: resourceBigipAs3Delete,
+                Exists: resourceBigipAs3Exists,
                 Importer: &schema.ResourceImporter{
                         State: schema.ImportStatePassthrough,
                 },
@@ -60,6 +61,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
         body, err := ioutil.ReadAll(resp.Body)
         bodyString := string(body)
         if ( resp.Status != "200 OK" ||  err != nil)  {
+           defer resp.Body.Close() 
 	   return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v",bodyString,err )
         } 
         log.Printf("[INFO] as3 resp in create call is :%+v", resp)
@@ -91,7 +93,10 @@ func resourceBigipAs3Read(d *schema.ResourceData,meta interface{}) error {
         resp, err := client.Do(req)
         body, err := ioutil.ReadAll(resp.Body)
         bodyString := string(body)
+        log.Printf("[INFO] as3 resp in read call is :%+v", resp)
+        log.Printf("[INFO] as3 bodystring in read is :%+v",bodyString)
         if ( resp.Status != "200 OK" ||  err != nil)  {
+           defer resp.Body.Close()
            return fmt.Errorf("Error while Sending/fetching http request with AS3 json :%s  %v",bodyString,err )
         }
 
@@ -100,6 +105,38 @@ func resourceBigipAs3Read(d *schema.ResourceData,meta interface{}) error {
         defer resp.Body.Close()
         return nil
 }
+
+func resourceBigipAs3Exists(d *schema.ResourceData,meta interface{}) (bool, error) {
+        client_bigip := meta.(*bigip.BigIP)
+        log.Printf("[INFO] Checking if As3 config exists in bigip ")
+
+        tr := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+        client := &http.Client{Transport: tr}
+        url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
+        req, err := http.NewRequest("GET", url, nil)
+        if err != nil {
+           log.Printf("[ERROR] Error while creating http request with AS3 json: %v", err)
+           return false, err
+        }
+        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
+        req.Header.Set("Accept", "application/json")
+        req.Header.Set("Content-Type", "application/json")
+
+        resp, err := client.Do(req)
+        body, err := ioutil.ReadAll(resp.Body)
+        bodyString := string(body)
+        log.Printf("[INFO] as3 resp in Exists call is :%+v", resp)
+        log.Printf("[INFO] as3 bodystring in Exists call is :%+v",bodyString)
+        if ( resp.Status == "204 No Content" ||  err != nil)  {
+           log.Printf("[ERROR] Error while checking as3resource present in bigip :%s  %v",bodyString,err )
+	   defer resp.Body.Close()
+           return false, err
+        }
+        defer resp.Body.Close()
+        return true, nil
+}
+
 
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
         client_bigip := meta.(*bigip.BigIP)
