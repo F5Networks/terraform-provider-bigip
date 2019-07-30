@@ -1,184 +1,182 @@
 package bigip
 
 import (
-        "fmt"
-        "log"
-        "net/http"
-        "io/ioutil"
-        "crypto/tls"
-        "github.com/f5devcentral/go-bigip"
-        "strings"
-        "github.com/hashicorp/terraform/helper/schema"
+	"crypto/tls"
+	"fmt"
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
 )
 
 func resourceBigipAs3() *schema.Resource {
-        return &schema.Resource{
-                Create: resourceBigipAs3Create,
-                Read:   resourceBigipAs3Read,
-                Update: resourceBigipAs3Update,
-                Delete: resourceBigipAs3Delete,
-                Exists: resourceBigipAs3Exists,
-                Importer: &schema.ResourceImporter{
-                        State: schema.ImportStatePassthrough,
-                },
+	return &schema.Resource{
+		Create: resourceBigipAs3Create,
+		Read:   resourceBigipAs3Read,
+		Update: resourceBigipAs3Update,
+		Delete: resourceBigipAs3Delete,
+		Exists: resourceBigipAs3Exists,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
-                Schema: map[string]*schema.Schema{
+		Schema: map[string]*schema.Schema{
 
-                        "as3_json": {
-                                Type:        schema.TypeString,
-                                Required:    true,
-                                Description: "AS3 json",
-                        },
-                        "tenant_name": {
-                                Type:        schema.TypeString,
-                                Optional:    true,
-                                Description: "unique identifier for resource",
-                        },
-                },
-        }
+			"as3_json": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "AS3 json",
+			},
+			"tenant_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "unique identifier for resource",
+			},
+		},
+	}
 }
 
 func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
-        client_bigip := meta.(*bigip.BigIP)
+	client_bigip := meta.(*bigip.BigIP)
 
-        as3_json := d.Get("as3_json").(string)
-        name := d.Get("tenant_name").(string)
-        log.Printf("[INFO] Creating as3 config in bigip:%s", as3_json )
-        tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-        client := &http.Client{Transport: tr}
-        url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-        req, err := http.NewRequest("POST", url, strings.NewReader(as3_json))
-        if err != nil {
-	   return fmt.Errorf("Error while creating http request with AS3 json:%v",err)
-        }
-        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
-        req.Header.Set("Accept", "application/json")
-        req.Header.Set("Content-Type", "application/json")
-
-        resp, err := client.Do(req)
-        body, err := ioutil.ReadAll(resp.Body)
-        bodyString := string(body)
-        if ( resp.Status != "200 OK" ||  err != nil)  {
-           defer resp.Body.Close() 
-	   return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v",bodyString,err )
-        } 
-
-        defer resp.Body.Close()
-        d.SetId(name)
-        return resourceBigipAs3Read(d,meta)
-}
-func resourceBigipAs3Read(d *schema.ResourceData,meta interface{}) error {
-        client_bigip := meta.(*bigip.BigIP)
-        log.Printf("[INFO] Reading As3 config" )
-
-        tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-        client := &http.Client{Transport: tr}
+	as3_json := d.Get("as3_json").(string)
+	name := d.Get("tenant_name").(string)
+	log.Printf("[INFO] Creating as3 config in bigip:%s", as3_json)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
 	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-        req, err := http.NewRequest("GET", url, nil)
-        if err != nil {
-           return fmt.Errorf("Error while creating http request for reading As3 config:%v",err)
-        }
-        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
-        req.Header.Set("Accept", "application/json")
-        req.Header.Set("Content-Type", "application/json")
+	req, err := http.NewRequest("POST", url, strings.NewReader(as3_json))
+	if err != nil {
+		return fmt.Errorf("Error while creating http request with AS3 json:%v", err)
+	}
+	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
-        resp, err := client.Do(req)
-        body, err := ioutil.ReadAll(resp.Body)
-        bodyString := string(body)
-        if ( resp.Status != "200 OK" ||  err != nil)  {
-           defer resp.Body.Close()
-           return fmt.Errorf("Error while Sending/fetching http request :%s  %v",bodyString,err )
-        }
+	resp, err := client.Do(req)
+	body, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(body)
+	if resp.Status != "200 OK" || err != nil {
+		defer resp.Body.Close()
+		return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v", bodyString, err)
+	}
 
-        defer resp.Body.Close()
-        return nil
+	defer resp.Body.Close()
+	d.SetId(name)
+	return resourceBigipAs3Read(d, meta)
+}
+func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
+	client_bigip := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Reading As3 config")
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("Error while creating http request for reading As3 config:%v", err)
+	}
+	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	body, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(body)
+	if resp.Status != "200 OK" || err != nil {
+		defer resp.Body.Close()
+		return fmt.Errorf("Error while Sending/fetching http request :%s  %v", bodyString, err)
+	}
+
+	defer resp.Body.Close()
+	return nil
 }
 
-func resourceBigipAs3Exists(d *schema.ResourceData,meta interface{}) (bool, error) {
-        client_bigip := meta.(*bigip.BigIP)
-        log.Printf("[INFO] Checking if As3 config exists in bigip ")
+func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client_bigip := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Checking if As3 config exists in bigip ")
 
-        tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-        client := &http.Client{Transport: tr}
-        url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-        req, err := http.NewRequest("GET", url, nil)
-        if err != nil {
-           log.Printf("[ERROR] Error while creating http request for checking As3 config : %v", err)
-           return false, err
-        }
-        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
-        req.Header.Set("Accept", "application/json")
-        req.Header.Set("Content-Type", "application/json")
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Printf("[ERROR] Error while creating http request for checking As3 config : %v", err)
+		return false, err
+	}
+	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
-        resp, err := client.Do(req)
-        body, err := ioutil.ReadAll(resp.Body)
-        bodyString := string(body)
-        if ( resp.Status == "204 No Content" ||  err != nil)  {
-           log.Printf("[ERROR] Error while checking as3resource present in bigip :%s  %v",bodyString,err )
-	   defer resp.Body.Close()
-           return false, err
-        }
-        defer resp.Body.Close()
-        return true, nil
+	resp, err := client.Do(req)
+	body, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(body)
+	if resp.Status == "204 No Content" || err != nil {
+		log.Printf("[ERROR] Error while checking as3resource present in bigip :%s  %v", bodyString, err)
+		defer resp.Body.Close()
+		return false, err
+	}
+	defer resp.Body.Close()
+	return true, nil
 }
-
 
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
-        client_bigip := meta.(*bigip.BigIP)
-        as3_json := d.Get("as3_json").(string)
-        log.Printf("[INFO] Updating As3 Config :%s", as3_json )
-        tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: true} }
-        client := &http.Client{Transport: tr}
+	client_bigip := meta.(*bigip.BigIP)
+	as3_json := d.Get("as3_json").(string)
+	log.Printf("[INFO] Updating As3 Config :%s", as3_json)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
 	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-        req, err := http.NewRequest("PATCH", url, strings.NewReader(as3_json))
-        if err != nil {
-           return fmt.Errorf("Error while creating http request with AS3 json:%v",err)
-        }
-        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
-        req.Header.Set("Accept", "application/json")
-        req.Header.Set("Content-Type", "application/json")
+	req, err := http.NewRequest("PATCH", url, strings.NewReader(as3_json))
+	if err != nil {
+		return fmt.Errorf("Error while creating http request with AS3 json:%v", err)
+	}
+	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
-        resp, err := client.Do(req)
-        body, err := ioutil.ReadAll(resp.Body)
-        bodyString := string(body)
-        if ( resp.Status != "200 OK" ||  err != nil)  {
-           return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v",bodyString,err )
-        }
+	resp, err := client.Do(req)
+	body, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(body)
+	if resp.Status != "200 OK" || err != nil {
+		return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v", bodyString, err)
+	}
 
-        defer resp.Body.Close()
-        return resourceBigipAs3Read(d,meta)
+	defer resp.Body.Close()
+	return resourceBigipAs3Read(d, meta)
 }
 
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
-        client_bigip := meta.(*bigip.BigIP)
-        log.Printf("[INFO] Deleting As3 config")
+	client_bigip := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Deleting As3 config")
 
-        tr := &http.Transport{
-        TLSClientConfig: &tls.Config{InsecureSkipVerify: true} }
-        client := &http.Client{Transport: tr}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
 	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-        req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest("DELETE", url, nil)
 
-        if err != nil {
-           return fmt.Errorf("Error while creating http request for deleting as3 config:%v",err)
-        }
-        req.SetBasicAuth(client_bigip.User,client_bigip.Password)
-        req.Header.Set("Accept", "application/json")
-        req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		return fmt.Errorf("Error while creating http request for deleting as3 config:%v", err)
+	}
+	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
-        resp, err := client.Do(req)
-        body, err := ioutil.ReadAll(resp.Body)
-        bodyString := string(body)
-        if ( resp.Status != "200 OK" ||  err != nil)  {
-           return fmt.Errorf("Error while Sending/deleting http request with AS3 json :%s  %v",bodyString,err )
-        }
+	resp, err := client.Do(req)
+	body, err := ioutil.ReadAll(resp.Body)
+	bodyString := string(body)
+	if resp.Status != "200 OK" || err != nil {
+		return fmt.Errorf("Error while Sending/deleting http request with AS3 json :%s  %v", bodyString, err)
+	}
 
-        defer resp.Body.Close()
-        d.SetId("")
-        return nil
+	defer resp.Body.Close()
+	d.SetId("")
+	return nil
 }
-
