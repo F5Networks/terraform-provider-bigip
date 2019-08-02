@@ -10,6 +10,8 @@ description: |-
 
 `bigip_as3` Configures BIG-IP using AS3 Json.
 
+For more info on AS3, please refer [AS3](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/) 
+
 ## Example Usage
 
 ```hcl
