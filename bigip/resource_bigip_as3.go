@@ -31,7 +31,8 @@ func resourceBigipAs3() *schema.Resource {
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
+				Default:     "as3",
 				Description: "unique identifier for resource",
 			},
 		},
