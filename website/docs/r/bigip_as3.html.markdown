@@ -26,5 +26,5 @@ resource "bigip_as3" "as3_example" {
 
 * `as3_json` - (Required) Name of AS3 Json file/file path,Reference for [AS3_Example](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/quick-start.html#quick-start-example-declaration)
 
-* `tenant_name` - (Optional) Arbitary Name used for Unique Identifier of terraform resource,Default value `"as3"`
+* `tenant_name` - (Optional) Arbitrary Name used for Unique Identifier of terraform resource,Default value `"as3"`
 
