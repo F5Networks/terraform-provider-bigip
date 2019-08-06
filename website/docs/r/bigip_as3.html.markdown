@@ -16,8 +16,7 @@ For more info on AS3, please refer [AS3](https://clouddocs.f5.com/products/exten
 
 ```hcl
 
-resource "bigip_as3" "as3_example"
-        {
+resource "bigip_as3" "as3_example" {
             tenant_name = "as3"
             as3_json = "${file("example.json")}"
         }
