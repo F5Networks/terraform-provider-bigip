@@ -1068,8 +1068,8 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 	published_copy := d.Get("published_copy").(string)
-        if published_copy == "" {
-		published_copy =  "Drafts/" + name
+	if published_copy == "" {
+		published_copy = "Drafts/" + name
 	}
 	t := client.PublishPolicy(name, published_copy)
 	if t != nil {
