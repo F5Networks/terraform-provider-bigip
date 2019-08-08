@@ -43,14 +43,14 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				Required: true,
+				Optional: true,
 			},
 
 			"requires": {
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				Required: true,
+				Optional: true,
 			},
 
 			"strategy": {
@@ -62,7 +62,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 
 			"rule": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -1068,6 +1068,9 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 	published_copy := d.Get("published_copy").(string)
+	if published_copy == "" {
+		published_copy = "Drafts/" + name
+	}
 	t := client.PublishPolicy(name, published_copy)
 	if t != nil {
 		return t
