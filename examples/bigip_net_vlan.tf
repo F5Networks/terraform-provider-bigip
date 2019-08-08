@@ -14,5 +14,5 @@ resource "bigip_net_vlan" "vlan1" {
 		vlanport = 1.2,
 		tagged = false
 	}	
-
+}
 
