@@ -12,16 +12,16 @@ Configures an SSL persistence profile
 
 ## Example
 
-```
+```hcl
 resource "bigip_ltm_persistence_profile_ssl" "ppssl" {
-    name = "/Common/terraform_ssl"
-    defaults_from = "/Common/ssl"
-    match_across_pools = "enabled"
-    match_across_services = "enabled"
-    match_across_virtuals = "enabled"
-    mirror = "enabled"
-    timeout = 3600
-    override_conn_limit = "enabled"
+  name                  = "/Common/terraform_ssl"
+  defaults_from         = "/Common/ssl"
+  match_across_pools    = "enabled"
+  match_across_services = "enabled"
+  match_across_virtuals = "enabled"
+  mirror                = "enabled"
+  timeout               = 3600
+  override_conn_limit   = "enabled"
 }
 ```
 

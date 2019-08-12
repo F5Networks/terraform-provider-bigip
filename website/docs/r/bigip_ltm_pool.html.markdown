@@ -18,14 +18,13 @@ Resources should be named with their "full path". The full path is the combinati
 
 ```hcl
 resource "bigip_ltm_pool" "pool" {
-  name = "/Common/terraform-pool"
+  name                = "/Common/terraform-pool"
   load_balancing_mode = "round-robin"
-  description = "Test-Pool"
-  monitors = ["${bigip_ltm_monitor.monitor.name}","${bigip_ltm_monitor.monitor2.name}"]
-  allow_snat = "yes"
-  allow_nat = "yes"
+  description         = "Test-Pool"
+  monitors            = ["${bigip_ltm_monitor.monitor.name}", "${bigip_ltm_monitor.monitor2.name}"]
+  allow_snat          = "yes"
+  allow_nat           = "yes"
 }
-
 ```      
 
 ## Argument Reference
