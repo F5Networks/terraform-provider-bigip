@@ -39,6 +39,14 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"partition": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Publish to partition",
+				Default:     "/Common",
+				ForceNew:    true,
+			},
+
 			"controls": {
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
@@ -254,7 +262,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 									"http_host": {
 										Type:     schema.TypeBool,
 										Optional: true,
-										//Computed: true,
 									},
 									"http_referer": {
 										Type:     schema.TypeBool,
@@ -1067,12 +1074,11 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
-	published_copy := d.Get("published_copy").(string)
-	if published_copy == "" {
-		published_copy = "Drafts/" + name
-	}
-	t := client.PublishPolicy(name, published_copy)
+	draft_copy := "/" + d.Get("partition").(string) + "/Drafts/" + d.Get("name").(string)
+	t := client.PublishPolicy(name, draft_copy)
 	if t != nil {
+		log.Println("[WARN] Error on Create Policy: " + name)
+		log.Printf("%#v", t)
 		return t
 	}
 	return resourceBigipLtmPolicyRead(d, meta)
@@ -1080,7 +1086,7 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 
 func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	name := d.Id()
+	name := "/" + d.Get("partition").(string) + "/" + d.Id()
 
 	log.Println("[INFO] Fetching policy " + name)
 	p, err := client.GetPolicy(name)
@@ -1102,7 +1108,7 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 
-	name := d.Id()
+	name := "/" + d.Get("partition").(string) + "/" + d.Id()
 	log.Println("[INFO] Fetching policy " + name)
 	p, err := client.GetPolicy(name)
 	if err != nil {
@@ -1122,17 +1128,28 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 	log.Println("[INFO] Updating  Policy " + name)
 	p := dataToPolicy(name, d)
+
+	i := client.CreatePolicyDraft("/" + d.Get("partition").(string) + "/" + name)
+	if i != nil {
+		return i
+	}
 	err := client.UpdatePolicy(name, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
 		return err
+	}
+
+	draft_copy := "/" + d.Get("partition").(string) + "/Drafts/" + d.Get("name").(string)
+	t := client.PublishPolicy(name, draft_copy)
+	if t != nil {
+		return t
 	}
 	return resourceBigipLtmPolicyRead(d, meta)
 }
 
 func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	name := d.Id()
+	name := "/" + d.Get("partition").(string) + "/" + d.Id()
 	err := client.DeletePolicy(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Policy   (%s) (%v) ", name, err)
@@ -1151,6 +1168,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	result := strings.Join(values, "")
 	p.Name = result
 	p.Strategy = d.Get("strategy").(string)
+	p.Partition = "/" + d.Get("partition").(string)
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
 	ruleCount := d.Get("rule.#").(int)
@@ -1177,7 +1195,6 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		}
 		p.Rules = append(p.Rules, r)
 	}
-
 	return p
 }
 
@@ -1190,6 +1207,9 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 	}
 	if err := d.Set("requires", makeStringSet(&p.Requires)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("partition", p.Partition); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Partition   state for Policy (%s): %s", d.Id(), err)
 	}
 
 	for i, r := range p.Rules {
