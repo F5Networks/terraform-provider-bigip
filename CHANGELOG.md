@@ -1,4 +1,12 @@
 ## 0.12.4 (Unreleased)
+- Fix #139 changing required parameters to optional in _bigip_ltm_policy
+- Added #134 SSL Ssl Client Profile and Server Profile feature
+- Added #137 Bigip AS3 integration
+- Fix Changed Required to optional for tenant name
+- Fix #128 Addition of description field for virtual server/pool/node
+- Fix #126 Fix for Changing name in 'bigip_ltm_profile_http2' causes Terraform Crash
+- Added #116 Add Node/Virtualserver with Routedomain
+
 ## 0.12.3 (June 06, 2019)
 - Fix for terraform 0.12 
 - Fix the test TF files for terraform 12
