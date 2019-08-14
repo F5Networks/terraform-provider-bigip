@@ -586,18 +586,17 @@ type VirtualServerPolicies struct {
 }
 
 type PolicyPublish struct {
-	Name    string
-	Command string
+	Name        string
+	Command     string
 }
 type PolicyPublishDTO struct {
-	Name    string `json:"name"`
-	Command string `json:"command"`
+	Name        string `json:"name"`
+	Command     string `json:"command"`
 }
-
 func (p *PolicyPublish) MarshalJSON() ([]byte, error) {
 	return json.Marshal(PolicyPublishDTO{
-		Name:    p.Name,
-		Command: p.Command,
+		Name:        p.Name,
+		Command:     p.Command,
 	})
 }
 func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
@@ -610,7 +609,6 @@ func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
 	p.Command = dto.Command
 	return nil
 }
-
 type Policy struct {
 	Name        string
 	PublishCopy string
@@ -669,14 +667,14 @@ func (p *Policy) UnmarshalJSON(b []byte) error {
 }
 
 type VirtualServerPolicy struct {
-	Name      string
-	Partition string
-	FullPath  string
+	Name        string
+	Partition   string
+	FullPath    string
 }
 type VirtualServerPolicyDTO struct {
-	Name      string `json:"name"`
-	Partition string `json:"partition,omitempty"`
-	FullPath  string `json:"fullPath,omitempty"`
+	Name        string   `json:"name"`
+	Partition   string   `json:"partition,omitempty"`
+	FullPath    string   `json:"fullPath,omitempty"`
 }
 
 type PolicyRules struct {
@@ -1730,7 +1728,6 @@ const (
 	uriSourceAddr     = "source-addr"
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
-	uriCreateDraft    = "?options=create-draft"
 )
 
 var cidr = map[string]string{
@@ -1940,7 +1937,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -2316,12 +2313,7 @@ func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	}
 	retval := make([]string, 0, len(policies.PolicyRef))
 	for _, p := range policies.PolicyRef {
-		//if the policy is attached to a partition append its partition to the name
-		if p.Partition != "" {
-			retval = append(retval, "/" + p.Partition + "/" + p.Name)
-		} else {
-			retval = append(retval, p.Name)
-		}
+		retval = append(retval, p.Name)
 	}
 	return retval, nil
 }
@@ -2583,7 +2575,7 @@ func (b *BigIP) CreatePolicy(p *Policy) error {
 
 func (b *BigIP) PublishPolicy(name, publish string) error {
 	config := &PolicyPublish{
-		Name:    publish,
+		Name: publish,
 		Command: "publish",
 	}
 	values := []string{}
@@ -2601,11 +2593,6 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-	//The terraform provider always sets the default partition
-	// However need to add this check for backwards compat.
-	if p.Partition != "" {
-		values = append(values, p.Partition + "/")
-	}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.
@@ -2621,16 +2608,6 @@ func (b *BigIP) DeletePolicy(name string) error {
 	// Join three strings into one.
 	//result := strings.Join(values, "")
 	return b.delete(uriLtm, uriPolicy, name)
-}
-
-//Create a draft from an existing policy
-func (b *BigIP) CreatePolicyDraft(name string) error {
-	var s struct{}
-	values := []string{}
-	values = append(values, name)
-	values = append(values, uriCreateDraft)
-	result := strings.Join(values, "")
-	return b.patch(s, uriLtm, uriPolicy, result)
 }
 
 // Oneconnect profile creation
