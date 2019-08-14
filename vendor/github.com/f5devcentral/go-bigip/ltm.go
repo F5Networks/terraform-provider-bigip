@@ -94,7 +94,7 @@ type ClientSSLProfile struct {
 	CertLifespan                    int      `json:"certLifespan,omitempty"`
 	CertLookupByIpaddrPort          string   `json:"certLookupByIpaddrPort,omitempty"`
 	Chain                           string   `json:"chain,omitempty"`
-	Ciphers                         string   `json:"Ciphers,omitempty"`
+	Ciphers                         string   `json:"ciphers,omitempty"`
 	ClientCertCa                    string   `json:"clientCertCa,omitempty"`
 	CrlFile                         string   `json:"crlFile,omitempty"`
 	DefaultsFrom                    string   `json:"defaultsFrom,omitempty"`
@@ -1866,7 +1866,7 @@ func (b *BigIP) DeleteServerSSLProfile(name string) error {
 // ModifyServerSSLProfile allows you to change any attribute of a sever-ssl profile.
 // Fields that can be modified are referenced in the VirtualServer struct.
 func (b *BigIP) ModifyServerSSLProfile(name string, config *ServerSSLProfile) error {
-	return b.put(config, uriLtm, uriProfile, uriServerSSL, name)
+	return b.patch(config, uriLtm, uriProfile, uriServerSSL, name)
 }
 
 // ClientSSLProfiles returns a list of client-ssl profiles.
@@ -1917,7 +1917,7 @@ func (b *BigIP) DeleteClientSSLProfile(name string) error {
 // ModifyClientSSLProfile allows you to change any attribute of a client-ssl profile.
 // Fields that can be modified are referenced in the ClientSSLProfile struct.
 func (b *BigIP) ModifyClientSSLProfile(name string, config *ClientSSLProfile) error {
-	return b.put(config, uriLtm, uriProfile, uriClientSSL, name)
+	return b.patch(config, uriLtm, uriProfile, uriClientSSL, name)
 }
 
 // Nodes returns a list of nodes.
