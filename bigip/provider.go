@@ -158,16 +158,11 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
-			if strings.Contains(field, "_") {
-				f := val.FieldByName(strings.Title(snakeCaseToCamelCase(field)))
-				if f.IsValid() {
-					f.Set(reflect.ValueOf(d[field]))
-				} else {
-					log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
-				}
-			} else {
-				log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
+			if field == "http_reply" {
+				f := val.FieldByName(strings.Title("httpReply"))
+				f.Set(reflect.ValueOf(d[field]))
 			}
+			log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
 		}
 	}
 }
@@ -179,29 +174,4 @@ func parseF5Identifier(str string) (partition, name string) {
 		return ary[0], ary[1]
 	}
 	return "", str
-}
-
-func snakeCaseToCamelCase(inputUnderScoreStr string) (camelCase string) {
-	//snake_case to camelCase
-
-	isToUpper := false
-
-	for k, v := range inputUnderScoreStr {
-		if k == 0 {
-			camelCase = string(inputUnderScoreStr[0])
-		} else {
-			if isToUpper {
-				camelCase += strings.ToUpper(string(v))
-				isToUpper = false
-			} else {
-				if v == '_' {
-					isToUpper = true
-				} else {
-					camelCase += string(v)
-				}
-			}
-		}
-	}
-	return
-
 }
