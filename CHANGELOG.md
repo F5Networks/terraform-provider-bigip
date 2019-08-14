@@ -6,7 +6,6 @@
 - Fix #128 Addition of description field for virtual server/pool/node
 - Fix #126 Fix for Changing name in 'bigip_ltm_profile_http2' causes Terraform Crash
 - Added #116 Add Node/Virtualserver with Routedomain
-- Fix #141 fix policy uploading to defined partition
 
 ## 0.12.3 (June 06, 2019)
 - Fix for terraform 0.12 
