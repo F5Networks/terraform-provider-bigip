@@ -20,6 +20,7 @@ resource "bigip_ltm_node" "test-node" {
 	dynamic_ratio = "1"
 	monitor = "/Common/icmp"
 	rate_limit = "disabled"
+	state = "user-up"
 }
 `
 var TEST_FQDN_NODE_RESOURCE = `
@@ -31,6 +32,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 	monitor = "default"
 	rate_limit = "disabled"
 	fqdn { interval = "3000"}
+	state = "user-up"
 }
 `
 
@@ -50,7 +52,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "192.168.30.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "description", "Test-Node"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "description", ""),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "/Common/icmp"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "state", "user-up"),
@@ -74,7 +76,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "address", "f5.com"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "connection_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "dynamic_ratio", "1"),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "description", "Test-Node"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "description", ""),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "monitor", "default"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
