@@ -63,12 +63,11 @@ func resourceBigipLtmNode() *schema.Resource {
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "Test-Node",
+				Default:  "",
 			},
 			"state": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "user-up",
 				Description: "Marks the node up or down. The default value is user-up.",
 			},
 			"fqdn": {
@@ -210,6 +209,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	//d.Set("state", node.State)
 	d.Set("connection_limit", node.ConnectionLimit)
+	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
 	d.Set("fqdn.0.interval", node.FQDN.Interval)
 	d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
