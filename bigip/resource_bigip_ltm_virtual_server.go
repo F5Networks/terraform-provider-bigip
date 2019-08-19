@@ -44,7 +44,6 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "VirtualServer-test",
 			},
 
 			"destination": {
@@ -383,7 +382,6 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Source:                     d.Get("source").(string),
 		Pool:                       d.Get("pool").(string),
 		Mask:                       d.Get("mask").(string),
-		Description:                d.Get("description").(string),
 		Rules:                      rules,
 		PersistenceProfiles:        persistenceProfiles,
 		Profiles:                   profiles,
@@ -401,7 +399,9 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		TranslateAddress: d.Get("translate_address").(string),
 		VlansEnabled:     d.Get("vlans_enabled").(bool),
 	}
-
+	if d.Get("description").(string) != "" {
+		vs.Description = d.Get("description").(string)
+	}
 	err := client.ModifyVirtualServer(name, vs)
 	if err != nil {
 		return err
