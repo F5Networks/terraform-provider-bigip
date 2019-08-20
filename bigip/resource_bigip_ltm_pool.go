@@ -141,7 +141,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
 		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
 	}
-
+	d.Set("description", pool.Description)
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitors to state for Pool  (%s): %s", d.Id(), err)
@@ -186,14 +186,11 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowNAT:          d.Get("allow_nat").(string),
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
+		Description:       d.Get("description").(string),
 		SlowRampTime:      d.Get("slow_ramp_time").(int),
 		ServiceDownAction: d.Get("service_down_action").(string),
 		ReselectTries:     d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
-	}
-
-	if d.Get("description").(string) != "" {
-		pool.Description = d.Get("description").(string)
 	}
 	err := client.ModifyPool(name, pool)
 	if err != nil {
