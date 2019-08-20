@@ -44,7 +44,6 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "VirtualServer-test",
 			},
 
 			"destination": {
@@ -260,6 +259,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("irules", makeStringList(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
+	d.Set("description", vs.Description)
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
@@ -401,7 +401,6 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		TranslateAddress: d.Get("translate_address").(string),
 		VlansEnabled:     d.Get("vlans_enabled").(bool),
 	}
-
 	err := client.ModifyVirtualServer(name, vs)
 	if err != nil {
 		return err

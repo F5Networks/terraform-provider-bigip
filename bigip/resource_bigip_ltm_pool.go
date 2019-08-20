@@ -53,7 +53,6 @@ func resourceBigipLtmPool() *schema.Resource {
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "Test-Pool",
 			},
 
 			"load_balancing_mode": {
@@ -142,7 +141,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
 		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
 	}
-
+	d.Set("description", pool.Description)
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitors to state for Pool  (%s): %s", d.Id(), err)
@@ -193,7 +192,6 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		ReselectTries:     d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
-
 	err := client.ModifyPool(name, pool)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Pool   (%s) (%v) ", name, err)

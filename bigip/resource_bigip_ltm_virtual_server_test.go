@@ -34,6 +34,7 @@ resource "bigip_ltm_policy" "http_to_https_redirect" {
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TEST_VS_NAME + `"
 	destination = "10.255.255.254"
+	description = "VirtualServer-test"
 	port = 9999
 	mask = "255.255.255.255"
 	source_address_translation = "automap"
