@@ -68,6 +68,7 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TEST_VS_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "10.255.255.254"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", "VirtualServer-test"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
@@ -89,6 +90,125 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 						fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
 						"http_to_https_redirect"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmVS_create_Defaultstate(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreateDefaultstate("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/fastL4")), "/Common/fastL4"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmVS_Modify_stateDisabledtoEnabled(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreatestatedisabled("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/fastL4")),
+						"/Common/fastL4"),
+				),
+			},
+			{
+				Config: testVSCreatestateenabled("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/fastL4")),
+						"/Common/fastL4"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmVS_Modify_stateEnabledtoDisabled(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreatestateenabled("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/fastL4")),
+						"/Common/fastL4"),
+				),
+			},
+			{
+				Config: testVSCreatestatedisabled("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "any"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/fastL4")),
+						"/Common/fastL4"),
 				),
 			},
 		},
@@ -132,6 +252,37 @@ func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 		}
 		return nil
 	}
+}
+func testVSCreatestatedisabled(vs_name string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "test-vs" {
+        name = "/Common/%s"
+        destination = "192.168.50.1"
+        port = 800
+        mask = "255.255.255.255"
+        state = "disabled"
+}`, vs_name)
+}
+
+func testVSCreatestateenabled(vs_name string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "test-vs" {
+        name = "/Common/%s"
+        destination = "192.168.50.1"
+        port = 800
+        mask = "255.255.255.255"
+        state = "enabled"
+}`, vs_name)
+}
+
+func testVSCreateDefaultstate(vs_name string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "test-vs" {
+        name = "/Common/%s"
+        destination = "192.168.50.1"
+        port = 800
+        mask = "255.255.255.255"
+}`, vs_name)
 }
 
 func testCheckVSsDestroyed(s *terraform.State) error {

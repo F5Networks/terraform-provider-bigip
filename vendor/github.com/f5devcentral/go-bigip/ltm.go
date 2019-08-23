@@ -501,6 +501,7 @@ type VirtualServer struct {
 	ConnectionLimit            int    `json:"connectionLimit,omitempty"`
 	Destination                string `json:"destination,omitempty"`
 	Enabled                    bool   `json:"enabled,omitempty"`
+	Disabled                   bool   `json:"disabled,omitempty"`
 	GTMScore                   int    `json:"gtmScore,omitempty"`
 	FallbackPersistenceProfile string `json:"fallbackPersistence,omitempty"`
 	IPProtocol                 string `json:"ipProtocol,omitempty"`

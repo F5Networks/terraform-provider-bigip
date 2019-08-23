@@ -45,6 +45,13 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"state": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validateEnabledDisabled,
+				Description:  "Specifies whether the virtual server and its resources are available for load balancing. The default is Enabled",
+			},
 
 			"destination": {
 				Type:     schema.TypeString,
@@ -260,6 +267,11 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	d.Set("irules", makeStringList(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("description", vs.Description)
+	if vs.Enabled {
+		d.Set("state", "enabled")
+	} else {
+		d.Set("state", "disabled")
+	}
 	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
@@ -400,6 +412,9 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		TranslatePort:    d.Get("translate_port").(string),
 		TranslateAddress: d.Get("translate_address").(string),
 		VlansEnabled:     d.Get("vlans_enabled").(bool),
+	}
+	if d.Get("state").(string) == "disabled" {
+		vs.Disabled = true
 	}
 	err := client.ModifyVirtualServer(name, vs)
 	if err != nil {
