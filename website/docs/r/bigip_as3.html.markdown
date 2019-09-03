@@ -30,5 +30,4 @@ resource "bigip_as3"  "as3-example1" {
 
 * `tenant_name` - (Required) This is the partition name where the application services will be configured.    
 
-For more information on as3 please refer https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/#
  
