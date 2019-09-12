@@ -43,7 +43,7 @@ resource "bigip_as3"  "as3-example" {
       "id": "urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d",
       "label": "Sample 1",
       "remark": "Simple HTTP application with RR pool",
-      "Sample_01": {
+      "as3": {
          "class": "Tenant",
          "A1": {
             "class": "Application",
@@ -73,3 +73,4 @@ resource "bigip_as3"  "as3-example" {
    }
 }
 ``` 
+* `as3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
