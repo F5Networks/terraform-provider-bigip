@@ -6,9 +6,9 @@ description: |-
     Provides details about bigip_sys_dns resource
 ---
 
-# bigip\_ltm\_dns
+# bigip\_sys\_dns
 
-`bigip_ltm_dns` Configures DNS server on F5 BIG-IP
+`bigip_sys_dns` Configures DNS server on F5 BIG-IP
 
 
 
@@ -17,10 +17,10 @@ description: |-
 
 
 ```hcl
-resource "bigip_ltm_dns" "dns1" {
+resource "bigip_sys_dns" "dns1" {
    description = "/Common/DNS1"
    name_servers = ["1.1.1.1"]
-   numberof_dots = 2
+   number_of_dots = 2
    search = ["f5.com"]
 }
 ```      
