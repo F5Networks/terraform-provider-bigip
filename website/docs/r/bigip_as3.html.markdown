@@ -16,8 +16,8 @@ This resource is helpful to configure deploy as3 declarative JSON on BIG-IP.
 
 ```hcl
 
-resource "bigip_as3"  "as3-example1" {
-     as3_json = "${file("example1.json")}" 
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("example.json")}" 
      tenant_name = "as3"
  }
 
@@ -30,7 +30,7 @@ resource "bigip_as3"  "as3-example1" {
 
 * `tenant_name` - (Required) This is the partition name where the application services will be configured.    
 
-`example1.json` 
+* `example.json` - Example of AS3 Declarative JSON 
 
 ```hcl
 {
