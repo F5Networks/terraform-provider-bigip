@@ -73,4 +73,4 @@ resource "bigip_as3"  "as3-example" {
    }
 }
 ``` 
-* `as3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
+* `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
