@@ -1,3 +1,8 @@
+/*
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 //We can use null_resource to  deploy As3 templates, below is simple example to install the as3 rpm and another resource which deploys the example1.json ( which has the http VS configuration) More details on As3 please refer to https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/
 
 
