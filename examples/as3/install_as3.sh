@@ -1,3 +1,8 @@
+: '
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+'
 #!/bin/bash
 
 # This shell script will install the AS3 RPM to BIG-IP System, You can also use the following shell script to upload and install the target RPM to the BIG-IP system (the script first uninstalls any existing AS3 RPM packages on the BIG-IP). To use this script, you must have both cURL and jq installed.
