@@ -1,9 +1,10 @@
+#!/bin/bash -v
+
 : '
 Copyright 2019 F5 Networks Inc.
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 '
-#!/bin/bash -v
 
 sudo yum install -y gcc python27 python27-devel python27-pip libffi-devel openssl-devel git httpd
 
