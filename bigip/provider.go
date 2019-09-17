@@ -78,8 +78,6 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_persistence_profile_dstaddr": resourceBigipLtmPersistenceProfileDstAddr(),
 			"bigip_ltm_persistence_profile_ssl":     resourceBigipLtmPersistenceProfileSSL(),
 			"bigip_ltm_persistence_profile_cookie":  resourceBigipLtmPersistenceProfileCookie(),
-			"bigip_ltm_profile_server_ssl":          resourceBigipLtmProfileServerSsl(),
-			"bigip_ltm_profile_client_ssl":          resourceBigipLtmProfileClientSsl(),
 			"bigip_ltm_snat":                        resourceBigipLtmSnat(),
 			"bigip_ltm_snatpool":                    resourceBigipLtmSnatpool(),
 			"bigip_ltm_virtual_address":             resourceBigipLtmVirtualAddress(),
