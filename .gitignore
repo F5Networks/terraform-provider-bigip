@@ -1,0 +1,56 @@
+#Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+#Modifications Copyright 2019 F5 Networks Inc.
+#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+#If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*.py
+examples/*
+examples/aws/*.tf
+terraform-provider-bigip
+.idea/
+bin/
+target/
+#test files
+bigip.test
+*.tfvars
+vendor/.DS_Store
+.DS_Store
+_Store
+example.tf
+terraform.tfplan
+terraform.tfstate
+bin/
+modules-dev/
+/pkg/
+website/.vagrant
+website/.bundle
+website/build
+website/node_modules
+.vagrant/
+*.backup
+./*.tfstate
+.terraform/
+*.log
+*.bak
+*~
+.*.swp
+.idea
+*.iml
+*.test
+*.iml
+*.tf
+website/vendor
+keymap
+*.pem
+*.pub
+*.back
+*.goback
+bigip/*.back
+examples1
+# Test exclusions
+!examples/
+!command/test-fixtures/**/*.tfstate
+!command/test-fixtures/**/.terraform/
+
+# Allow
+# Keep windows files with windows line endings
+*.winfile eol=crlf
