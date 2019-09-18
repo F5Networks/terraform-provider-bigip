@@ -6,8 +6,8 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 
 provider "bigip" {
   address = "${var.bigip_management_ip}"
-  username = "admin"
-  password = "admin"
+  username = "xxxxx"
+  password = "xxxxx"
 }
 
 

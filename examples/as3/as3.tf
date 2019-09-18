@@ -8,8 +8,8 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 
 provider "bigip" {
   address = "X.X.X.X"
-  username = "admin"
-  password = "pass"
+  username = "xxxx"
+  password = "xxxx"
 }
 
 
