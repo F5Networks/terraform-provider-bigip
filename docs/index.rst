@@ -3,7 +3,7 @@ F5 Modules for Terraform
 
 Welcome to the F5 Modules for Terraform documentation.
 
-Use these modules to create, edit, update, and delete configuration objects on BIG-IP 12.0.0 and later, and BIG-IQ 5.4.0 and later.
+Use these modules to create, edit, update, and delete configuration objects on BIG-IP 12.1.1 and later, and BIG-IQ 5.4.0 and later.
 
 The code is open source and |f5_terraform_github|.
 
@@ -21,9 +21,9 @@ The code is open source and |f5_terraform_github|.
    :caption: User's Guide
    :glob:
 
-   /userguide/getting_started
-   /userguide/playbook_tutorial
-   /userguide/connection-local-or-delegate-to
+   /userguide/installing
+   /userguide/configuring
+   /userguide/modifying
    /userguide/support
    /userguide/module-usage-with-tower
 
@@ -35,5 +35,5 @@ The code is open source and |f5_terraform_github|.
 
 .. |f5_terraform_github| raw:: html
 
-   <a href="https://github.com/F5Networks/terraform-provider-bigip" target="_blank">available on github</a>
+   <a href="https://github.com/F5Networks/terraform-provider-bigip" target="_blank">available on GitHub</a>
 
