@@ -25,7 +25,6 @@ The code is open source and |f5_terraform_github|.
    /userguide/configuring
    /userguide/modifying
    /userguide/support
-   /userguide/module-usage-with-tower
 
 .. toctree::
    :maxdepth: 2
