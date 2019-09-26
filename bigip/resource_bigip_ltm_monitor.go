@@ -316,7 +316,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
+	if p == "/Common/udp" || p == "/Common/postgresql" || p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
 		return nil, nil
 	}
 
