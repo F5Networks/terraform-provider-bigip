@@ -3,11 +3,11 @@ Modifying Infrastructure
 
 Next you can modify the resource to see how Terraform handles change.
 
-Infrastructure is continuously evolving, and Terraform was built to help manage and enact that change. As you change Terraform configurations, Terraform builds an execution plan that only modifies what is necessary to reach your desired state.
+Terraform was built to help manage and enact change in environments where infrastructure is continuously evolving. As you change Terraform configurations, Terraform builds an execution plan that only modifies what is necessary to reach the desired state.
 
-By using Terraform to change infrastructure, you can version control not only your configurations but also your state so you can see how the infrastructure evolved over time.
+By using Terraform to change infrastructure, you can version control not only your configurations but also your state so you can see how the infrastructure evolves over time.
 
-1. Modify the policy name of our resource. Edit the `bigip_ltm_policy.test-policy` resource in your configuration and change it to the following:
+1. Modify the policy name of the resource. Edit the ``bigip_ltm_policy.test-policy`` resource in your configuration and change it to the following:
 
 .. code-block:: javascript
    :linenos:
@@ -44,7 +44,10 @@ By using Terraform to change infrastructure, you can version control not only yo
     }
 
 
-2. After changing the configuration, run `terraform apply` again to see how Terraform will apply this change to the existing resources. The prefix -/+ means that Terraform will destroy and recreate the resource, rather than update it in-place. While some attributes can be updated in-place (which are shown with the ~ prefix), Terraform handles these details for you, and the execution plan makes it clear what Terraform will do. 
+Terraform configurations are meant to be changed like this. You can also completely remove resources and Terraform will know to destroy the old one.
+
+
+2. After changing the configuration, run ``terraform apply`` again to see how Terraform will apply this change to the existing resources. The prefix -/+ means that Terraform will destroy and recreate the resource, rather than update it in-place. While some attributes can be updated in-place (which are shown with the ~ prefix), Terraform handles these details for you, and the execution plan makes it clear what Terraform will do. 
 
 .. code-block:: javascript
    :linenos:
@@ -200,6 +203,7 @@ By using Terraform to change infrastructure, you can version control not only yo
 
 Once again, Terraform prompts for approval of the execution plan before proceeding. As indicated by the execution plan, Terraform first destroyed the existing instance and then created a new one in its place. You can use terraform show again to see the new values associated with this instance.
 
+
 Destroying Infrastructure
 -------------------------
 
@@ -343,3 +347,10 @@ The - prefix indicates that the instance will be destroyed. As with apply, Terra
     root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
 
 
+To read more on BIG-IP Terraform resources and how to use them, see |terraform_doc|.
+
+
+
+.. |remote_state| raw:: html
+
+   <a href="https://www.terraform.io/docs/providers/bigip/index.html" target="_blank">Terraform documentation</a>

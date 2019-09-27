@@ -27,7 +27,6 @@ The infrastructure Terraform can manage includes low-level components such as co
    :caption: User's Guide
    :glob:
 
-   /userguide/prereqs
    /userguide/installing
    /userguide/configuring
    /userguide/modifying
