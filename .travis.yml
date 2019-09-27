@@ -1,49 +1,14 @@
-#Original work from https://github.com/DealerDotCom/terraform-provider-bigip
-#Modifications Copyright 2019 F5 Networks Inc.
-#This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-#If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
-
-dist: trusty
+language: python
 sudo: required
 services:
-  - docker
-language: go
-go:
-  - "1.11.x"
-
-git:
-  depth: 1
-
+- docker
 before_install:
 - docker pull f5devcentral/containthedocs:latest
-
-install:
-# This script is used by the Travis build to install a cookie for
-# go.googlesource.com so rate limits are higher when using `go get` to fetch
-# packages that live there.
-# See: https://github.com/golang/go/issues/12933
-- bash scripts/gogetcookie.sh
-- make tools
+install: 
 - pip install awscli --upgrade
-
 script:
-- make test
-- make website-lint
-- make website-test
 - ./scripts/docker-docs.sh ./scripts/test-docs.sh
-
-branches:
-  only:
-  - master
-matrix:
-  fast_finish: true
-  allow_failures:
-  - go: tip
-env:
-  - GOFLAGS=-mod=vendor GO111MODULE=on
-
-
-  deploy:
+deploy:
 # DEPLOY TO STAGING
 - provider: s3
   skip_cleanup: true
@@ -53,7 +18,7 @@ env:
   local_dir: docs/_build/html
   upload_dir: $AWS_DIR
   on:
-    branch: master
+    branch: doc-trippel
     repo: F5Networks/terraform-provider-bigip
 # DEPLOY TO PRODUCTION
 - provider: s3
@@ -64,7 +29,7 @@ env:
   local_dir: docs/_build/html
   upload_dir: $AWS_DIR
   on:
-    branch: doc-publish
+    branch: garbage-here-replace
     repo: F5Networks/terraform-provider-bigip
 
 after_deploy:
