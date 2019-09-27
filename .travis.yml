@@ -14,6 +14,9 @@ go:
 git:
   depth: 1
 
+before_install:
+- docker pull f5devcentral/containthedocs:latest
+
 install:
 # This script is used by the Travis build to install a cookie for
 # go.googlesource.com so rate limits are higher when using `go get` to fetch
@@ -21,11 +24,13 @@ install:
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
 - make tools
+- pip install awscli --upgrade
 
 script:
 - make test
 - make website-lint
 - make website-test
+- ./scripts/docker-docs.sh ./scripts/test-docs.sh
 
 branches:
   only:
@@ -36,3 +41,31 @@ matrix:
   - go: tip
 env:
   - GOFLAGS=-mod=vendor GO111MODULE=on
+
+
+  deploy:
+# DEPLOY TO STAGING
+- provider: s3
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: $AWS_S3_STAGING
+  local_dir: docs/_build/html
+  upload_dir: $AWS_DIR
+  on:
+    branch: master
+    repo: F5Networks/terraform-provider-bigip
+# DEPLOY TO PRODUCTION
+- provider: s3
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: $AWS_S3_BUCKET
+  local_dir: docs/_build/html
+  upload_dir: $AWS_DIR
+  on:
+    branch: doc-publish
+    repo: F5Networks/terraform-provider-bigip
+
+after_deploy:
+  - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
