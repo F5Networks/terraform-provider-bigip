@@ -2,7 +2,7 @@
 
 set -x
 
-: ${DOC_IMG:=quay.pdsea.f5net.com/doc-ops/containthedocs:latest}
+: ${DOC_IMG:=f5devcentral/containthedocs:latest}
 
 exec docker run --rm -it \
   -v $PWD:$PWD --workdir $PWD \
