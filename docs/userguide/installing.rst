@@ -1,7 +1,7 @@
 Installing Terraform
 ====================
 
-1. To install Terraform, find the |appropriate_package| for your system and download it. Terraform is packaged as a zip archive. Verify the SHA256 checksums before opening the zip file to ensure you are not using a maliciously modified version of Terraform.
+1. To install Terraform, find the |appropriate_package| for your system and download it. Terraform is packaged as a zip archive. You can find the |SHA256_checksums| for Terraform 0.12.9 online and you can |verify| which has been signed using |hashicorp| before opening the zip file to ensure you are not using a maliciously modified version of terraform.
 
 2. After downloading Terraform, unzip the package. Terraform runs as a single binary named ``terraform``. Any other files in the package can be safely removed and Terraform will still function.
 
@@ -43,6 +43,22 @@ Now you should be able to build infrastructure on the BIG-IP system (for example
 .. |appropriate_package| raw:: html
 
    <a href="https://www.terraform.io/downloads.html" target="_blank">appropriate package</a>
+
+
+.. |SHA256_checksums| raw:: html
+
+   <a href="https://releases.hashicorp.com/terraform/0.12.9/terraform_0.12.9_SHA256SUMS" target="_blank">SHA256 checksums for Terraform 0.12.9</a>
+
+
+.. |verify| raw:: html
+
+   <a href="https://releases.hashicorp.com/terraform/0.12.9/terraform_0.12.9_SHA256SUMS.sig" target="_blank">verify the checksums signature file</a>
+
+
+.. |hashicorp| raw:: html
+
+   <a href="https://hashicorp.com/security.html" target="_blank">HashiCorp's GPG key</a>
+
 
 
 .. |path_linux| raw:: html
