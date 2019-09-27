@@ -23,6 +23,16 @@ help:
 # Custom commands for building and testing project documentation
 
 # build live preview of docs locally
+.PHONY: clean
+clean:
+        rm -rf $(BUILDDIR)/*
+		
+.PHONY: html
+html:
+        $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+        @echo
+        @echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
 .PHONY: preview
 preview:
 	@echo "Running autobuild. View live edits at:"
