@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=/docs
 set BUILDDIR=/docs/_build
-set SPHINXPROJ=F5 Container Ingress Services
+set SPHINXPROJ=F5 Modules for Terraform
 
 if "%1" == "" goto help
 

@@ -5,7 +5,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = F5 Container Ingress Services 
+SPHINXPROJ    = F5 Modules for Terraform 
 SOURCEDIR     = docs
 BUILDDIR      = docs/_build
 
