@@ -10,7 +10,6 @@ By using Terraform to change infrastructure, you can version control not only yo
 1. Modify the policy name of the resource. Edit the ``bigip_ltm_policy.test-policy`` resource in your configuration and change it to the following:
 
 .. code-block:: javascript
-   :linenos:
 
    provider "bigip" {
     address = "x.x.x.x"
@@ -50,7 +49,6 @@ Terraform configurations are meant to be changed like this. You can also complet
 2. After changing the configuration, run ``terraform apply`` again to see how Terraform will apply this change to the existing resources. The prefix -/+ means that Terraform will destroy and recreate the resource, rather than update it in-place. While some attributes can be updated in-place (which are shown with the ~ prefix), Terraform handles these details for you, and the execution plan makes it clear what Terraform will do. 
 
 .. code-block:: javascript
-   :linenos:
 
    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform apply
     bigip_ltm_pool.mypool: Refreshing state... [id=/Common/mypool]
@@ -209,15 +207,14 @@ Destroying Infrastructure
 
 We've now seen how to build and change infrastructure. Before we move on to creating multiple resources and showing resource dependencies, we're going to go over how to completely destroy the Terraform-managed infrastructure.
 
-Destroying your infrastructure is a rare event in production environments. But if you're using Terraform to spin up multiple environments such as development, test, QA environments, then destroying is a useful action.
+Destroying your infrastructure is a rare event in production environments. But if you are using Terraform to spin up multiple environments such as development, test, or QA environments, then destroying is a useful action.
 
-Resources can be destroyed using the `terraform destroy` command, which is similar to `terraform apply` but it behaves as if all of the resources have been removed from the configuration.
+Resources can be destroyed using the ``terraform destroy`` command, which is similar to ``terraform apply`` but it behaves as if all of the resources have been removed from the configuration.
 
-The - prefix indicates that the instance will be destroyed. As with apply, Terraform shows its execution plan and waits for approval before making any changes. Just like with apply, Terraform determines the order in which things must be destroyed. 
+The ``-`` prefix indicates that the instance will be destroyed. As with ``apply``, Terraform shows its execution plan and waits for approval before making any changes. Just like with ``apply``, Terraform determines the order in which things must be destroyed. 
 
 
 .. code-block:: javascript
-   :linenos:
 
    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform destroy
     bigip_ltm_pool.mypool: Refreshing state... [id=/Common/mypool]
