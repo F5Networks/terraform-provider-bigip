@@ -29,7 +29,7 @@ We encourage you to use |slackterraform| for discussion and assistance on the F5
 
 F5 employees are members of this community and typically monitor the channel Monday-Friday 9-5 PST. They will offer best-effort assistance.
 
-.. |slackansible| raw:: html
+.. |slackterraform| raw:: html
 
    <a href="https://f5cloudsolutions.herokuapp.com/" target="_blank">the F5 Terraform channel on Slack</a>
 

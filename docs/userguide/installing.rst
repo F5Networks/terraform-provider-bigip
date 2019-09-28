@@ -15,8 +15,6 @@ After installing Terraform, verify the installation worked by opening a new term
 
 
 .. code-block:: javascript
-   :linenos:
-
 
     $ terraform
     Usage: terraform [--version] [--help] <command> [args]
