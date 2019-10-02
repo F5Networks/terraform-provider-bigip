@@ -19,7 +19,7 @@ deploy:
   local_dir: docs/_build/html
   upload_dir: $AWS_DIR
   on:
-    branch: docs-trippel
+    branch: 
     repo: F5Networks/terraform-provider-bigip
 # DEPLOY TO PRODUCTION
 - provider: s3
