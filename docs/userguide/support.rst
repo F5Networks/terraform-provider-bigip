@@ -20,7 +20,6 @@ If you'd like community support, you can open an issue |github_issue|.
 
 When communicating with F5 on the Issues page, use the GitHub user interface, rather than email.
 
-For best practices, see :doc:`Filing issues <filing-issues>`.
 
 Get community support on Slack
 ------------------------------

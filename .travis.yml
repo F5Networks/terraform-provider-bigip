@@ -30,7 +30,7 @@ deploy:
   local_dir: docs/_build/html
   upload_dir: $AWS_DIR
   on:
-    branch: docs-production
+    branch: docs-trippel
     repo: F5Networks/terraform-provider-bigip
 
 after_deploy:
