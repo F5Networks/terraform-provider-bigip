@@ -398,6 +398,7 @@ You can inspect the current state using ``terraform show``:
 
 
 
+
 .. |config_format| raw:: html
 
    <a href="https://www.terraform.io/downloads.html" target="_blank">this documentation</a>
