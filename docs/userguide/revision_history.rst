@@ -13,6 +13,6 @@ Document Revision History
         
       * - 1.0  
         - Initial release of Terraform documentation
-        - 9-27-19 
+        - 10-02-19 
       
 
