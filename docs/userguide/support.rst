@@ -16,7 +16,7 @@ If you'd like community support, you can open an issue |github_issue|.
 
 .. |github_issue| raw:: html
 
-   <a href="https://github.com/terraform-providers/terraform-provider-bigip/issues" target="_blank">on GitHub</a>
+   <a href="https://github.com/F5Networks/terraform-provider-bigip" target="_blank">on GitHub</a>
 
 When communicating with F5 on the Issues page, use the GitHub user interface, rather than email.
 

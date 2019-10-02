@@ -348,6 +348,6 @@ To read more on BIG-IP Terraform resources and how to use them, see |terraform_d
 
 
 
-.. |remote_state| raw:: html
+.. |terraform_doc| raw:: html
 
    <a href="https://www.terraform.io/docs/providers/bigip/index.html" target="_blank">Terraform documentation</a>
