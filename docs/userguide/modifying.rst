@@ -43,7 +43,7 @@ By using Terraform to change infrastructure, you can version control not only yo
     }
 
 
-Terraform configurations are meant to be changed like this. You can also completely remove resources and Terraform will know to destroy the old one.
+Terraform configurations are meant to be changed like this. You can also remove resources and Terraform will know to destroy the old one.
 
 
 2. After changing the configuration, run ``terraform apply`` again to see how Terraform will apply this change to the existing resources. The prefix -/+ means that Terraform will destroy and recreate the resource, rather than update it in-place. While some attributes can be updated in-place (which are shown with the ~ prefix), Terraform handles these details for you, and the execution plan makes it clear what Terraform will do. 
@@ -205,7 +205,7 @@ Once again, Terraform prompts for approval of the execution plan before proceedi
 Destroying Infrastructure
 -------------------------
 
-We've now seen how to build and change infrastructure. Before we move on to creating multiple resources and showing resource dependencies, we're going to go over how to completely destroy the Terraform-managed infrastructure.
+We've now seen how to build and change infrastructure. Before we move on to creating multiple resources and showing resource dependencies, we're going to go over how to destroy the Terraform-managed infrastructure.
 
 Destroying your infrastructure is a rare event in production environments. But if you are using Terraform to spin up multiple environments such as development, test, or QA environments, then destroying is a useful action.
 

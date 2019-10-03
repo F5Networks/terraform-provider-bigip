@@ -7,7 +7,7 @@ Below is an example of the entire configuration. Each section is described below
 
 .. important::
 
-   Verify that there are no other *.tf files in your directory, since Terraform loads all of them.
+   Verify that there are no other ``*.tf`` files in your directory, since Terraform loads all of them.
 
 
 Sample Terraform resource to create a policy on the BIG-IP system
@@ -80,7 +80,7 @@ The ``resource`` block defines a resource that exists within the infrastructure.
 Initializating
 --------------
 
-The first command to run for a new configuration, or after checking out an existing configuration from version control, is ``terraform init``, which initializes various local settings and data that will be used by subsequent commands.
+The first command to run for a new configuration, or after checking out an existing configuration from version control, is ``terraform init``, which initializes local settings and data that will be used by subsequent commands.
 
 Terraform uses a plugin-based architecture to support available infrastructure and service providers. As of Terraform version 0.10.0, each "Provider" is its own encapsulated binary distributed separately from Terraform itself. The ``terraform init`` command will automatically download and install any Provider binary for the providers in use within the configuration, which in this case is just the BIG-IP provider:
 
@@ -282,7 +282,7 @@ If the plan was created successfully, Terraform will now pause and wait for appr
 
 You can now verify the new policy created by Terraform in BIG-IP.
 
-Terraform also wrote some data into the ``terraform.tfstate file``. This state file is extremely important; it keeps track of the IDs of created resources so that Terraform knows what it is managing. This file must be saved and distributed to anyone who might run Terraform. It is generally recommended to setup |remote_state| when working with Terraform, to share the state automatically, but this is not necessary for simple situations like this Getting Started guide.
+Terraform also wrote some data into the ``terraform.tfstate file``. This state file is important; it keeps track of the IDs of created resources so that Terraform knows what it is managing. This file must be saved and distributed to anyone who will run Terraform. It is generally recommended to setup |remote_state| when working with Terraform, to share the state automatically, but this is not necessary for simple situations like this Getting Started guide.
 
 You can inspect the current state using ``terraform show``:
 
