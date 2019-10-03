@@ -11,11 +11,12 @@ Configuration files describe to Terraform the components needed to run a single 
 
 The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, and more.
 
+User Guide Index
+----------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :includehidden:
-   :caption: User's Guide
    :glob:
 
    /userguide/installing
