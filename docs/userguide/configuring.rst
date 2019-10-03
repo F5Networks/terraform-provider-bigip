@@ -100,11 +100,6 @@ You may now begin working with Terraform. To see changes that are required for y
 If you ever set or change modules or backend configuration for Terraform, rerun this command to reinitialize your working directory. If you forget, other commands will detect it and remind you to do so if necessary.
 
 
-.. code-block:: bash
-
-    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
-
-
 Applying changes
 ----------------
 

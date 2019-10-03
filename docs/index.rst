@@ -11,6 +11,20 @@ Configuration files describe to Terraform the components needed to run a single 
 
 The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, and more.
 
+Releases and Versioning
+-----------------------
+These BIG-IP versions are supported in these Ansible versions.
+
++-------------------------+----------------------+------------------------+
+| BIG-IP version          | Terraform 0.12       | Terraform 0.11         |
++=========================+======================+========================+
+| BIG-IP 14.x             | X                    | X                      |
++-------------------------+----------------------+------------------------+
+| BIG-IP 13.x             | X                    | X                      | 
++-------------------------+----------------------+------------------------+
+
+
+
 User Guide Index
 ----------------
 
