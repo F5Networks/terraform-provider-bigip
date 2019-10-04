@@ -13,7 +13,7 @@ The infrastructure Terraform can manage includes low-level components such as co
 
 Releases and Versioning
 -----------------------
-These BIG-IP versions are supported in these Ansible versions.
+These BIG-IP versions are supported in these Terraform versions.
 
 +-------------------------+----------------------+------------------------+
 | BIG-IP version          | Terraform 0.12       | Terraform 0.11         |
