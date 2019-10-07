@@ -30,7 +30,7 @@ deploy:
   local_dir: docs/_build/html
   upload_dir: $AWS_DIR
   on:
-    branch: docs-trippel
+    branch: docs-production
     repo: F5Networks/terraform-provider-bigip
 after_deploy:
   - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
