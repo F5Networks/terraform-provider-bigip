@@ -97,7 +97,7 @@ Terraform uses a plugin-based architecture to support available infrastructure a
 
 You may now begin working with Terraform. To see changes that are required for your infrastructure, run the command ``terraform plan``. All Terraform commands should now work.
 
-If you ever set or change modules or backend configuration for Terraform, rerun this command to reinitialize your working directory. If you forget, other commands will detect it and remind you to do so if necessary.
+If you ever set or change resources or the backend configuration for Terraform, rerun this command to reinitialize your working directory. If you forget, other commands will detect it and remind you to do so if necessary.
 
 
 Applying changes

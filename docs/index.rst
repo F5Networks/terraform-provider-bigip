@@ -1,9 +1,9 @@
-F5 Modules for Terraform
-========================
+F5 Resources for Terraform
+==========================
 
-Welcome to the F5 Modules for Terraform documentation. Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
+Welcome to the F5 Resources for Terraform documentation. Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
 
-Use these modules to create, edit, update, and delete configuration objects on BIG-IP 12.1.1 and later.
+Use these resources to create, edit, update, and delete configuration objects on BIG-IP 12.1.1 and later.
 
 The code is open source and |f5_terraform_github|.
 
