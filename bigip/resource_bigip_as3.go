@@ -2,13 +2,16 @@ package bigip
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -57,15 +60,55 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	resp, _ := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
-	if resp.Status != "200 OK" || err != nil {
-		defer resp.Body.Close()
-		return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v", bodyString, err)
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
+		return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v", string(body), err)
 	}
 
-	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusAccepted {
+		task := struct {
+			ID string `json:"id"`
+		}{}
+
+		result := struct {
+			Results []struct {
+				Message string `json:"message"`
+				Code    int    `json:"code"`
+			}
+		}{}
+
+		json.Unmarshal(body, &task)
+
+		url := client_bigip.Host + "/mgmt/shared/appsvcs/task/" + task.ID
+
+		for {
+			req, _ := http.NewRequest("GET", url, nil)
+
+			req.SetBasicAuth(client_bigip.User, client_bigip.Password)
+			req.Header.Set("Accept", "application/json")
+			req.Header.Set("Content-Type", "application/json")
+
+			taskResp, _ := client.Do(req)
+
+			body, err := ioutil.ReadAll(taskResp.Body)
+			if err != nil {
+				return fmt.Errorf("Error while Sending/Posting http request with AS3 json :%s  %v", string(body), err)
+			}
+			defer taskResp.Body.Close()
+
+			json.Unmarshal(body, &result)
+
+			if result.Results[0].Message != "in progress" {
+				break
+			}
+
+			time.Sleep(time.Second * 1)
+		}
+	}
+
 	d.SetId(name)
 	return resourceBigipAs3Read(d, meta)
 }
