@@ -76,6 +76,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		result := struct {
 			Results []struct {
 				Message string `json:"message"`
+				Code    int    `json:"code"`
 			}
 		}{}
 
@@ -104,7 +105,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 				break
 			}
 
-			time.Sleep(1)
+			time.Sleep(time.Second * 1)
 		}
 	}
 
