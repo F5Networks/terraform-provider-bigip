@@ -1,4 +1,0 @@
-variable "bigip_management_ip" {
-  default = "x.x.x.x"
-}
-
