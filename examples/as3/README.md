@@ -1,3 +1,7 @@
+
+[//]: # (Copyright 2019 F5 Networks Inc.)
+[//]: # (This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.)
+[//]: # (If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.)
 # AS3 Deployment using terraform  null resource
 - This shows details about how you can deploy AS3 RPM using null resource calling shell scripts to deploy AS3 RPM and AS3 Json payload. 
 # How you can use AS3 with null resource ?

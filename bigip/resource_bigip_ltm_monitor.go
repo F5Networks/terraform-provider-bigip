@@ -1,3 +1,9 @@
+/*
+Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+Modifications Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
@@ -310,7 +316,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
+	if p == "/Common/udp" || p == "/Common/postgresql" || p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
 		return nil, nil
 	}
 
