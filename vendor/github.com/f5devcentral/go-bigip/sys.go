@@ -374,6 +374,50 @@ func (b *BigIP) UpdateCertificate(certname,certpath,partition string) error {
         return  nil
 }
 
+// UploadKey copies a certificate key from local disk to BIGIP
+func (b *BigIP) UploadKey(keyname,keypath,partition string) error {
+	f, _ := os.Open(keypath)
+	_, err := b.UploadFile(f)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
+        log.Println("string:",sourcepath)
+        certkey := Key{
+                Name:       keyname,
+                SourcePath: sourcepath,
+		Partition:  partition,
+        }
+        log.Printf("%+v\n", certkey)
+        err = b.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
+	return  nil
+}
+
+// UpdateKey copies a certificate key from local disk to BIGIP
+func (b *BigIP) UpdateKey(keyname,keypath,partition string) error {
+	f, _ := os.Open(keypath)
+	_, err := b.UploadFile(f)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
+        log.Println("string:",sourcepath)
+        certkey := Key{
+                Name:       keyname,
+                SourcePath: sourcepath,
+		Partition:  partition,
+        }
+        log.Printf("%+v\n", certkey)
+        err = b.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
+	return  nil
+}
+
 // Keys returns a list of keys.
 func (b *BigIP) Keys() (*Keys, error) {
 	var keys Keys
