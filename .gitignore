@@ -40,6 +40,7 @@ website/node_modules
 *.tf
 website/vendor
 keymap
+README.md
 *.pem
 *.pub
 *.back
