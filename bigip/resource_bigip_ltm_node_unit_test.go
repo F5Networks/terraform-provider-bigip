@@ -1,3 +1,9 @@
+/*
+Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+Modifications Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
@@ -20,9 +26,9 @@ func testBigipLtmNodeInvalid(resourceName string) string {
 	                invalidkey = "foo"
 		}
 		provider "bigip" {
-			address = "10.10.10.1"
-			username = "admin"
-			password = "admin"
+			address = "xxx.xxx.xxx.xxx"
+			username = "xxx"
+			password = "xxx"
 		}
 	`, resourceName)
 }
@@ -49,8 +55,8 @@ func testBigipLtmNodeCreate(resourceName string, url string, address string) str
 		}
 		provider "bigip" {
 			address = "%s"
-			username = "admin"
-			password = "admin"
+			username = "xxxx"
+			password = "xxxx"
 		}
 	`, resourceName, address, url)
 }

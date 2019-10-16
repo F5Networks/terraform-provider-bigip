@@ -1,3 +1,9 @@
+/*
+Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+Modifications Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
@@ -8,6 +14,18 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
 )
+
+var parentMonitors = map[string]bool{
+	"/Common/udp":           true,
+	"/Common/postgresql":    true,
+	"/Common/http":          true,
+	"/Common/https":         true,
+	"/Common/icmp":          true,
+	"/Common/gateway-icmp":  true,
+	"/Common/tcp":           true,
+	"/Common/tcp-half-open": true,
+	"/Common/ftp":           true,
+}
 
 func resourceBigipLtmMonitor() *schema.Resource {
 	return &schema.Resource{
@@ -310,11 +328,11 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 
 func validateParent(v interface{}, k string) ([]string, []error) {
 	p := v.(string)
-	if p == "/Common/http" || p == "/Common/https" || p == "/Common/icmp" || p == "/Common/gateway-icmp" || p == "/Common/tcp" || p == "/Common/tcp-half-open" || p == "/Common/ftp" {
+	if parentMonitors[p] {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
 }
 
 func monitorParent(s string) string {

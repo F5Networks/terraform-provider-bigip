@@ -17,20 +17,20 @@ This resource is helpful to configure deploy as3 declarative JSON on BIG-IP.
 ```hcl
 
 resource "bigip_as3"  "as3-example" {
-     as3_json = "${file("example.json")}" 
+     as3_json = "${file("example.json")}"
      tenant_name = "as3"
  }
 
-```  
+```
 
 ## Argument Reference
 
 
 * `as3_json` - (Required) Name of the of the Declarative AS3 JSON file
 
-* `tenant_name` - (Required) This is the partition name where the application services will be configured.    
+* `tenant_name` - (Required) This is the partition name where the application services will be configured.
 
-* `example.json` - Example of AS3 Declarative JSON 
+* `example.json` - Example of AS3 Declarative JSON
 
 ```hcl
 {
@@ -72,5 +72,5 @@ resource "bigip_as3"  "as3-example" {
       }
    }
 }
-``` 
+```
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html

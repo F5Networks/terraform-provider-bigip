@@ -1,4 +1,11 @@
 #!/bin/sh
+
+: '
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+'
+
 #### This is deploy script which helps you to deploy F5 BIG-IP in AWS then extract the Public IP (management IP) of BIG-IP and use it to do other tasks on BIG-IP like
 # configuring VIPs, Pool, Monitor. This script uses two TF files the first one which is master.tf  is used to deploy f5 in AWS and the second TF file called as main.t#f is used to deploy VIPs, Pool etc. Both tf files cannot be on the same directory, they need to be in different directory. Also the temp.tt file needs to be created #where the master.tf file is located. The deploy.sh script needs to be in where the master.tf is located. deploy.sh will create variables.tf automatically.
 
