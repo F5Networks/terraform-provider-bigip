@@ -25,7 +25,7 @@ var parentMonitors = map[string]bool{
 	"/Common/tcp":           true,
 	"/Common/tcp-half-open": true,
 	"/Common/ftp":           true,
- }
+}
 
 func resourceBigipLtmMonitor() *schema.Resource {
 	return &schema.Resource{

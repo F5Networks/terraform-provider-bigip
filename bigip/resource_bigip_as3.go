@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"strings"
 
-        "github.com/f5devcentral/go-bigip"
-        "github.com/hashicorp/terraform/helper/schema"
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipAs3() *schema.Resource {
