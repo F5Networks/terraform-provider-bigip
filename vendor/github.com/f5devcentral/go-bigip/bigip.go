@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -48,6 +49,17 @@ type APIRequest struct {
 	URL         string
 	Body        string
 	ContentType string
+}
+
+// Upload contains information about a file upload status
+type Upload struct {
+        RemainingByteCount int64          `json:"remainingByteCount"`
+        UsedChunks         map[string]int `json:"usedChunks"`
+        TotalByteCount     int64          `json:"totalByteCount"`
+        LocalFilePath      string         `json:"localFilePath"`
+        TemporaryFilePath  string         `json:"temporaryFilePath"`
+        Generation         int            `json:"generation"`
+        LastUpdateMicros   int            `json:"lastUpdateMicros"`
 }
 
 // RequestError contains information about any error we get from a request.
@@ -273,6 +285,73 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 	return callErr
 }
 
+// Upload a file read from a Reader
+func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error) {
+	client := &http.Client{
+		Transport: b.Transport,
+		Timeout:   b.ConfigOptions.APICallTimeout,
+	}
+	options := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		ContentType: "application/octet-stream",
+	}
+	var format string
+	if strings.Contains(options.URL, "mgmt/") {
+		format = "%s/%s"
+	} else {
+		format = "%s/mgmt/%s"
+	}
+	url := fmt.Sprintf(format, b.Host, options.URL)
+	chunkSize := 512 * 1024
+	var start, end int64
+	for {
+		// Read next chunk
+		chunk := make([]byte, chunkSize)
+		n, err := r.Read(chunk)
+		if err != nil {
+			return nil, err
+		}
+		end = start + int64(n)
+		// Resize buffer size to number of bytes read
+		if n < chunkSize {
+			chunk = chunk[:n]
+		}
+		body := bytes.NewReader(chunk)
+		req, _ := http.NewRequest(strings.ToUpper(options.Method), url, body)
+		if b.Token != "" {
+			req.Header.Set("X-F5-Auth-Token", b.Token)
+		} else {
+			req.SetBasicAuth(b.User, b.Password)
+		}
+		req.Header.Add("Content-Type", options.ContentType)
+		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
+		// Try to upload chunk
+		res, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		data, _ := ioutil.ReadAll(res.Body)
+		if res.StatusCode >= 400 {
+			if res.Header.Get("Content-Type") == "application/json" {
+				return nil, b.checkError(data)
+			}
+
+			return nil, fmt.Errorf("HTTP %d :: %s", res.StatusCode, string(data[:]))
+		}
+		defer res.Body.Close()
+		var upload Upload
+		err = json.Unmarshal(data, &upload)
+		if err != nil {
+			return nil, err
+		}
+		start = end
+		if start >= size {
+			// Final chunk was uploaded
+			return &upload, err
+		}
+	}
+}
 //Get a url and populate an entity. If the entity does not exist (404) then the
 //passed entity will be untouched and false will be returned as the second parameter.
 //You can use this to distinguish between a missing entity or an actual error.
