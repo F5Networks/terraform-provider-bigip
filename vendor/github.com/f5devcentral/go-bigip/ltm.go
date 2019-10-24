@@ -1949,7 +1949,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string, ratio int) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -1959,13 +1959,14 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 
 	return b.post(config, uriLtm, uriNode)
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description, interval, address_family, autopopulate string, downinterval int) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string, ratio int, interval, address_family, autopopulate string, downinterval int) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1974,6 +1975,7 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 	config.FQDN.Name = address
 	config.FQDN.Interval = interval
