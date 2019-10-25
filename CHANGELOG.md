@@ -1,4 +1,4 @@
-## 1.0.0 (Unreleased)
+## 1.0.0 (October 25, 2019)
 - Added membership based monitor map
 - Fix a URL issue in readme
 - Added SSL code
