@@ -1,3 +1,7 @@
+
+[//]: # (Copyright 2019 F5 Networks Inc.)
+[//]: # (This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.)
+[//]: # (If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.)
 # Azure ARM  Terraform example TF files
 Below example shows how you can deploy f5 BIG-IP one NIC Azure Template using Terraform. This is BYOL example. You can configure the username and password for the BIG-IP. You have to do few minor changes to the template like additional of "$", replace username and password with var. etc. Templates you can find at https://github.com/F5Networks/f5-azure-arm-templates/tree/master/experimental/standalone
 

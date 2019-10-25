@@ -1,3 +1,9 @@
+/*
+Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+Modifications Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
@@ -21,6 +27,7 @@ resource "bigip_ltm_node" "test-node" {
 	monitor = "/Common/icmp"
 	rate_limit = "disabled"
 	state = "user-up"
+	ratio = "91"
 }
 `
 var TEST_FQDN_NODE_RESOURCE = `
@@ -33,6 +40,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 	rate_limit = "disabled"
 	fqdn { interval = "3000"}
 	state = "user-up"
+	ratio = "19"
 }
 `
 
@@ -56,6 +64,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "/Common/icmp"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "state", "user-up"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "ratio", "91"),
 				),
 			},
 		},
@@ -81,6 +90,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
 				),
 			},
 		},

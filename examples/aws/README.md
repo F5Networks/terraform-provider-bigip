@@ -1,3 +1,7 @@
+
+[//]: # (Copyright 2019 F5 Networks Inc.)
+[//]: # (This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.)
+[//]: # (If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.)
 # AWS Terraform example TF files
 The above TF files shows example of creating one F5 instance and 2 backend servers. It also creates
 VPC, subnets external, internal and management. Once terraform apply is done the infrastructure is

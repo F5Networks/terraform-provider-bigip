@@ -1,3 +1,7 @@
+
+[//]: # (Copyright 2019 F5 Networks Inc.)
+[//]: # (This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.)
+[//]: # (If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.)
 # End to End workflow
 deploy.sh shell script will execute two .TF files, the first TF file will manifest the instances on AWS for
 f5 big-ip and App servers, doing so it will also create VPC, subnets, routing & security groups required for the VPC.

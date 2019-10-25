@@ -1,14 +1,20 @@
+/*
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -157,10 +163,12 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
 
+	name := d.Get("tenant_name").(string)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/" + name
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {

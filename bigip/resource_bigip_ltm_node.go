@@ -1,3 +1,9 @@
+/*
+Original work from https://github.com/DealerDotCom/terraform-provider-bigip
+Modifications Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
@@ -52,6 +58,12 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
+				Computed:    true,
+			},
+			"ratio": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Sets the ratio number for the node.",
 				Computed:    true,
 			},
 			"monitor": {
@@ -121,6 +133,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	monitor := d.Get("monitor").(string)
 	state := d.Get("state").(string)
 	description := d.Get("description").(string)
+	ratio := d.Get("ratio").(int)
 
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
 
@@ -136,6 +149,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			monitor,
 			state,
 			description,
+			ratio,
 		)
 	} else {
 		interval := d.Get("fqdn.0.interval").(string)
@@ -152,6 +166,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			monitor,
 			state,
 			description,
+			ratio,
 			interval,
 			address_family,
 			autopopulate,
@@ -210,6 +225,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
+	d.Set("ratio", node.Ratio)
 	d.Set("fqdn.0.interval", node.FQDN.Interval)
 	d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
 	d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
@@ -254,6 +270,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			RateLimit:       d.Get("rate_limit").(string),
 			State:           d.Get("state").(string),
 			Description:     d.Get("description").(string),
+			Ratio:           d.Get("ratio").(int),
 		}
 	} else {
 		node = &bigip.Node{
@@ -263,6 +280,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			RateLimit:       d.Get("rate_limit").(string),
 			State:           d.Get("state").(string),
 			Description:     d.Get("description").(string),
+			Ratio:           d.Get("ratio").(int),
 		}
 	}
 
