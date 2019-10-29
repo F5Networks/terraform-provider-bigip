@@ -68,7 +68,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	resp, err := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
-	if resp.Status != "200 OK " || resp.Status != "202 Accepted" || err != nil {
+	if (resp.Status != "200 OK " || resp.Status != "202 Accepted") || err != nil {
 		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", bodyString, err)
 	}
@@ -192,7 +192,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	resp, err := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
-	if resp.Status != "200 OK " || resp.Status != "202 Accepted" || err != nil {
+	if (resp.Status != "200 OK " || resp.Status != "202 Accepted") || err != nil {
 		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", bodyString, err)
 	}
