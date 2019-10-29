@@ -92,6 +92,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_sys_snmp_traps":                  resourceBigipSysSnmpTraps(),
 			"bigip_sys_bigiplicense":                resourceBigipSysBigiplicense(),
 			"bigip_as3":                             resourceBigipAs3(),
+			"bigip_do":                              resourceBigipDo(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 		},
