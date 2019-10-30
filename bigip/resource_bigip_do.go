@@ -65,12 +65,11 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	resp, _ := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
-	if (resp.Status != "200 OK " || resp.Status != "202 Accepted") || err != nil {
-		defer resp.Body.Close()
-		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", bodyString, err)
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
+		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	if resp.StatusCode == http.StatusAccepted {
 		task := struct {
@@ -105,14 +104,14 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 
 			if result.Results[0].Message == "success" {
 				break
-			}
-			if result.Results[0].Message != "success" || result.Results[0].Message != "processing" {
+			} else if result.Results[0].Message == "processing" {
+				time.Sleep(1)
+				continue
+			} else {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
-			time.Sleep(1)
 		}
 	}
-	defer resp.Body.Close()
 	d.SetId(name)
 	return resourceBigipDoRead(d, meta)
 }
@@ -189,12 +188,11 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	resp, _ := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
-	if (resp.Status != "200 OK " || resp.Status != "202 Accepted") || err != nil {
-		defer resp.Body.Close()
-		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", bodyString, err)
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
+		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	if resp.StatusCode == http.StatusAccepted {
 		task := struct {
@@ -229,14 +227,14 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 
 			if result.Results[0].Message == "success" {
 				break
-			}
-			if result.Results[0].Message != "success" || result.Results[0].Message != "processing" {
+			} else if result.Results[0].Message == "processing" {
+				time.Sleep(1)
+				continue
+			} else {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
-			time.Sleep(1)
 		}
 	}
-	defer resp.Body.Close()
 	return resourceBigipDoRead(d, meta)
 }
 
