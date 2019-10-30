@@ -13,7 +13,6 @@ package bigip
 import (
 	"encoding/json"
 	"log"
-	"os"
 )
 
 type NTPs struct {
@@ -326,12 +325,12 @@ func (b *BigIP) AddCertificate(cert *Certificate) error {
 
 // UploadCertificate copies a certificate local disk to BIGIP
 func (b *BigIP) UploadCertificate(certname,certpath,partition string) error {
-	f, _ := os.Open(certpath)
-	_, err := b.UploadFile(f)
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte,certname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname + ".crt"
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
         log.Println("string:",sourcepath)
         cert := Certificate{
                 Name:       certname,
@@ -367,12 +366,12 @@ func (b *BigIP) DeleteCertificate(name string) error {
 
 // UpdateCertificate copies a certificate local disk to BIGIP
 func (b *BigIP) UpdateCertificate(certname,certpath,partition string) error {
-        f, _ := os.Open(certpath)
-        _, err := b.UploadFile(f)
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte,certname)
         if err != nil {
                 return err
         }
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname+".crt"
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
         cert := Certificate{
                 Name:       certname,
                 SourcePath: sourcepath,
@@ -386,12 +385,12 @@ func (b *BigIP) UpdateCertificate(certname,certpath,partition string) error {
 
 // UploadKey copies a certificate key from local disk to BIGIP
 func (b *BigIP) UploadKey(keyname,keypath,partition string) error {
-	f, _ := os.Open(keypath)
-	_, err := b.UploadFile(f)
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte,keyname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
         log.Println("string:",sourcepath)
         certkey := Key{
                 Name:       keyname,
@@ -408,12 +407,12 @@ func (b *BigIP) UploadKey(keyname,keypath,partition string) error {
 
 // UpdateKey copies a certificate key from local disk to BIGIP
 func (b *BigIP) UpdateKey(keyname,keypath,partition string) error {
-	f, _ := os.Open(keypath)
-	_, err := b.UploadFile(f)
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte,keyname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
         log.Println("string:",sourcepath)
         certkey := Key{
                 Name:       keyname,

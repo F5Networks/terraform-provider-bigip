@@ -5,7 +5,7 @@ provider "bigip" {
 }
 
 resource "bigip_ssl_certificate" "test-cert" {
-        name = "servercert"
-        cert_path = "servercert.crt"
+        name = "servercert.crt"
+        content = "${file("servercert.crt")}"
         partition = "Common"
 }
