@@ -48,7 +48,7 @@ func resourceBigipSslKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Certificate Key Name " + name)
 	certpath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
-	if !strings.HasSuffix(name,".key") {
+	if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}
 	err := client.UploadKey(name, certpath, partition)
@@ -64,7 +64,7 @@ func resourceBigipSslKeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Reading Certificate key: " + name)
-	if !strings.HasSuffix(name,".key") {
+	if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}
 	partition := d.Get("partition").(string)
@@ -81,7 +81,7 @@ func resourceBigipSslKeyExists(d *schema.ResourceData, meta interface{}) (bool, 
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Checking certificate key" + name + " exists.")
-	if !strings.HasSuffix(name,".key") {
+	if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}
 	partition := d.Get("partition").(string)
@@ -105,7 +105,7 @@ func resourceBigipSslKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	log.Println("[INFO] Certificate key Name " + name)
 	certpath := d.Get("content").(string)
-	if !strings.HasSuffix(name,".key") {
+	if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}
 	partition := d.Get("partition").(string)
@@ -121,7 +121,7 @@ func resourceBigipSslKeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Deleting Certificate key" + name)
-	if !strings.HasSuffix(name,".key") {
+	if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}
 	partition := d.Get("partition").(string)
