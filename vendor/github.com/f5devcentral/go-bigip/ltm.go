@@ -550,7 +550,7 @@ type VirtualServer struct {
 	VSIndex             int       `json:"vsIndex,omitempty"`
 	Vlans               []string  `json:"vlans,omitempty"`
 	Rules               []string  `json:"rules,omitempty"`
-	PersistenceProfiles []Profile `json:"persist,omitempty"`
+	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
 	Policies            []string  `json:"policies,omitempty"`
 }
