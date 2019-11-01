@@ -7,13 +7,11 @@ package bigip
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -72,41 +70,23 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	if resp.StatusCode == http.StatusAccepted {
-		task := struct {
-			ID string `json:"id"`
-		}{}
-
-		result := struct {
-			Results []struct {
-				Message string `json:"message"`
-			}
-		}{}
-
-		json.Unmarshal(body, &task)
-
-		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/task/" + task.ID
-
+		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding"
 		for {
 			req, _ := http.NewRequest("GET", url, nil)
-
 			req.SetBasicAuth(client_bigip.User, client_bigip.Password)
 			req.Header.Set("Accept", "application/json")
 			req.Header.Set("Content-Type", "application/json")
 
 			taskResp, _ := client.Do(req)
-
 			body, err := ioutil.ReadAll(taskResp.Body)
 			if err != nil {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
 			defer taskResp.Body.Close()
-			json.Unmarshal(body, &result)
-
-			if result.Results[0].Message == "success" {
-				break
-			} else if result.Results[0].Message == "processing" {
-				time.Sleep(1)
+			if taskResp.StatusCode == 202 {
 				continue
+			} else if taskResp.StatusCode == 200 {
+				break
 			} else {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
@@ -115,6 +95,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(name)
 	return resourceBigipDoRead(d, meta)
 }
+
 func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading Do config")
@@ -174,13 +155,14 @@ func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, erro
 
 func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
+
 	do_json := d.Get("do_json").(string)
-	log.Printf("[INFO] Updating Do Config :%s", do_json)
+	log.Printf("[INFO] Updating do config in bigip:%s", do_json)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/declarative-onboarding"
-	req, err := http.NewRequest("PATCH", url, strings.NewReader(do_json))
+	url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/"
+	req, err := http.NewRequest("POST", url, strings.NewReader(do_json))
 	if err != nil {
 		return fmt.Errorf("Error while creating http request with DO json:%v", err)
 	}
@@ -195,41 +177,23 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	if resp.StatusCode == http.StatusAccepted {
-		task := struct {
-			ID string `json:"id"`
-		}{}
-
-		result := struct {
-			Results []struct {
-				Message string `json:"message"`
-			}
-		}{}
-
-		json.Unmarshal(body, &task)
-
-		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/task/" + task.ID
-
+		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding"
 		for {
 			req, _ := http.NewRequest("GET", url, nil)
-
 			req.SetBasicAuth(client_bigip.User, client_bigip.Password)
 			req.Header.Set("Accept", "application/json")
 			req.Header.Set("Content-Type", "application/json")
 
 			taskResp, _ := client.Do(req)
-
 			body, err := ioutil.ReadAll(taskResp.Body)
 			if err != nil {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
 			defer taskResp.Body.Close()
-			json.Unmarshal(body, &result)
-
-			if result.Results[0].Message == "success" {
-				break
-			} else if result.Results[0].Message == "processing" {
-				time.Sleep(1)
+			if taskResp.StatusCode == 202 {
 				continue
+			} else if taskResp.StatusCode == 200 {
+				break
 			} else {
 				return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 			}
@@ -239,32 +203,5 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
-	client_bigip := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Deleting Do config")
-
-	name := d.Get("tenant_name").(string)
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/declarative-onboarding" + name
-	req, err := http.NewRequest("DELETE", url, nil)
-
-	if err != nil {
-		return fmt.Errorf("Error while creating http request for deleting do config:%v", err)
-	}
-	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
-	if resp.Status != "200 OK" || err != nil {
-		return fmt.Errorf("Error while Sending/deleting http request with DO json :%s  %v", bodyString, err)
-	}
-
-	defer resp.Body.Close()
-	d.SetId("")
-	return nil
+	return fmt.Errorf("Delete method on DO is not supported")
 }
