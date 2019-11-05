@@ -1040,6 +1040,7 @@ type Profile struct {
 	FullPath  string `json:"fullPath,omitempty"`
 	Partition string `json:"partition,omitempty"`
 	Context   string `json:"context,omitempty"`
+	TmDefault string `json:"tmDefault,omitempty"`
 }
 
 type IRules struct {
