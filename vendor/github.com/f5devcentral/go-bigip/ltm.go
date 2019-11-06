@@ -7,9 +7,9 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 /*
-Original work Copyright © 2015 Scott Ware 
+Original work Copyright © 2015 Scott Ware
 Licensed under the Apache License, Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -610,17 +610,18 @@ type VirtualServerPolicies struct {
 }
 
 type PolicyPublish struct {
-	Name        string
-	Command     string
+	Name    string
+	Command string
 }
 type PolicyPublishDTO struct {
-	Name        string `json:"name"`
-	Command     string `json:"command"`
+	Name    string `json:"name"`
+	Command string `json:"command"`
 }
+
 func (p *PolicyPublish) MarshalJSON() ([]byte, error) {
 	return json.Marshal(PolicyPublishDTO{
-		Name:        p.Name,
-		Command:     p.Command,
+		Name:    p.Name,
+		Command: p.Command,
 	})
 }
 func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
@@ -633,6 +634,7 @@ func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
 	p.Command = dto.Command
 	return nil
 }
+
 type Policy struct {
 	Name        string
 	PublishCopy string
@@ -691,14 +693,14 @@ func (p *Policy) UnmarshalJSON(b []byte) error {
 }
 
 type VirtualServerPolicy struct {
-	Name        string
-	Partition   string
-	FullPath    string
+	Name      string
+	Partition string
+	FullPath  string
 }
 type VirtualServerPolicyDTO struct {
-	Name        string   `json:"name"`
-	Partition   string   `json:"partition,omitempty"`
-	FullPath    string   `json:"fullPath,omitempty"`
+	Name      string `json:"name"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
 }
 
 type PolicyRules struct {
@@ -1961,7 +1963,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string, ratio int) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string, ratio int) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -2063,9 +2065,10 @@ func (b *BigIP) DeleteInternalDataGroup(name string) error {
 }
 
 // Modify a named internal data group, REPLACING all the records
-func (b *BigIP) ModifyInternalDataGroupRecords(name string, records []DataGroupRecord) error {
+func (b *BigIP) ModifyInternalDataGroupRecords(name, dgtype string, records []DataGroupRecord) error {
 	config := &DataGroup{
 		Records: records,
+		Type:    dgtype,
 	}
 	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
 }
@@ -2601,7 +2604,7 @@ func (b *BigIP) CreatePolicy(p *Policy) error {
 
 func (b *BigIP) PublishPolicy(name, publish string) error {
 	config := &PolicyPublish{
-		Name: publish,
+		Name:    publish,
 		Command: "publish",
 	}
 	values := []string{}
