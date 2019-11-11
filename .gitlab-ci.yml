@@ -1,0 +1,16 @@
+image: golang:1.11.x
+stages:
+  - build
+
+before_script:
+  - bash scripts/gogetcookie.sh
+  - make tools
+
+Build-Image:
+  stage: build
+  script:
+    - export GOFLAGS=-mod=vendor
+    - export GO111MODULE=on
+    - make test
+    - make website-lint
+    - make website-test
