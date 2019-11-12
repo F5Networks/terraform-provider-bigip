@@ -8,18 +8,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
  */
-/*
-Original work Copyright © 2015 Scott Ware 
-Licensed under the Apache License, Version 2.0 (the "License");
-You may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 
 package bigip
 
@@ -550,7 +538,7 @@ type VirtualServer struct {
 	VSIndex             int       `json:"vsIndex,omitempty"`
 	Vlans               []string  `json:"vlans,omitempty"`
 	Rules               []string  `json:"rules,omitempty"`
-	PersistenceProfiles []Profile `json:"persist,omitempty"`
+	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
 	Policies            []string  `json:"policies,omitempty"`
 }
@@ -1052,6 +1040,7 @@ type Profile struct {
 	FullPath  string `json:"fullPath,omitempty"`
 	Partition string `json:"partition,omitempty"`
 	Context   string `json:"context,omitempty"`
+	TmDefault string `json:"tmDefault,omitempty"`
 }
 
 type IRules struct {
@@ -1961,7 +1950,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string, ratio int) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -1971,13 +1960,14 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 
 	return b.post(config, uriLtm, uriNode)
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description, interval, address_family, autopopulate string, downinterval int) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string, ratio int, interval, address_family, autopopulate string, downinterval int) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1986,6 +1976,7 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 	config.FQDN.Name = address
 	config.FQDN.Interval = interval

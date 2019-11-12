@@ -110,6 +110,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"default_persistence_profile": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 
 			"fallback_persistence_profile": {
 				Type:        schema.TypeString,
@@ -377,7 +381,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	var persistenceProfiles []bigip.Profile
 	if p, ok := d.GetOk("persistence_profiles"); ok {
 		for _, profile := range p.(*schema.Set).List() {
-			persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
+			if profile == d.Get("default_persistence_profile").(string) {
+				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string), TmDefault: "yes"})
+			} else {
+				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
+			}
 		}
 	}
 
