@@ -7,7 +7,7 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 package bigip
 
 import (
@@ -597,19 +597,19 @@ type VirtualServerPolicies struct {
 }
 
 type PolicyPublish struct {
-	Name        string
-	Command	    string
+	Name    string
+	Command string
 }
 
 type PolicyPublishDTO struct {
-	Name       string `json:"name"`
-	Command    string `json:"command"`
+	Name    string `json:"name"`
+	Command string `json:"command"`
 }
 
 func (p *PolicyPublish) MarshalJSON() ([]byte, error) {
 	return json.Marshal(PolicyPublishDTO{
-		Name:      p.Name,
-		Command:   p.Command,
+		Name:    p.Name,
+		Command: p.Command,
 	})
 }
 
@@ -2333,12 +2333,7 @@ func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	}
 	retval := make([]string, 0, len(policies.PolicyRef))
 	for _, p := range policies.PolicyRef {
-		//if the policy is attached to a partition append its partition to the name
-		if p.Partition != "" {
-			retval = append(retval, "/" + p.Partition + "/" + p.Name)
-		} else {
-			retval = append(retval, p.Name)
-		}
+		retval = append(retval, p.Name)
 	}
 	return retval, nil
 }
@@ -2607,9 +2602,9 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 	values = append(values, "~Common~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
-	result := strings.Join(values, "")
+	//result := strings.Join(values, "")
 
-	log.Println("  ================== here in publish ", result, publish)
+	//log.Println("  ================== here in publish ", result, publish)
 
 	return b.post(config, uriLtm, uriPolicy)
 }
@@ -2618,11 +2613,6 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-	//The terraform provider always sets the default partition
-	// However need to add this check for backwards compat.
-	if p.Partition != "" {
-		values = append(values, p.Partition + "/")
-	}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.

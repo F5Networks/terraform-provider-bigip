@@ -6,7 +6,7 @@
 module github.com/terraform-providers/terraform-provider-bigip
 
 require (
-	github.com/f5devcentral/go-bigip v0.0.0-20191108055036-c962d85ebce7
+	github.com/f5devcentral/go-bigip v0.0.0-20191112122432-f9a3c303cdbd
 	github.com/hashicorp/go-hclog v0.7.0 // indirect
 	github.com/hashicorp/go-plugin v1.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -14,7 +14,6 @@ require (
 	github.com/hashicorp/terraform v0.12.13
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/stretchr/testify v1.3.0
-	golang.org/x/build v0.0.0-20190111050920-041ab4dc3f9d // indirect
 )
 
 go 1.13
