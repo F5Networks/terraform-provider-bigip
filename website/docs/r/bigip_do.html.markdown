@@ -18,7 +18,7 @@ This resource is helpful to configure do declarative JSON on BIG-IP.
 
 resource "bigip_do"  "do-example" {
      do_json = "${file("example.json")}"
-     tenant_name = "do"
+     tenant_name = "test_do"
  }
 
 ```
