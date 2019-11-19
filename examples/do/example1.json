@@ -1,0 +1,51 @@
+{
+    "schemaVersion": "1.0.0",
+    "class": "Device",
+    "async": true,  
+    "label": "my BIG-IP declaration for declarative onboarding",
+    "Common": {
+        "class": "Tenant",
+        "hostname": "bigip.example.com",
+        "myLicense": {
+            "class": "License",
+            "licenseType": "regKey",
+            "regKey": "xxxxx"
+        }, 
+        "admin": {
+            "class": "User",
+            "userType": "regular",
+            "password": "admin",
+            "shell": "bash"
+        },
+        "myProvisioning": {
+            "class": "Provision",
+            "ltm": "nominal",
+            "gtm": "minimum"
+        },
+        "external": {
+            "class": "VLAN",
+            "tag": 4093,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.1",
+                    "tagged": true
+                }
+            ],
+            "cmpHash": "dst-ip"
+        },
+        "external-self": {
+            "class": "SelfIp",
+            "address": "xxxx",
+            "vlan": "external",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        }
+    
+    }
+} 
+
+
+
+
+
