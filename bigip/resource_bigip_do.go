@@ -38,7 +38,7 @@ func resourceBigipDo() *schema.Resource {
 			"tenant_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "do",
+				Default:     "Do",
 				Description: "unique identifier for resource",
 			},
 		},
@@ -203,5 +203,6 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
-	return fmt.Errorf("Delete method on DO is not supported")
+
+	return nil
 }
