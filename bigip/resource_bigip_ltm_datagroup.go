@@ -161,6 +161,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Modifying Data Group List %s", name)
 
 	rs := d.Get("record").(*schema.Set)
+	dgtype := d.Get("type").(string)
 
 	var records []bigip.DataGroupRecord
 	if rs.Len() > 0 {
@@ -172,7 +173,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		records = nil
 	}
 
-	err := client.ModifyInternalDataGroupRecords(name, records)
+	err := client.ModifyInternalDataGroupRecords(name, dgtype, records)
 	if err != nil {
 		return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
 	}

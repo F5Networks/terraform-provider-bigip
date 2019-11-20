@@ -83,7 +83,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `source` -  (Optional) Specifies an IP address or network from which the virtual server will accept traffic.
 
-* `rules` - (Optional) The iRules you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
+* `irules` - (Optional) The iRules list you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
 
 * `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs. DEPRECATED - see Virtual Server Property Groups source-address-translation
 

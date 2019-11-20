@@ -10,7 +10,7 @@ description: |-
 
 `bigip_as3` provides details about bigip as3 resource
 
-This resource is helpful to configure deploy as3 declarative JSON on BIG-IP.
+This resource is helpful to configure as3 declarative JSON on BIG-IP.
 ## Example Usage
 
 

@@ -1,0 +1,33 @@
+variables:
+  GIT_DEPTH: 1
+
+image: golang:1.12.6
+stages:
+  - build
+  - test
+
+before_script:
+  - bash scripts/gogetcookie.sh
+  - make tools
+  - export GOFLAGS=-mod=vendor
+  - export GO111MODULE=on
+  - pwd
+  - go version
+  - echo $GOPATH
+
+Build-Image:
+  stage: build
+  tags:
+    - docker-executor
+  script:
+    - make build
+    - make website-lint
+
+Test-Image:
+  stage: test
+  tags:
+    - docker-executor
+  script:
+    - make test
+    - make testacc
+
