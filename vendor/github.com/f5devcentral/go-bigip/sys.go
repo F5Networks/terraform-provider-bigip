@@ -7,13 +7,12 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 package bigip
 
 import (
 	"encoding/json"
 	"log"
-	"os"
 )
 
 type NTPs struct {
@@ -214,27 +213,27 @@ func (p *LogPublisher) UnmarshalJSON(b []byte) error {
 }
 
 const (
-	uriSys         = "sys"
-	uriNtp         = "ntp"
-	uriDNS         = "dns"
-	uriProvision   = "provision"
-	uriAfm         = "afm"
-	uriAsm         = "asm"
-	uriApm         = "apm"
-	uriAvr         = "avr"
-	uriIlx         = "ilx"
-	uriSyslog      = "syslog"
-	uriSnmp        = "snmp"
-	uriTraps       = "traps"
-	uriLicense     = "license"
-	uriLogConfig   = "logConfig"
-	uriDestination = "destination"
-	uriIPFIX       = "ipfix"
-	uriPublisher   = "publisher"
-        uriFile        = "file"
-	uriSslCert     = "ssl-cert"
-	uriSslKey      = "ssl-key"
-        REST_DOWNLOAD_PATH ="/var/config/rest/downloads"
+	uriSys             = "sys"
+	uriNtp             = "ntp"
+	uriDNS             = "dns"
+	uriProvision       = "provision"
+	uriAfm             = "afm"
+	uriAsm             = "asm"
+	uriApm             = "apm"
+	uriAvr             = "avr"
+	uriIlx             = "ilx"
+	uriSyslog          = "syslog"
+	uriSnmp            = "snmp"
+	uriTraps           = "traps"
+	uriLicense         = "license"
+	uriLogConfig       = "logConfig"
+	uriDestination     = "destination"
+	uriIPFIX           = "ipfix"
+	uriPublisher       = "publisher"
+	uriFile            = "file"
+	uriSslCert         = "ssl-cert"
+	uriSslKey          = "ssl-key"
+	REST_DOWNLOAD_PATH = "/var/config/rest/downloads"
 )
 
 // Certificates represents a list of installed SSL certificates.
@@ -277,6 +276,7 @@ type Certificate struct {
 	UpdatedBy               string `json:"updatedBy,omitempty"`
 	Version                 int    `json:"version,omitempty"`
 }
+
 // Keys represents a list of installed keys.
 type Keys struct {
 	Keys []Key `json:"items,omitempty"`
@@ -325,25 +325,25 @@ func (b *BigIP) AddCertificate(cert *Certificate) error {
 }
 
 // UploadCertificate copies a certificate local disk to BIGIP
-func (b *BigIP) UploadCertificate(certname,certpath,partition string) error {
-	f, _ := os.Open(certpath)
-	_, err := b.UploadFile(f)
+func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte, certname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname + ".crt"
-        log.Println("string:",sourcepath)
-        cert := Certificate{
-                Name:       certname,
-                SourcePath: sourcepath,
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
+	log.Println("string:", sourcepath)
+	cert := Certificate{
+		Name:       certname,
+		SourcePath: sourcepath,
 		Partition:  partition,
-        }
-        log.Printf("%+v\n", cert)
-        err = b.AddCertificate(&cert)
+	}
+	log.Printf("%+v\n", cert)
+	err = b.AddCertificate(&cert)
 	if err != nil {
 		return err
 	}
-	return  nil
+	return nil
 }
 
 // GetCertificate retrieves a Certificate by name. Returns nil if the certificate does not exist
@@ -366,66 +366,66 @@ func (b *BigIP) DeleteCertificate(name string) error {
 }
 
 // UpdateCertificate copies a certificate local disk to BIGIP
-func (b *BigIP) UpdateCertificate(certname,certpath,partition string) error {
-        f, _ := os.Open(certpath)
-        _, err := b.UploadFile(f)
-        if err != nil {
-                return err
-        }
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname+".crt"
-        cert := Certificate{
-                Name:       certname,
-                SourcePath: sourcepath,
-        }
-        err = b.AddCertificate(&cert)
-        if err != nil {
-                return err
-        }
-        return  nil
+func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte, certname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
+	cert := Certificate{
+		Name:       certname,
+		SourcePath: sourcepath,
+	}
+	err = b.AddCertificate(&cert)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UploadKey copies a certificate key from local disk to BIGIP
-func (b *BigIP) UploadKey(keyname,keypath,partition string) error {
-	f, _ := os.Open(keypath)
-	_, err := b.UploadFile(f)
+func (b *BigIP) UploadKey(keyname, keypath, partition string) error {
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte, keyname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
-        log.Println("string:",sourcepath)
-        certkey := Key{
-                Name:       keyname,
-                SourcePath: sourcepath,
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
+	log.Println("string:", sourcepath)
+	certkey := Key{
+		Name:       keyname,
+		SourcePath: sourcepath,
 		Partition:  partition,
-        }
-        log.Printf("%+v\n", certkey)
-        err = b.AddKey(&certkey)
+	}
+	log.Printf("%+v\n", certkey)
+	err = b.AddKey(&certkey)
 	if err != nil {
 		return err
 	}
-	return  nil
+	return nil
 }
 
 // UpdateKey copies a certificate key from local disk to BIGIP
-func (b *BigIP) UpdateKey(keyname,keypath,partition string) error {
-	f, _ := os.Open(keypath)
-	_, err := b.UploadFile(f)
+func (b *BigIP) UpdateKey(keyname, keypath, partition string) error {
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte, keyname)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname + ".key"
-        log.Println("string:",sourcepath)
-        certkey := Key{
-                Name:       keyname,
-                SourcePath: sourcepath,
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
+	log.Println("string:", sourcepath)
+	certkey := Key{
+		Name:       keyname,
+		SourcePath: sourcepath,
 		Partition:  partition,
-        }
-        log.Printf("%+v\n", certkey)
-        err = b.AddKey(&certkey)
+	}
+	log.Printf("%+v\n", certkey)
+	err = b.AddKey(&certkey)
 	if err != nil {
 		return err
 	}
-	return  nil
+	return nil
 }
 
 // Keys returns a list of keys.

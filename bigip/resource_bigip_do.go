@@ -204,5 +204,5 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
 
-	return nil
+	return fmt.Errorf("Delete method on DO is not supported")
 }

@@ -7,7 +7,7 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 // Package bigip interacts with F5 BIG-IP systems using the REST API.
 package bigip
 
@@ -53,13 +53,13 @@ type APIRequest struct {
 
 // Upload contains information about a file upload status
 type Upload struct {
-        RemainingByteCount int64          `json:"remainingByteCount"`
-        UsedChunks         map[string]int `json:"usedChunks"`
-        TotalByteCount     int64          `json:"totalByteCount"`
-        LocalFilePath      string         `json:"localFilePath"`
-        TemporaryFilePath  string         `json:"temporaryFilePath"`
-        Generation         int            `json:"generation"`
-        LastUpdateMicros   int            `json:"lastUpdateMicros"`
+	RemainingByteCount int64          `json:"remainingByteCount"`
+	UsedChunks         map[string]int `json:"usedChunks"`
+	TotalByteCount     int64          `json:"totalByteCount"`
+	LocalFilePath      string         `json:"localFilePath"`
+	TemporaryFilePath  string         `json:"temporaryFilePath"`
+	Generation         int            `json:"generation"`
+	LastUpdateMicros   int            `json:"lastUpdateMicros"`
 }
 
 // RequestError contains information about any error we get from a request.
@@ -352,6 +352,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		}
 	}
 }
+
 //Get a url and populate an entity. If the entity does not exist (404) then the
 //passed entity will be untouched and false will be returned as the second parameter.
 //You can use this to distinguish between a missing entity or an actual error.

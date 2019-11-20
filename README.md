@@ -11,9 +11,6 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 [![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-bigip)
 [![license](https://img.shields.io/badge/license-Mozilla-red.svg?style=flat)](https://github.com/f5devcentral/terraform-provider-bigip/blob/master/LICENSE)
 [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-# Support
-- F5 provides support for the F5 Modules for Terraform. For more information, see this page.(https://www.f5.com/services/support/support-offerings/support-policies)
-- If you’d like community support, you can open an issue on GitHub.(https://github.com/F5Networks/terraform-provider-bigip)
 
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
@@ -44,7 +41,7 @@ Clone repository to: $GOPATH/src/github.com/terraform-providers/terraform-provid
 
 ```
 $ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:F5Networks/terraform-provider-bigip
+$ git clone https://github.com/terraform-providers/terraform-provider-bigip.git
 
 ```
 Enter the provider directory and build the provider

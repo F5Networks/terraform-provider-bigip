@@ -1,4 +1,13 @@
-## 0.12.5 (Unreleased)
+## 1.0.1 (Unreleased)
+## 1.0.0 (October 25, 2019)
+- Added membership based monitor map
+- Fix a URL issue in readme
+- Added SSL code
+- Added test conditions for udp
+- Added License banner to shell scripts, travis.yml, goreleaser.yml
+- Updated AS3 docs
+- Added banner to resource files
+
 ## 0.12.4 (August 14, 2019)
 - Fix #139 changing required parameters to optional in _bigip_ltm_policy
 - Added #134 SSL Ssl Client Profile and Server Profile feature
