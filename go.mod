@@ -6,7 +6,7 @@
 module github.com/terraform-providers/terraform-provider-bigip
 
 require (
-	github.com/f5devcentral/go-bigip v0.0.0-20191112122432-f9a3c303cdbd
+	github.com/f5devcentral/go-bigip v0.0.0-20191121065651-f310f6a92088
 	github.com/hashicorp/go-hclog v0.7.0 // indirect
 	github.com/hashicorp/go-plugin v1.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
