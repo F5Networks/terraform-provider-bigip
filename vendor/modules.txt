@@ -62,7 +62,7 @@ github.com/blang/semver
 github.com/bmatcuk/doublestar
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20191112122432-f9a3c303cdbd
+# github.com/f5devcentral/go-bigip v0.0.0-20191121065651-f310f6a92088
 github.com/f5devcentral/go-bigip
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
