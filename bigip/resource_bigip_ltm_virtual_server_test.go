@@ -49,7 +49,8 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
-	persistence_profiles = ["/Common/source_addr"]
+	persistence_profiles = ["/Common/source_addr","/Common/hash"]
+	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
         policies = ["${bigip_ltm_policy.http_to_https_redirect.name}"]
 
@@ -80,6 +81,7 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "irules.0", TEST_IRULE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "default_persistence_profile", "/Common/hash"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("profiles.%d", schema.HashString("/Common/http")),
 						"/Common/http"),
@@ -92,6 +94,9 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
 						"/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/hash")),
+						"/Common/hash"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
 						"http_to_https_redirect"),

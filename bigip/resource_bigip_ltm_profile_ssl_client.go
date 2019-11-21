@@ -451,10 +451,10 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 
 	//log.Println("[INFO] Updating Route " + description)
 
-	var tmOptions []string
-	if t, ok := d.GetOk("tm_options"); ok {
-		tmOptions = setToStringSlice(t.(*schema.Set))
-	}
+	//var tmOptions []string
+	//if t, ok := d.GetOk("tm_options"); ok {
+	//	tmOptions = setToStringSlice(t.(*schema.Set))
+	//}
 
 	var CertExtensionIncludes []string
 	if cei, ok := d.GetOk("cert_extension_includes"); ok {
@@ -518,29 +518,29 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		Key:                             d.Get("key").(string),
 		ModSslMethods:                   d.Get("mod_ssl_methods").(string),
 		Mode:                            d.Get("mode").(string),
-		TmOptions:                       tmOptions,
-		Passphrase:                      d.Get("passphrase").(string),
-		PeerCertMode:                    d.Get("peer_cert_mode").(string),
-		ProxyCaCert:                     d.Get("proxy_ca_cert").(string),
-		ProxyCaKey:                      d.Get("proxy_ca_key").(string),
-		ProxyCaPassphrase:               d.Get("proxy_ca_passphrase").(string),
-		ProxySsl:                        d.Get("proxy_ssl").(string),
-		ProxySslPassthrough:             d.Get("proxy_ssl_passthrough").(string),
-		RenegotiatePeriod:               d.Get("renegotiate_period").(string),
-		RenegotiateSize:                 d.Get("renegotiate_size").(string),
-		Renegotiation:                   d.Get("renegotiation").(string),
-		RetainCertificate:               d.Get("retain_certificate").(string),
-		SecureRenegotiation:             d.Get("secure_renegotiation").(string),
-		ServerName:                      d.Get("server_name").(string),
-		SessionMirroring:                d.Get("session_mirroring").(string),
-		SessionTicket:                   d.Get("session_ticket").(string),
-		SniDefault:                      d.Get("sni_default").(string),
-		SniRequire:                      d.Get("sni_require").(string),
-		SslForwardProxy:                 d.Get("ssl_forward_proxy").(string),
-		SslForwardProxyBypass:           d.Get("ssl_forward_proxy_bypass").(string),
-		SslSignHash:                     d.Get("ssl_sign_hash").(string),
-		StrictResume:                    d.Get("strict_resume").(string),
-		UncleanShutdown:                 d.Get("unclean_shutdown").(string),
+		//TmOptions:                       tmOptions,
+		Passphrase:            d.Get("passphrase").(string),
+		PeerCertMode:          d.Get("peer_cert_mode").(string),
+		ProxyCaCert:           d.Get("proxy_ca_cert").(string),
+		ProxyCaKey:            d.Get("proxy_ca_key").(string),
+		ProxyCaPassphrase:     d.Get("proxy_ca_passphrase").(string),
+		ProxySsl:              d.Get("proxy_ssl").(string),
+		ProxySslPassthrough:   d.Get("proxy_ssl_passthrough").(string),
+		RenegotiatePeriod:     d.Get("renegotiate_period").(string),
+		RenegotiateSize:       d.Get("renegotiate_size").(string),
+		Renegotiation:         d.Get("renegotiation").(string),
+		RetainCertificate:     d.Get("retain_certificate").(string),
+		SecureRenegotiation:   d.Get("secure_renegotiation").(string),
+		ServerName:            d.Get("server_name").(string),
+		SessionMirroring:      d.Get("session_mirroring").(string),
+		SessionTicket:         d.Get("session_ticket").(string),
+		SniDefault:            d.Get("sni_default").(string),
+		SniRequire:            d.Get("sni_require").(string),
+		SslForwardProxy:       d.Get("ssl_forward_proxy").(string),
+		SslForwardProxyBypass: d.Get("ssl_forward_proxy_bypass").(string),
+		SslSignHash:           d.Get("ssl_sign_hash").(string),
+		StrictResume:          d.Get("strict_resume").(string),
+		UncleanShutdown:       d.Get("unclean_shutdown").(string),
 	}
 
 	err := client.ModifyClientSSLProfile(name, pss)
@@ -672,9 +672,9 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
-	if err := d.Set("tm_options", obj.TmOptions); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
+	//if err := d.Set("tm_options", obj.TmOptions); err != nil {
+	//	return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+	//}
 
 	if err := d.Set("passphrase", obj.Passphrase); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)

@@ -37,8 +37,7 @@ func resourceBigipDo() *schema.Resource {
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "Do",
+				Required:    true,
 				Description: "unique identifier for resource",
 			},
 		},
