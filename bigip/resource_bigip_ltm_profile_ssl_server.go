@@ -339,33 +339,33 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 
 	//log.Println("[INFO] Updating Route " + description)
 
-	var tmOptions []string
+	/*var tmOptions []string
 	if t, ok := d.GetOk("tm_options"); ok {
 		tmOptions = setToStringSlice(t.(*schema.Set))
-	}
+	}*/
 
 	pss := &bigip.ServerSSLProfile{
-		Name:                         d.Get("name").(string),
-		Partition:                    d.Get("partition").(string),
-		FullPath:                     d.Get("full_path").(string),
-		Generation:                   d.Get("generation").(int),
-		AlertTimeout:                 d.Get("alert_timeout").(string),
-		Authenticate:                 d.Get("authenticate").(string),
-		AuthenticateDepth:            d.Get("authenticate_depth").(int),
-		CaFile:                       d.Get("ca_file").(string),
-		CacheSize:                    d.Get("cache_size").(int),
-		CacheTimeout:                 d.Get("cache_timeout").(int),
-		Cert:                         d.Get("cert").(string),
-		Chain:                        d.Get("chain").(string),
-		Ciphers:                      d.Get("ciphers").(string),
-		DefaultsFrom:                 d.Get("defaults_from").(string),
-		ExpireCertResponseControl:    d.Get("expire_cert_response_control").(string),
-		GenericAlert:                 d.Get("generic_alert").(string),
-		HandshakeTimeout:             d.Get("handshake_timeout").(string),
-		Key:                          d.Get("key").(string),
-		ModSslMethods:                d.Get("mod_ssl_methods").(string),
-		Mode:                         d.Get("mode").(string),
-		TmOptions:                    tmOptions,
+		Name:                      d.Get("name").(string),
+		Partition:                 d.Get("partition").(string),
+		FullPath:                  d.Get("full_path").(string),
+		Generation:                d.Get("generation").(int),
+		AlertTimeout:              d.Get("alert_timeout").(string),
+		Authenticate:              d.Get("authenticate").(string),
+		AuthenticateDepth:         d.Get("authenticate_depth").(int),
+		CaFile:                    d.Get("ca_file").(string),
+		CacheSize:                 d.Get("cache_size").(int),
+		CacheTimeout:              d.Get("cache_timeout").(int),
+		Cert:                      d.Get("cert").(string),
+		Chain:                     d.Get("chain").(string),
+		Ciphers:                   d.Get("ciphers").(string),
+		DefaultsFrom:              d.Get("defaults_from").(string),
+		ExpireCertResponseControl: d.Get("expire_cert_response_control").(string),
+		GenericAlert:              d.Get("generic_alert").(string),
+		HandshakeTimeout:          d.Get("handshake_timeout").(string),
+		Key:                       d.Get("key").(string),
+		ModSslMethods:             d.Get("mod_ssl_methods").(string),
+		Mode:                      d.Get("mode").(string),
+		//TmOptions:                    tmOptions,
 		Passphrase:                   d.Get("passphrase").(string),
 		PeerCertMode:                 d.Get("peer_cert_mode").(string),
 		ProxySsl:                     d.Get("proxy_ssl").(string),
@@ -434,6 +434,10 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving CaFile to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
+	if err := d.Set("cert", obj.Cert); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
 	if err := d.Set("chain", obj.Chain); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Chain to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
@@ -466,9 +470,9 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
-	if err := d.Set("tm_options", obj.TmOptions); err != nil {
+	/*if err := d.Set("tm_options", obj.TmOptions); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
+	}*/
 
 	if err := d.Set("passphrase", obj.Passphrase); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)
@@ -476,6 +480,10 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("proxy_ssl", obj.ProxySsl); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ProxySsl to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("peer_cert_mode", obj.PeerCertMode); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving PeerCertMode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("renegotiate_period", obj.RenegotiatePeriod); err != nil {
