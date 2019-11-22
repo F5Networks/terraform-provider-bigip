@@ -1,4 +1,4 @@
-## 1.1.0 (Unreleased)
+## 1.1.0 (November 22, 2019)
 
 ## Added Functionalities
 - Terraform resources for DO( Declarative Onboarding )
