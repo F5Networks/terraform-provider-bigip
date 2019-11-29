@@ -23,12 +23,13 @@ func resourceBigipSslCertificate() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of SSL Certificate",
+				Description: "Name of SSL Certificate with .crt extension",
 				ForceNew:    true,
 			},
 			"content": {
 				Type:        schema.TypeString,
 				Required:    true,
+				Sensitive:   true,
 				Description: "Content of certificate on Disk",
 			},
 
