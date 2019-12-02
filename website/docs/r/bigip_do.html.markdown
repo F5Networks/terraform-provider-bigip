@@ -18,7 +18,7 @@ This resource is helpful to configure do declarative JSON on BIG-IP.
 
 resource "bigip_do"  "do-example" {
      do_json = "${file("example.json")}"
-     tenant_name = "test_do"
+     config_name = "test_do"
  }
 
 ```
@@ -28,7 +28,7 @@ resource "bigip_do"  "do-example" {
 
 * `do_json` - (Required) Name of the of the Declarative DO JSON file
 
-* `tenant_name` - (Required) This is the partition name where the application services will be configured.
+* `config_name` - (Required) This is the arbitarty name used to set the terraform state changes for DO resource.
 
 * `example.json` - Example of DO Declarative JSON
 

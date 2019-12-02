@@ -18,7 +18,7 @@ This resource is helpful to configure as3 declarative JSON on BIG-IP.
 
 resource "bigip_as3"  "as3-example" {
      as3_json = "${file("example.json")}"
-     tenant_name = "as3"
+     config_name = "as3"
  }
 
 ```
@@ -28,7 +28,7 @@ resource "bigip_as3"  "as3-example" {
 
 * `as3_json` - (Required) Name of the of the Declarative AS3 JSON file
 
-* `tenant_name` - (Required) This is the partition name where the application services will be configured.
+* `config_name` - (Required) This is the arbitary name used to set the terraform state changes for as3 resource
 
 * `example.json` - Example of AS3 Declarative JSON
 
