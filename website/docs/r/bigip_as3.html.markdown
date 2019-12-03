@@ -18,7 +18,7 @@ This resource is helpful to configure as3 declarative JSON on BIG-IP.
 
 resource "bigip_as3"  "as3-example" {
      as3_json = "${file("example.json")}"
-     config_name = "as3"
+     config_name = "sample_test"
  }
 
 ```
