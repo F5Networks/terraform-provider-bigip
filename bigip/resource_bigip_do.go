@@ -35,10 +35,10 @@ func resourceBigipDo() *schema.Resource {
 				Required:    true,
 				Description: "DO json",
 			},
-			"tenant_name": {
+			"config_name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "unique identifier for resource",
+				Description: "unique identifier for DO resource",
 			},
 		},
 	}
@@ -48,7 +48,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	do_json := d.Get("do_json").(string)
-	name := d.Get("tenant_name").(string)
+	name := d.Get("config_name").(string)
 	log.Printf("[INFO] Creating do config in bigip:%s", do_json)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}

@@ -18,10 +18,10 @@ resource "null_resource" "install_do" {
   }
 }
 
-// tenant_name is used to set the identity of do resource which is unique for resource.
+// config_name is used to set the identity of do resource which is unique for resource.
 resource "bigip_do"  "do-example1" {
      do_json = "${file("example1.json")}"
-     tenant_name = "test_do"
+     config_name = "sample_test"
      depends_on = ["null_resource.install_do"]
 
  }
