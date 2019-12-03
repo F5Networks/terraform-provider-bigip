@@ -28,7 +28,7 @@ resource "bigip_as3"  "as3-example" {
 
 * `as3_json` - (Required) Name of the of the Declarative AS3 JSON file
 
-* `config_name` - (Required) This is the arbitary name used to set the terraform state change for as3 resource
+* `config_name` - (Required) This is the arbitrary name used to set the terraform state changes for as3 resource
 
 * `example.json` - Example of AS3 Declarative JSON
 

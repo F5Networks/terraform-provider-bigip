@@ -28,7 +28,7 @@ resource "bigip_do"  "do-example" {
 
 * `do_json` - (Required) Name of the of the Declarative DO JSON file
 
-* `config_name` - (Required) This is the arbitarty name used to set the terraform state changes for DO resource.
+* `config_name` - (Required) This is the arbitrary name used to set the terraform state changes for DO resource.
 
 * `example.json` - Example of DO Declarative JSON
 
