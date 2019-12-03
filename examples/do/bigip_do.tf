@@ -21,7 +21,7 @@ resource "null_resource" "install_do" {
 // config_name is used to set the identity of do resource which is unique for resource.
 resource "bigip_do"  "do-example1" {
      do_json = "${file("example1.json")}"
-     config_name = "sample_do"
+     config_name = "sample_test"
      depends_on = ["null_resource.install_do"]
 
  }
