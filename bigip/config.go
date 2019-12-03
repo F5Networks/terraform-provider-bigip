@@ -15,6 +15,7 @@ import (
 
 type Config struct {
 	Address        string
+	Port           string
 	Username       string
 	Password       string
 	LoginReference string
@@ -28,14 +29,14 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 		var client *bigip.BigIP
 		var err error
 		if c.LoginReference != "" {
-			client, err = bigip.NewTokenSession(c.Address, c.Username, c.Password, c.LoginReference, c.ConfigOptions)
+			client, err = bigip.NewTokenSession(c.Address, c.Port, c.Username, c.Password, c.LoginReference, c.ConfigOptions)
 			if err != nil {
 				log.Printf("[ERROR] Error creating New Token Session %s ", err)
 				return nil, err
 			}
 
 		} else {
-			client = bigip.NewSession(c.Address, c.Username, c.Password, c.ConfigOptions)
+			client = bigip.NewSession(c.Address, c.Port, c.Username, c.Password, c.ConfigOptions)
 		}
 		err = c.validateConnection(client)
 		if err == nil {
