@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -35,10 +35,10 @@ func resourceBigipAs3() *schema.Resource {
 				Required:    true,
 				Description: "AS3 json",
 			},
-			"tenant_name": {
+			"config_name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "unique identifier for resource",
+				Description: "unique identifier for AS3 resource",
 			},
 		},
 	}
@@ -48,7 +48,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	as3_json := d.Get("as3_json").(string)
-	name := d.Get("tenant_name").(string)
+	name := d.Get("config_name").(string)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", as3_json)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -162,7 +162,7 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
 
-	name := d.Get("tenant_name").(string)
+	name := d.Get("config_name").(string)
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
