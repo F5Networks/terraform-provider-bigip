@@ -79,12 +79,15 @@ func (r *RequestError) Error() error {
 }
 
 // NewSession sets up our connection to the BIG-IP system.
-func NewSession(host, user, passwd string, configOptions *ConfigOptions) *BigIP {
+func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *BigIP {
 	var url string
 	if !strings.HasPrefix(host, "http") {
 		url = fmt.Sprintf("https://%s", host)
 	} else {
 		url = host
+	}
+	if port != ""{
+		url = url + ":" + port
 	}
 	if configOptions == nil {
 		configOptions = defaultConfigOptions
@@ -107,7 +110,7 @@ func NewSession(host, user, passwd string, configOptions *ConfigOptions) *BigIP 
 // Auth. This is required when using an external authentication
 // provider, such as Radius or Active Directory. loginProviderName is
 // probably "tmos" but your environment may vary.
-func NewTokenSession(host, user, passwd, loginProviderName string, configOptions *ConfigOptions) (b *BigIP, err error) {
+func NewTokenSession(host, port, user, passwd, loginProviderName string, configOptions *ConfigOptions) (b *BigIP, err error) {
 	type authReq struct {
 		Username          string `json:"username"`
 		Password          string `json:"password"`
@@ -137,7 +140,7 @@ func NewTokenSession(host, user, passwd, loginProviderName string, configOptions
 		ContentType: "application/json",
 	}
 
-	b = NewSession(host, user, passwd, configOptions)
+	b = NewSession(host, port, user, passwd, configOptions)
 	resp, err := b.APICall(req)
 	if err != nil {
 		return
