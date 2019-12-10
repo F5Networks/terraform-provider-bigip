@@ -25,26 +25,30 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the Ssl Profile",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the Ssl Profile",
+				ValidateFunc: validateF5Name,
 			},
 
 			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "name of partition",
 			},
 
 			"full_path": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "full path of the profile",
 			},
 
 			"generation": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "generation",
 			},
 
@@ -114,7 +118,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
+				Default:     "/Common/serverssl",
 				Description: "Profile name that this profile defaults from.",
 			},
 

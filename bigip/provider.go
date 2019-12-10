@@ -26,6 +26,11 @@ func Provider() terraform.ResourceProvider {
 				Description: "Domain name/IP of the BigIP",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_HOST", nil),
 			},
+			"port": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Management Port to connect to Bigip",
+			},
 			"username": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -104,6 +109,7 @@ func Provider() terraform.ResourceProvider {
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Address:  d.Get("address").(string),
+		Port:     d.Get("port").(string),
 		Username: d.Get("username").(string),
 		Password: d.Get("password").(string),
 	}
