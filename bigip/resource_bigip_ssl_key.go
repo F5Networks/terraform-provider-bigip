@@ -30,6 +30,7 @@ func resourceBigipSslKey() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
+				ForceNew:    true,
 				Description: "Content of SSL certificate key present on local Disk",
 			},
 
