@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
@@ -309,6 +310,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 
 func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 	log.Println("[INFO] Creating Server Ssl Profile " + name)

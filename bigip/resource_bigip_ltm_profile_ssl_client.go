@@ -525,8 +525,6 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		//TmOptions:                       tmOptions,
 		Passphrase:            d.Get("passphrase").(string),
 		PeerCertMode:          d.Get("peer_cert_mode").(string),
-		ProxyCaCert:           d.Get("proxy_ca_cert").(string),
-		ProxyCaKey:            d.Get("proxy_ca_key").(string),
 		ProxyCaPassphrase:     d.Get("proxy_ca_passphrase").(string),
 		ProxySsl:              d.Get("proxy_ssl").(string),
 		ProxySslPassthrough:   d.Get("proxy_ssl_passthrough").(string),
@@ -686,14 +684,6 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("peer_cert_mode", obj.PeerCertMode); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving PeerCertMode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("proxy_ca_cert", obj.ProxyCaCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxySsl to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxyCaKey to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("proxy_ca_passphrase", obj.ProxyCaPassphrase); err != nil {

@@ -23,12 +23,14 @@ func resourceBigipSslKey() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of SSL Certificate key",
+				Description: "Name of SSL Certificate key with .key extension",
 				ForceNew:    true,
 			},
 			"content": {
 				Type:        schema.TypeString,
 				Required:    true,
+				Sensitive:   true,
+				ForceNew:    true,
 				Description: "Content of SSL certificate key present on local Disk",
 			},
 
