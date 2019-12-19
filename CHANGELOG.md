@@ -1,4 +1,4 @@
-## 1.1.1 (Unreleased)
+## 1.1.1 (December 19, 2019)
 ## Bug Fixes
 - bigip_ssl resources not over writing existing cert/key #218
 - Content argument of `bigip_ssl_key` should be marked sensitive #208
