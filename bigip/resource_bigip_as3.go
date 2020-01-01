@@ -164,7 +164,7 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/" 
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/"
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {
