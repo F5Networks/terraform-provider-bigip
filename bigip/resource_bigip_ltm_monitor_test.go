@@ -88,6 +88,7 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
         interval          = 5
         time_until_up     = 0
         timeout           = 16
+        database          = "postgres"
 }
 `
 
@@ -204,6 +205,7 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "interval", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "database", "postgres"),
 				),
 			},
 		},
