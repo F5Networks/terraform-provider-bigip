@@ -172,6 +172,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Optional:    true,
 				Description: "Specifies the user name if the monitored target requires authentication",
 			},
+			"database": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "",
+			},
 		},
 	}
 }
@@ -245,7 +250,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("username", m.Username)
 			d.Set("password", m.Password)
 			d.Set("name", name)
-
+			d.Set("database", m.Database)
 			return nil
 		}
 	}
@@ -301,6 +306,7 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 		Adaptive:       d.Get("adaptive").(string),
 		Username:       d.Get("username").(string),
 		Password:       d.Get("password").(string),
+		Database:       d.Get("database").(string),
 	}
 
 	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
