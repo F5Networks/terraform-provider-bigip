@@ -15,6 +15,7 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -31,9 +32,10 @@ func resourceBigipAs3() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 
 			"as3_json": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "AS3 json",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "AS3 json",
+				ValidateFunc: validation.ValidateJsonString,
 			},
 			"config_name": {
 				Type:        schema.TypeString,
