@@ -34,6 +34,18 @@ resource "bigip_ltm_monitor" "test-ftp-monitor" {
   destination   = "*:8008"
   filename      = "somefile"
 }
+
+resource "bigip_ltm_monitor" "test-postgresql-monitor" {
+  name = "/Common/test-postgresql-monitor"
+  parent = "/Common/postgresql"
+  send = "SELECT 'Test';"
+  receive = "Test"
+  interval = 5
+  timeout = 16
+  username = "abcd"
+  password = "abcd1234"
+  database = "postgres"
+}
 ```      
 
 ## Argument Reference
@@ -62,7 +74,13 @@ resource "bigip_ltm_monitor" "test-ftp-monitor" {
 
 * `time_until_up` - (Optional)
 
+* `database` - (Optional) Specifies the database in which the user is created
+
 * `destination` - (Optional) Specify an alias address for monitoring
+
+* `username` - (Optional) Specifies the user name if the monitored target requires authentication
+
+* `password` - (Optional) Specifies the password if the monitored target requires authentication 
 
 * `compatibility` -  (Optional) Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. Accepts 'enabled' or 'disabled' values, the default value is 'enabled'.
 
