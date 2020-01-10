@@ -78,6 +78,10 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 
 * `destination` - (Optional) Specify an alias address for monitoring
 
+* `username` - (Optional) Specifies the user name if the monitored target requires authentication
+
+* `password` - (Optional) Specifies the password if the monitored target requires authentication 
+
 * `compatibility` -  (Optional) Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. Accepts 'enabled' or 'disabled' values, the default value is 'enabled'.
 
 * `filename` - (Optional) Specifies the full path and file name of the file that the system attempts to download. The health check is successful if the system can download the file.
