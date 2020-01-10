@@ -175,7 +175,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"database": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "",
+				Description: "the database in which your user is created",
 			},
 		},
 	}
