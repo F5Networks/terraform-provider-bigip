@@ -164,12 +164,10 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
 
-	name := d.Get("config_name").(string)
-
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/" + name
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/"
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {
