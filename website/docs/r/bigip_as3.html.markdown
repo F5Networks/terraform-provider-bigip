@@ -16,61 +16,74 @@ This resource is helpful to configure as3 declarative JSON on BIG-IP.
 
 ```hcl
 
-resource "bigip_as3"  "as3-example" {
-     as3_json = "${file("example.json")}"
-     config_name = "sample_test"
- }
+variable "tenant_name" {
+  default = "Sample_01"
+}
+
+resource "bigip_as3" "as3-demo1" {
+  as3_json = templatefile(
+    "as3_example.tmpl",
+    {
+      tenant_name = jsonencode(var.tenant_name)
+    })
+  tenant_name = var.tenant_name
+}
 
 ```
 
 ## Argument Reference
 
 
-* `as3_json` - (Required) Name of the of the Declarative AS3 JSON file
+* `as3_json` - (Required) Path/Filename of Declarative AS3 JSON template file used with builtin ```templatefile``` function 
 
-* `config_name` - (Required) This is the arbitrary name used to set the terraform state changes for as3 resource
+* `tenant_name` - (Required) Tenant name used to set the terraform state changes for as3 resource
 
-* `example.json` - Example of AS3 Declarative JSON
+* `as3_example.tmpl` - Example template file  AS3 Declarative JSON
 
 ```hcl
-{
-   "class": "AS3",
-   "action": "deploy",
-   "persist": true,
-   "declaration": {
-      "class": "ADC",
-      "schemaVersion": "3.0.0",
-      "id": "urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d",
-      "label": "Sample 1",
-      "remark": "Simple HTTP application with RR pool",
-      "as3": {
-         "class": "Tenant",
-         "A1": {
-            "class": "Application",
-            "template": "http",
-            "serviceMain": {
-               "class": "Service_HTTP",
-               "virtualAddresses": [
-                  "10.0.1.10"
-               ],
-               "pool": "web_pool"
-            },
-            "web_pool": {
-               "class": "Pool",
-               "monitors": [
-                  "http"
-               ],
-               "members": [{
-                  "servicePort": 80,
-                  "serverAddresses": [
-                     "192.0.1.10",
-                     "192.0.1.11"
-                  ]
-               }]
-            }
+
+ {
+     "class": "AS3",
+     "action": "deploy",
+     "persist": true,
+     "declaration": {
+         "class": "ADC",
+         "schemaVersion": "3.0.0",
+         "id": "example-declaration-01",
+         "label": "Sample 1",
+         "remark": "Simple HTTP application with round robin pool",
+         ${tenant_name}: {
+             "class": "Tenant",
+             "defaultRouteDomain": 0,
+             "Application_1": {
+                 "class": "Application",
+                 "template": "http",
+             "serviceMain": {
+                 "class": "Service_HTTP",
+                 "virtualAddresses": [
+                     "10.0.2.10"
+                 ],
+                 "pool": "web_pool"
+                 },
+                 "web_pool": {
+                     "class": "Pool",
+                     "monitors": [
+                         "http"
+                     ],
+                     "members": [
+                         {
+                             "servicePort": 80,
+                             "serverAddresses": [
+                                 "192.0.1.100",
+                                 "192.0.1.110"
+                             ]
+                         }
+                     ]
+                 }
+             }
          }
-      }
-   }
-}
+     }
+ }
+
 ```
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
