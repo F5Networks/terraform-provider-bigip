@@ -37,10 +37,11 @@ func resourceBigipAs3() *schema.Resource {
 				Description:  "AS3 json",
 				ValidateFunc: validation.ValidateJsonString,
 			},
-			"config_name": {
+			"tenant_name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "unique identifier for AS3 resource",
+				ForceNew:    true,
+				Description: "Name of Tenant",
 			},
 		},
 	}
@@ -50,7 +51,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	as3_json := d.Get("as3_json").(string)
-	name := d.Get("config_name").(string)
+	name := d.Get("tenant_name").(string)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", as3_json)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -163,11 +164,12 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
+	name := d.Get("tenant_name").(string)
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/"
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/" + name
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {
