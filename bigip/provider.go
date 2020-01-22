@@ -7,9 +7,9 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"log"
 	"reflect"
 	"strings"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -173,11 +173,8 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
-			if field == "http_reply" {
-				f := val.FieldByName(strings.Title("httpReply"))
-				f.Set(reflect.ValueOf(d[field]))
-			}
-			log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
+			f := val.FieldByName(strings.Title(toCamelCase(field)))
+			f.Set(reflect.ValueOf(d[field]))
 		}
 	}
 }
@@ -189,4 +186,21 @@ func parseF5Identifier(str string) (partition, name string) {
 		return ary[0], ary[1]
 	}
 	return "", str
+}
+
+// Convert Snakecase to Camelcase
+func toCamelCase(str string) string {
+	var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
+	return link.ReplaceAllStringFunc(str, func(s string) string {
+		return strings.ToUpper(strings.Replace(s, "_", "", -1))
+	})
+}
+
+// Convert Camelcase to Snakecase
+func toSnakeCase(str string) string {
+	var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+    snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+    snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+    return strings.ToLower(snake)
 }
