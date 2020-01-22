@@ -10,8 +10,8 @@ import (
 	"log"
 
 	"fmt"
-	"sort"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/f5devcentral/go-bigip"
@@ -1283,7 +1283,7 @@ func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) ([]inte
 func interfaceToResourceData(a interface{}) map[string]interface{} {
 	obj := make(map[string]interface{})
 	v := reflect.ValueOf(a)
-	for i := 0; i< v.NumField(); i++ {
+	for i := 0; i < v.NumField(); i++ {
 		fn := toSnakeCase(v.Type().Field(i).Name)
 		if fn != "name" && fn != "generation" {
 			fv := v.Field(i).Interface()
