@@ -151,9 +151,9 @@ func dataSourceBigipAs3Adc() *schema.Resource {
 			},
 			"tenant_class_list": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				Elem: &schema.Schema{
-					Type: schema.TypeMap,
+					Type: schema.TypeString,
 				},
 			},
 			"tenant_list": {
@@ -174,14 +174,20 @@ func dataSourceBigipAs3AdcRead(d *schema.ResourceData, meta interface{}) error {
 	map1["class"] = "ADC"
 	map1["schemaVersion"] = d.Get("schema_version").(string)
 	if m, ok := d.GetOk("tenant_class_list"); ok {
-		for _, vs := range m.([]interface{}) {
-			for k, v := range vs.(map[string]interface{}) {
-				err := json.Unmarshal([]byte(v.(string)), &result)
+		for _, kv := range m.([]interface{}) {
+			err := json.Unmarshal([]byte(kv.(string)), &result)
+			if err != nil {
+				log.Printf("Json Unmarshall failed with: %v", err)
+				return err
+			}
+			var tenantResult map[string]interface{}
+			for k, v := range result {
+				err := json.Unmarshal([]byte(v.(string)), &tenantResult)
 				if err != nil {
 					log.Printf("Json Unmarshall failed with: %v", err)
 					return err
 				}
-				map1[k] = result
+				map1[k] = tenantResult
 			}
 		}
 	}

@@ -19,10 +19,10 @@ The basic resources are virtual servers, profiles, iRules, pools, pool members, 
 data "bigip_as3_app" "App1" {
   name = "App1"
   template = "https"
-  pool_class = "${data.bigip_as3_pool.mydataas3pool.result_map}"
+  pool_class = "${data.bigip_as3_pool.mydataas3pool.id}"
   service_class = "${data.bigip_as3_service.myservice.id}"
-  cert_class = "${data.bigip_as3_cert.exmpcert.result_map}"
-  tls_server_class = "${data.bigip_as3_tls_server.exmpserver.result_map}"
+  cert_class = "${data.bigip_as3_cert.exmpcert.id}"
+  tls_server_class = "${data.bigip_as3_tls_server.exmpserver.id}"
   enable = true
 }
 ```
@@ -43,10 +43,10 @@ data "bigip_as3_app" "App1" {
 
 * `servicemain`- (Optional) Primary service of the application
 
-* `pool_class` - (Optional) Pointer to the result map of pool datasource
+* `pool_class` - (Optional) Pointer to the id of pool datasource
 
 * `service_class` - (Optional) Pointer to the id of service datasource
 
-* `cert_class` - (Optional) Pointer to the result map of certificate datasource
+* `cert_class` - (Optional) Pointer to the id of certificate datasource
 
-* `tls_server_class` - (Optional) Pointer to the result map of TLS Server datasource
+* `tls_server_class` - (Optional) Pointer to the id of TLS Server datasource

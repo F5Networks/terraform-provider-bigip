@@ -16,7 +16,7 @@ description: |-
 ```hcl
 resource "bigip_as3_class" "as3-example" {
   name = "as3-example"
-  declaration="${data.bigip_as3_adc.exmpadc.result_map}"
+  declaration="${data.bigip_as3_adc.exmpadc.id}"
   tenants = ["Sample_01"]
 }
 ```
@@ -25,6 +25,6 @@ resource "bigip_as3_class" "as3-example" {
 
 * `name` - (Required) Name of the as3 class
 
-* `declaration` - (Required) Pointer to the result map of adc datasource
+* `declaration` - (Required) Pointer to the id of adc datasource
 
 * `tenants` - (Required) Specifies the list of tenants

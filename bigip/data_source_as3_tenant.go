@@ -56,12 +56,6 @@ func dataSourceBigipAs3Tenant() *schema.Resource {
 				Default:     0,
 				Description: "Name of application",
 			},
-			"tenant_map": {
-				Type:     schema.TypeMap,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
 		},
 	}
 }
@@ -98,8 +92,11 @@ func dataSourceBigipAs3TenantRead(d *schema.ResourceData, meta interface{}) erro
 	log.Printf("Tenant name:%+v", bigip.As3Tenant.TenantList)
 	resultMap := make(map[string]interface{})
 	resultMap[name] = string(out)
+	out1, err := json.Marshal(resultMap)
+	if err != nil {
+		return err
+	}
+	d.SetId(string(out1))
 	log.Printf("resultMap in Tenant Class:%v", resultMap)
-	d.Set("tenant_map", resultMap)
-	d.SetId(name)
 	return nil
 }

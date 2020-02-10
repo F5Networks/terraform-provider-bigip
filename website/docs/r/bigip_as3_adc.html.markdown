@@ -27,6 +27,6 @@ data "bigip_as3_adc" "exmpadc"{
  
 * `schema_version` - (Optional) When composing new declarations, you should use the latest schema version. This prevents inadvertently running a declaration on an outdated version of AS3 code.
  
-* `tenant_class_list` - (Optional) Pointer to the list of result maps of tenant datasources
+* `tenant_class_list` - (Optional) Pointer to the list of ids of tenant datasources
  
 * `label` - (Optional) This value can be anything less than 255 characters and simply labels the declaration.
