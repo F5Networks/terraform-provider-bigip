@@ -1,3 +1,18 @@
+# This is the As3 object model for terraform ( Another way to post As3 json to bigip ).
+# This model will construct AS3 json from the user inputs and post it to bigip
+# In this model top As3 class is defined as resource "bigip_as3_class" and rest as data sources.
+# resource "bigip_as3_class" uses data source "bigip_as3_adc" which in turn uses other data sources.
+# Below is the flow of code between data sources and resource
+# 
+# 
+# For "bigip_as3_app" http declartion, we need pool and service to attach it,hence it takes input from two data sources pool and service.
+# For "bigip_as3_app" https declartion, we need pool,service,cert,tls_server to attach it,hence it takes input from those data sources.
+# All the App declaration will be logically moved under tenant, hence "bigip_as3_tenant" will consume app data source
+# All the tenant decalaration will go under ADC class, hence "bigip_as3_adc" will consume tenant data source
+# Finally As3 class ( "bigip_as3_class" ) will be top class in AS3 declaration which will consume ADC data source.
+#
+# This is as per AS3 schema ( https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html )
+# For more info Please refer to F5 cloud docs
 provider "bigip" {
   address = "xxx.xxx.xxx.xxx"
   username = "xxxxx"
