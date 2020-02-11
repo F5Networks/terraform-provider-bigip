@@ -6,9 +6,9 @@
 # 
 # 
 # For "bigip_as3_app" declartion, we need pool and service to attach it,hence it takes input from two data sources pool and service
-# All the App declaration will be logically moved to tenant, hence "bigip_as3_tenant" will consume app data source
-# All the tenant decalaration will go under AS3 ADC class, hence "bigip_as3_adc" will consume tenant data source
-# Finally As3 class will be top class in AS3 declaration which will consume ADC data source.
+# All the App declaration will be logically moved under tenant, hence "bigip_as3_tenant" will consume app data source
+# All the tenant decalaration will go under ADC class, hence "bigip_as3_adc" will consume tenant data source
+# Finally As3 class ( "bigip_as3_class" ) will be top class in AS3 declaration which will consume ADC data source.
 #
 # This is as per AS3 schema ( https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html )
 # For more info Please refer to F5 cloud docs
