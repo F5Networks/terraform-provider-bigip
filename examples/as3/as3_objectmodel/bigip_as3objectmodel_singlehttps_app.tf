@@ -75,7 +75,7 @@ data "bigip_as3_app" "App1" {
   enable = true
 }
 data "bigip_as3_tenant" "sample"{
-  name = "xxxxxxxx"
+  name = "sample_01"
   app_class_list = ["${data.bigip_as3_app.App1.id}"]
   defaultroutedomain = 0
   enable = true
@@ -92,5 +92,5 @@ data "bigip_as3_adc" "exmpadc"{
 resource "bigip_as3_class" "as3-example" {
   name = "as3-example"
   declaration="${data.bigip_as3_adc.exmpadc.id}"
-  tenants = ["xxxxxxx"]
+  tenants = ["sample_01"]
 }
