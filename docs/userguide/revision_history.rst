@@ -11,6 +11,10 @@ Document Revision History
         - Description
         - Date
         
+      * - 1.1  
+        - Updated the documentation with the following changes: |br| • Added information about AS3 integration
+        - 02-14-20 
+
       * - 1.0  
         - Initial release of Terraform documentation
         - 10-02-19 
