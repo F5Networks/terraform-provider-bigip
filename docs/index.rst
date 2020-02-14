@@ -38,6 +38,7 @@ User Guide Index
    /userguide/installing
    /userguide/configuring
    /userguide/modifying
+   /userguide/as3-integration
    /userguide/support
    /userguide/revision_history
 
