@@ -17,7 +17,7 @@ description: |-
 data "bigip_as3_adc" "exmpadc"{
   name = "exmpadc"
   label = "your label goes here"
-  tenant_class_list = ["${data.bigip_as3_tenant.sample.id}"]
+  tenant_class_list = ["${data.bigip_as3_tenant.sample.tenant_map}"]
 }
 ```
  
