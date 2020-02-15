@@ -522,32 +522,48 @@ func (b *BigIP) CreateProvision(name string, fullPath string, cpuRatio int, disk
 		Level:       level,
 		MemoryRatio: memoryRatio,
 	}
-	if fullPath == "/Common/asm" {
+	if name == "asm" {
 		return b.put(config, uriSys, uriProvision, uriAsm)
 	}
-	if fullPath == "/Common/afm" {
+	if name == "afm" {
 		return b.put(config, uriSys, uriProvision, uriAfm)
-
 	}
-	if fullPath == "/Common/gtm" {
+	if name == "gtm" {
 		return b.put(config, uriSys, uriProvision, uriGtm)
 	}
-
-	if fullPath == "/Common/apm" {
+	if name == "apm" {
 		return b.put(config, uriSys, uriProvision, uriApm)
 	}
-
-	if fullPath == "/Common/avr" {
+	if name == "avr" {
 		return b.put(config, uriSys, uriProvision, uriAvr)
 	}
-	if fullPath == "/Common/ilx" {
+	if name == "ilx" {
 		return b.put(config, uriSys, uriProvision, uriIlx)
 	}
 	return nil
 }
 
-func (b *BigIP) ModifyProvision(config *Provision) error {
-	return b.put(config, uriSys, uriProvision, uriAfm)
+func (b *BigIP) ProvisionModule(config *Provision) error {
+	log.Printf(" Module Provision:%v", config)
+	if config.Name == "asm" {
+		return b.put(config, uriSys, uriProvision, uriAsm)
+	}
+	if config.Name == "afm" {
+		return b.put(config, uriSys, uriProvision, uriAfm)
+	}
+	if config.Name == "gtm" {
+		return b.put(config, uriSys, uriProvision, uriGtm)
+	}
+	if config.Name == "apm" {
+		return b.put(config, uriSys, uriProvision, uriApm)
+	}
+	if config.Name == "avr" {
+		return b.put(config, uriSys, uriProvision, uriAvr)
+	}
+	if config.Name == "ilx" {
+		return b.put(config, uriSys, uriProvision, uriIlx)
+	}
+	return nil
 }
 
 func (b *BigIP) DeleteProvision(name string) error {

@@ -86,7 +86,7 @@ func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *
 	} else {
 		url = host
 	}
-	if port != ""{
+	if port != "" {
 		url = url + ":" + port
 	}
 	if configOptions == nil {
