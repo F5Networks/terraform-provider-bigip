@@ -58,15 +58,6 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", nil),
 			},
 		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"bigip_as3_pool":       dataSourceBigipAs3Pool(),
-			"bigip_as3_service":    dataSourceBigipAs3Service(),
-			"bigip_as3_app":        dataSourceBigipAs3App(),
-			"bigip_as3_tenant":     dataSourceBigipAs3Tenant(),
-			"bigip_as3_adc":        dataSourceBigipAs3Adc(),
-			"bigip_as3_cert":       dataSourceBigipAs3Certificate(),
-			"bigip_as3_tls_server": dataSourceBigipAs3TlsServer(),
-		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -109,7 +100,6 @@ func Provider() terraform.ResourceProvider {
 			"bigip_do":                              resourceBigipDo(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
-			"bigip_as3_class":                       resourceBigipAs3Class(),
 		},
 
 		ConfigureFunc: providerConfigure,
