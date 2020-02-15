@@ -5,7 +5,7 @@
 # Below is the flow of code between data sources and resource
 # 
 # 
-# For "bigip_as3_app" https declartion, we need pool,service,cert,tls_server to attach it,hence it takes input from those data sources.
+# For "bigip_as3_app" declartion for https, we need pool,service,cert,tls_server to attach it,hence it takes input from those data sources.
 # All the App declaration will be logically moved under tenant, hence "bigip_as3_tenant" will consume app data source
 # All the tenant decalaration will go under ADC class, hence "bigip_as3_adc" will consume tenant data source
 # Finally As3 class ( "bigip_as3_class" ) will be top class in AS3 declaration which will consume ADC data source.
