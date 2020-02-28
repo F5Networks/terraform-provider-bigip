@@ -19,6 +19,32 @@ type Datacenters struct {
 	Datacenters []Datacenter `json:"items"`
 }
 
+
+type GTMWideIP struct {
+	Name                              string `json:"name,omitempty"`
+	Partition                         string `json:"partition,omitempty"`
+	FullPath                          string `json:"fullPath,omitempty"`
+	Generation                        int    `json:"generation,omitempty"`
+	AppService                        string `json:"appService,omitempty"`
+	Description                       string `json:"description,omitempty"`
+	Disabled                          bool   `json:"disabled,omitempty"`
+	Enabled                           bool   `json:"enabled,omitempty"`
+	FailureRcode                      string `json:"failureRcode,omitempty"`
+	FailureRcodeResponse              string `json:"failureRcodeResponse,omitempty"`
+	FailureRcodeTTL                   int    `json:"failureRcodeTtl,omitempty"`
+	LastResortPool                    string `json:"lastResortPool,omitempty"`
+	LoadBalancingDecisionLogVerbosity string `json:"loadBalancingDecisionLogVerbosity,omitempty"`
+	MinimalResponse                   string `json:"minimalResponse,omitempty"`
+	PersistCidrIpv4                   int    `json:"persistCidrIpv4,omitempty"`
+	PersistCidrIpv6                   int    `json:"persistCidrIpv6,omitempty"`
+	Persistence                       string `json:"persistence,omitempty"`
+	PoolLbMode                        string `json:"poolLbMode,omitempty"`
+	TTLPersistence                    int    `json:"ttlPersistence,omitempty"`
+
+	// Not in the spec, but returned by the API
+	// Setting this field atomically updates all members.
+	//Pools *[]GTMWideIPPool `json:"pools,omitempty"`
+}
 type Datacenter struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -144,6 +170,7 @@ const (
 	uriGtmmonitor = "monitor"
 	uriHttp       = "http"
 	uriPool_a     = "pool/a"
+        uriWideIp           = "wideip"
 )
 
 func (b *BigIP) Datacenters() (*Datacenter, error) {
@@ -264,4 +291,10 @@ func (b *BigIP) Pool_as() (*Pool_a, error) {
 	}
 
 	return &pool_a, nil
+}
+func (b *BigIP) AddGTMWideIP(name string, recordType string) error {
+        config := &GTMWideIP{
+		Name: name,
+	}
+	return b.post(config, uriGtm, uriWideIp, recordType)
 }
