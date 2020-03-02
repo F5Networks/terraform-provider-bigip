@@ -2,9 +2,9 @@ package bigip
 
 import (
 	"fmt"
-//	"log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
 )
 
 func resourceBigipGtmWideip() *schema.Resource {
@@ -13,30 +13,30 @@ func resourceBigipGtmWideip() *schema.Resource {
 		Read:   resourceBigipGtmWideipRead,
 		Update: resourceBigipGtmWideipUpdate,
 		Delete: resourceBigipGtmWideipDelete,
-//		Exists: resourceBigipGtmWideipExists,
+		//		Exists: resourceBigipGtmWideipExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the Wideip",
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the Wideip",
 			},
-                        "type": {
-                                Type:        schema.TypeString,
-                                Required:    true,
-                        },
+			"type": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
 
 			"partition": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 
 			"full_path": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"app_service": {
 				Type:     schema.TypeString,
@@ -44,38 +44,54 @@ func resourceBigipGtmWideip() *schema.Resource {
 			},
 
 			"description": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 
 			"generation": {
-				Type:        schema.TypeInt,
-				Optional:    true,
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
-
 		},
 	}
 }
 func resourceBigipGtmWideipCreate(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
 	d.SetId(name)
-        gtmtype := d.Get("type").(string)
-        err := client.AddGTMWideIP(name,gtmtype)
-        if err != nil {
+	gtmtype := d.Get("type").(string)
+	err := client.AddGTMWideIP(name, gtmtype)
+	if err != nil {
 		return fmt.Errorf("Error creating wideip (%s): %s", name, err)
 	}
-        return nil
+        err = resourceBigipGtmWideipUpdate(d, meta)
+	if err != nil {
+		client.DeleteGTMWideIP(name, gtmtype)
+		return err
+	}
+
+	return resourceBigipGtmWideipRead(d, meta)
 }
 
 func resourceBigipGtmWideipRead(d *schema.ResourceData, meta interface{}) error {
- return nil
+	return nil
 }
 
 func resourceBigipGtmWideipUpdate(d *schema.ResourceData, meta interface{}) error {
-  return nil
+	return nil
 }
 func resourceBigipGtmWideipDelete(d *schema.ResourceData, meta interface{}) error {
-  return nil
+	client := meta.(*bigip.BigIP)
+	gtmtype := d.Get("type").(string)
+	name := d.Id()
+	log.Println("[INFO] Deleting wideip " + name)
+	err := client.DeleteGTMWideIP(name, gtmtype)
+
+	if err != nil {
+		log.Printf("[ERROR] Unable to Delete wideip %s  %v : ", name, err)
+		return err
+	}
+	d.SetId("")
+	return nil
 }
