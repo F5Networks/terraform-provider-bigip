@@ -302,3 +302,6 @@ func (b *BigIP) AddGTMWideIP(name string, recordType string) error {
 func (b *BigIP) DeleteGTMWideIP(fullPath string, recordType string) error {
 	return b.delete(uriGtm, uriWideIp, recordType, fullPath)
 }
+func (b *BigIP) ModifyGTMWideIP(fullPath string, config *GTMWideIP, recordType string) error {
+	return b.put(config, uriGtm, uriWideIp, recordType, fullPath)
+}
