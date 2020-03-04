@@ -52,59 +52,59 @@ func resourceBigipGtmWideip() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-                        "disabled": {
-                                Type:     schema.TypeBool,
-                                Optional: true,
-                        },
-                        "enabled": {       
-                                Type:     schema.TypeBool,
-                                Optional: true,
-                        },
-                        "failure_rcode": {
-                                Type:     schema.TypeString,
+			"disabled": {
+				Type:     schema.TypeBool,
 				Optional: true,
-                        },
-                        "failure_rcode_ttl": {
-                                Type:     schema.TypeInt,
+			},
+			"enabled": {
+				Type:     schema.TypeBool,
 				Optional: true,
-                        },
-                        "failure_rcode_response": {
-                                Type:     schema.TypeString,
+			},
+			"failure_rcode": {
+				Type:     schema.TypeString,
 				Optional: true,
-                        },
-                        "last_resort_pool": {
-                                Type:     schema.TypeString,
+			},
+			"failure_rcode_ttl": {
+				Type:     schema.TypeInt,
 				Optional: true,
-                        },
-                        "minimal_response": {
-                                Type:     schema.TypeString,
+			},
+			"failure_rcode_response": {
+				Type:     schema.TypeString,
 				Optional: true,
-                        },
-                        "persistence": {
-                                Type:     schema.TypeString,
- 				Optional: true,
-                        },
-                        "pool_lb_mode": {
-                                Type:     schema.TypeString,
+			},
+			"last_resort_pool": {
+				Type:     schema.TypeString,
 				Optional: true,
-                        },
-                        "persist_cidr_ipv4": {
-                                Type:     schema.TypeInt,
-                                Optional: true,
-                        },
-                        "persist_cidr_ipv6": {
-                                Type:     schema.TypeInt,
-                                Optional: true,
-                        },
-                        "ttl_persistence": {
-                                Type:     schema.TypeInt,
-                                Optional: true,
-                        },
+			},
+			"minimal_response": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"persistence": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"pool_lb_mode": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"persist_cidr_ipv4": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"persist_cidr_ipv6": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"ttl_persistence": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
 func resourceBigipGtmWideipCreate(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
+	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
 	d.SetId(name)
@@ -117,14 +117,43 @@ func resourceBigipGtmWideipCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceBigipGtmWideipRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	recordtype := d.Get("type").(string)
+
+	log.Printf("[INFO] Fetching Wideip " + name)
+	wideip, err := client.GetGTMWideIP(name, recordtype)
+	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve wideip %s  %v :", name, err)
+		return err
+	}
+	if wideip == nil {
+		log.Printf("[WARN] wideip (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	d.Set("name", name)
+	d.Set("fullPath", wideip.FullPath)
+	d.Set("generation", wideip.Generation)
+	d.Set("enabled", wideip.Enabled)
+	d.Set("failureRcode", wideip.FailureRcode)
+	d.Set("failureRcodeResponse", wideip.FailureRcodeResponse)
+	d.Set("failureRcodeTtl", wideip.FailureRcodeTTL)
+	d.Set("lastResortPool", wideip.LastResortPool)
+	d.Set("minimalResponse", wideip.MinimalResponse)
+	d.Set("persistCidrIpv4", wideip.PersistCidrIpv4)
+	d.Set("persistCidrIpv6", wideip.PersistCidrIpv6)
+	d.Set("persistence", wideip.Persistence)
+	d.Set("poolLbMode", wideip.PoolLbMode)
+	d.Set("ttlPersistence", wideip.TTLPersistence)
 	return nil
 }
 
 func resourceBigipGtmWideipUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-        fullpath := d.Get("full_path").(string)
-        gtmtype := d.Get("type").(string)
+	fullpath := d.Get("full_path").(string)
+	gtmtype := d.Get("type").(string)
 	gtmwideip := &bigip.GTMWideIP{
 		FullPath:             d.Get("full_path").(string),
 		Generation:           d.Get("generation").(int),
@@ -146,9 +175,9 @@ func resourceBigipGtmWideipUpdate(d *schema.ResourceData, meta interface{}) erro
 	}
 	err := client.ModifyGTMWideIP(fullpath, gtmwideip, gtmtype)
 	if err != nil {
-			log.Printf("[ERROR] Unable to Modify WideIp   (%s) (%v) ", name, err)
-			return err
-		}
+		log.Printf("[ERROR] Unable to Modify WideIp   (%s) (%v) ", name, err)
+		return err
+	}
 
 	return resourceBigipGtmWideipRead(d, meta)
 }
