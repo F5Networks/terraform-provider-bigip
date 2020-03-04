@@ -305,3 +305,17 @@ func (b *BigIP) DeleteGTMWideIP(fullPath string, recordType string) error {
 func (b *BigIP) ModifyGTMWideIP(fullPath string, config *GTMWideIP, recordType string) error {
 	return b.put(config, uriGtm, uriWideIp, recordType, fullPath)
 }
+
+// GetGTMWideIP get's a WideIP by name
+func (b *BigIP) GetGTMWideIP(name string, recordType string) (*GTMWideIP, error) {
+       var w GTMWideIP
+
+       err, ok := b.getForEntity(&w, uriGtm, uriWideIp, string(recordType), name)
+       if err != nil {
+               return nil, err
+       }
+       if !ok {
+               return nil, nil
+       }
+       return &w, nil
+}
