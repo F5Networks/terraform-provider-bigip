@@ -114,5 +114,16 @@ func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceBigipfasthttpDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	tenantName := d.Get("tenant_name").(string)
+	applicationName := d.Get("application_name").(string)
+	log.Println("[INFO] Deleting fast template application in tenant %s %s ", tenantName, applicationName)
+
+	err := client.DeleteFastTemplate(tenantName, applicationName)
+	if err != nil {
+		log.Printf("[ERROR] Unable to delete fast template application (%s) (%v) ", applicationName, err)
+		return err
+	}
+	d.SetId("")
 	return nil
 }
