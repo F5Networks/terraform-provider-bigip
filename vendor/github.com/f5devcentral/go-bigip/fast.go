@@ -33,4 +33,4 @@ func (b *BigIP) CreateFastTemplate(template *Fasttemplate) error {
 	 return b.post(template, uriMgmt, uriShared, uriFast, uriApplications) }
 
 func (b *BigIP) DeleteFastTemplate(tenantName string, applicationName string) error {
-         return b.post(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName ) }
+         return b.delete(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName ) }

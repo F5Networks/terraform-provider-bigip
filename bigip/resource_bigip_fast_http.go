@@ -68,7 +68,6 @@ func resourceBigipfasthttp() *schema.Resource {
 
 func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
 	tenantName := d.Get("tenant_name").(string)
 	applicationName := d.Get("application_name").(string)
@@ -82,7 +81,6 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 	log.Println("[INFO] Creating fast template")
-	//var temParameters *bigip.fastParameters
 	temParameters := bigip.FastParameters{
 		TenantName:      tenantName,
 		ApplicationName: applicationName,
@@ -101,11 +99,15 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
-	d.SetId(name)
-	return nil
+	d.SetId(tenantName)
+	return resourceBigipfasthttpRead(d, meta)
+	//return nil
 }
 
 func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
+	//client := meta.(*bigip.BigIP)
+	name := d.Id()
+	log.Println("[INFO] Fetching node " + name)
 	return nil
 }
 
