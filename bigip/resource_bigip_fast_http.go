@@ -112,7 +112,7 @@ func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	return resourceBigipfasthttpCreate(d, meta)
 }
 
 func resourceBigipfasthttpDelete(d *schema.ResourceData, meta interface{}) error {
