@@ -10,17 +10,18 @@ See the License for the specific language governing permissions and limitations 
 */
 package bigip
 
-
-type fasthttp struct {
-        Name                      string `json:"name,omitempty"`
-        Parameters struct {
+type FastParameters struct {
                 TenantName               string `json:"tenant_name,omitempty"`
                 ApplicationName          string `json:"application_name,omitempty"`
                 VirtualPort              int `json:"virtual_port,omitempty"`
                 VirtualAddress            string `json:"virtual_address,omitempty"`
                 ServerPort                int   `json:"server_port,omitempty"`
                 ServerAddresses          []string `json:"server_addresses,omitempty"`
-        } `json:"Parameters,omitempty"`
+}
+
+type Fasttemplate struct {
+        Name                      string `json:"name,omitempty"`
+        Parameters                FastParameters `json:"parameters,omitempty"`
 }
 
 const (
@@ -28,5 +29,5 @@ const (
         uriApplications   = "applications"
 )
 
-func (b *BigIP) CreateFastTemplate(template *fasthttp) error {
+func (b *BigIP) CreateFastTemplate(template *Fasttemplate) error {
 	 return b.post(template, uriMgmt, uriShared, uriFast, uriApplications) }

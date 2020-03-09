@@ -8,10 +8,9 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
 )
 
 func resourceBigipfasthttp() *schema.Resource {
@@ -26,16 +25,16 @@ func resourceBigipfasthttp() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the template",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the template",
+				//ValidateFunc: validateF5Name,
 			},
-                        "tenant_name": {
-                                Type:        schema.TypeString,
-                                Required:    true,
-                                Description: "Name of the tenant",
-                        },
+			"tenant_name": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the tenant",
+			},
 			"application_name": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -57,11 +56,11 @@ func resourceBigipfasthttp() *schema.Resource {
 				Description: "Specifies server port ",
 			},
 			"server_addresses": {
-				Type:        schema.TypeList,
-				Required:    true,
+				Type:     schema.TypeList,
+				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
-					},
+				},
 			},
 		},
 	}
@@ -71,42 +70,44 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	tenant_name := d.Get("tenant_name").(string)
-	application_name := d.Get("address").(string)
-	virtual_port := d.Get("virtual_port").(int)
-	virtual_address := d.Get("virtual_address").(string)
-	server_port := d.Get("server_port").(int)
-	server_addresses:= d.Get("server_addresses").(string)
-
+	tenantName := d.Get("tenant_name").(string)
+	applicationName := d.Get("application_name").(string)
+	virtualPort := d.Get("virtual_port").(int)
+	virtualAddress := d.Get("virtual_address").(string)
+	serverPort := d.Get("server_port").(int)
+	var serverAddresses []string
+	if m, ok := d.GetOk("server_addresses"); ok {
+		for _, serverAddress := range m.([]interface{}) {
+			serverAddresses = append(serverAddresses, serverAddress.(string))
+		}
+	}
 	log.Println("[INFO] Creating fast template")
-      
-        var template *bigip.fathttp
-        template = &bigip.fasthttp{
-                Name:               name,
-		Parameters struct {
-                TenantName               string `json:"tenant_name,omitempty"`
-                ApplicationName          string `json:"application_name,omitempty"`
-                VirtualPort              int `json:"virtual_port,omitempty"`
-                VirtualAddress            string `json:"virtual_address,omitempty"`
-                ServerPort                int   `json:"server_port,omitempty"`
-                ServerAddresses          []string `json:"server_addresses,omitempty"`
-        } 
+	//var temParameters *bigip.fastParameters
+	temParameters := bigip.FastParameters{
+		TenantName:      tenantName,
+		ApplicationName: applicationName,
+		VirtualPort:     virtualPort,
+		VirtualAddress:  virtualAddress,
+		ServerPort:      serverPort,
+		ServerAddresses: serverAddresses,
+	}
+	template := &bigip.Fasttemplate{
+		Name:       name,
+		Parameters: temParameters,
+	}
 
-	err = client.CreateFastTemplate(template)
-
+	log.Printf("[INFO] Template Before Post Call:%+v", template)
+	err := client.CreateFastTemplate(template)
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
-
 	d.SetId(name)
-
 	return nil
 }
 
 func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
-
 
 func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
 	return nil

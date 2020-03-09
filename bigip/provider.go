@@ -100,7 +100,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_do":                              resourceBigipDo(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
-			"bigip_fast":				 resourceBigipfasthttp(),
+			"bigip_fast":                            resourceBigipfasthttp(),
 		},
 
 		ConfigureFunc: providerConfigure,
