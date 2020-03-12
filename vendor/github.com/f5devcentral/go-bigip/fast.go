@@ -29,9 +29,11 @@ type Fasttemplate struct {
 const (
 	uriFast         = "fast"
 	uriApplications = "applications"
+	uriTasks        = "tasks"
 )
 
 func (b *BigIP) CreateFastTemplate(template *Fasttemplate) error {
+	//b.getfastTask()
 	return b.post(template, uriMgmt, uriShared, uriFast, uriApplications)
 }
 
@@ -68,5 +70,16 @@ func maptoStruct(body interface{}) (*FastParameters, error) {
 		return nil, err
 	}
 	return &fastData, nil
+
+}
+
+func (b *BigIP) getfastTask() error {
+
+	//b.getForEntity(&fastAppResult, uriMgmt, uriShared, uriFast, uriTasks)
+	//jsonbody, err := jsonMarshal(body)
+	//if err != nil {
+	//      return nil, err
+	//}
+	return nil
 
 }

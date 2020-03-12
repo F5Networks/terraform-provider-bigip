@@ -99,7 +99,7 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
-	d.SetId(tenantName)
+	d.SetId(name)
 	time.Sleep(5 * time.Second)
 	return resourceBigipfasthttpRead(d, meta)
 	//return nil
