@@ -96,6 +96,7 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	resp, err := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
+	d.Set("as3_json", bodyString)
 	if resp.Status != "200 OK" || err != nil {
 		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/fetching http request :%s  %v", bodyString, err)
