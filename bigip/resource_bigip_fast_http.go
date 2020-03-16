@@ -10,7 +10,7 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
-	"time"
+	//"time"
 )
 
 func resourceBigipfasthttp() *schema.Resource {
@@ -80,7 +80,7 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 			serverAddresses = append(serverAddresses, serverAddress.(string))
 		}
 	}
-	log.Println("[INFO] Creating FAST template")
+	log.Println("[INFO] Creating Application through FAST template")
 	temParameters := &bigip.FastParameters{
 		TenantName:      tenantName,
 		ApplicationName: applicationName,
@@ -93,16 +93,12 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 		Name:       name,
 		Parameters: temParameters,
 	}
-
-	log.Printf("[INFO] Template Before Create Call:%+v", template)
 	err := client.CreateFastTemplate(template)
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
 	d.SetId(name)
-	time.Sleep(5 * time.Second)
 	return resourceBigipfasthttpRead(d, meta)
-	//return nil
 }
 
 func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
@@ -145,7 +141,7 @@ func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Println("Updating FastTemplate")
+	log.Println("Updating Application through Fast Template")
 	//name := d.Get("name").(string)
 	tenantName := d.Get("tenant_name").(string)
 	applicationName := d.Get("application_name").(string)
@@ -170,12 +166,10 @@ func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error
 		Name:       name,
 		Parameters: temParameters,
 	}
-	log.Printf("[INFO] Template Before Update Call:%+v", template)
 	err := client.CreateFastTemplate(template)
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
-	time.Sleep(5 * time.Second)
 	return resourceBigipfasthttpRead(d, meta)
 }
 

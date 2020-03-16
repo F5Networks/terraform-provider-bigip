@@ -86,7 +86,7 @@ func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *
 	} else {
 		url = host
 	}
-	if port != ""{
+	if port != "" {
 		url = url + ":" + port
 	}
 	if configOptions == nil {
@@ -237,6 +237,17 @@ func (b *BigIP) delete(path ...string) error {
 	return callErr
 }
 
+//Generic delete
+func (b *BigIP) fastDelete(path ...string) ([]byte, error) {
+	req := &APIRequest{
+		Method: "delete",
+		URL:    b.iControlPath(path),
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -252,6 +263,23 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) fastPost(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 func (b *BigIP) put(body interface{}, path ...string) error {
