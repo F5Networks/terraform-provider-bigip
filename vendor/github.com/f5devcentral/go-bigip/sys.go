@@ -15,6 +15,28 @@ import (
 	"log"
 )
 
+type Version struct {
+	Kind     string `json:"kind,omitempty"`
+	SelfLink string `json:"selfLink,omitempty"`
+	Entries  struct {
+		HTTPSLocalhostMgmtTmCliVersion0 struct {
+			NestedStats struct {
+				Entries struct {
+					Active struct {
+						Description string `json:"description"`
+					} `json:"active,omitempty"`
+					Latest struct {
+						Description string `json:"description"`
+					} `json:"latest,omitempty"`
+					Supported struct {
+						Description string `json:"description"`
+					} `json:"supported,omitempty"`
+				} `json:"entries,omitempty"`
+			} `json:"nestedStats,omitempty"`
+		} `json:"https://localhost/mgmt/tm/cli/version/0,omitempty"`
+	} `json:"entries,omitempty"`
+}
+
 type NTPs struct {
 	NTPs []NTP `json:"items"`
 }
@@ -214,6 +236,9 @@ func (p *LogPublisher) UnmarshalJSON(b []byte) error {
 
 const (
 	uriSys             = "sys"
+        uriTm              = "tm"
+        uriCli             = "cli"
+	uriVersion         = "version"
 	uriNtp             = "ntp"
 	uriDNS             = "dns"
 	uriProvision       = "provision"
@@ -485,6 +510,16 @@ func (b *BigIP) NTPs() (*NTP, error) {
 		return nil, err
 	}
 	return &ntp, nil
+}
+
+func (b *BigIP) BigipVersion() (*Version, error) {
+        var  bigipversion Version
+        err, _ := b.getForEntity(&bigipversion, uriMgmt, uriTm, uriCli, uriVersion)
+
+        if err != nil {
+                return nil, err
+        }
+        return &bigipversion, nil
 }
 
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {

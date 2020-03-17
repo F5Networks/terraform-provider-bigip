@@ -2057,14 +2057,11 @@ func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
 }
 
-// Modify a named internal data group, REPLACING all the records
-func (b *BigIP) ModifyInternalDataGroupRecords(name, dgtype string, records []DataGroupRecord) error {
-	config := &DataGroup{
-		Records: records,
-		Type:    dgtype,
-	}
-	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
+func (b *BigIP) ModifyInternalDataGroupRecords(config *DataGroup) error {
+	return b.put(config, uriLtm, uriDatagroup, uriInternal, config.Name)
+
 }
+
 
 // Get an internal data group by name, returns nil if the data group does not exist
 func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
