@@ -15,6 +15,7 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -31,14 +32,16 @@ func resourceBigipAs3() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 
 			"as3_json": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "AS3 json",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "AS3 json",
+				ValidateFunc: validation.ValidateJsonString,
 			},
 			"config_name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "unique identifier for AS3 resource",
+				ForceNew:    true,
+				Description: "Name of Tenant",
 			},
 		},
 	}
@@ -93,6 +96,7 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	resp, err := client.Do(req)
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
+	d.Set("as3_json", bodyString)
 	if resp.Status != "200 OK" || err != nil {
 		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/fetching http request :%s  %v", bodyString, err)
@@ -161,10 +165,12 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
+	name := d.Get("tenant_name").(string)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/"
+	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare/" + name
 	req, err := http.NewRequest("DELETE", url, nil)
 
 	if err != nil {

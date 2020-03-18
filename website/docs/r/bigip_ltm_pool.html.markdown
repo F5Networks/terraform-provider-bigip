@@ -21,7 +21,7 @@ resource "bigip_ltm_pool" "pool" {
   name                = "/Common/terraform-pool"
   load_balancing_mode = "round-robin"
   description         = "Test-Pool"
-  monitors            = ["${bigip_ltm_monitor.monitor.name}", "${bigip_ltm_monitor.monitor2.name}"]
+  monitors            = [bigip_ltm_monitor.monitor.name, bigip_ltm_monitor.monitor2.name]
   allow_snat          = "yes"
   allow_nat           = "yes"
 }

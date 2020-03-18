@@ -14,19 +14,17 @@ Configures a cookie persistence profile
 
 ```
 resource "bigip_ltm_persistence_profile_dstaddr" "dstaddr" {
-    name = "/Common/terraform_ppdstaddr"
-    defaults_from = "/Common/dest_addr"
-	match_across_pools = "enabled"
-	match_across_services = "enabled"
-	match_across_virtuals = "enabled"
-	mirror = "enabled"
-	timeout = 3600
-	override_conn_limit = "enabled"
-	hash_algorithm = "carp"
-	mask = "255.255.255.255"
-
+  name                  = "/Common/terraform_ppdstaddr"
+  defaults_from         = "/Common/dest_addr"
+  match_across_pools    = "enabled"
+  match_across_services = "enabled"
+  match_across_virtuals = "enabled"
+  mirror                = "enabled"
+  timeout               = 3600
+  override_conn_limit   = "enabled"
+  hash_algorithm        = "carp"
+  mask                  = "255.255.255.255"
 }
-
 
 ```
 

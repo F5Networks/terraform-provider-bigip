@@ -21,8 +21,7 @@ resource "bigip_net_selfip" "selfip1" {
   ip            = "11.1.1.1/24"
   vlan          = "/Common/internal"
   traffic_group = "traffic-group-1"
-
-  depends_on = ["bigip_net_vlan.vlan1"]
+  depends_on = [bigip_net_vlan.vlan1]
 }
 ```      
 

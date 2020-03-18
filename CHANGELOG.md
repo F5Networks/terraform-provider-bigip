@@ -1,4 +1,19 @@
+<<<<<<< HEAD
 ## 1.1.1 (Unreleased)
+=======
+## 1.1.2 (Unreleased)
+## 1.1.1 (December 19, 2019)
+## Bug Fixes
+- bigip_ssl resources not over writing existing cert/key #218
+- Content argument of `bigip_ssl_key` should be marked sensitive #208
+- Pool attachment docs is not updated upto date #207
+- Bigip provider - add a parameter to specify the mgmt port #23
+- AS3 module - tenant_name usage #24
+- [doc] DO module - mistake in documentation #25
+- creating Client SSL Profile with non-default partition Failed using terraform #27
+- creating Server SSL Profile with non-default partition Failed using terraform #28
+
+>>>>>>> 310652bca898fa14826f9e25ec19644da15bea41
 ## 1.1.0 (November 22, 2019)
 
 ## Added Functionalities

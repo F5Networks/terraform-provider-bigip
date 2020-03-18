@@ -17,13 +17,20 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
-resource "bigip_ltm_snat" "snat3" {
-  // this is using snatpool translation is not required
-  name = "snat3"
-  origins = ["6.1.6.6"]
-  mirror = "false"
-  snatpool = "/Common/sanjaysnatpool"
-  vlans = ["test-vlan"]
+resource "bigip_ltm_snat" "test-snat" {
+  name        = "TEST_SNAT_NAME"
+  translation = "/Common/136.1.1.1"
+  origins {
+    name = "2.2.2.2"
+  }
+  origins {
+    name = "3.3.3.3"
+  }
+  vlansdisabled = true
+  autolasthop   = "default"
+  mirror        = "disabled"
+  partition     = "Common"
+  full_path     = "/Common/test-snat"
 }
 
 ```      

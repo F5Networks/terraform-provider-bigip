@@ -5,7 +5,6 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
-	"strings"
 )
 
 func resourceBigipSslKey() *schema.Resource {
@@ -35,10 +34,11 @@ func resourceBigipSslKey() *schema.Resource {
 			},
 
 			"partition": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "Common",
-				Description: "Partition of ssl certificate key",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "Common",
+				Description:  "Partition of ssl certificate key",
+				ValidateFunc: validatePartitionName,
 			},
 		},
 	}
@@ -50,9 +50,9 @@ func resourceBigipSslKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Certificate Key Name " + name)
 	certpath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
-	if !strings.HasSuffix(name, ".key") {
+	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
-	}
+	}*/
 	err := client.UploadKey(name, certpath, partition)
 	if err != nil {
 		return fmt.Errorf("Error in Importing certificate key (%s): %s", name, err)
@@ -66,13 +66,15 @@ func resourceBigipSslKeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Reading Certificate key: " + name)
-	if !strings.HasSuffix(name, ".key") {
+	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
-	}
+	}*/
 	partition := d.Get("partition").(string)
-	name = "~" + partition + "~" + name
+	name = "/" + partition + "/" + name
 	certkey, err := client.GetKey(name)
 	log.Printf("[INFO] SSL key content:%+v", certkey)
+	d.Set("name", certkey.Name)
+	d.Set("partition", certkey.Partition)
 	if err != nil {
 		return err
 	}
@@ -83,11 +85,11 @@ func resourceBigipSslKeyExists(d *schema.ResourceData, meta interface{}) (bool, 
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Checking certificate key" + name + " exists.")
-	if !strings.HasSuffix(name, ".key") {
+	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
-	}
+	}*/
 	partition := d.Get("partition").(string)
-	name = "~" + partition + "~" + name
+	name = "/" + partition + "/" + name
 	certkey, err := client.GetKey(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve certificate key (%s) (%v) ", name, err)
@@ -107,9 +109,9 @@ func resourceBigipSslKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	log.Println("[INFO] Certificate key Name " + name)
 	certpath := d.Get("content").(string)
-	if !strings.HasSuffix(name, ".key") {
+	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
-	}
+	}*/
 	partition := d.Get("partition").(string)
 	err := client.UpdateKey(name, certpath, partition)
 	if err != nil {
@@ -123,11 +125,11 @@ func resourceBigipSslKeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Deleting Certificate key" + name)
-	if !strings.HasSuffix(name, ".key") {
+	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
-	}
+	}*/
 	partition := d.Get("partition").(string)
-	name = "~" + partition + "~" + name
+	name = "/" + partition + "/" + name
 	err := client.DeleteKey(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Pool   (%s) (%v) ", name, err)

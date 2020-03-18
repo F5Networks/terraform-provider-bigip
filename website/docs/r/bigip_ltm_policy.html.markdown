@@ -17,6 +17,7 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
+
 resource "bigip_ltm_policy" "test-policy" {
   name           = "my_policy"
   strategy       = "first-match"
@@ -26,13 +27,13 @@ resource "bigip_ltm_policy" "test-policy" {
   rule {
     name = "rule6"
 
-    action = {
+    action {
       tm_name = "20"
       forward = true
       pool    = "/Common/mypool"
     }
   }
-  depends_on = ["bigip_ltm_pool.mypool"]
+  depends_on = [bigip_ltm_pool.mypool]
 }
 ```      
 
