@@ -11,7 +11,7 @@ description: |-
 `bigip_as3` provides details about bigip as3 resource
 
 This resource is helpful to configure as3 declarative JSON on BIG-IP.
-## Example Usage
+## Example Usage for template file
 
 
 ```hcl
@@ -30,11 +30,22 @@ resource "bigip_as3" "as3-demo1" {
 }
 
 ```
+## Example Usage for json file
+
+
+```hcl
+
+resource "bigip_as3"  "as3-example1" {
+       as3_json = "${file("example1.json")}"
+       tenant_name = "Sample_01"
+ }
+
+```
 
 ## Argument Reference
 
 
-* `as3_json` - (Required) Path/Filename of Declarative AS3 JSON template file used with builtin ```templatefile``` function 
+* `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which can be a template file used with builtin ```templatefile``` function or a json file
 
 * `tenant_name` - (Required) Tenant name used to set the terraform state changes for as3 resource
 
@@ -86,4 +97,54 @@ resource "bigip_as3" "as3-demo1" {
  }
 
 ```
+* `as3_example1.json` - Example  AS3 Declarative JSON file
+
+```hcl
+
+{
+     "class": "AS3",
+     "action": "deploy",
+     "persist": true,
+     "declaration": {
+         "class": "ADC",
+         "schemaVersion": "3.0.0",
+         "id": "example-declaration-01",
+         "label": "Sample 1",
+         "remark": "Simple HTTP application with round robin pool",
+         "Sample_01": {
+             "class": "Tenant",
+             "defaultRouteDomain": 0,
+             "Application_1": {
+                 "class": "Application",
+                 "template": "http",
+             "serviceMain": {
+                 "class": "Service_HTTP",
+                 "virtualAddresses": [
+                     "10.0.2.10"
+                 ],
+                 "pool": "web_pool"
+                 },
+                 "web_pool": {
+                     "class": "Pool",
+                     "monitors": [
+                         "http"
+                     ],
+                     "members": [
+                         {
+                             "servicePort": 80,
+                             "serverAddresses": [
+                                 "192.0.1.100",
+                                 "192.0.1.110"
+                             ]
+                         }
+                     ]
+                 }
+             }
+         }
+     }
+ }
+
+```
+
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
+
