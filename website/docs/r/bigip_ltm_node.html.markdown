@@ -25,7 +25,10 @@ resource "bigip_ltm_node" "node" {
   monitor          = "/Common/icmp"
   description      = "Test-Node"
   rate_limit       = "disabled"
-  fqdn             = { address_family = "ipv4", interval = "3000" }
+  fqdn {
+    address_family = "ipv4"
+    interval       = "3000"
+  }
 }
 ```      
 

@@ -20,13 +20,10 @@ provider "bigip" {
   username = "xxxxx"
   password = "xxxxx"
 }
-
-
 resource "bigip_sys_ntp" "ntp1" {
-
-description = "/Common/NTP1"
-  servers = ["time.facebook.com"]
-  timezone = "America/Los_Angeles"
+  description = "/Common/NTP1"
+  servers     = ["time.facebook.com"]
+  timezone    = "America/Los_Angeles"
 }
 
 ```      

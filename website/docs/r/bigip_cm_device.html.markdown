@@ -16,12 +16,11 @@ This resource is helpful when configuring the BIG-IP device in cluster or in HA 
 
 ```hcl
 
-resource "bigip_cm_device" "my_new_device"
+resource "bigip_cm_device" "my_new_device" {
+  name                = "bigip300.f5.com"
+  configsync_ip       = "2.2.2.2"
+  mirror_ip           = "10.10.10.10"
+  mirror_secondary_ip = "11.11.11.11"
+}
 
-        {
-            name = "bigip300.f5.com"
-            configsync_ip = "2.2.2.2"
-            mirror_ip = "10.10.10.10"
-            mirror_secondary_ip = "11.11.11.11"
-        }
 ```       

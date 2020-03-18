@@ -11,11 +11,21 @@ description: |-
 `bigip_as3` provides details about bigip as3 resource
 
 This resource is helpful to configure as3 declarative JSON on BIG-IP.
-## Example Usage for template file
 
+## Example Usage 
 
 ```hcl
 
+
+# Example Usage for json file
+resource "bigip_as3"  "as3-example1" {
+       as3_json = "${file("example1.json")}"
+       tenant_name = "Sample_01"
+ }
+
+# [OR]
+
+# Example Usage for template file
 variable "tenant_name" {
   default = "Sample_01"
 }
@@ -30,22 +40,11 @@ resource "bigip_as3" "as3-demo1" {
 }
 
 ```
-## Example Usage for json file
-
-
-```hcl
-
-resource "bigip_as3"  "as3-example1" {
-       as3_json = "${file("example1.json")}"
-       tenant_name = "Sample_01"
- }
-
-```
 
 ## Argument Reference
 
 
-* `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which can be a template file used with builtin ```templatefile``` function or a json file
+* `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which can be a template/json file used with builtin ```templatefile``` function (or) ```file``` function
 
 * `tenant_name` - (Required) Tenant name used to set the terraform state changes for as3 resource
 
