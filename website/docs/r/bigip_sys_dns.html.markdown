@@ -18,10 +18,10 @@ description: |-
 
 ```hcl
 resource "bigip_sys_dns" "dns1" {
-   description = "/Common/DNS1"
-   name_servers = ["1.1.1.1"]
-   number_of_dots = 2
-   search = ["f5.com"]
+  description    = "/Common/DNS1"
+  name_servers   = ["1.1.1.1"]
+  number_of_dots = 2
+  search         = ["f5.com"]
 }
 ```      
 

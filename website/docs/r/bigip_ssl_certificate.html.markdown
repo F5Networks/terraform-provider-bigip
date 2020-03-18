@@ -18,10 +18,11 @@ Certificates can be imported from certificate files on the local disk, in PEM fo
 ```hcl
 
 resource "bigip_ssl_certificate" "test-cert" {
-        name = "servercert.crt"
-        content = "${file("servercert.crt")}"
-        partition = "Common"
+  name      = "servercert.crt"
+  content   = file("servercert.crt")
+  partition = "Common"
 }
+
 ```      
 
 ## Argument Reference

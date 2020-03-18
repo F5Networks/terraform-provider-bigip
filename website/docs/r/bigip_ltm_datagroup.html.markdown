@@ -28,7 +28,7 @@ resource "bigip_ltm_datagroup" "datagroup" {
 
   record {
     name = "test"
-    value = "123"
+    data = "123"
   }
 }
 
