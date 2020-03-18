@@ -20,7 +20,7 @@ For resources should be named with their "full path". The full path is the combi
 # Loading from a file is the preferred method
 resource "bigip_ltm_irule" "rule" {
   name  = "/Common/terraform_irule"
-  irule = "${file("myirule.tcl")}"
+  irule = file("myirule.tcl")
 }
 
 resource "bigip_ltm_irule" "rule2" {
@@ -30,10 +30,15 @@ when CLIENT_ACCEPTED {
      log local0. "test"
    }
 EOF
+
 }
 
-myirule.tcl
+```
 
+
+##myirule.tcl
+
+```
 when HTTP_REQUEST {
 
   if { [string tolower [HTTP::header value Upgrade]] equals "websocket" } {
@@ -46,8 +51,6 @@ when HTTP_REQUEST {
     log local0. "[IP::client_addr] - Regular HTTP request. ASM-checks and HTTP protocol enabled. Traffic is deep-inspected at L7."
   }
 }
-
-
 ```      
 
 ## Argument Reference

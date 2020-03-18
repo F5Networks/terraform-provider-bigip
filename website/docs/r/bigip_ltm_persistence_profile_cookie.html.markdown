@@ -29,9 +29,10 @@ resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
   hash_length                  = 0
 
   lifecycle {
-    ignore_changes = ["cookie_encryption_passphrase"]
+    ignore_changes = [cookie_encryption_passphrase]
   }
 }
+
 ```
 
 ## Reference

@@ -18,13 +18,14 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_net_vlan" "vlan1" {
-	name = "/Common/Internal"
-	tag = 101
-	interfaces = {
-                vlanport = 1.2,
-		            tagged = false
-	          }
+  name = "/Common/Internal"
+  tag  = 101
+  interfaces {
+    vlanport = 1.2
+    tagged   = false
   }
+}
+
 
 ```      
 
