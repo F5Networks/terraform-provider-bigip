@@ -236,8 +236,8 @@ func (p *LogPublisher) UnmarshalJSON(b []byte) error {
 
 const (
 	uriSys             = "sys"
-        uriTm              = "tm"
-        uriCli             = "cli"
+	uriTm              = "tm"
+	uriCli             = "cli"
 	uriVersion         = "version"
 	uriNtp             = "ntp"
 	uriDNS             = "dns"
@@ -513,13 +513,13 @@ func (b *BigIP) NTPs() (*NTP, error) {
 }
 
 func (b *BigIP) BigipVersion() (*Version, error) {
-        var  bigipversion Version
-        err, _ := b.getForEntity(&bigipversion, uriMgmt, uriTm, uriCli, uriVersion)
+	var bigipversion Version
+	err, _ := b.getForEntity(&bigipversion, uriMgmt, uriTm, uriCli, uriVersion)
 
-        if err != nil {
-                return nil, err
-        }
-        return &bigipversion, nil
+	if err != nil {
+		return nil, err
+	}
+	return &bigipversion, nil
 }
 
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {
@@ -562,13 +562,16 @@ func (b *BigIP) CreateProvision(name string, fullPath string, cpuRatio int, disk
 	}
 	if name == "afm" {
 		return b.put(config, uriSys, uriProvision, uriAfm)
+
 	}
 	if name == "gtm" {
 		return b.put(config, uriSys, uriProvision, uriGtm)
 	}
+
 	if name == "apm" {
 		return b.put(config, uriSys, uriProvision, uriApm)
 	}
+
 	if name == "avr" {
 		return b.put(config, uriSys, uriProvision, uriAvr)
 	}
