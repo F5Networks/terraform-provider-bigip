@@ -14,17 +14,17 @@ Configures a source address persistence profile
 
 ```
 resource "bigip_ltm_persistence_profile_srcaddr" "srcaddr" {
-    name = "/Common/terraform_srcaddr"
-    defaults_from = "/Common/source_addr"
-    match_across_pools = "enabled"
-    match_across_services = "enabled"
-    match_across_virtuals = "enabled"
-    mirror = "enabled"
-    timeout = 3600
-    override_conn_limit = "enabled"
-    hash_algorithm = "carp"
-    map_proxies = "enabled"
-    mask = "255.255.255.255"
+  name                  = "/Common/terraform_srcaddr"
+  defaults_from         = "/Common/source_addr"
+  match_across_pools    = "enabled"
+  match_across_services = "enabled"
+  match_across_virtuals = "enabled"
+  mirror                = "enabled"
+  timeout               = 3600
+  override_conn_limit   = "enabled"
+  hash_algorithm        = "carp"
+  map_proxies           = "enabled"
+  mask                  = "255.255.255.255"
 }
 ```
 

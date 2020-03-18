@@ -23,6 +23,7 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
   fallback_host         = "titanic"
   fallback_status_codes = ["400", "500", "300"]
 }
+
 ```      
 
 ## Argument Reference
