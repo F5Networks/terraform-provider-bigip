@@ -1,4 +1,23 @@
 ## 1.1.2 (Unreleased)
+
+# Bug Fixes
+
+- Missing "database" entry for PostgreSQL monitor #224 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/224 )
+- `bigip_as3` resource should validate JSON #227 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/227 )
+- bigip_as3 - doesn't delete resource #38 ( https://github.com/F5Networks/terraform-provider-bigip/issues/38 )
+- examples for bigip resources in repo are not compatible with terraform 0.12 #40.(https://github.com                    /F5Networks/terraform-provider-bigip/issues/40 )
+- Looks like provisioner resource in sys.go is not complete #244 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/244 )
+- bigip_as3 - doesn't delete resource #38 (https://github.com/F5Networks/terraform-provider-bigip/issues/38)
+- `bigip_as3` resource `resourceBigipAs3Read` action does not store actual value in state #254  ( https://github.com/terraform-providers/terraform-provider-bigip/issues/254 )
+- Unable to modify/update data group #248 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/248 )
+- Terraform crash when creating SSL certificate resources on F5 BIG-IP #255 (https://github.com/terraform-providers/terraform-provider-bigip/issues/255 )
+
+# Other Notes:
+
+- Any Documentation changes for terraform resources w.r.t above bug fixes are updated
+- Bigip_as3 resource now read as3 json from bigip and set the terraform state file, but as3 json from bigip will not have all the standard as3 classes as given from user json as input to tf file. So sometimes though there may not be actual changes between user as3 json and bigip as3 json ,( Top level AS3 class will not be there in bigip as3 json ) terraform will detect as change and when we do terraform apply it will says 1 changed. But it will be same json and there will be no change in bigip ( as3 is idempotent ).
+
+
 ## 1.1.1 (December 19, 2019)
 ## Bug Fixes
 - bigip_ssl resources not over writing existing cert/key #218
