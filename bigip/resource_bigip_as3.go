@@ -37,7 +37,7 @@ func resourceBigipAs3() *schema.Resource {
 				Description:  "AS3 json",
 				ValidateFunc: validation.ValidateJsonString,
 			},
-			"config_name": {
+			"tenant_name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
@@ -51,7 +51,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	as3_json := d.Get("as3_json").(string)
-	name := d.Get("config_name").(string)
+	name := d.Get("tenant_name").(string)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", as3_json)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
