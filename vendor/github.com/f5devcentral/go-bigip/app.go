@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and limitations 
 
 /*
 AS3 uses a declarative model, meaning you provide a JSON declaration rather than a set of imperative commands. The declaration represents the configuration which AS3 is responsible for creating on a BIG-IP system. AS3 is well-defined according to the rules of JSON Schema, and declarations validate according to JSON Schema. AS3 accepts declaration updates via REST (push), reference (pull), or CLI (flat file editing).
-To read more about As3 check https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/ 
+To read more about As3 check https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/
 */
 package bigip
 
