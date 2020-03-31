@@ -1003,7 +1003,7 @@ type Monitor struct {
 	Mode           string
 	Adaptive       string
 	AdaptiveLimit  int
-	Database       string
+        Database       string
 }
 
 type monitorDTO struct {
@@ -1015,7 +1015,7 @@ type monitorDTO struct {
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
 	Description    string `json:"description,omitempty"`
 	Destination    string `json:"destination,omitempty"`
-	Database       string `json:"database,omitempty"`
+        Database       string `json:"database,omitempty"`
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
 	ManualResume   string `json:"manualResume,omitempty"`
