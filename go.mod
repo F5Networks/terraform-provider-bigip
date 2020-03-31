@@ -11,6 +11,7 @@ require (
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
 	github.com/hashicorp/terraform-plugin-sdk v1.1.0
 	github.com/stretchr/testify v1.3.0
+	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 )
 
 go 1.13
