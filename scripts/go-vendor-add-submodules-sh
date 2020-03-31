@@ -1,0 +1,8 @@
+# Run in the root directory of a go package to list all direct github dependencies
+# and create git submodules for them in the vendor directory.
+for package in $(
+  go list -f '{{.Deps}}' | tr "[" " " | tr "]" " " | xargs go list -f '{{if not .Standard}}{{.ImportPath}}{{end}}' | grep github.com | cut -d/ -f1-3 | grep -v $(go list .) | uniq
+)
+do
+  git submodule add https://$package vendor/$package
+done
