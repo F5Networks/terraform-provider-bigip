@@ -47,6 +47,19 @@ type NTP struct {
 	Timezone    string   `json:"timezone,omitempty"`
 }
 
+type BigipCommand struct {
+	Command       string `json:"command"`
+	UtilCmdArgs   string `json:"utilCmdArgs"`
+	CommandResult string `json:"commandResult,omitempty"`
+}
+
+type BigipCmdResp struct {
+	Code       int           `json:"code"`
+	Message    string        `json:"message"`
+	ErrorStack []interface{} `json:"errorStack"`
+	APIError   int           `json:"apiError"`
+}
+
 type DNSs struct {
 	DNSs []DNS `json:"items"`
 }
@@ -238,6 +251,8 @@ const (
 	uriSys             = "sys"
 	uriTm              = "tm"
 	uriCli             = "cli"
+	uriUtil            = "util"
+	uriBash            = "bash"
 	uriVersion         = "version"
 	uriNtp             = "ntp"
 	uriDNS             = "dns"
@@ -520,6 +535,16 @@ func (b *BigIP) BigipVersion() (*Version, error) {
 		return nil, err
 	}
 	return &bigipversion, nil
+}
+
+func (b *BigIP) RunCommand(config *BigipCommand) (*BigipCommand, error) {
+	var respRef BigipCommand
+	resp, err := b.postReq(config, uriMgmt, uriTm, uriUtil, uriBash)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(resp, &respRef)
+	return &respRef, nil
 }
 
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {

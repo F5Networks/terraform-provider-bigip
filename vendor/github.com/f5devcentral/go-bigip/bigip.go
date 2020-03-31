@@ -237,6 +237,17 @@ func (b *BigIP) delete(path ...string) error {
 	return callErr
 }
 
+//Generic delete
+func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
+	req := &APIRequest{
+		Method: "delete",
+		URL:    b.iControlPath(path),
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -254,6 +265,23 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 	return callErr
 }
 
+func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) put(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -269,6 +297,23 @@ func (b *BigIP) put(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) putReq(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "put",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 func (b *BigIP) patch(body interface{}, path ...string) error {
