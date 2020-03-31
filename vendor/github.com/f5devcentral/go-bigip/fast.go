@@ -79,11 +79,15 @@ func (b *BigIP) postFastTemplate(template *Fasttemplate) error {
 			break // break here
 		}
 		if fastTask.Code == 503 {
-			log.Printf("[DEBUG] Failed  Creating Application with ID  = %v", respID)
-			log.Printf("[DEBUG] Sleeping for 1 Sec")
-			time.Sleep(1 * time.Second)
-			//break
-			return b.postFastTemplate(template)
+			taskIds, err := b.getfastTaskid()
+			if err != nil {
+				return err
+			}
+			for _, id := range taskIds {
+				if b.pollingStatus(id) {
+					return b.postFastTemplate(template)
+				}
+			}
 		}
 	}
 	return nil
@@ -145,11 +149,15 @@ func (b *BigIP) DeleteFastTemplate(tenantName string, applicationName string) er
 			break // break here
 		}
 		if fastTask.Code == 503 {
-			log.Printf("[DEBUG]Delete Failed for tenantName = %v,applicationName = %v with ID=%v", tenantName, applicationName, fastTask.ID)
-			log.Printf("[DEBUG] Waiting for 2 Sec")
-			time.Sleep(2000 * time.Millisecond)
-			//break
-			return b.DeleteFastTemplate(tenantName, applicationName)
+			taskIds, err := b.getfastTaskid()
+			if err != nil {
+				return err
+			}
+			for _, id := range taskIds {
+				if b.pollingStatus(id) {
+					return b.DeleteFastTemplate(tenantName, applicationName)
+				}
+			}
 		}
 	}
 	return nil
@@ -167,21 +175,24 @@ func maptoStruct(body interface{}) (*FastParameters, error) {
 	return &fastData, nil
 
 }
-
-func (b *BigIP) getfastTaskid() error {
+func (b *BigIP) getfastTaskid() ([]string, error) {
 	var taskList []FastTaskType
+	var taskIDs []string
 	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriFast, uriTasks)
 	if err != nil {
-		return err
+		return taskIDs, err
 	}
 	for l := range taskList {
 		if taskList[l].Message == "in progress" {
+			taskIDs = append(taskIDs, taskList[l].ID)
 			//log.Printf("Id = %v, Name = %v,Code = %v", taskList[l].ID, taskList[l].Message, taskList[l].Code)
 			//time.Sleep(1 * time.Second)
 		}
 	}
-	return nil
+	//log.Printf("Task List:%v",taskIDs)
+	return taskIDs, nil
 }
+
 func (b *BigIP) getfastTaskstatus(id string) (*FastTaskType, error) {
 	var taskList FastTaskType
 	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriFast, uriTasks, id)
