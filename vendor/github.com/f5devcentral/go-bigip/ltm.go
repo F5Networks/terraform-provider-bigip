@@ -3648,6 +3648,9 @@ func (b *BigIP) DeleteHttpCompressionProfile(name string) error {
 func (b *BigIP) ModifyHttpCompressionProfile(name string, config *HttpCompressionProfile) error {
 	return b.put(config, uriLtm, uriProfile, uriHttpcompress, name)
 }
+type As3AllTaskType struct {
+        Items        []As3TaskType   `json:"items,omitempty"`
+}
 type As3TaskType struct {
 	ID         string   `json:"id,omitempty"`
 	//Declaration struct{} `json:"declaration,omitempty"`
@@ -3683,11 +3686,15 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 			break // break here
 		}
 		if respCode == 503 {
-			log.Printf("[DEBUG] Failed  Creating Application with ID  = %v", respID)
-			log.Printf("[DEBUG] Sleeping for 1 Sec")
-			time.Sleep(5 * time.Second)
-			//break
-			return b.PostAs3Bigip(as3NewJson)
+                        taskIds, err := b.getas3Taskid()
+			if err != nil {
+				return err
+			}
+			for _, id := range taskIds {
+				if b.pollingStatus(id) {
+					return b.PostAs3Bigip(as3NewJson)
+				}
+			}
 		}
 	}
 
@@ -3718,11 +3725,15 @@ func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
                         break // break here
                 }
                 if respCode == 503 {
-                        log.Printf("[DEBUG] Failed  Deleting Application with ID  = %v", respID)
-                        log.Printf("[DEBUG] Sleeping for 1 Sec")
-                        time.Sleep(5 * time.Second)
-                        //break
-                        return b.DeleteAs3Bigip(tenantName)
+                       taskIds, err := b.getas3Taskid()
+                        if err != nil {
+                                return err
+                        }
+                        for _, id := range taskIds {
+                                if b.pollingStatus(id) {
+                                        return b.DeleteAs3Bigip(tenantName)
+                                }
+                        }
                 }
         }
         
@@ -3741,7 +3752,6 @@ func (b *BigIP) ModifyAs3(name string, as3_json string) error {
         taskStatus, err := b.getas3Taskstatus(respID)
         log.Println(taskStatus)
         respCode := taskStatus.Results[0].Code
-        log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
         for respCode != 200 {
                 fastTask, err := b.getas3Taskstatus(respID)
                 if err != nil {
@@ -3749,15 +3759,19 @@ func (b *BigIP) ModifyAs3(name string, as3_json string) error {
                 }
                 respCode = fastTask.Results[0].Code
                 if respCode == 200 {
-                        log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+                        log.Printf("[DEBUG]Sucessfully Modified Application with ID  = %v", respID)
                         break // break here
                 }
                 if respCode == 503 {
-                        log.Printf("[DEBUG] Failed  Deleting Application with ID  = %v", respID)
-                        log.Printf("[DEBUG] Sleeping for 1 Sec")
-                        time.Sleep(5 * time.Second)
-                        //break
-                        return b.ModifyAs3(name, as3_json)
+                       taskIds, err := b.getas3Taskid()
+                        if err != nil {
+                                return err
+                        }
+                        for _, id := range taskIds {
+                                if b.pollingStatus(id) {
+                                        return b.ModifyAs3(name, as3_json)
+                                }
+                        }
                 }
         }
 
@@ -3784,4 +3798,34 @@ func (b *BigIP) getas3Taskstatus( id string) (*As3TaskType, error) {
 	}
 	return &taskList, nil
 
+}
+func (b *BigIP) getas3Taskid() ([]string, error) {
+	var taskList As3AllTaskType
+	var taskIDs []string
+	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask)
+	if err != nil {
+		return taskIDs, err
+	}
+        log.Println(taskList)
+	for l := range taskList.Items {
+		if taskList.Items[l].Results[0].Message == "in progress" {
+			taskIDs = append(taskIDs, taskList.Items[l].ID)
+		}
+	}
+	return taskIDs, nil
+}
+func (b *BigIP) pollingStatus(id string) bool {
+	var taskList As3TaskType
+	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
+	if err != nil {
+		return false
+	}
+	if taskList.Results[0].Code != 200 && taskList.Results[0].Code != 503 {
+		time.Sleep(1 * time.Second)
+		return b.pollingStatus(id)
+	}
+	if taskList.Results[0].Code == 503 {
+		return false
+	}
+	return true
 }

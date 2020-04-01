@@ -57,11 +57,10 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	strTrimSpace := strings.TrimSpace(as3_json)
 	name := d.Get("tenant_name").(string)
 	exmp := client.GetTenantList(as3_json)
-	log.Println(exmp)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err := client.PostAs3Bigip(strTrimSpace)
 	if err != nil {
-		return fmt.Errorf("Error modifying node %s: %v", name, err)
+		return fmt.Errorf("Error creating json  %s: %v", name, err)
 	}
 	d.SetId(name)
 	return resourceBigipAs3Read(d, meta)
@@ -72,11 +71,11 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	as3exmp, err := client.GetAs3(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve node ")
+		log.Printf("[ERROR] Unable to retrieve json ")
 		return err
 	}
 	if as3exmp == "" {
-		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -124,7 +123,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	err := client.ModifyAs3(name, as3_json)
 	if err != nil {
-		return fmt.Errorf("Error modifying node %s: %v", name, err)
+		return fmt.Errorf("Error modifying json %s: %v", name, err)
 	}
 	return resourceBigipAs3Read(d, meta)
 }
