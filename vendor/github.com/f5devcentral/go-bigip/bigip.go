@@ -23,6 +23,8 @@ import (
 	"reflect"
 	"strings"
 	"time"
+        "regexp"
+        "log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -194,16 +196,14 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
-	}
-
+ 	}
+        
 	defer res.Body.Close()
 
 	data, _ := ioutil.ReadAll(res.Body)
-
 	if res.StatusCode >= 400 {
 		if res.Header["Content-Type"][0] == "application/json" {
 			return data, b.checkError(data)
@@ -264,9 +264,9 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 	_, callErr := b.APICall(req)
 	return callErr
 }
-
 func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
-	marshalJSON, err := jsonMarshal(body)
+
+        marshalJSON, err := jsonMarshal(body) 
 	if err != nil {
 		return nil, err
 	}
@@ -276,8 +276,7 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		URL:         b.iControlPath(path),
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
-	}
-
+        }
 	resp, callErr := b.APICall(req)
 	return resp, callErr
 }
@@ -331,6 +330,23 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
+        marshalJSON, err := jsonMarshal(body)
+        if err != nil {
+                return nil, err
+        }
+
+        req := &APIRequest{
+                Method:      "patch",
+                URL:         b.iControlPath(path),
+                Body:        string(marshalJSON),
+                ContentType: "application/json",
+        }
+
+        resp, callErr := b.APICall(req)
+        return resp,callErr
 }
 
 // Upload a file read from a Reader
@@ -410,7 +426,6 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
-
 	resp, err := b.APICall(req)
 	if err != nil {
 		var reqError RequestError
@@ -420,12 +435,11 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		}
 		return err, false
 	}
-
-	err = json.Unmarshal(resp, e)
+        err = json.Unmarshal(resp, e)
 	if err != nil {
+                log.Println(string(resp))
 		return err, false
 	}
-
 	return nil, true
 }
 
@@ -510,4 +524,50 @@ func toBoolString(b bool, trueStr, falseStr string) string {
 		return trueStr
 	}
 	return falseStr
+}
+func (b *BigIP) getForEntityas3(path ...string) (string, error, bool) {
+
+        req := &APIRequest{
+                Method:      "get",
+                URL:         b.iControlPath(path),
+                ContentType: "application/json",
+        }
+
+        resp, err := b.APICall(req)
+        if err != nil {
+                var reqError RequestError
+                json.Unmarshal(resp, &reqError)
+                if reqError.Code == 404 {
+                        return "", nil, false
+                }
+                return "", err, false
+        }
+
+        exmpstring := string(resp)
+        re := regexp.MustCompile(`"updateMode":"[a-z]*",`)
+        string1 := re.ReplaceAllString(exmpstring, "")
+        re = regexp.MustCompile(`[,]*"controls":{"[a-zA-Z]*":"[\-0-9A-Z:.]*"}[,]*`)
+	string2 := re.ReplaceAllString(string1, "")
+        strTrimSpace := strings.TrimSpace(string2)
+
+        return strTrimSpace, nil, true
+}
+
+func (b *BigIP) GetTenantList(body interface{}) ([]string){
+        s := make([]string, 1)
+        as3json := body.(string)
+        resp := []byte(as3json)
+        jsonRef := make(map[string]interface{})
+        json.Unmarshal(resp, &jsonRef)
+        for _, value := range jsonRef {
+                if rec, ok := value.(map[string]interface{}); ok {
+                      for k, v := range rec {
+                            if _, ok := v.(map[string]interface{}); ok {
+                            log.Println(k)
+                            s = append(s, "k")
+                            }
+                       }
+                }
+        }
+        return s
 }
