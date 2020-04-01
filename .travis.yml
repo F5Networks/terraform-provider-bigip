@@ -35,4 +35,4 @@ matrix:
   allow_failures:
   - go: tip
 env:
-  - GOFLAGS=-mod=vendor GO111MODULE=on
+  - GO111MODULE=on go mod vendor GOFLAGS=-mod=vendor GO111MODULE=on 
