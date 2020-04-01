@@ -21,9 +21,9 @@ install:
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
 - make tools
-- GO111MODULE=on go mod vendor
 
 script:
+- GO111MODULE=on go mod vendor
 - make test
 - make website-lint
 - make website-test
