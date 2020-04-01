@@ -39,7 +39,7 @@ func resourceBigipAs3() *schema.Resource {
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Computed:    true,
 				ForceNew:    true,
 				Description: "Name of Tenant",
 			},
@@ -55,37 +55,48 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[AS3] Error validating template \n")
 		//return false
 	}
-	name := d.Get("tenant_name").(string)
-        strTrimSpace := strings.TrimSpace(as3_json)
-      //  exmp := client.GetTenantList(as3_json)
-        log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
-        err := client.PostAs3Bigip(strTrimSpace)
-        if err != nil {
-                return fmt.Errorf("Error creating json  %s: %v", name, err)
-        }
-        d.SetId(name)
-        return resourceBigipAs3Read(d, meta)
+	//	name := d.Get("tenant_name").(string)
+	strTrimSpace := strings.TrimSpace(as3_json)
+	tenant_list := client.GetTenantList(as3_json)
+	var tenants string
+	for i := 0; i < len(tenant_list)-1; i++ {
+		if i == 0 {
+			tenants = tenant_list[i+1]
+			continue
+		}
+		tenants = tenants + "," + tenant_list[i+1]
+	}
+	log.Println(tenants)
+	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
+	err := client.PostAs3Bigip(strTrimSpace)
+	if err != nil {
+		return fmt.Errorf("Error creating json  %s: %v", tenants, err)
+	}
+	d.SetId(tenants)
+	//	d.SetId(name)
+	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
-        log.Printf("[INFO] Reading As3 config")
-        name := d.Id()
-        as3exmp, err := client.GetAs3(name)
-        if err != nil {
-                log.Printf("[ERROR] Unable to retrieve json ")
-                return err
-        }
-        if as3exmp == "" {
-                log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-                d.SetId("")
-                return nil
-        }
+	client := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Reading As3 config")
+	name := d.Id()
 
-        const s = `{"class":"AS3","action":"deploy","persist":true,"declaration":`
-        const s1 = `}`
-        as3exmp = s + as3exmp + s1
-        d.Set("as3_json", as3exmp)
-        return nil
+	as3exmp, err := client.GetAs3(name)
+	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve json ")
+		return err
+	}
+	if as3exmp == "" {
+		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+
+	const s = `{"class":"AS3","action":"deploy","persist":true,"declaration":`
+	const s1 = `}`
+	as3exmp = s + as3exmp + s1
+	d.Set("as3_json", as3exmp)
+	return nil
 }
 
 func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
@@ -118,26 +129,27 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 }
 
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
-        as3_json := d.Get("as3_json").(string)
-        log.Printf("[INFO] Updating As3 Config :%s", as3_json)
-        name := d.Id()
-        err := client.ModifyAs3(name, as3_json)
-        if err != nil {
-                return fmt.Errorf("Error modifying json %s: %v", name, err)
-        }
-        return resourceBigipAs3Read(d, meta)
+	client := meta.(*bigip.BigIP)
+	as3_json := d.Get("as3_json").(string)
+	log.Printf("[INFO] Updating As3 Config :%s", as3_json)
+	name := d.Id()
+	err := client.ModifyAs3(name, as3_json)
+	if err != nil {
+		return fmt.Errorf("Error modifying json %s: %v", name, err)
+	}
+	return resourceBigipAs3Read(d, meta)
 }
 
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
-        log.Printf("[INFO] Deleting As3 config")
-        name := d.Get("tenant_name").(string)
-        err := client.DeleteAs3Bigip(name)
-        if err != nil {
-                log.Printf("[ERROR] Unable to Delete: %v :", err)
-                return err
-        }
-        d.SetId("")
-        return nil
+	client := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Deleting As3 config")
+	//	name := d.Get("tenant_name").(string)
+	name := d.Id()
+	err := client.DeleteAs3Bigip(name)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Delete: %v :", err)
+		return err
+	}
+	d.SetId("")
+	return nil
 }

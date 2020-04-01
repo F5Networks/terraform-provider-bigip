@@ -564,7 +564,7 @@ func (b *BigIP) GetTenantList(body interface{}) ([]string){
                       for k, v := range rec {
                             if _, ok := v.(map[string]interface{}); ok {
                             log.Println(k)
-                            s = append(s, "k")
+                            s = append(s, k)
                             }
                        }
                 }

@@ -3804,7 +3804,6 @@ func (b *BigIP) getas3Taskid() ([]string, error) {
 	if err != nil {
 		return taskIDs, err
 	}
-        log.Println(taskList)
 	for l := range taskList.Items {
 		if taskList.Items[l].Results[0].Message == "in progress" {
 			taskIDs = append(taskIDs, taskList.Items[l].ID)
