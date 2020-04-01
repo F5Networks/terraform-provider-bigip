@@ -238,7 +238,7 @@ func (b *BigIP) delete(path ...string) error {
 }
 
 //Generic delete
-func (b *BigIP) fastDelete(path ...string) ([]byte, error) {
+func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
 	req := &APIRequest{
 		Method: "delete",
 		URL:    b.iControlPath(path),
