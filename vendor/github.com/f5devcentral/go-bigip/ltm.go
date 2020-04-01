@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+        "time"
 )
 
 // ServerSSLProfiles
@@ -139,7 +140,6 @@ type ClientSSLProfile struct {
 	StrictResume          string `json:"strictResume,omitempty"`
 	UncleanShutdown       string `json:"uncleanShutdown,omitempty"`
 }
-
 // Nodes contains a list of every node on the BIG-IP system.
 type Nodes struct {
 	Nodes []Node `json:"items"`
@@ -170,6 +170,13 @@ type Node struct {
 		Name          string `json:"tmName,omitempty"`
 	} `json:"fqdn,omitempty"`
 }
+
+type AsJsonn struct {
+        Name            string `json:"name,omitempty"`
+        As3Json       string `json:"as3Json,omitempty"`
+}
+
+
 
 // DataGroups contains a list of data groups on the BIG-IP system.
 type DataGroups struct {
@@ -1708,6 +1715,7 @@ type HttpCompressionProfile struct {
 }
 
 const (
+        uriTask           = "task"
 	uriLtm            = "ltm"
 	uriNode           = "node"
 	uriPool           = "pool"
@@ -1747,6 +1755,8 @@ const (
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
 	uriCreateDraft    = "?options=create-draft"
+        uriDeclare        = "declare"
+        uriAsyncDeclare   = "declare?async=true"
 )
 
 var cidr = map[string]string{
@@ -2055,14 +2065,12 @@ func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
 
 func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
-
 }
 
 // Modify a named internal data group, REPLACING all the records
 func (b *BigIP) ModifyInternalDataGroupRecords(config *DataGroup) error {
 	return b.put(config, uriLtm, uriDatagroup, uriInternal, config.Name)
 }
-
 // Get an internal data group by name, returns nil if the data group does not exist
 func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
 	var datagroup DataGroup
@@ -3639,4 +3647,141 @@ func (b *BigIP) DeleteHttpCompressionProfile(name string) error {
 // Fields that can be modified are referenced in the HttpCompressionProfile struct.
 func (b *BigIP) ModifyHttpCompressionProfile(name string, config *HttpCompressionProfile) error {
 	return b.put(config, uriLtm, uriProfile, uriHttpcompress, name)
+}
+type As3TaskType struct {
+	ID         string   `json:"id,omitempty"`
+	//Declaration struct{} `json:"declaration,omitempty"`
+        Results    []Results1  `json:"results,omitempty"`
+}
+type Results1 struct {
+                  Code       int64    `json:"code,omitempty"`
+                  Message    string   `json:"message,omitempty"`
+                LineCount  int64    `json:"lineCount,omitempty"`
+                Host         string   `json:"host,omitempty"`
+                Tenant       string   `json:"tenant,omitempty"`
+                RunTime    int64     `json:"runTime,omitempty"`
+} 
+func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
+	resp, err := b.fastPost(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriAsyncDeclare)
+        if err != nil {
+		return err
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+        respID := respRef["id"].(string)
+        taskStatus, err := b.getas3Taskstatus(respID)
+        respCode := taskStatus.Results[0].Code
+        log.Printf("[DEBUG]Code = %v,ID = %v", respCode, respID)
+        for respCode != 200 {
+		fastTask, err := b.getas3Taskstatus(respID)
+		if err != nil {
+			return err
+		}
+		respCode = fastTask.Results[0].Code
+		if respCode == 200 {
+			log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+			break // break here
+		}
+		if respCode == 503 {
+			log.Printf("[DEBUG] Failed  Creating Application with ID  = %v", respID)
+			log.Printf("[DEBUG] Sleeping for 1 Sec")
+			time.Sleep(5 * time.Second)
+			//break
+			return b.PostAs3Bigip(as3NewJson)
+		}
+	}
+
+        return nil
+}
+
+func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
+        tenant := tenantName + "?async=true"
+	resp, err :=  b.fastDelete(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+        if err != nil {
+                return err
+        }
+        respRef := make(map[string]interface{})
+        json.Unmarshal(resp, &respRef)
+        respID := respRef["id"].(string)
+        taskStatus, err := b.getas3Taskstatus(respID)
+        log.Println(taskStatus)
+        respCode := taskStatus.Results[0].Code 
+        log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
+        for respCode != 200 { 
+                fastTask, err := b.getas3Taskstatus(respID)
+                if err != nil {
+                        return err
+                }
+                respCode = fastTask.Results[0].Code
+                if respCode == 200 {
+                        log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+                        break // break here
+                }
+                if respCode == 503 {
+                        log.Printf("[DEBUG] Failed  Deleting Application with ID  = %v", respID)
+                        log.Printf("[DEBUG] Sleeping for 1 Sec")
+                        time.Sleep(5 * time.Second)
+                        //break
+                        return b.DeleteAs3Bigip(tenantName)
+                }
+        }
+        
+        return nil
+
+}
+func (b *BigIP) ModifyAs3(name string, as3_json string) error {
+        tenant := name + "?async=true"
+	resp, err := b.fastPatch(as3_json, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+        if err != nil {
+                return err
+        }
+        respRef := make(map[string]interface{})
+        json.Unmarshal(resp, &respRef)
+        respID := respRef["id"].(string)
+        taskStatus, err := b.getas3Taskstatus(respID)
+        log.Println(taskStatus)
+        respCode := taskStatus.Results[0].Code
+        log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
+        for respCode != 200 {
+                fastTask, err := b.getas3Taskstatus(respID)
+                if err != nil {
+                        return err
+                }
+                respCode = fastTask.Results[0].Code
+                if respCode == 200 {
+                        log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+                        break // break here
+                }
+                if respCode == 503 {
+                        log.Printf("[DEBUG] Failed  Deleting Application with ID  = %v", respID)
+                        log.Printf("[DEBUG] Sleeping for 1 Sec")
+                        time.Sleep(5 * time.Second)
+                        //break
+                        return b.ModifyAs3(name, as3_json)
+                }
+        }
+
+        return nil
+
+}
+func (b *BigIP) GetAs3(name string) (string, error) {
+        name = name + "?show=base"	
+	as3json, err, ok := b.getForEntityas3(uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", nil
+	}
+
+	return as3json, nil
+}
+func (b *BigIP) getas3Taskstatus( id string) (*As3TaskType, error) {
+	var taskList As3TaskType
+	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
+	if err != nil {
+		return nil, err
+	}
+	return &taskList, nil
+
 }
