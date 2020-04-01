@@ -56,7 +56,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	//	}
 	strTrimSpace := strings.TrimSpace(as3_json)
 	name := d.Get("tenant_name").(string)
-	exmp := client.GetTenantList(as3_json)
+	//	exmp := client.GetTenantList(as3_json)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err := client.PostAs3Bigip(strTrimSpace)
 	if err != nil {
