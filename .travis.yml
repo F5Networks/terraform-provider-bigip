@@ -23,7 +23,6 @@ install:
 - make tools
 
 script:
-- GO111MODULE=on go mod vendor
 - make test
 - make website-lint
 - make website-test
