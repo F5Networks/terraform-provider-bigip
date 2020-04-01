@@ -128,7 +128,7 @@ func (b *BigIP) GetFastTemplate(tenantName string, applicationName string) (*Fas
 //}
 
 func (b *BigIP) DeleteFastTemplate(tenantName string, applicationName string) error {
-	resp, err := b.fastDelete(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName)
+	resp, err := b.deleteReq(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName)
 	if err != nil {
 		return err
 	}

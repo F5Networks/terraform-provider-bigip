@@ -3696,7 +3696,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 
 func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
         tenant := tenantName + "?async=true"
-	resp, err :=  b.fastDelete(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+	resp, err :=  b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
         if err != nil {
                 return err
         }
