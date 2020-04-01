@@ -51,6 +51,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	as3_json := d.Get("as3_json").(string)
+         //  exmp := client.GetTenantList(as3_json)
 	if ok := bigip.ValidateAS3Template(as3_json); !ok {
 		return fmt.Errorf("[AS3] Error validating template \n")
 		//return false
