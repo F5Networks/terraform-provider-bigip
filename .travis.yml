@@ -21,6 +21,7 @@ install:
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
 - make tools
+- GO111MODULE=on go mod vendor
 
 script:
 - make test
@@ -35,4 +36,4 @@ matrix:
   allow_failures:
   - go: tip
 env:
-  - GO111MODULE=on go mod vendor GOFLAGS=-mod=vendor GO111MODULE=on 
+  - GOFLAGS=-mod=vendor GO111MODULE=on 
