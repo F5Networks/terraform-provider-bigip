@@ -16,6 +16,7 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
+
 resource "bigip_ltm_monitor" "monitor" {
   name        = "/Common/terraform_monitor"
   parent      = "/Common/http"
@@ -36,15 +37,14 @@ resource "bigip_ltm_monitor" "test-ftp-monitor" {
 }
 
 resource "bigip_ltm_monitor" "test-postgresql-monitor" {
-  name = "/Common/test-postgresql-monitor"
-  parent = "/Common/postgresql"
-  send = "SELECT 'Test';"
-  receive = "Test"
+  name     = "/Common/test-postgresql-monitor"
+  parent   = "/Common/postgresql"
+  send     = "SELECT 'Test';"
+  receive  = "Test"
   interval = 5
-  timeout = 16
+  timeout  = 16
   username = "abcd"
   password = "abcd1234"
-  database = "postgres"
 }
 ```      
 

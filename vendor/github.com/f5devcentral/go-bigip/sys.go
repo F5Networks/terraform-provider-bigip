@@ -15,6 +15,28 @@ import (
 	"log"
 )
 
+type Version struct {
+	Kind     string `json:"kind,omitempty"`
+	SelfLink string `json:"selfLink,omitempty"`
+	Entries  struct {
+		HTTPSLocalhostMgmtTmCliVersion0 struct {
+			NestedStats struct {
+				Entries struct {
+					Active struct {
+						Description string `json:"description"`
+					} `json:"active,omitempty"`
+					Latest struct {
+						Description string `json:"description"`
+					} `json:"latest,omitempty"`
+					Supported struct {
+						Description string `json:"description"`
+					} `json:"supported,omitempty"`
+				} `json:"entries,omitempty"`
+			} `json:"nestedStats,omitempty"`
+		} `json:"https://localhost/mgmt/tm/cli/version/0,omitempty"`
+	} `json:"entries,omitempty"`
+}
+
 type NTPs struct {
 	NTPs []NTP `json:"items"`
 }
@@ -23,6 +45,19 @@ type NTP struct {
 	Description string   `json:"description,omitempty"`
 	Servers     []string `json:"servers,omitempty"`
 	Timezone    string   `json:"timezone,omitempty"`
+}
+
+type BigipCommand struct {
+	Command       string `json:"command"`
+	UtilCmdArgs   string `json:"utilCmdArgs"`
+	CommandResult string `json:"commandResult,omitempty"`
+}
+
+type BigipCmdResp struct {
+	Code       int           `json:"code"`
+	Message    string        `json:"message"`
+	ErrorStack []interface{} `json:"errorStack"`
+	APIError   int           `json:"apiError"`
 }
 
 type DNSs struct {
@@ -214,6 +249,11 @@ func (p *LogPublisher) UnmarshalJSON(b []byte) error {
 
 const (
 	uriSys             = "sys"
+	uriTm              = "tm"
+	uriCli             = "cli"
+	uriUtil            = "util"
+	uriBash            = "bash"
+	uriVersion         = "version"
 	uriNtp             = "ntp"
 	uriDNS             = "dns"
 	uriProvision       = "provision"
@@ -487,6 +527,26 @@ func (b *BigIP) NTPs() (*NTP, error) {
 	return &ntp, nil
 }
 
+func (b *BigIP) BigipVersion() (*Version, error) {
+	var bigipversion Version
+	err, _ := b.getForEntity(&bigipversion, uriMgmt, uriTm, uriCli, uriVersion)
+
+	if err != nil {
+		return nil, err
+	}
+	return &bigipversion, nil
+}
+
+func (b *BigIP) RunCommand(config *BigipCommand) (*BigipCommand, error) {
+	var respRef BigipCommand
+	resp, err := b.postReq(config, uriMgmt, uriTm, uriUtil, uriBash)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(resp, &respRef)
+	return &respRef, nil
+}
+
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {
 	config := &DNS{
 		Description:  description,
@@ -522,32 +582,51 @@ func (b *BigIP) CreateProvision(name string, fullPath string, cpuRatio int, disk
 		Level:       level,
 		MemoryRatio: memoryRatio,
 	}
-	if fullPath == "/Common/asm" {
+	if name == "asm" {
 		return b.put(config, uriSys, uriProvision, uriAsm)
 	}
-	if fullPath == "/Common/afm" {
+	if name == "afm" {
 		return b.put(config, uriSys, uriProvision, uriAfm)
 
 	}
-	if fullPath == "/Common/gtm" {
+	if name == "gtm" {
 		return b.put(config, uriSys, uriProvision, uriGtm)
 	}
 
-	if fullPath == "/Common/apm" {
+	if name == "apm" {
 		return b.put(config, uriSys, uriProvision, uriApm)
 	}
 
-	if fullPath == "/Common/avr" {
+	if name == "avr" {
 		return b.put(config, uriSys, uriProvision, uriAvr)
 	}
-	if fullPath == "/Common/ilx" {
+	if name == "ilx" {
 		return b.put(config, uriSys, uriProvision, uriIlx)
 	}
 	return nil
 }
 
-func (b *BigIP) ModifyProvision(config *Provision) error {
-	return b.put(config, uriSys, uriProvision, uriAfm)
+func (b *BigIP) ProvisionModule(config *Provision) error {
+	log.Printf(" Module Provision:%v", config)
+	if config.Name == "asm" {
+		return b.put(config, uriSys, uriProvision, uriAsm)
+	}
+	if config.Name == "afm" {
+		return b.put(config, uriSys, uriProvision, uriAfm)
+	}
+	if config.Name == "gtm" {
+		return b.put(config, uriSys, uriProvision, uriGtm)
+	}
+	if config.Name == "apm" {
+		return b.put(config, uriSys, uriProvision, uriApm)
+	}
+	if config.Name == "avr" {
+		return b.put(config, uriSys, uriProvision, uriAvr)
+	}
+	if config.Name == "ilx" {
+		return b.put(config, uriSys, uriProvision, uriIlx)
+	}
+	return nil
 }
 
 func (b *BigIP) DeleteProvision(name string) error {

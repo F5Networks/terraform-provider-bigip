@@ -64,6 +64,34 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	return
 }
 
+func validatePartitionName(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+		break
+	case []string:
+		values = value.([]string)
+		break
+	case *[]string:
+		values = *(value.(*[]string))
+		break
+	case string:
+		values = []string{value.(string)}
+		break
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName", reflect.TypeOf(value)))
+	}
+
+	for _, v := range values {
+		match, _ := regexp.MatchString(`^[^/][^\s]+$`, v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q name should not start with `/`, e.g Common [or] test-partition are valid ", field))
+		}
+	}
+	return
+}
+
 func validatePoolMemberName(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
 	switch value.(type) {

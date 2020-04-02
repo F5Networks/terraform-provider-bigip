@@ -18,10 +18,11 @@ Certificate key can be imported from certificate key files on the local disk, in
 ```hcl
 
 resource "bigip_ssl_key" "test-key" {
-        name = "serverkey.key"
-        content = "${file("serverkey.key")}"
-        partition = "Common"
+  name      = "serverkey.key"
+  content   = file("serverkey.key")
+  partition = "Common"
 }
+
 ```      
 
 ## Argument Reference

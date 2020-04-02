@@ -18,7 +18,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_net_route" "route2" {
-  name = "external-route"
+  name    = "external-route"
   network = "10.10.10.0/24"
   gw      = "1.1.1.2"
 }

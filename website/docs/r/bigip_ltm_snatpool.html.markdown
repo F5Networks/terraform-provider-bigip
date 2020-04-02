@@ -17,11 +17,11 @@ Resource should be named with their "full path". The full path is the combinatio
 
 
 ```hcl
- resource "bigip_ltm_snatpoolpool" "snatpool_sanjose" {
-  name = "/Common/snatpool_sanjose"
-  members = ["191.1.1.1","194.2.2.2"]
-}
 
+resource "bigip_ltm_snatpool" "snatpool_sanjose" {
+  name    = "/Common/snatpool_sanjose"
+  members = ["191.1.1.1", "194.2.2.2"]
+}
 
 ```      
 
