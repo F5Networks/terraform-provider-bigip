@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"strings"
 	"time"
-        "regexp"
+//        "regexp"
         "log"
 )
 
@@ -543,31 +543,18 @@ func (b *BigIP) getForEntityas3(path ...string) (string, error, bool) {
                 return "", err, false
         }
 
-        exmpstring := string(resp)
-        re := regexp.MustCompile(`"updateMode":"[a-z]*",`)
-        string1 := re.ReplaceAllString(exmpstring, "")
-        re = regexp.MustCompile(`[,]*"controls":{"[a-zA-Z]*":"[\-0-9A-Z:.]*"}[,]*`)
-	string2 := re.ReplaceAllString(string1, "")
-        strTrimSpace := strings.TrimSpace(string2)
-
-        return strTrimSpace, nil, true
-}
-
-func (b *BigIP) GetTenantList(body interface{}) ([]string){
-        s := make([]string, 1)
-        as3json := body.(string)
-        resp := []byte(as3json)
+       // resp1 := []byte(exmpstring)
         jsonRef := make(map[string]interface{})
         json.Unmarshal(resp, &jsonRef)
-        for _, value := range jsonRef {
-                if rec, ok := value.(map[string]interface{}); ok {
-                      for k, v := range rec {
-                            if _, ok := v.(map[string]interface{}); ok {
-                            log.Println(k)
-                            s = append(s, k)
-                            }
-                       }
-                }
-        }
-        return s
+        delete(jsonRef, "updateMode")
+        delete(jsonRef, "controls")
+        emp, _ := json.Marshal(jsonRef)
+        exmpstring := string(emp)
+//        re := regexp.MustCompile(`"updateMode":"[a-z]*",`)
+  //      string1 := re.ReplaceAllString(exmpstring, "")
+    //    re = regexp.MustCompile(`[,]*"controls":{"[a-zA-Z]*":"[\-0-9A-Z:.]*"}[,]*`)
+//	string2 := re.ReplaceAllString(string1, "")
+        strTrimSpace := strings.TrimSpace(exmpstring)
+        log.Println(strTrimSpace)
+        return strTrimSpace, nil, true
 }
