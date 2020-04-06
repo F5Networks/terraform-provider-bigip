@@ -23,8 +23,6 @@ import (
 	"reflect"
 	"strings"
 	"time"
-	//        "regexp"
-	"log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -437,7 +435,6 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 	}
 	err = json.Unmarshal(resp, e)
 	if err != nil {
-		log.Println(string(resp))
 		return err, false
 	}
 	return nil, true

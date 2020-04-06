@@ -225,13 +225,11 @@ func (b *BigIP) ModifyAs3(name string, as3_json string) error {
 
 }
 func (b *BigIP) GetAs3(name string) (string, error) {
-	//name = name + "?show=base"
 	as3Json := make(map[string]interface{})
 	as3Json["class"] = "AS3"
 	as3Json["action"] = "deploy"
 	as3Json["persist"] = true
 	adcJson := make(map[string]interface{})
-	//as3json, err, ok := b.getForEntityas3(uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
 	err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
 	if err != nil {
 		return "", err
@@ -244,7 +242,6 @@ func (b *BigIP) GetAs3(name string) (string, error) {
 	as3Json["declaration"] = adcJson
 	out, _ := json.Marshal(as3Json)
 	as3String := string(out)
-	log.Printf("[DEBUG] As3 response string :%+v", as3String)
 	return as3String, nil
 }
 func (b *BigIP) getAs3version() (*as3Version, error) {

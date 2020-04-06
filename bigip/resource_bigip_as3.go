@@ -6,17 +6,12 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
-	"crypto/tls"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"io/ioutil"
-	"log"
-	"net/http"
-	//"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -55,7 +50,6 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	as3Json := d.Get("as3_json").(string)
 	if ok := bigip.ValidateAS3Template(as3Json); !ok {
 		return fmt.Errorf("[AS3] Error validating template \n")
-		//return false
 	}
 	//strTrimSpace := strings.TrimSpace(as3Json)
 	tenantList := client.GetTenantList(as3Json)
@@ -96,31 +90,19 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client_bigip := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Checking if As3 config exists in bigip ")
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
-	url := client_bigip.Host + "/mgmt/shared/appsvcs/declare"
-	req, err := http.NewRequest("GET", url, nil)
+	client := meta.(*bigip.BigIP)
+	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
+	name := d.Id()
+	as3Resp, err := client.GetAs3(name)
 	if err != nil {
-		log.Printf("[ERROR] Error while creating http request for checking As3 config : %v", err)
+		log.Printf("[ERROR] Unable to retrieve json ")
 		return false, err
 	}
-	req.SetBasicAuth(client_bigip.User, client_bigip.Password)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
-	if resp.Status == "204 No Content" || err != nil {
-		log.Printf("[ERROR] Error while checking as3resource present in bigip :%s  %v", bodyString, err)
-		defer resp.Body.Close()
-		return false, err
+	log.Printf("[INFO] AS3 response Body:%+v", as3Resp)
+	if as3Resp == "" {
+		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
+		return false, nil
 	}
-	defer resp.Body.Close()
 	return true, nil
 }
 
@@ -139,7 +121,6 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Deleting As3 config")
-	//	name := d.Get("tenant_name").(string)
 	name := d.Id()
 	err := client.DeleteAs3Bigip(name)
 	if err != nil {
