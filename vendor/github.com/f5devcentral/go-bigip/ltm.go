@@ -139,6 +139,7 @@ type ClientSSLProfile struct {
 	StrictResume          string `json:"strictResume,omitempty"`
 	UncleanShutdown       string `json:"uncleanShutdown,omitempty"`
 }
+
 // Nodes contains a list of every node on the BIG-IP system.
 type Nodes struct {
 	Nodes []Node `json:"items"`
@@ -171,11 +172,9 @@ type Node struct {
 }
 
 type AsJsonn struct {
-        Name            string `json:"name,omitempty"`
-        As3Json       string `json:"as3Json,omitempty"`
+	Name    string `json:"name,omitempty"`
+	As3Json string `json:"as3Json,omitempty"`
 }
-
-
 
 // DataGroups contains a list of data groups on the BIG-IP system.
 type DataGroups struct {
@@ -1009,7 +1008,7 @@ type Monitor struct {
 	Mode           string
 	Adaptive       string
 	AdaptiveLimit  int
-        Database       string
+	Database       string
 }
 
 type monitorDTO struct {
@@ -1021,7 +1020,7 @@ type monitorDTO struct {
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
 	Description    string `json:"description,omitempty"`
 	Destination    string `json:"destination,omitempty"`
-        Database       string `json:"database,omitempty"`
+	Database       string `json:"database,omitempty"`
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
 	ManualResume   string `json:"manualResume,omitempty"`
@@ -1714,7 +1713,7 @@ type HttpCompressionProfile struct {
 }
 
 const (
-        uriTask           = "task"
+	uriTask           = "task"
 	uriLtm            = "ltm"
 	uriNode           = "node"
 	uriPool           = "pool"
@@ -1754,8 +1753,8 @@ const (
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
 	uriCreateDraft    = "?options=create-draft"
-        uriDeclare        = "declare"
-        uriAsyncDeclare   = "declare?async=true"
+	uriDeclare        = "declare"
+	uriAsyncDeclare   = "declare?async=true"
 )
 
 var cidr = map[string]string{
@@ -2070,6 +2069,7 @@ func (b *BigIP) DeleteInternalDataGroup(name string) error {
 func (b *BigIP) ModifyInternalDataGroupRecords(config *DataGroup) error {
 	return b.put(config, uriLtm, uriDatagroup, uriInternal, config.Name)
 }
+
 // Get an internal data group by name, returns nil if the data group does not exist
 func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
 	var datagroup DataGroup

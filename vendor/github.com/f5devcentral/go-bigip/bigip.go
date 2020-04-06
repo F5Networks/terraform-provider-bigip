@@ -23,8 +23,8 @@ import (
 	"reflect"
 	"strings"
 	"time"
-//        "regexp"
-        "log"
+	//        "regexp"
+	"log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -199,8 +199,8 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
- 	}
-        
+	}
+
 	defer res.Body.Close()
 
 	data, _ := ioutil.ReadAll(res.Body)
@@ -266,7 +266,7 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 }
 func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 
-        marshalJSON, err := jsonMarshal(body) 
+	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		URL:         b.iControlPath(path),
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
-        }
+	}
 	resp, callErr := b.APICall(req)
 	return resp, callErr
 }
@@ -333,20 +333,20 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 }
 
 func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
-        marshalJSON, err := jsonMarshal(body)
-        if err != nil {
-                return nil, err
-        }
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
 
-        req := &APIRequest{
-                Method:      "patch",
-                URL:         b.iControlPath(path),
-                Body:        string(marshalJSON),
-                ContentType: "application/json",
-        }
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
 
-        resp, callErr := b.APICall(req)
-        return resp,callErr
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 // Upload a file read from a Reader
@@ -435,9 +435,9 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		}
 		return err, false
 	}
-        err = json.Unmarshal(resp, e)
+	err = json.Unmarshal(resp, e)
 	if err != nil {
-                log.Println(string(resp))
+		log.Println(string(resp))
 		return err, false
 	}
 	return nil, true
@@ -524,37 +524,4 @@ func toBoolString(b bool, trueStr, falseStr string) string {
 		return trueStr
 	}
 	return falseStr
-}
-func (b *BigIP) getForEntityas3(path ...string) (string, error, bool) {
-
-        req := &APIRequest{
-                Method:      "get",
-                URL:         b.iControlPath(path),
-                ContentType: "application/json",
-        }
-
-        resp, err := b.APICall(req)
-        if err != nil {
-                var reqError RequestError
-                json.Unmarshal(resp, &reqError)
-                if reqError.Code == 404 {
-                        return "", nil, false
-                }
-                return "", err, false
-        }
-
-       // resp1 := []byte(exmpstring)
-        jsonRef := make(map[string]interface{})
-        json.Unmarshal(resp, &jsonRef)
-        delete(jsonRef, "updateMode")
-        delete(jsonRef, "controls")
-        emp, _ := json.Marshal(jsonRef)
-        exmpstring := string(emp)
-//        re := regexp.MustCompile(`"updateMode":"[a-z]*",`)
-  //      string1 := re.ReplaceAllString(exmpstring, "")
-    //    re = regexp.MustCompile(`[,]*"controls":{"[a-zA-Z]*":"[\-0-9A-Z:.]*"}[,]*`)
-//	string2 := re.ReplaceAllString(string1, "")
-        strTrimSpace := strings.TrimSpace(exmpstring)
-        log.Println(strTrimSpace)
-        return strTrimSpace, nil, true
 }

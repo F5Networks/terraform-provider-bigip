@@ -8,10 +8,11 @@ package bigip
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
+	//"strings"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -30,17 +31,19 @@ func resourceBigipAs3() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-
 			"as3_json": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "AS3 json",
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "AS3 json",
+				StateFunc: func(v interface{}) string {
+					json, _ := structure.NormalizeJsonString(v)
+					return json
+				},
 				ValidateFunc: validation.ValidateJsonString,
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "Name of Tenant",
 			},
 		},
@@ -49,53 +52,46 @@ func resourceBigipAs3() *schema.Resource {
 
 func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
-	as3_json := d.Get("as3_json").(string)
-	if ok := bigip.ValidateAS3Template(as3_json); !ok {
+	as3Json := d.Get("as3_json").(string)
+	if ok := bigip.ValidateAS3Template(as3Json); !ok {
 		return fmt.Errorf("[AS3] Error validating template \n")
 		//return false
 	}
-	//	name := d.Get("tenant_name").(string)
-	strTrimSpace := strings.TrimSpace(as3_json)
-	tenant_list := client.GetTenantList(as3_json)
+	//strTrimSpace := strings.TrimSpace(as3Json)
+	tenantList := client.GetTenantList(as3Json)
+	strTrimSpace := client.AddTeemAgent(as3Json)
 	var tenants string
-	for i := 0; i < len(tenant_list)-1; i++ {
+	for i := 0; i < len(tenantList)-1; i++ {
 		if i == 0 {
-			tenants = tenant_list[i+1]
+			tenants = tenantList[i+1]
 			continue
 		}
-		tenants = tenants + "," + tenant_list[i+1]
+		tenants = tenants + "," + tenantList[i+1]
 	}
-	log.Println(tenants)
+	log.Printf("[INFO] Tenants in Json:%+v", tenants)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err := client.PostAs3Bigip(strTrimSpace)
 	if err != nil {
 		return fmt.Errorf("Error creating json  %s: %v", tenants, err)
 	}
 	d.SetId(tenants)
-	//	d.SetId(name)
 	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading As3 config")
 	name := d.Id()
-
-	as3exmp, err := client.GetAs3(name)
+	as3Resp, err := client.GetAs3(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		return err
 	}
-	if as3exmp == "" {
+	if as3Resp == "" {
 		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-
-	const s = `{"class":"AS3","action":"deploy","persist":true,"declaration":`
-	const s1 = `}`
-	as3exmp = s + as3exmp + s1
-	d.Set("as3_json", as3exmp)
+	d.Set("as3_json", as3Resp)
 	return nil
 }
 
@@ -130,10 +126,10 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	as3_json := d.Get("as3_json").(string)
-	log.Printf("[INFO] Updating As3 Config :%s", as3_json)
+	as3Json := d.Get("as3_json").(string)
+	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	name := d.Id()
-	err := client.ModifyAs3(name, as3_json)
+	err := client.ModifyAs3(name, as3Json)
 	if err != nil {
 		return fmt.Errorf("Error modifying json %s: %v", name, err)
 	}
