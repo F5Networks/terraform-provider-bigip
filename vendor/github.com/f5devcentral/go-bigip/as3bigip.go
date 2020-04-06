@@ -7,14 +7,30 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 
+const (
+	uriSha     = "shared"
+	uriAppsvcs = "appsvcs"
+	uriDecl    = "declare"
+	uriInfo    = "info"
+)
+
 type as3Validate struct {
 	as3SchemaURL    string
 	as3SchemaLatest string
+}
+
+type as3Version struct {
+	Version       string `json:"version"`
+	Release       string `json:"release"`
+	SchemaCurrent string `json:"schemaCurrent"`
+	SchemaMinimum string `json:"schemaMinimum"`
 }
 
 func ValidateAS3Template(as3ExampleJson string) bool {
@@ -29,7 +45,6 @@ func ValidateAS3Template(as3ExampleJson string) bool {
 	}
 
 	schemaLoader := gojsonschema.NewStringLoader(myAs3.as3SchemaLatest)
-	//schemaLoader := gojsonschema.NewReferenceLoader("file:///Users/chinthalapalli/go/src/github.com/Practice/as3-schema-3.13.2-1-cis.json")
 	documentLoader := gojsonschema.NewStringLoader(as3ExampleJson)
 
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -229,6 +244,14 @@ func (b *BigIP) GetAs3(name string) (string, error) {
 	log.Printf("[DEBUG] As3 response string :%+v", as3String)
 	return as3String, nil
 }
+func (b *BigIP) getAs3version() (*as3Version, error) {
+	var as3Ver as3Version
+	err, _ := b.getForEntity(&as3Ver, uriMgmt, uriShared, uriAppsvcs, uriInfo)
+	if err != nil {
+		return nil, err
+	}
+	return &as3Ver, nil
+}
 func (b *BigIP) getas3Taskstatus(id string) (*As3TaskType, error) {
 	var taskList As3TaskType
 	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
@@ -292,9 +315,17 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(resp, &jsonRef)
 	//jsonRef["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
+	as3ver, err := b.getAs3version()
+	if err != nil {
+		log.Println(err)
+	}
+	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
+	res1 := strings.Split(as3ver.Version, ".")
 	for _, value := range jsonRef {
 		if rec, ok := value.(map[string]interface{}); ok {
-			rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
+			if intConvert(res1[0]) > 3 || intConvert(res1[1]) >= 18 {
+				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
+			}
 		}
 	}
 	jsonData, err := json.Marshal(jsonRef)
@@ -303,4 +334,10 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 	}
 	s = string(jsonData)
 	return s
+}
+func intConvert(v interface{}) int {
+	if s, err := strconv.Atoi(v.(string)); err == nil {
+		return s
+	}
+	return 0
 }
