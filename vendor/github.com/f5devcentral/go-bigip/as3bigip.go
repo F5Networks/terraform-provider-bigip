@@ -15,10 +15,13 @@ import (
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 
 const (
-	uriSha     = "shared"
-	uriAppsvcs = "appsvcs"
-	uriDecl    = "declare"
-	uriInfo    = "info"
+	uriSha          = "shared"
+	uriAppsvcs      = "appsvcs"
+	uriDecl         = "declare"
+	uriInfo         = "info"
+	uriTask         = "task"
+	uriDeclare      = "declare"
+	uriAsyncDeclare = "declare?async=true"
 )
 
 type as3Validate struct {

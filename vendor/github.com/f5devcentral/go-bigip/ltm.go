@@ -171,11 +171,6 @@ type Node struct {
 	} `json:"fqdn,omitempty"`
 }
 
-type AsJsonn struct {
-	Name    string `json:"name,omitempty"`
-	As3Json string `json:"as3Json,omitempty"`
-}
-
 // DataGroups contains a list of data groups on the BIG-IP system.
 type DataGroups struct {
 	DataGroups []DataGroup `json:"items"`
@@ -1713,7 +1708,6 @@ type HttpCompressionProfile struct {
 }
 
 const (
-	uriTask           = "task"
 	uriLtm            = "ltm"
 	uriNode           = "node"
 	uriPool           = "pool"
@@ -1753,8 +1747,6 @@ const (
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
 	uriCreateDraft    = "?options=create-draft"
-	uriDeclare        = "declare"
-	uriAsyncDeclare   = "declare?async=true"
 )
 
 var cidr = map[string]string{
