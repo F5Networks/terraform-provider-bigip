@@ -290,8 +290,8 @@ func (b *BigIP) pollingStatus(id string) bool {
 	}
 	return true
 }
-func (b *BigIP) GetTenantList(body interface{}) []string {
-	s := make([]string, 1)
+func (b *BigIP) GetTenantList(body interface{}) string {
+	s := make([]string, 0)
 	as3json := body.(string)
 	resp := []byte(as3json)
 	jsonRef := make(map[string]interface{})
@@ -300,13 +300,13 @@ func (b *BigIP) GetTenantList(body interface{}) []string {
 		if rec, ok := value.(map[string]interface{}); ok {
 			for k, v := range rec {
 				if _, ok := v.(map[string]interface{}); ok {
-					log.Println(k)
 					s = append(s, k)
 				}
 			}
 		}
 	}
-	return s
+        tenant_list := strings.Join(s[:], ",")
+	return tenant_list
 }
 func (b *BigIP) AddTeemAgent(body interface{}) string {
 	var s string
