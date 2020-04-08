@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
-	"strings"
+	//	"strings"
 )
 
 func resourceBigipAs3() *schema.Resource {
@@ -110,16 +110,6 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	tenantList := client.GetTenantList(as3Json)
 	if tenantList != name {
 		d.Set("tenant_name", tenantList)
-		new_list := strings.Split(tenantList, ",")
-		old_list := strings.Split(name, ",")
-		deleted_tenants := client.TenantDifference(old_list, new_list)
-		if deleted_tenants != "" {
-			err := client.DeleteAs3Bigip(name)
-			if err != nil {
-				log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
-				return err
-			}
-		}
 	}
 	err := client.ModifyAs3(tenantList, as3Json)
 
