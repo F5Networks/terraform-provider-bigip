@@ -115,7 +115,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 		old_list := strings.Split(name, ",")
 		deleted_tenants := client.TenantDifference(old_list, new_list)
 		if deleted_tenants != "" {
-			err := client.DeleteAs3Bigip(name)
+			err := client.DeleteAs3Bigip(deleted_tenants)
 			if err != nil {
 				log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
 				return err

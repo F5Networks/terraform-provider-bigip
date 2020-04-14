@@ -130,10 +130,10 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 		if err != nil {
 			return err
 		}
+                respCode = fastTask.Results[0].Code
                 if respCode != 0 && respCode != 503{
                        _,tenant_count := b.GetTenantList(as3NewJson) 
-                       tenant_count = tenant_count -2
-                       i := tenant_count
+                       i := tenant_count - 2
                        success_count := 0
                        for i >= 0 {
                           if fastTask.Results[i].Code == 200 {
@@ -144,12 +144,11 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
                           }
                           i = i - 1
                        }
-                       if success_count == tenant_count {
+                       if success_count == tenant_count - 1 {
                           log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
                           break // break here
                        }
                 }
-		respCode = fastTask.Results[0].Code
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
