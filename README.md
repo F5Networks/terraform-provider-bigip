@@ -81,3 +81,8 @@ BIGIP_HOST=f5.mycompany.com BIGIP_USER=foo BIGIP_PASSWORD=secret make testacc
 
 Read [here](https://github.com/hashicorp/terraform/blob/master/.github/CONTRIBUTING.md#running-an-acceptance-test) for
 more information about acceptance testing in Terraform.
+
+# Community Help
+
+We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on Terraform Resources (click the **terraform** channel). There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance. This slack channel community support should **not** be considered a substitute for F5 Technical Support. See the [Slack Channel Statement](slack-channel-statement.md) for guidelines on using this channel.
+
