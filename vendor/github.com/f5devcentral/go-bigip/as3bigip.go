@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+        "errors"
 )
 
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
@@ -129,11 +130,26 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 		if err != nil {
 			return err
 		}
+                if respCode != 0 && respCode != 503{
+                       _,tenant_count := b.GetTenantList(as3NewJson) 
+                       tenant_count = tenant_count -2
+                       i := tenant_count
+                       success_count := 0
+                       for i >= 0 {
+                          if fastTask.Results[i].Code == 200 {
+                                success_count++
+                          }
+                          if fastTask.Results[i].Code >= 400 {
+                               return errors.New(fmt.Sprintf("HTTP %d :: %s", fastTask.Results[i].Code, fastTask.Results[i].Message))
+                          }
+                          i = i - 1
+                       }
+                       if success_count == tenant_count {
+                          log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+                          break // break here
+                       }
+                }
 		respCode = fastTask.Results[0].Code
-		if respCode == 200 {
-			log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
-			break // break here
-		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
@@ -290,7 +306,7 @@ func (b *BigIP) pollingStatus(id string) bool {
 	}
 	return true
 }
-func (b *BigIP) GetTenantList(body interface{}) string {
+func (b *BigIP) GetTenantList(body interface{}) (string, int) {
 	s := make([]string, 0)
 	as3json := body.(string)
 	resp := []byte(as3json)
@@ -306,7 +322,7 @@ func (b *BigIP) GetTenantList(body interface{}) string {
 		}
 	}
         tenant_list := strings.Join(s[:], ",")
-	return tenant_list
+	return tenant_list,len(s)
 }
 func (b *BigIP) AddTeemAgent(body interface{}) string {
 	var s string
