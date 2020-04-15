@@ -14,8 +14,8 @@ To use AS3 Extensions with Terraform, ensure you meet the following requirements
 - You have a BIG-IP system user account with the Administrator role
 
 
-Example
--------
+Example Usage
+-------------
 
 .. code-block:: json
 
@@ -99,7 +99,7 @@ Use the following terraform provisioner to download AS3 RPM from GitHub and inst
 You will need to pass BIG-IP and its credentials as an argument to the install script. This script is available in the `examples section <https://github.com/F5Networks/terraform-provider-bigip/tree/master/examples>`_ of AS3 in the Terraform repo.
 
 
-.. NOTE::vAS3 tenants are BIG-IP administrative partitions used to group configurations that support specific AS3 applications. An AS3 application may support a network-based business application or system. AS3 tenants may also include resources shared by applications in other tenants.
+.. NOTE:: AS3 tenants are BIG-IP administrative partitions used to group configurations that support specific AS3 applications. An AS3 application may support a network-based business application or system. AS3 tenants may also include resources shared by applications in other tenants.
 
 
 
