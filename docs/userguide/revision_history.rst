@@ -3,6 +3,8 @@
 Document Revision History
 =========================
 
+This page shows the revision history for this documentation. See `GitHub <https://github.com/F5Networks/terraform-provider-bigip>`_ for release information.
+
 .. list-table::
       :widths: 15 100 15
       :header-rows: 1
@@ -12,8 +14,8 @@ Document Revision History
         - Date
         
       * - 1.1  
-        - Updated the documentation with the following changes: |br| • Added information about AS3 integration
-        - 02-14-20 
+        - Updated the documentation with the following changes: |br| • Added section on :ref:`as3-integration`. |br| • Added section on :ref:`do-integration`. |br| • Added information about our Slack channel to the :ref:`support` page.
+        - 04-15-20 
 
       * - 1.0  
         - Initial release of Terraform documentation

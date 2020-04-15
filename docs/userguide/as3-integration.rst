@@ -11,7 +11,11 @@ Prerequisites
 To use AS3 Extensions with Terraform, ensure you meet the following requirements:
 - The BIG-IP system is running software version 12.1.x or higher
 - The BIG-IP system has AS3 Extension version 3.10 or higher installed
-- A BIG-IP system user account with the Administrator role
+- You have a BIG-IP system user account with the Administrator role
+
+
+Example
+-------
 
 .. code-block:: json
 
@@ -79,7 +83,7 @@ AS3 Installation
 
 Use the following terraform provisioner to download AS3 RPM from GitHub and install the RPM on BIG-IP.
 
-.. code-block:: go
+::
 
    resource "null_resource" "install_as3" {
 
@@ -92,17 +96,11 @@ Use the following terraform provisioner to download AS3 RPM from GitHub and inst
    }
 
 
-AS3 Tenants
------------
-
-AS3 tenants are BIG-IP administrative partitions used to group configurations that support specific AS3 applications. An AS3 application may support a network-based business application or system. AS3 tenants may also include resources shared by applications in other tenants.
+You will need to pass BIG-IP and its credentials as an argument to the install script. This script is available in the `examples section <https://github.com/F5Networks/terraform-provider-bigip/tree/master/examples>`_ of AS3 in the Terraform repo.
 
 
-AS3 resources
--------------
+.. NOTE::vAS3 tenants are BIG-IP administrative partitions used to group configurations that support specific AS3 applications. An AS3 application may support a network-based business application or system. AS3 tenants may also include resources shared by applications in other tenants.
 
-- See the `F5 AS3 User Guide <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/>`_ to get started using F5 AS3 Extension declarations
-- See the `F5 AS3 Reference Guide <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/>`_ for an overview and list of F5 AS3 Extension declarations
 
 
 .. |as3_json| raw:: html

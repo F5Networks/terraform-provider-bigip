@@ -1,3 +1,5 @@
+.. _support:
+
 Support
 =======
 
@@ -31,6 +33,8 @@ F5 employees are members of this community and typically monitor the channel Mon
 .. |slackterraform| raw:: html
 
    <a href="https://f5cloudsolutions.herokuapp.com/" target="_blank">the F5 Terraform channel on Slack</a>
+
+This slack channel community support should not be considered a substitute for F5 Technical Support. See the `Slack Channel Statement <https://github.com/F5Networks/terraform-provider-bigip/blob/master/slack-channel-statement.md>`_ for guidelines on using this channel.
 
 
 Exposing confidential information
