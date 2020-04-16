@@ -2,15 +2,17 @@ package bigip
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-        "errors"
 )
 
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
@@ -130,25 +132,25 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 		if err != nil {
 			return err
 		}
-                if respCode != 0 && respCode != 503{
-                       _,tenant_count := b.GetTenantList(as3NewJson) 
-                       tenant_count = tenant_count -2
-                       i := tenant_count
-                       success_count := 0
-                       for i >= 0 {
-                          if fastTask.Results[i].Code == 200 {
-                                success_count++
-                          }
-                          if fastTask.Results[i].Code >= 400 {
-                               return errors.New(fmt.Sprintf("HTTP %d :: %s", fastTask.Results[i].Code, fastTask.Results[i].Message))
-                          }
-                          i = i - 1
-                       }
-                       if success_count == tenant_count {
-                          log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
-                          break // break here
-                       }
-                }
+		if respCode != 0 && respCode != 503 {
+			_, tenant_count := b.GetTenantList(as3NewJson)
+			tenant_count = tenant_count - 2
+			i := tenant_count
+			success_count := 0
+			for i >= 0 {
+				if fastTask.Results[i].Code == 200 {
+					success_count++
+				}
+				if fastTask.Results[i].Code >= 400 {
+					return errors.New(fmt.Sprintf("HTTP %d :: %s", fastTask.Results[i].Code, fastTask.Results[i].Message))
+				}
+				i = i - 1
+			}
+			if success_count == tenant_count {
+				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+				break // break here
+			}
+		}
 		respCode = fastTask.Results[0].Code
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
@@ -321,8 +323,8 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int) {
 			}
 		}
 	}
-        tenant_list := strings.Join(s[:], ",")
-	return tenant_list,len(s)
+	tenant_list := strings.Join(s[:], ",")
+	return tenant_list, len(s)
 }
 func (b *BigIP) AddTeemAgent(body interface{}) string {
 	var s string
@@ -336,11 +338,13 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 		log.Println(err)
 	}
 	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
+	userAgent, err := getVersion("/usr/local/bin/terraform")
+	//log.Printf("[DEBUG] Terraform version:%+v", userAgent)
 	res1 := strings.Split(as3ver.Version, ".")
 	for _, value := range jsonRef {
 		if rec, ok := value.(map[string]interface{}); ok {
 			if intConvert(res1[0]) > 3 || intConvert(res1[1]) >= 18 {
-				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
+				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": userAgent}
 			}
 		}
 	}
@@ -357,23 +361,34 @@ func intConvert(v interface{}) int {
 	}
 	return 0
 }
+func getVersion(tfBinary string) (string, error) {
+	var versionRegex = regexp.MustCompile("Terraform v(.*?)(\\s.*)?\n")
+	out, err := exec.Command(tfBinary, "version").Output()
+	if err != nil {
+		return "", err
+	}
+	versionOutput := string(out)
+	match := versionRegex.FindStringSubmatch(versionOutput)
+	ua := fmt.Sprintf("Terraform/%s", match[1])
+	return ua, nil
+}
 func (b *BigIP) TenantDifference(slice1 []string, slice2 []string) string {
-    var diff []string
-    for i := 0; i < 2; i++ {
-        for _, s1 := range slice1 {
-            found := false
-            for _, s2 := range slice2 {
-                if s1 == s2 {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                diff = append(diff, s1)
-            }
- 
-        }
-    }
-    diff_tenant_list := strings.Join(diff[:], ",")
-    return diff_tenant_list
+	var diff []string
+	for i := 0; i < 2; i++ {
+		for _, s1 := range slice1 {
+			found := false
+			for _, s2 := range slice2 {
+				if s1 == s2 {
+					found = true
+					break
+				}
+			}
+			if !found {
+				diff = append(diff, s1)
+			}
+
+		}
+	}
+	diff_tenant_list := strings.Join(diff[:], ",")
+	return diff_tenant_list
 }
