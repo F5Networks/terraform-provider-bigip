@@ -21,3 +21,7 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Initial release of Terraform documentation
         - 10-02-19 
       
+
+.. |br| raw:: html
+ 
+   <br />
