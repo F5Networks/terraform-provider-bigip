@@ -7,11 +7,10 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
-	"reflect"
 )
 
 func resourceBigiqLicenseManage() *schema.Resource {
@@ -32,21 +31,25 @@ func resourceBigiqLicenseManage() *schema.Resource {
 			"bigiq_user": {
 				Type:        schema.TypeString,
 				Required:    true,
+				Sensitive:   true,
 				Description: "The registration key pool to use",
 			},
 			"bigiq_port": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "The registration key pool to use",
 			},
 			"bigiq_password": {
 				Type:        schema.TypeString,
 				Required:    true,
+				Sensitive:   true,
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Sensitive:   true,
 				Default:     false,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", nil),
@@ -54,43 +57,37 @@ func resourceBigiqLicenseManage() *schema.Resource {
 			"bigiq_login_ref": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Default:     "tmos",
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", nil),
 			},
+			"pool_license_type": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validatePoolLicenseType,
+				Description:  "This will specify Utility/regKey Licence pool type",
+			},
+			"assignment_type": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateAssignmentType,
+				Description:  "Whether the specified device is a managed or un-managed device",
+			},
 			"pool": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "The registration key pool to use",
 			},
 			"key": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "The registration key that you want to assign from the pool",
 			},
-			"managed": {
-				Type:        schema.TypeBool,
-				Required:    true,
-				Description: "Whether the specified device is a managed or un-managed device",
-			},
-			"device": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ConfigMode:   schema.SchemaConfigModeAttr,
-				ValidateFunc: getDevicedetails,
-				Description:  "When managed is yes, specifies the managed device, or device UUID, that you want to register.",
-			},
-			"device_username": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: getDevicedetails,
-				Description:  "The username used to connect to the remote device.",
-			},
-			"device_password": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: getDevicedetails,
-				Description:  "The password of the device_username.When managed is no, this parameter is required.",
+			"unit_of_measure": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets the rate at which this license usage is billed",
 			},
 		},
 	}
@@ -102,24 +99,34 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
 		return err
 	}
-	meta = bigiqRef
-	//log.Printf("bigiqRef = %+v", meta)
-	client := meta.(*bigip.BigIP)
-	poolName := d.Get("pool").(string)
-	regKey := d.Get("key").(string)
-	poolId, err := client.GetRegkeyPoolId(poolName)
-	if err != nil && poolId == "" {
-		log.Printf("Getting PoolID failed with :%v", err)
+	bigipRef := meta.(*bigip.BigIP)
+	log.Printf("bigipRef = %+v", bigipRef)
+	var poolId, regKey string
+	if v, ok := d.GetOk("pool"); ok {
+		poolId, err = bigiqRef.GetRegkeyPoolId(v.(string))
+		if (err != nil) && (poolId == "") {
+			log.Printf("Getting PoolID failed with :%v", err)
+			return err
+		}
+	}
+	if v, ok := d.GetOk("key"); ok {
+		regKey = v.(string)
+	}
+	log.Printf("Pool ID = %+v", poolId)
+	deviceID, err := bigiqRef.GetDeviceId("10.145.65.170")
+	if (err != nil) && (deviceID == "") {
+		log.Printf("Getting deviceID failed with :%v", err)
 		return err
 	}
-	//log.Printf("Pool ID = %+v", poolId)
+	log.Printf("deviceID = %+v", deviceID)
+	//Link: "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/5c1e6fa1-ae98-4d65-b7c4-2872c21d5fa3",
 	deRef := bigip.DeviceRef{
-		Link: "https://localhost/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices/5c1e6fa1-ae98-4d65-b7c4-2872c21d5fa3",
+		Link: deviceID,
 	}
 	config := &bigip.ManagedDevice{
 		DeviceReference: deRef,
 	}
-	resp, err := client.RegkeylicenseAssign(config, poolId, regKey)
+	resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 	if err != nil {
 		log.Printf("Assigning License failed from regKey Pool:%v", err)
 		return err
@@ -135,19 +142,18 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
 		return err
 	}
-	meta = bigiqRef
-	client := meta.(*bigip.BigIP)
-	log.Printf("meta in Read = %+v", meta)
+	bigipRef := meta.(*bigip.BigIP)
+	log.Printf("bigipRef = %+v", bigipRef)
 	memID := d.Id()
 	//log.Printf("bigiqRef = %+v", bigiqRef)
 	poolName := d.Get("pool").(string)
 	regKey := d.Get("key").(string)
-	poolId, err := client.GetRegkeyPoolId(poolName)
+	poolId, err := bigiqRef.GetRegkeyPoolId(poolName)
 	if err != nil && poolId == "" {
 		log.Printf("Getting PoolID failed with :%v", err)
 		return err
 	}
-	client.GetMemberStatus(poolId, regKey, memID)
+	bigiqRef.GetMemberStatus(poolId, regKey, memID)
 	return nil
 }
 
@@ -163,19 +169,19 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
 		return err
 	}
-	meta = bigiqRef
-	client := meta.(*bigip.BigIP)
-	log.Printf("meta in delete = %+v", meta)
+	//meta = bigiqRef
+	bigipRef := meta.(*bigip.BigIP)
+	log.Printf("bigipRef = %+v", bigipRef)
 	memID := d.Id()
 	poolName := d.Get("pool").(string)
 	regKey := d.Get("key").(string)
-	poolId, err := client.GetRegkeyPoolId(poolName)
+	poolId, err := bigiqRef.GetRegkeyPoolId(poolName)
 	if err != nil && poolId == "" {
 		log.Printf("Getting PoolID failed with :%v", err)
 		return err
 	}
 	//log.Printf("Pool ID = %+v", poolId)
-	client.RegkeylicenseRevoke(poolId, regKey, memID)
+	bigiqRef.RegkeylicenseRevoke(poolId, regKey, memID)
 	return nil
 }
 
@@ -191,33 +197,4 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 	}
 	//log.Printf("bigiqConfig = %+v", bigiqConfig)
 	return bigiqConfig.Client()
-}
-func getDevicedetails(value interface{}, field string) (ws []string, errors []error) {
-	var values []string
-	log.Printf("Value type:%T and Value:%+v", value, value)
-	switch value.(type) {
-	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
-		break
-	case []string:
-		values = value.([]string)
-		break
-	case *[]string:
-		values = *(value.(*[]string))
-		break
-	case string:
-		values = []string{value.(string)}
-		break
-	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
-	}
-
-	for _, v := range values {
-		log.Printf("---Value type:%T and Value:%+v", v, v)
-		//match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.]+$", v)
-		//if !match {
-		//	errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
-		//}
-	}
-	return
 }

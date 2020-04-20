@@ -113,6 +113,22 @@ func (b *BigIP) GetManagedDevices() (*devicesList, error) {
 	return &self, nil
 }
 
+func (b *BigIP) GetDeviceId(deviceName string) (string, error) {
+	var self devicesList
+	err, _ := b.getForEntity(&self, uriMgmt, uriShared, uriResolver, uriDevicegroup, uriCmBigip, uriDevices)
+	if err != nil {
+		return "", err
+	}
+	for _, d := range self.DevicesInfo {
+		log.Printf("Address=%v,Hostname=%v,UUID=%v", d.Address, d.Hostname, d.UUID)
+		if d.Address == deviceName || d.Hostname == deviceName || d.UUID == deviceName {
+			log.Printf("SelfLink Type=%T,SelfLink=%v", d.SelfLink, d.SelfLink)
+			return d.SelfLink, nil
+		}
+	}
+	return "", nil
+}
+
 func (b *BigIP) GetRegkeyPoolId(poolName string) (string, error) {
 	var self regKeyPools
 	err, _ := b.getForEntity(&self, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses)

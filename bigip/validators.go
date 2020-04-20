@@ -194,3 +194,47 @@ func validateDataGroupType(value interface{}, field string) (ws []string, errors
 	}
 	return
 }
+func validatePoolLicenseType(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+	case []string:
+		values = value.([]string)
+	case *[]string:
+		values = *(value.(*[]string))
+	case string:
+		values = []string{value.(string)}
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
+	}
+	for _, v := range values {
+		match, _ := regexp.MatchString("(?mi)^Utility$|^regkey$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match as Utility (or) Regkey", field))
+		}
+	}
+	return
+}
+func validateAssignmentType(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+	case []string:
+		values = value.([]string)
+	case *[]string:
+		values = *(value.(*[]string))
+	case string:
+		values = []string{value.(string)}
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
+	}
+	for _, v := range values {
+		match, _ := regexp.MatchString("(?mi)^MANAGED$|^UNMANAGED$|^UNREACHABLE$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match as MANAGED/UNMANAGED/UNREACHABLE", field))
+		}
+	}
+	return
+}
