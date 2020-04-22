@@ -14,6 +14,8 @@ const (
 	uriCmBigip     = "cm-bigip-allBigIpDevices"
 	uriDevice      = "device"
 	uriMembers     = "members"
+	uriTasks       = "tasks"
+	uriManagement  = "member-management"
 )
 
 type DeviceRef struct {
@@ -23,11 +25,11 @@ type ManagedDevice struct {
 	DeviceReference DeviceRef `json:"deviceReference"`
 }
 
-type unmanagedDevice struct {
+type UnmanagedDevice struct {
 	DeviceAddress string `json:"deviceAddress"`
 	Username      string `json:"username"`
 	Password      string `json:"password"`
-	HTTPSPort     int    `json:"httpsPort"`
+	HTTPSPort     int    `json:"httpsPort,omitempty"`
 }
 
 type regKeyPools struct {
@@ -86,6 +88,59 @@ type regKeyAssignStatus struct {
 	Status         string `json:"status"`
 }
 
+type LicenseParam struct {
+	Address         string `json:"address,omitempty"`
+	AssignmentType  string `json:"assignmentType,omitempty"`
+	Command         string `json:"command,omitempty"`
+	Hypervisor      string `json:"hypervisor,omitempty"`
+	LicensePoolName string `json:"licensePoolName,omitempty"`
+	MacAddress      string `json:"macAddress,omitempty"`
+	Password        string `json:"password,omitempty"`
+	SkuKeyword1     string `json:"skuKeyword1,omitempty"`
+	SkuKeyword2     string `json:"skuKeyword2,omitempty"`
+	Tenant          string `json:"tenant,omitempty"`
+	UnitOfMeasure   string `json:"unitOfMeasure,omitempty"`
+	User            string `json:"user,omitempty"`
+}
+
+func (b *BigIP) PostLicense(config *LicenseParam) (string, error) {
+	resp, err := b.postReq(config, uriMgmt, uriCm, uriDevice, uriTasks, uriLicensing, uriPool, uriManagement)
+	if err != nil {
+		return "", err
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	respID := respRef["id"].(string)
+	log.Printf("respRef = %v,ID = %v", respRef, respID)
+	return respID, nil
+}
+func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
+	licRes := make(map[string]interface{})
+	err, _ := b.getForEntity(&licRes, uriMgmt, uriCm, uriDevice, uriTasks, uriLicensing, uriPool, uriManagement, id)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf(" Initial status response is :%s", licRes["status"].(string))
+	lic_status := licRes["status"].(string)
+	for lic_status != "FINISHED" {
+		log.Printf(" status response is :%s", lic_status)
+		if lic_status == "FAILED" {
+			return licRes, nil
+		}
+		return b.GetLicenseStatus(id)
+	}
+	return licRes, nil
+}
+
+func (b *BigIP) GetDeviceLicenseStatus(path ...string) (string, error) {
+	licRes := make(map[string]interface{})
+	err, _ := b.getForEntity(&licRes, path...)
+	if err != nil {
+		return "", err
+	}
+	//log.Printf(" Initial status response is :%s", licRes["status"])
+	return licRes["status"].(string), nil
+}
 func (b *BigIP) GetRegPools() (*regKeyPools, error) {
 	var self regKeyPools
 	err, _ := b.getForEntity(&self, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses)
@@ -136,6 +191,7 @@ func (b *BigIP) GetRegkeyPoolId(poolName string) (string, error) {
 		return "", err
 	}
 	for _, pool := range self.RegKeyPoollist {
+		log.Printf("[DEBUG] Pool Details:%+v", pool)
 		if pool.Name == poolName {
 			return pool.ID, nil
 		}
@@ -174,6 +230,20 @@ func (b *BigIP) GetMemberStatus(poolId, regKey, memId string) (*memberDetail, er
 func (b *BigIP) RegkeylicenseRevoke(poolId, regKey, memId string) error {
 	log.Printf("Deleting License for Member:%+v", memId)
 	_, err := b.deleteReq(uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses, poolId, uriOfferings, regKey, uriMembers, memId)
+	if err != nil {
+		return err
+	}
+	r1 := make(map[string]interface{})
+	err, _ = b.getForEntity(&r1, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses, poolId, uriOfferings, regKey, uriMembers, memId)
+	if err != nil {
+		return err
+	}
+	log.Printf("Response after delete:%+v", r1)
+	return nil
+}
+func (b *BigIP) LicenseRevoke(config interface{}, poolId, regKey, memId string) error {
+	log.Printf("Deleting License for Member:%+v from LicenseRevoke", memId)
+	_, err := b.deleteReqBody(config, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses, poolId, uriOfferings, regKey, uriMembers, memId)
 	if err != nil {
 		return err
 	}

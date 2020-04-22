@@ -238,3 +238,11 @@ func validateAssignmentType(value interface{}, field string) (ws []string, error
 	}
 	return
 }
+
+func getDeviceUri(str string) ([]string, error) {
+	re := regexp.MustCompile(`^(?:(?:(https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?`)
+	if len(re.FindStringSubmatch(str)) > 0 {
+		return re.FindStringSubmatch(str), nil
+	}
+	return []string{}, nil
+}
