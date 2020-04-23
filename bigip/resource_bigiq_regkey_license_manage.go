@@ -293,10 +293,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 	}
 	var deviceIP []string
 	deviceIP, _ = getDeviceUri(bigipRef.Host)
-	devicePort, err := strconv.Atoi(deviceIP[3])
-	if err == nil {
-		return err
-	}
+	devicePort, _ := strconv.Atoi(deviceIP[3])
 	assignmentType := d.Get("assignment_type").(string)
 	if regKey == "" {
 		address := deviceIP[2]
