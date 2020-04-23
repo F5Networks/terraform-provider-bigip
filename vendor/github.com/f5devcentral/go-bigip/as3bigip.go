@@ -116,8 +116,9 @@ type Results1 struct {
 	RunTime   int64  `json:"runTime,omitempty"`
 }
 
-func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
-	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriAsyncDeclare)
+func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) error {
+        tenantFilter = tenantFilter + "?async=true"
+	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter)
 	if err != nil {
 		return err
 	}
@@ -134,8 +135,9 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 		}
 		respCode = fastTask.Results[0].Code
 		if respCode != 0 && respCode != 503 {
-			_, tenant_count := b.GetTenantList(as3NewJson)
-			i := tenant_count - 2
+			tenant_list, tenant_count := b.GetTenantList(as3NewJson)
+                        if tenant_list == tenantFilter {
+			i := tenant_count - 1
 			success_count := 0
 			for i >= 0 {
 				if fastTask.Results[i].Code == 200 {
@@ -146,10 +148,15 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 				}
 				i = i - 1
 			}
-			if success_count == tenant_count-1 {
+			if success_count == tenant_count {
 				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 				break // break here
 			}
+                  }
+                  if respCode == 200 {
+                          log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+                                break // break here
+                  }
 		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
@@ -158,7 +165,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string) error {
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id) {
-					return b.PostAs3Bigip(as3NewJson)
+					return b.PostAs3Bigip(as3NewJson, tenantFilter)
 				}
 			}
 		}
@@ -313,11 +320,19 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int) {
 	resp := []byte(as3json)
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(resp, &jsonRef)
-	for _, value := range jsonRef {
-		if rec, ok := value.(map[string]interface{}); ok {
+	for key, value := range jsonRef {
+		if rec, ok := value.(map[string]interface{}); ok && key == "declaration"{
 			for k, v := range rec {
-				if _, ok := v.(map[string]interface{}); ok {
+				if rec2, ok := v.(map[string]interface{}); ok {
+                                      found := 0
+                                      for k1, v1 := range rec2 {
+                                          if k1 == "class" && v1 == "Tenant" {
+                                              found = 1
+                                           }
+                                       }
+                                       if found == 1 {
 					s = append(s, k)
+                                    }
 				}
 			}
 		}
