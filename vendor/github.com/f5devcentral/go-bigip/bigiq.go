@@ -120,7 +120,7 @@ func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf(" Initial status response is :%s", licRes["status"].(string))
+	//log.Printf(" Initial status response is :%s", licRes["status"].(string))
 	lic_status := licRes["status"].(string)
 	for lic_status != "FINISHED" {
 		log.Printf(" status response is :%s", lic_status)
@@ -150,13 +150,27 @@ func (b *BigIP) GetRegPools() (*regKeyPools, error) {
 	return &self, nil
 }
 
-func (b *BigIP) GetRegPool(poolid string) (*regKeyPool, error) {
-	var self regKeyPool
-	err, _ := b.getForEntity(&self, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses, poolid)
+func (b *BigIP) GetPoolType(poolName string) (*regKeyPool, error) {
+	var self regKeyPools
+	err, _ := b.getForEntity(&self, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriRegkey, uriLicenses)
 	if err != nil {
 		return nil, err
 	}
-	return &self, nil
+	for _, pool := range self.RegKeyPoollist {
+		if pool.Name == poolName {
+			return &pool, nil
+		}
+	}
+	err, _ = b.getForEntity(&self, uriMgmt, uriCm, uriDevice, uriLicensing, uriPool, uriUtility, uriLicenses)
+	if err != nil {
+		return nil, err
+	}
+	for _, pool := range self.RegKeyPoollist {
+		if pool.Name == poolName {
+			return &pool, nil
+		}
+	}
+	return nil, nil
 }
 
 func (b *BigIP) GetManagedDevices() (*devicesList, error) {
@@ -191,7 +205,6 @@ func (b *BigIP) GetRegkeyPoolId(poolName string) (string, error) {
 		return "", err
 	}
 	for _, pool := range self.RegKeyPoollist {
-		log.Printf("[DEBUG] Pool Details:%+v", pool)
 		if pool.Name == poolName {
 			return pool.ID, nil
 		}

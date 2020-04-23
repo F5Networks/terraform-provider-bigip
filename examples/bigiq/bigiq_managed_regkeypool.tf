@@ -7,7 +7,6 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
   bigiq_address="xxx.xxx.xxx.xxx"
   bigiq_user="xxxx"
   bigiq_password="xxxxx"
-  pool_license_type="Regkey"
   license_poolname = "regkey_pool_name"
   assignment_type = "MANAGED"
 }

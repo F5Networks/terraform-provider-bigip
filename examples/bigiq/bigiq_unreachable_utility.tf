@@ -7,7 +7,6 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
   bigiq_address="xxx.xxx.xxx.xxx"
   bigiq_user="xxxx"
   bigiq_password="xxxxx"
-  pool_license_type="Utility"
   license_poolname = "utility_pool_name"
   unit_of_measure = "yearly"
   assignment_type = "UNREACHABLE"
