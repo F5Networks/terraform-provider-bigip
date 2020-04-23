@@ -136,15 +136,16 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	var deviceIP []string
 	var respID string
 	deviceIP, _ = getDeviceUri(bigipRef.Host)
-	devicePort, err := strconv.Atoi(deviceIP[3])
-	if err == nil {
-		return err
-	}
+	devicePort, _ := strconv.Atoi(deviceIP[3])
 	licensePoolName := d.Get("license_poolname").(string)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
 	if err != nil {
 		return err
 	}
+	if poolInfo == nil {
+		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
+	}
+	log.Printf("poolInfo:%+v", poolInfo)
 	var licenseType string
 	if poolInfo.SortName == "Registration Key Pool" {
 		licenseType = poolInfo.SortName
