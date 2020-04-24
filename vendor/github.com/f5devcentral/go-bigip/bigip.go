@@ -446,6 +446,26 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 	return nil, true
 }
 
+func (b *BigIP) getForEntityNew(e interface{}, path ...string) (error, bool) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		return err, false
+	}
+	err = json.Unmarshal(resp, e)
+	if err != nil {
+		return err, false
+	}
+	return nil, true
+}
+
 // checkError handles any errors we get from our API requests. It returns either the
 // message of the error, if any, or nil.
 func (b *BigIP) checkError(resp []byte) error {

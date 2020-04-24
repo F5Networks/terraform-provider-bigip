@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 )
 
 const (
@@ -104,6 +105,7 @@ type LicenseParam struct {
 }
 
 func (b *BigIP) PostLicense(config *LicenseParam) (string, error) {
+	log.Printf("[INFO] %v license to BIGIP device:%v from BIGIQ", config.Command, config.Address)
 	resp, err := b.postReq(config, uriMgmt, uriCm, uriDevice, uriTasks, uriLicensing, uriPool, uriManagement)
 	if err != nil {
 		return "", err
@@ -111,7 +113,8 @@ func (b *BigIP) PostLicense(config *LicenseParam) (string, error) {
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["id"].(string)
-	log.Printf("respRef = %v,ID = %v", respRef, respID)
+	//log.Printf("respRefcID = %v", respID)
+	time.Sleep(5 * time.Second)
 	return respID, nil
 }
 func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
@@ -120,11 +123,11 @@ func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	//log.Printf(" Initial status response is :%s", licRes["status"].(string))
-	lic_status := licRes["status"].(string)
-	for lic_status != "FINISHED" {
-		log.Printf(" status response is :%s", lic_status)
-		if lic_status == "FAILED" {
+	licStatus := licRes["status"].(string)
+	for licStatus != "FINISHED" {
+		//log.Printf(" status response is :%s", licStatus)
+		if licStatus == "FAILED" {
+			log.Println("[ERROR]License assign/revoke status failed")
 			return licRes, nil
 		}
 		return b.GetLicenseStatus(id)

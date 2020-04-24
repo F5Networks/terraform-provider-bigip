@@ -13,6 +13,8 @@ package bigip
 import (
 	"encoding/json"
 	"log"
+	//"strings"
+	"time"
 )
 
 type Version struct {
@@ -778,6 +780,22 @@ func (b *BigIP) Bigiplicenses() (*Bigiplicense, error) {
 	}
 
 	return &bigiplicense, nil
+}
+
+func (b *BigIP) GetBigipLiceseStatus() (map[string]interface{}, error) {
+	bigipLicense := make(map[string]interface{})
+	err, _ := b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+	c := 0
+	for err != nil {
+		time.Sleep(10 * time.Second)
+		c++
+		err, _ = b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+		if c == 15 {
+			log.Printf("[DEBUG] Device is not up even after waiting for 120 seconds")
+			return nil, err
+		}
+	}
+	return bigipLicense, nil
 }
 
 func (b *BigIP) CreateBigiplicense(command, registration_key string) error {
