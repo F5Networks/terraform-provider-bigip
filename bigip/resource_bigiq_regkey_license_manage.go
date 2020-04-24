@@ -172,6 +172,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		unitOfMeasure := d.Get("unit_of_measure").(string)
 		config := &bigip.LicenseParam{
 			Address:         address,
+			Port:            devicePort,
 			AssignmentType:  assignmentType,
 			Command:         command,
 			Hypervisor:      hyperVisor,
@@ -307,6 +308,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		unitOfMeasure := d.Get("unit_of_measure").(string)
 		config := &bigip.LicenseParam{
 			Address:         address,
+			Port:            devicePort,
 			AssignmentType:  assignmentType,
 			Command:         command,
 			Hypervisor:      hyperVisor,

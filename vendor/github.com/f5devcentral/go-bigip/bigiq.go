@@ -90,6 +90,7 @@ type regKeyAssignStatus struct {
 
 type LicenseParam struct {
 	Address         string `json:"address,omitempty"`
+	Port            int    `json:"port,omitempty"`
 	AssignmentType  string `json:"assignmentType,omitempty"`
 	Command         string `json:"command,omitempty"`
 	Hypervisor      string `json:"hypervisor,omitempty"`
