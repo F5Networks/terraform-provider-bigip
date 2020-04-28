@@ -116,11 +116,12 @@ type Results1 struct {
 	RunTime   int64  `json:"runTime,omitempty"`
 }
 
-func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) error {
-        tenantFilter = tenantFilter + "?async=true"
-	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter)
+func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string) {
+        tenant := tenantFilter + "?async=true"
+        successfulTenants := make([]string, 0)
+	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
-		return err
+		return err, ""
 	}
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
@@ -131,29 +132,33 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) error {
 	for respCode != 200 {
 		fastTask, err := b.getas3Taskstatus(respID)
 		if err != nil {
-			return err
+			return err, ""
 		}
 		respCode = fastTask.Results[0].Code
 		if respCode != 0 && respCode != 503 {
 			tenant_list, tenant_count := b.GetTenantList(as3NewJson)
-                        if tenant_list == tenantFilter {
+                        if tenantCompare(tenant_list, tenantFilter) == 1 {
 			i := tenant_count - 1
 			success_count := 0
 			for i >= 0 {
 				if fastTask.Results[i].Code == 200 {
+                                        successfulTenants = append(successfulTenants, fastTask.Results[i].Tenant)
 					success_count++
 				}
-				if fastTask.Results[i].Code >= 400 {
-					return errors.New(fmt.Sprintf("HTTP %d :: %s", fastTask.Results[i].Code, fastTask.Results[i].Message))
+     				if fastTask.Results[i].Code >= 400 {
+                                        log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
 				}
 				i = i - 1
 			}
 			if success_count == tenant_count {
 				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 				break // break here
-			}
-                  }
-                  if respCode == 200 {
+			} else {
+                            finallist := strings.Join(successfulTenants[:], ",")
+                            return errors.New(fmt.Sprintf("Partial Success")), finallist
+                        }
+                  } 
+                   if respCode == 200 {
                           log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
                                 break // break here
                   }
@@ -161,7 +166,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) error {
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
-				return err
+				return err, ""
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id) {
@@ -171,7 +176,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) error {
 		}
 	}
 
-	return nil
+	return nil, strings.Join(successfulTenants[:], ",")
 }
 func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
 	tenant := tenantName + "?async=true"
@@ -211,8 +216,8 @@ func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
 	return nil
 
 }
-func (b *BigIP) ModifyAs3(name string, as3_json string) error {
-	tenant := name + "?async=true"
+func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
+	tenant := tenantFilter + "?async=true"
 	resp, err := b.fastPatch(as3_json, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
 		return err
@@ -239,7 +244,7 @@ func (b *BigIP) ModifyAs3(name string, as3_json string) error {
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id) {
-					return b.ModifyAs3(name, as3_json)
+					return b.ModifyAs3(tenantFilter, as3_json)
 				}
 			}
 		}
@@ -405,4 +410,12 @@ func (b *BigIP) TenantDifference(slice1 []string, slice2 []string) string {
 	}
 	diff_tenant_list := strings.Join(diff[:], ",")
 	return diff_tenant_list
+}
+func tenantCompare(t1 string, t2 string) int {
+        tenantList1 := strings.Split(t1, ",")
+        tenantList2 := strings.Split(t2, ",")
+        if len(tenantList1) == len(tenantList2) {
+          return 1
+}
+        return 0
 }

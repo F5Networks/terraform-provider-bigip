@@ -74,10 +74,10 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	strTrimSpace := client.AddTeemAgent(as3Json)
 	log.Printf("[INFO] Tenants in Json:%+v", tenantList)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
-	err := client.PostAs3Bigip(strTrimSpace, tenantList)
+	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
-		client.DeleteAs3Bigip(tenantList)
-		return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+		d.Set("tenant_list", successfulTenants)
+		//	return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
 	}
 	d.SetId(tenantList)
 	return resourceBigipAs3Read(d, meta)
@@ -143,16 +143,12 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 				}
 			}
 		}
-		err := client.ModifyAs3(tenantList, as3Json)
-		if err != nil {
-			return fmt.Errorf("Error modifying json %s: %v", name, err)
-		}
 	} else {
 		tenantList = tenantFilter
-		err := client.PostAs3Bigip(as3Json, tenantList)
-		if err != nil {
-			return fmt.Errorf("Error modifying json %s: %v", name, err)
-		}
+	}
+	err, successfulTenants := client.PostAs3Bigip(as3Json, tenantList)
+	if err != nil {
+		d.Set("tenant_list", successfulTenants)
 	}
 	return resourceBigipAs3Read(d, meta)
 }
