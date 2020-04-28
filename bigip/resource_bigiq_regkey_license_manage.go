@@ -49,18 +49,32 @@ func resourceBigiqLicenseManage() *schema.Resource {
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Sensitive:   true,
-				Default:     false,
+				Type:      schema.TypeBool,
+				Optional:  true,
+				Sensitive: true,
+				Default:   false,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+					if old != new {
+						return true
+					}
+					return false
+				},
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", nil),
 			},
 			"bigiq_login_ref": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Sensitive:   true,
-				Default:     "tmos",
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
+				Default:   "tmos",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+					if old != new {
+						return true
+					}
+					return false
+				},
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", nil),
 			},
@@ -222,6 +236,22 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 	d.SetId(respID)
+	assignmentType := d.Get("assignment_type").(string)
+	if strings.ToLower(assignmentType) == "unreachable" {
+		licenseStatus, err := bigiqRef.GetLicenseStatus(respID)
+		if err != nil {
+			return fmt.Errorf("getting license status failed with : %v", err)
+		}
+		if licenseStatus["status"] == "FAILED" {
+			d.SetId("")
+			return fmt.Errorf("%s", licenseStatus["errorMessage"])
+		}
+		licenseText := licenseStatus["licenseText"].(string)
+		err = bigipRef.InstallLicense(licenseText)
+		if err != nil {
+			return fmt.Errorf("License Assignment to UNREACHBLE Device Failed : %v", err)
+		}
+	}
 	return resourceBigiqLicenseManageRead(d, meta)
 }
 func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) error {
@@ -401,6 +431,12 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		skuKeyword2 := d.Get("skukeyword2").(string)
 		tenant := d.Get("tenant").(string)
 		unitOfMeasure := d.Get("unit_of_measure").(string)
+		assignmentType := d.Get("assignment_type").(string)
+		var password, username string
+		if strings.ToLower(assignmentType) == "unmanaged" {
+			password = bigipRef.Password
+			username = bigipRef.User
+		}
 		config := &bigip.LicenseParam{
 			Address:         address,
 			Port:            devicePort,
@@ -409,16 +445,22 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 			Hypervisor:      hyperVisor,
 			LicensePoolName: licensePoolName,
 			MacAddress:      macAddress,
-			Password:        bigipRef.Password,
+			Password:        password,
 			SkuKeyword1:     skuKeyword1,
 			SkuKeyword2:     skuKeyword2,
 			Tenant:          tenant,
 			UnitOfMeasure:   unitOfMeasure,
-			User:            bigipRef.User,
+			User:            username,
 		}
 		_, err := bigiqRef.PostLicense(config)
 		if err != nil {
 			return fmt.Errorf("revoking license failed with : %v", err)
+		}
+		if strings.ToLower(assignmentType) == "unreachable" {
+			err = bigipRef.RevokeLicense()
+			if err != nil {
+				return fmt.Errorf("License Assignment to UNREACHBLE Device Failed : %v", err)
+			}
 		}
 	} else {
 		if strings.ToUpper(assignmentType) == "MANAGED" {
