@@ -38,8 +38,6 @@ resource "bigip_as3"  "as3-example1" {
 
 * `tenant_filter` - (Optional) If there are muntiple tenants in a json this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified 
 
-* `as3_example.tmpl` - Example template file  AS3 Declarative JSON
-
 * `as3_example1.json` - Example  AS3 Declarative JSON file with single tenant
 
 ```hcl
