@@ -16,13 +16,34 @@ description: |-
 
 
 ```hcl
+
+# MANAGED Regkey Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address="xxxx.xxx.xxx.xxx"
-  bigiq_user="xxxx"
-  bigiq_password="xxxxx"
-  license_poolname = "utility_pool_name"
+  bigiq_address = var.bigiq
+  bigiq_user = var.bigiq_un
+  bigiq_password = var.bigiq_pw
+  license_poolname = "regkeypool_name"
+  assignment_type = "MANAGED"
+}
+
+# UNMANAGED Regkey Pool
+resource "bigip_common_license_manage_bigiq" "test_example" {
+  bigiq_address = var.bigiq
+  bigiq_user = var.bigiq_un
+  bigiq_password = var.bigiq_pw
+  license_poolname = "regkeypool_name"
+  assignment_type = "UNMANAGED"
+} 
+
+# UNMANAGED Utility Pool
+resource "bigip_common_license_manage_bigiq" "test_example" {
+  bigiq_address = var.bigiq
+  bigiq_user = var.bigiq_un
+  bigiq_password = var.bigiq_pw
+  license_poolname = "utilitypool_name"
   assignment_type = "UNMANAGED"
   unit_of_measure = "yearly"
+  skukeyword1 = "BTHSM200M"
 }
 ```      
 
@@ -44,7 +65,7 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
 
 * `license_poolname` - (Required) A name given to the license pool. type `string`
 
-* `unit_of_measure` - (Optional) The units used to measure billing. For example, “hourly” or “daily”. Required for Utility license Type. type `string`
+* `unit_of_measure` - (Optional, Required for `Utility` licenseType) The units used to measure billing. For example, “hourly” or “daily”. Type `string`
 
 * `skukeyword1` - (Optional) An optional offering name. type `string`
 

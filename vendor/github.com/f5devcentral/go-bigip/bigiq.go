@@ -112,7 +112,7 @@ func (b *BigIP) PostLicense(config *LicenseParam) (string, error) {
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["id"].(string)
-	log.Printf("respRef = %v,ID = %v", respRef, respID)
+	//log.Printf("respRef = %v,ID = %v", respRef, respID)
 	return respID, nil
 }
 func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
@@ -121,15 +121,15 @@ func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	//log.Printf(" Initial status response is :%s", licRes["status"].(string))
-	lic_status := licRes["status"].(string)
-	for lic_status != "FINISHED" {
-		log.Printf(" status response is :%s", lic_status)
-		if lic_status == "FAILED" {
+	licStatus := licRes["status"].(string)
+	for licStatus != "FINISHED" {
+		//log.Printf(" status response is :%s", licStatus)
+		if licStatus == "FAILED" {
 			return licRes, nil
 		}
 		return b.GetLicenseStatus(id)
 	}
+	log.Printf("License Assignment is :%s", licStatus)
 	return licRes, nil
 }
 
