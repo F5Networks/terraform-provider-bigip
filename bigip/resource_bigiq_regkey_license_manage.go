@@ -13,6 +13,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func resourceBigiqLicenseManage() *schema.Resource {
@@ -165,6 +166,12 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
 		}
 	}
+	assignmentType := d.Get("assignment_type").(string)
+	if strings.ToLower(assignmentType) == "unreachable" {
+		if d.Get("mac_address").(string) == "" || d.Get("hypervisor").(string) == "" {
+			return fmt.Errorf("mac_address and hypervisor are required parameter for assignment_type = %s", assignmentType)
+		}
+	}
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {
 		return fmt.Errorf("getting Poolid failed with :%v", err)
@@ -236,8 +243,6 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 			respID = resp.ID
 		}
 	}
-	d.SetId(respID)
-	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
 		licenseStatus, err := bigiqRef.GetLicenseStatus(respID)
 		if err != nil {
@@ -253,6 +258,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 			return fmt.Errorf("License Assignment to UNREACHBLE Device Failed : %v", err)
 		}
 	}
+	d.SetId(respID)
 	return resourceBigiqLicenseManageRead(d, meta)
 }
 func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) error {
@@ -468,8 +474,9 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		if strings.ToLower(assignmentType) == "unreachable" {
 			err = bigipRef.RevokeLicense()
 			if err != nil {
-				return fmt.Errorf("License Revoking to UNREACHBLE Device Failed : %v", err)
+				return fmt.Errorf("license revoking to unreachable device failed : %v", err)
 			}
+			time.Sleep(5 * time.Second)
 		}
 		log.Println("[DEBUG] wait for bigip status with license revoking")
 		bigipLicence, err := bigipRef.GetBigipLiceseStatus()
