@@ -136,7 +136,7 @@ func resourceBigiqLicenseManage() *schema.Resource {
 
 func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) error {
 	bigipRef := meta.(*bigip.BigIP)
-	log.Printf("Start License assignment for :%+v", bigipRef.Host)
+	log.Printf("[INFO] Start License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -257,7 +257,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 }
 func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) error {
 	bigipRef := meta.(*bigip.BigIP)
-	log.Printf("Reading License assignment for :%+v", bigipRef.Host)
+	log.Printf("[INFO] Reading License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -302,7 +302,7 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 
 func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) error {
 	bigipRef := meta.(*bigip.BigIP)
-	log.Printf("Updating License assignment:%+v", bigipRef)
+	log.Printf("[INFO] Updating License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -471,6 +471,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 				return fmt.Errorf("License Revoking to UNREACHBLE Device Failed : %v", err)
 			}
 		}
+		log.Println("[DEBUG] wait for bigip status with license revoking")
 		bigipLicence, err := bigipRef.GetBigipLiceseStatus()
 		if err != nil {
 			return fmt.Errorf("getting license revoking status from bigip failed with :%v", err)
@@ -479,7 +480,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		if ok {
 			return fmt.Errorf("getting license revoking status from bigip failed with :%v", err)
 		}
-		//log.Printf("bigipLicence:%+v", bigipLicence)
+		log.Printf("[INFO] License Revoking for Device %+v Success", bigipRef.Host)
 	} else {
 		if strings.ToUpper(assignmentType) == "MANAGED" {
 			bigiqRef.RegkeylicenseRevoke(poolId, regKey, memID)
