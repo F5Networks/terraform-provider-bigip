@@ -153,7 +153,9 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 			if success_count == tenant_count {
 				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 				break // break here
-			} else {
+			} else if success_count == 0{
+                                return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+                        } else {
                             finallist := strings.Join(successfulTenants[:], ",")
                             return errors.New(fmt.Sprintf("Partial Success")), finallist
                         }
@@ -161,6 +163,9 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
                    if respCode == 200 {
                           log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
                                 break // break here
+                  }
+                  if respCode >= 400 {
+                          return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
                   }
 		}
 		if respCode == 503 {

@@ -76,8 +76,10 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
+		if successfulTenants == "" {
+			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+		}
 		d.Set("tenant_list", successfulTenants)
-		//	return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
 	}
 	d.SetId(tenantList)
 	return resourceBigipAs3Read(d, meta)
@@ -148,6 +150,9 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	}
 	err, successfulTenants := client.PostAs3Bigip(as3Json, tenantList)
 	if err != nil {
+		if successfulTenants == "" {
+			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
+		}
 		d.Set("tenant_list", successfulTenants)
 	}
 	return resourceBigipAs3Read(d, meta)
