@@ -194,7 +194,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -203,7 +202,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	defer res.Body.Close()
 
 	data, _ := ioutil.ReadAll(res.Body)
-
 	if res.StatusCode >= 400 {
 		if res.Header["Content-Type"][0] == "application/json" {
 			return data, b.checkError(data)
@@ -281,8 +279,8 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 	_, callErr := b.APICall(req)
 	return callErr
 }
-
 func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
+
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
 		return nil, err
@@ -294,7 +292,6 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
 	}
-
 	resp, callErr := b.APICall(req)
 	return resp, callErr
 }
@@ -348,6 +345,23 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 // Upload a file read from a Reader
@@ -427,7 +441,6 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
-
 	resp, err := b.APICall(req)
 	if err != nil {
 		var reqError RequestError
@@ -437,12 +450,10 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		}
 		return err, false
 	}
-
 	err = json.Unmarshal(resp, e)
 	if err != nil {
 		return err, false
 	}
-
 	return nil, true
 }
 

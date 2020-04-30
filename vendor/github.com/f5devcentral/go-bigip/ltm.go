@@ -2055,7 +2055,6 @@ func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
 
 func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
-
 }
 
 // Modify a named internal data group, REPLACING all the records
