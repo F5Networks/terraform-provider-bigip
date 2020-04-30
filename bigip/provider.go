@@ -101,6 +101,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
+			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
 		},
 
 		ConfigureFunc: providerConfigure,

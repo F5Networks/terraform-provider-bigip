@@ -248,6 +248,23 @@ func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
 	return resp, callErr
 }
 
+func (b *BigIP) deleteReqBody(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "delete",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -426,6 +443,26 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		return err, false
 	}
 
+	return nil, true
+}
+
+func (b *BigIP) getForEntityNew(e interface{}, path ...string) (error, bool) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		return err, false
+	}
+	err = json.Unmarshal(resp, e)
+	if err != nil {
+		return err, false
+	}
 	return nil, true
 }
 
