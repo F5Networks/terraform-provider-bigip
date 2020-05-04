@@ -1,0 +1,73 @@
+{
+     "class": "AS3",
+     "action": "deploy",
+     "persist": true,
+     "declaration": {
+         "class": "ADC",
+         "schemaVersion": "3.0.0",
+         "id": "example-declaration-01",
+         "label": "Sample 1",
+         "remark": "Simple HTTP application with round robin pool",
+         "Sample_03": {
+             "class": "Tenant",
+             "defaultRouteDomain": 0,
+             "Application_3": {
+                 "class": "Application",
+                 "template": "http",
+             "serviceMain": {
+                 "class": "Service_HTTP",
+                 "virtualAddresses": [
+                     "10.2.2.11"
+                 ],
+                 "pool": "web_pool3"
+                 },
+                 "web_pool3": {
+                     "class": "Pool",
+                     "monitors": [
+                         "http"
+                     ],
+                     "members": [
+                         {
+                             "servicePort": 80,
+                             "serverAddresses": [
+                                 "192.3.1.102",
+                                 "192.3.1.112"
+                             ]
+                         }
+                     ]
+                 }
+             }
+         },
+         "Sample_04": {
+             "class": "Tenant",
+             "defaultRouteDomain": 0,
+             "Application_4": {
+                 "class": "Application",
+                 "template": "http",
+             "serviceMain": {
+                 "class": "Service_HTTP",
+                 "virtualAddresses": [
+                     "10.2.3.11"
+                 ],
+                 "pool": "web_pool4"
+                 },
+                 "web_pool4": {
+                     "class": "Pool",
+                     "monitors": [
+                         "http"
+                     ],
+                     "members": [
+                         {
+                             "servicePort": 80,
+                             "serverAddresses": [
+                                 "193.3.2.100",
+                                 "193.3.2.110"
+                             ]
+                         }
+                     ]
+                 }
+             }
+         }
+     }
+ }
+
