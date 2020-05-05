@@ -35,11 +35,13 @@ type ConfigOptions struct {
 
 // BigIP is a container for our session state.
 type BigIP struct {
-	Host          string
-	User          string
-	Password      string
-	Token         string // if set, will be used instead of User/Password
-	Transport     *http.Transport
+	Host      string
+	User      string
+	Password  string
+	Token     string // if set, will be used instead of User/Password
+	Transport *http.Transport
+	// UserAgent is an optional field that specifies the caller of this request.
+	UserAgent     string
 	ConfigOptions *ConfigOptions
 }
 

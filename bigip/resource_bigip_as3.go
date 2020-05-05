@@ -148,7 +148,8 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		tenantList = tenantFilter
 	}
-	err, successfulTenants := client.PostAs3Bigip(as3Json, tenantList)
+	strTrimSpace := client.AddTeemAgent(as3Json)
+	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
 		if successfulTenants == "" {
 			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)

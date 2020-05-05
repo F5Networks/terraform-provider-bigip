@@ -117,8 +117,8 @@ type Results1 struct {
 }
 
 func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string) {
-        tenant := tenantFilter + "?async=true"
-        successfulTenants := make([]string, 0)
+	tenant := tenantFilter + "?async=true"
+	successfulTenants := make([]string, 0)
 	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
 		return err, ""
@@ -137,36 +137,36 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 		respCode = fastTask.Results[0].Code
 		if respCode != 0 && respCode != 503 {
 			tenant_list, tenant_count := b.GetTenantList(as3NewJson)
-                        if tenantCompare(tenant_list, tenantFilter) == 1 {
-			i := tenant_count - 1
-			success_count := 0
-			for i >= 0 {
-				if fastTask.Results[i].Code == 200 {
-                                        successfulTenants = append(successfulTenants, fastTask.Results[i].Tenant)
-					success_count++
+			if tenantCompare(tenant_list, tenantFilter) == 1 {
+				i := tenant_count - 1
+				success_count := 0
+				for i >= 0 {
+					if fastTask.Results[i].Code == 200 {
+						successfulTenants = append(successfulTenants, fastTask.Results[i].Tenant)
+						success_count++
+					}
+					if fastTask.Results[i].Code >= 400 {
+						log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
+					}
+					i = i - 1
 				}
-     				if fastTask.Results[i].Code >= 400 {
-                                        log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
+				if success_count == tenant_count {
+					log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+					break // break here
+				} else if success_count == 0 {
+					return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+				} else {
+					finallist := strings.Join(successfulTenants[:], ",")
+					return errors.New(fmt.Sprintf("Partial Success")), finallist
 				}
-				i = i - 1
 			}
-			if success_count == tenant_count {
+			if respCode == 200 {
 				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 				break // break here
-			} else if success_count == 0{
-                                return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
-                        } else {
-                            finallist := strings.Join(successfulTenants[:], ",")
-                            return errors.New(fmt.Sprintf("Partial Success")), finallist
-                        }
-                  } 
-                   if respCode == 200 {
-                          log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
-                                break // break here
-                  }
-                  if respCode >= 400 {
-                          return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
-                  }
+			}
+			if respCode >= 400 {
+				return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+			}
 		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
@@ -331,18 +331,18 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int) {
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(resp, &jsonRef)
 	for key, value := range jsonRef {
-		if rec, ok := value.(map[string]interface{}); ok && key == "declaration"{
+		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 			for k, v := range rec {
 				if rec2, ok := v.(map[string]interface{}); ok {
-                                      found := 0
-                                      for k1, v1 := range rec2 {
-                                          if k1 == "class" && v1 == "Tenant" {
-                                              found = 1
-                                           }
-                                       }
-                                       if found == 1 {
-					s = append(s, k)
-                                    }
+					found := 0
+					for k1, v1 := range rec2 {
+						if k1 == "class" && v1 == "Tenant" {
+							found = 1
+						}
+					}
+					if found == 1 {
+						s = append(s, k)
+					}
 				}
 			}
 		}
@@ -362,13 +362,14 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 		log.Println(err)
 	}
 	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
-	userAgent, err := getVersion("/usr/local/bin/terraform")
+	log.Printf("[DEBUG] Terraform Version:%+v", b.UserAgent)
+	//userAgent, err := getVersion("/usr/local/bin/terraform")
 	//log.Printf("[DEBUG] Terraform version:%+v", userAgent)
 	res1 := strings.Split(as3ver.Version, ".")
 	for _, value := range jsonRef {
 		if rec, ok := value.(map[string]interface{}); ok {
 			if intConvert(res1[0]) > 3 || intConvert(res1[1]) >= 18 {
-				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": userAgent}
+				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": b.UserAgent}
 			}
 		}
 	}
@@ -417,10 +418,10 @@ func (b *BigIP) TenantDifference(slice1 []string, slice2 []string) string {
 	return diff_tenant_list
 }
 func tenantCompare(t1 string, t2 string) int {
-        tenantList1 := strings.Split(t1, ",")
-        tenantList2 := strings.Split(t2, ",")
-        if len(tenantList1) == len(tenantList2) {
-          return 1
-}
-        return 0
+	tenantList1 := strings.Split(t1, ",")
+	tenantList2 := strings.Split(t2, ",")
+	if len(tenantList1) == len(tenantList2) {
+		return 1
+	}
+	return 0
 }

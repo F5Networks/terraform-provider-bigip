@@ -22,15 +22,14 @@ func resourceBigipCommand() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"when": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "tmsh_command",
+				Default:  "apply",
 			},
 			"commands": {
 				Type:     schema.TypeList,
 				Required: true,
-				ForceNew: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -52,32 +51,31 @@ func resourceBigipCommand() *schema.Resource {
 func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	var commandList []string
-	if m, ok := d.GetOk("commands"); ok {
-		for _, cmd := range m.([]interface{}) {
-			commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+	if d.Get("when").(string) == "apply" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
 		}
+		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			//log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+		}
+		_ = d.Set("command_result", resultList)
 	}
-	log.Printf("[INFO] Running TMSH/BASH Command : %v ", commandList)
-	var resultList []string
-
-	for _, str := range commandList {
-		log.Printf("[INFO] Command to run:%v", str)
-		commandConfig := &bigip.BigipCommand{
-			Command:     "run",
-			UtilCmdArgs: str,
-		}
-		log.Printf("[INFO] Command struct:%+v", commandConfig)
-		resultCmd, err := client.RunCommand(commandConfig)
-		if err != nil {
-			return fmt.Errorf("error retrieving Command Result: %v", err)
-		}
-		log.Printf("[INFO] Result Command struct:%+v", resultCmd)
-		resultList = append(resultList, resultCmd.CommandResult)
-
-		//d.Set()
-	}
-	d.Set("command_result", resultList)
-	d.SetId(d.Get("name").(string))
+	d.SetId(d.Get("when").(string))
 	return nil
 }
 
@@ -86,12 +84,62 @@ func resourceBigipCommandRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error {
-	//return resourceBigipCommandRead(d, meta)
-	log.Println("[INFO]:Update Operation is not supported for this resource")
+	client := meta.(*bigip.BigIP)
+	var commandList []string
+	if d.Get("when").(string) == "apply" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
+		}
+		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			//log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			//log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+		}
+		_ = d.Set("command_result", resultList)
+	}
 	return nil
 }
 
 func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Println("[INFO]:Delete Operation is not supported for this resource")
+	client := meta.(*bigip.BigIP)
+	var commandList []string
+	if d.Get("when").(string) == "destroy" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
+		}
+		log.Printf("[INFO] Running Delete TMSH Command: %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+			//d.Set()
+		}
+	}
+	d.SetId("")
 	return nil
 }
