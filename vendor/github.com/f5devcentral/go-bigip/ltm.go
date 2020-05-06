@@ -2248,22 +2248,34 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 // in CIDR notation or decimal, i.e.: "24" or "255.255.255.0". A CIDR mask of "0" is the same
 // as "0.0.0.0".
 func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
-	subnetMask := cidr[mask]
 
-	if strings.Contains(mask, ".") {
-		subnetMask = mask
-	}
+	if strings.Contains(destination, ":") {
+                subnetMask := mask
 
+		config := &VirtualServer{
+                Name:             name,
+                Destination:      fmt.Sprintf("%s.%d", destination, port),
+                Mask:             subnetMask,
+                Pool:             pool,
+                TranslateAddress: translate_address,
+                TranslatePort:    translate_port,
+             }
+
+             return b.post(config, uriLtm, uriVirtual)
+        }
+
+        subnetMask := cidr[mask]
 	config := &VirtualServer{
-		Name:             name,
-		Destination:      fmt.Sprintf("%s:%d", destination, port),
-		Mask:             subnetMask,
-		Pool:             pool,
-		TranslateAddress: translate_address,
-		TranslatePort:    translate_port,
-	}
+                Name:             name,
+                Destination:      fmt.Sprintf("%s:%d", destination, port),
+                Mask:             subnetMask,
+                Pool:             pool,
+                TranslateAddress: translate_address,
+                TranslatePort:    translate_port,
+             }
 
-	return b.post(config, uriLtm, uriVirtual)
+          return b.post(config, uriLtm, uriVirtual)
+
 }
 
 // AddVirtualServer adds a new virtual server by config to the BIG-IP system.
