@@ -324,7 +324,6 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if strings.Count(vs_dest, ":") >= 2 {
                 regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
                 destination := regex.FindStringSubmatch(vs.Destination)
-		log.Printf("port is :%s",destination[3])
 		parsedPort, _ := strconv.Atoi(destination[3])
 		d.Set("port", parsedPort)
 	}
