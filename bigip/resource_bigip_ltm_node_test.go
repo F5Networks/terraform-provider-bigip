@@ -84,7 +84,6 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 		},
 	})
 
-
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -107,7 +106,6 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			},
 		},
 	})
-
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -174,7 +172,6 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 			},
 		},
 	})
-
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

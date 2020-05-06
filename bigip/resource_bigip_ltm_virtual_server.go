@@ -44,8 +44,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:     schema.TypeString,
+				Optional: true,
 				//Default:     "0.0.0.0/0",
 				Computed:    true,
 				Description: "Source IP and mask for the virtual server",
@@ -75,8 +75,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"mask": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:     schema.TypeString,
+				Optional: true,
 				//Default:     "255.255.255.255",
 				Computed:    true,
 				Description: "subnet mask",
@@ -270,15 +270,15 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	vs_dest := vs.Destination
 	if strings.Count(vs_dest, ":") >= 2 {
 		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
-                destination := regex.FindStringSubmatch(vs.Destination)
-                if destination == nil {
-                        return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
-                }
+		destination := regex.FindStringSubmatch(vs.Destination)
+		if destination == nil {
+			return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
+		}
 		if err := d.Set("destination", destination[2]); err != nil {
-		       return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-           }
-       }
-       if strings.Count(vs_dest, ":") < 2 {
+			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
+		}
+	}
+	if strings.Count(vs_dest, ":") < 2 {
 		regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]
@@ -287,8 +287,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		}
 		if err := d.Set("destination", parsedDestination); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-	    }
-       }
+		}
+	}
 	if err := d.Set("source", vs.Source); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -302,28 +302,28 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
-//	   so we need to extract it
-//	*/
-//	regex = regexp.MustCompile(`\:(\d+)`)
-//	port := regex.FindStringSubmatch(vs.Destination)
-//	if len(port) < 2 {
-//		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
-//	}
-//	parsedPort, _ := strconv.Atoi(port[1])
+	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
+	//	   so we need to extract it
+	//	*/
+	//	regex = regexp.MustCompile(`\:(\d+)`)
+	//	port := regex.FindStringSubmatch(vs.Destination)
+	//	if len(port) < 2 {
+	//		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+	//	}
+	//	parsedPort, _ := strconv.Atoi(port[1])
 
 	if strings.Count(vs_dest, ":") < 2 {
-	        regex := regexp.MustCompile(`\:(\d+)`)
-     	        port := regex.FindStringSubmatch(vs.Destination)
-                if len(port) < 2 {
-                  return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
-                }
-	      parsedPort, _ := strconv.Atoi(port[1])
-	      d.Set("port", parsedPort)
+		regex := regexp.MustCompile(`\:(\d+)`)
+		port := regex.FindStringSubmatch(vs.Destination)
+		if len(port) < 2 {
+			return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+		}
+		parsedPort, _ := strconv.Atoi(port[1])
+		d.Set("port", parsedPort)
 	}
 	if strings.Count(vs_dest, ":") >= 2 {
-                regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
-                destination := regex.FindStringSubmatch(vs.Destination)
+		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedPort, _ := strconv.Atoi(destination[3])
 		d.Set("port", parsedPort)
 	}

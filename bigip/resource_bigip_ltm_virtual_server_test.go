@@ -76,8 +76,6 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 }
 `
 
-
-
 func TestAccBigipLtmVS_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
