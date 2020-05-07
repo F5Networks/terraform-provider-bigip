@@ -286,6 +286,17 @@ type poolMember struct {
 	Name string `json:"name"`
 }
 
+type PoolMemberFqdn struct {
+        Name string `json:"name"`
+        FQDN struct {
+                AddressFamily string `json:"addressFamily,omitempty"`
+                AutoPopulate  string `json:"autopopulate,omitempty"`
+                DownInterval  int    `json:"downInterval,omitempty"`
+                Interval      string `json:"interval,omitempty"`
+                Name          string `json:"tmName,omitempty"`
+        } `json:"fqdn,omitempty"`
+}
+
 // poolMembers is used only when modifying members on a pool.
 type poolMembers struct {
 	Members []PoolMember `json:"members"`
@@ -2117,6 +2128,10 @@ func (b *BigIP) AddPoolMember(pool, member string) error {
 	}
 
 	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
+func (b *BigIP) AddPoolMemberFQDN(pool string, config *PoolMemberFqdn) error {
+       return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
 }
 
 // GetPoolMember returns the details of a member in the specified pool.
