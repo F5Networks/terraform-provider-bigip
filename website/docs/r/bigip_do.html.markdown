@@ -28,7 +28,7 @@ resource "bigip_do"  "do-example" {
 
 * `do_json` - (Required) Name of the of the Declarative DO JSON file
 
-* `timeout(minutes)` - (Optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes .
+* `timeout(minutes)` - (Optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes) .
 
 *  Note: Delete method is not supported by DO, so terraform destroy won't delete configuration in bigip but we will set the terrform state to empty and won't throw error.
 
