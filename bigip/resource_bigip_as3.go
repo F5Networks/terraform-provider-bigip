@@ -13,7 +13,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
+	"sync"
 )
+
+var x = 0
+var m sync.Mutex
 
 func resourceBigipAs3() *schema.Resource {
 	return &schema.Resource{
@@ -61,6 +65,9 @@ func resourceBigipAs3() *schema.Resource {
 func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	as3Json := d.Get("as3_json").(string)
+	m.Lock()
+	defer m.Unlock()
+	log.Printf("[INFO] Creating As3 config")
 	tenantFilter := d.Get("tenant_filter").(string)
 	if ok := bigip.ValidateAS3Template(as3Json); !ok {
 		return fmt.Errorf("[AS3] Error validating template \n")
@@ -72,7 +79,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.Set("tenant_list", tenantList)
 	strTrimSpace := client.AddTeemAgent(as3Json)
-	log.Printf("[INFO] Tenants in Json:%+v", tenantList)
+	//log.Printf("[INFO] Tenants in Json:%+v", tenantList)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
@@ -82,6 +89,8 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		d.Set("tenant_list", successfulTenants)
 	}
 	d.SetId(tenantList)
+	x = x + 1
+	//m.Unlock()
 	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
@@ -127,6 +136,9 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	as3Json := d.Get("as3_json").(string)
+	//m.Lock()
+	m.Lock()
+	defer m.Unlock()
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	name := d.Get("tenant_list").(string)
 	tenantList, _ := client.GetTenantList(as3Json)
@@ -154,13 +166,19 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 		if successfulTenants == "" {
 			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
 		}
-		d.Set("tenant_list", successfulTenants)
+		_ = d.Set("tenant_list", successfulTenants)
 	}
+	x = x + 1
+	//m.Unlock()
 	return resourceBigipAs3Read(d, meta)
 }
 
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	//as3Json := d.Get("as3_json").(string)
+	m.Lock()
+	defer m.Unlock()
+	//m.Lock()
 	log.Printf("[INFO] Deleting As3 config")
 	name := d.Get("tenant_list").(string)
 	err := client.DeleteAs3Bigip(name)
@@ -168,6 +186,8 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[ERROR] Unable to Delete: %v :", err)
 		return err
 	}
+	x = x + 1
+	//m.Unlock()
 	d.SetId("")
 	return nil
 }
