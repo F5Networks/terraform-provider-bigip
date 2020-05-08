@@ -35,11 +35,13 @@ type ConfigOptions struct {
 
 // BigIP is a container for our session state.
 type BigIP struct {
-	Host          string
-	User          string
-	Password      string
-	Token         string // if set, will be used instead of User/Password
-	Transport     *http.Transport
+	Host      string
+	User      string
+	Password  string
+	Token     string // if set, will be used instead of User/Password
+	Transport *http.Transport
+	// UserAgent is an optional field that specifies the caller of this request.
+	UserAgent     string
 	ConfigOptions *ConfigOptions
 }
 
@@ -194,7 +196,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -203,7 +204,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	defer res.Body.Close()
 
 	data, _ := ioutil.ReadAll(res.Body)
-
 	if res.StatusCode >= 400 {
 		if res.Header["Content-Type"][0] == "application/json" {
 			return data, b.checkError(data)
@@ -242,6 +242,23 @@ func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
 	req := &APIRequest{
 		Method: "delete",
 		URL:    b.iControlPath(path),
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
+func (b *BigIP) deleteReqBody(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "delete",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
 	}
 
 	resp, callErr := b.APICall(req)
@@ -333,6 +350,23 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 	return callErr
 }
 
+func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 // Upload a file read from a Reader
 func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error) {
 	client := &http.Client{
@@ -410,7 +444,6 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
-
 	resp, err := b.APICall(req)
 	if err != nil {
 		var reqError RequestError
@@ -420,12 +453,30 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		}
 		return err, false
 	}
-
 	err = json.Unmarshal(resp, e)
 	if err != nil {
 		return err, false
 	}
+	return nil, true
+}
 
+func (b *BigIP) getForEntityNew(e interface{}, path ...string) (error, bool) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		return err, false
+	}
+	err = json.Unmarshal(resp, e)
+	if err != nil {
+		return err, false
+	}
 	return nil, true
 }
 
