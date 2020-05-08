@@ -18,16 +18,29 @@ This resource is helpful to send TMSH command to an BIG-IP node and returns the 
 resource "bigip_command" "test-command" {
   commands   = ["show sys version"]
 }
+
+
+#create ltm node
+resource "bigip_command" "test-command" {
+  commands   = ["create ltm node 10.10.10.70"]
+}
+
+# Destroy ltm node
+
+resource "bigip_command" "test-command" {
+  when ="destroy"
+  commands   = ["delete ltm node 10.10.10.70"]
+}
+
 ```   
 ## Argument Reference
 
 * `commands` - (Required) The commands to send to the remote BIG-IP device over the configured provider. The resulting output from the command is returned and added to `command_result` 
-* `name` - (Optional) Optional Name to to Uniquely identify state.    
+* `when` - (Optional,possible values:`apply` or `destroy`) default value will be `apply`,can be set to `destroy` for terraform destroy call.    
 
 
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
 
-* `command_result` - The resulting output from the `commands` executed
-
+* `command_result` - The resulting output from the `commands` execute
