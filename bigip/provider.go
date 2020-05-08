@@ -7,18 +7,18 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"reflect"
 	"regexp"
 	"strings"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 const DEFAULT_PARTITION = "Common"
 
 func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
+	p := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"address": {
 				Type:        schema.TypeString,
@@ -101,13 +101,22 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
+			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
 		},
-
-		ConfigureFunc: providerConfigure,
 	}
+	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+		terraformVersion := p.TerraformVersion
+		if terraformVersion == "" {
+			// Terraform 0.12 introduced this field to the protocol
+			// We can therefore assume that if it's missing it's 0.10 or 0.11
+			terraformVersion = "0.11+compatible"
+		}
+		return providerConfigure(d, terraformVersion)
+	}
+	return p
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 	config := Config{
 		Address:  d.Get("address").(string),
 		Port:     d.Get("port").(string),
@@ -117,8 +126,9 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)
 	}
-
-	return config.Client()
+	cfg, err := config.Client()
+	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
+	return cfg, err
 }
 
 //Convert slice of strings to schema.TypeSet

@@ -43,4 +43,4 @@ resource "bigip_command" "test-command" {
 
 In addition to all arguments above, the following attributes are exported:
 
-* `command_result` - The resulting output from the `commands` execute
+* `command_result` - The resulting output from the `commands` executed
