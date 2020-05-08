@@ -35,9 +35,9 @@ type UnmanagedDevice struct {
 
 type regKeyPools struct {
 	//Items      []struct {
-	//	ID       string `json:"id"`
-	//	Name     string `json:"name"`
-	//	SortName string `json:"sortName"`
+	//      ID       string `json:"id"`
+	//      Name     string `json:"name"`
+	//      SortName string `json:"sortName"`
 	//} `json:"items"`
 	RegKeyPoollist []regKeyPool `json:"items"`
 }
