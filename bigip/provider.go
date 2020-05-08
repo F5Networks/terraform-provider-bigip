@@ -127,6 +127,9 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		config.LoginReference = d.Get("login_ref").(string)
 	}
 	cfg, err := config.Client()
+	if err != nil {
+		return cfg, err
+	}
 	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
 	return cfg, err
 }
