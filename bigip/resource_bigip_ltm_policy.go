@@ -11,8 +11,8 @@ import (
 
 	"fmt"
 	"reflect"
-	"strings"
 	"sort"
+	"strings"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -1215,84 +1215,82 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 
 	d.Set("name", p.Name)
 
-        if len(p.Rules) > 0 {
-                sort.Slice(p.Rules, func(i, j int) bool {
-                        return p.Rules[i].Ordinal < p.Rules[j].Ordinal
-                })
+	if len(p.Rules) > 0 {
+		sort.Slice(p.Rules, func(i, j int) bool {
+			return p.Rules[i].Ordinal < p.Rules[j].Ordinal
+		})
 
-                rule, err := flattenPolicyRules(p.Rules, d)
-                if err != nil {
-                        return err
-                }
+		rule, err := flattenPolicyRules(p.Rules, d)
+		if err != nil {
+			return err
+		}
 
-                err = d.Set("rule", rule)
-                if err != nil {
-                        return err
-                }
-        }
+		err = d.Set("rule", rule)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-
 func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]interface{}, error) {
-        att := make([]interface{}, len(rules))
-        for i, v := range rules {
-                obj := make(map[string]interface{})
+	att := make([]interface{}, len(rules))
+	for i, v := range rules {
+		obj := make(map[string]interface{})
 
-                if v.Name != "" {
-                        obj["name"] = v.Name
-                }
+		if v.Name != "" {
+			obj["name"] = v.Name
+		}
 
-                if len(v.Actions) > 0 {
-                        r, err := flattenPolicyRuleActions(v.Actions)
-                        if err != nil {
-                                return []interface{}{att}, err
-                        }
-                        obj["action"] = r
-                }
+		if len(v.Actions) > 0 {
+			r, err := flattenPolicyRuleActions(v.Actions)
+			if err != nil {
+				return []interface{}{att}, err
+			}
+			obj["action"] = r
+		}
 
-                if len(v.Conditions) > 0 {
-                        r, err := flattenPolicyRuleConditions(v.Conditions)
-                        if err != nil {
-                                return []interface{}{att}, err
-                        }
-                        obj["condition"] = r
-                }
+		if len(v.Conditions) > 0 {
+			r, err := flattenPolicyRuleConditions(v.Conditions)
+			if err != nil {
+				return []interface{}{att}, err
+			}
+			obj["condition"] = r
+		}
 
-                att[i] = obj
-        }
-        return att, nil
+		att[i] = obj
+	}
+	return att, nil
 }
 
 func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) ([]interface{}, error) {
-        att := make([]interface{}, len(actions))
-        for x, a := range actions {
-                att[x] = interfaceToResourceData(a)
-        }
-        return att, nil
+	att := make([]interface{}, len(actions))
+	for x, a := range actions {
+		att[x] = interfaceToResourceData(a)
+	}
+	return att, nil
 }
 
 func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) ([]interface{}, error) {
-        att := make([]interface{}, len(conditions))
-        for x, a := range conditions {
-                att[x] = interfaceToResourceData(a)
-        }
-        return att, nil
+	att := make([]interface{}, len(conditions))
+	for x, a := range conditions {
+		att[x] = interfaceToResourceData(a)
+	}
+	return att, nil
 }
 
 func interfaceToResourceData(a interface{}) map[string]interface{} {
-        obj := make(map[string]interface{})
-        v := reflect.ValueOf(a)
-        for i := 0; i < v.NumField(); i++ {
-                fn := toSnakeCase(v.Type().Field(i).Name)
-                if fn != "name" && fn != "generation" {
-                        fv := v.Field(i).Interface()
-                        if (v.Field(i).Kind() == reflect.Slice && fv != nil) || fv != reflect.Zero(v.Field(i).Type()).Interface() {
-                                obj[fn] = fv
-                        }
-                }
-        }
-        return obj
+	obj := make(map[string]interface{})
+	v := reflect.ValueOf(a)
+	for i := 0; i < v.NumField(); i++ {
+		fn := toSnakeCase(v.Type().Field(i).Name)
+		if fn != "name" && fn != "generation" {
+			fv := v.Field(i).Interface()
+			if (v.Field(i).Kind() == reflect.Slice && fv != nil) || fv != reflect.Zero(v.Field(i).Type()).Interface() {
+				obj[fn] = fv
+			}
+		}
+	}
+	return obj
 }
-

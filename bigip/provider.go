@@ -10,10 +10,9 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"log"
 	"reflect"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 const DEFAULT_PARTITION = "Common"
@@ -186,7 +185,7 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 			}
 		} else {
 			f := val.FieldByName(strings.Title(toCamelCase(field)))
-                        f.Set(reflect.ValueOf(d[field]))
+			f.Set(reflect.ValueOf(d[field]))
 		}
 	}
 }
@@ -202,17 +201,17 @@ func parseF5Identifier(str string) (partition, name string) {
 
 // Convert Snakecase to Camelcase
 func toCamelCase(str string) string {
-        var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
-        return link.ReplaceAllStringFunc(str, func(s string) string {
-                return strings.ToUpper(strings.Replace(s, "_", "", -1))
-        })
+	var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
+	return link.ReplaceAllStringFunc(str, func(s string) string {
+		return strings.ToUpper(strings.Replace(s, "_", "", -1))
+	})
 }
 
 // Convert Camelcase to Snakecase
 func toSnakeCase(str string) string {
-        var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-        var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
-        snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-        snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-        return strings.ToLower(snake)
+	var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
 }
