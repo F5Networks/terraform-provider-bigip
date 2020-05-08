@@ -287,14 +287,14 @@ type poolMember struct {
 }
 
 type PoolMemberFqdn struct {
-        Name string `json:"name"`
-        FQDN struct {
-                AddressFamily string `json:"addressFamily,omitempty"`
-                AutoPopulate  string `json:"autopopulate,omitempty"`
-                DownInterval  int    `json:"downInterval,omitempty"`
-                Interval      string `json:"interval,omitempty"`
-                Name          string `json:"tmName,omitempty"`
-        } `json:"fqdn,omitempty"`
+	Name string `json:"name"`
+	FQDN struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
 }
 
 // poolMembers is used only when modifying members on a pool.
@@ -2066,6 +2066,7 @@ func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
 
 func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+
 }
 
 // Modify a named internal data group, REPLACING all the records
@@ -2131,7 +2132,7 @@ func (b *BigIP) AddPoolMember(pool, member string) error {
 }
 
 func (b *BigIP) AddPoolMemberFQDN(pool string, config *PoolMemberFqdn) error {
-       return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
 }
 
 // GetPoolMember returns the details of a member in the specified pool.
@@ -2265,32 +2266,31 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
 
 	if strings.Contains(destination, ":") {
-                subnetMask := mask
+		subnetMask := mask
 
 		config := &VirtualServer{
-                Name:             name,
-                Destination:      fmt.Sprintf("%s.%d", destination, port),
-                Mask:             subnetMask,
-                Pool:             pool,
-                TranslateAddress: translate_address,
-                TranslatePort:    translate_port,
-             }
+			Name:             name,
+			Destination:      fmt.Sprintf("%s.%d", destination, port),
+			Mask:             subnetMask,
+			Pool:             pool,
+			TranslateAddress: translate_address,
+			TranslatePort:    translate_port,
+		}
 
-             return b.post(config, uriLtm, uriVirtual)
-        }
+		return b.post(config, uriLtm, uriVirtual)
+	}
+	subnetMask := cidr[mask]
 
-        subnetMask := cidr[mask]
 	config := &VirtualServer{
-                Name:             name,
-                Destination:      fmt.Sprintf("%s:%d", destination, port),
-                Mask:             subnetMask,
-                Pool:             pool,
-                TranslateAddress: translate_address,
-                TranslatePort:    translate_port,
-             }
+		Name:             name,
+		Destination:      fmt.Sprintf("%s:%d", destination, port),
+		Mask:             subnetMask,
+		Pool:             pool,
+		TranslateAddress: translate_address,
+		TranslatePort:    translate_port,
+	}
 
-          return b.post(config, uriLtm, uriVirtual)
-
+	return b.post(config, uriLtm, uriVirtual)
 }
 
 // AddVirtualServer adds a new virtual server by config to the BIG-IP system.

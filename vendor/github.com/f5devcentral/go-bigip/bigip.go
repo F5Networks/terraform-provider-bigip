@@ -196,6 +196,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
+
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -204,6 +205,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	defer res.Body.Close()
 
 	data, _ := ioutil.ReadAll(res.Body)
+
 	if res.StatusCode >= 400 {
 		if res.Header["Content-Type"][0] == "application/json" {
 			return data, b.checkError(data)
@@ -444,6 +446,7 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
+
 	resp, err := b.APICall(req)
 	if err != nil {
 		var reqError RequestError
@@ -453,10 +456,12 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		}
 		return err, false
 	}
+
 	err = json.Unmarshal(resp, e)
 	if err != nil {
 		return err, false
 	}
+
 	return nil, true
 }
 
