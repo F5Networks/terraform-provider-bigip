@@ -1,4 +1,25 @@
 ## 1.2.0 (Unreleased)
+
+# Feature additions:
+
+- Terraform resource module for BIGIP Licence management through BIGIQ
+- As3 Schema validation.
+- AS3 TEEM control Agent additions.
+- Terraform resource module for bigip_command /Run TMSH and BASH commands on F5 devices
+
+# Bug Fixes:
+1. big_ltm_virtual_server does not work with IPv6 address [https://github.com/F5Networks/terraform-provider-bigip/issues/62, #278]
+2. declaring virtual addresses in /Common/Shared via AS3 fails [ https://github.com/F5Networks/terraform-provider-bigip/issues/48]
+3. BIG-IQ Licensing  [https://github.com/F5Networks/terraform-provider-bigip/issues/44]
+4. DO Error on Terraform destroy [https://github.com/F5Networks/terraform-provider-bigip/issues/43]
+5. The provider provider.bigip does not support resource type "bigip_command".[https://github.com/F5Networks/terraform-provider-bigip/issues/63]
+6. `bigip_as3` Read/Exists/Update actions should be restricted to target tenant #253
+7. `bigip_as3` resource `resourceBigipAs3Read` action does not store actual value in state #254 
+8. v1.1.2 changed the contract of the `bigip_as3` resource #267 
+9. autopopulate not passed to pool attachment #242
+10. Error while Sending/Posting http request with DO json :{"code":404 #243
+11. Rework ltm policy (#241)
+
 ## 1.1.2 (March 19, 2020)
 
 # Bug Fixes
