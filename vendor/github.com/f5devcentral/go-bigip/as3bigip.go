@@ -16,6 +16,7 @@ import (
 )
 
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
 
 const (
 	uriSha          = "shared"
@@ -31,6 +32,12 @@ type as3Validate struct {
 	as3SchemaURL    string
 	as3SchemaLatest string
 }
+
+type doValidate struct {
+        doSchemaURL    string
+        doSchemaLatest string
+}
+
 
 type as3Version struct {
 	Version       string `json:"version"`
@@ -98,6 +105,58 @@ func (as3 *as3Validate) fetchAS3Schema() error {
 	}
 	return nil
 }
+
+func ValidateDOTemplate(doExampleJson string) bool {
+        myDO := &doValidate{
+                doSchemaLatestURL,
+                "",
+        }
+	log.Printf("[DEBUG] validating DO json against DO schema")
+        err := myDO.fetchDOSchema()
+        if err != nil {
+                fmt.Errorf("DO Schema Fetch failed: %s", err)
+                return false
+        }
+
+        schemaLoader := gojsonschema.NewStringLoader(myDO.doSchemaLatest)
+        documentLoader := gojsonschema.NewStringLoader(doExampleJson)
+
+        result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+        if err != nil {
+                fmt.Errorf("%s", err)
+                return false
+        }
+        if !result.Valid() {
+                log.Printf("DO JSON is not valid. see errors :\n")
+                for _, desc := range result.Errors() {
+                        log.Printf("- %s\n", desc)
+                }
+                return false
+        }else {
+		log.Printf("[DEBUG] DO Json  is valid\n")
+	}
+        return true
+}
+
+func (do *doValidate) fetchDOSchema() error {
+        res, resErr := http.Get(do.doSchemaURL)
+        if resErr != nil {
+                log.Printf("Error while fetching latest DO schema : %v", resErr)
+                return resErr
+        }
+        if res.StatusCode == http.StatusOK {
+                body, err := ioutil.ReadAll(res.Body)
+                if err != nil {
+                        log.Printf("Unable to read the DO template from json response body : %v", err)
+                        return err
+                }
+                defer res.Body.Close()
+		do.doSchemaLatest = string(body)
+                return err
+        }
+        return nil
+}
+
 
 type As3AllTaskType struct {
 	Items []As3TaskType `json:"items,omitempty"`

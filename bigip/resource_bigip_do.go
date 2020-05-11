@@ -56,6 +56,9 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	do_json := d.Get("do_json").(string)
+	if ok := bigip.ValidateDOTemplate(do_json); !ok {
+		return fmt.Errorf("[DO] Error validating template against DO schema \n")
+	}
 	//	name := d.Get("tenant_name").(string)
 	timeout := d.Get("timeout").(int)
 	timeout_sec := timeout * 60
