@@ -11,7 +11,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	//"time"
+	"sync"
 )
+
+var x = 0
+var m sync.Mutex
 
 func resourceBigipfasthttp() *schema.Resource {
 	return &schema.Resource{
@@ -68,6 +72,8 @@ func resourceBigipfasthttp() *schema.Resource {
 
 func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	m.Lock()
+	defer m.Unlock()
 	name := d.Get("name").(string)
 	tenantName := d.Get("tenant_name").(string)
 	applicationName := d.Get("application_name").(string)
@@ -98,6 +104,7 @@ func resourceBigipfasthttpCreate(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
 	d.SetId(name)
+	x = x + 1
 	return resourceBigipfasthttpRead(d, meta)
 }
 
@@ -140,6 +147,8 @@ func resourceBigipfasthttpRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	m.Lock()
+	defer m.Unlock()
 	name := d.Id()
 	log.Println("Updating Application through Fast Template")
 	//name := d.Get("name").(string)
@@ -170,11 +179,14 @@ func resourceBigipfasthttpUpdate(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("Error Creating template %s: %v", name, err)
 	}
+	x = x + 1
 	return resourceBigipfasthttpRead(d, meta)
 }
 
 func resourceBigipfasthttpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+	m.Lock()
+	defer m.Unlock()
 	tenantName := d.Get("tenant_name").(string)
 	applicationName := d.Get("application_name").(string)
 	log.Printf("[INFO] Deleting Fast application: %v \t in tenant :%v", tenantName, applicationName)
@@ -184,6 +196,7 @@ func resourceBigipfasthttpDelete(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[ERROR] Unable to delete fast template application (%s) (%v) ", applicationName, err)
 		return err
 	}
+	x = x + 1
 	d.SetId("")
 	return nil
 }
