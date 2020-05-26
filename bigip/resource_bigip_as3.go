@@ -202,10 +202,10 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[ERROR] Unable to Delete: %v :", err)
 		return err
 	}
-        if failedTenants != "" {
-           _ = d.Set("tenant_list", name)
-           return resourceBigipAs3Read(d, meta)
-        }
+	if failedTenants != "" {
+		_ = d.Set("tenant_list", name)
+		return resourceBigipAs3Read(d, meta)
+	}
 	x = x + 1
 	//m.Unlock()
 	d.SetId("")
