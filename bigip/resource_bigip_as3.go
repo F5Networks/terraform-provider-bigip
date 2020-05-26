@@ -197,11 +197,15 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	//m.Lock()
 	log.Printf("[INFO] Deleting As3 config")
 	name := d.Get("tenant_list").(string)
-	err,_ := client.DeleteAs3Bigip(name)
+	err, failedTenants := client.DeleteAs3Bigip(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete: %v :", err)
 		return err
 	}
+        if failedTenants != "" {
+           _ = d.Set("tenant_list", name)
+           return resourceBigipAs3Read(d, meta)
+        }
 	x = x + 1
 	//m.Unlock()
 	d.SetId("")
