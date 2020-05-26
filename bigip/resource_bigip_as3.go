@@ -163,7 +163,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			old_list := strings.Split(name, ",")
 			deleted_tenants := client.TenantDifference(old_list, new_list)
 			if deleted_tenants != "" {
-				err := client.DeleteAs3Bigip(deleted_tenants)
+				err, _ := client.DeleteAs3Bigip(deleted_tenants)
 				if err != nil {
 					log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
 					return err
@@ -197,7 +197,7 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	//m.Lock()
 	log.Printf("[INFO] Deleting As3 config")
 	name := d.Get("tenant_list").(string)
-	err := client.DeleteAs3Bigip(name)
+	err,_ := client.DeleteAs3Bigip(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete: %v :", err)
 		return err
