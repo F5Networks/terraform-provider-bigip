@@ -9,8 +9,9 @@ Prerequisites
 -------------
 
 To use AS3 Extensions with Terraform, ensure you meet the following requirements:
-- The BIG-IP system is running software version 12.1.x or higher
-- The BIG-IP system has AS3 Extension version 3.10 or higher installed
+
+- The BIG-IP system is running software version 12.1.x or newer
+- The BIG-IP system has AS3 Extension version 3.10 or newer installed
 - You have a BIG-IP system user account with the Administrator role
 
 
