@@ -13,6 +13,10 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Description
         - Date
         
+      * - 1.2  
+        - Updated the documentation with the following changes: |br| • Added section on :ref:`bigiq-licensing`.
+        - 06-16-20 
+
       * - 1.1  
         - Updated the documentation with the following changes: |br| • Added section on :ref:`as3-integration`. |br| • Added section on :ref:`do-integration`. |br| • Added information about our Slack channel to the :ref:`support` page.
         - 04-15-20 
