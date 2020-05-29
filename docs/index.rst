@@ -40,6 +40,7 @@ User Guide Index
    /userguide/modifying
    /userguide/as3-integration
    /userguide/do-integration
+   /userguide/bigiq-licensing
    /userguide/support
    /userguide/revision_history
 
