@@ -1,28 +1,26 @@
 .. _bigiq-licensing:
 
-BIG-IQ Licensing with Terraform
-===============================
+BIG-IP Licensing Using Terraform through BIG-IQ
+===============================================
 
 .. seealso::
    :class: sidebar
 
-   `Terraform documentation <https://www.terraform.io/docs/providers/bigip/r/bigip_common_license_manage_bigiq.html>`_.
+   - `Terraform documentation <https://www.terraform.io/docs/providers/bigip/r/bigip_common_license_manage_bigiq.html>`_.
+   - `BIG-IQ License Management <https://clouddocs.f5.com/products/big-iq/mgmt-api/v7.1.0/ApiReferences/bigiq_public_api_ref/r_license_assign_revoke.html>`_.
 
-In this section you can see examples of the ``bigip_common_license_manage_bigiq`` resource module. This resource is used for BIG-IP provider license managment from BIG-IQ.
+Using BIG-IQ, you can assign the regkey/utility licenses to a BIG-IP/provider. You can also revoke licenses from BIG-IP/provider for MANAGED, UNMANAGED, or UNREACHABLE devices using BIG-IQ. 
 
-There are 3 different managed modes:
+In this section you can see examples of the ``bigip_common_license_manage_bigiq`` resource module. This resource is used for BIG-IP provider license management from BIG-IQ using Terraform.
 
-- MANAGED
-- UNMANAGED
-- UNREACHABLE
 
 Prerequisites
 -------------
 
-To license BIG-IQ with Terraform, ensure you meet the following requirements:
+To license from BIG-IQ with Terraform, ensure you meet the following requirements:
 
-- The BIG-IP system is running software version 12.1.x or higher
-- You have a BIG-IP system user account with the Administrator role
+- BIG-IQ v5.6 or newer
+- The BIG-IP system is running software version 12.X or newer
 
 
 Example Usage
