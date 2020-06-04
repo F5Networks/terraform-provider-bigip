@@ -45,6 +45,16 @@ resource "bigip_ltm_pool_attachment" "attach_node" {
 
 ## Argument Reference
 
+* `id` - (Computed) the `id` of the resource is a combination of the pool and node member full path, joined by a hyphen (e.g. "/Common/terraform-pool-/Common/node1:80")
+
 * `pool` - (Required) Name of the pool, which should be referenced from `bigip_ltm_pool` resource
 
 * `node` - (Required) Name of the Node with service port. (Name of Node should be referenced from `bigip_ltm_node` resource)
+
+## Importing
+An existing pool attachment (i.e. pool membership) can be imported into this resource by supplying both the pool full path, and the node full path with the relevant port. If the pool or node membership is not found, an error will be returned. An example is below:
+
+```sh
+$ terraform import bigip_ltm_pool_attachment.node-pool-attach \
+	'{"pool": "/Common/terraform-pool", "node": "/Common/node1:80"}'
+```
