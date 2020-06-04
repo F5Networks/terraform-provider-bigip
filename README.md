@@ -26,7 +26,7 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 # Documentation
 
-Provider documentation and reference can be found [here](website/docs).
+For the documentation, including download, installation, and usage instructions, see the [F5 Resources for Terraform User guide](https://clouddocs.f5.com/products/orchestration/terraform/latest/).
 
 # Building the  Provider
 
