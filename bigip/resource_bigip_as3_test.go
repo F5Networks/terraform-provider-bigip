@@ -107,23 +107,23 @@ func TestAccBigipAs3_create(t *testing.T) {
 			},
 		},
 	})
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckdevicesDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_AS3_RESOURCE4,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckAs3Exists("Sample_01", true),
-                                        testCheckAs3Exists("Sample_02", false),
-                                ),
-                                ExpectNonEmptyPlan: true,
-                        },              
-                },              
-        }) 
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckdevicesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE4,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01", true),
+					testCheckAs3Exists("Sample_02", false),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
 }
 
 func TestAccBigipAs3_update(t *testing.T) {
