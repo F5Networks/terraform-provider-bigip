@@ -8,15 +8,14 @@ package bigip
 import (
 	"crypto/tls"
 	"fmt"
+	i "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"testing"
-
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 //var TEST_DEVICE_NAME = fmt.Sprintf("/%s/test-device", TEST_PARTITION)
@@ -64,7 +63,7 @@ func TestAccBigipAs3_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE,
@@ -80,7 +79,7 @@ func TestAccBigipAs3_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE1,
@@ -95,7 +94,7 @@ func TestAccBigipAs3_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE2,
@@ -112,7 +111,7 @@ func TestAccBigipAs3_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE4,
@@ -132,7 +131,7 @@ func TestAccBigipAs3_update(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE1,
@@ -153,7 +152,7 @@ func TestAccBigipAs3_update(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE3,
@@ -213,4 +212,19 @@ func TestAccBigipAs3_badJSON(t *testing.T) {
 			},
 		},
 	})
+}
+func testCheckAs3Destroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*bigip.BigIP)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "bigip_as3" {
+			continue
+		}
+
+		name := rs.Primary.ID
+		err, failedTenants := client.DeleteAs3Bigip(name)
+		if err != nil || failedTenants != "" {
+			return err
+		}
+	}
+	return nil
 }
