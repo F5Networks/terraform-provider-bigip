@@ -42,6 +42,7 @@ User Guide Index
    /userguide/do-integration
    /userguide/bigiq-licensing
    /userguide/support
+   /userguide/release-notes
    /userguide/revision_history
 
 

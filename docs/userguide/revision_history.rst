@@ -3,7 +3,7 @@
 Document Revision History
 =========================
 
-This page shows the revision history for this documentation. See `GitHub <https://github.com/F5Networks/terraform-provider-bigip>`_ for release information.
+This page shows the revision history for this documentation. See `GitHub <https://github.com/F5Networks/terraform-provider-bigip/releases>`_ for release information.
 
 .. list-table::
       :widths: 15 100 15
