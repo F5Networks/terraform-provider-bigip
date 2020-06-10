@@ -241,6 +241,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 
 	return nil, strings.Join(successfulTenants[:], ",")
 }
+
 /*func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
 	tenant := tenantName + "?async=true"
 	resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
@@ -281,76 +282,73 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 
 }*/
 
-
-
-
 func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
-        tenant := tenantName + "?async=true"
-        failedTenants := make([]string, 0)
-        resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
-        if err != nil {
-                return err, ""
-        }
-        respRef := make(map[string]interface{})
-        json.Unmarshal(resp, &respRef)
-        respID := respRef["id"].(string)
-        taskStatus, err := b.getas3Taskstatus(respID)
-        respCode := taskStatus.Results[0].Code
-        log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
-        for respCode != 200 {
-                fastTask, err := b.getas3Taskstatus(respID)
-                if err != nil {
-                        return err, ""
-                }
-                respCode = fastTask.Results[0].Code
-                if respCode != 0 && respCode != 503 {
-                        tenant_count := len(strings.Split(tenantName, ","))
-                        if tenant_count != 1 {
-                                i := tenant_count - 1
-                                success_count := 0
-                                for i >= 0 {
-                                        if fastTask.Results[i].Code == 200 {
-                                                success_count++
-                                        }
-                                        if fastTask.Results[i].Code >= 400 {
-                                                failedTenants = append(failedTenants, fastTask.Results[i].Tenant)
-                                                log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
-                                        }
-                                        i = i - 1
-                                }
-                                if success_count == tenant_count {
-                                        log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
-                                        break // break here
-                                } else if success_count == 0 {
-                                        return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
-                                } else {
-                                        finallist := strings.Join(failedTenants[:], ",")
-                                        return errors.New(fmt.Sprintf("Partial Success")), finallist
-                                }
-                        }
-                        if respCode == 200 {
-                                log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
-                                break // break here
-                        }
-                        if respCode >= 400 {
-                                return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
-                        }
-                }
-                if respCode == 503 {
-                        taskIds, err := b.getas3Taskid()
-                        if err != nil {
-                                return err, ""
-                        }
-                        for _, id := range taskIds {
-                                if b.pollingStatus(id) {
-                                        return b.DeleteAs3Bigip(tenantName)
-                                }
-                        }
-                }
-                time.Sleep(3 * time.Second)
-        }
+	tenant := tenantName + "?async=true"
+	failedTenants := make([]string, 0)
+	resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+	if err != nil {
+		return err, ""
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	respID := respRef["id"].(string)
+	taskStatus, err := b.getas3Taskstatus(respID)
+	respCode := taskStatus.Results[0].Code
+	log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
+	for respCode != 200 {
+		fastTask, err := b.getas3Taskstatus(respID)
+		if err != nil {
+			return err, ""
+		}
+		respCode = fastTask.Results[0].Code
+		if respCode != 0 && respCode != 503 {
+			tenant_count := len(strings.Split(tenantName, ","))
+			if tenant_count != 1 {
+				i := tenant_count - 1
+				success_count := 0
+				for i >= 0 {
+					if fastTask.Results[i].Code == 200 {
+						success_count++
+					}
+					if fastTask.Results[i].Code >= 400 {
+						failedTenants = append(failedTenants, fastTask.Results[i].Tenant)
+						log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
+					}
+					i = i - 1
+				}
+				if success_count == tenant_count {
+					log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+					break // break here
+				} else if success_count == 0 {
+					return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
+				} else {
+					finallist := strings.Join(failedTenants[:], ",")
+					return errors.New(fmt.Sprintf("Partial Success")), finallist
+				}
+			}
+			if respCode == 200 {
+				log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+				break // break here
+			}
+			if respCode >= 400 {
+				return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
+			}
+		}
+		if respCode == 503 {
+			taskIds, err := b.getas3Taskid()
+			if err != nil {
+				return err, ""
+			}
+			for _, id := range taskIds {
+				if b.pollingStatus(id) {
+					return b.DeleteAs3Bigip(tenantName)
+				}
+			}
+		}
+		time.Sleep(3 * time.Second)
+	}
 
-        return nil, ""
+	return nil, ""
 
 }
 func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
