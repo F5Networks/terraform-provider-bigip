@@ -1,4 +1,19 @@
-## 1.3.0 (Unreleased)
+## 1.2.1 (Unreleased)
+
+# Bug Fixes
+
+1. Provider shows passwords in clear text when issuing terraform plan.#279
+2. Terraforn apply crash with bigip_as3 and F5 VE 15 #291 
+3. AS3 apply fails on Terraform #294 
+4. Documentation Link on readme.md [F5Networks/terraform-provider-bigip/issues/85]
+
+# Additional Changes
+
+1. Added Acceptance test for terraform resource ""bigip_ltm_pool_attachment"
+2. Documentation Update for terraform resource ""bigip_ltm_pool_attachment"
+3. Update Example for terraform resource "bigip_ltm_pool_attachment"
+4. New test scenerios for terraform resource "bigip_as3"
+
 ## 1.2.0 (May 11, 2020)
 
 # Feature additions:
