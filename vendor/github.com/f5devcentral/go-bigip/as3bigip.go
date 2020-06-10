@@ -16,6 +16,7 @@ import (
 )
 
 const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
 
 const (
 	uriSha          = "shared"
@@ -30,6 +31,11 @@ const (
 type as3Validate struct {
 	as3SchemaURL    string
 	as3SchemaLatest string
+}
+
+type doValidate struct {
+	doSchemaURL    string
+	doSchemaLatest string
 }
 
 type as3Version struct {
@@ -94,6 +100,57 @@ func (as3 *as3Validate) fetchAS3Schema() error {
 			return err
 		}
 		as3.as3SchemaLatest = string(byteJSON)
+		return err
+	}
+	return nil
+}
+
+func ValidateDOTemplate(doExampleJson string) bool {
+	myDO := &doValidate{
+		doSchemaLatestURL,
+		"",
+	}
+	log.Printf("[DEBUG] validating DO json against DO schema")
+	err := myDO.fetchDOSchema()
+	if err != nil {
+		fmt.Errorf("DO Schema Fetch failed: %s", err)
+		return false
+	}
+
+	schemaLoader := gojsonschema.NewStringLoader(myDO.doSchemaLatest)
+	documentLoader := gojsonschema.NewStringLoader(doExampleJson)
+
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	if err != nil {
+		fmt.Errorf("%s", err)
+		return false
+	}
+	if !result.Valid() {
+		log.Printf("DO JSON is not valid. see errors :\n")
+		for _, desc := range result.Errors() {
+			log.Printf("- %s\n", desc)
+		}
+		return false
+	} else {
+		log.Printf("[DEBUG] DO Json  is valid\n")
+	}
+	return true
+}
+
+func (do *doValidate) fetchDOSchema() error {
+	res, resErr := http.Get(do.doSchemaURL)
+	if resErr != nil {
+		log.Printf("Error while fetching latest DO schema : %v", resErr)
+		return resErr
+	}
+	if res.StatusCode == http.StatusOK {
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			log.Printf("Unable to read the DO template from json response body : %v", err)
+			return err
+		}
+		defer res.Body.Close()
+		do.doSchemaLatest = string(body)
 		return err
 	}
 	return nil
@@ -179,11 +236,13 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 				}
 			}
 		}
+		time.Sleep(3 * time.Second)
 	}
 
 	return nil, strings.Join(successfulTenants[:], ",")
 }
-func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
+
+/*func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
 	tenant := tenantName + "?async=true"
 	resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
@@ -216,9 +275,80 @@ func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
 				}
 			}
 		}
+		time.Sleep(3 * time.Second)
 	}
 
 	return nil
+
+}*/
+
+func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
+	tenant := tenantName + "?async=true"
+	failedTenants := make([]string, 0)
+	resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+	if err != nil {
+		return err, ""
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	respID := respRef["id"].(string)
+	taskStatus, err := b.getas3Taskstatus(respID)
+	respCode := taskStatus.Results[0].Code
+	log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
+	for respCode != 200 {
+		fastTask, err := b.getas3Taskstatus(respID)
+		if err != nil {
+			return err, ""
+		}
+		respCode = fastTask.Results[0].Code
+		if respCode != 0 && respCode != 503 {
+			tenant_count := len(strings.Split(tenantName, ","))
+			if tenant_count != 1 {
+				i := tenant_count - 1
+				success_count := 0
+				for i >= 0 {
+					if fastTask.Results[i].Code == 200 {
+						success_count++
+					}
+					if fastTask.Results[i].Code >= 400 {
+						failedTenants = append(failedTenants, fastTask.Results[i].Tenant)
+						log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
+					}
+					i = i - 1
+				}
+				if success_count == tenant_count {
+					log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+					break // break here
+				} else if success_count == 0 {
+					return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
+				} else {
+					finallist := strings.Join(failedTenants[:], ",")
+					return errors.New(fmt.Sprintf("Partial Success")), finallist
+				}
+			}
+			if respCode == 200 {
+				log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
+				break // break here
+			}
+			if respCode >= 400 {
+				return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
+			}
+		}
+		if respCode == 503 {
+			taskIds, err := b.getas3Taskid()
+			if err != nil {
+				return err, ""
+			}
+			for _, id := range taskIds {
+				if b.pollingStatus(id) {
+					return b.DeleteAs3Bigip(tenantName)
+				}
+			}
+		}
+		time.Sleep(3 * time.Second)
+	}
+
+	return nil, ""
 
 }
 func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
@@ -350,7 +480,7 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int) {
 	tenant_list := strings.Join(s[:], ",")
 	return tenant_list, len(s)
 }
-func (b *BigIP) AddTeemAgent(body interface{}) string {
+func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	var s string
 	as3json := body.(string)
 	resp := []byte(as3json)
@@ -359,7 +489,10 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 	//jsonRef["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
 	as3ver, err := b.getAs3version()
 	if err != nil {
-		log.Println(err)
+		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
+	}
+	if as3ver.Version == "" {
+		return "", fmt.Errorf("Getting AS3 Version failed,please check AS3 installed?")
 	}
 	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
 	log.Printf("[DEBUG] Terraform Version:%+v", b.UserAgent)
@@ -375,10 +508,11 @@ func (b *BigIP) AddTeemAgent(body interface{}) string {
 	}
 	jsonData, err := json.Marshal(jsonRef)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
+		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
 	}
 	s = string(jsonData)
-	return s
+	return s, nil
 }
 func intConvert(v interface{}) int {
 	if s, err := strconv.Atoi(v.(string)); err == nil {

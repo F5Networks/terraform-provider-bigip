@@ -9,9 +9,32 @@ provider "bigip" {
   password = "xxxx"
 }
 
+resource "bigip_ltm_monitor" "monitor" {
+  name     = "/Common/terraform_monitor"
+  parent   = "/Common/http"
+  send     = "GET /some/path\r\n"
+  timeout  = "999"
+  interval = "998"
+}
+
+resource "bigip_ltm_pool" "pool" {
+  name                = "/Common/terraform-pool"
+  load_balancing_mode = "round-robin"
+  monitors            = ["/Common/terraform_monitor"]
+  allow_snat          = "yes"
+  allow_nat           = "yes"
+  depends_on = [bigip_ltm_monitor.monitor]
+}
+
+resource "bigip_ltm_node" "node" {
+  name             = "/Common/terraform_node1"
+  address          = "192.168.30.2"
+    }
+
 resource "bigip_ltm_pool_attachment" "attach_node" {
   pool       = "/Common/terraform-pool"
-  node       = "/Common/11.1.1.101:80"
+  node       = "${bigip_ltm_node.node.name}:80"
   depends_on = [bigip_ltm_pool.pool]
 }
+
 
