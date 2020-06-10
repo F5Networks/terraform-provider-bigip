@@ -30,7 +30,7 @@ resource "bigip_ltm_policy" "http_to_https_redirect" {
   rule  {
     name = "http_to_https_redirect_rule"
     action {
-      tm_name = "http_to_https_redirect"
+//      tm_name = "http_to_https_redirect"
       redirect = true
       location = "tcl:https://[HTTP::host][HTTP::uri]"
       http_reply = true
