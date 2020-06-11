@@ -15,6 +15,7 @@ This page shows the revision history for this documentation. See `GitHub <https:
         
       * - 1.2  
         - Updated the documentation with the following changes: |br| • Added section on :ref:`bigiq-licensing`.
+        - Added a `page linking to :ref:`release-notes`.
         - 06-16-20 
 
       * - 1.1  

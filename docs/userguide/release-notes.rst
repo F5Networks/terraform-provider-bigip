@@ -1,3 +1,5 @@
+.. _release-notes:
+
 F5 Terraform Provider Release Notes
 ===================================
 
