@@ -7,13 +7,37 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 package bigip
 
 import (
 	"encoding/json"
 	"log"
+	//"strings"
+	"time"
 )
+
+type Version struct {
+	Kind     string `json:"kind,omitempty"`
+	SelfLink string `json:"selfLink,omitempty"`
+	Entries  struct {
+		HTTPSLocalhostMgmtTmCliVersion0 struct {
+			NestedStats struct {
+				Entries struct {
+					Active struct {
+						Description string `json:"description"`
+					} `json:"active,omitempty"`
+					Latest struct {
+						Description string `json:"description"`
+					} `json:"latest,omitempty"`
+					Supported struct {
+						Description string `json:"description"`
+					} `json:"supported,omitempty"`
+				} `json:"entries,omitempty"`
+			} `json:"nestedStats,omitempty"`
+		} `json:"https://localhost/mgmt/tm/cli/version/0,omitempty"`
+	} `json:"entries,omitempty"`
+}
 
 type NTPs struct {
 	NTPs []NTP `json:"items"`
@@ -23,6 +47,19 @@ type NTP struct {
 	Description string   `json:"description,omitempty"`
 	Servers     []string `json:"servers,omitempty"`
 	Timezone    string   `json:"timezone,omitempty"`
+}
+
+type BigipCommand struct {
+	Command       string `json:"command"`
+	UtilCmdArgs   string `json:"utilCmdArgs"`
+	CommandResult string `json:"commandResult,omitempty"`
+}
+
+type BigipCmdResp struct {
+	Code       int           `json:"code"`
+	Message    string        `json:"message"`
+	ErrorStack []interface{} `json:"errorStack"`
+	APIError   int           `json:"apiError"`
 }
 
 type DNSs struct {
@@ -213,24 +250,260 @@ func (p *LogPublisher) UnmarshalJSON(b []byte) error {
 }
 
 const (
-	uriSys         = "sys"
-	uriNtp         = "ntp"
-	uriDNS         = "dns"
-	uriProvision   = "provision"
-	uriAfm         = "afm"
-	uriAsm         = "asm"
-	uriApm         = "apm"
-	uriAvr         = "avr"
-	uriIlx         = "ilx"
-	uriSyslog      = "syslog"
-	uriSnmp        = "snmp"
-	uriTraps       = "traps"
-	uriLicense     = "license"
-	uriLogConfig   = "logConfig"
-	uriDestination = "destination"
-	uriIPFIX       = "ipfix"
-	uriPublisher   = "publisher"
+	uriSys             = "sys"
+	uriTm              = "tm"
+	uriCli             = "cli"
+	uriUtil            = "util"
+	uriBash            = "bash"
+	uriVersion         = "version"
+	uriNtp             = "ntp"
+	uriDNS             = "dns"
+	uriProvision       = "provision"
+	uriAfm             = "afm"
+	uriAsm             = "asm"
+	uriApm             = "apm"
+	uriAvr             = "avr"
+	uriIlx             = "ilx"
+	uriSyslog          = "syslog"
+	uriSnmp            = "snmp"
+	uriTraps           = "traps"
+	uriLicense         = "license"
+	uriLogConfig       = "logConfig"
+	uriDestination     = "destination"
+	uriIPFIX           = "ipfix"
+	uriPublisher       = "publisher"
+	uriFile            = "file"
+	uriSslCert         = "ssl-cert"
+	uriSslKey          = "ssl-key"
+	REST_DOWNLOAD_PATH = "/var/config/rest/downloads"
 )
+
+// Certificates represents a list of installed SSL certificates.
+type Certificates struct {
+	Certificates []Certificate `json:"items,omitempty"`
+}
+
+// Certificate represents an SSL Certificate.
+type Certificate struct {
+	AppService              string `json:"appService,omitempty"`
+	CachePath               string `json:"cachePath,omitempty"`
+	CertificateKeyCurveName string `json:"certificateKeyCurveName,omitempty"`
+	CertificateKeySize      int    `json:"certificateKeySize,omitempty"`
+	CertValidationOptions   string `json:"certValidationOptions,omitempty"`
+	Checksum                string `json:"checksum,omitempty"`
+	CreatedBy               string `json:"createdBy,omitempty"`
+	CreateTime              string `json:"createTime,omitempty"`
+	Email                   string `json:"email,omitempty"`
+	ExpirationDate          int    `json:"expirationDate,omitempty"`
+	ExpirationString        string `json:"expirationString,omitempty"`
+	Fingerprint             string `json:"fingerprint,omitempty"`
+	FullPath                string `json:"fullPath,omitempty"`
+	Generation              int    `json:"generation,omitempty"`
+	IsBundle                string `json:"isBundle,omitempty"`
+	IsDynamic               string `json:"isDynamic,omitempty"`
+	Issuer                  string `json:"issuer,omitempty"`
+	IssuerCert              string `json:"issuerCert,omitempty"`
+	KeyType                 string `json:"keyType,omitempty"`
+	LastUpdateTime          string `json:"lastUpdateTime,omitempty"`
+	Mode                    int    `json:"mode,omitempty"`
+	Name                    string `json:"name,omitempty"`
+	Partition               string `json:"partition,omitempty"`
+	Revision                int    `json:"revision,omitempty"`
+	SerialNumber            string `json:"serialNumber,omitempty"`
+	Size                    uint64 `json:"size,omitempty"`
+	SourcePath              string `json:"sourcePath,omitempty"`
+	Subject                 string `json:"subject,omitempty"`
+	SubjectAlternativeName  string `json:"subjectAlternativeName,omitempty"`
+	SystemPath              string `json:"systemPath,omitempty"`
+	UpdatedBy               string `json:"updatedBy,omitempty"`
+	Version                 int    `json:"version,omitempty"`
+}
+
+// Keys represents a list of installed keys.
+type Keys struct {
+	Keys []Key `json:"items,omitempty"`
+}
+
+// Key represents a private key associated with a certificate.
+type Key struct {
+	AppService     string `json:"appService,omitempty"`
+	CachePath      string `json:"cachePath,omitempty"`
+	Checksum       string `json:"checksum,omitempty"`
+	CreatedBy      string `json:"createdBy,omitempty"`
+	CreateTime     string `json:"createTime,omitempty"`
+	CurveName      string `json:"curveName,omitempty"`
+	FullPath       string `json:"fullPath,omitempty"`
+	Generation     int    `json:"generation,omitempty"`
+	IsDynamic      string `json:"isDynamic,omitempty"`
+	KeySize        int    `json:"keySize,omitempty"`
+	KeyType        string `json:"keyType,omitempty"`
+	LastUpdateTime string `json:"lastUpdateTime,omitempty"`
+	Mode           int    `json:"mode,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Partition      string `json:"partition,omitempty"`
+	Passphrase     string `json:"passphrase,omitempty"`
+	Revision       int    `json:"revision,omitempty"`
+	SecurityType   string `json:"securityType,omitempty"`
+	Size           uint64 `json:"size,omitempty"`
+	SourcePath     string `json:"sourcePath,omitempty"`
+	SystemPath     string `json:"systemPath,omitempty"`
+	UpdatedBy      string `json:"updatedBy,omitempty"`
+}
+
+// Certificates returns a list of certificates.
+func (b *BigIP) Certificates() (*Certificates, error) {
+	var certs Certificates
+	err, _ := b.getForEntity(&certs, uriSys, uriFile, uriSslCert)
+	if err != nil {
+		return nil, err
+	}
+
+	return &certs, nil
+}
+
+// AddCertificate installs a certificate.
+func (b *BigIP) AddCertificate(cert *Certificate) error {
+	return b.post(cert, uriSys, uriFile, uriSslCert)
+}
+
+// UploadCertificate copies a certificate local disk to BIGIP
+func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte, certname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
+	log.Println("string:", sourcepath)
+	cert := Certificate{
+		Name:       certname,
+		SourcePath: sourcepath,
+		Partition:  partition,
+	}
+	log.Printf("%+v\n", cert)
+	err = b.AddCertificate(&cert)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetCertificate retrieves a Certificate by name. Returns nil if the certificate does not exist
+func (b *BigIP) GetCertificate(name string) (*Certificate, error) {
+	var cert Certificate
+	err, ok := b.getForEntity(&cert, uriSys, uriFile, uriSslCert, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &cert, nil
+}
+
+// DeleteCertificate removes a certificate.
+func (b *BigIP) DeleteCertificate(name string) error {
+	return b.delete(uriSys, uriFile, uriSslCert, name)
+}
+
+// UpdateCertificate copies a certificate local disk to BIGIP
+func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
+	certbyte := []byte(certpath)
+	_, err := b.UploadBytes(certbyte, certname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
+	cert := Certificate{
+		Name:       certname,
+		SourcePath: sourcepath,
+	}
+	err = b.AddCertificate(&cert)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UploadKey copies a certificate key from local disk to BIGIP
+func (b *BigIP) UploadKey(keyname, keypath, partition string) error {
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte, keyname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
+	log.Println("string:", sourcepath)
+	certkey := Key{
+		Name:       keyname,
+		SourcePath: sourcepath,
+		Partition:  partition,
+	}
+	log.Printf("%+v\n", certkey)
+	err = b.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateKey copies a certificate key from local disk to BIGIP
+func (b *BigIP) UpdateKey(keyname, keypath, partition string) error {
+	keybyte := []byte(keypath)
+	_, err := b.UploadBytes(keybyte, keyname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
+	log.Println("string:", sourcepath)
+	certkey := Key{
+		Name:       keyname,
+		SourcePath: sourcepath,
+		Partition:  partition,
+	}
+	log.Printf("%+v\n", certkey)
+	err = b.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Keys returns a list of keys.
+func (b *BigIP) Keys() (*Keys, error) {
+	var keys Keys
+	err, _ := b.getForEntity(&keys, uriSys, uriFile, uriSslKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &keys, nil
+}
+
+// AddKey installs a key.
+func (b *BigIP) AddKey(config *Key) error {
+	return b.post(config, uriSys, uriFile, uriSslKey)
+}
+
+// GetKey retrieves a key by name. Returns nil if the key does not exist.
+func (b *BigIP) GetKey(name string) (*Key, error) {
+	var key Key
+	err, ok := b.getForEntity(&key, uriSys, uriFile, uriSslKey, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &key, nil
+}
+
+// DeleteKey removes a key.
+func (b *BigIP) DeleteKey(name string) error {
+	return b.delete(uriSys, uriFile, uriSslKey, name)
+}
 
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
 	config := &NTP{
@@ -254,6 +527,26 @@ func (b *BigIP) NTPs() (*NTP, error) {
 		return nil, err
 	}
 	return &ntp, nil
+}
+
+func (b *BigIP) BigipVersion() (*Version, error) {
+	var bigipversion Version
+	err, _ := b.getForEntity(&bigipversion, uriMgmt, uriTm, uriCli, uriVersion)
+
+	if err != nil {
+		return nil, err
+	}
+	return &bigipversion, nil
+}
+
+func (b *BigIP) RunCommand(config *BigipCommand) (*BigipCommand, error) {
+	var respRef BigipCommand
+	resp, err := b.postReq(config, uriMgmt, uriTm, uriUtil, uriBash)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(resp, &respRef)
+	return &respRef, nil
 }
 
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {
@@ -291,32 +584,51 @@ func (b *BigIP) CreateProvision(name string, fullPath string, cpuRatio int, disk
 		Level:       level,
 		MemoryRatio: memoryRatio,
 	}
-	if fullPath == "/Common/asm" {
+	if name == "asm" {
 		return b.put(config, uriSys, uriProvision, uriAsm)
 	}
-	if fullPath == "/Common/afm" {
+	if name == "afm" {
 		return b.put(config, uriSys, uriProvision, uriAfm)
 
 	}
-	if fullPath == "/Common/gtm" {
+	if name == "gtm" {
 		return b.put(config, uriSys, uriProvision, uriGtm)
 	}
 
-	if fullPath == "/Common/apm" {
+	if name == "apm" {
 		return b.put(config, uriSys, uriProvision, uriApm)
 	}
 
-	if fullPath == "/Common/avr" {
+	if name == "avr" {
 		return b.put(config, uriSys, uriProvision, uriAvr)
 	}
-	if fullPath == "/Common/ilx" {
+	if name == "ilx" {
 		return b.put(config, uriSys, uriProvision, uriIlx)
 	}
 	return nil
 }
 
-func (b *BigIP) ModifyProvision(config *Provision) error {
-	return b.put(config, uriSys, uriProvision, uriAfm)
+func (b *BigIP) ProvisionModule(config *Provision) error {
+	log.Printf(" Module Provision:%v", config)
+	if config.Name == "asm" {
+		return b.put(config, uriSys, uriProvision, uriAsm)
+	}
+	if config.Name == "afm" {
+		return b.put(config, uriSys, uriProvision, uriAfm)
+	}
+	if config.Name == "gtm" {
+		return b.put(config, uriSys, uriProvision, uriGtm)
+	}
+	if config.Name == "apm" {
+		return b.put(config, uriSys, uriProvision, uriApm)
+	}
+	if config.Name == "avr" {
+		return b.put(config, uriSys, uriProvision, uriAvr)
+	}
+	if config.Name == "ilx" {
+		return b.put(config, uriSys, uriProvision, uriIlx)
+	}
+	return nil
 }
 
 func (b *BigIP) DeleteProvision(name string) error {
@@ -468,6 +780,22 @@ func (b *BigIP) Bigiplicenses() (*Bigiplicense, error) {
 	}
 
 	return &bigiplicense, nil
+}
+
+func (b *BigIP) GetBigipLiceseStatus() (map[string]interface{}, error) {
+	bigipLicense := make(map[string]interface{})
+	err, _ := b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+	c := 0
+	for err != nil {
+		time.Sleep(10 * time.Second)
+		c++
+		err, _ = b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+		if c == 15 {
+			log.Printf("[DEBUG] Device is not up even after waiting for 120 seconds")
+			return nil, err
+		}
+	}
+	return bigipLicense, nil
 }
 
 func (b *BigIP) CreateBigiplicense(command, registration_key string) error {

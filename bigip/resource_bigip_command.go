@@ -1,0 +1,145 @@
+/*
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+package bigip
+
+import (
+	"fmt"
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+)
+
+func resourceBigipCommand() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceBigipCommandCreate,
+		Read:   resourceBigipCommandRead,
+		Update: resourceBigipCommandUpdate,
+		Delete: resourceBigipCommandDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+		Schema: map[string]*schema.Schema{
+			"when": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "apply",
+			},
+			"commands": {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "The commands to send to the remote BIG-IP device over the configured provider",
+			},
+			"command_result": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "Partition of ssl certificate",
+			},
+		},
+	}
+}
+
+func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	var commandList []string
+	if d.Get("when").(string) == "apply" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
+		}
+		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			//log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+		}
+		_ = d.Set("command_result", resultList)
+	}
+	d.SetId(d.Get("when").(string))
+	return nil
+}
+
+func resourceBigipCommandRead(d *schema.ResourceData, meta interface{}) error {
+	log.Println("[INFO]:Read Operation is not supported for this resource")
+	return nil
+}
+func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	var commandList []string
+	if d.Get("when").(string) == "apply" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
+		}
+		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			//log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			//log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+		}
+		_ = d.Set("command_result", resultList)
+	}
+	return nil
+}
+
+func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	var commandList []string
+	if d.Get("when").(string) == "destroy" {
+		if m, ok := d.GetOk("commands"); ok {
+			for _, cmd := range m.([]interface{}) {
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+			}
+		}
+		log.Printf("[INFO] Running Delete TMSH Command: %v ", commandList)
+		var resultList []string
+		for _, str := range commandList {
+			log.Printf("[INFO] Command to run:%v", str)
+			commandConfig := &bigip.BigipCommand{
+				Command:     "run",
+				UtilCmdArgs: str,
+			}
+			log.Printf("[INFO] Command struct:%+v", commandConfig)
+			resultCmd, err := client.RunCommand(commandConfig)
+			if err != nil {
+				return fmt.Errorf("error retrieving Command Result: %v", err)
+			}
+			log.Printf("[INFO] Result Command struct:%+v", resultCmd)
+			resultList = append(resultList, resultCmd.CommandResult)
+			//d.Set()
+		}
+	}
+	d.SetId("")
+	return nil
+}

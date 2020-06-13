@@ -9,7 +9,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 )
 
@@ -29,32 +29,28 @@ func resourceBigipSysProvision() *schema.Resource {
 				Required:    true,
 				Description: "Name of the module to be provisioned",
 			},
-
 			"full_path": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "path",
 			},
-
 			"cpu_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "cpu Ratio",
 			},
-
 			"disk_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "disk Ratio",
 			},
-
 			"level": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "what level nominal or dedicated",
 				Default:     "nominal",
 			},
-
 			"memory_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -62,30 +58,28 @@ func resourceBigipSysProvision() *schema.Resource {
 			},
 		},
 	}
-
 }
 
 func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
-	FullPath := d.Get("full_path").(string)
+	fullPath := d.Get("full_path").(string)
 	cpuRatio := d.Get("cpu_ratio").(int)
 	diskRatio := d.Get("disk_ratio").(int)
 	level := d.Get("level").(string)
 	memoryRatio := d.Get("memory_ratio").(int)
 
-	log.Println("[INFO] Provisioning  ")
+	log.Printf("[INFO] Provisioning for %v module", name)
 
-	err := client.CreateProvision(
-		name,
-		FullPath,
-		cpuRatio,
-		diskRatio,
-		level,
-		memoryRatio,
-	)
-
+	r := &bigip.Provision{
+		Name:        name,
+		FullPath:    fullPath,
+		CpuRatio:    cpuRatio,
+		DiskRatio:   diskRatio,
+		Level:       level,
+		MemoryRatio: memoryRatio,
+	}
+	err := client.ProvisionModule(r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Provision  (%s) ", err)
 		return err
@@ -96,11 +90,8 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
-	log.Println("[INFO] Updating Provsioning " + name)
-
+	log.Printf("[INFO] Updating Provisioning for :%v module", name)
 	r := &bigip.Provision{
 		Name:        name,
 		FullPath:    d.Get("full_path").(string),
@@ -109,10 +100,9 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 		Level:       d.Get("level").(string),
 		MemoryRatio: d.Get("memory_ratio").(int),
 	}
-
-	err := client.ModifyProvision(r)
+	err := client.ProvisionModule(r)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Provision (%v) ", err)
+		log.Printf("[ERROR] Unable to Update Provision (%v) ", err)
 		return err
 	}
 	return resourceBigipSysProvisionRead(d, meta)
@@ -120,11 +110,8 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
 	log.Println("[INFO] Reading Provisions " + name)
-
 	p, err := client.Provisions(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", name, err)

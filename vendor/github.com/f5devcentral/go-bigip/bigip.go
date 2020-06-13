@@ -7,7 +7,7 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
+*/
 // Package bigip interacts with F5 BIG-IP systems using the REST API.
 package bigip
 
@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -34,11 +35,13 @@ type ConfigOptions struct {
 
 // BigIP is a container for our session state.
 type BigIP struct {
-	Host          string
-	User          string
-	Password      string
-	Token         string // if set, will be used instead of User/Password
-	Transport     *http.Transport
+	Host      string
+	User      string
+	Password  string
+	Token     string // if set, will be used instead of User/Password
+	Transport *http.Transport
+	// UserAgent is an optional field that specifies the caller of this request.
+	UserAgent     string
 	ConfigOptions *ConfigOptions
 }
 
@@ -48,6 +51,17 @@ type APIRequest struct {
 	URL         string
 	Body        string
 	ContentType string
+}
+
+// Upload contains information about a file upload status
+type Upload struct {
+	RemainingByteCount int64          `json:"remainingByteCount"`
+	UsedChunks         map[string]int `json:"usedChunks"`
+	TotalByteCount     int64          `json:"totalByteCount"`
+	LocalFilePath      string         `json:"localFilePath"`
+	TemporaryFilePath  string         `json:"temporaryFilePath"`
+	Generation         int            `json:"generation"`
+	LastUpdateMicros   int            `json:"lastUpdateMicros"`
 }
 
 // RequestError contains information about any error we get from a request.
@@ -67,12 +81,15 @@ func (r *RequestError) Error() error {
 }
 
 // NewSession sets up our connection to the BIG-IP system.
-func NewSession(host, user, passwd string, configOptions *ConfigOptions) *BigIP {
+func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *BigIP {
 	var url string
 	if !strings.HasPrefix(host, "http") {
 		url = fmt.Sprintf("https://%s", host)
 	} else {
 		url = host
+	}
+	if port != "" {
+		url = url + ":" + port
 	}
 	if configOptions == nil {
 		configOptions = defaultConfigOptions
@@ -95,7 +112,7 @@ func NewSession(host, user, passwd string, configOptions *ConfigOptions) *BigIP 
 // Auth. This is required when using an external authentication
 // provider, such as Radius or Active Directory. loginProviderName is
 // probably "tmos" but your environment may vary.
-func NewTokenSession(host, user, passwd, loginProviderName string, configOptions *ConfigOptions) (b *BigIP, err error) {
+func NewTokenSession(host, port, user, passwd, loginProviderName string, configOptions *ConfigOptions) (b *BigIP, err error) {
 	type authReq struct {
 		Username          string `json:"username"`
 		Password          string `json:"password"`
@@ -125,7 +142,7 @@ func NewTokenSession(host, user, passwd, loginProviderName string, configOptions
 		ContentType: "application/json",
 	}
 
-	b = NewSession(host, user, passwd, configOptions)
+	b = NewSession(host, port, user, passwd, configOptions)
 	resp, err := b.APICall(req)
 	if err != nil {
 		return
@@ -222,6 +239,34 @@ func (b *BigIP) delete(path ...string) error {
 	return callErr
 }
 
+//Generic delete
+func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
+	req := &APIRequest{
+		Method: "delete",
+		URL:    b.iControlPath(path),
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
+func (b *BigIP) deleteReqBody(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "delete",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -237,6 +282,23 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 func (b *BigIP) put(body interface{}, path ...string) error {
@@ -256,6 +318,23 @@ func (b *BigIP) put(body interface{}, path ...string) error {
 	return callErr
 }
 
+func (b *BigIP) putReq(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "put",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) patch(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -271,6 +350,91 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
+// Upload a file read from a Reader
+func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error) {
+	client := &http.Client{
+		Transport: b.Transport,
+		Timeout:   b.ConfigOptions.APICallTimeout,
+	}
+	options := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		ContentType: "application/octet-stream",
+	}
+	var format string
+	if strings.Contains(options.URL, "mgmt/") {
+		format = "%s/%s"
+	} else {
+		format = "%s/mgmt/%s"
+	}
+	url := fmt.Sprintf(format, b.Host, options.URL)
+	chunkSize := 512 * 1024
+	var start, end int64
+	for {
+		// Read next chunk
+		chunk := make([]byte, chunkSize)
+		n, err := r.Read(chunk)
+		if err != nil {
+			return nil, err
+		}
+		end = start + int64(n)
+		// Resize buffer size to number of bytes read
+		if n < chunkSize {
+			chunk = chunk[:n]
+		}
+		body := bytes.NewReader(chunk)
+		req, _ := http.NewRequest(strings.ToUpper(options.Method), url, body)
+		if b.Token != "" {
+			req.Header.Set("X-F5-Auth-Token", b.Token)
+		} else {
+			req.SetBasicAuth(b.User, b.Password)
+		}
+		req.Header.Add("Content-Type", options.ContentType)
+		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
+		// Try to upload chunk
+		res, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		data, _ := ioutil.ReadAll(res.Body)
+		if res.StatusCode >= 400 {
+			if res.Header.Get("Content-Type") == "application/json" {
+				return nil, b.checkError(data)
+			}
+
+			return nil, fmt.Errorf("HTTP %d :: %s", res.StatusCode, string(data[:]))
+		}
+		defer res.Body.Close()
+		var upload Upload
+		err = json.Unmarshal(data, &upload)
+		if err != nil {
+			return nil, err
+		}
+		start = end
+		if start >= size {
+			// Final chunk was uploaded
+			return &upload, err
+		}
+	}
 }
 
 //Get a url and populate an entity. If the entity does not exist (404) then the
@@ -298,6 +462,26 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		return err, false
 	}
 
+	return nil, true
+}
+
+func (b *BigIP) getForEntityNew(e interface{}, path ...string) (error, bool) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		return err, false
+	}
+	err = json.Unmarshal(resp, e)
+	if err != nil {
+		return err, false
+	}
 	return nil, true
 }
 

@@ -12,7 +12,7 @@ import (
 	"regexp"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
@@ -58,6 +58,12 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Sets the dynamic ratio number for the node. Used for dynamic ratio load balancing. ",
+				Computed:    true,
+			},
+			"ratio": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Sets the ratio number for the node.",
 				Computed:    true,
 			},
 			"monitor": {
@@ -127,8 +133,9 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	monitor := d.Get("monitor").(string)
 	state := d.Get("state").(string)
 	description := d.Get("description").(string)
+	ratio := d.Get("ratio").(int)
 
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
 	var err error
@@ -142,6 +149,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			monitor,
 			state,
 			description,
+			ratio,
 		)
 	} else {
 		interval := d.Get("fqdn.0.interval").(string)
@@ -158,6 +166,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 			monitor,
 			state,
 			description,
+			ratio,
 			interval,
 			address_family,
 			autopopulate,
@@ -197,7 +206,8 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
-		regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?`)
+		// x:x(%x)
+		regex := regexp.MustCompile(`((?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})|(?:.*:[^%]*))(?:\%\d+)?`)
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
 		if err := d.Set("address", node.Address); err != nil {
@@ -216,6 +226,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
+	d.Set("ratio", node.Ratio)
 	d.Set("fqdn.0.interval", node.FQDN.Interval)
 	d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
 	d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
@@ -248,7 +259,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	var node *bigip.Node
 	if r.MatchString(address) {
@@ -260,6 +271,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			RateLimit:       d.Get("rate_limit").(string),
 			State:           d.Get("state").(string),
 			Description:     d.Get("description").(string),
+			Ratio:           d.Get("ratio").(int),
 		}
 	} else {
 		node = &bigip.Node{
@@ -269,6 +281,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 			RateLimit:       d.Get("rate_limit").(string),
 			State:           d.Get("state").(string),
 			Description:     d.Get("description").(string),
+			Ratio:           d.Get("ratio").(int),
 		}
 	}
 

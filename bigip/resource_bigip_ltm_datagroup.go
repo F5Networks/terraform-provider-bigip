@@ -9,9 +9,10 @@ package bigip
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmDataGroup() *schema.Resource {
@@ -161,6 +162,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Modifying Data Group List %s", name)
 
 	rs := d.Get("record").(*schema.Set)
+	dgtype := d.Get("type").(string)
 
 	var records []bigip.DataGroupRecord
 	if rs.Len() > 0 {
@@ -172,11 +174,35 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		records = nil
 	}
 
-	err := client.ModifyInternalDataGroupRecords(name, records)
-	if err != nil {
-		return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
+	dgver := &bigip.DataGroup{
+		Name:    name,
+		Type:    dgtype,
+		Records: records,
 	}
 
+	dgver1213 := &bigip.DataGroup{
+		Name:    name,
+		Records: records,
+	}
+
+	ver, err := client.BigipVersion()
+
+	bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
+	re := regexp.MustCompile(`^(12)|(13).*`)
+	matchresult := re.MatchString(bigipversion)
+	regversion := re.FindAllString(bigipversion, -1)
+	if matchresult == true {
+		log.Printf("[DEBUG] Bigip version is : %s", regversion)
+		err = client.ModifyInternalDataGroupRecords(dgver1213)
+		if err != nil {
+			return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
+		}
+	} else {
+		err = client.ModifyInternalDataGroupRecords(dgver)
+		if err != nil {
+			return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
+		}
+	}
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 

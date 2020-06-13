@@ -18,15 +18,15 @@ provider "bigip" {
   username = "xxxxx"
   password = "xxxxx"
 }
-
-resource "bigip_sys_provision" "provision-ilx" {
-  name        = "/Common/ilx"
-  fullPath    = "ilx"
-  cpuRatio    = 0
-  diskRatio   = 0
-  level       = "nominal"
-  memoryRatio = 0
+resource "bigip_sys_provision" "test-provision" {
+  name         = "TEST_ASM_PROVISION_NAME"
+  full_path    = "asm"
+  cpu_ratio    = 0
+  disk_ratio   = 0
+  level        = "none"
+  memory_ratio = 0
 }
+
 ```
 
 ## Argument Reference

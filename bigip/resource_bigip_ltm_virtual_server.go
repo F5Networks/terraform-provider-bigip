@@ -11,9 +11,10 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmVirtualServer() *schema.Resource {
@@ -32,6 +33,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the virtual server",
+				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
 
@@ -42,9 +44,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "0.0.0.0/0",
+				Type:     schema.TypeString,
+				Optional: true,
+				//Default:     "0.0.0.0/0",
+				Computed:    true,
 				Description: "Source IP and mask for the virtual server",
 			},
 			"description": {
@@ -72,10 +75,11 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"mask": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "255.255.255.255",
-				Description: "Mask can either be in CIDR notation or decimal, i.e.: \"24\" or \"255.255.255.0\". A CIDR mask of \"0\" is the same as \"0.0.0.0\"",
+				Type:     schema.TypeString,
+				Optional: true,
+				//Default:     "255.255.255.255",
+				Computed:    true,
+				Description: "subnet mask",
 			},
 
 			"profiles": {
@@ -108,6 +112,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Set:      schema.HashString,
 				Optional: true,
 				Computed: true,
+			},
+			"default_persistence_profile": {
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 
 			"fallback_persistence_profile": {
@@ -179,8 +187,35 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 	}
 }
 
+func resourceBigipLtmVirtualServerAttrDefaults(d *schema.ResourceData) {
+	_, hasMask := d.GetOk("mask")
+	_, hasSource := d.GetOk("source")
+
+	// Set default mask if nil
+	if !hasMask {
+		// looks like IPv6, lets set to /128
+		if strings.Contains(d.Get("destination").(string), ":") {
+			d.Set("mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")
+		} else { // /32 for IPv4
+			d.Set("mask", "255.255.255.255")
+		}
+	}
+
+	// set default source if nil
+	if !hasSource {
+		// looks like IPv6, lets set to ::/0
+		if strings.Contains(d.Get("destination").(string), ":") {
+			d.Set("source", "::/0")
+		} else { // 0.0.0.0/0
+			d.Set("source", "0.0.0.0/0")
+		}
+	}
+}
+
 func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+
+	resourceBigipLtmVirtualServerAttrDefaults(d)
 
 	name := d.Get("name").(string)
 	port := d.Get("port").(int)
@@ -231,21 +266,29 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		d.SetId("")
 		return nil
 	}
-	// Extract destination address from "/partition_name/(virtual_server_address)[%route_domain]:port"
-	regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
-	destination := regex.FindStringSubmatch(vs.Destination)
-	parsedDestination := destination[2] + destination[3]
-	if len(destination) < 3 {
-		return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
-	}
-	if err := d.Set("destination", parsedDestination); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
 
-	// Extract source address from "(source_address)[%route_domain](/mask)" groups 1 + 2
-	//regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
-	//source := regex.FindStringSubmatch(vs.Source)
-	//parsedSource := source[1] + source[2]
+	vs_dest := vs.Destination
+	if strings.Count(vs_dest, ":") >= 2 {
+		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		if destination == nil {
+			return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
+		}
+		if err := d.Set("destination", destination[2]); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
+		}
+	}
+	if strings.Count(vs_dest, ":") < 2 {
+		regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		parsedDestination := destination[2] + destination[3]
+		if len(destination) < 3 {
+			return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
+		}
+		if err := d.Set("destination", parsedDestination); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
+		}
+	}
 	if err := d.Set("source", vs.Source); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -259,17 +302,31 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
-	   so we need to extract it
-	*/
-	regex = regexp.MustCompile(`\:(\d+)`)
-	port := regex.FindStringSubmatch(vs.Destination)
-	if len(port) < 2 {
-		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
-	}
-	parsedPort, _ := strconv.Atoi(port[1])
-	d.Set("port", parsedPort)
+	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
+	//	   so we need to extract it
+	//	*/
+	//	regex = regexp.MustCompile(`\:(\d+)`)
+	//	port := regex.FindStringSubmatch(vs.Destination)
+	//	if len(port) < 2 {
+	//		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+	//	}
+	//	parsedPort, _ := strconv.Atoi(port[1])
 
+	if strings.Count(vs_dest, ":") < 2 {
+		regex := regexp.MustCompile(`\:(\d+)`)
+		port := regex.FindStringSubmatch(vs.Destination)
+		if len(port) < 2 {
+			return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+		}
+		parsedPort, _ := strconv.Atoi(port[1])
+		d.Set("port", parsedPort)
+	}
+	if strings.Count(vs_dest, ":") >= 2 {
+		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		parsedPort, _ := strconv.Atoi(destination[3])
+		d.Set("port", parsedPort)
+	}
 	d.Set("irules", makeStringList(&vs.Rules))
 	d.Set("ip_protocol", vs.IPProtocol)
 	d.Set("description", vs.Description)
@@ -292,7 +349,14 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("persistence_profiles", vs.PersistenceProfiles)
+	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
+	for _, profile := range vs.PersistenceProfiles {
+		FullProfileName := "/" + profile.Partition + "/" + profile.Name
+		profile_names.Add(FullProfileName)
+	}
+	if profile_names.Len() > 0 {
+		d.Set("persistence_profiles", profile_names)
+	}
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -354,6 +418,8 @@ func resourceBigipLtmVirtualServerExists(d *schema.ResourceData, meta interface{
 func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
+	resourceBigipLtmVirtualServerAttrDefaults(d)
+
 	name := d.Id()
 
 	var profiles []bigip.Profile
@@ -376,7 +442,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	var persistenceProfiles []bigip.Profile
 	if p, ok := d.GetOk("persistence_profiles"); ok {
 		for _, profile := range p.(*schema.Set).List() {
-			persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
+			if profile == d.Get("default_persistence_profile").(string) {
+				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string), TmDefault: "yes"})
+			} else {
+				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
+			}
 		}
 	}
 
@@ -395,8 +465,13 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		rules = listToStringSlice(cfg_rules.([]interface{}))
 	}
 
+	destPort := fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int))
+	if strings.Contains(d.Get("destination").(string), ":") {
+		destPort = fmt.Sprintf("%s.%d", d.Get("destination").(string), d.Get("port").(int))
+	}
+
 	vs := &bigip.VirtualServer{
-		Destination:                fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
+		Destination:                destPort,
 		FallbackPersistenceProfile: d.Get("fallback_persistence_profile").(string),
 		Source:                     d.Get("source").(string),
 		Pool:                       d.Get("pool").(string),

@@ -137,7 +137,7 @@ resource "aws_key_pair" "auth2" {
 
 
 resource "aws_instance" "SCS_F5" {
-    ami = "ami-73a92609"
+    ami = "ami-03b18799f246d2695"
     instance_type = "${var.instance_type}"
     associate_public_ip_address = true
     private_ip = "10.0.0.10"

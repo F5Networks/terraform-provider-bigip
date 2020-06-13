@@ -17,16 +17,14 @@ For resources should be named with their "full path". The full path is the combi
 
 
 ```hcl
- resource "bigip_ltm_profile_httpcompress" "sjhttpcompression"
-
-        {
-            name = "/Common/sjhttpcompression2"
-            defaults_from = "/Common/httpcompression"
-            uri_exclude   = ["www.abc.f5.com", "www.abc2.f5.com"]
-            uri_include   = ["www.xyzbc.cisco.com"]
-            content_type_include = ["nicecontent.com"]
-            content_type_exclude = ["nicecontentexclude.com"]
-        }
+ resource "bigip_ltm_profile_httpcompress" "sjhttpcompression" {
+   name                 = "/Common/sjhttpcompression2"
+   defaults_from        = "/Common/httpcompression"
+   uri_exclude          = ["www.abc.f5.com", "www.abc2.f5.com"]
+   uri_include          = ["www.xyzbc.cisco.com"]
+   content_type_include = ["nicecontent.com"]
+   content_type_exclude = ["nicecontentexclude.com"]
+ }
 
 ```      
 

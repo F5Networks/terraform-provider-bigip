@@ -8,7 +8,7 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/stretchr/testify/assert"
 	//"io/ioutil"
 	"log"

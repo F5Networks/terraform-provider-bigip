@@ -11,11 +11,12 @@ import (
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 var TEST_NODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
+var TEST_V6_NODE_NAME = fmt.Sprintf("/%s/test-v6-node", TEST_PARTITION)
 var TEST_FQDN_NODE_NAME = fmt.Sprintf("/%s/test-fqdn-node", TEST_PARTITION)
 
 var TEST_NODE_RESOURCE = `
@@ -27,8 +28,22 @@ resource "bigip_ltm_node" "test-node" {
 	monitor = "/Common/icmp"
 	rate_limit = "disabled"
 	state = "user-up"
+	ratio = "91"
 }
 `
+
+var TEST_V6_NODE_RESOURCE = `
+resource "bigip_ltm_node" "test-node" {
+	name = "` + TEST_V6_NODE_NAME + `"
+	address = "fe80::10"
+	connection_limit = "0"
+	dynamic_ratio = "1"
+	monitor = "default"
+	rate_limit = "disabled"
+	state = "user-up"
+}
+`
+
 var TEST_FQDN_NODE_RESOURCE = `
 resource "bigip_ltm_node" "test-fqdn-node" {
 	name = "` + TEST_FQDN_NODE_NAME + `"
@@ -39,6 +54,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 	rate_limit = "disabled"
 	fqdn { interval = "3000"}
 	state = "user-up"
+	ratio = "19"
 }
 `
 
@@ -60,6 +76,30 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "description", ""),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "/Common/icmp"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "state", "user-up"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "ratio", "91"),
+				),
+			},
+		},
+	})
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_V6_NODE_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(TEST_V6_NODE_NAME, true),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_V6_NODE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "fe80::10"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "default"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "state", "user-up"),
 				),
@@ -87,6 +127,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
 				),
 			},
 		},
@@ -107,6 +148,25 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 					testCheckNodeExists(TEST_NODE_NAME, true),
 				),
 				ResourceName:      TEST_NODE_NAME,
+				ImportState:       false,
+				ImportStateVerify: true,
+			},
+		},
+	})
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_V6_NODE_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(TEST_V6_NODE_NAME, true),
+				),
+				ResourceName:      TEST_V6_NODE_NAME,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

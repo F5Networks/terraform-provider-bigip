@@ -9,11 +9,12 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"regexp"
 	"testing"
 )
 
@@ -24,7 +25,35 @@ var dir, err = os.Getwd()
 var TEST_AS3_RESOURCE = `
 resource "bigip_as3"  "as3-example" {
      as3_json = "${file("` + dir + `/../examples/as3/example1.json")}"
-     tenant_name = "as3"
+    // tenant_name = "as3"
+}
+`
+var TEST_AS3_RESOURCE1 = `
+resource "bigip_as3"  "as3-multitenant-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/as3_example1.json")}"
+}
+`
+var TEST_AS3_RESOURCE2 = `
+resource "bigip_as3"  "as3-partialsuccess-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/as3_example2.json")}"
+}
+`
+var TEST_AS3_RESOURCE3 = `
+resource "bigip_as3"  "as3-tenantadd-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/as3_example3.json")}"
+}
+`
+var TEST_AS3_RESOURCE4 = `
+resource "bigip_as3"  "as3-tenantfilter-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/as3_example1.json")}"
+     tenant_filter = "Sample_01"
+}
+`
+
+var TEST_AS3_RESOURCE_INVALID_JSON = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/invalid.json")}"
+    // tenant_name = "as3"
 }
 `
 
@@ -34,13 +63,108 @@ func TestAccBigipAs3_create(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckdevicesDestroyed,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AS3_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("as3", true),
-					resource.TestCheckResourceAttr("bigip_as3.as3-example", "tenant_name", "as3"),
+					//					resource.TestCheckResourceAttr("bigip_as3.as3-example", "tenant_name", "as3"),
+				),
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02", true),
+				),
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_03", true),
+					testCheckAs3Exists("Sample_04", false),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE4,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01", true),
+					testCheckAs3Exists("Sample_02", false),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3_update(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02", true),
+				),
+			},
+			{
+				Config: TEST_AS3_RESOURCE3,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02,Sample_03", true),
+				),
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_AS3_RESOURCE3,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02,Sample_03", true),
+				),
+			},
+			{
+				Config: TEST_AS3_RESOURCE1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02", true),
+					testCheckAs3Exists("Sample_03", false),
 				),
 			},
 		},
@@ -72,4 +196,35 @@ func testCheckAs3Exists(name string, exists bool) resource.TestCheckFunc {
 		defer resp.Body.Close()
 		return nil
 	}
+}
+
+func TestAccBigipAs3_badJSON(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckdevicesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config:      TEST_AS3_RESOURCE_INVALID_JSON,
+				ExpectError: regexp.MustCompile(`"as3_json" contains an invalid JSON:.*`),
+			},
+		},
+	})
+}
+func testCheckAs3Destroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*bigip.BigIP)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "bigip_as3" {
+			continue
+		}
+
+		name := rs.Primary.ID
+		err, failedTenants := client.DeleteAs3Bigip(name)
+		if err != nil || failedTenants != "" {
+			return err
+		}
+	}
+	return nil
 }

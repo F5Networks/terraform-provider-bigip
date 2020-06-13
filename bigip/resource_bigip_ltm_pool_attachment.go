@@ -10,10 +10,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
-
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"strings"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
@@ -50,9 +50,35 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 
 	poolName := d.Get("pool").(string)
 	nodeName := d.Get("node").(string)
-
+	parts := strings.Split(nodeName, ":")
+	node1, err := client.GetNode(parts[0])
+	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve node %s  %v :", nodeName, err)
+		return err
+	}
+	if node1 == nil {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
+	if node1.FQDN.Name != "" {
+		config := &bigip.PoolMemberFqdn{
+			Name: nodeName,
+		}
+		config.FQDN.Name = node1.FQDN.Name
+		config.FQDN.Interval = node1.FQDN.Interval
+		config.FQDN.AddressFamily = node1.FQDN.AddressFamily
+		config.FQDN.AutoPopulate = node1.FQDN.AutoPopulate
+		config.FQDN.DownInterval = node1.FQDN.DownInterval
+		err = client.AddPoolMemberFQDN(poolName, config)
+		if err != nil {
+			return fmt.Errorf("Failure adding node %s to pool %s: %s", nodeName, poolName, err)
+		}
+		d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
+		return nil
+	}
 	log.Printf("[INFO] Adding node %s to pool: %s", nodeName, poolName)
-	err := client.AddPoolMember(poolName, nodeName)
+	err = client.AddPoolMember(poolName, nodeName)
 	if err != nil {
 		return fmt.Errorf("Failure adding node %s to pool %s: %s", nodeName, poolName, err)
 	}

@@ -11,10 +11,11 @@ import (
 
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})
@@ -1128,9 +1129,23 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 	log.Println("[INFO] Updating  Policy " + name)
 	p := dataToPolicy(name, d)
-	err := client.UpdatePolicy(name, &p)
+	err := client.CreatePolicyDraft(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to Create Draft Policy   (%s) (%v) ", name, err)
+		return err
+	}
+	err = client.UpdatePolicy(name, &p)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Update Draft Policy   (%s) (%v) ", name, err)
+		return err
+	}
+	published_copy := d.Get("published_copy").(string)
+	if published_copy == "" {
+		published_copy = "Drafts/" + name
+	}
+	err = client.PublishPolicy(name, published_copy)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Publish Policy   (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipLtmPolicyRead(d, meta)
@@ -1198,31 +1213,84 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 		return fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err)
 	}
 
-	for i, r := range p.Rules {
-		rule := fmt.Sprintf("rule.%d", i)
-		d.Set(fmt.Sprintf("%s.name", rule), r.FullPath)
-		for x, a := range r.Actions {
-			action := fmt.Sprintf("%s.action.%d", rule, x)
-			interfaceToResourceData(a, d, action)
+	d.Set("name", p.Name)
+
+	if len(p.Rules) > 0 {
+		sort.Slice(p.Rules, func(i, j int) bool {
+			return p.Rules[i].Ordinal < p.Rules[j].Ordinal
+		})
+
+		rule, err := flattenPolicyRules(p.Rules, d)
+		if err != nil {
+			return err
 		}
 
-		for x, c := range r.Conditions {
-			condition := fmt.Sprintf("%s.condition.%d", rule, x)
-			interfaceToResourceData(c, d, condition)
+		err = d.Set("rule", rule)
+		if err != nil {
+			return err
 		}
 	}
+
 	return nil
 }
 
-func interfaceToResourceData(obj interface{}, d *schema.ResourceData, prefix string) {
-	v := reflect.ValueOf(obj)
-	for fi := 0; fi < v.NumField(); fi++ {
-		fn := v.Type().Field(fi).Name
-		if fn != "Name" && fn != "Generation" {
-			f := v.Field(fi)
-			if (f.Kind() == reflect.Slice && f.Interface() != nil) || f.Interface() != reflect.Zero(f.Type()).Interface() {
-				d.Set(fmt.Sprintf("%s.%s%s", prefix, strings.ToLower(fn[0:1]), fn[1:]), f.Interface())
+func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]interface{}, error) {
+	att := make([]interface{}, len(rules))
+	for i, v := range rules {
+		obj := make(map[string]interface{})
+
+		if v.Name != "" {
+			obj["name"] = v.Name
+		}
+
+		if len(v.Actions) > 0 {
+			r, err := flattenPolicyRuleActions(v.Actions)
+			if err != nil {
+				return []interface{}{att}, err
+			}
+			obj["action"] = r
+		}
+
+		if len(v.Conditions) > 0 {
+			r, err := flattenPolicyRuleConditions(v.Conditions)
+			if err != nil {
+				return []interface{}{att}, err
+			}
+			obj["condition"] = r
+		}
+
+		att[i] = obj
+	}
+	return att, nil
+}
+
+func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) ([]interface{}, error) {
+	att := make([]interface{}, len(actions))
+	for x, a := range actions {
+		att[x] = interfaceToResourceData(a)
+	}
+	return att, nil
+}
+
+func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) ([]interface{}, error) {
+	att := make([]interface{}, len(conditions))
+	for x, a := range conditions {
+		att[x] = interfaceToResourceData(a)
+	}
+	return att, nil
+}
+
+func interfaceToResourceData(a interface{}) map[string]interface{} {
+	obj := make(map[string]interface{})
+	v := reflect.ValueOf(a)
+	for i := 0; i < v.NumField(); i++ {
+		fn := toSnakeCase(v.Type().Field(i).Name)
+		if fn != "name" && fn != "generation" {
+			fv := v.Field(i).Interface()
+			if (v.Field(i).Kind() == reflect.Slice && fv != nil) || fv != reflect.Zero(v.Field(i).Type()).Interface() {
+				obj[fn] = fv
 			}
 		}
 	}
+	return obj
 }

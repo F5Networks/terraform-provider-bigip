@@ -18,37 +18,35 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_virtual_server" "http" {
-  name = "/Common/terraform_vs_http"
+  name        = "/Common/terraform_vs_http"
   destination = "10.12.12.12"
-  port = 80
-  pool = "/Common/the-default-pool"
+  port        = 80
+  pool        = "/Common/the-default-pool"
 }
 
 # A Virtual server with SSL enabled
 resource "bigip_ltm_virtual_server" "https" {
-  name = "/Common/terraform_vs_https"
-  destination = "${var.vip_ip}"
-  description = "VirtualServer-test"
-  port = 443
-  pool = "${var.pool}"
-  profiles = ["/Common/tcp","/Common/my-awesome-ssl-cert","/Common/http"]
+  name                       = "/Common/terraform_vs_https"
+  destination                = var.vip_ip
+  description                = "VirtualServer-test"
+  port                       = 443
+  pool                       = var.pool
+  profiles                   = ["/Common/tcp", "/Common/my-awesome-ssl-cert", "/Common/http"]
   source_address_translation = "automap"
-  translate_address = "enabled"
-  translate_port = "enabled"
-  vlans_disabled = true
+  translate_address          = "enabled"
+  translate_port             = "enabled"
 }
 
 # A Virtual server with separate client and server profiles
- resource "bigip_ltm_virtual_server" "https" {
-  name = "/Common/terraform_vs_https"
-  destination = "10.255.255.254"
-  description = "VirtualServer-test"
-  port = 443
-  client_profiles = ["/Common/clientssl"]
-  server_profiles = ["/Common/serverssl"]
+resource "bigip_ltm_virtual_server" "https" {
+  name                       = "/Common/terraform_vs_https"
+  destination                = "10.255.255.254"
+  description                = "VirtualServer-test"
+  port                       = 443
+  client_profiles            = ["/Common/clientssl"]
+  server_profiles            = ["/Common/serverssl"]
   source_address_translation = "automap"
 }
-
 
 ```      
 
@@ -83,7 +81,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `source` -  (Optional) Specifies an IP address or network from which the virtual server will accept traffic.
 
-* `rules` - (Optional) The iRules you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
+* `irules` - (Optional) The iRules list you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
 
 * `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs. DEPRECATED - see Virtual Server Property Groups source-address-translation
 

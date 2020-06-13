@@ -11,9 +11,19 @@ provider "bigip" {
 }
 
 
-// tenant_name is used to set the identity of as3 resource which is unique for resource.
+// Using  provisioner to download and install do rpm on bigip, pass arguments as BIG-IP IP address, credentials
+// Use this provisioner for first time to download and install do rpm on bigip
+resource "null_resource" "install_as3" {
+  provisioner "local-exec" {
+    command = "./install-as3-rpm.sh x.x.x.x xxxx:xxxx"
+  }
+}
+
+// config_name is used to set the identity of as3 resource which is unique for resource.
 resource "bigip_as3"  "as3-example1" {
      as3_json = "${file("example1.json")}" 
-     tenant_name = "as3"
+     config_name = "sample_test"
+     depends_on = ["null_resource.install_as3"]
  }
+
 

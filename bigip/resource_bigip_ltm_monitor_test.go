@@ -11,13 +11,15 @@ import (
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 var TEST_MONITOR_NAME = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
 var TEST_HTTPS_MONITOR_NAME = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
 var TEST_FTP_MONITOR_NAME = fmt.Sprintf("/%s/test-ftp-monitor", TEST_PARTITION)
+var TEST_UDP_MONITOR_NAME = fmt.Sprintf("/%s/test-udp-monitor", TEST_PARTITION)
+var TEST_POSTGRESQL_MONITOR_NAME = fmt.Sprintf("/%s/test-postgresql-monitor", TEST_PARTITION)
 
 var TEST_MONITOR_RESOURCE = `
 resource "bigip_ltm_monitor" "test-monitor" {
@@ -64,6 +66,29 @@ resource "bigip_ltm_monitor" "test-ftp-monitor" {
 	adaptive = ""
 	adaptive_limit = "0"
 	transparent = ""
+}
+`
+
+var TEST_UDP_MONITOR_RESOURCE = `
+resource "bigip_ltm_monitor" "test-udp-monitor" {
+        name = "` + TEST_UDP_MONITOR_NAME + `"
+        parent = "/Common/udp"
+        interval          = 5
+        time_until_up     = 0
+        timeout           = 16
+        reverse = "disabled"
+        send = "default send string"
+}
+`
+
+var TEST_POSTGRESQL_MONITOR_RESOURCE = `
+resource "bigip_ltm_monitor" "test-postgresql-monitor" {
+        name = "` + TEST_POSTGRESQL_MONITOR_NAME + `"
+        parent = "/Common/postgresql"
+        interval          = 5
+        time_until_up     = 0
+        timeout           = 16
+        database          = "postgres"
 }
 `
 
@@ -140,6 +165,47 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "adaptive", ""),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "adaptive_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "transparent", ""),
+				),
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_UDP_MONITOR_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TEST_UDP_MONITOR_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "parent", "/Common/udp"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "reverse", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "send", "default send string"),
+				),
+			},
+		},
+	})
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_POSTGRESQL_MONITOR_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TEST_POSTGRESQL_MONITOR_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "parent", "/Common/postgresql"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "database", "postgres"),
 				),
 			},
 		},

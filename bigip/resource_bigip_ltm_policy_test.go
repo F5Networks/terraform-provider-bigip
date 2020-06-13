@@ -9,8 +9,8 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"log"
 	"testing"
 )
@@ -49,7 +49,7 @@ resource "bigip_ltm_policy" "test-policy" {
 	rule  {
 	      name = "rule6"
 		      action {
-			      tm_name = "20"
+//			      tm_name = "20"
 			      forward = true
 			      pool = "/Common/test-pool"
 		      }
@@ -64,7 +64,7 @@ resource "bigip_ltm_policy" "http_to_https_redirect" {
   rule  {
     name = "http_to_https_redirect_rule"
     action {
-      tm_name = "http_to_https_redirect"
+  //    tm_name = "http_to_https_redirect"
       redirect = true
       location = "tcl:https://[HTTP::host][HTTP::uri]"
       http_reply = true

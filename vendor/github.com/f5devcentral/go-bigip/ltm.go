@@ -7,20 +7,7 @@ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
- */
-/*
-Original work Copyright © 2015 Scott Ware 
-Licensed under the Apache License, Version 2.0 (the "License");
-You may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 */
-
 package bigip
 
 import (
@@ -41,46 +28,46 @@ type ServerSSLProfiles struct {
 // ServerSSLProfile contains information about each server-ssl profile. You can use all
 // of these fields when modifying a server-ssl profile.
 type ServerSSLProfile struct {
-	Name                         string   `json:"name,omitempty"`
-	Partition                    string   `json:"partition,omitempty"`
-	FullPath                     string   `json:"fullPath,omitempty"`
-	Generation                   int      `json:"generation,omitempty"`
-	AlertTimeout                 string   `json:"alertTimeout,omitempty"`
-	Authenticate                 string   `json:"authenticate,omitempty"`
-	AuthenticateDepth            int      `json:"authenticateDepth,omitempty"`
-	CaFile                       string   `json:"caFile,omitempty"`
-	CacheSize                    int      `json:"cacheSize,omitempty"`
-	CacheTimeout                 int      `json:"cacheTimeout,omitempty"`
-	Cert                         string   `json:"cert,omitempty"`
-	Chain                        string   `json:"chain,omitempty"`
-	Ciphers                      string   `json:"ciphers,omitempty"`
-	DefaultsFrom                 string   `json:"defaultsFrom,omitempty"`
-	ExpireCertResponseControl    string   `json:"expireCertResponseControl,omitempty"`
-	GenericAlert                 string   `json:"genericAlert,omitempty"`
-	HandshakeTimeout             string   `json:"handshakeTimeout,omitempty"`
-	Key                          string   `json:"key,omitempty"`
-	ModSslMethods                string   `json:"modSslMethods,omitempty"`
-	Mode                         string   `json:"mode,omitempty"`
-	TmOptions                    []string `json:"tmOptions,omitempty"`
-	Passphrase                   string   `json:"passphrase,omitempty"`
-	PeerCertMode                 string   `json:"peerCertMode,omitempty"`
-	ProxySsl                     string   `json:"proxySsl,omitempty"`
-	RenegotiatePeriod            string   `json:"renegotiatePeriod,omitempty"`
-	RenegotiateSize              string   `json:"renegotiateSize,omitempty"`
-	Renegotiation                string   `json:"renegotiation,omitempty"`
-	RetainCertificate            string   `json:"retainCertificate,omitempty"`
-	SecureRenegotiation          string   `json:"secureRenegotiation,omitempty"`
-	ServerName                   string   `json:"serverName,omitempty"`
-	SessionMirroring             string   `json:"sessionMirroring,omitempty"`
-	SessionTicket                string   `json:"sessionTicket,omitempty"`
-	SniDefault                   string   `json:"sniDefault,omitempty"`
-	SniRequire                   string   `json:"sniRequire,omitempty"`
-	SslForwardProxy              string   `json:"sslForwardProxy,omitempty"`
-	SslForwardProxyBypass        string   `json:"sslForwardProxyBypass,omitempty"`
-	SslSignHash                  string   `json:"sslSignHash,omitempty"`
-	StrictResume                 string   `json:"strictResume,omitempty"`
-	UncleanShutdown              string   `json:"uncleanShutdown,omitempty"`
-	UntrustedCertResponseControl string   `json:"untrustedCertResponseControl,omitempty"`
+	Name                      string `json:"name,omitempty"`
+	Partition                 string `json:"partition,omitempty"`
+	FullPath                  string `json:"fullPath,omitempty"`
+	Generation                int    `json:"generation,omitempty"`
+	AlertTimeout              string `json:"alertTimeout,omitempty"`
+	Authenticate              string `json:"authenticate,omitempty"`
+	AuthenticateDepth         int    `json:"authenticateDepth,omitempty"`
+	CaFile                    string `json:"caFile,omitempty"`
+	CacheSize                 int    `json:"cacheSize,omitempty"`
+	CacheTimeout              int    `json:"cacheTimeout,omitempty"`
+	Cert                      string `json:"cert,omitempty"`
+	Chain                     string `json:"chain,omitempty"`
+	Ciphers                   string `json:"ciphers,omitempty"`
+	DefaultsFrom              string `json:"defaultsFrom,omitempty"`
+	ExpireCertResponseControl string `json:"expireCertResponseControl,omitempty"`
+	GenericAlert              string `json:"genericAlert,omitempty"`
+	HandshakeTimeout          string `json:"handshakeTimeout,omitempty"`
+	Key                       string `json:"key,omitempty"`
+	ModSslMethods             string `json:"modSslMethods,omitempty"`
+	Mode                      string `json:"mode,omitempty"`
+	//TmOptions                    []string `json:"tmOptions,omitempty"`
+	Passphrase                   string `json:"passphrase,omitempty"`
+	PeerCertMode                 string `json:"peerCertMode,omitempty"`
+	ProxySsl                     string `json:"proxySsl,omitempty"`
+	RenegotiatePeriod            string `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize              string `json:"renegotiateSize,omitempty"`
+	Renegotiation                string `json:"renegotiation,omitempty"`
+	RetainCertificate            string `json:"retainCertificate,omitempty"`
+	SecureRenegotiation          string `json:"secureRenegotiation,omitempty"`
+	ServerName                   string `json:"serverName,omitempty"`
+	SessionMirroring             string `json:"sessionMirroring,omitempty"`
+	SessionTicket                string `json:"sessionTicket,omitempty"`
+	SniDefault                   string `json:"sniDefault,omitempty"`
+	SniRequire                   string `json:"sniRequire,omitempty"`
+	SslForwardProxy              string `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass        string `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash                  string `json:"sslSignHash,omitempty"`
+	StrictResume                 string `json:"strictResume,omitempty"`
+	UncleanShutdown              string `json:"uncleanShutdown,omitempty"`
+	UntrustedCertResponseControl string `json:"untrustedCertResponseControl,omitempty"`
 }
 
 // ClientSSLProfiles
@@ -128,29 +115,29 @@ type ClientSSLProfile struct {
 	Key                             string   `json:"key,omitempty"`
 	ModSslMethods                   string   `json:"modSslMethods,omitempty"`
 	Mode                            string   `json:"mode,omitempty"`
-	TmOptions                       []string `json:"tmOptions,omitempty"`
-	Passphrase                      string   `json:"passphrase,omitempty"`
-	PeerCertMode                    string   `json:"peerCertMode,omitempty"`
-	ProxyCaCert                     string   `json:"proxyCaCert,omitempty"`
-	ProxyCaKey                      string   `json:"proxyCaKey,omitempty"`
-	ProxyCaPassphrase               string   `json:"proxyCaPassphrase,omitempty"`
-	ProxySsl                        string   `json:"proxySsl,omitempty"`
-	ProxySslPassthrough             string   `json:"proxySslPassthrough,omitempty"`
-	RenegotiatePeriod               string   `json:"renegotiatePeriod,omitempty"`
-	RenegotiateSize                 string   `json:"renegotiateSize,omitempty"`
-	Renegotiation                   string   `json:"renegotiation,omitempty"`
-	RetainCertificate               string   `json:"retainCertificate,omitempty"`
-	SecureRenegotiation             string   `json:"secureRenegotiation,omitempty"`
-	ServerName                      string   `json:"serverName,omitempty"`
-	SessionMirroring                string   `json:"sessionMirroring,omitempty"`
-	SessionTicket                   string   `json:"sessionTicket,omitempty"`
-	SniDefault                      string   `json:"sniDefault,omitempty"`
-	SniRequire                      string   `json:"sniRequire,omitempty"`
-	SslForwardProxy                 string   `json:"sslForwardProxy,omitempty"`
-	SslForwardProxyBypass           string   `json:"sslForwardProxyBypass,omitempty"`
-	SslSignHash                     string   `json:"sslSignHash,omitempty"`
-	StrictResume                    string   `json:"strictResume,omitempty"`
-	UncleanShutdown                 string   `json:"uncleanShutdown,omitempty"`
+	//TmOptions                       []string `json:"tmOptions,omitempty"`
+	Passphrase            string `json:"passphrase,omitempty"`
+	PeerCertMode          string `json:"peerCertMode,omitempty"`
+	ProxyCaCert           string `json:"proxyCaCert,omitempty"`
+	ProxyCaKey            string `json:"proxyCaKey,omitempty"`
+	ProxyCaPassphrase     string `json:"proxyCaPassphrase,omitempty"`
+	ProxySsl              string `json:"proxySsl,omitempty"`
+	ProxySslPassthrough   string `json:"proxySslPassthrough,omitempty"`
+	RenegotiatePeriod     string `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize       string `json:"renegotiateSize,omitempty"`
+	Renegotiation         string `json:"renegotiation,omitempty"`
+	RetainCertificate     string `json:"retainCertificate,omitempty"`
+	SecureRenegotiation   string `json:"secureRenegotiation,omitempty"`
+	ServerName            string `json:"serverName,omitempty"`
+	SessionMirroring      string `json:"sessionMirroring,omitempty"`
+	SessionTicket         string `json:"sessionTicket,omitempty"`
+	SniDefault            string `json:"sniDefault,omitempty"`
+	SniRequire            string `json:"sniRequire,omitempty"`
+	SslForwardProxy       string `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass string `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash           string `json:"sslSignHash,omitempty"`
+	StrictResume          string `json:"strictResume,omitempty"`
+	UncleanShutdown       string `json:"uncleanShutdown,omitempty"`
 }
 
 // Nodes contains a list of every node on the BIG-IP system.
@@ -297,6 +284,17 @@ type PoolMembers struct {
 // poolMember is used only when adding members to a pool.
 type poolMember struct {
 	Name string `json:"name"`
+}
+
+type PoolMemberFqdn struct {
+	Name string `json:"name"`
+	FQDN struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
 }
 
 // poolMembers is used only when modifying members on a pool.
@@ -550,7 +548,7 @@ type VirtualServer struct {
 	VSIndex             int       `json:"vsIndex,omitempty"`
 	Vlans               []string  `json:"vlans,omitempty"`
 	Rules               []string  `json:"rules,omitempty"`
-	PersistenceProfiles []Profile `json:"persist,omitempty"`
+	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
 	Policies            []string  `json:"policies,omitempty"`
 }
@@ -610,19 +608,22 @@ type VirtualServerPolicies struct {
 }
 
 type PolicyPublish struct {
-	Name        string
-	Command     string
+	Name    string
+	Command string
 }
+
 type PolicyPublishDTO struct {
-	Name        string `json:"name"`
-	Command     string `json:"command"`
+	Name    string `json:"name"`
+	Command string `json:"command"`
 }
+
 func (p *PolicyPublish) MarshalJSON() ([]byte, error) {
 	return json.Marshal(PolicyPublishDTO{
-		Name:        p.Name,
-		Command:     p.Command,
+		Name:    p.Name,
+		Command: p.Command,
 	})
 }
+
 func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
 	var dto PolicyPublishDTO
 	err := json.Unmarshal(b, &dto)
@@ -633,6 +634,7 @@ func (p *PolicyPublish) UnmarshalJSON(b []byte) error {
 	p.Command = dto.Command
 	return nil
 }
+
 type Policy struct {
 	Name        string
 	PublishCopy string
@@ -691,14 +693,14 @@ func (p *Policy) UnmarshalJSON(b []byte) error {
 }
 
 type VirtualServerPolicy struct {
-	Name        string
-	Partition   string
-	FullPath    string
+	Name      string
+	Partition string
+	FullPath  string
 }
 type VirtualServerPolicyDTO struct {
-	Name        string   `json:"name"`
-	Partition   string   `json:"partition,omitempty"`
-	FullPath    string   `json:"fullPath,omitempty"`
+	Name      string `json:"name"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
 }
 
 type PolicyRules struct {
@@ -1012,6 +1014,7 @@ type Monitor struct {
 	Mode           string
 	Adaptive       string
 	AdaptiveLimit  int
+	Database       string
 }
 
 type monitorDTO struct {
@@ -1023,6 +1026,7 @@ type monitorDTO struct {
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
 	Description    string `json:"description,omitempty"`
 	Destination    string `json:"destination,omitempty"`
+	Database       string `json:"database,omitempty"`
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
 	ManualResume   string `json:"manualResume,omitempty"`
@@ -1052,6 +1056,7 @@ type Profile struct {
 	FullPath  string `json:"fullPath,omitempty"`
 	Partition string `json:"partition,omitempty"`
 	Context   string `json:"context,omitempty"`
+	TmDefault string `json:"tmDefault,omitempty"`
 }
 
 type IRules struct {
@@ -1752,6 +1757,7 @@ const (
 	uriSourceAddr     = "source-addr"
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
+	uriCreateDraft    = "?options=create-draft"
 )
 
 var cidr = map[string]string{
@@ -1961,7 +1967,7 @@ func (b *BigIP) AddNode(config *Node) error {
 }
 
 // CreateNode adds a new IP based node to the BIG-IP system.
-func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state ,description string) error {
+func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string, ratio int) error {
 	config := &Node{
 		Name:            name,
 		Address:         address,
@@ -1971,13 +1977,14 @@ func (b *BigIP) CreateNode(name, address, rate_limit string, connection_limit, d
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 
 	return b.post(config, uriLtm, uriNode)
 }
 
 // CreateFQDNNode adds a new FQDN based node to the BIG-IP system.
-func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description, interval, address_family, autopopulate string, downinterval int) error {
+func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limit, dynamic_ratio int, monitor, state, description string, ratio int, interval, address_family, autopopulate string, downinterval int) error {
 	config := &Node{
 		Name:            name,
 		RateLimit:       rate_limit,
@@ -1986,6 +1993,7 @@ func (b *BigIP) CreateFQDNNode(name, address, rate_limit string, connection_limi
 		Monitor:         monitor,
 		State:           state,
 		Description:     description,
+		Ratio:           ratio,
 	}
 	config.FQDN.Name = address
 	config.FQDN.Interval = interval
@@ -2058,14 +2066,12 @@ func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
 
 func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+
 }
 
 // Modify a named internal data group, REPLACING all the records
-func (b *BigIP) ModifyInternalDataGroupRecords(name string, records []DataGroupRecord) error {
-	config := &DataGroup{
-		Records: records,
-	}
-	return b.put(config, uriLtm, uriDatagroup, uriInternal, name)
+func (b *BigIP) ModifyInternalDataGroupRecords(config *DataGroup) error {
+	return b.put(config, uriLtm, uriDatagroup, uriInternal, config.Name)
 }
 
 // Get an internal data group by name, returns nil if the data group does not exist
@@ -2122,6 +2128,10 @@ func (b *BigIP) AddPoolMember(pool, member string) error {
 		Name: member,
 	}
 
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
+func (b *BigIP) AddPoolMemberFQDN(pool string, config *PoolMemberFqdn) error {
 	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
 }
 
@@ -2254,11 +2264,22 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 // in CIDR notation or decimal, i.e.: "24" or "255.255.255.0". A CIDR mask of "0" is the same
 // as "0.0.0.0".
 func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
-	subnetMask := cidr[mask]
 
-	if strings.Contains(mask, ".") {
-		subnetMask = mask
+	if strings.Contains(destination, ":") {
+		subnetMask := mask
+
+		config := &VirtualServer{
+			Name:             name,
+			Destination:      fmt.Sprintf("%s.%d", destination, port),
+			Mask:             subnetMask,
+			Pool:             pool,
+			TranslateAddress: translate_address,
+			TranslatePort:    translate_port,
+		}
+
+		return b.post(config, uriLtm, uriVirtual)
 	}
+	subnetMask := cidr[mask]
 
 	config := &VirtualServer{
 		Name:             name,
@@ -2388,7 +2409,7 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 // Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp", "udp", "postgresql"}
 
 	for _, name := range monitorUris {
 		var m Monitors
@@ -2599,16 +2620,16 @@ func (b *BigIP) CreatePolicy(p *Policy) error {
 
 func (b *BigIP) PublishPolicy(name, publish string) error {
 	config := &PolicyPublish{
-		Name: publish,
+		Name:    publish,
 		Command: "publish",
 	}
 	values := []string{}
 	values = append(values, "~Common~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
-	result := strings.Join(values, "")
+	//result := strings.Join(values, "")
 
-	log.Println("  ================== here in publish ", result, publish)
+	//log.Println("  ================== here in publish ", result, publish)
 
 	return b.post(config, uriLtm, uriPolicy)
 }
@@ -2632,6 +2653,16 @@ func (b *BigIP) DeletePolicy(name string) error {
 	// Join three strings into one.
 	//result := strings.Join(values, "")
 	return b.delete(uriLtm, uriPolicy, name)
+}
+
+//Create a draft from an existing policy
+func (b *BigIP) CreatePolicyDraft(name string) error {
+	var s struct{}
+	values := []string{}
+	values = append(values, name)
+	values = append(values, uriCreateDraft)
+	result := strings.Join(values, "")
+	return b.patch(s, uriLtm, uriPolicy, result)
 }
 
 // Oneconnect profile creation
