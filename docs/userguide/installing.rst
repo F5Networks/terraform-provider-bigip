@@ -7,8 +7,8 @@ Installing Terraform
 
 #. Make sure that the ``terraform`` binary is available on the ``PATH``.
 
-  - `Set the PATH on Linux and Mac <https://stackoverflow.com/questions/14637979/how-to-permanently-set-path-on-linux-unix>`_ 
-  - `Set the PATH on Windows <https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows>`_
+   - `Set the PATH on Linux and Mac <https://stackoverflow.com/questions/14637979/how-to-permanently-set-path-on-linux-unix>`_ 
+   - `Set the PATH on Windows <https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows>`_
 
 
 Verifying the Installation
