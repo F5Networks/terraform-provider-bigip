@@ -25,6 +25,7 @@ Limitations:
 - DO does not support ``DELETE`` operation: ``terraform destroy`` will raise an error.
 - If you POST a declaration that modifies the password for the admin account, even if the declaration returns an error, the password can be changed. Therefore you may need to update the admin password in the client you are using to send the declaration.
 - The first time you POST a Declarative Onboarding declaration, the system records the configuration that exists prior to processing the declaration. Declarative Onboarding is meant to initially configure a BIG-IP device. However, if you POST subsequent declarations to the same BIG-IP system, and leave out some of the properties you initially used, the system restores the original properties for those items. 
+
 .. IMPORTANT:: No matter what you send in a subsequent declaration, Declarative Onboarding will never unlicense a BIG-IP device, it will never delete a user, and it WILL never break the device trust once it has been established.
 
 Example Usage
