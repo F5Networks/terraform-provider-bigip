@@ -7,6 +7,7 @@ package bigip
 
 import (
 	"fmt"
+	"github.com/RavinderReddyF5/f5-teem"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
@@ -90,6 +91,28 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+	}
+	assetInfo := f5teem.AssetInfo{
+		"Terraform-Provider-BIGIP-Ecosystem",
+		"1.2.0",
+		"",
+	}
+	teemDevice := f5teem.AnonymousClient(assetInfo, "")
+	f := map[string]interface{}{
+		"Device":          1,
+		"Tenant":          1,
+		"License":         1,
+		"DNS":             1,
+		"NTP":             1,
+		"Provision":       1,
+		"VLAN":            2,
+		"SelfIp":          2,
+		"platform":        "BIG-IP",
+		"platformVersion": "15.1.0.5",
+	}
+	err = teemDevice.Report(f, "Terraform BIGIP-ravinder-latest", "1")
+	if err != nil {
+		log.Printf("[ERROR]Error:%v", err)
 	}
 	d.SetId(tenantList)
 	x = x + 1
