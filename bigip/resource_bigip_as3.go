@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/RavinderReddyF5/f5-teem"
 	"github.com/f5devcentral/go-bigip"
+	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -75,6 +76,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	//strTrimSpace := strings.TrimSpace(as3Json)
 	tenantList, _ := client.GetTenantList(as3Json)
+	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		tenantList = tenantFilter
 	}
@@ -92,25 +94,19 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 	}
+	id := uuid.New()
+	uniqueID := id.String()
 	assetInfo := f5teem.AssetInfo{
-		"Terraform-Provider-BIGIP-Ecosystem",
-		"1.2.0",
-		"",
+		"Terraform-provider-bigip",
+		client.UserAgent,
+		uniqueID,
 	}
 	teemDevice := f5teem.AnonymousClient(assetInfo, "")
 	f := map[string]interface{}{
-		"Device":          1,
-		"Tenant":          1,
-		"License":         1,
-		"DNS":             1,
-		"NTP":             1,
-		"Provision":       1,
-		"VLAN":            2,
-		"SelfIp":          2,
-		"platform":        "BIG-IP",
-		"platformVersion": "15.1.0.5",
+		"Number_of_tenants": len(tenantCount),
+		"Terraform Version": client.UserAgent,
 	}
-	err = teemDevice.Report(f, "Terraform BIGIP-ravinder-latest", "1")
+	err = teemDevice.Report(f, "bigip_as3", "1")
 	if err != nil {
 		log.Printf("[ERROR]Error:%v", err)
 	}
