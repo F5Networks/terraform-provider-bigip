@@ -8,6 +8,8 @@ package bigip
 
 import (
 	"fmt"
+	f5teem "github.com/RavinderReddyF5/f5-teem"
+	"github.com/google/uuid"
 	"log"
 	"regexp"
 	"strconv"
@@ -244,6 +246,21 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 	if err != nil {
 		client.DeleteVirtualServer(name)
 		return err
+	}
+	id := uuid.New()
+	uniqueID := id.String()
+	assetInfo := f5teem.AssetInfo{
+		"Terraform-provider-bigip",
+		client.UserAgent,
+		uniqueID,
+	}
+	teemDevice := f5teem.AnonymousClient(assetInfo, "")
+	f := map[string]interface{}{
+		"Terraform Version": client.UserAgent,
+	}
+	err = teemDevice.Report(f, "bigip_ltm_virtual_server", "1")
+	if err != nil {
+		log.Printf("[ERROR]Error:%v", err)
 	}
 
 	return resourceBigipLtmVirtualServerRead(d, meta)
