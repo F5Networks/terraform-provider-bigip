@@ -19,24 +19,37 @@ Example Usage
 -------------
 
 .. code-block:: json
+   :caption: Example usage for json file
+   :tab-width: 4
+   :linenos:
 
-    resource "bigip_as3"  "as3-example" {
-        as3_json = "${file("example.json")}"
-        tenant_name = "as3"
-    }
+    resource "bigip_as3" "as3-example1"
+    Unknown macro: { as3_json = "${file("example1.json")}" }
+
+
+
+.. code-block:: json
+   :caption: Example usage for json file with tenant filter
+   :tab-width: 4
+   :linenos:
+
+    resource "bigip_as3" "as3-example1"
+    Unknown macro: { as3_json = "${file("example2.json")}" tenant_filter = "Sample_03" }
 
 
 Argument Reference
 ------------------
 
-- |as3_json| - (Required) Name of the Declarative AS3 JSON file
 
-- tenant_name - (Required) The partition name where the application services will be configured
+- `as3_json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_json>`_ - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ``file`` function
 
-- example.json - Example of AS3 Declarative JSON
+- `tenant_filter <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#tenant_filter>`_ - (Optional) If there are muntiple tenants in a json this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified
+
+- `as3_example1.json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_example1-json>`_ - Example AS3 Declarative JSON file with single tenant
 
 
 .. code-block:: json
+   :linenos:
 
     {
         "class": "AS3",
@@ -45,38 +58,122 @@ Argument Reference
         "declaration": {
             "class": "ADC",
             "schemaVersion": "3.0.0",
-            "id": "urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d",
+            "id": "example-declaration-01",
             "label": "Sample 1",
-            "remark": "Simple HTTP application with RR pool",
-            "as3": {
+            "remark": "Simple HTTP application with round robin pool",
+            "Sample_01": {
                 "class": "Tenant",
-                "A1": {
+                "defaultRouteDomain": 0,
+                "Application_1": {
                     "class": "Application",
                     "template": "http",
-                    "serviceMain": {
-                        "class": "Service_HTTP",
-                        "virtualAddresses": [
-                            "10.0.1.10"
-                        ],
-                        "pool": "web_pool"
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "10.0.2.10"
+                    ],
+                    "pool": "web_pool"
                     },
                     "web_pool": {
                         "class": "Pool",
                         "monitors": [
                             "http"
                         ],
-                    "members": [{
-                        "servicePort": 80,
-                        "serverAddresses": [
-                            "192.0.1.10",
-                            "192.0.1.11"
+                        "members": [
+                            {
+                                "servicePort": 80,
+                                "serverAddresses": [
+                                    "192.0.1.100",
+                                    "192.0.1.110"
+                                ]
+                            }
                         ]
-                    }]
                     }
                 }
             }
         }
     }
+
+- `as3_example2.json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_example2-json>`_ - Example AS3 Declarative JSON file with multiple tenants
+
+.. code-block:: json
+   :linenos:
+
+    
+    {
+        "class": "AS3",
+        "action": "deploy",
+        "persist": true,
+        "declaration": {
+            "class": "ADC",
+            "schemaVersion": "3.0.0",
+            "id": "example-declaration-01",
+            "label": "Sample 1",
+            "remark": "Simple HTTP application with round robin pool",
+            "Sample_02": {
+                "class": "Tenant",
+                "defaultRouteDomain": 0,
+                "Application_2": {
+                    "class": "Application",
+                    "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "10.2.2.10"
+                    ],
+                    "pool": "web_pool2"
+                    },
+                    "web_pool2": {
+                        "class": "Pool",
+                        "monitors": [
+                            "http"
+                        ],
+                        "members": [
+                            {
+                                "servicePort": 80,
+                                "serverAddresses": [
+                                    "192.2.1.100",
+                                    "192.2.1.110"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            "Sample_03": {
+                "class": "Tenant",
+                "defaultRouteDomain": 0,
+                "Application_3": {
+                    "class": "Application",
+                    "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "10.1.2.10"
+                    ],
+                    "pool": "web_pool3"
+                    },
+                    "web_pool3": {
+                        "class": "Pool",
+                        "monitors": [
+                            "http"
+                        ],
+                        "members": [
+                            {
+                                "servicePort": 80,
+                                "serverAddresses": [
+                                    "192.3.1.100",
+                                    "192.3.1.110"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
 AS3 Installation
@@ -101,19 +198,3 @@ You will need to pass BIG-IP and its credentials as an argument to the install s
 
 
 .. NOTE:: AS3 tenants are BIG-IP administrative partitions used to group configurations that support specific AS3 applications. An AS3 application may support a network-based business application or system. AS3 tenants may also include resources shared by applications in other tenants.
-
-
-
-.. |as3_json| raw:: html
-
-   <a href="https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_json" target="_blank">as3_json</a>
-
-
-.. |tenant_name| raw:: html
-
-   <a href="https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#tenant_name" target="_blank">tenant_name</a>
-
-
-.. |example.json| raw:: html
-
-   <a href="https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#example-json" target="_blank">example.json</a>

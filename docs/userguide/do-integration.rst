@@ -33,9 +33,9 @@ Example Usage
 
 .. code-block:: json
 
-    resource "bigip_do"  "do-example" {
+    resource "bigip_do" "do-example" {
         do_json = "${file("example.json")}"
-        tenant_name = "test_do"
+        timeout = 15
     }
 
 
@@ -44,7 +44,9 @@ Argument Reference
 
 - `do_json <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#do_json>`_ - (Required) Name of the of the Declarative DO JSON file
 
-- tenant_name - (Required) This is the partition name where the application services will be configured.
+- `timeout(minutes <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#timeout-minutes->`_ - (Optional) timeout to keep polling DO endpoint until the BIG-IP is provisioned by DO. The default timeout is 20 minutes
+
+    .. NOTE:: Delete method is not supported by DO, so terraform destroy won't delete configuration in BIG-IP but we will set the terrform state to empty and won't throw an error.
 
 - `example.json <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#example-json>`_ - Example of DO Declarative JSON
 

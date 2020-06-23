@@ -13,6 +13,10 @@ This page shows the revision history for this documentation. See `GitHub <https:
       * - Doc Rev
         - Description
         - Date
+
+      * - 1.3  
+        - Updated the documentation with the following changes: |br| • Updates to :ref:`as3-integration` and :ref:`do-integration`.
+        - 06-23-20         
         
       * - 1.2  
         - Updated the documentation with the following changes: |br| • Added section on :ref:`bigiq-licensing`. |br| • Added a page linking to :ref:`release-notes`.
