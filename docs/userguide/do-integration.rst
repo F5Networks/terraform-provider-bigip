@@ -46,7 +46,7 @@ Argument Reference
 
 - `timeout(minutes <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#timeout-minutes->`_ - (Optional) timeout to keep polling DO endpoint until the BIG-IP is provisioned by DO. The default timeout is 20 minutes
 
-    .. NOTE:: Delete method is not supported by DO, so terraform destroy won't delete configuration in BIG-IP but we will set the terrform state to empty and won't throw an error.
+  .. NOTE:: Delete method is not supported by DO, so terraform destroy won't delete configuration in BIG-IP but we will set the terrform state to empty and won't throw an error.
 
 - `example.json <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#example-json>`_ - Example of DO Declarative JSON
 

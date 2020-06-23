@@ -20,21 +20,21 @@ Example Usage
 
 .. code-block:: json
    :caption: Example usage for json file
-   :tab-width: 4
    :linenos:
 
-    resource "bigip_as3" "as3-example1"
-    Unknown macro: { as3_json = "${file("example1.json")}" }
+    resource "bigip_as3" "as3-example1" {
+        Unknown macro: { as3_json = "${file("example1.json")}" 
+    }
 
 
 
 .. code-block:: json
    :caption: Example usage for json file with tenant filter
-   :tab-width: 4
    :linenos:
 
-    resource "bigip_as3" "as3-example1"
-    Unknown macro: { as3_json = "${file("example2.json")}" tenant_filter = "Sample_03" }
+    resource "bigip_as3" "as3-example1" {
+        Unknown macro: { as3_json = "${file("example2.json")}" tenant_filter = "Sample_03" 
+    }
 
 
 Argument Reference
