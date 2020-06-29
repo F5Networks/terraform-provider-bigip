@@ -247,20 +247,23 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 		client.DeleteVirtualServer(name)
 		return err
 	}
-	id := uuid.New()
-	uniqueID := id.String()
-	assetInfo := f5teem.AssetInfo{
-		"Terraform-provider-bigip",
-		client.UserAgent,
-		uniqueID,
-	}
-	teemDevice := f5teem.AnonymousClient(assetInfo, "")
-	f := map[string]interface{}{
-		"Terraform Version": client.UserAgent,
-	}
-	err = teemDevice.Report(f, "bigip_ltm_virtual_server", "1")
-	if err != nil {
-		log.Printf("[ERROR]Error:%v", err)
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		err = teemDevice.Report(f, "bigip_ltm_virtual_server", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 
 	return resourceBigipLtmVirtualServerRead(d, meta)

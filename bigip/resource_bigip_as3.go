@@ -94,21 +94,23 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 	}
-	id := uuid.New()
-	uniqueID := id.String()
-	assetInfo := f5teem.AssetInfo{
-		"Terraform-provider-bigip",
-		client.UserAgent,
-		uniqueID,
-	}
-	teemDevice := f5teem.AnonymousClient(assetInfo, "")
-	f := map[string]interface{}{
-		"Number_of_tenants": len(tenantCount),
-		"Terraform Version": client.UserAgent,
-	}
-	err = teemDevice.Report(f, "bigip_as3", "1")
-	if err != nil {
-		log.Printf("[ERROR]Error:%v", err)
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Number_of_tenants": len(tenantCount),
+			"Terraform Version": client.UserAgent,
+		}
+		err = teemDevice.Report(f, "bigip_as3", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 	d.SetId(tenantList)
 	x = x + 1
