@@ -1,4 +1,4 @@
-module github.com/RavinderReddyF5/f5-teem
+module github.com/f5devcentral/go-bigip/f5teem
 
 go 1.13
 

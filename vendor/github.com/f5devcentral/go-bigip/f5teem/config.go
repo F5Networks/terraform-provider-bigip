@@ -11,7 +11,7 @@ var prodEnd = map[string]string{
 }
 var stagEnd = map[string]string{
 	"endpoint": "product-tst.apis.f5networks.net",
-	"api_key":  "bWMssM43DzDTX1bXA9CVzdKkOIrk1I8Z",
+	"api_key":  "",
 }
 var k = map[string]interface{}{
 	"production": prodEnd,
