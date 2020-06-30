@@ -30,12 +30,9 @@ import (
 
 func AnonymousClient(assetInfo AssetInfo, apiKey string) *TeemObject {
 	envTeem, teemServer := getEndpointInfo()
-	log.Printf("teemServer:%+v", teemServer)
-	log.Printf("environment:%+v", envTeem)
 	if envTeem != "staging" {
 		apiKey = teemServer.(map[string]string)["api_key"]
 	}
-	log.Printf("apiKey:%+v", apiKey)
 	serviceHost := teemServer.(map[string]string)["endpoint"]
 	log.Printf("[INFO]TeemServer:%+v\n", serviceHost)
 	teemClient := TeemObject{
