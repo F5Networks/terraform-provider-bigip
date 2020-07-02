@@ -28,7 +28,6 @@ Example Usage
 
 
 
-
 .. code-block:: json
    :caption: Example usage for json file with tenant filter
    :linenos:
