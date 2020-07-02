@@ -19,21 +19,17 @@ Example Usage
 -------------
 
 .. code-block:: json
-   :caption: Example usage for json file
    :linenos:
 
-    resource "bigip_as3" "as3-example1" {
-        Unknown macro: { as3_json = "${file("example1.json")}" 
+    # Example Usage for json file
+    resource "bigip_as3"  "as3-example1" {
+        as3_json = "${file("example1.json")}"
     }
 
-
-
-.. code-block:: json
-   :caption: Example usage for json file with tenant filter
-   :linenos:
-
-    resource "bigip_as3" "as3-example1" {
-        Unknown macro: { as3_json = "${file("example2.json")}" tenant_filter = "Sample_03" 
+    # Example Usage for json file with tenant filter
+    resource "bigip_as3"  "as3-example1" {
+        as3_json = "${file("example2.json")}"
+        tenant_filter = "Sample_03"
     }
 
 
