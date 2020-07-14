@@ -87,9 +87,12 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
 		if successfulTenants == "" {
-			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+			return fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
 	}
 	d.SetId(tenantList)
 	x = x + 1
@@ -158,12 +161,12 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
 		if tenantList != name {
-			d.Set("tenant_list", tenantList)
-			new_list := strings.Split(tenantList, ",")
-			old_list := strings.Split(name, ",")
-			deleted_tenants := client.TenantDifference(old_list, new_list)
-			if deleted_tenants != "" {
-				err, _ := client.DeleteAs3Bigip(deleted_tenants)
+			_ = d.Set("tenant_list", tenantList)
+			newList := strings.Split(tenantList, ",")
+			oldList := strings.Split(name, ",")
+			deletedTenants := client.TenantDifference(oldList, newList)
+			if deletedTenants != "" {
+				err, _ := client.DeleteAs3Bigip(deletedTenants)
 				if err != nil {
 					log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
 					return err
@@ -183,6 +186,9 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
 	}
 	x = x + 1
 	//m.Unlock()
