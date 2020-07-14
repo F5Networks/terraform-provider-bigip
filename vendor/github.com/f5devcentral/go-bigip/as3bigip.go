@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+//const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
 
 const (
@@ -28,10 +28,10 @@ const (
 	uriAsyncDeclare = "declare?async=true"
 )
 
-type as3Validate struct {
+/*type as3Validate struct {
 	as3SchemaURL    string
 	as3SchemaLatest string
-}
+}*/
 
 type doValidate struct {
 	doSchemaURL    string
@@ -45,7 +45,7 @@ type as3Version struct {
 	SchemaMinimum string `json:"schemaMinimum"`
 }
 
-func ValidateAS3Template(as3ExampleJson string) bool {
+/*func ValidateAS3Template(as3ExampleJson string) bool {
 	myAs3 := &as3Validate{
 		as3SchemaLatestURL,
 		"",
@@ -104,7 +104,7 @@ func (as3 *as3Validate) fetchAS3Schema() error {
 	}
 	return nil
 }
-
+*/
 func ValidateDOTemplate(doExampleJson string) bool {
 	myDO := &doValidate{
 		doSchemaLatestURL,

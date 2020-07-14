@@ -6,11 +6,12 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	//	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
@@ -37,9 +38,31 @@ func resourceBigipAs3() *schema.Resource {
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
+
 					return json
 				},
-				ValidateFunc: validation.ValidateJsonString,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					if _, err := structure.NormalizeJsonString(v); err != nil {
+						errors = append(errors, fmt.Errorf("%q contains an invalid JSON: %s", k, err))
+					}
+					as3json := v.(string)
+					resp := []byte(as3json)
+					jsonRef := make(map[string]interface{})
+					json.Unmarshal(resp, &jsonRef)
+					for key, value := range jsonRef {
+						if key == "class" && value != "AS3" {
+							errors = append(errors, fmt.Errorf("Json must have AS3 class"))
+						}
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for k, v := range rec {
+								if k == "class" && v != "ADC" {
+									errors = append(errors, fmt.Errorf("Json must have ADC class"))
+								}
+							}
+						}
+					}
+					return
+				},
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
@@ -69,9 +92,9 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Creating As3 config")
 	tenantFilter := d.Get("tenant_filter").(string)
-	if ok := bigip.ValidateAS3Template(as3Json); !ok {
-		return fmt.Errorf("[AS3] Error validating template \n")
-	}
+	//	if ok := bigip.ValidateAS3Template(as3Json); !ok {
+	//		return fmt.Errorf("[AS3] Error validating template \n")
+	//	}
 	//strTrimSpace := strings.TrimSpace(as3Json)
 	tenantList, _ := client.GetTenantList(as3Json)
 	if tenantFilter != "" {
