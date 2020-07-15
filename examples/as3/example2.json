@@ -27,19 +27,23 @@
           "monitors": [
             "http"
           ],
-          "members": [{
-            "servicePort": 80,
-            "serverAddresses": [
-              "192.0.2.12",
-              "192.0.2.13"
-            ]
-          }]
+          "members": [
+            {
+              "servicePort": 80,
+              "serverAddresses": [
+                "192.0.2.12",
+                "192.0.2.13"
+              ]
+            }
+          ]
         },
         "webtls": {
           "class": "TLS_Server",
-          "certificates": [{
-            "certificate": "webcert"
-          }]
+          "certificates": [
+            {
+              "certificate": "webcert"
+            }
+          ]
         },
         "webcert": {
           "class": "Certificate",
