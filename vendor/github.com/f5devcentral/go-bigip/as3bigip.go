@@ -225,7 +225,6 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 					return fmt.Errorf("as3 config post error response %+v", string(j)), finallist
 				}
 			}
-			log.Printf("[DEBUG]outside of if:Code = %v,ID = %v", respCode, respID)
 			if respCode == 200 {
 				log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 				break // break here
