@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xeipuuv/gojsonschema"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,9 +12,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xeipuuv/gojsonschema"
 )
 
-const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
+//const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
 
 const (
@@ -28,10 +29,10 @@ const (
 	uriAsyncDeclare = "declare?async=true"
 )
 
-type as3Validate struct {
+/*type as3Validate struct {
 	as3SchemaURL    string
 	as3SchemaLatest string
-}
+}*/
 
 type doValidate struct {
 	doSchemaURL    string
@@ -45,7 +46,7 @@ type as3Version struct {
 	SchemaMinimum string `json:"schemaMinimum"`
 }
 
-func ValidateAS3Template(as3ExampleJson string) bool {
+/*func ValidateAS3Template(as3ExampleJson string) bool {
 	myAs3 := &as3Validate{
 		as3SchemaLatestURL,
 		"",
@@ -104,7 +105,7 @@ func (as3 *as3Validate) fetchAS3Schema() error {
 	}
 	return nil
 }
-
+*/
 func ValidateDOTemplate(doExampleJson string) bool {
 	myDO := &doValidate{
 		doSchemaLatestURL,
@@ -173,6 +174,9 @@ type Results1 struct {
 	RunTime   int64  `json:"runTime,omitempty"`
 }
 
+/*
+PostAs3Bigip used for posting as3 json file to BIGIP
+*/
 func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string) {
 	tenant := tenantFilter + "?async=true"
 	successfulTenants := make([]string, 0)
@@ -183,27 +187,30 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["id"].(string)
-	taskStatus, err := b.getas3Taskstatus(respID)
-	respCode := taskStatus.Results[0].Code
-	log.Printf("[DEBUG]Code = %v,ID = %v", respCode, respID)
+	taskStatus, err := b.getas3TaskStatus(respID)
+	respCode := taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
+	log.Printf("[DEBUG]Code = %+v,ID = %+v", respCode, respID)
 	for respCode != 200 {
-		fastTask, err := b.getas3Taskstatus(respID)
+		fastTask, err := b.getas3TaskStatus(respID)
 		if err != nil {
 			return err, ""
 		}
-		respCode = fastTask.Results[0].Code
+		respCode = fastTask["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
 		if respCode != 0 && respCode != 503 {
 			tenant_list, tenant_count := b.GetTenantList(as3NewJson)
 			if tenantCompare(tenant_list, tenantFilter) == 1 {
+				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "declaration is invalid" {
+					return fmt.Errorf("Tenant Creation failed with :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), ""
+				}
 				i := tenant_count - 1
 				success_count := 0
 				for i >= 0 {
-					if fastTask.Results[i].Code == 200 {
-						successfulTenants = append(successfulTenants, fastTask.Results[i].Tenant)
+					if fastTask["results"].([]interface{})[i].(map[string]interface{})["code"].(float64) == 200 {
+						successfulTenants = append(successfulTenants, fastTask["results"].([]interface{})[i].(map[string]interface{})["tenant"].(string))
 						success_count++
 					}
-					if fastTask.Results[i].Code >= 400 {
-						log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", fastTask.Results[i].Code, fastTask.Results[i].Message, fastTask.Results[i].Tenant)
+					if fastTask["results"].([]interface{})[i].(map[string]interface{})["code"].(float64) >= 400 {
+						log.Printf("[ERROR] : HTTP %v :: %s for tenant %v", fastTask["results"].([]interface{})[i].(map[string]interface{})["code"].(float64), fastTask["results"].([]interface{})[i].(map[string]interface{})["message"].(string), fastTask["results"].([]interface{})[i].(map[string]interface{})["tenant"])
 					}
 					i = i - 1
 				}
@@ -211,10 +218,11 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 					log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 					break // break here
 				} else if success_count == 0 {
-					return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+					return fmt.Errorf("Tenant Creation failed"), ""
 				} else {
 					finallist := strings.Join(successfulTenants[:], ",")
-					return errors.New(fmt.Sprintf("Partial Success")), finallist
+					j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
+					return fmt.Errorf("as3 config post error response %+v", string(j)), finallist
 				}
 			}
 			if respCode == 200 {
@@ -222,7 +230,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 				break // break here
 			}
 			if respCode >= 400 {
-				return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+				return fmt.Errorf("Tenant Creation failed"), ""
 			}
 		}
 		if respCode == 503 {
@@ -423,7 +431,14 @@ func (b *BigIP) getas3Taskstatus(id string) (*As3TaskType, error) {
 		return nil, err
 	}
 	return &taskList, nil
-
+}
+func (b *BigIP) getas3TaskStatus(id string) (map[string]interface{}, error) {
+	var taskList map[string]interface{}
+	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
+	if err != nil {
+		return nil, err
+	}
+	return taskList, nil
 }
 func (b *BigIP) getas3Taskid() ([]string, error) {
 	var taskList As3AllTaskType

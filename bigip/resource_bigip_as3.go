@@ -6,13 +6,14 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	//	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
@@ -39,9 +40,31 @@ func resourceBigipAs3() *schema.Resource {
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
+
 					return json
 				},
-				ValidateFunc: validation.ValidateJsonString,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					if _, err := structure.NormalizeJsonString(v); err != nil {
+						errors = append(errors, fmt.Errorf("%q contains an invalid JSON: %s", k, err))
+					}
+					as3json := v.(string)
+					resp := []byte(as3json)
+					jsonRef := make(map[string]interface{})
+					json.Unmarshal(resp, &jsonRef)
+					for key, value := range jsonRef {
+						if key == "class" && value != "AS3" {
+							errors = append(errors, fmt.Errorf("Json must have AS3 class"))
+						}
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for k, v := range rec {
+								if k == "class" && v != "ADC" {
+									errors = append(errors, fmt.Errorf("Json must have ADC class"))
+								}
+							}
+						}
+					}
+					return
+				},
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
@@ -71,9 +94,9 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Creating As3 config")
 	tenantFilter := d.Get("tenant_filter").(string)
-	if ok := bigip.ValidateAS3Template(as3Json); !ok {
-		return fmt.Errorf("[AS3] Error validating template \n")
-	}
+	//	if ok := bigip.ValidateAS3Template(as3Json); !ok {
+	//		return fmt.Errorf("[AS3] Error validating template \n")
+	//	}
 	//strTrimSpace := strings.TrimSpace(as3Json)
 	tenantList, _ := client.GetTenantList(as3Json)
 	tenantCount := strings.Split(tenantList, ",")
@@ -90,9 +113,12 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
 		if successfulTenants == "" {
-			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+			return fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
 	}
 	if !client.Teem {
 		id := uuid.New()
@@ -179,12 +205,12 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
 		if tenantList != name {
-			d.Set("tenant_list", tenantList)
-			new_list := strings.Split(tenantList, ",")
-			old_list := strings.Split(name, ",")
-			deleted_tenants := client.TenantDifference(old_list, new_list)
-			if deleted_tenants != "" {
-				err, _ := client.DeleteAs3Bigip(deleted_tenants)
+			_ = d.Set("tenant_list", tenantList)
+			newList := strings.Split(tenantList, ",")
+			oldList := strings.Split(name, ",")
+			deletedTenants := client.TenantDifference(oldList, newList)
+			if deletedTenants != "" {
+				err, _ := client.DeleteAs3Bigip(deletedTenants)
 				if err != nil {
 					log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
 					return err
@@ -204,6 +230,9 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
 	}
 	x = x + 1
 	//m.Unlock()
