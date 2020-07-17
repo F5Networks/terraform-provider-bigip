@@ -42,6 +42,7 @@ type BigIP struct {
 	Transport *http.Transport
 	// UserAgent is an optional field that specifies the caller of this request.
 	UserAgent     string
+	Teem          bool
 	ConfigOptions *ConfigOptions
 }
 

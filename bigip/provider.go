@@ -50,6 +50,13 @@ func Provider() terraform.ResourceProvider {
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
+			"teem_disable": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				//Default:     false,
+				Description: "If this flag set to true,sending telemetry data to TEEM will be disabled",
+				DefaultFunc: schema.EnvDefaultFunc("TEEM_DISABLE", false),
+			},
 			"login_ref": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -131,6 +138,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		return cfg, err
 	}
 	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
+	cfg.Teem = d.Get("teem_disable").(bool)
 	return cfg, err
 }
 

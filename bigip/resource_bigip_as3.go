@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	//	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -97,6 +99,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	//	}
 	//strTrimSpace := strings.TrimSpace(as3Json)
 	tenantList, _ := client.GetTenantList(as3Json)
+	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		tenantList = tenantFilter
 	}
@@ -115,6 +118,24 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		_ = d.Set("tenant_list", successfulTenants)
 		if len(successfulTenants) != len(tenantList) {
 			log.Printf("%v", err)
+		}
+	}
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Number_of_tenants": len(tenantCount),
+			"Terraform Version": client.UserAgent,
+		}
+		err = teemDevice.Report(f, "bigip_as3", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
 	d.SetId(tenantList)
