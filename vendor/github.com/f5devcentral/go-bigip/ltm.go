@@ -1164,7 +1164,7 @@ type fastl4DTO struct {
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
 	Partition             string `json:"partition,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
-	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
+	HardwareSynCookie     string `json:"hardwareSynCookie,omitempty"`
 	IdleTimeout           string `json:"idleTimeout,omitempty"`
 	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
