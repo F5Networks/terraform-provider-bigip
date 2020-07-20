@@ -16,7 +16,6 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
-//const as3SchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json"
 const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
 
 const (
@@ -28,11 +27,6 @@ const (
 	uriDeclare      = "declare"
 	uriAsyncDeclare = "declare?async=true"
 )
-
-/*type as3Validate struct {
-	as3SchemaURL    string
-	as3SchemaLatest string
-}*/
 
 type doValidate struct {
 	doSchemaURL    string
@@ -46,66 +40,6 @@ type as3Version struct {
 	SchemaMinimum string `json:"schemaMinimum"`
 }
 
-/*func ValidateAS3Template(as3ExampleJson string) bool {
-	myAs3 := &as3Validate{
-		as3SchemaLatestURL,
-		"",
-	}
-	err := myAs3.fetchAS3Schema()
-	if err != nil {
-		fmt.Errorf("As3 Schema Fetch failed: %s", err)
-		return false
-	}
-
-	schemaLoader := gojsonschema.NewStringLoader(myAs3.as3SchemaLatest)
-	documentLoader := gojsonschema.NewStringLoader(as3ExampleJson)
-
-	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
-	if err != nil {
-		fmt.Errorf("%s", err)
-		return false
-	}
-	if !result.Valid() {
-		log.Printf("The document is not valid. see errors :\n")
-		for _, desc := range result.Errors() {
-			log.Printf("- %s\n", desc)
-		}
-		return false
-	}
-	return true
-}
-
-func (as3 *as3Validate) fetchAS3Schema() error {
-	res, resErr := http.Get(as3.as3SchemaURL)
-	if resErr != nil {
-		log.Printf("Error while fetching latest as3 schema : %v", resErr)
-		return resErr
-	}
-	if res.StatusCode == http.StatusOK {
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			log.Printf("Unable to read the as3 template from json response body : %v", err)
-			return err
-		}
-		defer res.Body.Close()
-		jsonMap := make(map[string]interface{})
-		err = json.Unmarshal(body, &jsonMap)
-		if err != nil {
-			log.Printf("Unable to unmarshal json response body : %v", err)
-			return err
-		}
-		jsonMap["$id"] = as3SchemaLatestURL
-		byteJSON, err := json.Marshal(jsonMap)
-		if err != nil {
-			log.Printf("Unable to marshal : %v", err)
-			return err
-		}
-		as3.as3SchemaLatest = string(byteJSON)
-		return err
-	}
-	return nil
-}
-*/
 func ValidateDOTemplate(doExampleJson string) bool {
 	myDO := &doValidate{
 		doSchemaLatestURL,
@@ -197,7 +131,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 		}
 		respCode = fastTask["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
 		if respCode != 0 && respCode != 503 {
-			tenant_list, tenant_count := b.GetTenantList(as3NewJson)
+			tenant_list, tenant_count, _ := b.GetTenantList(as3NewJson)
 			if tenantCompare(tenant_list, tenantFilter) == 1 {
 				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "declaration is invalid" {
 					return fmt.Errorf("Tenant Creation failed with :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), ""
@@ -249,46 +183,6 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 
 	return nil, strings.Join(successfulTenants[:], ",")
 }
-
-/*func (b *BigIP) DeleteAs3Bigip(tenantName string) error {
-	tenant := tenantName + "?async=true"
-	resp, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
-	if err != nil {
-		return err
-	}
-	respRef := make(map[string]interface{})
-	json.Unmarshal(resp, &respRef)
-	respID := respRef["id"].(string)
-	taskStatus, err := b.getas3Taskstatus(respID)
-	respCode := taskStatus.Results[0].Code
-	log.Printf("[DEBUG]Delete Code = %v,ID = %v", respCode, respID)
-	for respCode != 200 {
-		fastTask, err := b.getas3Taskstatus(respID)
-		if err != nil {
-			return err
-		}
-		respCode = fastTask.Results[0].Code
-		if respCode == 200 {
-			log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
-			break // break here
-		}
-		if respCode == 503 {
-			taskIds, err := b.getas3Taskid()
-			if err != nil {
-				return err
-			}
-			for _, id := range taskIds {
-				if b.pollingStatus(id) {
-					return b.DeleteAs3Bigip(tenantName)
-				}
-			}
-		}
-		time.Sleep(3 * time.Second)
-	}
-
-	return nil
-
-}*/
 
 func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
 	tenant := tenantName + "?async=true"
@@ -396,25 +290,56 @@ func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
 	return nil
 
 }
-func (b *BigIP) GetAs3(name string) (string, error) {
-	as3Json := make(map[string]interface{})
-	as3Json["class"] = "AS3"
-	as3Json["action"] = "deploy"
-	as3Json["persist"] = true
-	adcJson := make(map[string]interface{})
-	err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
-	if err != nil {
-		return "", err
-	}
-	if !ok {
-		return "", nil
-	}
-	delete(adcJson, "updateMode")
-	delete(adcJson, "controls")
-	as3Json["declaration"] = adcJson
-	out, _ := json.Marshal(as3Json)
-	as3String := string(out)
-	return as3String, nil
+func (b *BigIP) GetAs3(name ,appList string) (string, error) {
+          as3Json := make(map[string]interface{})
+        as3Json["class"] = "AS3"
+        as3Json["action"] = "deploy"
+        as3Json["persist"] = true
+        adcJson := make(map[string]interface{})
+        err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+        if err != nil {
+                return "", err
+        }
+        if !ok {
+                return "", nil
+        }
+        delete(adcJson, "updateMode")
+        delete(adcJson, "controls")
+        as3Json["declaration"] = adcJson
+        out, _ := json.Marshal(as3Json)
+        as3String := string(out)
+        tenantList := strings.Split(appList, ",")
+        found := 0
+        for _, item  := range tenantList {
+           if item == "Shared" {
+               found = 1
+             }
+        }
+        if found == 0 {
+        sharedTenant := ""
+        resp := []byte(as3String)
+        jsonRef := make(map[string]interface{})
+        json.Unmarshal(resp, &jsonRef)
+        for key, value := range jsonRef {
+                if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+                        for k, v := range rec {
+                                if rec2, ok := v.(map[string]interface{}); ok {
+                                         for k1, v1 := range rec2 {
+                                              if _, ok := v1.(map[string]interface{}); ok {
+                                                 if k1 == "Shared" {
+                                                    sharedTenant = k
+                                                 }
+                                              }
+                                         }
+                                }
+                           delete(rec, sharedTenant)
+                        }
+                }
+        }
+        out, _ = json.Marshal(jsonRef)
+        as3String = string(out)
+        }
+        return as3String, nil
 }
 func (b *BigIP) getAs3version() (*as3Version, error) {
 	var as3Ver as3Version
@@ -469,31 +394,45 @@ func (b *BigIP) pollingStatus(id string) bool {
 	}
 	return true
 }
-func (b *BigIP) GetTenantList(body interface{}) (string, int) {
-	s := make([]string, 0)
-	as3json := body.(string)
-	resp := []byte(as3json)
-	jsonRef := make(map[string]interface{})
-	json.Unmarshal(resp, &jsonRef)
-	for key, value := range jsonRef {
-		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
-			for k, v := range rec {
-				if rec2, ok := v.(map[string]interface{}); ok {
-					found := 0
-					for k1, v1 := range rec2 {
-						if k1 == "class" && v1 == "Tenant" {
-							found = 1
-						}
-					}
-					if found == 1 {
-						s = append(s, k)
-					}
-				}
-			}
-		}
-	}
-	tenant_list := strings.Join(s[:], ",")
-	return tenant_list, len(s)
+func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
+        tenantList := make([]string, 0)
+        applicationList := make([]string, 0)
+        as3json := body.(string)
+        resp := []byte(as3json)
+        jsonRef := make(map[string]interface{})
+        json.Unmarshal(resp, &jsonRef)
+        for key, value := range jsonRef {
+                if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+                        for k, v := range rec {
+                                if rec2, ok := v.(map[string]interface{}); ok {
+                                        found := 0
+                                        for k1, v1 := range rec2 {
+                                                if k1 == "class" && v1 == "Tenant" {
+                                                        found = 1
+                                                }
+                                                if rec3, ok := v1.(map[string]interface{}); ok {
+                                                      found1 := 0
+                                               for k2, v2 := range rec3 {
+                                                   if k2 == "class" && v2 == "Application" {
+                                                        found1 = 1
+                                                }
+                                                }
+                                                if found1 == 1 {
+                                                applicationList = append(applicationList, k1)
+                                        }
+
+                                                }
+                                        }
+                                        if found == 1 {
+                                                tenantList = append(tenantList, k)
+                                        }
+                                }
+                        }
+                }
+        }
+        finalTenantlist := strings.Join(tenantList[:], ",")
+        finalApplicationList := strings.Join(applicationList[:], ",")
+        return finalTenantlist, len(tenantList), finalApplicationList
 }
 func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	var s string
