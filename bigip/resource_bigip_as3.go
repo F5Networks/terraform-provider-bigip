@@ -13,7 +13,6 @@ import (
 	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	//	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
@@ -83,6 +82,12 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "Name of Tenant",
 			},
+			"application_list": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "Name of Application",
+			},
 		},
 	}
 }
@@ -94,16 +99,13 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Creating As3 config")
 	tenantFilter := d.Get("tenant_filter").(string)
-	//	if ok := bigip.ValidateAS3Template(as3Json); !ok {
-	//		return fmt.Errorf("[AS3] Error validating template \n")
-	//	}
-	//strTrimSpace := strings.TrimSpace(as3Json)
-	tenantList, _ := client.GetTenantList(as3Json)
+	tenantList, _, applicationList := client.GetTenantList(as3Json)
 	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		tenantList = tenantFilter
 	}
 	_ = d.Set("tenant_list", tenantList)
+	d.Set("application_list", applicationList)
 	strTrimSpace, err := client.AddTeemAgent(as3Json)
 	if err != nil {
 		return err
@@ -147,7 +149,8 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading As3 config")
 	name := d.Get("tenant_list").(string)
-	as3Resp, err := client.GetAs3(name)
+	applicationList := d.Get("application_list").(string)
+	as3Resp, err := client.GetAs3(name, applicationList)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {
@@ -171,11 +174,12 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
 	name := d.Get("tenant_list").(string)
+	applicationList := d.Get("application_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter != "" {
 		name = tenantFilter
 	}
-	as3Resp, err := client.GetAs3(name)
+	as3Resp, err := client.GetAs3(name, applicationList)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {
@@ -201,7 +205,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	name := d.Get("tenant_list").(string)
-	tenantList, _ := client.GetTenantList(as3Json)
+	tenantList, _, _ := client.GetTenantList(as3Json)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
 		if tenantList != name {
