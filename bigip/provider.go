@@ -109,7 +109,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
 			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
-                        "bigip_bigiq_as3":                             resourceBigiqAs3(),
+			"bigip_bigiq_as3":                       resourceBigiqAs3(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
