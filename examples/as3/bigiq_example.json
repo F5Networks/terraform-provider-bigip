@@ -35,7 +35,7 @@
                             "servicePort": 80,
                             "serverAddresses": [
                                 "192.0.2.33",
-                                "192.0.2.13"
+                                "192.0.2.23"
                             ],
                             "shareNodes": true
                         }
