@@ -4,20 +4,24 @@
     "persist": true,
     "declaration": {
         "class": "ADC",
-        "schemaVersion": "3.0.0",
+        "schemaVersion": "3.7.0",
         "id": "example-declaration-01",
-        "label": "Sample 1",
-        "remark": "Simple HTTP application with round robin pool",
-        "Sample_new": {
+        "label": "Task1",
+        "remark": "Task 1 - HTTP Application Service",
+        "target": {
+            "address": "xx.xxx.xx.xxx"
+        },
+        "Task1": {
             "class": "Tenant",
-            "defaultRouteDomain": 0,
-            "Application_1": {
+            "MyWebApp1http": {
                 "class": "Application",
                 "template": "http",
+
+
                 "serviceMain": {
                     "class": "Service_HTTP",
                     "virtualAddresses": [
-                        "10.0.1.10"
+                        "10.1.2.10"
                     ],
                     "pool": "web_pool"
                 },
@@ -30,9 +34,10 @@
                         {
                             "servicePort": 80,
                             "serverAddresses": [
-                                "192.0.1.100",
-                                "192.0.1.110"
-                            ]
+                                "192.0.2.33",
+                                "192.0.2.23"
+                            ],
+                            "shareNodes": true
                         }
                     ]
                 }

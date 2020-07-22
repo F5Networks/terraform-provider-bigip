@@ -102,7 +102,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if resp.StatusCode == http.StatusAccepted {
 		for i := 0; i <= timeout_sec; i++ {
-			log.Printf("[DEBUG]Value of loop counter :%d", i)
+			log.Printf("[DEBUG]Value of Timeout counter in seconds :%d", i)
 			url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 			req, _ := http.NewRequest("GET", url, nil)
 			req.SetBasicAuth(client_bigip.User, client_bigip.Password)
@@ -110,6 +110,11 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 			req.Header.Set("Content-Type", "application/json")
 
 			taskResp, err := client.Do(req)
+			if taskResp == nil {
+				log.Printf("[DEBUG]taskResp of DO is empty,but continue the loop until timeout \n")
+				time.Sleep(1 * time.Second)
+				continue
+			}
 			defer taskResp.Body.Close()
 			if err != nil {
 				log.Printf("[DEBUG]Polling the task id until the timeout")
@@ -143,6 +148,10 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
+		if taskResp == nil {
+			d.SetId("")
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+		}
 		defer taskResp.Body.Close()
 		if err != nil {
 			d.SetId("")

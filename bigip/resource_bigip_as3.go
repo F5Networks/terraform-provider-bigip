@@ -6,11 +6,13 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
@@ -37,9 +39,31 @@ func resourceBigipAs3() *schema.Resource {
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
+
 					return json
 				},
-				ValidateFunc: validation.ValidateJsonString,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					if _, err := structure.NormalizeJsonString(v); err != nil {
+						errors = append(errors, fmt.Errorf("%q contains an invalid JSON: %s", k, err))
+					}
+					as3json := v.(string)
+					resp := []byte(as3json)
+					jsonRef := make(map[string]interface{})
+					json.Unmarshal(resp, &jsonRef)
+					for key, value := range jsonRef {
+						if key == "class" && value != "AS3" {
+							errors = append(errors, fmt.Errorf("Json must have AS3 class"))
+						}
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for k, v := range rec {
+								if k == "class" && v != "ADC" {
+									errors = append(errors, fmt.Errorf("Json must have ADC class"))
+								}
+							}
+						}
+					}
+					return
+				},
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
@@ -58,6 +82,12 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "Name of Tenant",
 			},
+			"application_list": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "Name of Application",
+			},
 		},
 	}
 }
@@ -69,15 +99,13 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Creating As3 config")
 	tenantFilter := d.Get("tenant_filter").(string)
-	if ok := bigip.ValidateAS3Template(as3Json); !ok {
-		return fmt.Errorf("[AS3] Error validating template \n")
-	}
-	//strTrimSpace := strings.TrimSpace(as3Json)
-	tenantList, _ := client.GetTenantList(as3Json)
+	tenantList, _, applicationList := client.GetTenantList(as3Json)
+	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		tenantList = tenantFilter
 	}
 	_ = d.Set("tenant_list", tenantList)
+	d.Set("application_list", applicationList)
 	strTrimSpace, err := client.AddTeemAgent(as3Json)
 	if err != nil {
 		return err
@@ -87,9 +115,30 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
 	if err != nil {
 		if successfulTenants == "" {
-			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+			return fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
+	}
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Number_of_tenants": len(tenantCount),
+			"Terraform Version": client.UserAgent,
+		}
+		err = teemDevice.Report(f, "bigip_as3", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 	d.SetId(tenantList)
 	x = x + 1
@@ -100,7 +149,8 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading As3 config")
 	name := d.Get("tenant_list").(string)
-	as3Resp, err := client.GetAs3(name)
+	applicationList := d.Get("application_list").(string)
+	as3Resp, err := client.GetAs3(name, applicationList)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {
@@ -124,11 +174,12 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
 	name := d.Get("tenant_list").(string)
+	applicationList := d.Get("application_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter != "" {
 		name = tenantFilter
 	}
-	as3Resp, err := client.GetAs3(name)
+	as3Resp, err := client.GetAs3(name, applicationList)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {
@@ -154,16 +205,16 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	defer m.Unlock()
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	name := d.Get("tenant_list").(string)
-	tenantList, _ := client.GetTenantList(as3Json)
+	tenantList, _, _ := client.GetTenantList(as3Json)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
 		if tenantList != name {
-			d.Set("tenant_list", tenantList)
-			new_list := strings.Split(tenantList, ",")
-			old_list := strings.Split(name, ",")
-			deleted_tenants := client.TenantDifference(old_list, new_list)
-			if deleted_tenants != "" {
-				err, _ := client.DeleteAs3Bigip(deleted_tenants)
+			_ = d.Set("tenant_list", tenantList)
+			newList := strings.Split(tenantList, ",")
+			oldList := strings.Split(name, ",")
+			deletedTenants := client.TenantDifference(oldList, newList)
+			if deletedTenants != "" {
+				err, _ := client.DeleteAs3Bigip(deletedTenants)
 				if err != nil {
 					log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
 					return err
@@ -183,6 +234,9 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
 		}
 		_ = d.Set("tenant_list", successfulTenants)
+		if len(successfulTenants) != len(tenantList) {
+			log.Printf("%v", err)
+		}
 	}
 	x = x + 1
 	//m.Unlock()

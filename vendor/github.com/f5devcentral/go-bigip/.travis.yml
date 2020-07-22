@@ -7,3 +7,6 @@ matrix:
     - go: tip
   allow_failures:
     - go: tip
+
+env:
+  - TEEM_API_ENVIRONMENT=staging
