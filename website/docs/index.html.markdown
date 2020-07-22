@@ -30,3 +30,8 @@ provider "bigip" {
 - `password` - (Required) Password for authentication
 - `token_auth` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
 - `login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
+
+### Note
+The F5 BIG-IP provider gathers non-identifiable usage data for the purposes of improving the product as outlined in the end user license agreement for BIG-IP. To opt out of data collection, use the following:
+
+`export TEEM_DISABLE=true`
