@@ -290,56 +290,56 @@ func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
 	return nil
 
 }
-func (b *BigIP) GetAs3(name ,appList string) (string, error) {
-          as3Json := make(map[string]interface{})
-        as3Json["class"] = "AS3"
-        as3Json["action"] = "deploy"
-        as3Json["persist"] = true
-        adcJson := make(map[string]interface{})
-        err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
-        if err != nil {
-                return "", err
-        }
-        if !ok {
-                return "", nil
-        }
-        delete(adcJson, "updateMode")
-        delete(adcJson, "controls")
-        as3Json["declaration"] = adcJson
-        out, _ := json.Marshal(as3Json)
-        as3String := string(out)
-        tenantList := strings.Split(appList, ",")
-        found := 0
-        for _, item  := range tenantList {
-           if item == "Shared" {
-               found = 1
-             }
-        }
-        if found == 0 {
-        sharedTenant := ""
-        resp := []byte(as3String)
-        jsonRef := make(map[string]interface{})
-        json.Unmarshal(resp, &jsonRef)
-        for key, value := range jsonRef {
-                if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
-                        for k, v := range rec {
-                                if rec2, ok := v.(map[string]interface{}); ok {
-                                         for k1, v1 := range rec2 {
-                                              if _, ok := v1.(map[string]interface{}); ok {
-                                                 if k1 == "Shared" {
-                                                    sharedTenant = k
-                                                 }
-                                              }
-                                         }
-                                }
-                           delete(rec, sharedTenant)
-                        }
-                }
-        }
-        out, _ = json.Marshal(jsonRef)
-        as3String = string(out)
-        }
-        return as3String, nil
+func (b *BigIP) GetAs3(name, appList string) (string, error) {
+	as3Json := make(map[string]interface{})
+	as3Json["class"] = "AS3"
+	as3Json["action"] = "deploy"
+	as3Json["persist"] = true
+	adcJson := make(map[string]interface{})
+	err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", nil
+	}
+	delete(adcJson, "updateMode")
+	delete(adcJson, "controls")
+	as3Json["declaration"] = adcJson
+	out, _ := json.Marshal(as3Json)
+	as3String := string(out)
+	tenantList := strings.Split(appList, ",")
+	found := 0
+	for _, item := range tenantList {
+		if item == "Shared" {
+			found = 1
+		}
+	}
+	if found == 0 {
+		sharedTenant := ""
+		resp := []byte(as3String)
+		jsonRef := make(map[string]interface{})
+		json.Unmarshal(resp, &jsonRef)
+		for key, value := range jsonRef {
+			if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+				for k, v := range rec {
+					if rec2, ok := v.(map[string]interface{}); ok {
+						for k1, v1 := range rec2 {
+							if _, ok := v1.(map[string]interface{}); ok {
+								if k1 == "Shared" {
+									sharedTenant = k
+								}
+							}
+						}
+					}
+					delete(rec, sharedTenant)
+				}
+			}
+		}
+		out, _ = json.Marshal(jsonRef)
+		as3String = string(out)
+	}
+	return as3String, nil
 }
 func (b *BigIP) getAs3version() (*as3Version, error) {
 	var as3Ver as3Version
@@ -395,44 +395,44 @@ func (b *BigIP) pollingStatus(id string) bool {
 	return true
 }
 func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
-        tenantList := make([]string, 0)
-        applicationList := make([]string, 0)
-        as3json := body.(string)
-        resp := []byte(as3json)
-        jsonRef := make(map[string]interface{})
-        json.Unmarshal(resp, &jsonRef)
-        for key, value := range jsonRef {
-                if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
-                        for k, v := range rec {
-                                if rec2, ok := v.(map[string]interface{}); ok {
-                                        found := 0
-                                        for k1, v1 := range rec2 {
-                                                if k1 == "class" && v1 == "Tenant" {
-                                                        found = 1
-                                                }
-                                                if rec3, ok := v1.(map[string]interface{}); ok {
-                                                      found1 := 0
-                                               for k2, v2 := range rec3 {
-                                                   if k2 == "class" && v2 == "Application" {
-                                                        found1 = 1
-                                                }
-                                                }
-                                                if found1 == 1 {
-                                                applicationList = append(applicationList, k1)
-                                        }
+	tenantList := make([]string, 0)
+	applicationList := make([]string, 0)
+	as3json := body.(string)
+	resp := []byte(as3json)
+	jsonRef := make(map[string]interface{})
+	json.Unmarshal(resp, &jsonRef)
+	for key, value := range jsonRef {
+		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+			for k, v := range rec {
+				if rec2, ok := v.(map[string]interface{}); ok {
+					found := 0
+					for k1, v1 := range rec2 {
+						if k1 == "class" && v1 == "Tenant" {
+							found = 1
+						}
+						if rec3, ok := v1.(map[string]interface{}); ok {
+							found1 := 0
+							for k2, v2 := range rec3 {
+								if k2 == "class" && v2 == "Application" {
+									found1 = 1
+								}
+							}
+							if found1 == 1 {
+								applicationList = append(applicationList, k1)
+							}
 
-                                                }
-                                        }
-                                        if found == 1 {
-                                                tenantList = append(tenantList, k)
-                                        }
-                                }
-                        }
-                }
-        }
-        finalTenantlist := strings.Join(tenantList[:], ",")
-        finalApplicationList := strings.Join(applicationList[:], ",")
-        return finalTenantlist, len(tenantList), finalApplicationList
+						}
+					}
+					if found == 1 {
+						tenantList = append(tenantList, k)
+					}
+				}
+			}
+		}
+	}
+	finalTenantlist := strings.Join(tenantList[:], ",")
+	finalApplicationList := strings.Join(applicationList[:], ",")
+	return finalTenantlist, len(tenantList), finalApplicationList
 }
 func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	var s string
