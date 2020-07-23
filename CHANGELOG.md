@@ -1,4 +1,17 @@
 ## 1.3.0 (Unreleased)
+
+# Features additions:
+
+ - AS3 resource for BIGIQ
+
+# Bug Fixes:
+
+1. F5 LTM default custom profile values should calculated rather than hardcoded in code [https://github.com/terraform-providers/terraform-provider-bigip/issues/298]
+2. Handling Common/Shared tenant created via AS3
+3. DO declaration fails with CRASH error
+4. Terraform crashes when the structure of response from bigip changes
+5. Error: produced an unexpected new value for was present, but new absent.#305 [https://github.com/terraform-providers/terraform-provider-bigip/issues/305] 
+
 ## 1.2.1 (June 11, 2020)
 
 # Bug Fixes
