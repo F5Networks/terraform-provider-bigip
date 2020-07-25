@@ -26,6 +26,7 @@ These BIG-IP versions are supported in these Terraform versions.
 
 | BIG-IP version	|Terraform 0.12 |	Terraform 0.11  |
 |-----------------|---------------|-----------------|
+| BIG-IP 15.x	    |      X        |       X         |
 | BIG-IP 14.x	    | 	   X        |       X         |
 | BIG-IP 12.x	    |      X        |      	X         |
 | BIG-IP 13.x	    |      X        |       X         |
