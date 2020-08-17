@@ -393,6 +393,27 @@ You can inspect the current state using ``terraform show``:
 
 
 
+How to Generate/Build Terraform BIG-IP Provider Binary
+------------------------------------------------------
+
+Prerequisites:
+
+- Go (golang)
+- Terraform installed 
+
+Steps to Build Locally:
+
+#. ``git clone https://github.com/F5Networks/terraform-provider-bigip.git``
+
+#. ``cd terraform-provider-bigip``
+
+#. ``export GOFLAGS=-mod=vendor``
+
+#. ``go build``
+
+#. Move the binary to the current working directory where Terraform config files are located.
+
+
 
 .. |config_format| raw:: html
 
