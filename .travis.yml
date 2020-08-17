@@ -20,7 +20,7 @@ deploy:
   upload_dir: $AWS_DIR
   on:
     branch: docs-staging
-    repo: F5Networks/terraform-provider-bigip
+    repo: F5Networks/terraform-provider-bigip-version0.12
 # DEPLOY TO PRODUCTION
 - provider: s3
   skip_cleanup: true
