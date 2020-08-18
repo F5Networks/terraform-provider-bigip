@@ -398,7 +398,7 @@ How to Generate/Build Terraform BIG-IP Provider Binary
 
 Prerequisites:
 
-- Go (golang)
+- `Go <https://golang.org/doc/install>`_ 1.11
 - Terraform installed 
 
 Steps to Build Locally:
