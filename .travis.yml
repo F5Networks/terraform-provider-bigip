@@ -31,6 +31,6 @@ deploy:
   upload_dir: $AWS_DIR
   on:
     branch: docs-publish
-    repo: F5Networks/terraform-provider-bigip
+    repo: F5Networks/terraform-provider-bigip-version0.12
 after_deploy:
   - aws cloudfront create-invalidation --distribution-id $AWS_DIST_ID --paths $AWS_DIR
