@@ -102,10 +102,11 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			},
 
 			"cert": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Name of the server certificate.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the server certificate.",
 			},
 
 			"cert_key_chain": {
@@ -235,10 +236,11 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			},
 
 			"key": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Name of the Server SSL profile key",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the Server SSL profile key",
 			},
 
 			"mod_ssl_methods": {

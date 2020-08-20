@@ -18,7 +18,7 @@ import (
 var TEST_CLIENTSSL_NAME = fmt.Sprintf("/%s/test-ClientSsl", TEST_PARTITION)
 
 //Many of the values below are intentionally non default settings so that the unit tests will avoid defaults that are set by f5 but possibly not updated by the REST call (potential hidden bug)
-var TEST_CLIENTSSL_RESOURCE = `
+var TestClientsslResource = `
 resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
   name = "/Common/test-ClientSsl"
   partition = "Common"
@@ -28,7 +28,7 @@ resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
 }
 `
 
-func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
+func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -37,7 +37,7 @@ func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
 		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_CLIENTSSL_RESOURCE,
+				Config: TestClientsslResource,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(TEST_CLIENTSSL_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "name", "/Common/test-ClientSsl"),
@@ -63,7 +63,6 @@ func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "ciphers", "DEFAULT"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "client_cert_ca", "none"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "crl_file", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "defaults_from", "/Common/clientssl"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "forward_proxy_bypass_default_action", "intercept"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "generic_alert", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "handshake_timeout", "10"),
@@ -95,6 +94,32 @@ func TestAccBigipLtmProfileClientSsl_create(t *testing.T) {
 	})
 }
 
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/318
+//
+func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccBigipLtmProfileClientSsl_NonDefaultCertConfigBasic("Common"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists("/Common/lbeform_INT", true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "name", "/Common/lbeform_INT"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "cert", "/Common/lbeform_2020_INT.crt"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_client_ssl.test-ClientSsl", "key", "/Common/lbeform_2020_INT.key"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -104,7 +129,7 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_CLIENTSSL_RESOURCE,
+				Config: TestClientsslResource,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(TEST_CLIENTSSL_NAME, true),
 				),
@@ -151,4 +176,36 @@ func testCheckClientSslDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testAccBigipLtmProfileClientSsl_NonDefaultCertConfigBasic(partition string) string {
+	return fmt.Sprintf(`
+	variable vs_lb {
+		type = object({
+		client_profile = string
+	})
+	default = { "client_profile" = "lbeform" }
+	}
+	variable env {
+		type    = string
+	default = "INT"
+	}
+	resource "bigip_ssl_certificate" "test-cert" {
+		name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
+		content   = file("`+dir+`/../examples/servercert.crt")
+		partition = "%[1]s"
+	}
+
+	resource "bigip_ssl_key" "test-key" {
+		name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
+		content   = file("`+dir+`/../examples/serverkey.key")
+		partition = "%[1]s"
+	}
+	resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
+		name = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_${var.env}"
+		cert = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
+		key  = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
+		depends_on = [bigip_ssl_certificate.test-cert, bigip_ssl_key.test-key]
+	}
+`, partition)
 }
