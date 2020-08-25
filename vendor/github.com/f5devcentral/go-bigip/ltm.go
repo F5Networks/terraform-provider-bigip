@@ -2810,7 +2810,7 @@ func (b *BigIP) DeleteFastl4(name string) error {
 // ModifyFastl4 updates the given Fastl4 profile with any changed values.
 func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 	fastl4.Name = name
-	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
+	return b.patch(fastl4, uriLtm, uriProfile, uriFastl4, name)
 }
 
 func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
