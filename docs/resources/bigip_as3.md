@@ -19,12 +19,12 @@ This resource is helpful to configure as3 declarative JSON on BIG-IP.
 
 # Example Usage for json file
 resource "bigip_as3"  "as3-example1" {
-       as3_json = "${file("example1.json")}"
+       as3_json = file("example1.json")
  }
 
 # Example Usage for json file with tenant filter
 resource "bigip_as3"  "as3-example1" {
-       as3_json = "${file("example2.json")}"
+       as3_json = file("example2.json")
        tenant_filter = "Sample_03"
  }
 
