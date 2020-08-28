@@ -86,6 +86,10 @@ func (b *TeemObject) Report(telemetry map[string]interface{}, telemetryType, tel
 	telemetryData, _ := json.Marshal(telemetry)
 	telemetryDatalist := []string{string(telemetryData[:])}
 	log.Printf("[DEBUG] telemetryDatalist:%+v", telemetryDatalist)
+
+	telemetrynew := []map[string]interface{}{}
+	telemetrynew = append(telemetrynew, telemetry)
+
 	bodyData := map[string]interface{}{
 		"documentType":         b.TelemetryType,
 		"documentVersion":      b.TelemetryTypeVersion,
@@ -95,7 +99,7 @@ func (b *TeemObject) Report(telemetry map[string]interface{}, telemetryType, tel
 		"observationStartTime": time.Now().UTC().Format(time.RFC3339Nano),
 		"observationEndTime":   time.Now().UTC().Format(time.RFC3339Nano),
 		"epochTime":            time.Now().Unix(),
-		"telemetryRecords":     telemetryDatalist,
+		"telemetryRecords":     telemetrynew,
 	}
 	bodyInfo, _ := json.Marshal(bodyData)
 	body := bytes.NewReader([]byte(bodyInfo))
