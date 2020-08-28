@@ -62,23 +62,23 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[DO] Error validating template against DO schema \n")
 	}
 	//	name := d.Get("tenant_name").(string)
-        if !client_bigip.Teem {
-                id := uuid.New()
-                uniqueID := id.String()
-                assetInfo := f5teem.AssetInfo{
-                        "Terraform-provider-bigip",
-                        client_bigip.UserAgent,
-                        uniqueID,
-                }
-                teemDevice := f5teem.AnonymousClient(assetInfo, "")
-                f := map[string]interface{}{
-                        "Terraform Version": client_bigip.UserAgent,
-                }
-                err := teemDevice.Report(f, "bigip_do", "1")
-                if err != nil {
-                        log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
-                }
-        }
+	if !client_bigip.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client_bigip.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Terraform Version": client_bigip.UserAgent,
+		}
+		err := teemDevice.Report(f, "bigip_do", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 
 	timeout := d.Get("timeout").(int)
 	timeout_sec := timeout * 60
