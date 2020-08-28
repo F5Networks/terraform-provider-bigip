@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"io/ioutil"
 	"log"
@@ -60,6 +62,24 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[DO] Error validating template against DO schema \n")
 	}
 	//	name := d.Get("tenant_name").(string)
+        if !client_bigip.Teem {
+                id := uuid.New()
+                uniqueID := id.String()
+                assetInfo := f5teem.AssetInfo{
+                        "Terraform-provider-bigip",
+                        client_bigip.UserAgent,
+                        uniqueID,
+                }
+                teemDevice := f5teem.AnonymousClient(assetInfo, "")
+                f := map[string]interface{}{
+                        "Terraform Version": client_bigip.UserAgent,
+                }
+                err := teemDevice.Report(f, "bigip_do", "1")
+                if err != nil {
+                        log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+                }
+        }
+
 	timeout := d.Get("timeout").(int)
 	timeout_sec := timeout * 60
 	log.Printf("[DEBUG]timeout_sec is :%d", timeout_sec)
@@ -85,6 +105,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		fmt.Errorf("Error while reading http response with DO json:%v", err)
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode < 200 || resp.StatusCode > 202 {
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
