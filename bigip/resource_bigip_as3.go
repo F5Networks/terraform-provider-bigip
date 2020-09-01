@@ -150,7 +150,9 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading As3 config")
 	name := d.Get("tenant_list").(string)
 	applicationList := d.Get("application_list").(string)
+	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
 	as3Resp, err := client.GetAs3(name, applicationList)
+	log.Printf("[DEBUG] AS3 json retreived from the GET call in Read function : %s", as3Resp)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {
