@@ -7,8 +7,8 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package main
 
 import (
+	"github.com/F5Networks/terraform-provider-bigip/bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/terraform-providers/terraform-provider-bigip/bigip"
 )
 
 func main() {
