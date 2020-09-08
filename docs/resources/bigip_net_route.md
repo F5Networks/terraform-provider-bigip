@@ -31,4 +31,4 @@ resource "bigip_net_route" "route2" {
 
 * `network` - (Optional) The destination subnet and netmask for the route.
 
-* `network` - (Optional) Specifies a gateway address for the route.
+* `gw` - (Optional) Specifies a gateway address for the route.
