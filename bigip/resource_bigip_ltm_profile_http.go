@@ -21,7 +21,6 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -29,14 +28,19 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Description:  "Name of the profile",
 				ValidateFunc: validateF5Name,
 			},
-
+			"defaults_from": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				Description:  "Inherit defaults from parent profile",
+				ValidateFunc: validateF5Name,
+			},
 			"accept_xff": {
 				Type:        schema.TypeString,
-				Default:     "disabled",
+				Computed:    true,
 				Optional:    true,
 				Description: "Enables or disables trusting the client IP address, and statistics from the client IP address, based on the request's XFF (X-forwarded-for) headers, if they exist.",
 			},
-
 			"app_service": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -45,29 +49,20 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"basic_auth_realm": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "none",
+				Computed:    true,
 				Description: "Specifies a quoted string for the basic authentication realm. The system sends this string to a client whenever authorization fails. The default value is none",
 			},
-
-			"defaults_from": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Inherit defaults from parent profile",
-				ValidateFunc: validateF5Name,
-			},
-
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "User defibned description",
+				Computed:    true,
+				Description: "User defined description",
 			},
-
 			"encrypt_cookie_secret": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies a passphrase for the cookie encryption",
 			},
-
 			"encrypt_cookies": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
@@ -75,14 +70,12 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Optional:    true,
 				Description: "Encrypts specified cookies that the BIG-IP system sends to a client system",
 			},
-
 			"fallback_host": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "none",
+				Computed:    true,
 				Description: "Specifies an HTTP fallback host. HTTP redirection allows you to redirect HTTP traffic to another protocol identifier, host name, port number, or URI path.",
 			},
-
 			"fallback_status_codes": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
@@ -90,37 +83,34 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Optional:    true,
 				Description: "Specifies one or more three-digit status codes that can be returned by an HTTP server.",
 			},
-
 			"head_erase": {
 				Type:        schema.TypeString,
-				Default:     "none",
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the header string that you want to erase from an HTTP request. You can also specify none",
 			},
-
 			"head_insert": {
 				Type:        schema.TypeString,
-				Default:     "none",
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies a quoted header string that you want to insert into an HTTP request. You can also specify none. ",
 			},
 			"insert_xforwarded_for": {
 				Type:     schema.TypeString,
-				Default:  "disabled",
 				Optional: true,
+				Computed: true,
 				Description: "When using connection pooling, which allows clients to make use of other client requests' server-side connections,	you can insert the X-Forwarded-For header and specify a client IP address. ",
 			},
 			"lws_separator": {
 				Type:        schema.TypeString,
-				Default:     "none",
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies a quoted header string that you want to insert into an HTTP request. You can also specify none. ",
 			},
-
 			"oneconnect_transformations": {
 				Type:        schema.TypeString,
-				Default:     "enabled",
 				Optional:    true,
+				Computed:    true,
 				Description: "Enables the system to perform HTTP header transformations for the purpose of  keeping server-side connections open. This feature requires configuration of a OneConnect profile.",
 			},
 			"tm_partition": {
@@ -132,26 +122,25 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"proxy_type": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "reverse",
+				Computed:    true,
 				Description: "Specifies the type of HTTP proxy. ",
 			},
-
 			"redirect_rewrite": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "none",
+				Computed:    true,
 				Description: "Specifies which of the application HTTP redirects the system rewrites to HTTPS.",
 			},
 			"request_chunking": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "preserve",
+				Computed:    true,
 				Description: "Specifies how to handle chunked and unchunked requests.",
 			},
 			"response_chunking": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "preserve",
+				Computed:    true,
 				Description: "Specifies how to handle chunked and unchunked responses.",
 			},
 			"response_headers_permitted": {
@@ -159,30 +148,31 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies headers that the BIG-IP system allows in an HTTP response.",
 			},
 			"server_agent_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "BigIP",
+				Computed:    true,
 				Description: "Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. If no string is specified, then no Server header will be added to such responses",
 			},
 			"via_host_name": {
 				Type:        schema.TypeString,
-				Default:     "none",
+				Computed:    true,
 				Optional:    true,
 				Description: "Specifies the hostname to include into Via header",
 			},
 			"via_request": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "preserve",
+				Computed:    true,
 				Description: "Specifies whether to append, remove, or preserve a Via header in an HTTP request",
 			},
 			"via_response": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "preserve",
+				Computed:    true,
 				Description: "Specifies whether to append, remove, or preserve a Via header in an HTTP request",
 			},
 			"xff_alternative_names": {
@@ -190,6 +180,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies alternative XFF headers instead of the default X-forwarded-for header",
 			},
 		},
@@ -213,7 +204,7 @@ func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{})
 
 	err = resourceBigipLtmProfileHttpUpdate(d, meta)
 	if err != nil {
-		client.DeleteHttpProfile(name)
+		_ = client.DeleteHttpProfile(name)
 		return err
 	}
 
@@ -238,31 +229,81 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	d.Set("defaults_from", pp.DefaultsFrom)
-	d.Set("accept_xff", pp.AcceptXff)
-	d.Set("basic_auth_realm", pp.BasicAuthRealm)
-	d.Set("description", pp.Description)
-	d.Set("encrypt_cookie_secret", pp.EncryptCookieSecret)
-	d.Set("encrypt_cookies", pp.EncryptCookies)
-	d.Set("fallback_host", pp.FallbackHost)
-	d.Set("fallback_status_codes", pp.FallbackStatusCodes)
-	d.Set("head_erase", pp.HeaderErase)
-	d.Set("head_insert", pp.HeaderInsert)
-	d.Set("insert_xforwarded_for", pp.InsertXforwardedFor)
-	d.Set("lws_separator", pp.LwsSeparator)
-	d.Set("oneconnect_transformations", pp.OneconnectTransformations)
-	d.Set("tm_partition", pp.TmPartition)
-	d.Set("proxy_type", pp.ProxyType)
-	d.Set("redirect_rewrite", pp.RedirectRewrite)
-	d.Set("request_chunking", pp.RequestChunking)
-	d.Set("response_chunking", pp.ResponseChunking)
-	d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
-	d.Set("server_agent_name", pp.ServerAgentName)
-	d.Set("via_host_name", pp.ViaHostName)
-	d.Set("via_request", pp.ViaRequest)
-	d.Set("via_response", pp.ViaResponse)
-	d.Set("xff_alternative_names", pp.XffAlternativeNames)
+	if _, ok := d.GetOk("name"); ok {
+		_ = d.Set("name", name)
+	}
+	if _, ok := d.GetOk("defaults_from"); ok {
+		_ = d.Set("defaults_from", pp.DefaultsFrom)
+	}
+	if _, ok := d.GetOk("accept_xff"); ok {
+		_ = d.Set("accept_xff", pp.AcceptXff)
+	}
+	if _, ok := d.GetOk("basic_auth_realm"); ok {
+		_ = d.Set("basic_auth_realm", pp.BasicAuthRealm)
+	}
+	if _, ok := d.GetOk("description"); ok {
+		_ = d.Set("description", pp.Description)
+	}
+	if _, ok := d.GetOk("encrypt_cookie_secret"); ok {
+		_ = d.Set("encrypt_cookie_secret", pp.EncryptCookieSecret)
+	}
+	if _, ok := d.GetOk("encrypt_cookies"); ok {
+		_ = d.Set("encrypt_cookies", pp.EncryptCookies)
+	}
+	if _, ok := d.GetOk("fallback_host"); ok {
+		_ = d.Set("fallback_host", pp.FallbackHost)
+	}
+	if _, ok := d.GetOk("fallback_status_codes"); ok {
+		_ = d.Set("fallback_status_codes", pp.FallbackStatusCodes)
+	}
+	if _, ok := d.GetOk("head_erase"); ok {
+		_ = d.Set("head_erase", pp.HeaderErase)
+	}
+	if _, ok := d.GetOk("head_insert"); ok {
+		_ = d.Set("head_insert", pp.HeaderInsert)
+	}
+	if _, ok := d.GetOk("insert_xforwarded_for"); ok {
+		_ = d.Set("insert_xforwarded_for", pp.InsertXforwardedFor)
+	}
+	if _, ok := d.GetOk("lws_separator"); ok {
+		_ = d.Set("lws_separator", pp.LwsSeparator)
+	}
+	if _, ok := d.GetOk("oneconnect_transformations"); ok {
+		_ = d.Set("oneconnect_transformations", pp.OneconnectTransformations)
+	}
+	if _, ok := d.GetOk("tm_partition"); ok {
+		_ = d.Set("tm_partition", pp.TmPartition)
+	}
+	if _, ok := d.GetOk("proxy_type"); ok {
+		_ = d.Set("proxy_type", pp.ProxyType)
+	}
+	if _, ok := d.GetOk("redirect_rewrite"); ok {
+		_ = d.Set("redirect_rewrite", pp.RedirectRewrite)
+	}
+	if _, ok := d.GetOk("request_chunking"); ok {
+		_ = d.Set("request_chunking", pp.RequestChunking)
+	}
+	if _, ok := d.GetOk("response_chunking"); ok {
+		_ = d.Set("response_chunking", pp.ResponseChunking)
+	}
+	if _, ok := d.GetOk("response_headers_permitted"); ok {
+		_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
+	}
+	if _, ok := d.GetOk("server_agent_name"); ok {
+		_ = d.Set("server_agent_name", pp.ServerAgentName)
+	}
+	if _, ok := d.GetOk("via_host_name"); ok {
+		_ = d.Set("via_host_name", pp.ViaHostName)
+	}
+	if _, ok := d.GetOk("via_request"); ok {
+		_ = d.Set("via_request", pp.ViaRequest)
+	}
+	if _, ok := d.GetOk("via_response"); ok {
+		_ = d.Set("via_response", pp.ViaResponse)
+	}
+	if _, ok := d.GetOk("xff_alternative_names"); ok {
+		_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
+	}
 	return nil
 }
 
