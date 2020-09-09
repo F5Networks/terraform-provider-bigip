@@ -229,12 +229,9 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 		d.SetId("")
 		return nil
 	}
-	if _, ok := d.GetOk("name"); ok {
-		_ = d.Set("name", name)
-	}
-	if _, ok := d.GetOk("defaults_from"); ok {
-		_ = d.Set("defaults_from", pp.DefaultsFrom)
-	}
+	_ = d.Set("name", name)
+	_ = d.Set("defaults_from", pp.DefaultsFrom)
+
 	if _, ok := d.GetOk("accept_xff"); ok {
 		_ = d.Set("accept_xff", pp.AcceptXff)
 	}

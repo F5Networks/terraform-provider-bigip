@@ -27,7 +27,7 @@ resource "bigip_ltm_profile_http" "test-http" {
 }
 `
 
-func TestAccBigipLtmProfileHttp_create(t *testing.T) {
+func TestAccBigipLtmProfileHttpCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -57,7 +57,7 @@ func TestAccBigipLtmProfileHttp_create(t *testing.T) {
 		},
 	})
 }
-func TestAccBigipLtmProfileHttp_update_ServerAgent(t *testing.T) {
+func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -86,7 +86,7 @@ func TestAccBigipLtmProfileHttp_update_ServerAgent(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmProfilehttp_import(t *testing.T) {
+func TestAccBigipLtmProfileHttpImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -95,12 +95,12 @@ func TestAccBigipLtmProfilehttp_import(t *testing.T) {
 		CheckDestroy: testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TestHttpResource,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName, true),
-				),
-				ResourceName:      TestHttpName,
-				ImportState:       false,
+				Config: testaccBigipLtmHttpProfileImportConfig(),
+			},
+			{
+				ResourceName:      "bigip_ltm_profile_http.test-http-profile",
+				ImportStateId:     "/Common/test-http",
+				ImportState:       true,
 				ImportStateVerify: true,
 			},
 		},
@@ -161,4 +161,12 @@ resource "bigip_ltm_profile_http" "%[3]s" {
   server_agent_name = "myBIG-IP"
 }
 `, partition, profileName, resourceName)
+}
+
+func testaccBigipLtmHttpProfileImportConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_http" "test-http" {
+  name = "%s"
+  defaults_from = "/Common/http"
+}`, "/Common/test-http")
 }
