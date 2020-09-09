@@ -67,7 +67,7 @@ func TestAccBigipLtmProfileFastl4_update_IdleTimeout(t *testing.T) {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckClientSslDestroyed,
+		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccBigipLtmProfileFastl4_default_Config(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
