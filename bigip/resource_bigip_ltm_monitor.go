@@ -133,9 +133,10 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description: "Alias for the destination",
 			},
 			"compatibility": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:     true,
+				Default:      "enabled",
 				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
 				ValidateFunc: validateEnabledDisabled,
 			},
@@ -198,6 +199,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
 		d.Get("compatibility").(string),
+		d.Get("destination").(string),
 	)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
