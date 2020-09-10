@@ -2427,7 +2427,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string, destination string) error {
 	config := &Monitor{
 		Name:           name,
 		ParentMonitor:  parent,
@@ -2438,6 +2438,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
 		Compatibility:  compatibility,
+		Destination:    destination,
 	}
 
 	return b.AddMonitor(config)
