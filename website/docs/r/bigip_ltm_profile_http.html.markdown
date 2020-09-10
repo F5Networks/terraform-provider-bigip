@@ -43,3 +43,11 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 * `head_insert` - (Optional) Specifies a quoted header string that you want to insert into an HTTP request
 
 * `insert_xforwarded_for` - (Optional) When using connection pooling, which allows clients to make use of other client requests' server-side connections, you can insert the X-Forwarded-For header and specify a client IP address
+
+## Import
+
+BIG-IP LTM http profiles can be imported using the `name`, e.g.
+
+```
+$ terraform import bigip_ltm_profile_http.test-http /Common/test-http
+```

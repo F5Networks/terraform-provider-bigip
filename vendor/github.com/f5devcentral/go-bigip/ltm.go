@@ -3565,7 +3565,7 @@ func (b *BigIP) DeleteHttpProfile(name string) error {
 // ModifyHttpProfile allows you to change any attribute of a http profile.
 // Fields that can be modified are referenced in the HttpProfile struct.
 func (b *BigIP) ModifyHttpProfile(name string, config *HttpProfile) error {
-	return b.put(config, uriLtm, uriProfile, uriHttp, name)
+	return b.patch(config, uriLtm, uriProfile, uriHttp, name)
 }
 
 // OneconnectProfiles returns a list of HTTP profiles

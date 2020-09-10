@@ -52,3 +52,11 @@ resource "bigip_ltm_profile_fastl4" "profile_fastl4" {
 * `iptos_toserver`  - (Optional) Specifies an IP ToS number for the server side. This setting specifies the Type of Service level that the traffic management system assigns to IP packets when sending them to servers. The default value is 65535 (pass-through), which indicates, do not modify.
 
 * `keepalive_interval` - (Optional) Specifies the keep alive probe interval, in seconds. The default value is disabled (0 seconds).
+
+## Import
+
+BIG-IP LTM fastl4 profiles can be imported using the `name`, e.g.
+
+```
+$ terraform import bigip_ltm_profile_fastl4.test-fastl4 /Common/test-fastl4
+```
