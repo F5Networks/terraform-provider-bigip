@@ -133,11 +133,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description: "Alias for the destination",
 			},
 			"compatibility": {
-				Type:         schema.TypeString,
-				Optional:     true,
+				Type:     schema.TypeString,
+				Optional: true,
 				//Computed:     true,
 				Default:      "enabled",
-		        	Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
+				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
 				ValidateFunc: validateEnabledDisabled,
 			},
 			"filename": {
