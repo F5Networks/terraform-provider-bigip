@@ -8,11 +8,11 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"regexp"
+	"strings"
 )
 
 var parentMonitors = map[string]bool{
@@ -217,6 +217,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 	name := d.Id()
 
+	parent_monitor := d.Get("parent").(string)
+	re := regexp.MustCompile("/.*/https$")
+	matchresult := re.MatchString(parent_monitor)
+
 	monitors, err := client.Monitors()
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
@@ -245,7 +249,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("destination", m.Destination)
-			d.Set("compatibility", m.Compatibility)
+			if matchresult {
+				d.Set("compatibility", m.Compatibility)
+			} else {
+				d.Set("compatibility", d.Get("compatibility").(string))
+			}
 			d.Set("filename", m.Filename)
 			d.Set("mode", m.Mode)
 			d.Set("adaptive", m.Adaptive)
