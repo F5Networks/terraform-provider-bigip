@@ -573,7 +573,7 @@ type VirtualAddress struct {
 	ICMPEcho              bool
 	InheritedTrafficGroup bool
 	Mask                  string
-	RouteAdvertisement    bool
+	RouteAdvertisement    string
 	ServerScope           string
 	TrafficGroup          string
 	Unit                  int
@@ -593,7 +593,7 @@ type virtualAddressDTO struct {
 	ICMPEcho              string `json:"icmpEcho,omitempty" bool:"enabled"`
 	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty" bool:"yes"`
 	Mask                  string `json:"mask,omitempty"`
-	RouteAdvertisement    string `json:"routeAdvertisement,omitempty" bool:"enabled"`
+	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"` 
 	ServerScope           string `json:"serverScope,omitempty"`
 	TrafficGroup          string `json:"trafficGroup,omitempty"`
 	Unit                  int    `json:"unit,omitempty"`
