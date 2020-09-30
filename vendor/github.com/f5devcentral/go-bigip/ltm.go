@@ -573,7 +573,7 @@ type VirtualAddress struct {
 	ICMPEcho              bool
 	InheritedTrafficGroup bool
 	Mask                  string
-	RouteAdvertisement    bool
+	RouteAdvertisement    string
 	ServerScope           string
 	TrafficGroup          string
 	Unit                  int
@@ -593,7 +593,7 @@ type virtualAddressDTO struct {
 	ICMPEcho              string `json:"icmpEcho,omitempty" bool:"enabled"`
 	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty" bool:"yes"`
 	Mask                  string `json:"mask,omitempty"`
-	RouteAdvertisement    string `json:"routeAdvertisement,omitempty" bool:"enabled"`
+	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"` 
 	ServerScope           string `json:"serverScope,omitempty"`
 	TrafficGroup          string `json:"trafficGroup,omitempty"`
 	Unit                  int    `json:"unit,omitempty"`
@@ -1164,7 +1164,7 @@ type fastl4DTO struct {
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
 	Partition             string `json:"partition,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
-	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
+	HardwareSynCookie     string `json:"hardwareSynCookie,omitempty"`
 	IdleTimeout           string `json:"idleTimeout,omitempty"`
 	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
@@ -2427,7 +2427,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string, destination string) error {
 	config := &Monitor{
 		Name:           name,
 		ParentMonitor:  parent,
@@ -2438,6 +2438,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
 		Compatibility:  compatibility,
+		Destination:    destination,
 	}
 
 	return b.AddMonitor(config)
@@ -2810,7 +2811,7 @@ func (b *BigIP) DeleteFastl4(name string) error {
 // ModifyFastl4 updates the given Fastl4 profile with any changed values.
 func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 	fastl4.Name = name
-	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
+	return b.patch(fastl4, uriLtm, uriProfile, uriFastl4, name)
 }
 
 func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
@@ -3564,7 +3565,7 @@ func (b *BigIP) DeleteHttpProfile(name string) error {
 // ModifyHttpProfile allows you to change any attribute of a http profile.
 // Fields that can be modified are referenced in the HttpProfile struct.
 func (b *BigIP) ModifyHttpProfile(name string, config *HttpProfile) error {
-	return b.put(config, uriLtm, uriProfile, uriHttp, name)
+	return b.patch(config, uriLtm, uriProfile, uriHttp, name)
 }
 
 // OneconnectProfiles returns a list of HTTP profiles

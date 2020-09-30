@@ -89,5 +89,3 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
 * `tenant` - (Optional) For an unreachable BIG-IP, you can provide an optional description for the assignment in this field.
 
 * `key` - (Optional) License Assignment is done with specified `key`, supported only with RegKeypool type License assignement. type `string`
-
-

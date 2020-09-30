@@ -15,9 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_HTTP_NAME = fmt.Sprintf("/%s/test-http", TEST_PARTITION)
+var TestHttpName = fmt.Sprintf("/%s/test-http", TEST_PARTITION)
 
-var TEST_HTTP_RESOURCE = `
+var TestHttpResource = `
 resource "bigip_ltm_profile_http" "test-http" {
   name = "/Common/test-http"
   defaults_from = "/Common/http"
@@ -27,7 +27,7 @@ resource "bigip_ltm_profile_http" "test-http" {
 }
 `
 
-func TestAccBigipLtmProfilehttp_create(t *testing.T) {
+func TestAccBigipLtmProfileHttpCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -36,9 +36,9 @@ func TestAccBigipLtmProfilehttp_create(t *testing.T) {
 		CheckDestroy: testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_HTTP_RESOURCE,
+				Config: TestHttpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TEST_HTTP_NAME, true),
+					testCheckhttpExists(TestHttpName, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "name", "/Common/test-http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "description", "some http"),
@@ -57,8 +57,7 @@ func TestAccBigipLtmProfilehttp_create(t *testing.T) {
 		},
 	})
 }
-
-func TestAccBigipLtmProfilehttp_import(t *testing.T) {
+func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -67,12 +66,41 @@ func TestAccBigipLtmProfilehttp_import(t *testing.T) {
 		CheckDestroy: testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_HTTP_RESOURCE,
+				Config: testaccbigipltmprofilehttpDefaultConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TEST_HTTP_NAME, true),
+					testCheckhttpExists(TestHttpName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http.http-profile-test", "name", TestHttpName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http.http-profile-test", "defaults_from", "/Common/http"),
 				),
-				ResourceName:      TEST_HTTP_NAME,
-				ImportState:       false,
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateServeragentConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(TestHttpName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http.http-profile-test", "name", TestHttpName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http.http-profile-test", "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_http.http-profile-test", "server_agent_name", "myBIG-IP"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileHttpImport(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccBigipLtmHttpProfileImportConfig(),
+			},
+			{
+				ResourceName:      "bigip_ltm_profile_http.test-http-profile",
+				ImportStateId:     "/Common/test-http",
+				ImportState:       true,
 				ImportStateVerify: true,
 			},
 		},
@@ -114,4 +142,31 @@ func testCheckHttpsDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testaccbigipltmprofilehttpDefaultConfig(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_http" "%[3]s" {
+  name = "%[2]s"
+  defaults_from = "/%[1]s/http"
+}
+`, partition, profileName, resourceName)
+}
+
+func testaccbigipltmprofilehttpUpdateServeragentConfig(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_http" "%[3]s" {
+  name = "%[2]s"
+  defaults_from = "/%[1]s/http"
+  server_agent_name = "myBIG-IP"
+}
+`, partition, profileName, resourceName)
+}
+
+func testaccBigipLtmHttpProfileImportConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_http" "test-http" {
+  name = "%s"
+  defaults_from = "/Common/http"
+}`, "/Common/test-http")
 }

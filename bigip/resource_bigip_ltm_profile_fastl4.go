@@ -26,65 +26,68 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the Fastl4 Profile",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the Fastl4 Profile",
 			},
 			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "name of partition",
 			},
 			"defaults_from": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Use the parent Fastl4 profile",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Use the parent Fastl4 profile",
 			},
 			"client_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     30,
-				Description: "Use the parent Fastl4 profile",
+				Computed:    true,
+				Description: "Number of seconds allowed for a client to transmit enough data to select a server when you have late binding enabled. Value -1 means indefinite (not recommended)",
 			},
 			"explicitflow_migration": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "disabled",
+				Computed:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
 			"hardware_syncookie": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "enabled",
+				Computed:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
 			"idle_timeout": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "300",
-				Description: "Use the parent Fastl4 profile",
+				Computed:    true,
+				Description: "Number of seconds (default 300; may not be 0) connection may remain idle before it becomes eligible for deletion. Value -1 (not recommended) means infinite",
 			},
 			"iptos_toclient": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "65535",
+				Computed:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
 			"iptos_toserver": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "65535",
+				Computed:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
 			"keepalive_interval": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     0,
+				Computed:    true,
 				Description: "Use the parent Fastl4 profile",
 			},
 		},
 	}
-
 }
 
 func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{}) error {
@@ -165,20 +168,35 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	d.Set("partition", obj.Partition)
-	d.Set("defaults_from", obj.DefaultsFrom)
-	if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	_ = d.Set("partition", obj.Partition)
+	_ = d.Set("defaults_from", obj.DefaultsFrom)
+
+	if _, ok := d.GetOk("client_timeout"); ok {
+		if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("explicitflow_migration"); ok {
+		if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
+		}
 	}
-	d.Set("hardware_syncookie", obj.HardwareSynCookie)
-	d.Set("idle_timeout", obj.IdleTimeout)
-	d.Set("iptos_toclient", obj.IpTosToClient)
-	d.Set("iptos_toserver", obj.IpTosToServer)
-	d.Set("keepalive_interval", obj.KeepAliveInterval)
+	if _, ok := d.GetOk("iptos_toclient"); ok {
+		_ = d.Set("iptos_toclient", obj.IpTosToClient)
+	}
+	if _, ok := d.GetOk("iptos_toserver"); ok {
+		_ = d.Set("iptos_toserver", obj.IpTosToServer)
+	}
+	if _, ok := d.GetOk("hardware_syncookie"); ok {
+		_ = d.Set("hardware_syncookie", obj.HardwareSynCookie)
+	}
+	if _, ok := d.GetOk("idle_timeout"); ok {
+		_ = d.Set("idle_timeout", obj.IdleTimeout)
+	}
+	if _, ok := d.GetOk("keepalive_interval"); ok {
+		_ = d.Set("keepalive_interval", obj.KeepAliveInterval)
+	}
 
 	return nil
 }
