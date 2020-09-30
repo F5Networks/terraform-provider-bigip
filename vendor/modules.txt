@@ -56,8 +56,10 @@ github.com/bgentry/go-netrc/netrc
 github.com/bgentry/speakeasy
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20200610140822-65789d10c97a
+# github.com/f5devcentral/go-bigip v0.0.0-20200902132350-cf5379c78bac
 github.com/f5devcentral/go-bigip
+# github.com/f5devcentral/go-bigip/f5teem v0.0.0-20200902132350-cf5379c78bac
+github.com/f5devcentral/go-bigip/f5teem
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.2

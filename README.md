@@ -15,7 +15,11 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 # Requirements
+<<<<<<< HEAD
 -	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x / 0.13.x
+=======
+-	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x /0.13.x
+>>>>>>> master
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
 # F5 BigIP LTM requirements
@@ -39,17 +43,17 @@ For documentation, including download, installation, and usage instructions, see
 
 # Building the  Provider
 
-Clone repository to: $GOPATH/src/github.com/terraform-providers/terraform-provider-bigip
+Clone repository to: $GOPATH/src/github.com/F5Networks/terraform-provider-bigip
 
 ```
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone https://github.com/terraform-providers/terraform-provider-bigip.git
+$ mkdir -p $GOPATH/src/github.com/F5Networks; cd $GOPATH/src/github.com/F5Networks
+$ git clone https://github.com/F5Networks/terraform-provider-bigip.git
 
 ```
 Enter the provider directory and build the provider
 
 ```
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-bigip
+$ cd $GOPATH/src/github.com/F5Networks/terraform-provider-bigip
 $ make build
 
 ```
@@ -87,5 +91,3 @@ more information about acceptance testing in Terraform.
 # Community Help
 
 We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on Terraform Resources (click the **terraform** channel). There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance. This slack channel community support should **not** be considered a substitute for F5 Technical Support. See the [Slack Channel Statement](slack-channel-statement.md) for guidelines on using this channel.
-
-

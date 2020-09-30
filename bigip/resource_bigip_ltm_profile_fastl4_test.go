@@ -15,11 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_FASTL4_NAME = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
+var TestFastl4Name = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
 
-var TEST_FASTL4_RESOURCE = `
+var TestFastl4Resource = `
 resource "bigip_ltm_profile_fastl4" "test-fastl4" {
-            name = "` + TEST_FASTL4_NAME + `"
+            name = "` + TestFastl4Name + `"
             partition = "Common"
             defaults_from = "/Common/fastL4"
 			client_timeout = 40
@@ -41,10 +41,10 @@ func TestAccBigipLtmProfileFastl4_create(t *testing.T) {
 		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FASTL4_RESOURCE,
+				Config: TestFastl4Resource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckfastl4Exists(TEST_FASTL4_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "name", TEST_FASTL4_NAME),
+					testCheckfastl4Exists(TestFastl4Name, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "name", TestFastl4Name),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "partition", "Common"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "defaults_from", "/Common/fastL4"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.test-fastl4", "client_timeout", "40"),
@@ -61,6 +61,37 @@ func TestAccBigipLtmProfileFastl4_create(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileFastl4_update_IdleTimeout(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfastl4sDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccBigipLtmProfileFastl4_default_Config(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckfastl4Exists(TestFastl4Name, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "name", TestFastl4Name),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "partition", TEST_PARTITION),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "defaults_from", "/Common/fastL4"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileFastl4_update_IdleTimeout_Config_(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckfastl4Exists(TestFastl4Name, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "name", TestFastl4Name),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "partition", TEST_PARTITION),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "defaults_from", "/Common/fastL4"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "idle_timeout", "307"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileFastl4_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -70,11 +101,11 @@ func TestAccBigipLtmProfileFastl4_import(t *testing.T) {
 		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FASTL4_RESOURCE,
+				Config: TestFastl4Resource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckfastl4Exists(TEST_FASTL4_NAME, true),
+					testCheckfastl4Exists(TestFastl4Name, true),
 				),
-				ResourceName:      TEST_FASTL4_NAME,
+				ResourceName:      TestFastl4Name,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -117,4 +148,23 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testAccBigipLtmProfileFastl4_default_Config(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_fastl4" "%[3]s" {
+  name = "%[2]s"
+  defaults_from = "/%[1]s/fastL4"
+}
+`, partition, profileName, resourceName)
+}
+
+func testAccBigipLtmProfileFastl4_update_IdleTimeout_Config_(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_fastl4" "%[3]s" {
+  name = "%[2]s"
+  defaults_from = "/%[1]s/fastL4"
+  idle_timeout = "307"
+}
+`, partition, profileName, resourceName)
 }

@@ -2,8 +2,11 @@ package bigip
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"reflect"
+	"strings"
 	"time"
 )
 
@@ -18,6 +21,13 @@ const (
 	uriTasks       = "tasks"
 	uriManagement  = "member-management"
 )
+
+type BigiqDevice struct {
+	Address  string `json:"address"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Port     int    `json:"port,omitempty"`
+}
 
 type DeviceRef struct {
 	Link string `json:"link"`
@@ -103,6 +113,25 @@ type LicenseParam struct {
 	Tenant          string `json:"tenant,omitempty"`
 	UnitOfMeasure   string `json:"unitOfMeasure,omitempty"`
 	User            string `json:"user,omitempty"`
+}
+
+type BigiqAs3AllTaskType struct {
+	Items []BigiqAs3TaskType `json:"items,omitempty"`
+}
+
+type BigiqAs3TaskType struct {
+	Code int64 `json:"code,omitempty"`
+	//ID string `json:"id,omitempty"`
+	//Declaration struct{} `json:"declaration,omitempty"`
+	Results []BigiqResults `json:"results,omitempty"`
+}
+type BigiqResults struct {
+	Code    int64  `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+	//      LineCount int64  `json:"lineCount,omitempty"`
+	Host    string `json:"host,omitempty"`
+	Tenant  string `json:"tenant,omitempty"`
+	RunTime int64  `json:"runTime,omitempty"`
 }
 
 func (b *BigIP) PostLicense(config *LicenseParam) (string, error) {
@@ -271,4 +300,95 @@ func (b *BigIP) LicenseRevoke(config interface{}, poolId, regKey, memId string) 
 	}
 	log.Printf("Response after delete:%+v", r1)
 	return nil
+}
+func (b *BigIP) PostAs3Bigiq(as3NewJson string) (error, string) {
+	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare)
+	if err != nil {
+		return err, ""
+	}
+	var taskList BigiqAs3TaskType
+	tenant_list, tenant_count, _ := b.GetTenantList(as3NewJson)
+	json.Unmarshal(resp, &taskList)
+	successfulTenants := make([]string, 0)
+	if taskList.Code != 200 && taskList.Code != 0 {
+		i := tenant_count - 1
+		success_count := 0
+		for i >= 0 {
+			if taskList.Results[i].Code == 200 {
+				successfulTenants = append(successfulTenants, taskList.Results[i].Tenant)
+				success_count++
+			}
+			if taskList.Results[i].Code >= 400 {
+				log.Printf("[ERROR] : HTTP %d :: %s for tenant %v", taskList.Results[i].Code, taskList.Results[i].Message, taskList.Results[i].Tenant)
+			}
+			i = i - 1
+		}
+		if success_count == tenant_count {
+			log.Printf("[DEBUG]Sucessfully Created tenants  = %v", tenant_list)
+		} else if success_count == 0 {
+			return errors.New(fmt.Sprintf("Tenant Creation failed")), ""
+		} else {
+			finallist := strings.Join(successfulTenants[:], ",")
+			return errors.New(fmt.Sprintf("Partial Success")), finallist
+		}
+	}
+	return nil, tenant_list
+
+}
+
+func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
+	as3Json := make(map[string]interface{})
+	as3Json["class"] = "AS3"
+	as3Json["action"] = "deploy"
+	as3Json["persist"] = true
+	adcJson := make(map[string]interface{})
+	err, ok := b.getForEntityNew(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", nil
+	}
+	as3Json["declaration"] = adcJson
+	out, _ := json.Marshal(as3Json)
+	as3String := string(out)
+	return as3String, nil
+}
+
+func (b *BigIP) DeleteAs3Bigiq(as3NewJson string, tenantName string) (error, string) {
+	as3Json, err := tenantTrimToDelete(as3NewJson)
+	if err != nil {
+		log.Println("[ERROR] Error in trimming the as3 json")
+		return err, ""
+	}
+	return b.post(as3Json, uriMgmt, uriShared, uriAppsvcs, uriDeclare), ""
+}
+
+func tenantTrimToDelete(resp string) (string, error) {
+	jsonRef := make(map[string]interface{})
+	json.Unmarshal([]byte(resp), &jsonRef)
+
+	for key, value := range jsonRef {
+		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+			for k, v := range rec {
+				if k == "target" && reflect.ValueOf(v).Kind() == reflect.Map {
+					continue
+				}
+				if rec2, ok := v.(map[string]interface{}); ok {
+					for k1, v1 := range rec2 {
+						if k1 != "class" && v1 != "Tenant" {
+							delete(rec2, k1)
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	b, err := json.Marshal(jsonRef)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

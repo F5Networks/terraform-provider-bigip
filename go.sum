@@ -36,8 +36,10 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/f5devcentral/go-bigip v0.0.0-20200610140822-65789d10c97a h1:1GMT/Bu/DxDVGNv7VXbC8Of+sK80PHEG6ozKbwBCMr0=
-github.com/f5devcentral/go-bigip v0.0.0-20200610140822-65789d10c97a/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/go-bigip v0.0.0-20200902132350-cf5379c78bac h1:HHmuPIExmNDgspx032NYd9kh0NxrBGWf72k+KafTcGw=
+github.com/f5devcentral/go-bigip v0.0.0-20200902132350-cf5379c78bac/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20200902132350-cf5379c78bac h1:TsFbhfB3uLBG5UPT7c5ZAHcc3s8oeSAVH/qN3g7+yoQ=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20200902132350-cf5379c78bac/go.mod h1:1Ly3xA1+0ydxV5iDxUBmOt4saqtbFZmxFxcRCcs6Xfk=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
