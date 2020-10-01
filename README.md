@@ -35,7 +35,9 @@ These BIG-IP versions are supported in these Terraform versions.
 
 # Documentation
 
-For documentation, including download, installation, and usage instructions, see the [F5 Resources for Terraform User guide](https://clouddocs.f5.com/products/orchestration/terraform/latest/).
+Documentation for the F5 BIG-IP terraform integration is available at https://clouddocs.f5.com/products/orchestration/terraform/latest/
+
+Terraform provider documentation is available at  https://www.terraform.io/docs/providers/bigip/index.html
 
 # Building the  Provider
 

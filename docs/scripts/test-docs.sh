@@ -8,7 +8,7 @@ make clean
 make html
 
 echo "Checking grammar and style"
-vale --glob='*.rst' .
+write-good `find ./docs -not \( -path ./docs/drafts -prune \) -name '*.rst'` --so --no-illusion --thereIs --cliches
 
 #echo "Checking links"
 #make linkcheck
