@@ -9,6 +9,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"net"
 	"reflect"
 	"regexp"
 	"strings"
@@ -112,20 +113,27 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 	}
 
 	for _, v := range values {
-
 		if strings.Count(v, ":") >= 2 {
 			match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.:]+.\\d+$", v)
 			if !match {
 				errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [:._-]. e.g. /Common/node1:80", field))
 			}
 		} else {
-			match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.]+:\\d+$", v)
+			match, _ := regexp.MatchString("^[\\w_\\-.]+:\\d+$", v)
 			if !match {
 				errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [._-]. e.g. /Common/node1:80", field))
 			}
 		}
 	}
 	return
+}
+
+// IsValidIP tests that the argument is a valid IP address.
+func IsValidIP(value string) bool {
+	if net.ParseIP(value) == nil {
+		return false
+	}
+	return true
 }
 
 func validateEnabledDisabled(value interface{}, field string) (ws []string, errors []error) {
