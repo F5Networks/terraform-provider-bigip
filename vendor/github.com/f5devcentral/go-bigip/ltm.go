@@ -312,14 +312,21 @@ type PoolMember struct {
 	Address         string `json:"address,omitempty"`
 	ConnectionLimit int    `json:"connectionLimit,omitempty"`
 	DynamicRatio    int    `json:"dynamicRatio,omitempty"`
-	InheritProfile  string `json:"inheritProfile,omitempty"`
-	Logging         string `json:"logging,omitempty"`
-	Monitor         string `json:"monitor,omitempty"`
-	PriorityGroup   int    `json:"priorityGroup,omitempty"`
-	RateLimit       string `json:"rateLimit,omitempty"`
-	Ratio           int    `json:"ratio,omitempty"`
-	Session         string `json:"session,omitempty"`
-	State           string `json:"state,omitempty"`
+	FQDN            struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
+	InheritProfile string `json:"inheritProfile,omitempty"`
+	Logging        string `json:"logging,omitempty"`
+	Monitor        string `json:"monitor,omitempty"`
+	PriorityGroup  int    `json:"priorityGroup,omitempty"`
+	RateLimit      string `json:"rateLimit,omitempty"`
+	Ratio          int    `json:"ratio,omitempty"`
+	Session        string `json:"session,omitempty"`
+	State          string `json:"state,omitempty"`
 }
 
 // Pool transfer object so we can mask the bool data munging
@@ -593,7 +600,7 @@ type virtualAddressDTO struct {
 	ICMPEcho              string `json:"icmpEcho,omitempty" bool:"enabled"`
 	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty" bool:"yes"`
 	Mask                  string `json:"mask,omitempty"`
-	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"` 
+	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"`
 	ServerScope           string `json:"serverScope,omitempty"`
 	TrafficGroup          string `json:"trafficGroup,omitempty"`
 	Unit                  int    `json:"unit,omitempty"`
@@ -2123,11 +2130,7 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 
 // AddPoolMember adds a node/member to the given pool. <member> must be in the form
 // of <node>:<port>, i.e.: "web-server1:443".
-func (b *BigIP) AddPoolMember(pool, member string) error {
-	config := &poolMember{
-		Name: member,
-	}
-
+func (b *BigIP) AddPoolMember(pool string, config *PoolMember) error {
 	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
 }
 
@@ -2166,7 +2169,7 @@ func (b *BigIP) ModifyPoolMember(pool string, config *PoolMember) error {
 	// This cannot be modified for an existing pool member.
 	config.Address = ""
 
-	return b.put(config, uriLtm, uriPool, pool, uriPoolMember, member)
+	return b.patch(config, uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
 // UpdatePoolMembers does a replace-all-with for the members of a pool.
@@ -2293,7 +2296,7 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 	return b.post(config, uriLtm, uriVirtual)
 }*/
 func (b *BigIP) CreateVirtualServer(config *VirtualServer) error {
-   return b.post(config, uriLtm, uriVirtual)
+	return b.post(config, uriLtm, uriVirtual)
 }
 
 // AddVirtualServer adds a new virtual server by config to the BIG-IP system.
