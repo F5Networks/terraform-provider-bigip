@@ -13,6 +13,7 @@ import (
 	"github.com/f5devcentral/go-bigip/f5teem"
 	uuid "github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,6 +38,11 @@ func resourceBigipDo() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "DO json",
+				StateFunc: func(v interface{}) string {
+					json, _ := structure.NormalizeJsonString(v)
+
+					return json
+				},
 			},
 			"timeout": {
 				Type:        schema.TypeInt,
@@ -58,9 +64,9 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	client_bigip := meta.(*bigip.BigIP)
 
 	do_json := d.Get("do_json").(string)
-	if ok := bigip.ValidateDOTemplate(do_json); !ok {
-		return fmt.Errorf("[DO] Error validating template against DO schema \n")
-	}
+	//	if ok := bigip.ValidateDOTemplate(do_json); !ok {
+	//		return fmt.Errorf("[DO] Error validating template against DO schema \n")
+	//	}
 	//	name := d.Get("tenant_name").(string)
 	if !client_bigip.Teem {
 		id := uuid.New()

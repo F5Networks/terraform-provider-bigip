@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+//	"io/ioutil"
 	"log"
-	"net/http"
+//	"net/http"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/xeipuuv/gojsonschema"
+//	"github.com/xeipuuv/gojsonschema"
 )
 
 const doSchemaLatestURL = "https://raw.githubusercontent.com/F5Networks/terraform-provider-bigip/master/schemas/doschema.json"
@@ -40,6 +40,7 @@ type as3Version struct {
 	SchemaMinimum string `json:"schemaMinimum"`
 }
 
+/*
 func ValidateDOTemplate(doExampleJson string) bool {
 	myDO := &doValidate{
 		doSchemaLatestURL,
@@ -90,6 +91,7 @@ func (do *doValidate) fetchDOSchema() error {
 	}
 	return nil
 }
+*/
 
 type As3AllTaskType struct {
 	Items []As3TaskType `json:"items,omitempty"`
