@@ -89,9 +89,11 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 	client := meta.(*bigip.BigIP)
 	poolName := d.Get("pool").(string)
 	nodeName := d.Get("node").(string)
+	poolPartition := strings.Split(poolName, "/")[1]
 	parts := strings.Split(nodeName, ":")
 	config := &bigip.PoolMember{
-		Name: nodeName,
+		Name:      nodeName,
+		Partition: poolPartition,
 	}
 	if !IsValidIP(parts[0]) {
 		//log.Printf("[INFO] Adding FQDN node %s to pool: %s", nodeName, poolName)

@@ -121,7 +121,7 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 		} else {
 			match, _ := regexp.MatchString("^[\\w_\\-.]+:\\d+$", v)
 			if !match {
-				errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [._-]. e.g. /Common/node1:80", field))
+				errors = append(errors, fmt.Errorf("%q must match Node-address:Port and Node Address is IP/FQDN. e.g. 1.1.1.1:80/www.google.com:80", field))
 			}
 		}
 	}
