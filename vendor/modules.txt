@@ -56,9 +56,9 @@ github.com/bgentry/go-netrc/netrc
 github.com/bgentry/speakeasy
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20200902132350-cf5379c78bac
+# github.com/f5devcentral/go-bigip v0.0.0-20201014184950-5a84faa373bd
 github.com/f5devcentral/go-bigip
-# github.com/f5devcentral/go-bigip/f5teem v0.0.0-20200902132350-cf5379c78bac
+# github.com/f5devcentral/go-bigip/f5teem v0.0.0-20201014184950-5a84faa373bd
 github.com/f5devcentral/go-bigip/f5teem
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
@@ -219,12 +219,6 @@ github.com/ulikunitz/xz/lzma
 # github.com/vmihailenco/msgpack v3.3.3+incompatible
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
-# github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f
-github.com/xeipuuv/gojsonpointer
-# github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415
-github.com/xeipuuv/gojsonreference
-# github.com/xeipuuv/gojsonschema v1.2.0
-github.com/xeipuuv/gojsonschema
 # github.com/zclconf/go-cty v1.1.0
 github.com/zclconf/go-cty/cty
 github.com/zclconf/go-cty/cty/convert
