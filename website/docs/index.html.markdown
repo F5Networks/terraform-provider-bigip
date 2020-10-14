@@ -16,10 +16,14 @@ This provider uses the iControlREST API. All the resources are validated with Bi
 ## Example
 
 ```
+variable hostname {}
+variable username {}
+variable password {}
+
 provider "bigip" {
-  address = "${var.url}"
-  username = "${var.username}"
-  password = "${var.password}"
+  address = var.hostname
+  username = var.username
+  password = var.password
 }
 ```
 
