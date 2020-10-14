@@ -8,50 +8,18 @@ package bigip
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"testing"
 )
 
-var TEST_POOL_RESOURCE3 = `
-resource "bigip_ltm_node" "test-node" {
-        name = "` + TEST_NODE_NAME + `"
-        address = "10.10.10.10"
-        connection_limit = "0"
-        dynamic_ratio = "1"
-        monitor = "default"
-        rate_limit = "disabled"
-}
+var poolMember = fmt.Sprintf("%s:443", "10.10.10.10")
+var poolMemberFqdn = fmt.Sprintf("%s:443", "www.google.com")
+var poolMemberFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMember)
+var poolMemberFqdnFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMemberFqdn)
 
-resource "bigip_ltm_pool" "test-pool" {
-        name = "` + TEST_POOL_NAME + `"
-        monitors = ["/Common/http"]
-        allow_nat = "yes"
-        allow_snat = "yes"
-        description = "Test-Pool-Sample"
-        load_balancing_mode = "round-robin"
-        slow_ramp_time = "5"
-        service_down_action = "reset"
-        reselect_tries = "2"
-}
-`
-
-var TEST_POOL_RESOURCE1 = `
-resource "bigip_ltm_node" "test-node" {
-	name = "` + TEST_NODE_NAME + `"
-	address = "10.10.10.10"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-        fqdn {
-    address_family = "ipv4"
-    interval       = "3000"
-  }
-}
-
+var TestPoolResource1 = `
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
 	monitors = ["/Common/http"]
@@ -63,16 +31,54 @@ resource "bigip_ltm_pool" "test-pool" {
 	service_down_action = "reset"
 	reselect_tries = "2"
 }
-
 resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
 	pool = bigip_ltm_pool.test-pool.name
-	node = "${bigip_ltm_node.test-node.name}:443"
+	node = "` + poolMember + `"
 }
 `
-var TEST_POOL_RESOURCE2 = `
+var TestPoolResource2 = `
+resource "bigip_ltm_pool" "test-pool" {
+        name = "` + TEST_POOL_NAME + `"
+        monitors = ["/Common/http"]
+        allow_nat = "yes"
+        allow_snat = "yes"
+        description = "Test-Pool-Sample"
+        load_balancing_mode = "round-robin"
+        slow_ramp_time = "5"
+        service_down_action = "reset"
+        reselect_tries = "2"
+}
+resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
+	pool = bigip_ltm_pool.test-pool.name
+	node = "` + poolMember + `"
+    ratio                 = 2
+    connection_limit      = 2
+    connection_rate_limit = 2
+    priority_group        = 2
+    dynamic_ratio         = 3
+}
+`
+var TestPoolResource3 = `
+resource "bigip_ltm_pool" "test-pool" {
+        name = "` + TEST_POOL_NAME + `"
+        monitors = ["/Common/http"]
+        allow_nat = "yes"
+        allow_snat = "yes"
+        description = "Test-Pool-Sample"
+        load_balancing_mode = "round-robin"
+        slow_ramp_time = "5"
+        service_down_action = "reset"
+        reselect_tries = "2"
+}
+resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
+	pool = bigip_ltm_pool.test-pool.name
+	node = "` + poolMemberFqdn + `"
+}
+`
+var TestPoolResource4 = `
 resource "bigip_ltm_node" "test-node" {
         name = "` + TEST_NODE_NAME + `"
-        address = "10.10.10.10"
+        address = "10.10.10.11"
         connection_limit = "0"
         dynamic_ratio = "1"
         monitor = "default"
@@ -82,7 +88,6 @@ resource "bigip_ltm_node" "test-node" {
     interval       = "3000"
   }
 }
-
 resource "bigip_ltm_pool" "test-pool" {
         name = "` + TEST_POOL_NAME + `"
         monitors = ["/Common/http"]
@@ -105,12 +110,52 @@ func TestAccBigipLtmPoolAttachment_create(t *testing.T) {
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POOL_RESOURCE1,
+				Config: TestPoolResource1,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, true),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmPoolAttachment_createFqdn(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestPoolResource3,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFqdnFullpath, true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMemberFqdn),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestPoolResource1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
 				),
 			},
 		},
@@ -123,19 +168,21 @@ func TestAccBigipLtmPoolAttachment_create(t *testing.T) {
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POOL_RESOURCE,
+				Config: TestPoolResource2,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, true),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "connection_limit", "2"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "connection_rate_limit", "2"),
 				),
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmPoolAttachment_update(t *testing.T) {
+func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -144,44 +191,19 @@ func TestAccBigipLtmPoolAttachment_update(t *testing.T) {
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POOL_RESOURCE1,
+				Config: TestPoolResource1,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, true),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
 				),
 			},
 			{
-				Config: TEST_POOL_RESOURCE2,
+				Config: TestPoolResource4,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, false),
-				),
-			},
-		},
-	})
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
-		Steps: []resource.TestStep{
-			{
-				Config: TEST_POOL_RESOURCE,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, true),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
-				),
-			},
-			{
-				Config: TEST_POOL_RESOURCE3,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
-					testCheckPoolAttachment(TEST_POOL_NAME, TEST_POOLNODE_NAMEPORT, false),
+					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, false),
 				),
 			},
 		},
