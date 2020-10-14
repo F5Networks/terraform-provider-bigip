@@ -7,9 +7,9 @@
 
 A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
-[![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-bigip)
-[![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-bigip)
-[![license](https://img.shields.io/badge/license-Mozilla-red.svg?style=flat)](https://github.com/f5devcentral/terraform-provider-bigip/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/f5networks/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5networks/terraform-provider-bigip)
+[![Go Report Card](https://goreportcard.com/badge/github.com/f5networks/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5networks/terraform-provider-bigip)
+[![license](https://img.shields.io/badge/license-Mozilla-red.svg?style=flat)](https://github.com/f5networks/terraform-provider-bigip/blob/master/LICENSE)
 [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
