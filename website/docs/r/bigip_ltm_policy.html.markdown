@@ -19,18 +19,15 @@ For resources should be named with their "full path". The full path is the combi
 ```hcl
 
 resource "bigip_ltm_policy" "test-policy" {
-  name           = "my_policy"
-  strategy       = "first-match"
-  requires       = ["http"]
-  published_copy = "Drafts/my_policy"
-  controls       = ["forwarding"]
+  name      = "test-policy"
+  strategy  = "/Common/first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
   rule {
     name = "rule6"
-
     action {
-      tm_name = "20"
       forward = true
-      pool    = "/Common/mypool"
+      pool    = bigip_ltm_pool.pool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]
