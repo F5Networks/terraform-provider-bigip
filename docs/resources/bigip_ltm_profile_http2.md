@@ -14,28 +14,53 @@ For resources should be named with their "full path". The full path is the combi
 
 ## Example Usage
 
-
 ```hcl
+
 resource "bigip_ltm_profile_http2" "nyhttp2" {
-  name                              = "/Common/NewYork_http2"
-  defaults_from                     = "/Common/http2"
-  concurrent_streams_per_connection = 10
-  connection_idle_timeout           = 30
-  activation_modes                  = ["alpn", "npn"]
+  name = "/Common/test-profile-http2"
+  frame_size               = 2021
+  receive_window           = 31
+  write_size               = 16380
+  header_table_size        = 4092
+  include_content_length   = "enabled"
+  enforce_tls_requirements = "enabled"
+  insert_header            = "disabled"
+  concurrent_streams_per_connection = 30
+  connection_idle_timeout           = 100
+  activation_modes = ["always"]
+}
+
+#Child Profile which inherits parent http2 profile
+
+resource "bigip_ltm_profile_http2" "nyhttp2-child" {
+  name                              = "/Common/test-profile-http2-child"
+  defaults_from                     = bigip_ltm_profile_http2.nyhttp2.name
 }
 
 ```      
 
 ## Argument Reference
 
-* `name` (Required) Name of the profile_http2
+* `name` (Required,`type string`) Name of Profile should be full path.The full path is the combination of the `partition + profile name`,For example `/Common/test-http2-profile`.
 
-* `defaults_from` - (Required) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (Required,`type string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
-* `concurrent_streams_per_connection` - (Optional) Specifies how many concurrent requests are allowed to be outstanding on a single HTTP/2 connection.
+* `concurrent_streams_per_connection` - (Optional,`type int`) Specifies how many concurrent requests are allowed to be outstanding on a single HTTP/2 connection.
 
-* `connection_idle_timeout` - (Optional) Specifies the number of seconds that a connection is idle before the connection is eligible for deletion..
+* `connection_idle_timeout` - (Optional,`type int`) Specifies the number of seconds that a connection is idle before the connection is eligible for deletion.
 
-* `connpool_maxsize` - (Optional) Specifies the maximum number of connections to a load balancing pool. A setting of 0 specifies that a pool can accept an unlimited number of connections. The default value is 2048.
+* `insert_header` - (Optional,`type string`) This setting specifies whether the BIG-IP system should add an HTTP header to the HTTP request to show that the request was received over HTTP/2, Allowed Values : `"enabled"/"disabled"` [ Default: `"disabled"`].
 
-* `activation_modes` - (Optional) Specifies what will cause an incoming connection to be handled as a HTTP/2 connection. The default values npn and alpn specify that the TLS next-protocol-negotiation and application-layer-protocol-negotiation extensions will be used.
+* `insert_header_name` - (Optional,`type string`) This setting specifies the name of the header that the BIG-IP system will add to the HTTP request when the Insert Header is enabled.
+
+* `header_table_size` - (Optional) The size of the header table, in KB, for the HTTP headers that the HTTP/2 protocol compresses to save bandwidth.
+
+* `enforce_tls_requirements` - (Optional,`type string`) Enable or disable enforcement of TLS requirements,Allowed Values : `"enabled"/"disabled"` [Default:`"enabled"`].
+
+* `frame_size` - (Optional,`type int`) The size of the data frames, in bytes, that the HTTP/2 protocol sends to the client. `Default: 2048`.
+
+* `receive_window` - (Optional,`type int`) The flow-control size for upload streams, in KB. `Default: 32`.
+
+* `write_size` - (Optional,`type int`) The total size of combined data frames, in bytes, that the HTTP/2 protocol sends in a single write function. `Default: 16384`".
+
+* `activation_modes` - (Optional) This setting specifies the condition that will cause the BIG-IP system to handle an incoming connection as an HTTP/2 connection, Allowed values : `[“alpn”]` (or) `[“always”]`.
