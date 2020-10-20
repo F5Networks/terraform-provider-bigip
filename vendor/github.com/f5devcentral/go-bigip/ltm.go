@@ -2730,19 +2730,20 @@ func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 
 // Create TCP profile for WAN or LAN
 
-func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
-	tcp := &Tcp{
-		Name:              name,
-		Partition:         partition,
-		DefaultsFrom:      defaultsFrom,
-		IdleTimeout:       idleTimeout,
-		CloseWaitTimeout:  closeWaitTimeout,
-		FinWait_2Timeout:  finWait_2Timeout,
-		FinWaitTimeout:    finWaitTimeout,
-		KeepAliveInterval: keepAliveInterval,
-		DeferredAccept:    deferredAccept,
-		FastOpen:          fastOpen,
-	}
+//func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
+func (b *BigIP) CreateTcp(tcp *Tcp) error {
+	//tcp := &Tcp{
+	//	Name:              name,
+	//	Partition:         partition,
+	//	DefaultsFrom:      defaultsFrom,
+	//	IdleTimeout:       idleTimeout,
+	//	CloseWaitTimeout:  closeWaitTimeout,
+	//	FinWait_2Timeout:  finWait_2Timeout,
+	//	FinWaitTimeout:    finWaitTimeout,
+	//	KeepAliveInterval: keepAliveInterval,
+	//	DeferredAccept:    deferredAccept,
+	//	FastOpen:          fastOpen,
+	//}
 	return b.post(tcp, uriLtm, uriProfile, uriTcp)
 }
 
@@ -2754,7 +2755,7 @@ func (b *BigIP) DeleteTcp(name string) error {
 // ModifyTcp updates the given Oneconnect profile with any changed values.
 func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	tcp.Name = name
-	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
+	return b.patch(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
 func (b *BigIP) GetTcp(name string) (*Tcp, error) {

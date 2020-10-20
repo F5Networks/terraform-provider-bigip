@@ -43,7 +43,7 @@ resource "bigip_ltm_profile_http2" "nyhttp2-child" {
 
 * `name` (Required,`type string`) Name of Profile should be full path.The full path is the combination of the `partition + profile name`,For example `/Common/test-http2-profile`.
 
-* `defaults_from` - (Required,`type string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (Optional,`type string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
 * `concurrent_streams_per_connection` - (Optional,`type int`) Specifies how many concurrent requests are allowed to be outstanding on a single HTTP/2 connection.
 
