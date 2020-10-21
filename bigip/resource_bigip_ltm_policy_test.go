@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"log"
+	"regexp"
 	"testing"
 )
 
@@ -117,7 +118,15 @@ func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		policy, err := client.GetPolicy(name)
+		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+		match := re.FindStringSubmatch(name)
+		if match == nil {
+			return fmt.Errorf("Failed to match regex in :%v", name)
+		}
+		partition := match[1]
+		policy_name := match[2]
+
+		policy, err := client.GetPolicy(policy_name, partition)
 		if err != nil {
 			return fmt.Errorf("Error while fetching policy: %v", err)
 
@@ -142,7 +151,16 @@ func testCheckPolicysDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		policy, err := client.GetPolicy(name)
+
+		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+		match := re.FindStringSubmatch(name)
+		if match == nil {
+			return fmt.Errorf("Failed to match regex :%v", name)
+		}
+		partition := match[1]
+		policy_name := match[2]
+
+		policy, err := client.GetPolicy(policy_name, partition)
 
 		if err != nil {
 			return nil

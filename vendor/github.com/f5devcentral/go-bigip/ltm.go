@@ -2565,14 +2565,15 @@ func (b *BigIP) Policies() (*Policies, error) {
 }
 
 //Load a fully policy definition. Policies seem to be best dealt with as one big entity.
-func (b *BigIP) GetPolicy(name string) (*Policy, error) {
+func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	var p Policy
 	values := []string{}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.
 	//result := strings.Join(values, "")
-	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, name)
+	policy_name := "~" + partition + "~" + name
+	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, policy_name)
 	if err != nil {
 		return nil, err
 	}
@@ -2581,7 +2582,7 @@ func (b *BigIP) GetPolicy(name string) (*Policy, error) {
 	}
 
 	var rules PolicyRules
-	err, _ = b.getForEntity(&rules, uriLtm, uriPolicy, name, "rules")
+	err, _ = b.getForEntity(&rules, uriLtm, uriPolicy, policy_name, "rules")
 	if err != nil {
 		return nil, err
 	}
@@ -2591,11 +2592,11 @@ func (b *BigIP) GetPolicy(name string) (*Policy, error) {
 		var a PolicyRuleActions
 		var c PolicyRuleConditions
 
-		err, _ = b.getForEntity(&a, uriLtm, uriPolicy, name, "rules", p.Rules[i].Name, "actions")
+		err, _ = b.getForEntity(&a, uriLtm, uriPolicy, policy_name, "rules", p.Rules[i].Name, "actions")
 		if err != nil {
 			return nil, err
 		}
-		err, _ = b.getForEntity(&c, uriLtm, uriPolicy, name, "rules", p.Rules[i].Name, "conditions")
+		err, _ = b.getForEntity(&c, uriLtm, uriPolicy, policy_name, "rules", p.Rules[i].Name, "conditions")
 		if err != nil {
 			return nil, err
 		}
@@ -2642,10 +2643,12 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 }
 
 //Update an existing policy.
-func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
+func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-	values = append(values, "Drafts/")
+        values = append(values, "~")
+        values = append(values, partition)
+        values = append(values, "~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
@@ -2653,20 +2656,22 @@ func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 }
 
 //Delete a policy by name.
-func (b *BigIP) DeletePolicy(name string) error {
+func (b *BigIP) DeletePolicy(name string, partition string) error {
 	values := []string{}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.
 	//result := strings.Join(values, "")
-	return b.delete(uriLtm, uriPolicy, name)
+	policy_name := "~" + partition + "~" + name
+	return b.delete(uriLtm, uriPolicy, policy_name)
 }
 
 //Create a draft from an existing policy
-func (b *BigIP) CreatePolicyDraft(name string) error {
+func (b *BigIP) CreatePolicyDraft(name string, partition string) error {
 	var s struct{}
+	policy_name := "~" + partition + "~" + name
 	values := []string{}
-	values = append(values, name)
+	values = append(values, policy_name)
 	values = append(values, uriCreateDraft)
 	result := strings.Join(values, "")
 	return b.patch(s, uriLtm, uriPolicy, result)
