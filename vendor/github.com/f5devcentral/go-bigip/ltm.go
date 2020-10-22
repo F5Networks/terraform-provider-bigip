@@ -2128,6 +2128,14 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 	return &poolMembers, nil
 }
 
+
+func (b *BigIP) AddPoolMember_Node(pool, member string) error {
+	config := &poolMember{	
+		Name: member,
+	}
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
 // AddPoolMember adds a node/member to the given pool. <member> must be in the form
 // of <node>:<port>, i.e.: "web-server1:443".
 func (b *BigIP) AddPoolMember(pool string, config *PoolMember) error {

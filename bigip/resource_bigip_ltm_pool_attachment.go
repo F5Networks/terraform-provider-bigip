@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"strings"
+	"regexp"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
@@ -37,7 +38,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validatePoolMemberName,
+				//ValidateFunc: validatePoolMemberName,
 				Description:  "Poolmember to add/remove to/from the pool. Format node_address:port. e.g 1.1.1.1:80",
 			},
 			"ratio": {
@@ -91,6 +92,50 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 	nodeName := d.Get("node").(string)
 	poolPartition := strings.Split(poolName, "/")[1]
 	parts := strings.Split(nodeName, ":")
+	 
+	log.Println("[DEBUG] node name is :%s",nodeName)
+	re := regexp.MustCompile(`/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+):(\d+)`)
+	match := re.FindStringSubmatch(nodeName)
+	if match != nil {
+	log.Println("[DEBUG] Referencing node from nnode resource")
+        node1, err := client.GetNode(parts[0])
+        if err != nil {
+                log.Printf("[ERROR] Unable to retrieve node %s  %v :", nodeName, err)
+                return err
+        }
+        if node1 == nil {
+                log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+                d.SetId("")
+                return nil
+        }
+        if node1.FQDN.Name != "" {
+                config := &bigip.PoolMemberFqdn{
+                        Name: nodeName,
+                }
+                config.FQDN.Name = node1.FQDN.Name
+                config.FQDN.Interval = node1.FQDN.Interval
+                config.FQDN.AddressFamily = node1.FQDN.AddressFamily
+                config.FQDN.AutoPopulate = node1.FQDN.AutoPopulate
+                config.FQDN.DownInterval = node1.FQDN.DownInterval
+                err = client.AddPoolMemberFQDN(poolName, config)
+                if err != nil {
+                        return fmt.Errorf("Failure adding node %s to pool %s: %s", nodeName, poolName, err)
+                }
+                d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
+                return nil
+        }
+        log.Printf("[INFO] Adding node %s to pool: %s", nodeName, poolName)
+        err = client.AddPoolMember_Node(poolName, nodeName)
+        if err != nil {
+                return fmt.Errorf("Failure adding node %s to pool %s: %s", nodeName, poolName, err)
+        }
+
+        d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
+
+        return nil
+      
+       } else {
+	log.Println("[DEBUG] creating node from pool attachment resource")
 	config := &bigip.PoolMember{
 		Name:      nodeName,
 		Partition: poolPartition,
@@ -118,6 +163,7 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		return err
 	}
 	return resourceBigipLtmPoolAttachmentRead(d, meta)
+     }
 }
 func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
@@ -155,7 +201,17 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 
 func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	poolName := d.Id()
+	
+	var poolName string
+	nodeName := d.Get("node").(string)
+	
+	re := regexp.MustCompile(`/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+):(\d+)`)
+        match := re.FindStringSubmatch(nodeName)
+        if match != nil {
+                poolName = d.Get("pool").(string)
+	} else {
+		poolName = d.Id()
+	}
 
 	// only add the instance that was previously defined for this resource
 	expected := d.Get("node").(string)
@@ -181,6 +237,17 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	}
 	// only set the instance Id that this resource manages
 	found := false
+	
+	if match != nil {
+	    for _, node := range nodes.PoolMembers {
+                if expected == node.FullPath {
+                        d.Set("node", expected)
+                        found = true
+                        break
+                }
+          }
+       }else {
+
 	for _, node := range nodes.PoolMembers {
 		if expected == node.Name {
 			_ = d.Set("node", expected)
@@ -188,7 +255,9 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 			found = true
 			break
 		}
-	}
+       	}
+      }
+
 	if !found {
 		log.Printf("[WARN] Node %s is not a member of pool %s", expected, poolName)
 		d.SetId("")
@@ -256,8 +325,18 @@ func resourceBigipLtmPoolAttachmentImport(d *schema.ResourceData, meta interface
 	if !found {
 		return nil, fmt.Errorf("cannot locate node %s in pool %s", expectedNode, poolName)
 	}
+
+	nodeName := d.Get("node").(string)
+
+        re := regexp.MustCompile(`/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+):(\d+)`)
+        match := re.FindStringSubmatch(nodeName)
+        if match != nil {
+	               d.Set("pool", poolName)
+ 		       d.Set("node", expectedNode)
+         } else{
 	_ = d.Set("pool", poolName)
 	_ = d.Set("node", expectedNode)
+	}
 	d.SetId(id)
 
 	return []*schema.ResourceData{d}, nil
