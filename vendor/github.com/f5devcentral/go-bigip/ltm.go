@@ -2128,9 +2128,8 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 	return &poolMembers, nil
 }
 
-
-func (b *BigIP) AddPoolMember_Node(pool, member string) error {
-	config := &poolMember{	
+func (b *BigIP) AddPoolMemberNode(pool, member string) error {
+	config := &poolMember{
 		Name: member,
 	}
 	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
@@ -2654,9 +2653,9 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-        values = append(values, "~")
-        values = append(values, partition)
-        values = append(values, "~Drafts~")
+	values = append(values, "~")
+	values = append(values, partition)
+	values = append(values, "~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
