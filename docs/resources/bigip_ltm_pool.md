@@ -25,7 +25,7 @@ resource "bigip_ltm_monitor" "monitor" {
 resource "bigip_ltm_pool" "pool" {
   name                      = "/Common/Axiom_Environment_APP1_Pool"
   load_balancing_mode       = "round-robin"
-  priority_group_activation = 1
+  minimum_active_members = 1
   monitors                  = [bigip_ltm_monitor.monitor.name]
 }
 ```      
@@ -44,7 +44,7 @@ resource "bigip_ltm_pool" "pool" {
 
 * `load_balancing_mode` - (Optional, type `string`) Specifies the load balancing method. The default is Round Robin.
 
-* `priority_group_activation` - (Optional, type `int`) Specifies whether the system load balances traffic according to the priority number assigned to the pool member,Default Value is `0` meaning `disabled`.
+* `minimum_active_members` - (Optional, type `int`) Specifies whether the system load balances traffic according to the priority number assigned to the pool member,Default Value is `0` meaning `disabled`.
 
 * `slow_ramp_time` - (Optional, type `int`) Specifies the duration during which the system sends less traffic to a newly-enabled pool member.
 

@@ -65,7 +65,7 @@ func resourceBigipLtmPool() *schema.Resource {
 				Computed:    true,
 				Description: "Specifies the load balancing method. The default is Round Robin.Possible values: round-robin, ...",
 			},
-			"priority_group_activation": {
+			"minimum_active_members": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
@@ -136,7 +136,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
 	}
-	if err := d.Set("priority_group_activation", pool.MinActiveMembers); err != nil {
+	if err := d.Set("minimum_active_members", pool.MinActiveMembers); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
@@ -183,7 +183,7 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 		AllowSNAT:         d.Get("allow_snat").(string),
 		LoadBalancingMode: d.Get("load_balancing_mode").(string),
 		Description:       d.Get("description").(string),
-		MinActiveMembers:  d.Get("priority_group_activation").(int),
+		MinActiveMembers:  d.Get("minimum_active_members").(int),
 		SlowRampTime:      d.Get("slow_ramp_time").(int),
 		ServiceDownAction: d.Get("service_down_action").(string),
 		ReselectTries:     d.Get("reselect_tries").(int),
