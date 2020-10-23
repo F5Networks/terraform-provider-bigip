@@ -2144,6 +2144,13 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 	return &poolMembers, nil
 }
 
+func (b *BigIP) AddPoolMemberNode(pool, member string) error {
+	config := &poolMember{
+		Name: member,
+	}
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
 // AddPoolMember adds a node/member to the given pool. <member> must be in the form
 // of <node>:<port>, i.e.: "web-server1:443".
 func (b *BigIP) AddPoolMember(pool string, config *PoolMember) error {
@@ -2662,9 +2669,9 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-        values = append(values, "~")
-        values = append(values, partition)
-        values = append(values, "~Drafts~")
+	values = append(values, "~")
+	values = append(values, partition)
+	values = append(values, "~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
