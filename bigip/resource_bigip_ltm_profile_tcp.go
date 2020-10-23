@@ -23,12 +23,12 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the TCP Profile",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the TCP Profile",
 			},
 			"partition": {
 				Type:        schema.TypeString,
@@ -36,108 +36,62 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 				Description: "name of partition",
 			},
 			"defaults_from": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/tcp",
-				Description: "Use the parent tcp profile",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Use the parent tcp profile",
 			},
-
 			"idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     300,
-				Description: "idle_timeout can be given value",
+				Computed:    true,
+				Description: "Number of seconds (default 300; may not be 0) connection may remain idle before it becomes eligible for deletion. Value -1 (not recommended) means infinite",
 			},
-
 			"close_wait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     5,
-				Description: "close wait timer integer",
+				Computed:    true,
+				Description: "Number of seconds (default 5) connection will remain in LAST-ACK state before exiting. Value -1 means indefinite, limited by maximum retransmission timeout",
 			},
-
 			"finwait_2timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     300,
-				Description: "timer integer",
+				Computed:    true,
+				Description: "Number of seconds (default 300) connection will remain in LAST-ACK state before closing. Value -1 means indefinite, limited by maximum retransmission timeout",
 			},
-
 			"finwait_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     5,
-				Description: "fin wait timer integer",
+				Computed:    true,
+				Description: "Number of seconds (default 5) connection will remain in FIN-WAIT-1 or closing state before exiting. Value -1 means indefinite, limited by maximum retransmission timeout",
 			},
-
 			"keepalive_interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     1800,
-				Description: "keepalive_interval timer integer",
+				Computed:    true,
+				Description: "Number of seconds (default 1800) between keep-alive probes",
 			},
-
 			"deferred_accept": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "disabled",
-				Description: "Defferred accept",
+				Computed:    true,
+				Description: "If enabled, ADC will defer allocating resources to a connection until some payload data has arrived from the client (default false). This may help minimize the impact of certain DoS attacks but adds undesirable latency under normal conditions. Note: ‘deferredAccept’ is incompatible with server-speaks-first application protocols,Default : disabled",
 			},
 			"fast_open": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "disabled",
-				Description: "fast_open value ",
+				Computed:    true,
+				Description: "If enabled (default), the system can use the TCP Fast Open protocol extension to reduce latency by sending payload data with initial SYN",
 			},
 		},
 	}
-
 }
 
 func resourceBigipLtmProfileTcpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
-	partition := d.Get("partition").(string)
-	defaultsFrom := d.Get("defaults_from").(string)
-	idleTimeout := d.Get("idle_timeout").(int)
-	closeWaitTimeout := d.Get("close_wait_timeout").(int)
-	finWait_2Timeout := d.Get("finwait_2timeout").(int)
-	finWaitTimeout := d.Get("finwait_timeout").(int)
-	keepAliveInterval := d.Get("keepalive_interval").(int)
-	deferredAccept := d.Get("deferred_accept").(string)
-	fastOpen := d.Get("fast_open").(string)
-	log.Println("[INFO] Creating TCP profile")
-
-	err := client.CreateTcp(
-		name,
-		partition,
-		defaultsFrom,
-		idleTimeout,
-		closeWaitTimeout,
-		finWait_2Timeout,
-		finWaitTimeout,
-		keepAliveInterval,
-		deferredAccept,
-		fastOpen,
-	)
-
-	if err != nil {
-		log.Printf("[ERROR] Unable to Create tcp Profile  (%s) (%v)", name, err)
-		return err
-	}
-	d.SetId(name)
-	return resourceBigipLtmProfileTcpRead(d, meta)
-}
-
-func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-
-	//log.Println("[INFO] Updating Route " + description)
-
-	r := &bigip.Tcp{
+	tcpProfileConfig := &bigip.Tcp{
 		Name:              name,
 		Partition:         d.Get("partition").(string),
 		DefaultsFrom:      d.Get("defaults_from").(string),
@@ -149,10 +103,35 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 		DeferredAccept:    d.Get("deferred_accept").(string),
 		FastOpen:          d.Get("fast_open").(string),
 	}
-
-	err := client.ModifyTcp(name, r)
+	log.Println("[INFO] Creating TCP profile")
+	err := client.CreateTcp(tcpProfileConfig)
 	if err != nil {
-		return fmt.Errorf("Error create profile tcp (%s): %s", name, err)
+		log.Printf("[ERROR] Unable to Create tcp Profile  (%s) (%v)", name, err)
+		return err
+	}
+	d.SetId(name)
+	return resourceBigipLtmProfileTcpRead(d, meta)
+}
+
+func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*bigip.BigIP)
+	name := d.Id()
+	log.Println("[INFO] Updating TCP Profile Route " + name)
+	tcpProfileConfig := &bigip.Tcp{
+		Name:              name,
+		Partition:         d.Get("partition").(string),
+		DefaultsFrom:      d.Get("defaults_from").(string),
+		IdleTimeout:       d.Get("idle_timeout").(int),
+		CloseWaitTimeout:  d.Get("close_wait_timeout").(int),
+		FinWait_2Timeout:  d.Get("finwait_2timeout").(int),
+		FinWaitTimeout:    d.Get("finwait_timeout").(int),
+		KeepAliveInterval: d.Get("keepalive_interval").(int),
+		DeferredAccept:    d.Get("deferred_accept").(string),
+		FastOpen:          d.Get("fast_open").(string),
+	}
+	err := client.ModifyTcp(name, tcpProfileConfig)
+	if err != nil {
+		return fmt.Errorf("Error create profile tcp (%s): %s ", name, err)
 	}
 	return resourceBigipLtmProfileTcpRead(d, meta)
 }
@@ -170,32 +149,43 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	d.Set("partition", obj.Partition)
-	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for tcp profile  (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for tcp profile  (%s): %s", d.Id(), err)
+		}
 	}
-
-	if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("idle_timeout"); ok {
+		if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("close_wait_timeout", obj.CloseWaitTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CloseWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("close_wait_timeout"); ok {
+		if err := d.Set("close_wait_timeout", obj.CloseWaitTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CloseWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+		}
 	}
-
-	if err := d.Set("finwait_2timeout", obj.FinWait_2Timeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving FinWait_2Timeout to state for tcp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("finwait_2timeout"); ok {
+		if err := d.Set("finwait_2timeout", obj.FinWait_2Timeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving FinWait_2Timeout to state for tcp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("finwait_timeout", obj.FinWaitTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving FinWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("finwait_timeout"); ok {
+		if err := d.Set("finwait_timeout", obj.FinWaitTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving FinWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
+		}
 	}
-
-	d.Set("keepalive_interval", obj.KeepAliveInterval)
-	if err := d.Set("deferred_accept", obj.DeferredAccept); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DeferredAccept to state for tcp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("keepalive_interval"); ok {
+		_ = d.Set("keepalive_interval", obj.KeepAliveInterval)
 	}
-	d.Set("fast_open", obj.FastOpen)
-
+	if _, ok := d.GetOk("deferred_accept"); ok {
+		if err := d.Set("deferred_accept", obj.DeferredAccept); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DeferredAccept to state for tcp profile  (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("fast_open"); ok {
+		_ = d.Set("fast_open", obj.FastOpen)
+	}
 	return nil
 }
 

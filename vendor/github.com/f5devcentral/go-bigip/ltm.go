@@ -1220,11 +1220,19 @@ type Httpcompress struct {
 
 type http2DTO struct {
 	Name                           string   `json:"name,omitempty"`
+	FullPath                       string   `json:"fullPath,omitempty"`
 	DefaultsFrom                   string   `json:"defaultsFrom,omitempty"`
 	ConcurrentStreamsPerConnection int      `json:"concurrentStreamsPerConnection,omitempty"`
 	ConnectionIdleTimeout          int      `json:"connectionIdleTimeout,omitempty"`
 	HeaderTableSize                int      `json:"headerTableSize,omitempty"`
 	ActivationModes                []string `json:"activationModes,omitempty"`
+	EnforceTLSRequirements         string   `json:"enforceTlsRequirements,omitempty"`
+	FrameSize                      int      `json:"frameSize,omitempty"`
+	IncludeContentLength           string   `json:"includeContentLength,omitempty"`
+	InsertHeader                   string   `json:"insertHeader,omitempty"`
+	InsertHeaderName               string   `json:"insertHeaderName,omitempty"`
+	ReceiveWindow                  int      `json:"receiveWindow,omitempty"`
+	WriteSize                      int      `json:"writeSize,omitempty"`
 }
 
 type Http2s struct {
@@ -1233,11 +1241,19 @@ type Http2s struct {
 
 type Http2 struct {
 	Name                           string
+	FullPath                       string
 	DefaultsFrom                   string
 	ConcurrentStreamsPerConnection int
 	ConnectionIdleTimeout          int
 	HeaderTableSize                int
 	ActivationModes                []string
+	EnforceTLSRequirements         string
+	FrameSize                      int
+	IncludeContentLength           string
+	InsertHeader                   string
+	InsertHeaderName               string
+	ReceiveWindow                  int
+	WriteSize                      int
 }
 
 type Recordss struct {
@@ -2719,19 +2735,20 @@ func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 
 // Create TCP profile for WAN or LAN
 
-func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
-	tcp := &Tcp{
-		Name:              name,
-		Partition:         partition,
-		DefaultsFrom:      defaultsFrom,
-		IdleTimeout:       idleTimeout,
-		CloseWaitTimeout:  closeWaitTimeout,
-		FinWait_2Timeout:  finWait_2Timeout,
-		FinWaitTimeout:    finWaitTimeout,
-		KeepAliveInterval: keepAliveInterval,
-		DeferredAccept:    deferredAccept,
-		FastOpen:          fastOpen,
-	}
+//func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
+func (b *BigIP) CreateTcp(tcp *Tcp) error {
+	//tcp := &Tcp{
+	//	Name:              name,
+	//	Partition:         partition,
+	//	DefaultsFrom:      defaultsFrom,
+	//	IdleTimeout:       idleTimeout,
+	//	CloseWaitTimeout:  closeWaitTimeout,
+	//	FinWait_2Timeout:  finWait_2Timeout,
+	//	FinWaitTimeout:    finWaitTimeout,
+	//	KeepAliveInterval: keepAliveInterval,
+	//	DeferredAccept:    deferredAccept,
+	//	FastOpen:          fastOpen,
+	//}
 	return b.post(tcp, uriLtm, uriProfile, uriTcp)
 }
 
@@ -2743,7 +2760,7 @@ func (b *BigIP) DeleteTcp(name string) error {
 // ModifyTcp updates the given Oneconnect profile with any changed values.
 func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	tcp.Name = name
-	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
+	return b.patch(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
 func (b *BigIP) GetTcp(name string) (*Tcp, error) {
@@ -2876,15 +2893,12 @@ func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
 	return &httpcompress, nil
 }
 
-func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
-	http2 := &Http2{
-		Name:                           name,
-		DefaultsFrom:                   defaultsFrom,
-		ConcurrentStreamsPerConnection: concurrentStreamsPerConnection,
-		ConnectionIdleTimeout:          connectionIdleTimeout,
-		HeaderTableSize:                headerTableSize,
-		ActivationModes:                activationModes,
-	}
+//func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
+func (b *BigIP) CreateHttp2(http2 *Http2) error {
+	//http2 := &Http2{
+	//	Name:         name,
+	//	DefaultsFrom: defaultsFrom,
+	//}
 	return b.post(http2, uriLtm, uriProfile, uriHttp2)
 }
 
@@ -2895,8 +2909,8 @@ func (b *BigIP) DeleteHttp2(name string) error {
 
 // Modify http2 updates the given http2 profile with any changed values.
 func (b *BigIP) ModifyHttp2(name string, http2 *Http2) error {
-	http2.Name = name
-	return b.put(http2, uriLtm, uriProfile, uriHttp2, name)
+	http2.FullPath = name
+	return b.patch(http2, uriLtm, uriProfile, uriHttp2, name)
 }
 
 func (b *BigIP) GetHttp2(name string) (*Http2, error) {

@@ -77,6 +77,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"send": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Request string to send.",
 				StateFunc: func(s interface{}) string {
 					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
