@@ -1948,11 +1948,11 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 }
 
 // CreateClientSSLProfile creates a new client-ssl profile on the BIG-IP system.
-func (b *BigIP) CreateClientSSLProfile(name string, parent string) error {
-	config := &ClientSSLProfile{
+func (b *BigIP) CreateClientSSLProfile(config *ClientSSLProfile) error {
+       /*	config := &ClientSSLProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriProfile, uriClientSSL)
 }
