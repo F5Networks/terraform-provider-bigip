@@ -179,6 +179,19 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description: "Client Certificate Constrained Delegation CA passphrase",
 			},
 
+			"proxy_ca_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Proxy CA Cert",
+			},
+
+			"proxy_ca_key": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Proxy CA Key",
+			},
 			"peer_cert_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -315,10 +328,31 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 	parent := d.Get("defaults_from").(string)
 	log.Println("[INFO] Creating Server Ssl Profile " + name)
 
-	err := client.CreateServerSSLProfile(
+	/*err := client.CreateServerSSLProfile(
 		name,
 		parent,
-	)
+	)*/
+	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
+	proxyCaCert := d.Get("proxy_ca_cert").(string)
+	proxyCaKey := d.Get("proxy_ca_key").(string)
+	sslForwardProxyBypass := d.Get("ssl_forward_proxy_bypass").(string)
+	if sslForwardProxyEnabled == "enabled" {
+		proxyCaCert = "/Common/default.crt"
+		proxyCaKey = "/Common/default.key"
+		if sslForwardProxyBypass == "" {
+			sslForwardProxyBypass = "disabled"
+		}
+	}
+
+	pss := &bigip.ServerSSLProfile{
+		Name:                  name,
+		DefaultsFrom:          parent,
+		ProxyCaCert:           proxyCaCert,
+		ProxyCaKey:            proxyCaKey,
+		SslForwardProxy:       sslForwardProxyEnabled,
+		SslForwardProxyBypass: sslForwardProxyBypass,
+	}
+	err := client.CreateServerSSLProfile(pss)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Server Ssl Profile (%s) (%v)", name, err)
@@ -347,6 +381,13 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 	if t, ok := d.GetOk("tm_options"); ok {
 		tmOptions = setToStringSlice(t.(*schema.Set))
 	}*/
+	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
+	proxyCaCert := d.Get("proxy_ca_cert").(string)
+	proxyCaKey := d.Get("proxy_ca_key").(string)
+	if sslForwardProxyEnabled == "enabled" {
+		proxyCaCert = "/Common/default.crt"
+		proxyCaKey = "/Common/default.key"
+	}
 
 	pss := &bigip.ServerSSLProfile{
 		Name:                      d.Get("name").(string),
@@ -370,6 +411,8 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		ModSslMethods:             d.Get("mod_ssl_methods").(string),
 		Mode:                      d.Get("mode").(string),
 		//TmOptions:                    tmOptions,
+		ProxyCaCert:                  proxyCaCert,
+		ProxyCaKey:                   proxyCaKey,
 		Passphrase:                   d.Get("passphrase").(string),
 		PeerCertMode:                 d.Get("peer_cert_mode").(string),
 		ProxySsl:                     d.Get("proxy_ssl").(string),
@@ -383,7 +426,7 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		SessionTicket:                d.Get("session_ticket").(string),
 		SniDefault:                   d.Get("sni_default").(string),
 		SniRequire:                   d.Get("sni_require").(string),
-		SslForwardProxy:              d.Get("ssl_forward_proxy").(string),
+		SslForwardProxy:              sslForwardProxyEnabled,
 		SslForwardProxyBypass:        d.Get("ssl_forward_proxy_bypass").(string),
 		SslSignHash:                  d.Get("ssl_sign_hash").(string),
 		StrictResume:                 d.Get("strict_resume").(string),
@@ -471,6 +514,13 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	}
 
 	if err := d.Set("mode", obj.Mode); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("proxy_ca_cert", obj.ProxyCaCert); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 

@@ -51,6 +51,8 @@ type ServerSSLProfile struct {
 	//TmOptions                    []string `json:"tmOptions,omitempty"`
 	Passphrase                   string `json:"passphrase,omitempty"`
 	PeerCertMode                 string `json:"peerCertMode,omitempty"`
+        ProxyCaCert           string `json:"proxyCaCert,omitempty"`
+        ProxyCaKey            string `json:"proxyCaKey,omitempty"`
 	ProxySsl                     string `json:"proxySsl,omitempty"`
 	RenegotiatePeriod            string `json:"renegotiatePeriod,omitempty"`
 	RenegotiateSize              string `json:"renegotiateSize,omitempty"`
@@ -1897,11 +1899,11 @@ func (b *BigIP) GetServerSSLProfile(name string) (*ServerSSLProfile, error) {
 }
 
 // CreateServerSSLProfile creates a new server-ssl profile on the BIG-IP system.
-func (b *BigIP) CreateServerSSLProfile(name string, parent string) error {
-	config := &ServerSSLProfile{
+func (b *BigIP) CreateServerSSLProfile(config *ServerSSLProfile) error {
+	/*config := &ServerSSLProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriProfile, uriServerSSL)
 }
