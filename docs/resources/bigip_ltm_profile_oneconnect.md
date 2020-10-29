@@ -17,8 +17,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_profile_oneconnect" "oneconnect-sanjose" {
-  name                  = "sanjose"
-  partition             = "Common"
+  name                  = "/Common/sanjose"
   defaults_from         = "/Common/oneconnect"
   idle_timeout_override = "disabled"
   max_age               = 3600

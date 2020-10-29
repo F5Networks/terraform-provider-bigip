@@ -19,7 +19,6 @@ description: |-
 
 resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
   name          = "/Common/test-ServerSsl"
-  partition     = "Common"
   defaults_from = "/Common/serverssl"
   authenticate  = "always"
   ciphers       = "DEFAULT"
