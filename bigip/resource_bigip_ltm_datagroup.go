@@ -25,7 +25,6 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -34,7 +33,6 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 				Description:  "Name of the Data Group List",
 				ValidateFunc: validateF5Name,
 			},
-
 			"type": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -42,7 +40,6 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 				Description:  "The Data Group type (string, ip, integer)",
 				ValidateFunc: validateDataGroupType,
 			},
-
 			"record": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -52,7 +49,6 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-
 						"data": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -82,20 +78,16 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	} else {
 		records = nil
 	}
-
 	dg := &bigip.DataGroup{
 		Name:    name,
 		Type:    dgtype,
 		Records: records,
 	}
-
 	err := client.AddInternalDataGroup(dg)
 	if err != nil {
-		return fmt.Errorf("Error creating Data Group List %s: %v", name, err)
+		return fmt.Errorf("Error creating Data Group List %s: %v ", name, err)
 	}
-
 	d.SetId(name)
-
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
@@ -108,7 +100,7 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving Data Group List %s: %v", name, err)
+		return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 	}
 
 	if datagroup == nil {
@@ -117,9 +109,8 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 		return nil
 	}
 
-	d.Set("name", datagroup.FullPath)
-	d.Set("type", datagroup.Type)
-
+	_ = d.Set("name", datagroup.FullPath)
+	_ = d.Set("type", datagroup.Type)
 	for _, record := range datagroup.Records {
 		dgRecord := map[string]interface{}{
 			"name": record.Name,
@@ -127,11 +118,9 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 		}
 		records = append(records, dgRecord)
 	}
-
 	if err := d.Set("record", records); err != nil {
-		return fmt.Errorf("Error updating records in state for Data Group List %s: %v", name, err)
+		return fmt.Errorf("Error updating records in state for Data Group List %s: %v ", name, err)
 	}
-
 	return nil
 }
 
@@ -143,7 +132,7 @@ func resourceBigipLtmDataGroupExists(d *schema.ResourceData, meta interface{}) (
 
 	datagroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		return false, fmt.Errorf("Error retrieving Data Group List %s: %v", name, err)
+		return false, fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 	}
 
 	if datagroup == nil {
@@ -195,12 +184,12 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		err = client.ModifyInternalDataGroupRecords(dgver1213)
 		if err != nil {
-			return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
+			return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
 		}
 	} else {
 		err = client.ModifyInternalDataGroupRecords(dgver)
 		if err != nil {
-			return fmt.Errorf("Error modifying Data Group List %s: %v", name, err)
+			return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
 		}
 	}
 	return resourceBigipLtmDataGroupRead(d, meta)
@@ -214,7 +203,7 @@ func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) e
 
 	err := client.DeleteInternalDataGroup(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting Data Group List %s: %v", name, err)
+		return fmt.Errorf("Error deleting Data Group List %s: %v ", name, err)
 	}
 
 	d.SetId("")
