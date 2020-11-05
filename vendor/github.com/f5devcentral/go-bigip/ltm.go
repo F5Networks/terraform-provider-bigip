@@ -51,8 +51,8 @@ type ServerSSLProfile struct {
 	//TmOptions                    []string `json:"tmOptions,omitempty"`
 	Passphrase                   string `json:"passphrase,omitempty"`
 	PeerCertMode                 string `json:"peerCertMode,omitempty"`
-        ProxyCaCert           string `json:"proxyCaCert,omitempty"`
-        ProxyCaKey            string `json:"proxyCaKey,omitempty"`
+	ProxyCaCert                  string `json:"proxyCaCert,omitempty"`
+	ProxyCaKey                   string `json:"proxyCaKey,omitempty"`
 	ProxySsl                     string `json:"proxySsl,omitempty"`
 	RenegotiatePeriod            string `json:"renegotiatePeriod,omitempty"`
 	RenegotiateSize              string `json:"renegotiateSize,omitempty"`
@@ -1084,6 +1084,7 @@ type oneconnectDTO struct {
 	Partition           string `json:"partition,omitempty"`
 	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
 	IdleTimeoutOverride string `json:"idleTimeoutOverride,omitempty"`
+	LimitType           string `json:"limitType,omitempty"`
 	MaxAge              int    `json:"maxAge,omitempty"`
 	MaxReuse            int    `json:"maxReuse,omitempty"`
 	MaxSize             int    `json:"maxSize,omitempty"`
@@ -1099,6 +1100,7 @@ type Oneconnect struct {
 	Partition           string
 	DefaultsFrom        string
 	IdleTimeoutOverride string
+	LimitType           string
 	MaxAge              int
 	MaxReuse            int
 	MaxSize             int
@@ -1951,7 +1953,7 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 
 // CreateClientSSLProfile creates a new client-ssl profile on the BIG-IP system.
 func (b *BigIP) CreateClientSSLProfile(config *ClientSSLProfile) error {
-       /*	config := &ClientSSLProfile{
+	/*	config := &ClientSSLProfile{
 		Name:         name,
 		DefaultsFrom: parent,
 	}*/
@@ -2703,18 +2705,7 @@ func (b *BigIP) CreatePolicyDraft(name string, partition string) error {
 }
 
 // Oneconnect profile creation
-func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsFrom, sharePools, sourceMask string, maxAge, maxReuse, maxSize int) error {
-	oneconnect := &Oneconnect{
-		Name:                name,
-		IdleTimeoutOverride: idleTimeoutOverride,
-		Partition:           partition,
-		DefaultsFrom:        defaultsFrom,
-		SharePools:          sharePools,
-		SourceMask:          sourceMask,
-		MaxAge:              maxAge,
-		MaxReuse:            maxReuse,
-		MaxSize:             maxSize,
-	}
+func (b *BigIP) CreateOneconnect(oneconnect *Oneconnect) error {
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
@@ -2739,7 +2730,7 @@ func (b *BigIP) DeleteOneconnect(name string) error {
 // ModifyOneconnect updates the given Oneconnect profile with any changed values.
 func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 	oneconnect.Name = name
-	return b.put(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
+	return b.patch(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
 }
 
 // Create TCP profile for WAN or LAN
