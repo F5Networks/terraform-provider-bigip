@@ -43,3 +43,12 @@ resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {
 * `max_size` - (Optional,`type int`) Specifies the maximum number of connections that the system holds in the connection reuse pool. If the pool is already full, then the server-side connection closes after the response is completed. The default value is `10000`.
 
 * `source_mask` - (Optional,`type string`) Specifies a source IP mask. The default value is `0.0.0.0`. The system applies the value of this option to the source address to determine its eligibility for reuse. A mask of 0.0.0.0 causes the system to share reused connections across all clients. A host mask (all 1's in binary), causes the system to share only those reused connections originating from the same client IP address.
+
+
+## Import
+
+BIG-IP LTM oneconnect profiles can be imported using the `name` , e.g.
+
+```
+$ terraform import bigip_ltm_profile_oneconnect.test-oneconnect /Common/test-oneconnect
+```
