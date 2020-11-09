@@ -414,7 +414,8 @@ type CookiePersistenceProfile struct {
 	HashLength                 int    `json:"hashLength,omitempty"`
 	HashOffset                 int    `json:"hashOffset,omitempty"`
 	HTTPOnly                   string `json:"httponly,omitempty"`
-	Secure                     string `json:"secure,omitempty"`
+	Method                  string `json:"method,omitempty"`
+        Secure                     string `json:"secure,omitempty"`
 }
 
 // DestAddrPersistenceProfiles contains a list of all dest-addr profiles

@@ -65,7 +65,10 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", nil),
 			},
 		},
-
+		DataSourcesMap: map[string]*schema.Resource{
+			"bigip_ltm_datagroup": dataSourceBigipLtmDataGroup(),
+			"bigip_ltm_monitor":   dataSourceBigipLtmMonitor(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
 			"bigip_cm_devicegroup":                  resourceBigipCmDevicegroup(),

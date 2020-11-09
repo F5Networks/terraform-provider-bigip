@@ -67,6 +67,12 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 				Description:  "To enable _ disable match across virtual servers with given persistence record",
 				ValidateFunc: validateEnabledDisabled,
 			},
+			"method": {
+				Type:        schema.TypeString,
+				Default:     "insert",
+				Optional:    true,
+				Description: "Specifies the type of cookie processing that the system uses",
+			},
 
 			"mirror": {
 				Type:         schema.TypeString,
@@ -210,6 +216,7 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	if err := d.Set("mirror", pp.Mirror); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
 	}
+	d.Set("method", pp.Method)
 	d.Set("timeout", pp.Timeout)
 	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 
@@ -237,16 +244,18 @@ func resourceBigipLtmPersistenceProfileCookieUpdate(d *schema.ResourceData, meta
 
 	pp := &bigip.CookiePersistenceProfile{
 		PersistenceProfile: bigip.PersistenceProfile{
-			AppService:              d.Get("app_service").(string),
-			DefaultsFrom:            d.Get("defaults_from").(string),
-			MatchAcrossPools:        d.Get("match_across_pools").(string),
-			MatchAcrossServices:     d.Get("match_across_services").(string),
-			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-			Mirror:                  d.Get("mirror").(string),
+			AppService:          d.Get("app_service").(string),
+			DefaultsFrom:        d.Get("defaults_from").(string),
+			MatchAcrossPools:    d.Get("match_across_pools").(string),
+			MatchAcrossServices: d.Get("match_across_services").(string),
+			MatchAcrossVirtuals: d.Get("match_across_virtuals").(string),
+			Mirror:              d.Get("mirror").(string),
+			//  Method:                  d.Get("method").(string),
 			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
 			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
 		},
 		// Specific to CookiePersistenceProfile
+		Method:                     d.Get("method").(string),
 		AlwaysSend:                 d.Get("always_send").(string),
 		CookieEncryption:           d.Get("cookie_encryption").(string),
 		CookieEncryptionPassphrase: d.Get("cookie_encryption_passphrase").(string),
