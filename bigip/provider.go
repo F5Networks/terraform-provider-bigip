@@ -67,6 +67,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"bigip_ltm_datagroup": dataSourceBigipLtmDataGroup(),
+			"bigip_ltm_monitor":   dataSourceBigipLtmMonitor(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
