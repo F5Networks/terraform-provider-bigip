@@ -26,6 +26,80 @@ func dataSourceBigipLtmMonitor() *schema.Resource {
 				Required:    true,
 				Description: "partition of LTM Monitor",
 			},
+			"defaults_from": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
+			},
+			"interval": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"timeout": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"receive_disable": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Expected response string.",
+			},
+			"reverse": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"transparent": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"manual_resume": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ip_dscp": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"time_until_up": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "Time in seconds",
+			},
+			"destination": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Alias for the destination",
+			},
+			"filename": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies the full path and file name of the file that the system attempts to download. The health check is successful if the system can download the file.",
+			},
+			"mode": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies the data transfer process (DTP) mode. The default value is passive.",
+			},
+			"adaptive": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ftp adaptive",
+			},
+			"adaptive_limit": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "Integer value",
+			},
+			"username": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies the user name if the monitored target requires authentication",
+			},
+			"database": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "the database in which your user is created",
+			},
 		},
 	}
 }
@@ -62,7 +136,6 @@ func dataSourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) err
 			_ = d.Set("adaptive", m.Adaptive)
 			_ = d.Set("adaptive_limit", m.AdaptiveLimit)
 			_ = d.Set("username", m.Username)
-			_ = d.Set("password", m.Password)
 			_ = d.Set("name", name)
 			_ = d.Set("database", m.Database)
 			d.SetId(m.FullPath)
