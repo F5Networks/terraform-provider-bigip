@@ -34,6 +34,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Use the parent Httpcompress profile",
 			},
 
@@ -42,6 +43,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Servers Address",
 			},
 			"uri_include": {
@@ -49,6 +51,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Servers Address",
 			},
 			"content_type_include": {
@@ -56,6 +59,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies a list of content types for compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to compress.",
 			},
 			"content_type_exclude": {
@@ -63,6 +67,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies a list of content types for compression of HTTP Content-Type responses. Use a string list to specify a list of content types you want to exclude.",
 			},
 		},
@@ -81,14 +86,24 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 
 	log.Println("[INFO] Creating Httpcompress profile")
 
-	err := client.CreateHttpcompress(
-		name,
-		defaultsFrom,
-		uriExclude,
-		uriInclude,
-		contentTypeInclude,
-		contentTypeExclude,
-	)
+	/*	err := client.CreateHttpcompress(
+			name,
+			defaultsFrom,
+			uriExclude,
+			uriInclude,
+			contentTypeInclude,
+			contentTypeExclude,
+		)
+	*/
+	r := &bigip.Httpcompress{
+		Name:               name,
+		DefaultsFrom:       defaultsFrom,
+		UriExclude:         uriExclude,
+		UriInclude:         uriInclude,
+		ContentTypeInclude: contentTypeInclude,
+		ContentTypeExclude: contentTypeExclude,
+	}
+	err := client.CreateHttpcompress(r)
 
 	if err != nil {
 		return fmt.Errorf("Error retrieving profile Http compress (%s): %s", name, err)
@@ -108,6 +123,7 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 		UriExclude:         setToStringSlice(d.Get("uri_exclude").(*schema.Set)),
 		UriInclude:         setToStringSlice(d.Get("uri_include").(*schema.Set)),
 		ContentTypeInclude: setToStringSlice(d.Get("content_type_include").(*schema.Set)),
+		ContentTypeExclude: setToStringSlice(d.Get("content_type_exclude").(*schema.Set)),
 	}
 
 	err := client.ModifyHttpcompress(name, r)
@@ -130,19 +146,33 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("uri_include", obj.UriInclude); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UriInclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Http Compress profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("uri_exclude", obj.UriExclude); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UriExclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("uri_include"); ok {
+		if err := d.Set("uri_include", obj.UriInclude); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving UriInclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("content_type_include", obj.ContentTypeInclude); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ContentTypeInclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("uri_exclude"); ok {
+		if err := d.Set("uri_exclude", obj.UriExclude); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving UriExclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("content_type_exclude", obj.ContentTypeExclude); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ContentTypeExclude to state for Http Compress profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("content_type_include"); ok {
+		if err := d.Set("content_type_include", obj.ContentTypeInclude); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ContentTypeInclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
+		}
 	}
+	if _, ok := d.GetOk("content_type_exclude"); ok {
+		if err := d.Set("content_type_exclude", obj.ContentTypeExclude); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ContentTypeExclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
+		}
+	}
+
 
 	return nil
 }
