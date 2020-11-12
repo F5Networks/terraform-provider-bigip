@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-var TEST_POLICY_NAME = "test-policy"
+var TEST_POLICY_NAME = "/Common/test-policy"
 
 var TEST_POLICY_RESOURCE = `
 resource "bigip_ltm_node" "test-node" {
@@ -43,9 +43,9 @@ resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
 resource "bigip_ltm_policy" "test-policy" {
 	depends_on = ["bigip_ltm_pool.test-pool"]
 	name = "` + TEST_POLICY_NAME + `"
-	strategy = "/Common/first-match"
+	strategy = "first-match"
 	requires = ["http"]
-	published_copy = "Drafts/` + TEST_POLICY_NAME + `"
+#	published_copy = "Drafts/` + TEST_POLICY_NAME + `"
 	controls = ["forwarding"]
 	rule  {
 	      name = "rule6"
@@ -56,14 +56,14 @@ resource "bigip_ltm_policy" "test-policy" {
 		      }
 	}
 }
-resource "bigip_ltm_policy" "http_to_https_redirect" {
-  name = "http_to_https_redirect"
-  strategy = "/Common/first-match"
+resource "bigip_ltm_policy" "test-policy-again" {
+  name = "/Common/test-policy-again"
+  strategy = "first-match"
   requires = ["http"]
-  published_copy = "Drafts/http_to_https_redirect"
+ # published_copy = "Drafts/http_to_https_redirect"
   controls = ["forwarding"]
   rule  {
-    name = "http_to_https_redirect_rule"
+    name = "testrule"
     action {
   //    tm_name = "http_to_https_redirect"
       redirect = true
@@ -86,7 +86,7 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 				Config: TEST_POLICY_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TEST_POLICY_NAME, true),
-					testCheckPolicyExists("http_to_https_redirect", true),
+					testCheckPolicyExists("/Common/test-policy-again", true),
 				),
 			},
 		},
