@@ -73,7 +73,44 @@ resource "bigip_ltm_policy" "test-policy-again" {
   }
 }
 `
-
+var TEST_POLICY_RESOURCE2 = `
+resource "bigip_ltm_pool" "test-pool" {
+        name = "` + TEST_POOL_NAME + `"
+        monitors = ["/Common/http"]
+        allow_nat = "yes"
+        allow_snat = "yes"
+        description = "Test-Pool-Sample"
+        load_balancing_mode = "round-robin"
+        slow_ramp_time = "5"
+        service_down_action = "reset"
+        reselect_tries = "2"
+}
+resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
+	pool = bigip_ltm_pool.test-pool.name
+	node = "` + poolMember + `"
+    ratio                 = 2
+    connection_limit      = 2
+    connection_rate_limit = 2
+    priority_group        = 2
+    dynamic_ratio         = 3
+}
+resource "bigip_ltm_policy" "test-policy" {
+        depends_on = ["bigip_ltm_pool.test-pool"]
+        name = "` + TEST_POLICY_NAME + `"
+        strategy = "first-match"
+        requires = ["http"]
+#       published_copy = "Drafts/` + TEST_POLICY_NAME + `"
+        controls = ["forwarding"]
+        rule  {
+              name = "rule6"
+                      action {
+//                            tm_name = "20"
+                              forward = true
+                              pool = "/Common/test-pool"
+                      }
+        }
+}
+`
 func TestAccBigipLtmPolicy_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -91,6 +128,24 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
+        resource.Test(t, resource.TestCase{
+                PreCheck: func() {
+                        testAcctPreCheck(t)
+                },
+                Providers:    testAccProviders,
+                CheckDestroy: testCheckPolicysDestroyed,
+                Steps: []resource.TestStep{
+                        {
+                                Config: TEST_POLICY_RESOURCE2,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckPolicyExists(TEST_POLICY_NAME, true),
+                                ),
+                        },
+                },
+        })
 }
 
 func TestAccBigipLtmPolicy_import(t *testing.T) {
@@ -112,6 +167,27 @@ func TestAccBigipLtmPolicy_import(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
+        resource.Test(t, resource.TestCase{
+                PreCheck: func() {
+                        testAcctPreCheck(t)
+                },
+                Providers:    testAccProviders,
+                CheckDestroy: testCheckPolicysDestroyed,
+                Steps: []resource.TestStep{
+                        {
+                                Config: TEST_POLICY_RESOURCE2,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckPolicyExists(TEST_POLICY_NAME, true),
+                                ),
+                                ResourceName:      TEST_POLICY_NAME,
+                                ImportState:       false,
+                                ImportStateVerify: true,
+                        },
+                },
+        })
 }
 
 func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
