@@ -111,6 +111,7 @@ resource "bigip_ltm_policy" "test-policy" {
         }
 }
 `
+
 func TestAccBigipLtmPolicy_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -131,21 +132,21 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 }
 
 func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckPolicysDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_POLICY_RESOURCE2,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckPolicyExists(TEST_POLICY_NAME, true),
-                                ),
-                        },
-                },
-        })
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_POLICY_RESOURCE2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TEST_POLICY_NAME, true),
+				),
+			},
+		},
+	})
 }
 
 func TestAccBigipLtmPolicy_import(t *testing.T) {
@@ -170,24 +171,24 @@ func TestAccBigipLtmPolicy_import(t *testing.T) {
 }
 
 func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
-        resource.Test(t, resource.TestCase{
-                PreCheck: func() {
-                        testAcctPreCheck(t)
-                },
-                Providers:    testAccProviders,
-                CheckDestroy: testCheckPolicysDestroyed,
-                Steps: []resource.TestStep{
-                        {
-                                Config: TEST_POLICY_RESOURCE2,
-                                Check: resource.ComposeTestCheckFunc(
-                                        testCheckPolicyExists(TEST_POLICY_NAME, true),
-                                ),
-                                ResourceName:      TEST_POLICY_NAME,
-                                ImportState:       false,
-                                ImportStateVerify: true,
-                        },
-                },
-        })
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_POLICY_RESOURCE2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TEST_POLICY_NAME, true),
+				),
+				ResourceName:      TEST_POLICY_NAME,
+				ImportState:       false,
+				ImportStateVerify: true,
+			},
+		},
+	})
 }
 
 func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
