@@ -93,7 +93,7 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 	poolPartition := strings.Split(poolName, "/")[1]
 	parts := strings.Split(nodeName, ":")
 	log.Printf("[DEBUG] Name of Node :%s ", nodeName)
-	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9?_-]+):(\d+)`)
+	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
 		log.Println("[DEBUG] Referencing node from ltm_node resource")
@@ -199,7 +199,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 	var poolName string
 	nodeName := d.Get("node").(string)
-	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9?_-]+):(\d+)`)
+	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
 		poolName = d.Get("pool").(string)
@@ -322,7 +322,7 @@ func resourceBigipLtmPoolAttachmentImport(d *schema.ResourceData, meta interface
 
 	nodeName := d.Get("node").(string)
 
-	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9?_-]+):(\d+)`)
+	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
 		_ = d.Set("pool", poolName)
