@@ -8,7 +8,7 @@ description: |-
 
 # bigip\_ltm\_ssl_certificate
 
-Use this data source (`bigip_ltm_ssl_certificate`) to get the ltm irule details available on BIG-IP
+Use this data source (`bigip_ltm_ssl_certificate`) to get the ltm ssl-certificate details available on BIG-IP
  
  
 ## Example Usage
@@ -20,8 +20,8 @@ data "bigip_ltm_ssl_certificate" "test" {
 }
 
 
-output "bigip_ssl_certificate" {
-  value = "${data.bigip_ltm_ssl_certificate.test.irule}"
+output "bigip_ssl_certificate_name" {
+  value = "${data.bigip_ltm_ssl_certificate.test.name}"
 }
 
 ```      
@@ -35,9 +35,7 @@ output "bigip_ssl_certificate" {
 
 ## Attributes Reference
 
-* `ssl_certificate` - Irule configured on bigip
-
 * `name` - Name of ssl_certificate configured on bigip with full path
 
-* `partition` - Bigip partition in which rule is configured
+* `partition` - Bigip partition in which ssl-certificate is configured
 
