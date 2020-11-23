@@ -1,27 +1,27 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_ltm_ssl_certificate"
+page_title: "BIG-IP: bigip_ssl_certificate"
 sidebar_current: "docs-bigip-datasource-ssl_certificate-x"
 description: |-
-    Provides details about bigip_ltm_ssl_certificate data source
+    Provides details about bigip_ssl_certificate data source
 ---
 
-# bigip\_ltm\_ssl_certificate
+# bigip\_ssl_certificate
 
-Use this data source (`bigip_ltm_ssl_certificate`) to get the ltm ssl-certificate details available on BIG-IP
+Use this data source (`bigip_ssl_certificate`) to get the ssl-certificate details available on BIG-IP
  
  
 ## Example Usage
 ```hcl
 
-data "bigip_ltm_ssl_certificate" "test" {
+data "bigip_ssl_certificate" "test" {
   name = "terraform_ssl_certificate"
   partition = "Common"
 }
 
 
 output "bigip_ssl_certificate_name" {
-  value = "${data.bigip_ltm_ssl_certificate.test.name}"
+  value = "${data.bigip_ssl_certificate.test.name}"
 }
 
 ```      
