@@ -31,9 +31,9 @@ func dataSourceBigipSslCertificate() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The certificate body",
-				},
 			},
-     }
+		},
+	}
 }
 func dataSourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) error {
 
@@ -43,12 +43,10 @@ func dataSourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{})
 
 	log.Println("[INFO] Reading Certificate : " + name)
 	certificate, err := client.GetCertificate(name)
-	log.Printf("[DEBUG] cert is :%v",certificate)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[INFO] Certificate content:%+v", certificate)
 	d.Set("name", certificate.Name)
 	d.Set("partition", certificate.Partition)
 
