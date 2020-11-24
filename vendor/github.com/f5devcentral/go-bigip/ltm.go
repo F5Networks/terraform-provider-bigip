@@ -2867,15 +2867,15 @@ func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
 
 // ===============
 
-func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude, contentTypeInclude, contentTypeExclude []string) error {
-	httpcompress := &Httpcompress{
+func (b *BigIP) CreateHttpcompress(httpcompress *Httpcompress) error {
+	/*httpcompress := &Httpcompress{
 		Name:               name,
 		DefaultsFrom:       defaultsFrom,
 		UriExclude:         uriExclude,
 		UriInclude:         uriInclude,
 		ContentTypeInclude: contentTypeInclude,
 		ContentTypeExclude: contentTypeExclude,
-	}
+	}*/
 	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
 }
 
@@ -2887,7 +2887,7 @@ func (b *BigIP) DeleteHttpcompress(name string) error {
 // ModifyFastl4 updates the given Fastl4 profile with any changed values.
 func (b *BigIP) ModifyHttpcompress(name string, httpcompress *Httpcompress) error {
 	httpcompress.Name = name
-	return b.put(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
+	return b.patch(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
 }
 
 func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
