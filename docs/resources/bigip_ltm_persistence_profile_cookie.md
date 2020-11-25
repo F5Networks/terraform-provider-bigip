@@ -47,6 +47,8 @@ resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
 
 `match_across_virtuals` (Optional) (enabled or disabled) match across virtual servers with given persistence record
 
+`method` (Optional) Specifies the type of cookie processing that the system uses. The default value is insert
+
 `mirror` (Optional) (enabled or disabled) mirror persistence record
 
 `timeout` (Optional) (enabled or disabled) Timeout for persistence of the session in seconds

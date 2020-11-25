@@ -17,7 +17,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile" {
-  name               = "sanjose-tcp-lan-profile"
+  name               = "/Common/sanjose-tcp-lan-profile"
   idle_timeout       = 200
   close_wait_timeout = 5
   finwait_2timeout   = 5
