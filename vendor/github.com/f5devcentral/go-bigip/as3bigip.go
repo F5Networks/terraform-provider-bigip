@@ -413,6 +413,32 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	s = string(jsonData)
 	return s, nil
 }
+
+func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {
+	resp, err := b.postReq(config, uriMgmt, uriShared, "service-discovery", "task", taskid, "nodes")
+	if err != nil {
+		return err
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	//respID := respRef["id"].(string)
+	log.Printf("[INFO] Response:%+v", respRef)
+	return nil
+}
+
+func (b *BigIP) GetServiceDiscoveryNodes(taskid string) (interface{}, error) {
+	var nodesList interface{}
+	err, ok := b.getForEntity(&nodesList, uriMgmt, uriShared, "service-discovery", "task", taskid, "nodes")
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return nodesList, nil
+}
+
 func intConvert(v interface{}) int {
 	if s, err := strconv.Atoi(v.(string)); err == nil {
 		return s
