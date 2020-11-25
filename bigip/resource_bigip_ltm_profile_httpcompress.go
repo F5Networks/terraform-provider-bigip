@@ -173,7 +173,6 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 		}
 	}
 
-
 	return nil
 }
 
