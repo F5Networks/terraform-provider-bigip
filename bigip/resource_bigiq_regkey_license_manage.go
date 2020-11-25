@@ -165,6 +165,8 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		if d.Get("unit_of_measure").(string) == "" {
 			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
 		}
+	} else if poolInfo.SortName == "Purchased Pool" {
+		licenseType = poolInfo.SortName
 	}
 	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
@@ -269,7 +271,15 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
 		return err
 	}
+	licensePoolName := d.Get("license_poolname").(string)
 	memID := d.Id()
+	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
+	if err != nil {
+		return err
+	}
+	if poolInfo == nil {
+		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
+	}
 	//poolLicenseType := d.Get("pool_license_type").(string)
 	poolName := d.Get("license_poolname").(string)
 	regKey := d.Get("key").(string)
@@ -283,6 +293,10 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		licenseStatus, err := bigiqRef.GetLicenseStatus(taskId)
 		if err != nil {
 			return fmt.Errorf("getting license status failed with : %v", err)
+		}
+		if licenseStatus["status"] == "FINISHED" && poolInfo.SortName == "Purchased Pool" {
+			d.Set("device_license_status", "LICENSED")
+			return nil
 		}
 		if licenseStatus["status"] == "FAILED" {
 			d.SetId("")
@@ -336,6 +350,8 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 		if d.Get("unit_of_measure").(string) == "" {
 			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
 		}
+	} else if poolInfo.SortName == "Purchased Pool" {
+		licenseType = poolInfo.SortName
 	}
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {

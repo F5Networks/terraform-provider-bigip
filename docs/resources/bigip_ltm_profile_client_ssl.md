@@ -19,7 +19,6 @@ description: |-
 
 resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
   name          = "/Common/test-ClientSsl"
-  partition     = "Common"
   defaults_from = "/Common/clientssl"
   authenticate  = "always"
   ciphers       = "DEFAULT"
