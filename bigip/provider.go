@@ -115,6 +115,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_command":                         resourceBigipCommand(),
 			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
 			"bigip_bigiq_as3":                       resourceBigiqAs3(),
+			"bigip_event_service_discovery":         resourceServiceDiscovery(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
