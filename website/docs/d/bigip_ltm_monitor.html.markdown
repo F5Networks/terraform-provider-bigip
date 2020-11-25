@@ -34,16 +34,16 @@ Additionally, the following attributes are exported:
 
 * `destination` - id will be full path name of ltm monitor.
 
-* `interval` - id will be full path name of ltm monitor.
+* `interval` - Specifies, in seconds, the frequency at which the system issues the monitor check when either the resource is down or the status of the resource is unknown.
 
-* `ip_dscp` - id will be full path name of ltm monitor.
+* `ip_dscp` - Displays the differentiated services code point (DSCP). DSCP is a 6-bit value in the Differentiated Services (DS) field of the IP header.
 
-* `manual_resume` - id will be full path name of ltm monitor.
+* `manual_resume` - Displays whether the system automatically changes the status of a resource to Enabled at the next successful monitor check.
 
-* `reverse` - id will be full path name of ltm monitor.
+* `reverse` - Instructs the system to mark the target resource down when the test is successful.
 
-* `transparent` - id will be full path name of ltm monitor.
+* `transparent` - Displays whether the monitor operates in transparent mode.
 
-* `adaptive_limit` - id will be full path name of ltm monitor.
+* `adaptive_limit` - Displays whether adaptive response time monitoring is enabled for this monitor.
 
-* `adaptive` - id will be full path name of ltm monitor.
+* `adaptive` - Displays whether adaptive response time monitoring is enabled for this monitor.

@@ -26,3 +26,9 @@ data "bigip_ltm_datagroup" "DG-TC3" {
 * `name` - (Required) Name of the datagroup
 
 * `partition` - (Required) partition of the datagroup
+
+## Attributes Reference
+
+* `type` - The Data Group type (string, ip, integer)"
+
+* `record` - Specifies record of type (string/ip/integer)
