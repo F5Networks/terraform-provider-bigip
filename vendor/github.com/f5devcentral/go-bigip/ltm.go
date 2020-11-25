@@ -414,8 +414,8 @@ type CookiePersistenceProfile struct {
 	HashLength                 int    `json:"hashLength,omitempty"`
 	HashOffset                 int    `json:"hashOffset,omitempty"`
 	HTTPOnly                   string `json:"httponly,omitempty"`
-	Method                  string `json:"method,omitempty"`
-        Secure                     string `json:"secure,omitempty"`
+	Method                     string `json:"method,omitempty"`
+	Secure                     string `json:"secure,omitempty"`
 }
 
 // DestAddrPersistenceProfiles contains a list of all dest-addr profiles
@@ -1903,10 +1903,10 @@ func (b *BigIP) GetServerSSLProfile(name string) (*ServerSSLProfile, error) {
 
 // CreateServerSSLProfile creates a new server-ssl profile on the BIG-IP system.
 func (b *BigIP) CreateServerSSLProfile(config *ServerSSLProfile) error {
-	/*config := &ServerSSLProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}*/
+	//	config := &ServerSSLProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriProfile, uriServerSSL)
 }
@@ -1954,10 +1954,10 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 
 // CreateClientSSLProfile creates a new client-ssl profile on the BIG-IP system.
 func (b *BigIP) CreateClientSSLProfile(config *ClientSSLProfile) error {
-	/*	config := &ClientSSLProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}*/
+	//	config := &ClientSSLProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriProfile, uriClientSSL)
 }
@@ -2859,14 +2859,14 @@ func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
 // ===============
 
 func (b *BigIP) CreateHttpcompress(httpcompress *Httpcompress) error {
-	/*httpcompress := &Httpcompress{
-		Name:               name,
-		DefaultsFrom:       defaultsFrom,
-		UriExclude:         uriExclude,
-		UriInclude:         uriInclude,
-		ContentTypeInclude: contentTypeInclude,
-		ContentTypeExclude: contentTypeExclude,
-	}*/
+	//	httpcompress := &Httpcompress{
+	//		Name:               name,
+	//		DefaultsFrom:       defaultsFrom,
+	//		UriExclude:         uriExclude,
+	//		UriInclude:         uriInclude,
+	//		ContentTypeInclude: contentTypeInclude,
+	//		ContentTypeExclude: contentTypeExclude,
+	//	}
 	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
 }
 
