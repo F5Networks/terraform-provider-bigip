@@ -17,7 +17,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_profile_fasthttp" "sjfasthttpprofile" {
-  name                         = "sjfasthttpprofile"
+  name                         = "/Common/sjfasthttpprofile"
   defaults_from                = "/Common/fasthttp"
   idle_timeout                 = 300
   connpoolidle_timeoutoverride = 0

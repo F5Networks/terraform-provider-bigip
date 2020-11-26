@@ -56,6 +56,24 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
   mac_address = "FA:16:3E:1B:6D:32"
   hypervisor = "azure"
 }
+
+# MANAGED Purchased Pool
+resource "bigip_common_license_manage_bigiq" "test_example" {
+  bigiq_address = var.bigiq
+  bigiq_user = var.bigiq_un
+  bigiq_password = var.bigiq_pw
+  license_poolname = "purchased_pool_name"
+  assignment_type = "MANAGED"
+}
+# UNMANAGED Purchased Pool
+resource "bigip_common_license_manage_bigiq" "test_example" {
+  bigiq_address = var.bigiq
+  bigiq_user = var.bigiq_un
+  bigiq_password = var.bigiq_pw
+  license_poolname = "purchased_pool_name"
+  assignment_type = "UNMANAGED"
+}
+
 ```      
 
 ## Argument Reference
