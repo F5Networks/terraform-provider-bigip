@@ -560,7 +560,7 @@ type VirtualServer struct {
 	Rules               []string  `json:"rules,omitempty"`
 	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
-	Policies            []string  `json:"policies,omitempty"`
+	Policies            []string  `json:"policies"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
@@ -2392,7 +2392,7 @@ func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	}
 	retval := make([]string, 0, len(policies.PolicyRef))
 	for _, p := range policies.PolicyRef {
-		retval = append(retval, p.Name)
+		retval = append(retval, p.FullPath)
 	}
 	return retval, nil
 }

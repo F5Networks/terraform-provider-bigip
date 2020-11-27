@@ -24,8 +24,6 @@ resource "bigip_ltm_pool" "mypool" {
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
-
-
 resource "bigip_ltm_policy" "test-policy" {
   name      = "/Common/test-policy"
   strategy  = "first-match"
@@ -35,7 +33,7 @@ resource "bigip_ltm_policy" "test-policy" {
     name = "rule6"
     action {
       forward = true
-      pool    = bigip_ltm_pool.pool.name
+      pool    = bigip_ltm_pool.mypool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]
