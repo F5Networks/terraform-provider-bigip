@@ -38,6 +38,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Type:     schema.TypeString,
 				Default:  "",
 				Optional: true,
+			//      Computed: true,
 			},
 
 			"defaults_from": {
@@ -45,6 +46,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Required:     true,
 				Description:  "Inherit defaults from parent profile",
 				ValidateFunc: validateF5Name,
+			//	Computed:     true,
 			},
 
 			"match_across_pools": {
@@ -52,6 +54,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable match across pools with given persistence record",
 				ValidateFunc: validateEnabledDisabled,
+				Computed:     true,
 			},
 
 			"match_across_services": {
@@ -59,6 +62,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable match across services with given persistence record",
 				ValidateFunc: validateEnabledDisabled,
+				Computed:     true,
 			},
 
 			"match_across_virtuals": {
@@ -66,6 +70,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable match across services with given persistence record",
 				ValidateFunc: validateEnabledDisabled,
+				Computed:     true,
 			},
 
 			"mirror": {
@@ -73,12 +78,14 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable",
 				ValidateFunc: validateEnabledDisabled,
+				Computed:     true,
 			},
 
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Timeout for persistence of the session",
+				Computed:    true,
 			},
 
 			"override_conn_limit": {
@@ -87,6 +94,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
 				ValidateFunc: validateEnabledDisabled,
+			//	Computed:     true,
 			},
 
 			// Specific to SourceAddrPersistenceProfile
@@ -95,6 +103,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Default:     "default",
 				Optional:    true,
 				Description: "Specify the hash algorithm",
+			//	Computed:    true,
 			},
 
 			"map_proxies": {
@@ -103,11 +112,13 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable directs all to the same single pool member",
 				ValidateFunc: validateEnabledDisabled,
+			//	Computed:     true,
 			},
 
 			"mask": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Identify a range of source IP addresses to manage together as a single source address affinity persistent connection when connecting to the pool. Must be a valid IPv4 or IPv6 mask.",
 			},
 		},
@@ -120,10 +131,12 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	err := client.CreateSourceAddrPersistenceProfile(
-		name,
-		parent,
-	)
+	config := &bigip.PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	err := client.CreateSourceAddrPersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Source Address Persistence Profile  (%s) (%v) ", name, err)
 		return err
@@ -158,28 +171,50 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("app_service", pp.AppService); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("app_service"); ok {
+		if err := d.Set("app_service", pp.AppService); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-	}
-	d.Set("match_across_pools", pp.MatchAcrossPools)
-	d.Set("match_across_services", pp.MatchAcrossServices)
-	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	if err := d.Set("mirror", pp.Mirror); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-	}
-	d.Set("timeout", pp.Timeout)
-	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 
-	// Specific to SourceAddrPersistenceProfile
-	if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+		}
 	}
-	d.Set("map_proxies", pp.MapProxies)
-	d.Set("mask", pp.Mask)
+	if _, ok := d.GetOk("match_across_pools"); ok {
+		_ = d.Set("match_across_pools", pp.MatchAcrossPools)
+	}
+	if _, ok := d.GetOk("match_across_services"); ok {
+		_ = d.Set("match_across_services", pp.MatchAcrossServices)
+	}
+	if _, ok := d.GetOk("match_across_virtuals"); ok {
+		_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	}
+	if _, ok := d.GetOk("mirror"); ok {
+		if err := d.Set("mirror", pp.Mirror); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("timeout"); ok {
+		_ = d.Set("timeout", pp.Timeout)
+	}
+	if _, ok := d.GetOk("override_conn_limit"); ok {
+		_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	}
+	// Specific to SourceAddrPersistenceProfile
+	if _, ok := d.GetOk("hash_algorithm"); ok {
+		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("map_proxies"); ok {
+		_ = d.Set("map_proxies", pp.MapProxies)
+	}
+	if _, ok := d.GetOk("mask"); ok {
+		_ = d.Set("mask", pp.Mask)
+	}
 
 	return nil
 }
