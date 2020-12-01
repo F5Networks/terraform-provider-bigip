@@ -432,13 +432,13 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
+	profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
 	for _, profile := range vs.PersistenceProfiles {
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
-		profile_names.Add(FullProfileName)
+		profileNames.Add(FullProfileName)
 	}
-	if profile_names.Len() > 0 {
-		d.Set("persistence_profiles", profile_names)
+	if profileNames.Len() > 0 {
+		d.Set("persistence_profiles", profileNames)
 	}
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
