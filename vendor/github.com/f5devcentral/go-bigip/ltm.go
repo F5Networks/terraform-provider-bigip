@@ -3419,11 +3419,11 @@ func (b *BigIP) GetSourceAddrPersistenceProfile(name string) (*SourceAddrPersist
 }
 
 // CreateSourceAddrPersistenceProfile creates a new source-addr persist profile on the BIG-IP system.
-func (b *BigIP) CreateSourceAddrPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateSourceAddrPersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriSourceAddr)
 }
@@ -3441,7 +3441,7 @@ func (b *BigIP) DeleteSourceAddrPersistenceProfile(name string) error {
 // ModifySourceAddrPersistenceProfile allows you to change any attribute of a source-addr persist profile.
 // Fields that can be modified are referenced in the SourceAddrPersistenceProfile struct.
 func (b *BigIP) ModifySourceAddrPersistenceProfile(name string, config *SourceAddrPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriSourceAddr, name)
+	return b.patch(config, uriLtm, uriPersistence, uriSourceAddr, name)
 }
 
 // SSLPersistenceProfiles returns a list of ssl persist profiles
