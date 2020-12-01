@@ -38,7 +38,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Type:     schema.TypeString,
 				Default:  "",
 				Optional: true,
-			//      Computed: true,
+				//      Computed: true,
 			},
 
 			"defaults_from": {
@@ -46,7 +46,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Required:     true,
 				Description:  "Inherit defaults from parent profile",
 				ValidateFunc: validateF5Name,
-			//	Computed:     true,
+				//	Computed:     true,
 			},
 
 			"match_across_pools": {
@@ -94,7 +94,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
 				ValidateFunc: validateEnabledDisabled,
-			//	Computed:     true,
+				//	Computed:     true,
 			},
 
 			// Specific to SourceAddrPersistenceProfile
@@ -103,7 +103,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Default:     "default",
 				Optional:    true,
 				Description: "Specify the hash algorithm",
-			//	Computed:    true,
+				//	Computed:    true,
 			},
 
 			"map_proxies": {
@@ -112,7 +112,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Optional:     true,
 				Description:  "To enable _ disable directs all to the same single pool member",
 				ValidateFunc: validateEnabledDisabled,
-			//	Computed:     true,
+				//	Computed:     true,
 			},
 
 			"mask": {
