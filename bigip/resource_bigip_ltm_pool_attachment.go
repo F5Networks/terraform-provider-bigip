@@ -121,11 +121,11 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 				return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
 			}
 			err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
-	                if err != nil {
-                        //_ = client.DeleteHttpProfile(name)
-                        return err
-        	        }
-	
+			if err != nil {
+				//_ = client.DeleteHttpProfile(name)
+				return err
+			}
+
 			d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
 			return nil
 		}
@@ -135,11 +135,11 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
 		}
 		d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
-                err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
-                if err != nil {
-                        //_ = client.DeleteHttpProfile(name)
-                        return err
-                }
+		err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
+		if err != nil {
+			//_ = client.DeleteHttpProfile(name)
+			return err
+		}
 		return nil
 	} else {
 		log.Println("[DEBUG] creating node from pool attachment resource")
@@ -174,84 +174,84 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface{}) error {
-        client := meta.(*bigip.BigIP)
-        nodeName := d.Get("node").(string)
-	log.Printf("[DEBUG] node name is :%s",nodeName)
-        re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
-        match := re.FindStringSubmatch(nodeName)
-        if match != nil {
+	client := meta.(*bigip.BigIP)
+	nodeName := d.Get("node").(string)
+	log.Printf("[DEBUG] node name is :%s", nodeName)
+	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
+	match := re.FindStringSubmatch(nodeName)
+	if match != nil {
 		parts := strings.Split(nodeName, ":")
 		node1, err := client.GetNode(parts[0])
 		if node1 == nil {
-                        log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-                        d.SetId("")
-                        return nil 
-                }       
+			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 
-		poolMem  := strings.Split(nodeName, ":")[0]
-		log.Printf("[DEBUG] pool member without port is :%s",poolMem)
+		poolMem := strings.Split(nodeName, ":")[0]
+		log.Printf("[DEBUG] pool member without port is :%s", poolMem)
 		node_name := strings.Split(poolMem, "/")[2]
-		log.Printf("[DEBUG] node_name passing to config is :%s",node_name)
+		log.Printf("[DEBUG] node_name passing to config is :%s", node_name)
 		poolName := d.Get("pool").(string)
-		log.Printf("[DEBUG] poolName is :%s",poolName)
+		log.Printf("[DEBUG] poolName is :%s", poolName)
 		config := &bigip.PoolMember{
-                	Name:            node_name,
-            	        FullPath:        nodeName,
-                        ConnectionLimit: d.Get("connection_limit").(int),
-                        DynamicRatio:    d.Get("dynamic_ratio").(int),
-                        PriorityGroup:   d.Get("priority_group").(int),
-                        RateLimit:       d.Get("connection_rate_limit").(string),
-                        Ratio:           d.Get("ratio").(int),
-                     }		
+			Name:            node_name,
+			FullPath:        nodeName,
+			ConnectionLimit: d.Get("connection_limit").(int),
+			DynamicRatio:    d.Get("dynamic_ratio").(int),
+			PriorityGroup:   d.Get("priority_group").(int),
+			RateLimit:       d.Get("connection_rate_limit").(string),
+			Ratio:           d.Get("ratio").(int),
+		}
 		if node1.FQDN.Name != "" {
 			log.Printf("[DEBUG] adding autopopulate for fqdn ")
-                        var autoPopulate string
-                	if d.Get("fqdn_autopopulate").(string) == "" {
-                        	autoPopulate = "enabled"
-                	} else {
-                          autoPopulate = d.Get("fqdn_autopopulate").(string)
-                    }
-                    config.FQDN.Name = node1.FQDN.Name
-                    config.FQDN.AutoPopulate = autoPopulate
-                }  
+			var autoPopulate string
+			if d.Get("fqdn_autopopulate").(string) == "" {
+				autoPopulate = "enabled"
+			} else {
+				autoPopulate = d.Get("fqdn_autopopulate").(string)
+			}
+			config.FQDN.Name = node1.FQDN.Name
+			config.FQDN.AutoPopulate = autoPopulate
+		}
 		err = client.ModifyPoolMember(poolName, config)
 		if err != nil {
-                    return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
-        	}
-	
-          } else {
-            
-        poolName := d.Id()
-        poolPartition := strings.Split(poolName, "/")[1]
-        nodeName := d.Get("node").(string)
-        parts := strings.Split(nodeName, ":")
-        poolMem := fmt.Sprintf("/%s/%s", poolPartition, nodeName)
-        config := &bigip.PoolMember{
-                Name:            nodeName,
-                FullPath:        poolMem,
-                ConnectionLimit: d.Get("connection_limit").(int),
-                DynamicRatio:    d.Get("dynamic_ratio").(int),
-                PriorityGroup:   d.Get("priority_group").(int),
-                RateLimit:       d.Get("connection_rate_limit").(string),
-                Ratio:           d.Get("ratio").(int),
-        }
-        log.Printf("[INFO] Modifying pool member (%s) from pool (%s)", poolMem, poolName)
-        if !IsValidIP(parts[0]) {
-                var autoPopulate string
-                if d.Get("fqdn_autopopulate").(string) == "" {
-                        autoPopulate = "enabled"
-                } else {
-                        autoPopulate = d.Get("fqdn_autopopulate").(string)
-                }
-                config.FQDN.Name = parts[0]
-                config.FQDN.AutoPopulate = autoPopulate
-        }
-        err := client.ModifyPoolMember(poolName, config)
-        if err != nil {
-                return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
-        }
-       }
-       return resourceBigipLtmPoolAttachmentRead(d, meta)
+			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+		}
+
+	} else {
+
+		poolName := d.Id()
+		poolPartition := strings.Split(poolName, "/")[1]
+		nodeName := d.Get("node").(string)
+		parts := strings.Split(nodeName, ":")
+		poolMem := fmt.Sprintf("/%s/%s", poolPartition, nodeName)
+		config := &bigip.PoolMember{
+			Name:            nodeName,
+			FullPath:        poolMem,
+			ConnectionLimit: d.Get("connection_limit").(int),
+			DynamicRatio:    d.Get("dynamic_ratio").(int),
+			PriorityGroup:   d.Get("priority_group").(int),
+			RateLimit:       d.Get("connection_rate_limit").(string),
+			Ratio:           d.Get("ratio").(int),
+		}
+		log.Printf("[INFO] Modifying pool member (%s) from pool (%s)", poolMem, poolName)
+		if !IsValidIP(parts[0]) {
+			var autoPopulate string
+			if d.Get("fqdn_autopopulate").(string) == "" {
+				autoPopulate = "enabled"
+			} else {
+				autoPopulate = d.Get("fqdn_autopopulate").(string)
+			}
+			config.FQDN.Name = parts[0]
+			config.FQDN.AutoPopulate = autoPopulate
+		}
+		err := client.ModifyPoolMember(poolName, config)
+		if err != nil {
+			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+		}
+	}
+	return resourceBigipLtmPoolAttachmentRead(d, meta)
 }
 
 func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}) error {
