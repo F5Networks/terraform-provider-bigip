@@ -52,17 +52,17 @@ resource "bigip_ltm_virtual_server" "test-vs" {
     policies = [bigip_ltm_policy.http_to_https_redirect.name]
 }
 `
-var TEST_VS6_NAME = fmt.Sprintf("/%s/test-vs6", TEST_PARTITION)
+var TestVs6Name = fmt.Sprintf("/%s/test-vs6", TEST_PARTITION)
 
-var TEST_VS6_RESOURCE = TEST_IRULE_RESOURCE + `
+var TestVs6Resource = TEST_IRULE_RESOURCE + `
 resource "bigip_ltm_virtual_server" "test-vs" {
-	name = "` + TEST_VS6_NAME + `"
-        destination = "fe80::11"
+	name = "` + TestVs6Name + `"
+    destination = "fe80::11"
 	description = "VirtualServer-test"
 	port = 9999
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
-	irules = ["${bigip_ltm_irule.test-rule.name}"]
+	irules = [bigip_ltm_irule.test-rule.name]
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
@@ -72,7 +72,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 }
 `
 
-func TestAccBigipLtmVS_create(t *testing.T) {
+func TestAccBigipLtmVS_CreateV4V6(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -125,10 +125,10 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 		),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VS6_RESOURCE,
+				Config: TestVs6Resource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TEST_VS6_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TEST_VS6_NAME),
+					testCheckVSExists(TestVs6Name, true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVs6Name),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "fe80::11"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
@@ -312,7 +312,6 @@ func TestAccBigipLtmVS_Policyattach_detach(t *testing.T) {
 		},
 	})
 }
-
 func TestAccBigipLtmVS_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -322,34 +321,27 @@ func TestAccBigipLtmVS_import(t *testing.T) {
 		CheckDestroy: testCheckVSsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TestVsResource,
+				Config: testaccBigipLtmVSImportConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TestVsName, true),
+					testCheckVSExists("/Common/test-vs", true),
 				),
-				ResourceName:      TestVsName,
-				ImportState:       false,
-				ImportStateVerify: true,
 			},
-		},
-	})
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckVSsDestroyed,
-		Steps: []resource.TestStep{
 			{
-				Config: TEST_VS6_RESOURCE,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TEST_VS6_NAME, true),
-				),
-				ResourceName:      TEST_VS6_NAME,
-				ImportState:       false,
+				ResourceName:      "bigip_ltm_virtual_server.test_vs_import",
+				ImportStateId:     "/Common/test-vs",
+				ImportState:       true,
 				ImportStateVerify: true,
 			},
 		},
 	})
+}
+func testaccBigipLtmVSImportConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "test_vs_import" {
+  name = "%s"
+  destination = "192.168.11.11"
+  port = 80
+}`, "/Common/test-vs")
 }
 
 func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
@@ -503,7 +495,7 @@ func testCheckVSsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if vs != nil {
-			return fmt.Errorf("Virtual server %s not destroyed.", name)
+			return fmt.Errorf("Virtual server %s not destroyed. ", name)
 		}
 	}
 	return nil
