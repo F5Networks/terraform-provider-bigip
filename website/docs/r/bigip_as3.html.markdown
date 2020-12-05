@@ -36,7 +36,7 @@ resource "bigip_as3"  "as3-example1" {
 
 * `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ```file``` function
 
-* `tenant_filter` - (Optional) If there are muntiple tenants in a json this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified 
+* `tenant_filter` - (Optional) If there are multiple tenants on a BIG-IP, this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified.
 
 * `as3_example1.json` - Example  AS3 Declarative JSON file with single tenant
 
