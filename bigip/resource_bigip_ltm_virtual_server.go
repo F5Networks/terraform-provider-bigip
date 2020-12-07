@@ -350,8 +350,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return nil
 	}
 
-	vs_dest := vs.Destination
-	if strings.Count(vs_dest, ":") >= 2 {
+	vsDest := vs.Destination
+	if strings.Count(vsDest, ":") >= 2 {
 		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
@@ -361,7 +361,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
 		}
 	}
-	if strings.Count(vs_dest, ":") < 2 {
+	if strings.Count(vsDest, ":") < 2 {
 		regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]
@@ -395,7 +395,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	//	}
 	//	parsedPort, _ := strconv.Atoi(port[1])
 
-	if strings.Count(vs_dest, ":") < 2 {
+	if strings.Count(vsDest, ":") < 2 {
 		regex := regexp.MustCompile(`\:(\d+)`)
 		port := regex.FindStringSubmatch(vs.Destination)
 		if len(port) < 2 {
@@ -404,7 +404,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		parsedPort, _ := strconv.Atoi(port[1])
 		d.Set("port", parsedPort)
 	}
-	if strings.Count(vs_dest, ":") >= 2 {
+	if strings.Count(vsDest, ":") >= 2 {
 		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedPort, _ := strconv.Atoi(destination[3])
@@ -432,13 +432,13 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
+	profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
 	for _, profile := range vs.PersistenceProfiles {
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
-		profile_names.Add(FullProfileName)
+		profileNames.Add(FullProfileName)
 	}
-	if profile_names.Len() > 0 {
-		d.Set("persistence_profiles", profile_names)
+	if profileNames.Len() > 0 {
+		d.Set("persistence_profiles", profileNames)
 	}
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
@@ -450,29 +450,29 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	}
 
 	if profiles != nil && len(profiles.Profiles) > 0 {
-		profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-		client_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-		server_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		clientProfileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		serverProfileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
 		for _, profile := range profiles.Profiles {
 			switch profile.Context {
 			case bigip.CONTEXT_CLIENT:
-				client_profile_names.Add(profile.FullPath)
+				clientProfileNames.Add(profile.FullPath)
 				break
 			case bigip.CONTEXT_SERVER:
-				server_profile_names.Add(profile.FullPath)
+				serverProfileNames.Add(profile.FullPath)
 				break
 			default:
-				profile_names.Add(profile.FullPath)
+				profileNames.Add(profile.FullPath)
 			}
 		}
-		if profile_names.Len() > 0 {
-			d.Set("profiles", profile_names)
+		if profileNames.Len() > 0 {
+			d.Set("profiles", profileNames)
 		}
-		if client_profile_names.Len() > 0 {
-			d.Set("client_profiles", client_profile_names)
+		if clientProfileNames.Len() > 0 {
+			d.Set("client_profiles", clientProfileNames)
 		}
-		if server_profile_names.Len() > 0 {
-			d.Set("server_profiles", server_profile_names)
+		if serverProfileNames.Len() > 0 {
+			d.Set("server_profiles", serverProfileNames)
 		}
 	}
 

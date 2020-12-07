@@ -16,36 +16,22 @@ import (
 	"testing"
 )
 
-var TEST_POLICY_NAME = "/Common/test-policy"
+var TestPolicyName = "/Common/test-policy"
 
-var TEST_POLICY_RESOURCE = `
-resource "bigip_ltm_node" "test-node" {
-	name = "` + TEST_NODE_NAME + `"
-	address = "10.10.10.10"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-}
+var TestPolicyResource = `
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
 	monitors = ["/Common/http"]
 	allow_nat = "yes"
 	allow_snat = "yes"
 	load_balancing_mode = "round-robin"
-	depends_on = ["bigip_ltm_node.test-node"]
-}
-resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
-	pool = "` + TEST_POOL_NAME + `"
-	node = "` + TEST_POOLNODE_NAMEPORT + `"
-	depends_on = ["bigip_ltm_node.test-node", "bigip_ltm_pool.test-pool"]
 }
 resource "bigip_ltm_policy" "test-policy" {
 	depends_on = ["bigip_ltm_pool.test-pool"]
-	name = "` + TEST_POLICY_NAME + `"
+	name = "` + TestPolicyName + `"
 	strategy = "first-match"
 	requires = ["http"]
-#	published_copy = "Drafts/` + TEST_POLICY_NAME + `"
+#	published_copy = "Drafts/` + TestPolicyName + `"
 	controls = ["forwarding"]
 	rule  {
 	      name = "rule6"
@@ -73,7 +59,7 @@ resource "bigip_ltm_policy" "test-policy-again" {
   }
 }
 `
-var TEST_POLICY_RESOURCE2 = `
+var TestPolicyResource2 = `
 resource "bigip_ltm_pool" "test-pool" {
         name = "` + TEST_POOL_NAME + `"
         monitors = ["/Common/http"]
@@ -96,10 +82,10 @@ resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
 }
 resource "bigip_ltm_policy" "test-policy" {
         depends_on = ["bigip_ltm_pool.test-pool"]
-        name = "` + TEST_POLICY_NAME + `"
+        name = "` + TestPolicyName + `"
         strategy = "first-match"
         requires = ["http"]
-#       published_copy = "Drafts/` + TEST_POLICY_NAME + `"
+#       published_copy = "Drafts/` + TestPolicyName + `"
         controls = ["forwarding"]
         rule  {
               name = "rule6"
@@ -121,9 +107,9 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 		CheckDestroy: testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POLICY_RESOURCE,
+				Config: TestPolicyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					testCheckPolicyExists(TestPolicyName, true),
 					testCheckPolicyExists("/Common/test-policy-again", true),
 				),
 			},
@@ -140,9 +126,9 @@ func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
 		CheckDestroy: testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POLICY_RESOURCE2,
+				Config: TestPolicyResource2,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					testCheckPolicyExists(TestPolicyName, true),
 				),
 			},
 		},
@@ -158,11 +144,11 @@ func TestAccBigipLtmPolicy_import(t *testing.T) {
 		CheckDestroy: testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POLICY_RESOURCE,
+				Config: TestPolicyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					testCheckPolicyExists(TestPolicyName, true),
 				),
-				ResourceName:      TEST_POLICY_NAME,
+				ResourceName:      TestPolicyName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -179,11 +165,11 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 		CheckDestroy: testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POLICY_RESOURCE2,
+				Config: TestPolicyResource2,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TEST_POLICY_NAME, true),
+					testCheckPolicyExists(TestPolicyName, true),
 				),
-				ResourceName:      TEST_POLICY_NAME,
+				ResourceName:      TestPolicyName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -198,21 +184,19 @@ func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
 		match := re.FindStringSubmatch(name)
 		if match == nil {
-			return fmt.Errorf("Failed to match regex in :%v", name)
+			return fmt.Errorf("Failed to match regex in :%v ", name)
 		}
 		partition := match[1]
-		policy_name := match[2]
-
-		policy, err := client.GetPolicy(policy_name, partition)
+		policyName := match[2]
+		policy, err := client.GetPolicy(policyName, partition)
 		if err != nil {
-			return fmt.Errorf("Error while fetching policy: %v", err)
-
+			return fmt.Errorf("Error while fetching policy: %v ", err)
 		}
 		if exists && policy == nil {
-			return fmt.Errorf("Policy %s was not created.", name)
+			return fmt.Errorf("Policy %s was not created ", name)
 		}
 		if !exists && policy != nil {
-			return fmt.Errorf("Policy %s still exists.", name)
+			return fmt.Errorf("Policy %s still exists ", name)
 		}
 		log.Printf("[DEBUG] Policy \"%s\" Created ", name)
 		return nil
@@ -226,24 +210,20 @@ func testCheckPolicysDestroyed(s *terraform.State) error {
 		if rs.Type != "bigip_ltm_policy" {
 			continue
 		}
-
 		name := rs.Primary.ID
-
 		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
 		match := re.FindStringSubmatch(name)
 		if match == nil {
-			return fmt.Errorf("Failed to match regex :%v", name)
+			return fmt.Errorf("Failed to match regex :%v ", name)
 		}
 		partition := match[1]
-		policy_name := match[2]
-
-		policy, err := client.GetPolicy(policy_name, partition)
-
+		policyName := match[2]
+		policy, err := client.GetPolicy(policyName, partition)
 		if err != nil {
 			return nil
 		}
 		if policy != nil {
-			return fmt.Errorf("Policy %s not destroyed.", name)
+			return fmt.Errorf("Policy %s not destroyed ", name)
 		}
 	}
 	return nil
