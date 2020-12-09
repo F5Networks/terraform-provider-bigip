@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func dataSourceBigipSslCertificate() *schema.Resource {
@@ -44,7 +45,10 @@ func dataSourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{})
 	log.Println("[INFO] Reading Certificate : " + name)
 	certificate, err := client.GetCertificate(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error retrieving certificate %s: %v", name, err)
+	}
+	if certificate == nil {
+		return fmt.Errorf("Certificate (%s) not found", name)
 	}
 
 	d.Set("name", certificate.Name)
