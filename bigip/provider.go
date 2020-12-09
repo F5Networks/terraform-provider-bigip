@@ -8,11 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 const DEFAULT_PARTITION = "Common"
@@ -70,6 +71,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_monitor":     dataSourceBigipLtmMonitor(),
 			"bigip_ltm_irule":       dataSourceBigipLtmIrule(),
 			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
+			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
