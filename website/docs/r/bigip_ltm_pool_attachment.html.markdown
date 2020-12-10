@@ -41,8 +41,6 @@ resource "bigip_ltm_pool_attachment" "attach_node" {
 
 ```
 
-Pool attachment with node reference from ltm_node ( This will be depreceated in future releases )
-
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
   name     = "/Common/terraform_monitor"
