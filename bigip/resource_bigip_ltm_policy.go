@@ -1173,7 +1173,7 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 		log.Printf("[ERROR] Unable to Create Draft Policy   (%s) (%v) ", policy_name, err)
 		return err
 	}
-	err = client.UpdatePolicy(name, partition, &p)
+	err = client.UpdatePolicy(policy_name, partition, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Draft Policy   (%s) (%v) ", policy_name, err)
 		return err
