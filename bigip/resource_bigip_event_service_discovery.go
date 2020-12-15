@@ -94,18 +94,23 @@ func resourceServiceDiscoveryRead(d *schema.ResourceData, meta interface{}) erro
 		}
 	}
 	serviceDiscoveryResp, err := client.GetServiceDiscoveryNodes(taskid)
+	log.Printf("[DEBUG] serviceDiscoveryResp is :%v", serviceDiscoveryResp)
 	if err != nil {
 		return fmt.Errorf("Error Reading node : %v ", err)
 	}
 	nodeList1 := serviceDiscoveryResp.(map[string]interface{})["result"].(map[string]interface{})["providerOptions"].(map[string]interface{})["nodeList"]
-	nodeListCount := d.Get("node.#").(int)
-	if len(nodeList1.([]interface{})) != nodeListCount {
-		d.SetId("")
-		return fmt.Errorf("[DEBUG] Get Node list failed for  (%s): %s", d.Id(), err)
-	}
+	log.Printf("[DEBUG] nodeList1 is :%v", nodeList1)
+	//	nodeListCount := d.Get("node.#").(int)
+	//	if len(nodeList1.([]interface{})) != nodeListCount {
+	//		d.SetId("")
+	//		return fmt.Errorf("[DEBUG] Get Node list failed for  (%s): %s", d.Id(), err)
+	//	}
 	if serviceDiscoveryResp == nil {
 		d.SetId("")
 		return fmt.Errorf("[DEBUG]serviceDiscoveryResp is : %s", serviceDiscoveryResp)
+	}
+	if err := d.Set("node", nodeList1); err != nil {
+		return fmt.Errorf("Error updating nodelist in state: %v ", err)
 	}
 	return nil
 }
