@@ -3107,11 +3107,11 @@ func (b *BigIP) GetCookiePersistenceProfile(name string) (*CookiePersistenceProf
 }
 
 // CreateCookiePersistenceProfile creates a new cookie persist profile on the BIG-IP system.
-func (b *BigIP) CreateCookiePersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateCookiePersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriCookie)
 }
@@ -3129,7 +3129,7 @@ func (b *BigIP) DeleteCookiePersistenceProfile(name string) error {
 // ModifyCookiePersistenceProfile allows you to change any attribute of a cookie persist profile.
 // Fields that can be modified are referenced in the CookiePersistenceProfile struct.
 func (b *BigIP) ModifyCookiePersistenceProfile(name string, config *CookiePersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriCookie, name)
+	return b.patch(config, uriLtm, uriPersistence, uriCookie, name)
 }
 
 // DestAddrPersistenceProfiles returns a list of dest-addr persist profiles
