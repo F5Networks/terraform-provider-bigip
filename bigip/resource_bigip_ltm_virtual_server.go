@@ -106,13 +106,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-
 			"persistence_profiles": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
-				Computed: true,
+				//Computed: true,
 			},
 			"default_persistence_profile": {
 				Type:     schema.TypeString,
@@ -131,14 +130,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
-
 			"source_address_translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "none, automap, snat",
 			},
-
 			"snatpool": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -376,8 +373,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-	d.Set("protocol", vs.IPProtocol)
-	d.Set("name", name)
+	_ = d.Set("protocol", vs.IPProtocol)
+	_ = d.Set("name", name)
 	if err := d.Set("pool", vs.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Pool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -402,30 +399,30 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
 		}
 		parsedPort, _ := strconv.Atoi(port[1])
-		d.Set("port", parsedPort)
+		_ = d.Set("port", parsedPort)
 	}
 	if strings.Count(vsDest, ":") >= 2 {
 		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedPort, _ := strconv.Atoi(destination[3])
-		d.Set("port", parsedPort)
+		_ = d.Set("port", parsedPort)
 	}
-	d.Set("irules", makeStringList(&vs.Rules))
-	d.Set("ip_protocol", vs.IPProtocol)
-	d.Set("description", vs.Description)
+	_ = d.Set("irules", makeStringList(&vs.Rules))
+	_ = d.Set("ip_protocol", vs.IPProtocol)
+	_ = d.Set("description", vs.Description)
 	if vs.Enabled {
-		d.Set("state", "enabled")
+		_ = d.Set("state", "enabled")
 	} else {
-		d.Set("state", "disabled")
+		_ = d.Set("state", "disabled")
 	}
-	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+	_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("policies", vs.Policies); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Policies to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("vlans", vs.Vlans)
+	_ = d.Set("vlans", vs.Vlans)
 	if err := d.Set("translate_address", vs.TranslateAddress); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslateAddress to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -438,12 +435,12 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		profileNames.Add(FullProfileName)
 	}
 	if profileNames.Len() > 0 {
-		d.Set("persistence_profiles", profileNames)
+		_ = d.Set("persistence_profiles", profileNames)
 	}
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("vlans_enabled", vs.VlansEnabled)
+	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
@@ -466,16 +463,15 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			}
 		}
 		if profileNames.Len() > 0 {
-			d.Set("profiles", profileNames)
+			_ = d.Set("profiles", profileNames)
 		}
 		if clientProfileNames.Len() > 0 {
-			d.Set("client_profiles", clientProfileNames)
+			_ = d.Set("client_profiles", clientProfileNames)
 		}
 		if serverProfileNames.Len() > 0 {
-			d.Set("server_profiles", serverProfileNames)
+			_ = d.Set("server_profiles", serverProfileNames)
 		}
 	}
-
 	return nil
 }
 
@@ -544,8 +540,8 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	}
 
 	var rules []string
-	if cfg_rules, ok := d.GetOk("irules"); ok {
-		rules = listToStringSlice(cfg_rules.([]interface{}))
+	if cfgRules, ok := d.GetOk("irules"); ok {
+		rules = listToStringSlice(cfgRules.([]interface{}))
 	}
 
 	destPort := fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int))
