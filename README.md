@@ -96,7 +96,7 @@ Copyright 2014-2020 F5 Networks Inc.
 
 ### F5 Networks Contributor License Agreement
 
-Terraform F5 Contributor License Agreement.pdf(https://github.com/F5Networks/terraform-provider-bigip/blob/profile_detatch_issue/F5_Contributor_License_Agreement.pdf)
+[Terraform F5 Contributor License Agreement.pdf](https://github.com/F5Networks/terraform-provider-bigip/blob/profile_detatch_issue/F5_Contributor_License_Agreement.pdf)
 
 Before you start contributing to any project sponsored by F5 Networks, Inc. (F5) on GitHub, you will need to sign a Contributor License Agreement (CLA).  
 
