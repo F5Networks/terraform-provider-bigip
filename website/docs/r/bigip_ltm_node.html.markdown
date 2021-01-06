@@ -8,8 +8,6 @@ description: |-
 
 # bigip\_ltm\_node
 
-This resource will be depreceated in future releases, use bigip_ltm_pool_attachment resource to create and manage node membership in pools.
-
 `bigip_ltm_node` Manages a node configuration
 
 For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
