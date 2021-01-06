@@ -229,9 +229,9 @@ func resourceBigipLtmVirtualServerAttrDefaults(d *schema.ResourceData) {
 	if !hasMask {
 		// looks like IPv6, lets set to /128
 		if strings.Contains(d.Get("destination").(string), ":") {
-			d.Set("mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")
+			_ = d.Set("mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")
 		} else { // /32 for IPv4
-			d.Set("mask", "255.255.255.255")
+			_ = d.Set("mask", "255.255.255.255")
 		}
 	}
 
@@ -239,9 +239,9 @@ func resourceBigipLtmVirtualServerAttrDefaults(d *schema.ResourceData) {
 	if !hasSource {
 		// looks like IPv6, lets set to ::/0
 		if strings.Contains(d.Get("destination").(string), ":") {
-			d.Set("source", "::/0")
+			_ = d.Set("source", "::/0")
 		} else { // 0.0.0.0/0
-			d.Set("source", "0.0.0.0/0")
+			_ = d.Set("source", "0.0.0.0/0")
 		}
 	}
 }
@@ -304,7 +304,7 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 
 	err := resourceBigipLtmVirtualServerUpdate(d, meta)
 	if err != nil {
-		client.DeleteVirtualServer(name)
+		_ = client.DeleteVirtualServer(name)
 		return err
 	}
 	if !client.Teem {
@@ -331,9 +331,7 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 
 func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
 	log.Println("[INFO] Fetching virtual server " + name)
 
 	vs, err := client.GetVirtualServer(name)
