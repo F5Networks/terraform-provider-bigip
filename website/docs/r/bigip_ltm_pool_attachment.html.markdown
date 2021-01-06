@@ -41,7 +41,7 @@ resource "bigip_ltm_pool_attachment" "attach_node" {
 
 ```
 
-Pool attachment with node reference from ltm_node ( This will be depreceated in future releases )
+Pool attachment with node reference from ltm_node
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
