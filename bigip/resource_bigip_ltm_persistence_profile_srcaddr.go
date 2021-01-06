@@ -35,10 +35,10 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 			},
 
 			"app_service": {
-				Type:     schema.TypeString,
-				Default:  "",
+				Type: schema.TypeString,
+				//Default:  "",
 				Optional: true,
-				//      Computed: true,
+				Computed: true,
 			},
 
 			"defaults_from": {
@@ -46,39 +46,38 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Required:     true,
 				Description:  "Inherit defaults from parent profile",
 				ValidateFunc: validateF5Name,
-				//	Computed:     true,
 			},
 
 			"match_across_pools": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across pools with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
-				Computed:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across pools with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"match_across_services": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across services with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
-				Computed:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across services with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"match_across_virtuals": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across services with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
-				Computed:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across services with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"mirror": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable",
-				ValidateFunc: validateEnabledDisabled,
-				Computed:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"timeout": {
@@ -89,30 +88,30 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type:         schema.TypeString,
-				Default:      false,
-				Optional:     true,
-				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				ValidateFunc: validateEnabledDisabled,
-				//	Computed:     true,
+				Type: schema.TypeString,
+				//Default:      false,
+				Optional:    true,
+				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			// Specific to SourceAddrPersistenceProfile
 			"hash_algorithm": {
-				Type:        schema.TypeString,
-				Default:     "default",
+				Type: schema.TypeString,
+				//Default:     "default",
 				Optional:    true,
 				Description: "Specify the hash algorithm",
-				//	Computed:    true,
+				Computed:    true,
 			},
 
 			"map_proxies": {
-				Type:         schema.TypeString,
-				Default:      true,
-				Optional:     true,
-				Description:  "To enable _ disable directs all to the same single pool member",
-				ValidateFunc: validateEnabledDisabled,
-				//	Computed:     true,
+				Type: schema.TypeString,
+				//Default:      true,
+				Optional:    true,
+				Description: "To enable _ disable directs all to the same single pool member",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"mask": {
@@ -223,29 +222,52 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	timeout := d.Get("timeout").(int)
+	if timeout != 0 {
+		pp := &bigip.SourceAddrPersistenceProfile{
+			PersistenceProfile: bigip.PersistenceProfile{
+				AppService:              d.Get("app_service").(string),
+				DefaultsFrom:            d.Get("defaults_from").(string),
+				MatchAcrossPools:        d.Get("match_across_pools").(string),
+				MatchAcrossServices:     d.Get("match_across_services").(string),
+				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+				Mirror:                  d.Get("mirror").(string),
+				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+				Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
+			},
 
-	pp := &bigip.SourceAddrPersistenceProfile{
-		PersistenceProfile: bigip.PersistenceProfile{
-			AppService:              d.Get("app_service").(string),
-			DefaultsFrom:            d.Get("defaults_from").(string),
-			MatchAcrossPools:        d.Get("match_across_pools").(string),
-			MatchAcrossServices:     d.Get("match_across_services").(string),
-			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-			Mirror:                  d.Get("mirror").(string),
-			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
-		},
+			// Specific to SourceAddrPersistenceProfile
+			HashAlgorithm: d.Get("hash_algorithm").(string),
+			MapProxies:    d.Get("map_proxies").(string),
+			Mask:          d.Get("mask").(string),
+		}
+		err := client.ModifySourceAddrPersistenceProfile(name, pp)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
+			return err
+		}
+	} else {
+		pp := &bigip.SourceAddrPersistenceProfile{
+			PersistenceProfile: bigip.PersistenceProfile{
+				AppService:              d.Get("app_service").(string),
+				DefaultsFrom:            d.Get("defaults_from").(string),
+				MatchAcrossPools:        d.Get("match_across_pools").(string),
+				MatchAcrossServices:     d.Get("match_across_services").(string),
+				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+				Mirror:                  d.Get("mirror").(string),
+				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+			},
 
-		// Specific to SourceAddrPersistenceProfile
-		HashAlgorithm: d.Get("hash_algorithm").(string),
-		MapProxies:    d.Get("map_proxies").(string),
-		Mask:          d.Get("mask").(string),
-	}
-
-	err := client.ModifySourceAddrPersistenceProfile(name, pp)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
-		return err
+			// Specific to SourceAddrPersistenceProfile
+			HashAlgorithm: d.Get("hash_algorithm").(string),
+			MapProxies:    d.Get("map_proxies").(string),
+			Mask:          d.Get("mask").(string),
+		}
+		err := client.ModifySourceAddrPersistenceProfile(name, pp)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
+			return err
+		}
 	}
 
 	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
