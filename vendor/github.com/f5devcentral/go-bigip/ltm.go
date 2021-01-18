@@ -2777,8 +2777,8 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 	return &tcp, nil
 }
 
-func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {
-	fasthttp := &Fasthttp{
+func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
+	/*fasthttp := &Fasthttp{
 		Name:                        name,
 		DefaultsFrom:                defaultsFrom,
 		IdleTimeout:                 idleTimeout,
@@ -2790,8 +2790,8 @@ func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolI
 		ConnpoolStep:                connpoolStep,
 		ForceHttp_10Response:        forceHttp_10Response,
 		MaxHeaderSize:               maxHeaderSize,
-	}
-	return b.post(fasthttp, uriLtm, uriProfile, uriFasthttp)
+	}*/
+	return b.post(config, uriLtm, uriProfile, uriFasthttp)
 }
 
 // Delete Fast http removes an Fasthttp profile from the system.
@@ -2802,7 +2802,7 @@ func (b *BigIP) DeleteFasthttp(name string) error {
 // ModifyFasthttp updates the given Fasthttp profile with any changed values.
 func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
 	fasthttp.Name = name
-	return b.put(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
+	return b.patch(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
 func (b *BigIP) GetFasthttp(name string) (*Fasthttp, error) {
