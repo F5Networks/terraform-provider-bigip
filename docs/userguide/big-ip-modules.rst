@@ -174,183 +174,205 @@ Similarly, you can have N-nic deployments based on user provided subnet_ids and 
 
 
 BIG-IP Automation Toolchain InSpec Profile for testing readiness of Automation Tool Chain components
-After the module deployment, we can use inspec tool for verifying the Bigip connectivity along with ATC components
+After the module deployment, you can use the inspec tool for verifying the BIG-IP connectivity along with ATC components.
 
 This InSpec profile evaluates the following:
 
-Basic connectivity to a BIG-IP management endpoint ('bigip-connectivity')
-Availability of the Declarative Onboarding (DO) service ('bigip-declarative-onboarding')
-Version reported by the Declarative Onboarding (DO) service ('bigip-declarative-onboarding-version')
-Availability of the Application Services (AS3) service ('bigip-application-services')
-Version reported by the Application Services (AS3) service ('bigip-application-services-version')
-Availability of the Telemetry Streaming (TS) service ('bigip-telemetry-streaming')
-Version reported by the Telemetry Streaming (TS) service ('bigip-telemetry-streaming-version')
-Availability of the Cloud Failover Extension( CFE ) service ('bigip-cloud-failover-extension')
-Version reported by the Cloud Failover Extension( CFE ) service('bigip-cloud-failover-extension-version')
+- Basic connectivity to a BIG-IP management endpoint (``bigip-connectivity``)
+- Availability of the Declarative Onboarding (DO) service (``bigip-declarative-onboarding``)
+- Version reported by the Declarative Onboarding (DO) service (``bigip-declarative-onboarding-version``)
+- Availability of the Application Services (AS3) service (``bigip-application-services``)
+- Version reported by the Application Services (AS3) service (``bigip-application-services-version``)
+- Availability of the Telemetry Streaming (TS) service (``bigip-telemetry-streaming``)
+- Version reported by the Telemetry Streaming (TS) service (``bigip-telemetry-streaming-version``)
+- Availability of the Cloud Failover Extension( CFE ) service (``bigip-cloud-failover-extension``)
+- Version reported by the Cloud Failover Extension (CFE) service (``bigip-cloud-failover-extension-version``)
+
 run inspec tests
-we can either run inspec exec command or execute runtests.sh in any one of example nic folder which will run below inspec command
+You can either run the inspec exec command or execute runtests.sh in any one of the example nic folders:
 
-inspec exec inspec/bigip-ready --input bigip_address=$BIGIP_MGMT_IP bigip_port=$BIGIP_MGMT_PORT user=$BIGIP_USER password=$BIGIP_PASSWORD do_version=$DO_VERSION as3_version=$AS3_VERSION ts_version=$TS_VERSION fast_version=$FAST_VERSION cfe_version=$CFE_VERSION
+``inspec exec inspec/bigip-ready --input bigip_address=$BIGIP_MGMT_IP bigip_port=$BIGIP_MGMT_PORT user=$BIGIP_USER password=$BIGIP_PASSWORD do_version=$DO_VERSION as3_version=$AS3_VERSION ts_version=$TS_VERSION fast_version=$FAST_VERSION cfe_version=$CFE_VERSION``
 
-Required Input Variables
-These variables must be set in the module block when using this module.
+Required and Optional Input Variables
+`````````````````````````````````````
+Required variables must be set in the module block when using this module. Optional variables have default values and do not need to be set to use this module. You may set these variables to override their default values.
 
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| Parameter                   | Type    | Required | Default           | Description                             |
-+=============================+=========+==========+===================+=========================================+
-| prefix                      | String  | Required | N/A               | This value is inserted in the beginning |
-|                             |         |          |                   | of each AWS object.                     |
-|                             |         |          |                   | Note: Requires alpha-numeric without    |
-|                             |         |          |                   | special characters.                     |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| ec2_key_name	              | String  | Required | N/A               | AWS EC2 Key name for SSH access.        |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| mgmt_subnet_ids	            | List of | Required | N/A               | Map with Subnet-id and public_ip as     |
-|                             | maps    |          |                   | keys for the management subnet.         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| mgmt_securitygroup_ids      | List    | Required | N/A               | securitygroup_ids for the management    |
-|                             |         |          |                   | interface.                              |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| instance_count              | Number  | Required | false             | Number of BIG-IP instances to spin up.  |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| f5_username                 | String  | Optional | bigipuser         | The admin username of the F5 BIG-IP     |
-|                             |         |          |                   | that will be deployed                   |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| ec2_instance_type	          | String  | Optional | m5.large          | AWS EC2 instance type.                  |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| f5_ami_search_name	        | String  | Optional | F5 Networks       | BIG-IP AMI name to search for.          |
-|                             |         |          | BIGIP-14.* PAYG   |                                         |
-|                             |         |          | - Best 200Mbps*   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| mgmt_eip                    | Boolean | Optional | True              | Enable an Elastic IP address on the     |
-|                             |         |          |                   | management interface.                   |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| aws_secretmanager_auth      | Boolean | Optional | False             | Whether to use key vault to pass        |
-|                             |         |          |                   | authentication.                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| aws_secretmanager_secret_id | String  | Optional | N/A               | AWS Secret Manager Secret ID that       |
-|                             |         |          |                   | stores the BIG-IP password.             |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| aws_iam_instance_profile    | String  | Optional | N/A               | AWS IAM instance profile that can be    |
-|                             |         |          |                   | associated for BIG-IP with required     |
-|                             |         |          |                   | permissions.                            |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| DO_URL	                    | String  | Optional | latest            | URL to download the BIG-IP Declarative  |
-|                             |         |          |                   | Onboarding module.                      |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| AS3_URL	                    | String  | Optional | latest            | URL to download the BIG-IP Application  |
-|                             |         |          |                   | Service Extension 3 (AS3) module.       |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| TS_URL                      | String  | Optional | latest            | URL to download the BIG-IP Telemetry    |
-|                             |         |          |                   | Streaming module.                       |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| fastPackageUrl              | String  | Optional | latest            | URL to download the BIG-IP FAST module. |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| CFE_URL                     | String  | Optional | latest            | URL to download the BIG-IP Cloud        |
-|                             |         |          |                   | Failover Extension module.              |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| libs_dir	                  | String  | Optional | /config/cloud/aws | Directory on the BIG-IP to download the |
-|                             |         |          | /node_modules     | A&O Toolchain into.                     |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| onboard_log	                | String  | Optional | /var/log/startup  | Directory on the BIG-IP to store the    |
-|                             |         |          | -script.log       | cloud-init logs.                        |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| external_subnet_ids         | List of | Optional | [{ "subnet_id" =  | The subnet ID of the virtual network    |
-|                             | Maps    |          | null, "public_ip" | where the virtual machines will reside. |
-|                             |         |          | = null }]         |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| internal_subnet_ids         | List of | Optional | [{ "subnet_id" =  | The subnet ID of the virtual network    |
-|                             | Maps    |          | null, "public_ip" | where the virtual machines will reside. |
-|                             |         |          | = null }]         |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| external_securitygroup_ids  | List    | Optional | ``[]``            | The Network Security Group IDs for      |
-|                             |         |          |                   | external network.                       |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
-| internal_securitygroup_ids  | List    | Optional | ``[]``            | The Network Security Group IDs for      |
-|                             |         |          |                   | internal network.                       |
-|                             |         |          |                   |                                         |
-|                             |         |          |                   |                                         |
-+-----------------------------+---------+----------+-------------------+-----------------------------------------+
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| Parameter                   | Type    | Required | Default               | Description                             |
++=============================+=========+==========+=======================+=========================================+
+| prefix                      | String  | Required | N/A                   | This value is inserted in the beginning |
+|                             |         |          |                       | of each AWS object.                     |
+|                             |         |          |                       | Note: Requires alpha-numeric without    |
+|                             |         |          |                       | special characters.                     |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| ec2_key_name	              | String  | Required | N/A                   | AWS EC2 Key name for SSH access.        |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| mgmt_subnet_ids	          | List of | Required | N/A                   | Map with Subnet-id and public_ip as     |
+|                             | maps    |          |                       | keys for the management subnet.         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| mgmt_securitygroup_ids      | List    | Required | N/A                   | securitygroup_ids for the management    |
+|                             |         |          |                       | interface.                              |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| instance_count              | Number  | Required | false                 | Number of BIG-IP instances to spin up.  |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| f5_username                 | String  | Optional | bigipuser             | The admin username of the F5 BIG-IP     |
+|                             |         |          |                       | that will be deployed                   |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| ec2_instance_type	          | String  | Optional | m5.large              | AWS EC2 instance type.                  |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| f5_ami_search_name	      | String  | Optional | ``F5 Networks``       | BIG-IP AMI name to search for.          |
+|                             |         |          | ``BIGIP-14.* PAYG``   |                                         |
+|                             |         |          | ``- Best 200Mbps*``   |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| mgmt_eip                    | Boolean | Optional | True                  | Enable an Elastic IP address on the     |
+|                             |         |          |                       | management interface.                   |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| aws_secretmanager_auth      | Boolean | Optional | False                 | Whether to use key vault to pass        |
+|                             |         |          |                       | authentication.                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| aws_secretmanager_secret_id | String  | Optional | N/A                   | AWS Secret Manager Secret ID that       |
+|                             |         |          |                       | stores the BIG-IP password.             |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| aws_iam_instance_profile    | String  | Optional | N/A                   | AWS IAM instance profile that can be    |
+|                             |         |          |                       | associated for BIG-IP with required     |
+|                             |         |          |                       | permissions.                            |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| DO_URL	                  | String  | Optional | latest                | URL to download the BIG-IP Declarative  |
+|                             |         |          |                       | Onboarding module.                      |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| AS3_URL	                  | String  | Optional | latest                | URL to download the BIG-IP Application  |
+|                             |         |          |                       | Service Extension 3 (AS3) module.       |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| TS_URL                      | String  | Optional | latest                | URL to download the BIG-IP Telemetry    |
+|                             |         |          |                       | Streaming module.                       |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| fastPackageUrl              | String  | Optional | latest                | URL to download the BIG-IP FAST module. |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| CFE_URL                     | String  | Optional | latest                | URL to download the BIG-IP Cloud        |
+|                             |         |          |                       | Failover Extension module.              |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| libs_dir	                  | String  | Optional | /config/cloud/aws     | Directory on the BIG-IP to download the |
+|                             |         |          | /node_modules         | A&O Toolchain into.                     |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| onboard_log	              | String  | Optional | /var/log/startup      | Directory on the BIG-IP to store the    |
+|                             |         |          | -script.log           | cloud-init logs.                        |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| external_subnet_ids         | List of | Optional | ``[{ "subnet_id" =``  | The subnet ID of the virtual network    |
+|                             | Maps    |          | ``null, "public_ip"`` | where the virtual machines will reside. |
+|                             |         |          | ``= null }]``         |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| internal_subnet_ids         | List of | Optional | ``[{ "subnet_id" =``  | The subnet ID of the virtual network    |
+|                             | Maps    |          | ``null, "public_ip"`` | where the virtual machines will reside. |
+|                             |         |          | ``= null }]``         |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| external_securitygroup_ids  | List    | Optional | ``[]``                | The Network Security Group IDs for      |
+|                             |         |          |                       | external network.                       |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
+| internal_securitygroup_ids  | List    | Optional | ``[]``                | The Network Security Group IDs for      |
+|                             |         |          |                       | internal network.                       |
+|                             |         |          |                       |                                         |
+|                             |         |          |                       |                                         |
++-----------------------------+---------+----------+-----------------------+-----------------------------------------+
 
 .. Note:: For each external interface there will be one primary, secondary private IP will be assigned.
 
+Output Variables
+````````````````
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| Parameter          | Description/Notes                                                                                                         |
++====================+===========================================================================================================================+
+| mgmtPublicIP       | Describes the name of the policy.                                                                                         |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| mgmtPublicDNS      | This value specifies the match strategy.                                                                                  |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| mgmtPort           | This value specifies the protocol.                                                                                        |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| f5_username        | This value determines if you want to publish the policy else it will be deployed in Drafts mode.                          |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| bigip_password     | This value specifies the controls.                                                                                        |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| private_addresses  | Use this policy to apply rules.                                                                                           |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
+| public_addresses   | If Rule is used, then you need to provide the tm_name. It can be any value.                                               |
++--------------------+---------------------------------------------------------------------------------------------------------------------------+
 
+.. Note:: A local json file that contains the DO declaration will be generated.
 
 |
 
