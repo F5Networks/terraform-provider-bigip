@@ -214,7 +214,7 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| mgmt_subnet_ids	          | List of | Required | N/A                   | Map with Subnet-id and public_ip as     |
+| mgmt_subnet_ids             | List of | Required | N/A                   | Map with Subnet-id and public_ip as     |
 |                             | maps    |          |                       | keys for the management subnet.         |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
@@ -240,7 +240,7 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| ec2_instance_type	          | String  | Optional | m5.large              | AWS EC2 instance type.                  |
+| ec2_instance_type           | String  | Optional | m5.large              | AWS EC2 instance type.                  |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
@@ -278,14 +278,14 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| DO_URL	                  | String  | Optional | latest                | URL to download the BIG-IP Declarative  |
+| DO_URL                      | String  | Optional | latest                | URL to download the BIG-IP Declarative  |
 |                             |         |          |                       | Onboarding module.                      |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| AS3_URL	                  | String  | Optional | latest                | URL to download the BIG-IP Application  |
+| AS3_URL                     | String  | Optional | latest                | URL to download the BIG-IP Application  |
 |                             |         |          |                       | Service Extension 3 (AS3) module.       |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
@@ -311,7 +311,7 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| libs_dir	                  | String  | Optional | /config/cloud/aws     | Directory on the BIG-IP to download the |
+| libs_dir                    | String  | Optional | /config/cloud/aws     | Directory on the BIG-IP to download the |
 |                             |         |          | /node_modules         | A&O Toolchain into.                     |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
