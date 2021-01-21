@@ -12,7 +12,9 @@ This Terraform module deploys N-NIC F5 BIG-IP in AWS cloud. You can deploy multi
 
 Prerequisites
 `````````````
-This module is supported on Terraform version 0.13 and newer.
+.. sidebar:: :fonticon:`fa fa-info-circle fa-lg` Version Notice:
+
+   This module is supported on Terraform version 0.13 and newer.
 
 The templates below are tested on Terraform v0.13.0
 
@@ -80,7 +82,10 @@ To use AWS secret manager password, you must enable the variable ``aws_secretman
 
 Example Usage
 `````````````
-`See more common deployment examples here <https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples>`_. 
+.. seealso::
+   :class: sidebar
+
+   `Additional common deployment examples <https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples>`_. 
 
 There should be one-to-one mapping between subnet_ids and securitygroup_ids. For example if you have two or more external subnet_ids, you must give the same number of external securitygroup_ids to the module.
 
@@ -141,7 +146,7 @@ With Dynamic Private IP Allocation, you must pass null value to primary/secondar
     }
 
     #
-    #Example of 4-NIC Deployment Module usage with two external public interfaces, one management, and one internal interface. There should be one-to-one mapping between subnet_ids and securitygroupids)
+    #Example of 4-NIC Deployment Module usage with two external public interfaces, one management and internal interface. There should be one-to-one mapping between subnet_ids and securitygroup_ids).
     #
 
     module bigip {
@@ -397,7 +402,9 @@ This Terraform module deploys N-NIC F5 BIG-IP in Azure cloud. You can deploy mul
 
 Prerequisites
 `````````````
-This module is supported on Terraform version 0.13 and newer.
+.. sidebar:: :fonticon:`fa fa-info-circle fa-lg` Version Notice:
+
+   This module is supported on Terraform version 0.13 and newer.
 
 The templates below are tested on Terraform v0.13.0:
 
@@ -472,7 +479,10 @@ To use Azure secret key vault, you must enable the variable ``az_key_vault_authe
 
 Example Usage
 `````````````
-`See more common deployment examples here <https://github.com/f5devcentral/terraform-azure-bigip-module/tree/master/examples>`_. 
+.. seealso::
+   :class: sidebar
+
+   `Additional common deployment examples <https://github.com/f5devcentral/terraform-azure-bigip-module/tree/master/examples>`_.
 
 There should be one-to-one mapping between subnet_ids and securitygroup_ids. For example, if you have two or more external subnet_ids, you must give the same number of external securitygroup_ids to the module.
 
@@ -484,7 +494,7 @@ If you are using static private IP allocation, you cannot use module count becau
 With Dynamic Private IP Allocation, you must pass null value to primary/secondary private IP declaration and module count will be supported.
 
 .. code-block:: javascript
-   :caption: Example of 1-NIC Deployment with Dynamic Private IP Allocation
+   :caption: Example Deployment with Dynamic Private IP Allocation
 
     Example 1-NIC Deployment Module usage
 
@@ -516,7 +526,7 @@ With Dynamic Private IP Allocation, you must pass null value to primary/secondar
     }
 
 
-    Example 3-NIC Deployment  Module usage 
+    Example 3-NIC Deployment Module usage 
 
     module bigip {
       count                       = var.instance_count 
@@ -532,7 +542,7 @@ With Dynamic Private IP Allocation, you must pass null value to primary/secondar
       availabilityZones           =  var.availabilityZones
     }
 
-    Example 4-NIC Deployment  Module usage(with 2 external public interfaces,one management and internal interface.There should be one to one mapping between subnet_ids and securitygroupids)
+    Example 4-NIC Deployment Module usage (with 2 external public interfaces, one management and internal interface. There should be one-to-one mapping between subnet_ids and securitygroupids).
 
     module bigip {
       count                       = var.instance_count
@@ -550,11 +560,11 @@ With Dynamic Private IP Allocation, you must pass null value to primary/secondar
 
 
 Similarly, you can have N-NIC deployments based on user-provided subnet_ids and securitygroup_ids.
-With module count, user can deploy multiple bigip instances in the azure cloud (with the default value of count being one )
+With module count, you can deploy multiple BIG-IP instances in the Azure cloud (with the default value of count 1)
 
 
 .. code-block:: javascript
-   :caption: Example 3-NIC Deployment with Static Private IP Allocation
+   :caption: Example Deployment with Static Private IP Allocation
    
     module bigip {
       count                      = var.instance_count
