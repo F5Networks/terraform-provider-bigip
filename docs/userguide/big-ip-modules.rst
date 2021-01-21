@@ -1,3 +1,5 @@
+.. _big-ip-modules:
+
 BIG-IP Modules
 ==============
 This page covers modules for :ref:`big-ip-modules-aws` and :ref:`big-ip-modules-azure`.
@@ -78,25 +80,26 @@ To use AWS secret manager password, you must enable the variable ``aws_secretman
 
 Example Usage
 `````````````
-`See more common deployment examples here<https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples>`_. 
+`See more common deployment examples here <https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples>`_. 
 
 There should be one-to-one mapping between subnet_ids and securitygroup_ids. For example if you have two or more external subnet_ids, you must give the same number of external securitygroup_ids to the module.
 
 Users can have dynamic or static private IP allocation. If the primary/secondary private IP value is null, it will be dynamic or else static private IP allocation. With Static private IP allocation, you can assign primary and secondary private IPs for external interfaces, whereas the primary private IP is for management
 and internal interfaces.
 
-If it is static private ip allocation we can't use module count as same private ips will be tried to allocate for multiple bigip instances based on module count.
+If you are using static private IP allocation, you cannot use module count because the same private IPs will be allocated to multiple BIG-IP instances based on the module count. 
 
-With Dynamic private ip allocation,we have to pass null value to primary/secondary private ip declaration and module count will be supported.
+With Dynamic Private IP Allocation, you must pass null value to primary/secondary private IP declaration and module count will be supported.
 
 .. Note:: Sometimes the given static primary and secondary private IPs may get exchanged. This limitation is present in AWS.
 
+|
 
 .. code-block:: javascript
    :caption: Dynamic Private IP Allocation
 
     #
-    #Example 1-NIC Deployment Module usage
+    #Example of 1-NIC Deployment Module usage
     #
     module bigip {
       count                  = var.instance_count
@@ -108,7 +111,7 @@ With Dynamic private ip allocation,we have to pass null value to primary/seconda
     }
 
     #
-    #Example 2-NIC Deployment Module usage
+    #Example of 2-NIC Deployment Module usage
     #
     module bigip {
       count                  = var.instance_count
@@ -122,7 +125,7 @@ With Dynamic private ip allocation,we have to pass null value to primary/seconda
     }
 
     #
-    #Example 3-NIC Deployment  Module usage
+    #Example of 3-NIC Deployment Module usage
     #
     module bigip {
       count                  = var.instance_count
@@ -138,7 +141,7 @@ With Dynamic private ip allocation,we have to pass null value to primary/seconda
     }
 
     #
-    #Example 4-NIC Deployment  Module usage(with 2 external public interfaces,one management and internal interface.There should be one to one mapping between subnet_ids and securitygroupids)
+    #Example of 4-NIC Deployment Module usage with two external public interfaces, one management, and one internal interface. There should be one-to-one mapping between subnet_ids and securitygroupids)
     #
 
     module bigip {
@@ -154,14 +157,14 @@ With Dynamic private ip allocation,we have to pass null value to primary/seconda
       internal_securitygroup_ids  = ["securitygropu_id_internal"]
     }
 
-Similarly, you can have N-nic deployments based on user provided subnet_ids and securitygroup_ids. With module count, you can deploy multiple BIG-IP instances in the AWS cloud (with the default value of count being one).
+Similarly, you can have N-NIC deployments based on user-provided subnet_ids and securitygroup_ids. With module count, you can deploy multiple BIG-IP instances in the AWS cloud (with the default value of 1).
 
 
 
 .. code-block:: javascript
    :caption: Private IP Allocation
 
-    Example 3-NIC Deployment with static private ip allocation
+    Example of 3-NIC Deployment with static private ip allocation
 
     module bigip {
       source                      = "../../"
@@ -180,7 +183,7 @@ Similarly, you can have N-nic deployments based on user provided subnet_ids and 
 
 InSpec Tool
 ```````````
-The BIG-IP Automation Toolchain InSpec Profile is used for testing the readiness of Automation Tool Chain (ATC) components. After the module deployment, you can use the InSpec tool to verify BIG-IP connectivity with ATC components.
+The BIG-IP Automation Toolchain InSpec Profile is used for testing the readiness of Automation Tool Chain (ATC) components. After module deployment, you can use the InSpec tool to verify BIG-IP connectivity with ATC components.
 
 This InSpec profile evaluates the following:
 
@@ -197,7 +200,9 @@ This InSpec profile evaluates the following:
 
 To run InSpec tests, you can either run the inspec exec command or execute runtests.sh in any one of example NIC folders which will run below the inspec command. For example:
 
-``inspec exec inspec/bigip-ready --input bigip_address=$BIGIP_MGMT_IP bigip_port=$BIGIP_MGMT_PORT user=$BIGIP_USER password=$BIGIP_PASSWORD do_version=$DO_VERSION as3_version=$AS3_VERSION ts_version=$TS_VERSION fast_version=$FAST_VERSION cfe_version=$CFE_VERSION``
+::
+
+    inspec exec inspec/bigip-ready --input bigip_address=$BIGIP_MGMT_IP bigip_port=$BIGIP_MGMT_PORT user=$BIGIP_USER password=$BIGIP_PASSWORD do_version=$DO_VERSION as3_version=$AS3_VERSION ts_version=$TS_VERSION fast_version=$FAST_VERSION cfe_version=$CFE_VERSION
 
 
 Required and Optional Input Variables
@@ -361,25 +366,26 @@ Required variables must be set in the module block when using this module. Optio
 
 Output Variables
 ````````````````
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| Parameter          | Description/Notes                                                                                                         |
-+====================+===========================================================================================================================+
-| mgmtPublicIP       | Describes the name of the policy.                                                                                         |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| mgmtPublicDNS      | This value specifies the match strategy.                                                                                  |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| mgmtPort           | This value specifies the protocol.                                                                                        |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| f5_username        | This value determines if you want to publish the policy else it will be deployed in Drafts mode.                          |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| bigip_password     | This value specifies the controls.                                                                                        |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| private_addresses  | Use this policy to apply rules.                                                                                           |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
-| public_addresses   | If Rule is used, then you need to provide the tm_name. It can be any value.                                               |
-+--------------------+---------------------------------------------------------------------------------------------------------------------------+
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Parameter          | Description/Notes                                                                                                                                                                                                       |
++====================+=========================================================================================================================================================================================================================+
+| mgmtPublicIP       | The actual IP address allocated for the resource.                                                                                                                                                                       |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| mgmtPublicDNS      | FQDN to connect to the first VM provisioned.                                                                                                                                                                            |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| mgmtPort           | The Mgmt Port.                                                                                                                                                                                                          |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| f5_username        | BIG-IP username.                                                                                                                                                                                                        |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| bigip_password     | The BIG-IP Password. If ``dynamic_password`` is selected, then it will be a randomly generated password. If ``aws_secretmanager_auth`` is selected, then it will be an aws_secretsmanager_secret_version secret string. |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| private_addresses  | List of BIG-IP private addresses.                                                                                                                                                                                       |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| public_addresses   | List of BIG-IP public addresses.                                                                                                                                                                                        |
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. Note:: A local json file that contains the DO declaration will be generated.
+
 
 |
 
@@ -387,7 +393,7 @@ Output Variables
 
 Azure
 -----
-This Terraform module deploys N-nic F5 BIG-IP in Azure cloud. You can deploy multiple instances of BIG-IP with the module count feature.
+This Terraform module deploys N-NIC F5 BIG-IP in Azure cloud. You can deploy multiple instances of BIG-IP with the module count feature.
 
 Prerequisites
 `````````````
@@ -466,14 +472,14 @@ To use Azure secret key vault, you must enable the variable ``az_key_vault_authe
 
 Example Usage
 `````````````
-`See more common deployment examples here<https://github.com/f5devcentral/terraform-azure-bigip-module/tree/master/examples>`_. 
+`See more common deployment examples here <https://github.com/f5devcentral/terraform-azure-bigip-module/tree/master/examples>`_. 
 
 There should be one-to-one mapping between subnet_ids and securitygroup_ids. For example, if you have two or more external subnet_ids, you must give the same number of external securitygroup_ids to the module.
 
 Users can have dynamic or static private IP allocation. If the primary/secondary private IP value is null, it will be dynamic or else static private IP allocation. With Static private IP allocation, you can assign primary and secondary private IPs for external interfaces, whereas the primary private IP is for management
 and internal interfaces.
 
-If it is static private IP allocation, you cannot use module count as same private IPs will be tried to allocate for multiple BIG-IP instances based on module count.
+If you are using static private IP allocation, you cannot use module count because the same private IPs will be allocated to multiple BIG-IP instances based on the module count. 
 
 With Dynamic Private IP Allocation, you must pass null value to primary/secondary private IP declaration and module count will be supported.
 
