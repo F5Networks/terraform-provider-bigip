@@ -3471,11 +3471,11 @@ func (b *BigIP) GetSSLPersistenceProfile(name string) (*SSLPersistenceProfile, e
 }
 
 // CreateSSLPersistenceProfile creates a new ssl persist profile on the BIG-IP system.
-func (b *BigIP) CreateSSLPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateSSLPersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriSSL)
 }
@@ -3493,7 +3493,7 @@ func (b *BigIP) DeleteSSLPersistenceProfile(name string) error {
 // ModifySSLPersistenceProfile allows you to change any attribute of a ssl persist profile.
 // Fields that can be modified are referenced in the SSLPersistenceProfile struct.
 func (b *BigIP) ModifySSLPersistenceProfile(name string, config *SSLPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriSSL, name)
+	return b.patch(config, uriLtm, uriPersistence, uriSSL, name)
 }
 
 // UniversalPersistenceProfiles returns a list of universal persist profiles

@@ -48,31 +48,35 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 			},
 
 			"match_across_pools": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across pools with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across pools with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"match_across_services": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across services with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across services with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"match_across_virtuals": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across services with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable match across services with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"mirror": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "To enable _ disable",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 
 			"timeout": {
@@ -82,11 +86,12 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type:         schema.TypeString,
-				Default:      false,
-				Optional:     true,
-				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				ValidateFunc: validateEnabledDisabled,
+				Type: schema.TypeString,
+				//Default:      false,
+				Optional:    true,
+				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 		},
 	}
@@ -98,10 +103,12 @@ func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta in
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	err := client.CreateSSLPersistenceProfile(
-		name,
-		parent,
-	)
+	config := &bigip.PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+
+	err := client.CreateSSLPersistenceProfile(config)
 	if err != nil {
 		return err
 	}
@@ -134,21 +141,34 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	d.Set("defaults_from", pp.DefaultsFrom)
-	if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MatchAcrossPools to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		d.Set("defaults_from", pp.DefaultsFrom)
 	}
-	if err := d.Set("match_across_services", pp.MatchAcrossServices); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MatchAcrossServices to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("match_across_pools"); ok {
+		if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving MatchAcrossPools to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("match_across_virtuals", pp.MatchAcrossVirtuals); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MatchAcrossVirtuals to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("match_across_services"); ok {
+		if err := d.Set("match_across_services", pp.MatchAcrossServices); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving MatchAcrossServices to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+		}
 	}
-	d.Set("mirror", pp.Mirror)
-	d.Set("timeout", pp.Timeout)
-	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
-
+	if _, ok := d.GetOk("match_across_virtuals"); ok {
+		if err := d.Set("match_across_virtuals", pp.MatchAcrossVirtuals); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving MatchAcrossVirtuals to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("mirror"); ok {
+		d.Set("mirror", pp.Mirror)
+	}
+	if _, ok := d.GetOk("timeout"); ok {
+		d.Set("timeout", pp.Timeout)
+	}
+	if _, ok := d.GetOk("override_conn_limit"); ok {
+		d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	}
 	return nil
 }
 
