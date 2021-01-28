@@ -1066,7 +1066,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
@@ -1100,7 +1100,7 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
@@ -1130,7 +1130,7 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 
 	name := d.Id()
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return false, fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
@@ -1157,7 +1157,7 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
@@ -1196,7 +1196,7 @@ func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
@@ -1217,7 +1217,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	var p bigip.Policy
 	values := []string{}
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	partition := match[1]
 	policy_name := match[2]
@@ -1266,7 +1266,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 
 	if p.Strategy != "" {
-		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
+		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 		match := re.FindStringSubmatch(p.Strategy)
 		if match == nil {
 			return fmt.Errorf("Failed to match regex")
