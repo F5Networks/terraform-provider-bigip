@@ -14,6 +14,10 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Description
         - Date
 
+      * - 1.5  
+        - Updated the documentation with the following changes: |br| • Added new section: :ref:`big-ip-modules`
+        - 01-20-21   
+
       * - 1.4  
         - Updated the documentation with the following changes: |br| • Updated the version table.
         - 08-06-20     
