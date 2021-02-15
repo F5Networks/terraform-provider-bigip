@@ -73,8 +73,9 @@ func resourceBigipLtmNode() *schema.Resource {
 				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "User defined description of the node.",
 			},
 			"state": {
 				Type:        schema.TypeString,
