@@ -8,13 +8,12 @@ description: |-
 
 # bigip\_ltm\_pool
 
-`bigip_ltm_pool` Manages a pool configuration.
+`bigip_ltm_pool` Manages F5 BIG-IP LTM pools via iControl REST API.
 
 Resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
 
 
 ## Example Usage
-
 
 ```hcl
 
