@@ -6,7 +6,7 @@ description: |-
     Provides details about bigip_ltm_node data source
 ---
 
-# bigip\_ltm\_monitor
+# bigip\_ltm\_node
 
 Use this data source (`bigip_ltm_node`) to get the ltm node details available on BIG-IP
  
