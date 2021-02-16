@@ -72,6 +72,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_irule":       dataSourceBigipLtmIrule(),
 			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
 			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
+			"bigip_ltm_node":        dataSourceBigipLtmNode(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
