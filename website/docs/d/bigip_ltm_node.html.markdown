@@ -29,15 +29,15 @@ output "bigip_node" {
 
 ## Argument Reference
 
-* `name` - (Required) Name of the node
-
-* `address` - (Required) address of the node
+* `name` - (Required) Name of the node.
+* `partition` - (Required) partition of the node.
 
 
 ## Attributes Reference
 
 Additionally, the following attributes are exported:
-
+* `address` - The address of the node.
+  
 * `description` - User defined description of the node.
 
 * `connection_limit` - Node connection limit.

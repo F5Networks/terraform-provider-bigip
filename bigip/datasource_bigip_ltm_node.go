@@ -22,6 +22,11 @@ func dataSourceBigipLtmNode() *schema.Resource {
 				Required:    true,
 				Description: "Name of the node.",
 			},
+			"partition": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Partition of resource group",
+			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -29,7 +34,7 @@ func dataSourceBigipLtmNode() *schema.Resource {
 			},
 			"address": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "IP address of the node of the node.",
 			},
 			"connection_limit": {
