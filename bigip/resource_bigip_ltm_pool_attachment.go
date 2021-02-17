@@ -32,7 +32,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the pool to be attached with pool members",
 				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"node": {
 				Type:     schema.TypeString,
