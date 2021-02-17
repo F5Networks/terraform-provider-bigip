@@ -35,7 +35,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the virtual server",
 				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 
 			"port": {

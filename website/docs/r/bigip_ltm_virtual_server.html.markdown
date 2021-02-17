@@ -10,7 +10,7 @@ description: |-
 
 `bigip_ltm_virtual_server` Configures Virtual Server
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
+For resources should be named with their "full path". The full path is the combination of the partition + name of the resource (example: /Common/my-pool ) or partition + directory + name of the resource (example: /Common/test/my-pool ).When including directory in fullpath we have to make sure it is created in the given partition before using it.
 
 
 ## Example Usage

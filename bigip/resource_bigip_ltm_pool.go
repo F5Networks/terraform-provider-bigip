@@ -32,7 +32,7 @@ func resourceBigipLtmPool() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the pool",
 				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"monitors": {
 				Type:        schema.TypeSet,

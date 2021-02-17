@@ -65,6 +65,34 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	return
 }
 
+func validateF5NameWithDirectory(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+		break
+	case []string:
+		values = value.([]string)
+		break
+	case *[]string:
+		values = *(value.(*[]string))
+		break
+	case string:
+		values = []string{value.(string)}
+		break
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
+	}
+
+	for _, v := range values {
+		match, _ := regexp.MatchString("(^/[\\w_\\-.]+/[\\w_\\-.:]+/[\\w_\\-.:]+$)|(^/[\\w_\\-.]+/[\\w_\\-.:]+$)", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name or /Partition/Directory/Name  e.g. /Common/my-node or /Common/test/my-node", field))
+		}
+	}
+	return
+}
+
 func validatePartitionName(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
 	switch value.(type) {
