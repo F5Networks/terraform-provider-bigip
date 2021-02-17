@@ -2777,8 +2777,8 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 	return &tcp, nil
 }
 
-func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {
-	fasthttp := &Fasthttp{
+func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
+	/*fasthttp := &Fasthttp{
 		Name:                        name,
 		DefaultsFrom:                defaultsFrom,
 		IdleTimeout:                 idleTimeout,
@@ -2790,8 +2790,8 @@ func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolI
 		ConnpoolStep:                connpoolStep,
 		ForceHttp_10Response:        forceHttp_10Response,
 		MaxHeaderSize:               maxHeaderSize,
-	}
-	return b.post(fasthttp, uriLtm, uriProfile, uriFasthttp)
+	}*/
+	return b.post(config, uriLtm, uriProfile, uriFasthttp)
 }
 
 // Delete Fast http removes an Fasthttp profile from the system.
@@ -2801,18 +2801,17 @@ func (b *BigIP) DeleteFasthttp(name string) error {
 
 // ModifyFasthttp updates the given Fasthttp profile with any changed values.
 func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
-	fasthttp.Name = name
-	return b.put(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
+        fasthttp.Name = name
+	return b.patch(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
 func (b *BigIP) GetFasthttp(name string) (*Fasthttp, error) {
 	var fasthttp Fasthttp
-	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp)
+	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 
 	if err != nil {
 		return nil, err
 	}
-
 	return &fasthttp, nil
 }
 
@@ -3471,11 +3470,11 @@ func (b *BigIP) GetSSLPersistenceProfile(name string) (*SSLPersistenceProfile, e
 }
 
 // CreateSSLPersistenceProfile creates a new ssl persist profile on the BIG-IP system.
-func (b *BigIP) CreateSSLPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateSSLPersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriSSL)
 }
@@ -3493,7 +3492,7 @@ func (b *BigIP) DeleteSSLPersistenceProfile(name string) error {
 // ModifySSLPersistenceProfile allows you to change any attribute of a ssl persist profile.
 // Fields that can be modified are referenced in the SSLPersistenceProfile struct.
 func (b *BigIP) ModifySSLPersistenceProfile(name string, config *SSLPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriSSL, name)
+	return b.patch(config, uriLtm, uriPersistence, uriSSL, name)
 }
 
 // UniversalPersistenceProfiles returns a list of universal persist profiles
