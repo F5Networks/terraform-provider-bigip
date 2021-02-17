@@ -176,24 +176,45 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	timeout := d.Get("timeout").(int)
+	if timeout != 0 {
+		pp := &bigip.SSLPersistenceProfile{
+			PersistenceProfile: bigip.PersistenceProfile{
+				AppService:              d.Get("app_service").(string),
+				DefaultsFrom:            d.Get("defaults_from").(string),
+				MatchAcrossPools:        d.Get("match_across_pools").(string),
+				MatchAcrossServices:     d.Get("match_across_services").(string),
+				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+				Mirror:                  d.Get("mirror").(string),
+				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+				Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
+			},
+		}
 
-	pp := &bigip.SSLPersistenceProfile{
-		PersistenceProfile: bigip.PersistenceProfile{
-			AppService:              d.Get("app_service").(string),
-			DefaultsFrom:            d.Get("defaults_from").(string),
-			MatchAcrossPools:        d.Get("match_across_pools").(string),
-			MatchAcrossServices:     d.Get("match_across_services").(string),
-			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-			Mirror:                  d.Get("mirror").(string),
-			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
-		},
-	}
+		err := client.ModifySSLPersistenceProfile(name, pp)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
+			return err
+		}
+	} else {
+		pp := &bigip.SSLPersistenceProfile{
+			PersistenceProfile: bigip.PersistenceProfile{
+				AppService:              d.Get("app_service").(string),
+				DefaultsFrom:            d.Get("defaults_from").(string),
+				MatchAcrossPools:        d.Get("match_across_pools").(string),
+				MatchAcrossServices:     d.Get("match_across_services").(string),
+				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+				Mirror:                  d.Get("mirror").(string),
+				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+			},
+		}
 
-	err := client.ModifySSLPersistenceProfile(name, pp)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
-		return err
+		err := client.ModifySSLPersistenceProfile(name, pp)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
+			return err
+		}
+
 	}
 
 	return resourceBigipLtmPersistenceProfileSSLRead(d, meta)
