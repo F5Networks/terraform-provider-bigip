@@ -2801,18 +2801,17 @@ func (b *BigIP) DeleteFasthttp(name string) error {
 
 // ModifyFasthttp updates the given Fasthttp profile with any changed values.
 func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
-	fasthttp.Name = name
+        fasthttp.Name = name
 	return b.patch(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
 func (b *BigIP) GetFasthttp(name string) (*Fasthttp, error) {
 	var fasthttp Fasthttp
-	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp)
+	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 
 	if err != nil {
 		return nil, err
 	}
-
 	return &fasthttp, nil
 }
 
