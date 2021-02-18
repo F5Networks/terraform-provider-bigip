@@ -6,8 +6,8 @@
 module github.com/F5Networks/terraform-provider-bigip
 
 require (
-	github.com/f5devcentral/go-bigip v0.0.0-20210106153155-d1f99f158c0c
-	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210106153155-d1f99f158c0c
+	github.com/f5devcentral/go-bigip v0.0.0-20210218015208-fde2d84238d6
+	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210218015208-fde2d84238d6
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect

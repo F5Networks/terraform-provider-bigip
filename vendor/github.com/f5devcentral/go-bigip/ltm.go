@@ -2778,19 +2778,19 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 }
 
 func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
-	/*fasthttp := &Fasthttp{
-		Name:                        name,
-		DefaultsFrom:                defaultsFrom,
-		IdleTimeout:                 idleTimeout,
-		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
-		ConnpoolMaxReuse:            connpoolMaxReuse,
-		ConnpoolMaxSize:             connpoolMaxSize,
-		ConnpoolMinSize:             connpoolMinSize,
-		ConnpoolReplenish:           connpoolReplenish,
-		ConnpoolStep:                connpoolStep,
-		ForceHttp_10Response:        forceHttp_10Response,
-		MaxHeaderSize:               maxHeaderSize,
-	}*/
+	//	fasthttp := &Fasthttp{
+	//		Name:                        name,
+	//		DefaultsFrom:                defaultsFrom,
+	//		IdleTimeout:                 idleTimeout,
+	//		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
+	//		ConnpoolMaxReuse:            connpoolMaxReuse,
+	//		ConnpoolMaxSize:             connpoolMaxSize,
+	//		ConnpoolMinSize:             connpoolMinSize,
+	//		ConnpoolReplenish:           connpoolReplenish,
+	//		ConnpoolStep:                connpoolStep,
+	//		ForceHttp_10Response:        forceHttp_10Response,
+	//		MaxHeaderSize:               maxHeaderSize,
+	//	}
 	return b.post(config, uriLtm, uriProfile, uriFasthttp)
 }
 
@@ -2801,7 +2801,7 @@ func (b *BigIP) DeleteFasthttp(name string) error {
 
 // ModifyFasthttp updates the given Fasthttp profile with any changed values.
 func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
-        fasthttp.Name = name
+	fasthttp.Name = name
 	return b.patch(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
@@ -3471,10 +3471,10 @@ func (b *BigIP) GetSSLPersistenceProfile(name string) (*SSLPersistenceProfile, e
 
 // CreateSSLPersistenceProfile creates a new ssl persist profile on the BIG-IP system.
 func (b *BigIP) CreateSSLPersistenceProfile(config *PersistenceProfile) error {
-	/*config := &PersistenceProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}*/
+	//	config := &PersistenceProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriPersistence, uriSSL)
 }
