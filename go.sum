@@ -36,10 +36,10 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/f5devcentral/go-bigip v0.0.0-20210106153155-d1f99f158c0c h1:bS4qWmOOP647NXSSl9rqmjxT+hL0MDaU//vD+emSO5o=
-github.com/f5devcentral/go-bigip v0.0.0-20210106153155-d1f99f158c0c/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210106153155-d1f99f158c0c h1:6SbWQpNA+dN4Xz1qipGCOZm1AeswFkP5YyD46Smbb5s=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210106153155-d1f99f158c0c/go.mod h1:1Ly3xA1+0ydxV5iDxUBmOt4saqtbFZmxFxcRCcs6Xfk=
+github.com/f5devcentral/go-bigip v0.0.0-20210218015208-fde2d84238d6 h1:ToOO5Lf/N+NVqMg+VjOUrwkl3xT0FT6fF6lUJDw9+8M=
+github.com/f5devcentral/go-bigip v0.0.0-20210218015208-fde2d84238d6/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210218015208-fde2d84238d6 h1:owe7AeavGE/BXPPSEpbK0jdHdwIeMJfd7sQ3ONF/tJk=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210218015208-fde2d84238d6/go.mod h1:r7o5I22EvO+fps2u10bz4ZUlTlNHopQSWzVcW19hK3U=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
@@ -174,6 +174,7 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.1 h1:LrvDIY//XNo65Lq84G/akBuMGlawHvGBABv8f/ZN6DI=
 github.com/posener/complete v1.2.1/go.mod h1:6gapUrK/U1TAN7ciCoNRIdVC5sbdBTUh1DKN0g6uH7E=
+github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/spf13/afero v1.2.2 h1:5jhuqJyZCZf2JRofRvN/nIFgIWNzPa3/Vz8mYylgbWc=
