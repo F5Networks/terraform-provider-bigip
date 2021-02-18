@@ -7,10 +7,10 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"regexp"
 )
 
 func dataSourceBigipLtmNode() *schema.Resource {
@@ -71,7 +71,7 @@ func dataSourceBigipLtmNode() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
-				MaxItems: 1,
+				//MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"address_family": {
@@ -123,20 +123,45 @@ func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error 
 		return nil
 	}
 
+	if node.FQDN.Name != "" {
+		if err := d.Set("address", node.FQDN.Name); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+		}
+	} else {
+		// xxx.xxx.xxx.xxx(%x)
+		// x:x(%x)
+		regex := regexp.MustCompile(`((?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})|(?:.*:[^%]*))(?:\%\d+)?`)
+		address := regex.FindStringSubmatch(node.Address)
+		log.Println("[INFO] Address: " + address[1])
+		if err := d.Set("address", node.Address); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+		}
+	}
+
 	_ = d.Set("name", node.Name)
 	_ = d.Set("partition", node.Partition)
-	_ = d.Set("address", node.Address)
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)
 	_ = d.Set("monitor", node.Monitor)
 	_ = d.Set("rate_limit", node.RateLimit)
 	_ = d.Set("ratio", node.Ratio)
 	_ = d.Set("state", node.State)
-	_ = d.Set("fqdn.0.interval", node.FQDN.Interval)
-	_ = d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
-	_ = d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
-	_ = d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
-	_ = d.Set("fqdn.0.name", node.FQDN.Name)
+
+	var fqdn []map[string]interface{}
+
+	fqdnelements := map[string]interface{}{
+		"interval":       node.FQDN.Interval,
+		"downinterval":   node.FQDN.DownInterval,
+		"autopopulate":   node.FQDN.AutoPopulate,
+		"address_family": node.FQDN.AddressFamily,
+	}
+	fqdn = append(fqdn, fqdnelements)
+	_ = d.Set("fqdn", fqdn)
+
+	//	_ = d.Set("fqdn.0.interval", node.FQDN.Interval)
+	//	_ = d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
+	//	_ = d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
+	//	_ = d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
 	d.SetId(node.Name)
 
 	return nil
