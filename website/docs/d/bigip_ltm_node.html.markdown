@@ -17,12 +17,19 @@ Use this data source (`bigip_ltm_node`) to get the ltm node details available on
 
 data "bigip_ltm_node" "test" {
   name = "terraform_node"
-  address = "192.168.1.1"
+  partition = "Common"
 }
 
 
 output "bigip_node" {
   value = "${data.bigip_ltm_node.test.address}"
+}
+
+
+if it is fqdn address we can get fqdn elements as below
+
+output "bigip_node" {
+  value = "${data.bigip_ltm_node.test.fqdn[0].address_family}"
 }
 
 ```      
@@ -55,7 +62,6 @@ Additionally, the following attributes are exported:
 The `fqdn` block contains:
 
 * `address_family` - The FQDN node's address family.
-* `name` - The fully qualified domain name of the node.
 * `interval` - The amount of time before sending the next DNS query.
 * `downinterval` - The number of attempts to resolve a domain name.
 * `autopopulate` - Specifies if the node should scale to the IP address set returned by DNS.
