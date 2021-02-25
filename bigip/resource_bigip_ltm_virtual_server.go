@@ -8,12 +8,14 @@ package bigip
 
 import (
 	"fmt"
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
 	"strconv"
-
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"strings"
 )
 
 func resourceBigipLtmVirtualServer() *schema.Resource {
@@ -33,7 +35,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the virtual server",
 				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 
 			"port": {
@@ -43,9 +45,10 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "0.0.0.0/0",
+				Type:     schema.TypeString,
+				Optional: true,
+				//Default:     "0.0.0.0/0",
+				Computed:    true,
 				Description: "Source IP and mask for the virtual server",
 			},
 			"description": {
@@ -73,10 +76,11 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"mask": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "255.255.255.255",
-				Description: "Mask can either be in CIDR notation or decimal, i.e.: \"24\" or \"255.255.255.0\". A CIDR mask of \"0\" is the same as \"0.0.0.0\"",
+				Type:     schema.TypeString,
+				Optional: true,
+				//Default:     "255.255.255.255",
+				Computed:    true,
+				Description: "subnet mask",
 			},
 
 			"profiles": {
@@ -102,13 +106,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-
 			"persistence_profiles": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
-				Computed: true,
+				//Computed: true,
 			},
 			"default_persistence_profile": {
 				Type:     schema.TypeString,
@@ -127,14 +130,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
-
 			"source_address_translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "none, automap, snat",
 			},
-
 			"snatpool": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -184,36 +185,145 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 	}
 }
 
+var cidr = map[string]string{
+	"0":  "0.0.0.0",
+	"1":  "128.0.0.0",
+	"2":  "192.0.0.0",
+	"3":  "224.0.0.0",
+	"4":  "240.0.0.0",
+	"5":  "248.0.0.0",
+	"6":  "252.0.0.0",
+	"7":  "254.0.0.0",
+	"8":  "255.0.0.0",
+	"9":  "255.128.0.0",
+	"10": "255.192.0.0",
+	"11": "255.224.0.0",
+	"12": "255.240.0.0",
+	"13": "255.248.0.0",
+	"14": "255.252.0.0",
+	"15": "255.254.0.0",
+	"16": "255.255.0.0",
+	"17": "255.255.128.0",
+	"18": "255.255.192.0",
+	"19": "255.255.224.0",
+	"20": "255.255.240.0",
+	"21": "255.255.248.0",
+	"22": "255.255.252.0",
+	"23": "255.255.254.0",
+	"24": "255.255.255.0",
+	"25": "255.255.255.128",
+	"26": "255.255.255.192",
+	"27": "255.255.255.224",
+	"28": "255.255.255.240",
+	"29": "255.255.255.248",
+	"30": "255.255.255.252",
+	"31": "255.255.255.254",
+	"32": "255.255.255.255",
+}
+
+func resourceBigipLtmVirtualServerAttrDefaults(d *schema.ResourceData) {
+	_, hasMask := d.GetOk("mask")
+	_, hasSource := d.GetOk("source")
+
+	// Set default mask if nil
+	if !hasMask {
+		// looks like IPv6, lets set to /128
+		if strings.Contains(d.Get("destination").(string), ":") {
+			_ = d.Set("mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")
+		} else { // /32 for IPv4
+			_ = d.Set("mask", "255.255.255.255")
+		}
+	}
+
+	// set default source if nil
+	if !hasSource {
+		// looks like IPv6, lets set to ::/0
+		if strings.Contains(d.Get("destination").(string), ":") {
+			_ = d.Set("source", "::/0")
+		} else { // 0.0.0.0/0
+			_ = d.Set("source", "0.0.0.0/0")
+		}
+	}
+}
+
 func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
+	resourceBigipLtmVirtualServerAttrDefaults(d)
+
 	name := d.Get("name").(string)
 	port := d.Get("port").(int)
+	mask := d.Get("mask").(string)
+	pool := d.Get("pool").(string)
+	destination := d.Get("destination").(string)
+	//        VlansEnabled := d.Get("vlans_enabled").(bool)
 	TranslateAddress := d.Get("translate_port").(string)
 	TranslatePort := d.Get("translate_port").(string)
 
 	log.Println("[INFO] Creating virtual server " + name)
-	err := client.CreateVirtualServer(
-		name,
-		d.Get("destination").(string),
-		d.Get("mask").(string),
-		d.Get("pool").(string),
-		d.Get("vlans_enabled").(bool),
-		port,
-		TranslateAddress,
-		TranslatePort,
-	)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
-		return err
+
+	if strings.Contains(destination, ":") {
+		subnetMask := mask
+
+		config := &bigip.VirtualServer{
+			Name:             name,
+			Destination:      fmt.Sprintf("%s.%d", destination, port),
+			Mask:             subnetMask,
+			Pool:             pool,
+			TranslateAddress: TranslateAddress,
+			TranslatePort:    TranslatePort,
+			Source:           d.Get("source").(string),
+		}
+		err := client.CreateVirtualServer(config)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
+			return err
+		}
+
+	} else {
+
+		subnetMask := cidr[mask]
+
+		config := &bigip.VirtualServer{
+			Name:             name,
+			Destination:      fmt.Sprintf("%s:%d", destination, port),
+			Mask:             subnetMask,
+			Pool:             pool,
+			TranslateAddress: TranslateAddress,
+			TranslatePort:    TranslatePort,
+			Source:           d.Get("source").(string),
+		}
+		err := client.CreateVirtualServer(config)
+		if err != nil {
+			log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
+			return err
+		}
 	}
 
 	d.SetId(name)
 
-	err = resourceBigipLtmVirtualServerUpdate(d, meta)
+	err := resourceBigipLtmVirtualServerUpdate(d, meta)
 	if err != nil {
-		client.DeleteVirtualServer(name)
+		_ = client.DeleteVirtualServer(name)
 		return err
+	}
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		err = teemDevice.Report(f, "bigip_ltm_virtual_server", "1")
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 
 	return resourceBigipLtmVirtualServerRead(d, meta)
@@ -221,9 +331,7 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 
 func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
 	log.Println("[INFO] Fetching virtual server " + name)
 
 	vs, err := client.GetVirtualServer(name)
@@ -236,27 +344,35 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		d.SetId("")
 		return nil
 	}
-	// Extract destination address from "/partition_name/(virtual_server_address)[%route_domain]:port"
-	regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
-	destination := regex.FindStringSubmatch(vs.Destination)
-	parsedDestination := destination[2] + destination[3]
-	if len(destination) < 3 {
-		return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
-	}
-	if err := d.Set("destination", parsedDestination); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
 
-	// Extract source address from "(source_address)[%route_domain](/mask)" groups 1 + 2
-	//regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
-	//source := regex.FindStringSubmatch(vs.Source)
-	//parsedSource := source[1] + source[2]
+	vsDest := vs.Destination
+	if strings.Count(vsDest, ":") >= 2 {
+		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		if destination == nil {
+			return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
+		}
+		if err := d.Set("destination", destination[2]); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
+		}
+	}
+	if strings.Count(vsDest, ":") < 2 {
+		regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		parsedDestination := destination[2] + destination[3]
+		if len(destination) < 3 {
+			return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
+		}
+		if err := d.Set("destination", parsedDestination); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
+		}
+	}
 	if err := d.Set("source", vs.Source); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-	d.Set("protocol", vs.IPProtocol)
-	d.Set("name", name)
+	_ = d.Set("protocol", vs.IPProtocol)
+	_ = d.Set("name", name)
 	if err := d.Set("pool", vs.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Pool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
@@ -264,83 +380,96 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 
-	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
-	   so we need to extract it
-	*/
-	regex = regexp.MustCompile(`\:(\d+)`)
-	port := regex.FindStringSubmatch(vs.Destination)
-	if len(port) < 2 {
-		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
-	}
-	parsedPort, _ := strconv.Atoi(port[1])
-	d.Set("port", parsedPort)
+	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
+	//	   so we need to extract it
+	//	*/
+	//	regex = regexp.MustCompile(`\:(\d+)`)
+	//	port := regex.FindStringSubmatch(vs.Destination)
+	//	if len(port) < 2 {
+	//		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+	//	}
+	//	parsedPort, _ := strconv.Atoi(port[1])
 
-	d.Set("irules", makeStringList(&vs.Rules))
-	d.Set("ip_protocol", vs.IPProtocol)
-	d.Set("description", vs.Description)
-	if vs.Enabled {
-		d.Set("state", "enabled")
-	} else {
-		d.Set("state", "disabled")
+	if strings.Count(vsDest, ":") < 2 {
+		regex := regexp.MustCompile(`\:(\d+)`)
+		port := regex.FindStringSubmatch(vs.Destination)
+		if len(port) < 2 {
+			return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+		}
+		parsedPort, _ := strconv.Atoi(port[1])
+		_ = d.Set("port", parsedPort)
 	}
-	d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+	if strings.Count(vsDest, ":") >= 2 {
+		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		destination := regex.FindStringSubmatch(vs.Destination)
+		parsedPort, _ := strconv.Atoi(destination[3])
+		_ = d.Set("port", parsedPort)
+	}
+	_ = d.Set("irules", makeStringList(&vs.Rules))
+	_ = d.Set("ip_protocol", vs.IPProtocol)
+	_ = d.Set("description", vs.Description)
+	if vs.Enabled {
+		_ = d.Set("state", "enabled")
+	} else {
+		_ = d.Set("state", "disabled")
+	}
+	_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("policies", vs.Policies); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Policies to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("vlans", vs.Vlans)
+	_ = d.Set("vlans", vs.Vlans)
 	if err := d.Set("translate_address", vs.TranslateAddress); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslateAddress to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
+	profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
 	for _, profile := range vs.PersistenceProfiles {
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
-		profile_names.Add(FullProfileName)
+		profileNames.Add(FullProfileName)
 	}
-	if profile_names.Len() > 0 {
-		d.Set("persistence_profiles", profile_names)
+	if profileNames.Len() > 0 {
+		_ = d.Set("persistence_profiles", profileNames)
 	}
 	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
-	d.Set("vlans_enabled", vs.VlansEnabled)
+	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
 	}
 
 	if profiles != nil && len(profiles.Profiles) > 0 {
-		profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-		client_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
-		server_profile_names := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		clientProfileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
+		serverProfileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
 		for _, profile := range profiles.Profiles {
 			switch profile.Context {
 			case bigip.CONTEXT_CLIENT:
-				client_profile_names.Add(profile.FullPath)
+				clientProfileNames.Add(profile.FullPath)
 				break
 			case bigip.CONTEXT_SERVER:
-				server_profile_names.Add(profile.FullPath)
+				serverProfileNames.Add(profile.FullPath)
 				break
 			default:
-				profile_names.Add(profile.FullPath)
+				profileNames.Add(profile.FullPath)
 			}
 		}
-		if profile_names.Len() > 0 {
-			d.Set("profiles", profile_names)
+		if profileNames.Len() > 0 {
+			_ = d.Set("profiles", profileNames)
 		}
-		if client_profile_names.Len() > 0 {
-			d.Set("client_profiles", client_profile_names)
+		if clientProfileNames.Len() > 0 {
+			_ = d.Set("client_profiles", clientProfileNames)
 		}
-		if server_profile_names.Len() > 0 {
-			d.Set("server_profiles", server_profile_names)
+		if serverProfileNames.Len() > 0 {
+			_ = d.Set("server_profiles", serverProfileNames)
 		}
 	}
-
 	return nil
 }
 
@@ -365,6 +494,8 @@ func resourceBigipLtmVirtualServerExists(d *schema.ResourceData, meta interface{
 
 func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
+
+	resourceBigipLtmVirtualServerAttrDefaults(d)
 
 	name := d.Id()
 
@@ -407,12 +538,17 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	}
 
 	var rules []string
-	if cfg_rules, ok := d.GetOk("irules"); ok {
-		rules = listToStringSlice(cfg_rules.([]interface{}))
+	if cfgRules, ok := d.GetOk("irules"); ok {
+		rules = listToStringSlice(cfgRules.([]interface{}))
+	}
+
+	destPort := fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int))
+	if strings.Contains(d.Get("destination").(string), ":") {
+		destPort = fmt.Sprintf("%s.%d", d.Get("destination").(string), d.Get("port").(int))
 	}
 
 	vs := &bigip.VirtualServer{
-		Destination:                fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int)),
+		Destination:                destPort,
 		FallbackPersistenceProfile: d.Get("fallback_persistence_profile").(string),
 		Source:                     d.Get("source").(string),
 		Pool:                       d.Get("pool").(string),

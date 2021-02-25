@@ -8,7 +8,7 @@ description: |-
 
 # bigip\_ltm\_policy
 
-`bigip_ltm_policy` Configures Virtual Server
+`bigip_ltm_policy` Configures ltm policies to manage traffic assigned to a virtual server
 
 For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
 
@@ -18,19 +18,22 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 
+resource "bigip_ltm_pool" "mypool" {
+  name                = "/Common/test-pool"
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
 resource "bigip_ltm_policy" "test-policy" {
-  name           = "my_policy"
-  strategy       = "first-match"
-  requires       = ["http"]
-  published_copy = "Drafts/my_policy"
-  controls       = ["forwarding"]
+  name      = "/Common/test-policy"
+  strategy  = "first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
   rule {
     name = "rule6"
-
     action {
-      tm_name = "20"
       forward = true
-      pool    = "/Common/mypool"
+      pool    = bigip_ltm_pool.mypool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]
@@ -40,7 +43,7 @@ resource "bigip_ltm_policy" "test-policy" {
 ## Argument Reference
 
 
-* `name`- (Required) Name of the Policy
+* `name`- (Required) Name of the Policy ( policy name should be in full path which is combination of partition and policy name )
 
 * `strategy` - (Optional) Specifies the match strategy
 
@@ -51,8 +54,6 @@ resource "bigip_ltm_policy" "test-policy" {
 *  `controls` - (Optional) Specifies the controls
 
 * `rule` - (Optional) Rules can be applied using the policy
-
-* `tm_name` - (Required) If Rule is used then you need to provide the tm_name it can be any value
 
 * `forward` - (Optional) This action will affect forwarding.
 

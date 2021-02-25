@@ -8,11 +8,11 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"regexp"
+	"strings"
 )
 
 var parentMonitors = map[string]bool{
@@ -77,6 +77,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"send": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Request string to send.",
 				StateFunc: func(s interface{}) string {
 					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
@@ -133,9 +134,10 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description: "Alias for the destination",
 			},
 			"compatibility": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:     true,
+				Default:      "enabled",
 				Description:  "Specifies, when enabled, that the SSL options setting (in OpenSSL) is set to ALL. The default value is enabled.",
 				ValidateFunc: validateEnabledDisabled,
 			},
@@ -165,6 +167,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "Specifies the password if the monitored target requires authentication",
 			},
 			"username": {
@@ -197,6 +200,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		d.Get("receive").(string),
 		d.Get("receive_disable").(string),
 		d.Get("compatibility").(string),
+		d.Get("destination").(string),
 	)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
@@ -213,6 +217,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+
+	parent_monitor := d.Get("parent").(string)
+	re := regexp.MustCompile("/.*/https$")
+	matchresult := re.MatchString(parent_monitor)
 
 	monitors, err := client.Monitors()
 	if err != nil {
@@ -242,7 +250,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			d.Set("time_until_up", m.TimeUntilUp)
 			d.Set("manual_resume", m.ManualResume)
 			d.Set("destination", m.Destination)
-			d.Set("compatibility", m.Compatibility)
+			if matchresult {
+				d.Set("compatibility", m.Compatibility)
+			} else {
+				d.Set("compatibility", d.Get("compatibility").(string))
+			}
 			d.Set("filename", m.Filename)
 			d.Set("mode", m.Mode)
 			d.Set("adaptive", m.Adaptive)

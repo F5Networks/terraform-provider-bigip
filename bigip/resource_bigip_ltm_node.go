@@ -73,8 +73,9 @@ func resourceBigipLtmNode() *schema.Resource {
 				Description: "Specifies the name of the monitor or monitor rule that you want to associate with the node.",
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "User defined description of the node.",
 			},
 			"state": {
 				Type:        schema.TypeString,
@@ -135,7 +136,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	description := d.Get("description").(string)
 	ratio := d.Get("ratio").(int)
 
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
 	var err error
@@ -206,7 +207,8 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
-		regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?`)
+		// x:x(%x)
+		regex := regexp.MustCompile(`((?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})|(?:.*:[^%]*))(?:\%\d+)?`)
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
 		if err := d.Set("address", node.Address); err != nil {
@@ -258,7 +260,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:.*)$")
+	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	var node *bigip.Node
 	if r.MatchString(address) {

@@ -7,8 +7,9 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"log"
+	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -18,7 +19,7 @@ import (
 const DEFAULT_PARTITION = "Common"
 
 func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
+	p := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"address": {
 				Type:        schema.TypeString,
@@ -50,6 +51,13 @@ func Provider() terraform.ResourceProvider {
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
+			"teem_disable": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				//Default:     false,
+				Description: "If this flag set to true,sending telemetry data to TEEM will be disabled",
+				DefaultFunc: schema.EnvDefaultFunc("TEEM_DISABLE", false),
+			},
 			"login_ref": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -58,7 +66,14 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", nil),
 			},
 		},
-
+		DataSourcesMap: map[string]*schema.Resource{
+			"bigip_ltm_datagroup":   dataSourceBigipLtmDataGroup(),
+			"bigip_ltm_monitor":     dataSourceBigipLtmMonitor(),
+			"bigip_ltm_irule":       dataSourceBigipLtmIrule(),
+			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
+			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
+			"bigip_ltm_node":        dataSourceBigipLtmNode(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
 			"bigip_cm_devicegroup":                  resourceBigipCmDevicegroup(),
@@ -101,13 +116,25 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_fast":                            resourceBigipfasthttp(),
+			"bigip_command":                         resourceBigipCommand(),
+			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
+			"bigip_bigiq_as3":                       resourceBigiqAs3(),
+			"bigip_event_service_discovery":         resourceServiceDiscovery(),
 		},
-
-		ConfigureFunc: providerConfigure,
 	}
+	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+		terraformVersion := p.TerraformVersion
+		if terraformVersion == "" {
+			// Terraform 0.12 introduced this field to the protocol
+			// We can therefore assume that if it's missing it's 0.10 or 0.11
+			terraformVersion = "0.11+compatible"
+		}
+		return providerConfigure(d, terraformVersion)
+	}
+	return p
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 	config := Config{
 		Address:  d.Get("address").(string),
 		Port:     d.Get("port").(string),
@@ -117,8 +144,13 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)
 	}
-
-	return config.Client()
+	cfg, err := config.Client()
+	if err != nil {
+		return cfg, err
+	}
+	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
+	cfg.Teem = d.Get("teem_disable").(bool)
+	return cfg, err
 }
 
 //Convert slice of strings to schema.TypeSet
@@ -174,11 +206,8 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
-			if field == "http_reply" {
-				f := val.FieldByName(strings.Title("httpReply"))
-				f.Set(reflect.ValueOf(d[field]))
-			}
-			log.Printf("[WARN] You probably weren't expecting %s to be an invalid field", field)
+			f := val.FieldByName(strings.Title(toCamelCase(field)))
+			f.Set(reflect.ValueOf(d[field]))
 		}
 	}
 }
@@ -190,4 +219,21 @@ func parseF5Identifier(str string) (partition, name string) {
 		return ary[0], ary[1]
 	}
 	return "", str
+}
+
+// Convert Snakecase to Camelcase
+func toCamelCase(str string) string {
+	var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
+	return link.ReplaceAllStringFunc(str, func(s string) string {
+		return strings.ToUpper(strings.Replace(s, "_", "", -1))
+	})
+}
+
+// Convert Camelcase to Snakecase
+func toSnakeCase(str string) string {
+	var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
 }

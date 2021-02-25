@@ -108,11 +108,8 @@ type Appsvc02 struct {
 }
 
 const (
-	uriSha     = "shared"
-	uriAppsvcs = "appsvcs"
-	uriDecl    = "declare"
-	uriSam01   = "Sample_01"
-	uriSam02   = "Sample_02"
+	uriSam01 = "Sample_01"
+	uriSam02 = "Sample_02"
 )
 
 // Appsvcss returns a list of appsvcs

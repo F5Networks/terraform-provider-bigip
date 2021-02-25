@@ -15,13 +15,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_DATAGROUP_NAME = "/" + TEST_PARTITION + "/test-datagroup"
+var TestDatagroupName = "/" + TEST_PARTITION + "/test-datagroup"
 
-var TEST_DATAGROUP_STRING_RESOURCE = `
+var TestDatagroupStringResource = `
         resource "bigip_ltm_datagroup" "test-datagroup-string" {
-                name = "` + TEST_DATAGROUP_NAME + `"
+                name = "` + TestDatagroupName + `"
                 type = "string"
-
                 record {
                         name = "test-name1"
                         data = "test-data1"
@@ -31,11 +30,10 @@ var TEST_DATAGROUP_STRING_RESOURCE = `
                 }
         }`
 
-var TEST_DATAGROUP_IP_RESOURCE = `
+var TestDatagroupIpResource = `
 	resource "bigip_ltm_datagroup" "test-datagroup-ip" {
-		name = "` + TEST_DATAGROUP_NAME + `"
+		name = "` + TestDatagroupName + `"
 		type = "ip"
-
 		record {
 			name = "3.3.3.3/32"
 			data = "1.1.1.1"
@@ -45,11 +43,10 @@ var TEST_DATAGROUP_IP_RESOURCE = `
 		}
 	}`
 
-var TEST_DATAGROUP_INTEGER_RESOURCE = `
+var TestDatagroupIntegerResource = `
         resource "bigip_ltm_datagroup" "test-datagroup-integer" {
-                name = "` + TEST_DATAGROUP_NAME + `"
+                name = "` + TestDatagroupName + `"
                 type = "integer"
-
                 record {
                         name = "1"
                         data = "2"
@@ -59,7 +56,7 @@ var TEST_DATAGROUP_INTEGER_RESOURCE = `
                 }
         }`
 
-func TestAccBigipLtmDataGroup_create(t *testing.T) {
+func TestAccBigipLtmDataGroup_Create_TypeString(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -68,14 +65,15 @@ func TestAccBigipLtmDataGroup_create(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_STRING_RESOURCE,
+				Config: TestDatagroupStringResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
 			},
 		},
 	})
-
+}
+func TestAccBigipLtmDataGroup_Create_TypeIp(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -84,14 +82,16 @@ func TestAccBigipLtmDataGroup_create(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_IP_RESOURCE,
+				Config: TestDatagroupIpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
 			},
 		},
 	})
+}
 
+func TestAccBigipLtmDataGroup_Create_TypeInteger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -100,9 +100,9 @@ func TestAccBigipLtmDataGroup_create(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_INTEGER_RESOURCE,
+				Config: TestDatagroupIntegerResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
 			},
 		},
@@ -118,11 +118,11 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_STRING_RESOURCE,
+				Config: TestDatagroupStringResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
-				ResourceName:      TEST_DATAGROUP_NAME,
+				ResourceName:      TestDatagroupName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -137,11 +137,11 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_IP_RESOURCE,
+				Config: TestDatagroupIpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
-				ResourceName:      TEST_DATAGROUP_NAME,
+				ResourceName:      TestDatagroupName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -156,11 +156,11 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DATAGROUP_INTEGER_RESOURCE,
+				Config: TestDatagroupIntegerResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckDataGroupExists(TEST_DATAGROUP_NAME),
+					testCheckDataGroupExists(TestDatagroupName),
 				),
-				ResourceName:      TEST_DATAGROUP_NAME,
+				ResourceName:      TestDatagroupName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -174,13 +174,13 @@ func testCheckDataGroupExists(name string) resource.TestCheckFunc {
 
 		datagroup, err := client.GetInternalDataGroup(name)
 		if err != nil {
-			return fmt.Errorf("Error while fetching Data Group: %v", err)
+			return fmt.Errorf("Error while fetching Data Group: %v ", err)
 
 		}
 
-		datagroup_name := fmt.Sprintf("/%s/%s", datagroup.Partition, datagroup.Name)
-		if datagroup_name != name {
-			return fmt.Errorf("Data Group name does not match. Expecting %s got %s.", name, datagroup_name)
+		datagroupName := fmt.Sprintf("/%s/%s", datagroup.Partition, datagroup.Name)
+		if datagroupName != name {
+			return fmt.Errorf("Data Group name does not match. Expecting %s got %s ", name, datagroupName)
 		}
 		return nil
 	}

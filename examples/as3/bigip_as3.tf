@@ -5,7 +5,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
  */
 
 provider "bigip" {
-  address = "x.x.x.x"
+  address  = "x.x.x.x"
   username = "xxxx"
   password = "xxxxx"
 }
@@ -20,10 +20,9 @@ resource "null_resource" "install_as3" {
 }
 
 // config_name is used to set the identity of as3 resource which is unique for resource.
-resource "bigip_as3"  "as3-example1" {
-     as3_json = "${file("example1.json")}" 
-     config_name = "sample_test"
-     depends_on = ["null_resource.install_as3"]
- }
+resource "bigip_as3" "as3-example1" {
+  as3_json   = file("example1.json")
+  depends_on = ["null_resource.install_as3"]
+}
 
 

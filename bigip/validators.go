@@ -8,10 +8,11 @@ package bigip
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"net"
 	"reflect"
 	"regexp"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"strings"
 )
 
 //Validate the incoming set only contains values from the specified set
@@ -56,9 +57,37 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	}
 
 	for _, v := range values {
-		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.]+$", v)
+		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+$", v)
 		if !match {
-			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-]. e.g. /Common/my-pool", field))
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:]. e.g. /Common/my-pool", field))
+		}
+	}
+	return
+}
+
+func validateF5NameWithDirectory(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+		break
+	case []string:
+		values = value.([]string)
+		break
+	case *[]string:
+		values = *(value.(*[]string))
+		break
+	case string:
+		values = []string{value.(string)}
+		break
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
+	}
+
+	for _, v := range values {
+		match, _ := regexp.MatchString("(^/[\\w_\\-.]+/[\\w_\\-.:]+/[\\w_\\-.:]+$)|(^/[\\w_\\-.]+/[\\w_\\-.:]+$)", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name or /Partition/Directory/Name  e.g. /Common/my-node or /Common/test/my-node", field))
 		}
 	}
 	return
@@ -112,12 +141,27 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 	}
 
 	for _, v := range values {
-		match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.]+:\\d+$", v)
-		if !match {
-			errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [._-]. e.g. /Common/node1:80", field))
+		if strings.Count(v, ":") >= 2 {
+			match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.:]+.\\d+$", v)
+			if !match {
+				errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [:._-]. e.g. /Common/node1:80", field))
+			}
+		} else {
+			match, _ := regexp.MatchString("^[\\w_\\-.]+:\\d+$", v)
+			if !match {
+				errors = append(errors, fmt.Errorf("%q must match Node-address:Port and Node Address is IP/FQDN. e.g. 1.1.1.1:80/www.google.com:80", field))
+			}
 		}
 	}
 	return
+}
+
+// IsValidIP tests that the argument is a valid IP address.
+func IsValidIP(value string) bool {
+	if net.ParseIP(value) == nil {
+		return false
+	}
+	return true
 }
 
 func validateEnabledDisabled(value interface{}, field string) (ws []string, errors []error) {
@@ -193,4 +237,56 @@ func validateDataGroupType(value interface{}, field string) (ws []string, errors
 		}
 	}
 	return
+}
+func validatePoolLicenseType(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+	case []string:
+		values = value.([]string)
+	case *[]string:
+		values = *(value.(*[]string))
+	case string:
+		values = []string{value.(string)}
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
+	}
+	for _, v := range values {
+		match, _ := regexp.MatchString("(?mi)^Utility$|^regkey$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match as Utility (or) Regkey", field))
+		}
+	}
+	return
+}
+func validateAssignmentType(value interface{}, field string) (ws []string, errors []error) {
+	var values []string
+	switch value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(value.(*schema.Set))
+	case []string:
+		values = value.([]string)
+	case *[]string:
+		values = *(value.(*[]string))
+	case string:
+		values = []string{value.(string)}
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
+	}
+	for _, v := range values {
+		match, _ := regexp.MatchString("(?mi)^MANAGED$|^UNMANAGED$|^UNREACHABLE$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match as MANAGED/UNMANAGED/UNREACHABLE", field))
+		}
+	}
+	return
+}
+
+func getDeviceUri(str string) ([]string, error) {
+	re := regexp.MustCompile(`^(?:(?:(https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?`)
+	if len(re.FindStringSubmatch(str)) > 0 {
+		return re.FindStringSubmatch(str), nil
+	}
+	return []string{}, nil
 }

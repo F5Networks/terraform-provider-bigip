@@ -41,59 +41,68 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default:     300,
+				//	Default:     300,
+				Computed: true,
 			},
 
 			"connpoolidle_timeoutoverride": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "idle_timeout can be given value",
+				Computed:    true,
 			},
 
 			"connpool_maxreuse": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "connpool_maxreuse timer",
-				Default:     0,
+				//	Default:     0,
+				Computed: true,
 			},
 
 			"connpool_maxsize": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "timer integer",
+				Computed:    true,
 			},
 
 			"connpool_minsize": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Pool min size",
+				Computed:    true,
 			},
 
 			"connpool_replenish": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "enabled or disabled",
-				Default:     "enabled",
+				//	Default:     "enabled",
+				Computed: true,
 			},
 
 			"connpool_step": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default:     4,
+				//	Default:     4,
+				Computed: true,
 			},
 			"forcehttp_10response": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "disabled or enabled ",
-				Default:     "",
+				//	Default:     "",
+				Computed: true,
 			},
 
 			"maxheader_size": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "integer value",
-				Default:     32768,
+				//	Default:     32768,
+				Computed: true,
 			},
 		},
 	}
@@ -116,24 +125,26 @@ func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interfac
 	maxHeaderSize := d.Get("maxheader_size").(int)
 	log.Println("[INFO] Creating Fasthttp profile")
 
-	err := client.CreateFasthttp(
-		name,
-		defaultsFrom,
-		idleTimeout,
-		connpoolIdleTimeoutOverride,
-		connpoolMaxReuse,
-		connpoolMaxSize,
-		connpoolMinSize,
-		connpoolReplenish,
-		connpoolStep,
-		forceHttp_10Response,
-		maxHeaderSize,
-	)
+	r := &bigip.Fasthttp{
+		Name:                        name,
+		DefaultsFrom:                defaultsFrom,
+		IdleTimeout:                 idleTimeout,
+		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
+		ConnpoolMaxReuse:            connpoolMaxReuse,
+		ConnpoolMaxSize:             connpoolMaxSize,
+		ConnpoolMinSize:             connpoolMinSize,
+		ConnpoolReplenish:           connpoolReplenish,
+		ConnpoolStep:                connpoolStep,
+		ForceHttp_10Response:        forceHttp_10Response,
+		MaxHeaderSize:               maxHeaderSize,
+	}
+	err := client.CreateFasthttp(r)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Fasthttp   (%s) (%v) ", name, err)
 		return err
 	}
+
 	d.SetId(name)
 	return resourceBigipLtmProfileFasthttpRead(d, meta)
 }
@@ -181,37 +192,57 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("idle_timeout"); ok {
+		if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolIdleTimeoutOverride to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("connpoolidle_timeoutoverride"); ok {
+		if err := d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolIdleTimeoutOverride to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
+	if _, ok := d.GetOk("connpool_maxreuse"); ok {
 
-	if err := d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxReuse to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		if err := d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxReuse to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("connpool_maxsize", obj.ConnpoolMaxSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("connpool_maxsize"); ok {
+		if err := d.Set("connpool_maxsize", obj.ConnpoolMaxSize); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("connpool_minsize", obj.ConnpoolMinSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolMinSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("connpool_minsize"); ok {
+		if err := d.Set("connpool_minsize", obj.ConnpoolMinSize); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolMinSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("connpool_replenish", obj.ConnpoolReplenish); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolReplenish to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("connpool_replenish"); ok {
+		if err := d.Set("connpool_replenish", obj.ConnpoolReplenish); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolReplenish to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("connpool_step", obj.ConnpoolStep); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ConnpoolStep to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("connpool_step"); ok {
+		if err := d.Set("connpool_step", obj.ConnpoolStep); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ConnpoolStep to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("forcehttp_10response", obj.ForceHttp_10Response); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ForceHttp_10Response to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("forcehttp_10response"); ok {
+		if err := d.Set("forcehttp_10response", obj.ForceHttp_10Response); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ForceHttp_10Response to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
-	if err := d.Set("maxheader_size", obj.MaxHeaderSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MaxHeaderSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("maxheader_size"); ok {
+		if err := d.Set("maxheader_size", obj.MaxHeaderSize); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving MaxHeaderSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
+		}
 	}
 	return nil
 }

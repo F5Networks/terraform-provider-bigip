@@ -35,11 +35,14 @@ type ConfigOptions struct {
 
 // BigIP is a container for our session state.
 type BigIP struct {
-	Host          string
-	User          string
-	Password      string
-	Token         string // if set, will be used instead of User/Password
-	Transport     *http.Transport
+	Host      string
+	User      string
+	Password  string
+	Token     string // if set, will be used instead of User/Password
+	Transport *http.Transport
+	// UserAgent is an optional field that specifies the caller of this request.
+	UserAgent     string
+	Teem          bool
 	ConfigOptions *ConfigOptions
 }
 
@@ -238,7 +241,7 @@ func (b *BigIP) delete(path ...string) error {
 }
 
 //Generic delete
-func (b *BigIP) fastDelete(path ...string) ([]byte, error) {
+func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
 	req := &APIRequest{
 		Method: "delete",
 		URL:    b.iControlPath(path),
@@ -248,6 +251,24 @@ func (b *BigIP) fastDelete(path ...string) ([]byte, error) {
 	return resp, callErr
 }
 
+func (b *BigIP) deleteReqBody(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "delete",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
+>>>>>>> master
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -265,7 +286,7 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 	return callErr
 }
 
-func (b *BigIP) fastPost(body interface{}, path ...string) ([]byte, error) {
+func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
 		return nil, err
@@ -299,6 +320,23 @@ func (b *BigIP) put(body interface{}, path ...string) error {
 	return callErr
 }
 
+func (b *BigIP) putReq(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "put",
+		URL:         b.iControlPath(path),
+		Body:        strings.TrimRight(string(marshalJSON), "\n"),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
+
 func (b *BigIP) patch(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -314,6 +352,23 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 
 	_, callErr := b.APICall(req)
 	return callErr
+}
+
+func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
+	marshalJSON, err := jsonMarshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &APIRequest{
+		Method:      "patch",
+		URL:         b.iControlPath(path),
+		Body:        string(marshalJSON),
+		ContentType: "application/json",
+	}
+
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 // Upload a file read from a Reader
@@ -409,6 +464,26 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		return err, false
 	}
 
+	return nil, true
+}
+
+func (b *BigIP) getForEntityNew(e interface{}, path ...string) (error, bool) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		return err, false
+	}
+	err = json.Unmarshal(resp, e)
+	if err != nil {
+		return err, false
+	}
 	return nil, true
 }
 

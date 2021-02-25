@@ -13,6 +13,8 @@ package bigip
 import (
 	"encoding/json"
 	"log"
+	//"strings"
+	"time"
 )
 
 type Version struct {
@@ -45,6 +47,19 @@ type NTP struct {
 	Description string   `json:"description,omitempty"`
 	Servers     []string `json:"servers,omitempty"`
 	Timezone    string   `json:"timezone,omitempty"`
+}
+
+type BigipCommand struct {
+	Command       string `json:"command"`
+	UtilCmdArgs   string `json:"utilCmdArgs"`
+	CommandResult string `json:"commandResult,omitempty"`
+}
+
+type BigipCmdResp struct {
+	Code       int           `json:"code"`
+	Message    string        `json:"message"`
+	ErrorStack []interface{} `json:"errorStack"`
+	APIError   int           `json:"apiError"`
 }
 
 type DNSs struct {
@@ -238,6 +253,8 @@ const (
 	uriSys             = "sys"
 	uriTm              = "tm"
 	uriCli             = "cli"
+	uriUtil            = "util"
+	uriBash            = "bash"
 	uriVersion         = "version"
 	uriNtp             = "ntp"
 	uriDNS             = "dns"
@@ -522,6 +539,16 @@ func (b *BigIP) BigipVersion() (*Version, error) {
 	return &bigipversion, nil
 }
 
+func (b *BigIP) RunCommand(config *BigipCommand) (*BigipCommand, error) {
+	var respRef BigipCommand
+	resp, err := b.postReq(config, uriMgmt, uriTm, uriUtil, uriBash)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(resp, &respRef)
+	return &respRef, nil
+}
+
 func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots int, search []string) error {
 	config := &DNS{
 		Description:  description,
@@ -753,6 +780,22 @@ func (b *BigIP) Bigiplicenses() (*Bigiplicense, error) {
 	}
 
 	return &bigiplicense, nil
+}
+
+func (b *BigIP) GetBigipLiceseStatus() (map[string]interface{}, error) {
+	bigipLicense := make(map[string]interface{})
+	err, _ := b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+	c := 0
+	for err != nil {
+		time.Sleep(10 * time.Second)
+		c++
+		err, _ = b.getForEntityNew(&bigipLicense, uriMgmt, uriTm, uriSys, uriLicense)
+		if c == 15 {
+			log.Printf("[DEBUG] Device is not up even after waiting for 120 seconds")
+			return nil, err
+		}
+	}
+	return bigipLicense, nil
 }
 
 func (b *BigIP) CreateBigiplicense(command, registration_key string) error {

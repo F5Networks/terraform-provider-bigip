@@ -35,8 +35,9 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 			},
 
 			"app_service": {
-				Type:     schema.TypeString,
-				Default:  "",
+				Type: schema.TypeString,
+				//Default:  "",
+				Computed: true,
 				Optional: true,
 			},
 
@@ -48,105 +49,126 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 			},
 
 			"match_across_pools": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across pools with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable match across pools with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_services": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across services with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable match across services with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_virtuals": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "To enable _ disable match across virtual servers with given persistence record",
-				ValidateFunc: validateEnabledDisabled,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable match across virtual servers with given persistence record",
+				//ValidateFunc: validateEnabledDisabled,
+			},
+			"method": {
+				Type: schema.TypeString,
+				//Default:     "insert",
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies the type of cookie processing that the system uses",
 			},
 
 			"mirror": {
-				Type:         schema.TypeString,
-				Default:      "disabled",
-				Optional:     true,
-				Description:  "To enable _ disable",
-				ValidateFunc: validateEnabledDisabled,
+				Type: schema.TypeString,
+				//Default:      "disabled",
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable",
+				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Timeout for persistence of the session",
 			},
 
 			"override_conn_limit": {
-				Type:         schema.TypeString,
-				Default:      false,
-				Optional:     true,
-				Description:  "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				ValidateFunc: validateEnabledDisabled,
+				Type: schema.TypeString,
+				//Default:      false,
+				Optional:    true,
+				Computed:    true,
+				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
+				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			// Specific to CookiePersistenceProfile
 			"always_send": {
-				Type:         schema.TypeString,
-				Default:      "default",
-				Optional:     true,
-				Description:  "To enable _ disable always sending cookies",
-				ValidateFunc: validateEnabledDisabled,
+				Type: schema.TypeString,
+				//Default:      "default",
+				Computed:    true,
+				Optional:    true,
+				Description: "To enable _ disable always sending cookies",
+				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"cookie_encryption": {
-				Type:         schema.TypeString,
-				Default:      "disabled",
-				Optional:     true,
-				Description:  "To required, preferred, or disabled policy for cookie encryption",
-				ValidateFunc: validateReqPrefDisabled,
+				Type: schema.TypeString,
+				//Default:      "disabled",
+				Optional:    true,
+				Computed:    true,
+				Description: "To required, preferred, or disabled policy for cookie encryption",
+				//ValidateFunc: validateReqPrefDisabled,
 			},
 
 			"cookie_encryption_passphrase": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Passphrase for encrypted cookies",
 			},
 
 			"cookie_name": {
-				Type:        schema.TypeString,
-				Default:     "disabled",
+				Type: schema.TypeString,
+				//Default:     "disabled",
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of the cookie to track persistence",
 			},
 
 			"expiration": {
-				Type:        schema.TypeString,
-				Default:     "0",
+				Type: schema.TypeString,
+				//Default:     "0",
 				Optional:    true,
+				Computed:    true,
 				Description: "Expiration TTL for cookie specified in D:H:M:S or in seconds",
 			},
 
 			"hash_length": {
-				Type:        schema.TypeInt,
-				Default:     0,
+				Type: schema.TypeInt,
+				//Default:     0,
+				Computed:    true,
 				Optional:    true,
 				Description: "Length of hash to apply to cookie",
 			},
 
 			"hash_offset": {
-				Type:        schema.TypeInt,
-				Default:     0,
+				Type: schema.TypeInt,
+				//Default:     0,
 				Optional:    true,
+				Computed:    true,
 				Description: "Number of characters to skip in the cookie for the hash",
 			},
 
 			"httponly": {
-				Type:         schema.TypeString,
-				Default:      "disabled",
-				Optional:     true,
-				Description:  "To enable _ disable sending only over http",
-				ValidateFunc: validateEnabledDisabled,
+				Type: schema.TypeString,
+				//Default:      "disabled",
+				Optional:    true,
+				Description: "To enable _ disable sending only over http",
+				//ValidateFunc: validateEnabledDisabled,
+				Computed: true,
 			},
 		},
 	}
@@ -158,10 +180,15 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	err := client.CreateCookiePersistenceProfile(
+	/*err := client.CreateCookiePersistenceProfile(
 		name,
 		parent,
-	)
+	)*/
+	config := &bigip.PersistenceProfile{
+		Name:         name,
+		DefaultsFrom: parent,
+	}
+	err := client.CreateCookiePersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Cookie Persistence Profile %s %v :", name, err)
 		return err
@@ -196,36 +223,70 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("app_service", pp.AppService); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	_ = d.Set("name", name)
+	if _, ok := d.GetOk("partition"); ok {
+		if err := d.Set("app_service", pp.AppService); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+		}
 	}
-
-	if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("partition"); ok {
+		if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+		}
 	}
-	d.Set("match_across_pools", pp.MatchAcrossPools)
-	d.Set("match_across_services", pp.MatchAcrossServices)
-	d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	if err := d.Set("mirror", pp.Mirror); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("match_across_pools", pp.MatchAcrossPools)
 	}
-	d.Set("timeout", pp.Timeout)
-	d.Set("override_conn_limit", pp.OverrideConnectionLimit)
-
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("match_across_services", pp.MatchAcrossServices)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		if err := d.Set("mirror", pp.Mirror); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("method", pp.Method)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("timeout", pp.Timeout)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	}
 	// Specific to CookiePersistenceProfile
-	d.Set("always_send", pp.AlwaysSend)
-	if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("partition"); ok {
+
+		_ = d.Set("always_send", pp.AlwaysSend)
 	}
-	if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("partition"); ok {
+		if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+		}
 	}
-	d.Set("cookie_name", pp.CookieName)
-	d.Set("expiration", pp.Expiration)
-	d.Set("hash_length", pp.HashLength)
-	d.Set("hash_offset", pp.HashOffset)
-	d.Set("httponly", pp.HTTPOnly)
+	if _, ok := d.GetOk("partition"); ok {
+		if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+		}
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("cookie_name", pp.CookieName)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("expiration", pp.Expiration)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("hash_length", pp.HashLength)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("hash_offset", pp.HashOffset)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		_ = d.Set("httponly", pp.HTTPOnly)
+	}
 
 	return nil
 }
@@ -237,16 +298,18 @@ func resourceBigipLtmPersistenceProfileCookieUpdate(d *schema.ResourceData, meta
 
 	pp := &bigip.CookiePersistenceProfile{
 		PersistenceProfile: bigip.PersistenceProfile{
-			AppService:              d.Get("app_service").(string),
-			DefaultsFrom:            d.Get("defaults_from").(string),
-			MatchAcrossPools:        d.Get("match_across_pools").(string),
-			MatchAcrossServices:     d.Get("match_across_services").(string),
-			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-			Mirror:                  d.Get("mirror").(string),
+			AppService:          d.Get("app_service").(string),
+			DefaultsFrom:        d.Get("defaults_from").(string),
+			MatchAcrossPools:    d.Get("match_across_pools").(string),
+			MatchAcrossServices: d.Get("match_across_services").(string),
+			MatchAcrossVirtuals: d.Get("match_across_virtuals").(string),
+			Mirror:              d.Get("mirror").(string),
+			//  Method:                  d.Get("method").(string),
 			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
 			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
 		},
 		// Specific to CookiePersistenceProfile
+		Method:                     d.Get("method").(string),
 		AlwaysSend:                 d.Get("always_send").(string),
 		CookieEncryption:           d.Get("cookie_encryption").(string),
 		CookieEncryptionPassphrase: d.Get("cookie_encryption_passphrase").(string),

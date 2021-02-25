@@ -16,21 +16,18 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_VS_NAME = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
+var TestVsName = fmt.Sprintf("/%s/test-vs", TEST_PARTITION)
 
-var TEST_VS_RESOURCE = TEST_IRULE_RESOURCE + `
-
-
+var TestVsResource = TEST_IRULE_RESOURCE + `
 resource "bigip_ltm_policy" "http_to_https_redirect" {
-  name = "http_to_https_redirect"
-  strategy = "/Common/first-match"
+  name = "/Common/http_to_https_redirect"
+  strategy = "first-match"
   requires = ["http"]
   published_copy = "Drafts/http_to_https_redirect"
   controls = ["forwarding"]
   rule  {
     name = "http_to_https_redirect_rule"
     action {
-      tm_name = "http_to_https_redirect"
       redirect = true
       location = "tcl:https://[HTTP::host][HTTP::uri]"
       http_reply = true
@@ -38,26 +35,44 @@ resource "bigip_ltm_policy" "http_to_https_redirect" {
   }
 }
 resource "bigip_ltm_virtual_server" "test-vs" {
-	name = "` + TEST_VS_NAME + `"
+	name = "` + TestVsName + `"
 	destination = "10.255.255.254"
 	description = "VirtualServer-test"
 	port = 9999
 	mask = "255.255.255.255"
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
-	irules = ["${bigip_ltm_irule.test-rule.name}"]
+	irules = [bigip_ltm_irule.test-rule.name]
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
 	persistence_profiles = ["/Common/source_addr","/Common/hash"]
 	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
-        policies = ["${bigip_ltm_policy.http_to_https_redirect.name}"]
+    policies = [bigip_ltm_policy.http_to_https_redirect.name]
+}
+`
+var TestVs6Name = fmt.Sprintf("/%s/test-vs6", TEST_PARTITION)
 
+var TestVs6Resource = TEST_IRULE_RESOURCE + `
+resource "bigip_ltm_virtual_server" "test-vs" {
+	name = "` + TestVs6Name + `"
+    destination = "fe80::11"
+	description = "VirtualServer-test"
+	port = 9999
+	source_address_translation = "automap"
+	ip_protocol = "tcp"
+	irules = [bigip_ltm_irule.test-rule.name]
+	profiles = ["/Common/http"]
+	client_profiles = ["/Common/tcp"]
+	server_profiles = ["/Common/tcp-lan-optimized"]
+	persistence_profiles = ["/Common/source_addr", "/Common/hash"]
+	default_persistence_profile = "/Common/hash"
+	fallback_persistence_profile = "/Common/dest_addr"
 }
 `
 
-func TestAccBigipLtmVS_create(t *testing.T) {
+func TestAccBigipLtmVS_CreateV4V6(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -69,14 +84,55 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 		),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VS_RESOURCE,
+				Config: TestVsResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TEST_VS_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TEST_VS_NAME),
+					testCheckVSExists(TestVsName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVsName),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "10.255.255.254"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source", "0.0.0.0/0"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "irules.0", TEST_IRULE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("profiles.%d", schema.HashString("/Common/http")),
+						"/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("client_profiles.%d", schema.HashString("/Common/tcp")),
+						"/Common/tcp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
+						"/Common/tcp-lan-optimized"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
+						"/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+				),
+			},
+		},
+	})
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+			testCheckIRulesDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: TestVs6Resource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists(TestVs6Name, true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVs6Name),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "fe80::11"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source", "::/0"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", "VirtualServer-test"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
@@ -97,9 +153,9 @@ func TestAccBigipLtmVS_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/hash")),
 						"/Common/hash"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
-						"http_to_https_redirect"),
+					//resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
+					//		fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
+					//	"http_to_https_redirect"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
@@ -225,7 +281,71 @@ func TestAccBigipLtmVS_Modify_stateEnabledtoDisabled(t *testing.T) {
 		},
 	})
 }
-
+func TestAccBigipLtmVS_Policyattach_detach(t *testing.T) {
+	var rsName = "bigip_ltm_virtual_server.test_virtual_server_policyattch_detach"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreatePolicyAttach("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
+					resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("/Common/test-policy")), "/Common/test-policy"),
+				),
+			},
+			{
+				Config: testVSCreatePolicyDettach("test-vs-sample"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-sample", true),
+					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
+					//resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("")), ""),
+					//resource.TestCheckResourceAttr(rsName, "policies.0", ""),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmVS_Pooolattach_detatch(t *testing.T) {
+	var poolName = "test-pool"
+	var policyName = "test-policy"
+	var vsName = "test-vs-sample"
+	var partition = "Common"
+	var vsFullname = fmt.Sprintf("/%s/%s", partition, vsName)
+	var rsName = "bigip_ltm_virtual_server." + vsName
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreateAttach(poolName, policyName, vsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists(vsName, true),
+					resource.TestCheckResourceAttr(rsName, "name", vsFullname),
+					//resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("/Common/test-policy")), "/Common/test-policy"),
+				),
+			},
+			{
+				Config: testVSCreateDetatch(poolName, policyName, vsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists(vsName, true),
+					resource.TestCheckResourceAttr(rsName, "name", vsFullname),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipLtmVS_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -235,16 +355,27 @@ func TestAccBigipLtmVS_import(t *testing.T) {
 		CheckDestroy: testCheckVSsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VS_RESOURCE,
+				Config: testaccBigipLtmVSImportConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TEST_VS_NAME, true),
+					testCheckVSExists("/Common/test-vs", true),
 				),
-				ResourceName:      TEST_VS_NAME,
-				ImportState:       false,
+			},
+			{
+				ResourceName:      "bigip_ltm_virtual_server.test_vs_import",
+				ImportStateId:     "/Common/test-vs",
+				ImportState:       true,
 				ImportStateVerify: true,
 			},
 		},
 	})
+}
+func testaccBigipLtmVSImportConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "test_vs_import" {
+  name = "%s"
+  destination = "192.168.11.11"
+  port = 80
+}`, "/Common/test-vs")
 }
 
 func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
@@ -264,7 +395,7 @@ func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 		return nil
 	}
 }
-func testVSCreatestatedisabled(vs_name string) string {
+func testVSCreatestatedisabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
         name = "/Common/%s"
@@ -272,10 +403,10 @@ resource "bigip_ltm_virtual_server" "test-vs" {
         port = 800
         mask = "255.255.255.255"
         state = "disabled"
-}`, vs_name)
+}`, vsName)
 }
 
-func testVSCreatestateenabled(vs_name string) string {
+func testVSCreatestateenabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
         name = "/Common/%s"
@@ -283,17 +414,193 @@ resource "bigip_ltm_virtual_server" "test-vs" {
         port = 800
         mask = "255.255.255.255"
         state = "enabled"
-}`, vs_name)
+}`, vsName)
 }
 
-func testVSCreateDefaultstate(vs_name string) string {
+func testVSCreateDefaultstate(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
         name = "/Common/%s"
         destination = "192.168.50.1"
         port = 800
         mask = "255.255.255.255"
-}`, vs_name)
+}`, vsName)
+}
+
+func testVSCreatePolicyAttach(vsName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool" "mypool" {
+  name                = "/Common/test-pool"
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
+resource "bigip_ltm_policy" "test-policy" {
+  name      = "/Common/test-policy"
+  strategy  = "first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
+  rule {
+    name = "rule6"
+    action {
+      forward = true
+      pool    = bigip_ltm_pool.mypool.name
+    }
+  }
+  depends_on = [bigip_ltm_pool.mypool]
+}
+resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
+  name = "/Common/%s"
+  destination = "192.168.10.11"
+  port = 80
+  description = "Test virtual server"
+  pool = bigip_ltm_pool.mypool.name
+  ip_protocol = "tcp"
+  profiles = [
+    "/Common/tcp",
+    "/Common/http"
+  ]
+  persistence_profiles = [
+    "/Common/cookie"
+  ]
+  source_address_translation = "automap"
+  translate_address = "enabled"
+  policies = [
+    bigip_ltm_policy.test-policy.name
+  ]
+}`, vsName)
+}
+
+func testVSCreateAttach(poolName, policyName, vsName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool" "%[1]s" {
+  name                = "/Common/%[1]s"
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
+resource "bigip_ltm_policy" "%[2]s" {
+  name      = "/Common/%[2]s"
+  strategy  = "first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
+  rule {
+    name = "rule6"
+    action {
+      forward = true
+      pool    = bigip_ltm_pool.%[1]s.name
+    }
+  }
+  depends_on = [bigip_ltm_pool.%[1]s]
+}
+resource "bigip_ltm_virtual_server" "%[3]s" {
+  name = "/Common/%[3]s"
+  destination = "192.168.10.11"
+  port = 80
+  description = "Test virtual server"
+  pool = bigip_ltm_pool.%[1]s.name
+  ip_protocol = "tcp"
+  profiles = [
+    "/Common/tcp",
+    "/Common/http"
+  ]
+  persistence_profiles = [
+    "/Common/cookie"
+  ]
+  source_address_translation = "automap"
+  translate_address = "enabled"
+  policies = [
+    bigip_ltm_policy.%[2]s.name
+  ]
+}`, poolName, policyName, vsName)
+}
+
+func testVSCreateDetatch(poolName, policyName, vsName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool" "%[1]s" {
+  name                = "/Common/%[1]s"
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
+resource "bigip_ltm_policy" "%[2]s" {
+  name      = "/Common/%[2]s"
+  strategy  = "first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
+  rule {
+    name = "rule6"
+    action {
+      forward = true
+      pool    = bigip_ltm_pool.%[1]s.name
+    }
+  }
+  depends_on = [bigip_ltm_pool.%[1]s]
+}
+resource "bigip_ltm_virtual_server" "%[3]s" {
+  name = "/Common/%[3]s"
+  destination = "192.168.10.11"
+  port = 80
+  description = "Test virtual server"
+  //pool = bigip_ltm_pool.%[1]s.name
+  ip_protocol = "tcp"
+  profiles = [
+    "/Common/tcp",
+    "/Common/http"
+  ]
+  persistence_profiles = [
+    "/Common/cookie"
+  ]
+  source_address_translation = "automap"
+  translate_address = "enabled"
+  policies = [
+    bigip_ltm_policy.%[2]s.name
+  ]
+}`, poolName, policyName, vsName)
+}
+
+func testVSCreatePolicyDettach(vsName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool" "mypool" {
+  name                = "/Common/test-pool"
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
+resource "bigip_ltm_policy" "test-policy" {
+  name      = "/Common/test-policy"
+  strategy  = "first-match"
+  requires  = ["http"]
+  controls = ["forwarding"]
+  rule {
+    name = "rule6"
+    action {
+      forward = true
+      pool    = bigip_ltm_pool.mypool.name
+    }
+  }
+  depends_on = [bigip_ltm_pool.mypool]
+}
+resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
+  name = "/Common/%s"
+  destination = "192.168.10.11"
+  port = 80
+  description = "Test virtual server"
+  pool = bigip_ltm_pool.mypool.name
+  ip_protocol = "tcp"
+  profiles = [
+    "/Common/tcp",
+    "/Common/http"
+  ]
+  persistence_profiles = [
+    "/Common/cookie"
+  ]
+  source_address_translation = "automap"
+  translate_address = "enabled"
+  //policies = [
+  //  bigip_ltm_policy.test-policy.name
+  //]
+}`, vsName)
 }
 
 func testCheckVSsDestroyed(s *terraform.State) error {
@@ -310,7 +617,7 @@ func testCheckVSsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if vs != nil {
-			return fmt.Errorf("Virtual server %s not destroyed.", name)
+			return fmt.Errorf("Virtual server %s not destroyed. ", name)
 		}
 	}
 	return nil

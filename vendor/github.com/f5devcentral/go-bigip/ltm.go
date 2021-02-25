@@ -51,6 +51,8 @@ type ServerSSLProfile struct {
 	//TmOptions                    []string `json:"tmOptions,omitempty"`
 	Passphrase                   string `json:"passphrase,omitempty"`
 	PeerCertMode                 string `json:"peerCertMode,omitempty"`
+	ProxyCaCert                  string `json:"proxyCaCert,omitempty"`
+	ProxyCaKey                   string `json:"proxyCaKey,omitempty"`
 	ProxySsl                     string `json:"proxySsl,omitempty"`
 	RenegotiatePeriod            string `json:"renegotiatePeriod,omitempty"`
 	RenegotiateSize              string `json:"renegotiateSize,omitempty"`
@@ -286,6 +288,17 @@ type poolMember struct {
 	Name string `json:"name"`
 }
 
+type PoolMemberFqdn struct {
+	Name string `json:"name"`
+	FQDN struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
+}
+
 // poolMembers is used only when modifying members on a pool.
 type poolMembers struct {
 	Members []PoolMember `json:"members"`
@@ -301,14 +314,21 @@ type PoolMember struct {
 	Address         string `json:"address,omitempty"`
 	ConnectionLimit int    `json:"connectionLimit,omitempty"`
 	DynamicRatio    int    `json:"dynamicRatio,omitempty"`
-	InheritProfile  string `json:"inheritProfile,omitempty"`
-	Logging         string `json:"logging,omitempty"`
-	Monitor         string `json:"monitor,omitempty"`
-	PriorityGroup   int    `json:"priorityGroup,omitempty"`
-	RateLimit       string `json:"rateLimit,omitempty"`
-	Ratio           int    `json:"ratio,omitempty"`
-	Session         string `json:"session,omitempty"`
-	State           string `json:"state,omitempty"`
+	FQDN            struct {
+		AddressFamily string `json:"addressFamily,omitempty"`
+		AutoPopulate  string `json:"autopopulate,omitempty"`
+		DownInterval  int    `json:"downInterval,omitempty"`
+		Interval      string `json:"interval,omitempty"`
+		Name          string `json:"tmName,omitempty"`
+	} `json:"fqdn,omitempty"`
+	InheritProfile string `json:"inheritProfile,omitempty"`
+	Logging        string `json:"logging,omitempty"`
+	Monitor        string `json:"monitor,omitempty"`
+	PriorityGroup  int    `json:"priorityGroup,omitempty"`
+	RateLimit      string `json:"rateLimit,omitempty"`
+	Ratio          int    `json:"ratio,omitempty"`
+	Session        string `json:"session,omitempty"`
+	State          string `json:"state,omitempty"`
 }
 
 // Pool transfer object so we can mask the bool data munging
@@ -394,6 +414,7 @@ type CookiePersistenceProfile struct {
 	HashLength                 int    `json:"hashLength,omitempty"`
 	HashOffset                 int    `json:"hashOffset,omitempty"`
 	HTTPOnly                   string `json:"httponly,omitempty"`
+	Method                     string `json:"method,omitempty"`
 	Secure                     string `json:"secure,omitempty"`
 }
 
@@ -539,7 +560,7 @@ type VirtualServer struct {
 	Rules               []string  `json:"rules,omitempty"`
 	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
-	Policies            []string  `json:"policies,omitempty"`
+	Policies            []string  `json:"policies"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
@@ -562,7 +583,7 @@ type VirtualAddress struct {
 	ICMPEcho              bool
 	InheritedTrafficGroup bool
 	Mask                  string
-	RouteAdvertisement    bool
+	RouteAdvertisement    string
 	ServerScope           string
 	TrafficGroup          string
 	Unit                  int
@@ -582,7 +603,7 @@ type virtualAddressDTO struct {
 	ICMPEcho              string `json:"icmpEcho,omitempty" bool:"enabled"`
 	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty" bool:"yes"`
 	Mask                  string `json:"mask,omitempty"`
-	RouteAdvertisement    string `json:"routeAdvertisement,omitempty" bool:"enabled"`
+	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"`
 	ServerScope           string `json:"serverScope,omitempty"`
 	TrafficGroup          string `json:"trafficGroup,omitempty"`
 	Unit                  int    `json:"unit,omitempty"`
@@ -1003,7 +1024,7 @@ type Monitor struct {
 	Mode           string
 	Adaptive       string
 	AdaptiveLimit  int
-        Database       string
+	Database       string
 }
 
 type monitorDTO struct {
@@ -1015,7 +1036,7 @@ type monitorDTO struct {
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
 	Description    string `json:"description,omitempty"`
 	Destination    string `json:"destination,omitempty"`
-        Database       string `json:"database,omitempty"`
+	Database       string `json:"database,omitempty"`
 	Interval       int    `json:"interval,omitempty"`
 	IPDSCP         int    `json:"ipDscp,omitempty"`
 	ManualResume   string `json:"manualResume,omitempty"`
@@ -1064,6 +1085,7 @@ type oneconnectDTO struct {
 	Partition           string `json:"partition,omitempty"`
 	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
 	IdleTimeoutOverride string `json:"idleTimeoutOverride,omitempty"`
+	LimitType           string `json:"limitType,omitempty"`
 	MaxAge              int    `json:"maxAge,omitempty"`
 	MaxReuse            int    `json:"maxReuse,omitempty"`
 	MaxSize             int    `json:"maxSize,omitempty"`
@@ -1079,6 +1101,7 @@ type Oneconnect struct {
 	Partition           string
 	DefaultsFrom        string
 	IdleTimeoutOverride string
+	LimitType           string
 	MaxAge              int
 	MaxReuse            int
 	MaxSize             int
@@ -1153,7 +1176,7 @@ type fastl4DTO struct {
 	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
 	Partition             string `json:"partition,omitempty"`
 	ExplicitFlowMigration string `json:"explicitFlowMigration,omitempty"`
-	HardwareSynCookie     string `json:"hardwareSynCookie,omitem"`
+	HardwareSynCookie     string `json:"hardwareSynCookie,omitempty"`
 	IdleTimeout           string `json:"idleTimeout,omitempty"`
 	ClientTimeout         int    `json:"clientTimeout,omitempty"`
 	IpTosToClient         string `json:"ipTosToClient,omitempty"`
@@ -1202,11 +1225,19 @@ type Httpcompress struct {
 
 type http2DTO struct {
 	Name                           string   `json:"name,omitempty"`
+	FullPath                       string   `json:"fullPath,omitempty"`
 	DefaultsFrom                   string   `json:"defaultsFrom,omitempty"`
 	ConcurrentStreamsPerConnection int      `json:"concurrentStreamsPerConnection,omitempty"`
 	ConnectionIdleTimeout          int      `json:"connectionIdleTimeout,omitempty"`
 	HeaderTableSize                int      `json:"headerTableSize,omitempty"`
 	ActivationModes                []string `json:"activationModes,omitempty"`
+	EnforceTLSRequirements         string   `json:"enforceTlsRequirements,omitempty"`
+	FrameSize                      int      `json:"frameSize,omitempty"`
+	IncludeContentLength           string   `json:"includeContentLength,omitempty"`
+	InsertHeader                   string   `json:"insertHeader,omitempty"`
+	InsertHeaderName               string   `json:"insertHeaderName,omitempty"`
+	ReceiveWindow                  int      `json:"receiveWindow,omitempty"`
+	WriteSize                      int      `json:"writeSize,omitempty"`
 }
 
 type Http2s struct {
@@ -1215,11 +1246,19 @@ type Http2s struct {
 
 type Http2 struct {
 	Name                           string
+	FullPath                       string
 	DefaultsFrom                   string
 	ConcurrentStreamsPerConnection int
 	ConnectionIdleTimeout          int
 	HeaderTableSize                int
 	ActivationModes                []string
+	EnforceTLSRequirements         string
+	FrameSize                      int
+	IncludeContentLength           string
+	InsertHeader                   string
+	InsertHeaderName               string
+	ReceiveWindow                  int
+	WriteSize                      int
 }
 
 type Recordss struct {
@@ -1863,11 +1902,11 @@ func (b *BigIP) GetServerSSLProfile(name string) (*ServerSSLProfile, error) {
 }
 
 // CreateServerSSLProfile creates a new server-ssl profile on the BIG-IP system.
-func (b *BigIP) CreateServerSSLProfile(name string, parent string) error {
-	config := &ServerSSLProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}
+func (b *BigIP) CreateServerSSLProfile(config *ServerSSLProfile) error {
+	//	config := &ServerSSLProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriProfile, uriServerSSL)
 }
@@ -1914,11 +1953,11 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 }
 
 // CreateClientSSLProfile creates a new client-ssl profile on the BIG-IP system.
-func (b *BigIP) CreateClientSSLProfile(name string, parent string) error {
-	config := &ClientSSLProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}
+func (b *BigIP) CreateClientSSLProfile(config *ClientSSLProfile) error {
+	//	config := &ClientSSLProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriProfile, uriClientSSL)
 }
@@ -2110,13 +2149,20 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 	return &poolMembers, nil
 }
 
-// AddPoolMember adds a node/member to the given pool. <member> must be in the form
-// of <node>:<port>, i.e.: "web-server1:443".
-func (b *BigIP) AddPoolMember(pool, member string) error {
+func (b *BigIP) AddPoolMemberNode(pool, member string) error {
 	config := &poolMember{
 		Name: member,
 	}
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
 
+// AddPoolMember adds a node/member to the given pool. <member> must be in the form
+// of <node>:<port>, i.e.: "web-server1:443".
+func (b *BigIP) AddPoolMember(pool string, config *PoolMember) error {
+	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
+}
+
+func (b *BigIP) AddPoolMemberFQDN(pool string, config *PoolMemberFqdn) error {
 	return b.post(config, uriLtm, uriPool, pool, uriPoolMember)
 }
 
@@ -2151,7 +2197,7 @@ func (b *BigIP) ModifyPoolMember(pool string, config *PoolMember) error {
 	// This cannot be modified for an existing pool member.
 	config.Address = ""
 
-	return b.put(config, uriLtm, uriPool, pool, uriPoolMember, member)
+	return b.patch(config, uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
 // UpdatePoolMembers does a replace-all-with for the members of a pool.
@@ -2248,12 +2294,23 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 // CreateVirtualServer adds a new virtual server to the BIG-IP system. <mask> can either be
 // in CIDR notation or decimal, i.e.: "24" or "255.255.255.0". A CIDR mask of "0" is the same
 // as "0.0.0.0".
-func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
-	subnetMask := cidr[mask]
+/*func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_enabled bool, port int, translate_address, translate_port string) error {
 
-	if strings.Contains(mask, ".") {
-		subnetMask = mask
+	if strings.Contains(destination, ":") {
+		subnetMask := mask
+
+		config := &VirtualServer{
+			Name:             name,
+			Destination:      fmt.Sprintf("%s.%d", destination, port),
+			Mask:             subnetMask,
+			Pool:             pool,
+			TranslateAddress: translate_address,
+			TranslatePort:    translate_port,
+		}
+
+		return b.post(config, uriLtm, uriVirtual)
 	}
+	subnetMask := cidr[mask]
 
 	config := &VirtualServer{
 		Name:             name,
@@ -2264,6 +2321,9 @@ func (b *BigIP) CreateVirtualServer(name, destination, mask, pool string, vlans_
 		TranslatePort:    translate_port,
 	}
 
+	return b.post(config, uriLtm, uriVirtual)
+}*/
+func (b *BigIP) CreateVirtualServer(config *VirtualServer) error {
 	return b.post(config, uriLtm, uriVirtual)
 }
 
@@ -2332,7 +2392,7 @@ func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	}
 	retval := make([]string, 0, len(policies.PolicyRef))
 	for _, p := range policies.PolicyRef {
-		retval = append(retval, p.Name)
+		retval = append(retval, p.FullPath)
 	}
 	return retval, nil
 }
@@ -2401,7 +2461,7 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string) error {
+func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string, destination string) error {
 	config := &Monitor{
 		Name:           name,
 		ParentMonitor:  parent,
@@ -2412,6 +2472,7 @@ func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, time
 		ReceiveString:  receive,
 		ReceiveDisable: receive_disable,
 		Compatibility:  compatibility,
+		Destination:    destination,
 	}
 
 	return b.AddMonitor(config)
@@ -2532,14 +2593,15 @@ func (b *BigIP) Policies() (*Policies, error) {
 }
 
 //Load a fully policy definition. Policies seem to be best dealt with as one big entity.
-func (b *BigIP) GetPolicy(name string) (*Policy, error) {
+func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	var p Policy
 	values := []string{}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.
 	//result := strings.Join(values, "")
-	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, name)
+	policy_name := "~" + partition + "~" + name
+	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, policy_name)
 	if err != nil {
 		return nil, err
 	}
@@ -2548,7 +2610,7 @@ func (b *BigIP) GetPolicy(name string) (*Policy, error) {
 	}
 
 	var rules PolicyRules
-	err, _ = b.getForEntity(&rules, uriLtm, uriPolicy, name, "rules")
+	err, _ = b.getForEntity(&rules, uriLtm, uriPolicy, policy_name, "rules")
 	if err != nil {
 		return nil, err
 	}
@@ -2558,11 +2620,11 @@ func (b *BigIP) GetPolicy(name string) (*Policy, error) {
 		var a PolicyRuleActions
 		var c PolicyRuleConditions
 
-		err, _ = b.getForEntity(&a, uriLtm, uriPolicy, name, "rules", p.Rules[i].Name, "actions")
+		err, _ = b.getForEntity(&a, uriLtm, uriPolicy, policy_name, "rules", p.Rules[i].Name, "actions")
 		if err != nil {
 			return nil, err
 		}
-		err, _ = b.getForEntity(&c, uriLtm, uriPolicy, name, "rules", p.Rules[i].Name, "conditions")
+		err, _ = b.getForEntity(&c, uriLtm, uriPolicy, policy_name, "rules", p.Rules[i].Name, "conditions")
 		if err != nil {
 			return nil, err
 		}
@@ -2609,10 +2671,12 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 }
 
 //Update an existing policy.
-func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
+func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-	values = append(values, "Drafts/")
+	values = append(values, "~")
+	values = append(values, partition)
+	values = append(values, "~Drafts~")
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
@@ -2620,38 +2684,29 @@ func (b *BigIP) UpdatePolicy(name string, p *Policy) error {
 }
 
 //Delete a policy by name.
-func (b *BigIP) DeletePolicy(name string) error {
+func (b *BigIP) DeletePolicy(name string, partition string) error {
 	values := []string{}
 	values = append(values, "Drafts/")
 	values = append(values, name)
 	// Join three strings into one.
 	//result := strings.Join(values, "")
-	return b.delete(uriLtm, uriPolicy, name)
+	policy_name := "~" + partition + "~" + name
+	return b.delete(uriLtm, uriPolicy, policy_name)
 }
 
 //Create a draft from an existing policy
-func (b *BigIP) CreatePolicyDraft(name string) error {
+func (b *BigIP) CreatePolicyDraft(name string, partition string) error {
 	var s struct{}
+	policy_name := "~" + partition + "~" + name
 	values := []string{}
-	values = append(values, name)
+	values = append(values, policy_name)
 	values = append(values, uriCreateDraft)
 	result := strings.Join(values, "")
 	return b.patch(s, uriLtm, uriPolicy, result)
 }
 
 // Oneconnect profile creation
-func (b *BigIP) CreateOneconnect(name, idleTimeoutOverride, partition, defaultsFrom, sharePools, sourceMask string, maxAge, maxReuse, maxSize int) error {
-	oneconnect := &Oneconnect{
-		Name:                name,
-		IdleTimeoutOverride: idleTimeoutOverride,
-		Partition:           partition,
-		DefaultsFrom:        defaultsFrom,
-		SharePools:          sharePools,
-		SourceMask:          sourceMask,
-		MaxAge:              maxAge,
-		MaxReuse:            maxReuse,
-		MaxSize:             maxSize,
-	}
+func (b *BigIP) CreateOneconnect(oneconnect *Oneconnect) error {
 	return b.post(oneconnect, uriLtm, uriProfile, uriOneconnect)
 }
 
@@ -2676,24 +2731,25 @@ func (b *BigIP) DeleteOneconnect(name string) error {
 // ModifyOneconnect updates the given Oneconnect profile with any changed values.
 func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 	oneconnect.Name = name
-	return b.put(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
+	return b.patch(oneconnect, uriLtm, uriProfile, uriOneconnect, name)
 }
 
 // Create TCP profile for WAN or LAN
 
-func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
-	tcp := &Tcp{
-		Name:              name,
-		Partition:         partition,
-		DefaultsFrom:      defaultsFrom,
-		IdleTimeout:       idleTimeout,
-		CloseWaitTimeout:  closeWaitTimeout,
-		FinWait_2Timeout:  finWait_2Timeout,
-		FinWaitTimeout:    finWaitTimeout,
-		KeepAliveInterval: keepAliveInterval,
-		DeferredAccept:    deferredAccept,
-		FastOpen:          fastOpen,
-	}
+//func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
+func (b *BigIP) CreateTcp(tcp *Tcp) error {
+	//	tcp := &Tcp{
+	//		Name:              name,
+	//		Partition:         partition,
+	//		DefaultsFrom:      defaultsFrom,
+	//		IdleTimeout:       idleTimeout,
+	//		CloseWaitTimeout:  closeWaitTimeout,
+	//		FinWait_2Timeout:  finWait_2Timeout,
+	//		FinWaitTimeout:    finWaitTimeout,
+	//		KeepAliveInterval: keepAliveInterval,
+	//		DeferredAccept:    deferredAccept,
+	//		FastOpen:          fastOpen,
+	//	}
 	return b.post(tcp, uriLtm, uriProfile, uriTcp)
 }
 
@@ -2705,7 +2761,7 @@ func (b *BigIP) DeleteTcp(name string) error {
 // ModifyTcp updates the given Oneconnect profile with any changed values.
 func (b *BigIP) ModifyTcp(name string, tcp *Tcp) error {
 	tcp.Name = name
-	return b.put(tcp, uriLtm, uriProfile, uriTcp, name)
+	return b.patch(tcp, uriLtm, uriProfile, uriTcp, name)
 }
 
 func (b *BigIP) GetTcp(name string) (*Tcp, error) {
@@ -2721,21 +2777,21 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 	return &tcp, nil
 }
 
-func (b *BigIP) CreateFasthttp(name, defaultsFrom string, idleTimeout, connpoolIdleTimeoutOverride, connpoolMaxReuse, connpoolMaxSize, connpoolMinSize int, connpoolReplenish string, connpoolStep int, forceHttp_10Response string, maxHeaderSize int) error {
-	fasthttp := &Fasthttp{
-		Name:                        name,
-		DefaultsFrom:                defaultsFrom,
-		IdleTimeout:                 idleTimeout,
-		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
-		ConnpoolMaxReuse:            connpoolMaxReuse,
-		ConnpoolMaxSize:             connpoolMaxSize,
-		ConnpoolMinSize:             connpoolMinSize,
-		ConnpoolReplenish:           connpoolReplenish,
-		ConnpoolStep:                connpoolStep,
-		ForceHttp_10Response:        forceHttp_10Response,
-		MaxHeaderSize:               maxHeaderSize,
-	}
-	return b.post(fasthttp, uriLtm, uriProfile, uriFasthttp)
+func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
+	//	fasthttp := &Fasthttp{
+	//		Name:                        name,
+	//		DefaultsFrom:                defaultsFrom,
+	//		IdleTimeout:                 idleTimeout,
+	//		ConnpoolIdleTimeoutOverride: connpoolIdleTimeoutOverride,
+	//		ConnpoolMaxReuse:            connpoolMaxReuse,
+	//		ConnpoolMaxSize:             connpoolMaxSize,
+	//		ConnpoolMinSize:             connpoolMinSize,
+	//		ConnpoolReplenish:           connpoolReplenish,
+	//		ConnpoolStep:                connpoolStep,
+	//		ForceHttp_10Response:        forceHttp_10Response,
+	//		MaxHeaderSize:               maxHeaderSize,
+	//	}
+	return b.post(config, uriLtm, uriProfile, uriFasthttp)
 }
 
 // Delete Fast http removes an Fasthttp profile from the system.
@@ -2746,17 +2802,16 @@ func (b *BigIP) DeleteFasthttp(name string) error {
 // ModifyFasthttp updates the given Fasthttp profile with any changed values.
 func (b *BigIP) ModifyFasthttp(name string, fasthttp *Fasthttp) error {
 	fasthttp.Name = name
-	return b.put(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
+	return b.patch(fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 }
 
 func (b *BigIP) GetFasthttp(name string) (*Fasthttp, error) {
 	var fasthttp Fasthttp
-	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp)
+	err, _ := b.getForEntity(&fasthttp, uriLtm, uriProfile, uriFasthttp, name)
 
 	if err != nil {
 		return nil, err
 	}
-
 	return &fasthttp, nil
 }
 
@@ -2784,7 +2839,7 @@ func (b *BigIP) DeleteFastl4(name string) error {
 // ModifyFastl4 updates the given Fastl4 profile with any changed values.
 func (b *BigIP) ModifyFastl4(name string, fastl4 *Fastl4) error {
 	fastl4.Name = name
-	return b.put(fastl4, uriLtm, uriProfile, uriFastl4, name)
+	return b.patch(fastl4, uriLtm, uriProfile, uriFastl4, name)
 }
 
 func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
@@ -2802,15 +2857,15 @@ func (b *BigIP) GetFastl4(name string) (*Fastl4, error) {
 
 // ===============
 
-func (b *BigIP) CreateHttpcompress(name, defaultsFrom string, uriExclude, uriInclude, contentTypeInclude, contentTypeExclude []string) error {
-	httpcompress := &Httpcompress{
-		Name:               name,
-		DefaultsFrom:       defaultsFrom,
-		UriExclude:         uriExclude,
-		UriInclude:         uriInclude,
-		ContentTypeInclude: contentTypeInclude,
-		ContentTypeExclude: contentTypeExclude,
-	}
+func (b *BigIP) CreateHttpcompress(httpcompress *Httpcompress) error {
+	//	httpcompress := &Httpcompress{
+	//		Name:               name,
+	//		DefaultsFrom:       defaultsFrom,
+	//		UriExclude:         uriExclude,
+	//		UriInclude:         uriInclude,
+	//		ContentTypeInclude: contentTypeInclude,
+	//		ContentTypeExclude: contentTypeExclude,
+	//	}
 	return b.post(httpcompress, uriLtm, uriProfile, uriHttpcompress)
 }
 
@@ -2822,7 +2877,7 @@ func (b *BigIP) DeleteHttpcompress(name string) error {
 // ModifyFastl4 updates the given Fastl4 profile with any changed values.
 func (b *BigIP) ModifyHttpcompress(name string, httpcompress *Httpcompress) error {
 	httpcompress.Name = name
-	return b.put(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
+	return b.patch(httpcompress, uriLtm, uriProfile, uriHttpcompress, name)
 }
 
 func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
@@ -2838,15 +2893,16 @@ func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
 	return &httpcompress, nil
 }
 
-func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
-	http2 := &Http2{
-		Name:                           name,
-		DefaultsFrom:                   defaultsFrom,
-		ConcurrentStreamsPerConnection: concurrentStreamsPerConnection,
-		ConnectionIdleTimeout:          connectionIdleTimeout,
-		HeaderTableSize:                headerTableSize,
-		ActivationModes:                activationModes,
-	}
+//func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
+func (b *BigIP) CreateHttp2(http2 *Http2) error {
+	//	http2 := &Http2{
+	//		Name:                           name,
+	//		DefaultsFrom:                   defaultsFrom,
+	//		ConcurrentStreamsPerConnection: concurrentStreamsPerConnection,
+	//		ConnectionIdleTimeout:          connectionIdleTimeout,
+	//		HeaderTableSize:                headerTableSize,
+	//		ActivationModes:                activationModes,
+	//	}
 	return b.post(http2, uriLtm, uriProfile, uriHttp2)
 }
 
@@ -2857,8 +2913,8 @@ func (b *BigIP) DeleteHttp2(name string) error {
 
 // Modify http2 updates the given http2 profile with any changed values.
 func (b *BigIP) ModifyHttp2(name string, http2 *Http2) error {
-	http2.Name = name
-	return b.put(http2, uriLtm, uriProfile, uriHttp2, name)
+	http2.FullPath = name
+	return b.patch(http2, uriLtm, uriProfile, uriHttp2, name)
 }
 
 func (b *BigIP) GetHttp2(name string) (*Http2, error) {
@@ -3050,11 +3106,11 @@ func (b *BigIP) GetCookiePersistenceProfile(name string) (*CookiePersistenceProf
 }
 
 // CreateCookiePersistenceProfile creates a new cookie persist profile on the BIG-IP system.
-func (b *BigIP) CreateCookiePersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateCookiePersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriCookie)
 }
@@ -3072,7 +3128,7 @@ func (b *BigIP) DeleteCookiePersistenceProfile(name string) error {
 // ModifyCookiePersistenceProfile allows you to change any attribute of a cookie persist profile.
 // Fields that can be modified are referenced in the CookiePersistenceProfile struct.
 func (b *BigIP) ModifyCookiePersistenceProfile(name string, config *CookiePersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriCookie, name)
+	return b.patch(config, uriLtm, uriPersistence, uriCookie, name)
 }
 
 // DestAddrPersistenceProfiles returns a list of dest-addr persist profiles
@@ -3362,11 +3418,11 @@ func (b *BigIP) GetSourceAddrPersistenceProfile(name string) (*SourceAddrPersist
 }
 
 // CreateSourceAddrPersistenceProfile creates a new source-addr persist profile on the BIG-IP system.
-func (b *BigIP) CreateSourceAddrPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateSourceAddrPersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriSourceAddr)
 }
@@ -3384,7 +3440,7 @@ func (b *BigIP) DeleteSourceAddrPersistenceProfile(name string) error {
 // ModifySourceAddrPersistenceProfile allows you to change any attribute of a source-addr persist profile.
 // Fields that can be modified are referenced in the SourceAddrPersistenceProfile struct.
 func (b *BigIP) ModifySourceAddrPersistenceProfile(name string, config *SourceAddrPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriSourceAddr, name)
+	return b.patch(config, uriLtm, uriPersistence, uriSourceAddr, name)
 }
 
 // SSLPersistenceProfiles returns a list of ssl persist profiles
@@ -3414,11 +3470,11 @@ func (b *BigIP) GetSSLPersistenceProfile(name string) (*SSLPersistenceProfile, e
 }
 
 // CreateSSLPersistenceProfile creates a new ssl persist profile on the BIG-IP system.
-func (b *BigIP) CreateSSLPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
-		Name:         name,
-		DefaultsFrom: parent,
-	}
+func (b *BigIP) CreateSSLPersistenceProfile(config *PersistenceProfile) error {
+	//	config := &PersistenceProfile{
+	//		Name:         name,
+	//		DefaultsFrom: parent,
+	//	}
 
 	return b.post(config, uriLtm, uriPersistence, uriSSL)
 }
@@ -3436,7 +3492,7 @@ func (b *BigIP) DeleteSSLPersistenceProfile(name string) error {
 // ModifySSLPersistenceProfile allows you to change any attribute of a ssl persist profile.
 // Fields that can be modified are referenced in the SSLPersistenceProfile struct.
 func (b *BigIP) ModifySSLPersistenceProfile(name string, config *SSLPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriSSL, name)
+	return b.patch(config, uriLtm, uriPersistence, uriSSL, name)
 }
 
 // UniversalPersistenceProfiles returns a list of universal persist profiles
@@ -3538,7 +3594,7 @@ func (b *BigIP) DeleteHttpProfile(name string) error {
 // ModifyHttpProfile allows you to change any attribute of a http profile.
 // Fields that can be modified are referenced in the HttpProfile struct.
 func (b *BigIP) ModifyHttpProfile(name string, config *HttpProfile) error {
-	return b.put(config, uriLtm, uriProfile, uriHttp, name)
+	return b.patch(config, uriLtm, uriProfile, uriHttp, name)
 }
 
 // OneconnectProfiles returns a list of HTTP profiles

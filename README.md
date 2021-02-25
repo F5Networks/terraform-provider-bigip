@@ -15,7 +15,7 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 # Requirements
--	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x
+-	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x /0.13.x
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
 # F5 BigIP LTM requirements
@@ -24,30 +24,34 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 These BIG-IP versions are supported in these Terraform versions.
 
-| BIG-IP version	|Terraform 0.12 |	Terraform 0.11  |
-|-----------------|---------------|-----------------|
-| BIG-IP 14.x	    | 	   X        |       X         |
-| BIG-IP 12.x	    |      X        |      	X         |
-| BIG-IP 13.x	    |      X        |       X         |
+| BIG-IP version	|Terraform 0.13 |	Terraform 0.12  |	Terraform 0.11  |
+|-----------------|---------------|-----------------|-----------------|
+| BIG-IP 16.x	    |      X        |       X         |       X         |
+| BIG-IP 15.x	    |      X        |       X         |       X         |
+| BIG-IP 14.x	    | 	   X        |       X         |       X         |
+| BIG-IP 12.x	    |      X        |      	X         |      	X         |
+| BIG-IP 13.x	    |      X        |       X         |       X         |
 
 
 # Documentation
 
-Provider documentation and reference can be found [here](website/docs).
+Documentation for the F5 BIG-IP terraform integration is available at https://clouddocs.f5.com/products/orchestration/terraform/latest/
+
+Terraform provider documentation is available at  https://www.terraform.io/docs/providers/bigip/index.html
 
 # Building the  Provider
 
-Clone repository to: $GOPATH/src/github.com/terraform-providers/terraform-provider-bigip
+Clone repository to: $GOPATH/src/github.com/F5Networks/terraform-provider-bigip
 
 ```
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone https://github.com/terraform-providers/terraform-provider-bigip.git
+$ mkdir -p $GOPATH/src/github.com/F5Networks; cd $GOPATH/src/github.com/F5Networks
+$ git clone https://github.com/F5Networks/terraform-provider-bigip.git
 
 ```
 Enter the provider directory and build the provider
 
 ```
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-bigip
+$ cd $GOPATH/src/github.com/F5Networks/terraform-provider-bigip
 $ make build
 
 ```
@@ -81,3 +85,25 @@ BIGIP_HOST=f5.mycompany.com BIGIP_USER=foo BIGIP_PASSWORD=secret make testacc
 
 Read [here](https://github.com/hashicorp/terraform/blob/master/.github/CONTRIBUTING.md#running-an-acceptance-test) for
 more information about acceptance testing in Terraform.
+
+# Community Help
+
+We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on Terraform Resources (click the **terraform** channel). There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance. This slack channel community support should **not** be considered a substitute for F5 Technical Support. See the [Slack Channel Statement](slack-channel-statement.md) for guidelines on using this channel.
+
+## Copyright
+
+Copyright 2014-2020 F5 Networks Inc.
+
+### F5 Networks Contributor License Agreement
+
+[Terraform F5 Contributor License Agreement.pdf](https://github.com/F5Networks/terraform-provider-bigip/blob/profile_detatch_issue/F5_Contributor_License_Agreement.pdf)
+
+Before you start contributing to any project sponsored by F5 Networks, Inc. (F5) on GitHub, you will need to sign a Contributor License Agreement (CLA).  
+
+If you are signing as an individual, we recommend that you talk to your employer (if applicable) before signing the CLA since some employment agreements may have restrictions on your contributions to other projects. Otherwise by submitting a CLA you represent that you are legally entitled to grant the licenses recited therein.  
+
+If your employer has rights to intellectual property that you create, such as your contributions, you represent that you have received permission to make contributions on behalf of that employer, that your employer has waived such rights for your contributions, or that your employer has executed a separate CLA with F5.   
+
+If you are signing on behalf of a company, you represent that you are legally entitled to grant the license recited therein. You represent further that each employee of the entity that submits contributions is authorized to submit such contributions on behalf of the entity pursuant to the CLA. 
+
+

@@ -1,4 +1,56 @@
-## 1.2.0 (Unreleased)
+## 1.4.0 (Unreleased)
+## 1.3.0 (July 23, 2020)
+
+# Features additions:
+
+ - AS3 resource for BIGIQ
+
+# Bug Fixes:
+
+1. F5 LTM default custom profile values should calculated rather than hardcoded in code [https://github.com/terraform-providers/terraform-provider-bigip/issues/298]
+2. Handling Common/Shared tenant created via AS3
+3. DO declaration fails with CRASH error
+4. Terraform crashes when the structure of response from bigip changes
+5. Error: produced an unexpected new value for was present, but new absent.#305 [https://github.com/terraform-providers/terraform-provider-bigip/issues/305] 
+
+## 1.2.1 (June 11, 2020)
+
+# Bug Fixes
+
+1. Provider shows passwords in clear text when issuing terraform plan.#279
+2. Terraforn apply crash with bigip_as3 and F5 VE 15 #291 
+3. AS3 apply fails on Terraform #294 
+4. Documentation Link on readme.md [F5Networks/terraform-provider-bigip/issues/85]
+
+# Additional Changes
+
+1. Added Acceptance test for terraform resource ""bigip_ltm_pool_attachment"
+2. Documentation Update for terraform resource ""bigip_ltm_pool_attachment"
+3. Update Example for terraform resource "bigip_ltm_pool_attachment"
+4. New test scenerios for terraform resource "bigip_as3"
+
+## 1.2.0 (May 11, 2020)
+
+# Feature additions:
+
+- Terraform resource module for BIGIP Licence management through BIGIQ
+- As3 Schema validation.
+- AS3 TEEM control Agent additions.
+- Terraform resource module for bigip_command /Run TMSH and BASH commands on F5 devices
+
+# Bug Fixes:
+1. big_ltm_virtual_server does not work with IPv6 address [https://github.com/F5Networks/terraform-provider-bigip/issues/62, #278]
+2. declaring virtual addresses in /Common/Shared via AS3 fails [ https://github.com/F5Networks/terraform-provider-bigip/issues/48]
+3. BIG-IQ Licensing  [https://github.com/F5Networks/terraform-provider-bigip/issues/44]
+4. DO Error on Terraform destroy [https://github.com/F5Networks/terraform-provider-bigip/issues/43]
+5. The provider provider.bigip does not support resource type "bigip_command".[https://github.com/F5Networks/terraform-provider-bigip/issues/63]
+6. `bigip_as3` Read/Exists/Update actions should be restricted to target tenant #253
+7. `bigip_as3` resource `resourceBigipAs3Read` action does not store actual value in state #254 
+8. v1.1.2 changed the contract of the `bigip_as3` resource #267 
+9. autopopulate not passed to pool attachment #242
+10. Error while Sending/Posting http request with DO json :{"code":404 #243
+11. Rework ltm policy (#241)
+
 ## 1.1.2 (March 19, 2020)
 
 # Bug Fixes
@@ -20,6 +72,7 @@
 
 
 ## 1.1.1 (December 19, 2019)
+
 ## Bug Fixes
 - bigip_ssl resources not over writing existing cert/key #218
 - Content argument of `bigip_ssl_key` should be marked sensitive #208

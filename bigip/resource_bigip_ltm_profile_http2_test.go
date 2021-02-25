@@ -20,7 +20,7 @@ var TEST_HTTP2_NAME = fmt.Sprintf("/%s/test-http2", TEST_PARTITION)
 var TEST_HTTP2_RESOURCE = `
 resource "bigip_ltm_profile_http2" "test-http2" {
             name = "/Common/test-http2"
- 	    defaults_from = "/Common/http2"
+            defaults_from = "/Common/http2"
             concurrent_streams_per_connection = 10
             connection_idle_timeout = 30
             activation_modes = ["alpn"]
@@ -30,7 +30,7 @@ resource "bigip_ltm_profile_http2" "test-http2" {
 var TEST_HTTP2_RESOURCE_NAMEMODIFY = `
 resource "bigip_ltm_profile_http2" "test-http2" {
             name = "/Common/test-http2-new"
- 	    defaults_from = "/Common/http2"
+            defaults_from = "/Common/http2"
             concurrent_streams_per_connection = 20
             connection_idle_timeout = 40
             activation_modes = ["always"]
@@ -62,9 +62,7 @@ func TestAccBigipLtmProfileHttp2_create(t *testing.T) {
 
 /*
 TestAccBigipLtmProfileHttp2_modify used to Validate Changing/Updating the BIG-IP Config through Terraform Provider
-
 */
-
 func TestAccBigipLtmProfileHttp2_modify(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

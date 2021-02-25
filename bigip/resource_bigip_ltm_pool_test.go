@@ -15,19 +15,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
+var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
 var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
 var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
 
 var TEST_POOL_RESOURCE = `
-resource "bigip_ltm_node" "test-node" {
+/*resource "bigip_ltm_node" "test-node" {
 	name = "` + TEST_NODE_NAME + `"
 	address = "10.10.10.10"
 	connection_limit = "0"
 	dynamic_ratio = "1"
 	monitor = "default"
 	rate_limit = "disabled"
-}
+}*/
 
 resource "bigip_ltm_pool" "test-pool" {
 	name = "` + TEST_POOL_NAME + `"
@@ -42,9 +43,8 @@ resource "bigip_ltm_pool" "test-pool" {
 }
 
 resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
-	pool = "` + TEST_POOL_NAME + `"
-	node = "` + TEST_POOLNODE_NAMEPORT + `"
-	depends_on = ["bigip_ltm_node.test-node", "bigip_ltm_pool.test-pool"]
+         pool = bigip_ltm_pool.test-pool.name 
+         node = "` + poolMember1 + `"
 }
 `
 
@@ -69,7 +69,7 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "service_down_action", "reset"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "reselect_tries", "2"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", TEST_POOLNODE_NAMEPORT),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember1),
 				),
 			},
 		},

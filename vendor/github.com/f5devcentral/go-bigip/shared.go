@@ -21,6 +21,18 @@ const (
 	activationNeedEula   = "NEED_EULA_ACCEPT"
 )
 
+// Installs the given license.
+func (b *BigIP) InstallLicense(licenseText string) error {
+	r := map[string]string{"licenseText": licenseText}
+	return b.put(r, uriShared, uriLicensing, uriRegistration)
+}
+
+// Revoke license.
+func (b *BigIP) RevokeLicense() error {
+	//r := map[string]string{"licenseText": licenseText}
+	return b.delete(uriShared, uriLicensing, uriRegistration)
+}
+
 // Upload a file
 func (b *BigIP) UploadFile(f *os.File) (*Upload, error) {
 	if strings.HasSuffix(f.Name(), ".iso") {
