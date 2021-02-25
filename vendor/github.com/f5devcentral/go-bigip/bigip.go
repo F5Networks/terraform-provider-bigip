@@ -268,7 +268,6 @@ func (b *BigIP) deleteReqBody(body interface{}, path ...string) ([]byte, error) 
 	return resp, callErr
 }
 
->>>>>>> master
 func (b *BigIP) post(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {

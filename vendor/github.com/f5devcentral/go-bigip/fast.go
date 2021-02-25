@@ -46,7 +46,6 @@ type Fasttemplate struct {
 const (
 	uriFast         = "fast"
 	uriApplications = "applications"
-	uriTasks        = "tasks"
 )
 
 func (b *BigIP) CreateFastTemplate(template *Fasttemplate) error {
@@ -59,7 +58,7 @@ func (b *BigIP) CreateFastTemplate(template *Fasttemplate) error {
 
 func (b *BigIP) postFastTemplate(template *Fasttemplate) error {
 	//b.getfastTaskid()
-	resp, err := b.fastPost(template, uriMgmt, uriShared, uriFast, uriApplications)
+	resp, err := b.postReq(template, uriMgmt, uriShared, uriFast, uriApplications)
 	if err != nil {
 		return err
 	}
@@ -84,7 +83,7 @@ func (b *BigIP) postFastTemplate(template *Fasttemplate) error {
 				return err
 			}
 			for _, id := range taskIds {
-				if b.pollingStatus(id) {
+				if b.pollingStatusfast(id) {
 					return b.postFastTemplate(template)
 				}
 			}
@@ -128,7 +127,7 @@ func (b *BigIP) GetFastTemplate(tenantName string, applicationName string) (*Fas
 //}
 
 func (b *BigIP) DeleteFastTemplate(tenantName string, applicationName string) error {
-	resp, err := b.fastDelete(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName)
+	resp, err := b.deleteReq(uriMgmt, uriShared, uriFast, uriApplications, tenantName, applicationName)
 	if err != nil {
 		return err
 	}
@@ -154,7 +153,7 @@ func (b *BigIP) DeleteFastTemplate(tenantName string, applicationName string) er
 				return err
 			}
 			for _, id := range taskIds {
-				if b.pollingStatus(id) {
+				if b.pollingStatusfast(id) {
 					return b.DeleteFastTemplate(tenantName, applicationName)
 				}
 			}
@@ -202,7 +201,7 @@ func (b *BigIP) getfastTaskstatus(id string) (*FastTaskType, error) {
 	return &taskList, nil
 }
 
-func (b *BigIP) pollingStatus(id string) bool {
+func (b *BigIP) pollingStatusfast(id string) bool {
 	var taskList FastTaskType
 	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriFast, uriTasks, id)
 	if err != nil {
@@ -210,7 +209,7 @@ func (b *BigIP) pollingStatus(id string) bool {
 	}
 	if taskList.Code != 200 && taskList.Code != 503 {
 		time.Sleep(1 * time.Second)
-		return b.pollingStatus(id)
+		return b.pollingStatusfast(id)
 	}
 	if taskList.Code == 503 {
 		return false
