@@ -53,6 +53,11 @@ resource "bigip_as3"  "as3-example" {
      as3_json = "${file("` + dir + `/../examples/as3/invalid.json")}"
 }
 `
+var TestAs3Resource5 = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/example3.json")}"
+}
+`
 
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -174,6 +179,73 @@ func TestAccBigipAs3_update_deleteTenant(t *testing.T) {
 			},
 		},
 	})
+}
+
+
+func TestAccBigipAs3_update_config(t *testing.T) {
+        resource.Test(t, resource.TestCase{
+                PreCheck: func() {
+                        testAcctPreCheck(t)
+                },
+                Providers:    testAccProviders,
+                CheckDestroy: testCheckAs3Destroy,
+                Steps: []resource.TestStep{
+                        {
+                                Config: TestAs3Resource,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckAs3Exists("Sample_new", true),
+                                ),
+                        },
+                        {
+                                Config: TestAs3Resource5,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckAs3Exists("Sample_new", true),
+                                ),
+                        },
+                },
+        })
+}
+
+func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
+        resource.Test(t, resource.TestCase{
+                PreCheck: func() {
+                        testAcctPreCheck(t)
+                },
+                Providers:    testAccProviders,
+                CheckDestroy: testCheckAs3Destroy,
+                Steps: []resource.TestStep{
+                        {
+                                Config: TestAs3Resource,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckAs3Exists("Sample_new", true),
+                                ),
+                                ResourceName:      "as3-example",
+				ImportState:       false,
+				ImportStateVerify: true,
+                        },
+                },
+        })
+}
+
+func TestAccBigipAs3_import_MultiTenants(t *testing.T) {
+        resource.Test(t, resource.TestCase{
+                PreCheck: func() {
+                        testAcctPreCheck(t)
+                },
+                Providers:    testAccProviders,
+                CheckDestroy: testCheckAs3Destroy,
+                Steps: []resource.TestStep{
+                        {
+                                Config: TestAs3Resource1,
+                                Check: resource.ComposeTestCheckFunc(
+                                        testCheckAs3Exists("Sample_01,Sample_02", true),
+                                ),
+                                ResourceName:      "as3-multitenant-example",
+				ImportState:       false,
+				ImportStateVerify: true,
+                        },
+                },
+        })
 }
 
 func testCheckAs3Exists(name string, exists bool) resource.TestCheckFunc {
