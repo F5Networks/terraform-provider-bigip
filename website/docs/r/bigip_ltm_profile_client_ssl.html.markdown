@@ -33,6 +33,9 @@ resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
 * `authenticate` - (Optional) Specifies the frequency of client authentication for an SSL session.When `once`,specifies that the system authenticates the client once for an SSL session.
 When `always`, specifies that the system authenticates the client once for an SSL session and also upon reuse of that session.
 
+* `tm_options` - (Optional,type `list`) List of Enabled selection from a set of industry standard options for handling SSL processing.By default,
+Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usage` : tm_options    = ["dont-insert-empty-fragments","no-tlsv1.3"]
+
 * `authenticate_depth` - (Optional) Specifies the maximum number of certificates to be traversed in a client certificate chain
 
 * `cert` - (Optional) Specifies a cert name for use.

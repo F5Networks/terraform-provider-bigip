@@ -425,15 +425,11 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 
 func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
-	log.Println("[INFO] Creating Client Ssl Profile " + name)
 
-	/*	err := client.CreateClientSSLProfile(
-		name,
-		parent,
-	)*/
+	log.Printf("[INFO] Creating Client Ssl Profile:%+v ", name)
+
 	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
 	inheritCertkeychain := d.Get("inherit_cert_keychain").(string)
 	proxyCaCert := d.Get("proxy_ca_cert").(string)
@@ -477,12 +473,13 @@ func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interfa
 func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Println("[INFO] Updating Clientssl Profile : " + name)
+
+	log.Printf("[INFO] Updating Clientssl Profile : %v", name)
+
 	var tmOptions []string
 	if t, ok := d.GetOk("tm_options"); ok {
 		tmOptions = setToStringSlice(t.(*schema.Set))
 	}
-	log.Printf("[DEBUG] tmOptions:%+v", tmOptions)
 
 	var CertExtensionIncludes []string
 	if cei, ok := d.GetOk("cert_extension_includes"); ok {
@@ -712,16 +709,12 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 	if err := d.Set("mode", obj.Mode); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
-	log.Printf("[DEBUG] tm_options:%+v", obj.TmOptions)
 	if obj.TmOptions != "none" {
-		log.Printf("[DEBUG] tm_options:%+v", obj.TmOptions)
 		tmOptions := strings.Split(obj.TmOptions.(string), " ")
 		if len(tmOptions) > 0 {
 			tmOptions = tmOptions[1:]
 			tmOptions = tmOptions[:len(tmOptions)-1]
 		}
-		log.Printf("[DEBUG] tm_options:%+v", tmOptions)
-
 		if err := d.Set("tm_options", tmOptions); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
 		}
