@@ -447,7 +447,6 @@ func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interfa
 			sslForwardProxyBypass = "disabled"
 		}
 	}
-
 	pss := &bigip.ClientSSLProfile{
 		Name:                  name,
 		DefaultsFrom:          parent,
@@ -556,8 +555,6 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		Key:                             d.Get("key").(string),
 		ModSslMethods:                   d.Get("mod_ssl_methods").(string),
 		Mode:                            d.Get("mode").(string),
-		ProxyCaCert:                     proxyCaCert,
-		ProxyCaKey:                      proxyCaKey,
 		Passphrase:                      d.Get("passphrase").(string),
 		PeerCertMode:                    d.Get("peer_cert_mode").(string),
 		ProxyCaPassphrase:               d.Get("proxy_ca_passphrase").(string),
@@ -581,6 +578,12 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 	}
 	if len(tmOptions) > 0 {
 		pss.TmOptions = tmOptions
+	}
+	if proxyCaCert != "none" {
+		pss.ProxyCaCert = proxyCaCert
+	}
+	if proxyCaKey != "none" {
+		pss.ProxyCaKey = proxyCaKey
 	}
 	err := client.ModifyClientSSLProfile(name, pss)
 	if err != nil {
