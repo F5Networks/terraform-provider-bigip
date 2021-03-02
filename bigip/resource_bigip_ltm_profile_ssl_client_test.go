@@ -31,8 +31,7 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
-				//Config: TestClientsslResource,
-				Config: testAccBigipLtmProfileClientSsl_DefaultCreate(instName),
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
@@ -90,6 +89,87 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 }
 
 //
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+//
+func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateAuthenticate"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "authenticate"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "always"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+//
+func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateTmoptions"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")), "dont-insert-empty-fragments"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "tm_options"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
+//
 //This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/318
 //
 func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
@@ -132,7 +212,7 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				//Config: TestClientsslResource,
-				Config: testAccBigipLtmProfileClientSsl_DefaultCreate(instName),
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 				),
@@ -180,14 +260,39 @@ func testCheckClientSslDestroyed(s *terraform.State) error {
 	}
 	return nil
 }
-func testAccBigipLtmProfileClientSsl_DefaultCreate(instName string) string {
+func testaccbigipltmprofileclientsslDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
 		resource "%[1]s" "%[2]s" {
 			  name = "/Common/%[2]s"
 			  defaults_from = "/Common/clientssl"
-			  //authenticate = "always"
-			  //ciphers = "DEFAULT"
 		}`, resName, instName)
+}
+
+//func testAccBigipLtmProfileClientSsl_UpdateAuthenticate(instName string) string {
+//	return fmt.Sprintf(`
+//		resource "%[1]s" "%[2]s" {
+//			  name = "/Common/%[2]s"
+//			  defaults_from = "/Common/clientssl"
+//			  authenticate = "always"
+//			  //ciphers = "DEFAULT"
+//		}`, resName, instName)
+//}
+
+func testAccBigipLtmProfileClientSsl_UpdateParam(instName, updateParam string) string {
+	resPrefix := fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			  name = "/Common/%[2]s"
+			  defaults_from = "/Common/clientssl"`, resName, instName)
+	switch updateParam {
+	case "authenticate":
+		resPrefix = fmt.Sprintf(`%s
+			  authenticate = "always"`, resPrefix)
+	case "tm_options":
+		resPrefix = fmt.Sprintf(`%s
+			  tm_options = ["no-tlsv1.3"]`, resPrefix)
+	}
+	return fmt.Sprintf(`%s
+		}`, resPrefix)
 }
 
 func testaccbigipltmprofileclientsslNondefaultcertconfigbasic(partition, instName string) string {
