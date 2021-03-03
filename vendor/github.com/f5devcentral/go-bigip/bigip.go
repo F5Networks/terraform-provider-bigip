@@ -197,6 +197,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
+
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -347,6 +348,7 @@ func (b *BigIP) patch(body interface{}, path ...string) error {
 		Body:        string(marshalJSON),
 		ContentType: "application/json",
 	}
+
 	_, callErr := b.APICall(req)
 	return callErr
 }
