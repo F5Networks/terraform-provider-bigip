@@ -540,7 +540,7 @@ type VirtualServer struct {
 	Mirror                     string `json:"mirror,omitempty"`
 	MobileAppTunnel            string `json:"mobileAppTunnel,omitempty"`
 	NAT64                      string `json:"nat64,omitempty"`
-	Pool                       string `json:"pool,omitempty"`
+	Pool                       string `json:"pool"`
 	RateLimit                  string `json:"rateLimit,omitempty"`
 	RateLimitDestinationMask   int    `json:"rateLimitDstMask,omitempty"`
 	RateLimitMode              string `json:"rateLimitMode,omitempty"`
@@ -2298,7 +2298,6 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 
 	if strings.Contains(destination, ":") {
 		subnetMask := mask
-
 		config := &VirtualServer{
 			Name:             name,
 			Destination:      fmt.Sprintf("%s.%d", destination, port),
@@ -2320,7 +2319,6 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 		TranslateAddress: translate_address,
 		TranslatePort:    translate_port,
 	}
-
 	return b.post(config, uriLtm, uriVirtual)
 }*/
 func (b *BigIP) CreateVirtualServer(config *VirtualServer) error {
@@ -2366,7 +2364,7 @@ func (b *BigIP) DeleteVirtualServer(name string) error {
 // ModifyVirtualServer allows you to change any attribute of a virtual server. Fields that
 // can be modified are referenced in the VirtualServer struct.
 func (b *BigIP) ModifyVirtualServer(name string, config *VirtualServer) error {
-	return b.put(config, uriLtm, uriVirtual, name)
+	return b.patch(config, uriLtm, uriVirtual, name)
 }
 
 // VirtualServerProfiles gets the profiles currently associated with a virtual server.
