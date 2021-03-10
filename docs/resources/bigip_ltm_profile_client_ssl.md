@@ -11,34 +11,30 @@ description: |-
 `bigip_ltm_profile_client_ssl` Manages client SSL profiles on a BIG-IP
 
 
-
 ## Example Usage
     
-
 ```hcl
-
 resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
   name          = "/Common/test-ClientSsl"
   defaults_from = "/Common/clientssl"
   authenticate  = "always"
   ciphers       = "DEFAULT"
 }
-
-
 ```      
 
 ## Argument Reference
 
-* `name` (Required) Specifies the name of the profile. (type `string`)
+* `name` (Required,type `string`) Specifies the name of the profile.Name of Profile should be full path.The full path is the combination of the `partition + profile name`,For example `/Common/test-clientssl-profile`.
 
-* `partition` - (Optional) Device partition to manage resources on.
-
-* `defaults_from` - (Optional) The parent template of this monitor template. Once this value has been set, it cannot be changed. By default, this value is the `clientssl` parent on the `Common` partition.
+* `defaults_from` - (Optional) Parent profile for this clientssl profile.Once this value has been set, it cannot be changed. Default value is `/Common/clientssl`. It Should Full path `/partition/profile_name`
 
 * `allow_non_ssl` - (Optional) Enables or disables acceptance of non-SSL connections, When creating a new profile, the setting is provided by the parent profile
 
 * `authenticate` - (Optional) Specifies the frequency of client authentication for an SSL session.When `once`,specifies that the system authenticates the client once for an SSL session.
 When `always`, specifies that the system authenticates the client once for an SSL session and also upon reuse of that session.
+
+* `tm_options` - (Optional,type `list`) List of Enabled selection from a set of industry standard options for handling SSL processing.By default,
+Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usage` : tm_options    = ["dont-insert-empty-fragments","no-tlsv1.3"]
 
 * `authenticate_depth` - (Optional) Specifies the maximum number of certificates to be traversed in a client certificate chain
 
