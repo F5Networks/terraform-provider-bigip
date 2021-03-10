@@ -540,7 +540,7 @@ type VirtualServer struct {
 	Mirror                     string `json:"mirror,omitempty"`
 	MobileAppTunnel            string `json:"mobileAppTunnel,omitempty"`
 	NAT64                      string `json:"nat64,omitempty"`
-	Pool                       string `json:"pool,omitempty"`
+	Pool                       string `json:"pool"`
 	RateLimit                  string `json:"rateLimit,omitempty"`
 	RateLimitDestinationMask   int    `json:"rateLimitDstMask,omitempty"`
 	RateLimitMode              string `json:"rateLimitMode,omitempty"`
