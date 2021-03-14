@@ -80,6 +80,27 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "Client certificate chain traversal depth.  Default 9.",
 			},
 
+			"c3d_client_fallback_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Client Fallback Certificate. Default None.",
+			},
+
+			"c3d_drop_unknown_ocsp_status": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Unknown OCSP Response Control. Default Drop.",
+			},
+
+			"c3d_ocsp": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "OCSP. Default None.",
+			},
+
 			"ca_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -384,6 +405,13 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "SNI Require (true / false)",
 			},
 
+			"ssl_c3d": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Client Certificate Constrained Delegation enabled / disabled.  Default is disabled.",
+			},
+
 			"ssl_forward_proxy": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -537,6 +565,9 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		AllowNonSsl:                     d.Get("allow_non_ssl").(string),
 		Authenticate:                    d.Get("authenticate").(string),
 		AuthenticateDepth:               d.Get("authenticate_depth").(int),
+		C3dClientFallbackCert:           d.Get("c3d_client_fallback_cert").(string),
+		C3dDropUnknownOcspStatus:        d.Get("c3d_drop_unknown_ocsp_status").(string),
+		C3dOcsp:                         d.Get("c3d_ocsp").(string),
 		CaFile:                          d.Get("ca_file").(string),
 		CacheSize:                       d.Get("cache_size").(int),
 		CacheTimeout:                    d.Get("cache_timeout").(int),
@@ -575,6 +606,7 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 		SessionTicket:         d.Get("session_ticket").(string),
 		SniDefault:            d.Get("sni_default").(string),
 		SniRequire:            d.Get("sni_require").(string),
+		SslC3d:                d.Get("ssl_c3d").(string),
 		SslForwardProxy:       sslForwardProxyEnabled,
 		SslForwardProxyBypass: d.Get("ssl_forward_proxy_bypass").(string),
 		SslSignHash:           d.Get("ssl_sign_hash").(string),
@@ -628,6 +660,18 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("authenticate_depth", obj.AuthenticateDepth); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AuthenticateDepth to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_client_fallback_cert", obj.C3dClientFallbackCert); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dClientFallbackCert to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_drop_unknown_ocsp_status", obj.C3dDropUnknownOcspStatus); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dDropUnknownOcspStatus to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_ocsp", obj.C3dOcsp); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dOcsp to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("ca_file", obj.CaFile); err != nil {
@@ -780,6 +824,10 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("sni_require", obj.SniRequire); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SniRequire to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("ssl_c3d", obj.SslC3d); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SslC3d to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("ssl_forward_proxy", obj.SslForwardProxy); err != nil {
