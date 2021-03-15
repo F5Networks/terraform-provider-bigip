@@ -76,13 +76,15 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			"c3d_ca_cert": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "CA Certificate. Default",
+				Default:     "none",
+				Description: "CA Certificate. Default none.",
 			},
 
 			"c3d_ca_key": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "CA Key.  Default",
+				Default:     "none",
+				Description: "CA Key.  Default none.",
 			},
 
 			"c3d_ca_passphrase": {
@@ -100,17 +102,19 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			},
 
 			"c3d_cert_extension_custom_oids": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional:    true,
 				Description: "Certificate Extensions List.  Default",
 			},
 
 			"c3d_cert_extension_includes": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional:    true,
 				Description: "Certificate Extensions Includes. Default Extensions List",
 			},
@@ -328,7 +332,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			"ssl_c3d": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
+				Default:     "disabled",
 				Description: "Client Certificate Constrained Delegation. Default disabled",
 			},
 
@@ -445,14 +449,33 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		proxyCaKey = "/Common/default.key"
 	}
 	// Funky stuff toi get c3d to work
-	c3dCertExtensionCustomOids := []string{}
-	c3dCertExtensionIncludes := []string{}
-	if t, ok := d.GetOk("c3d_cert_extension_includes"); ok {
-		c3dCertExtensionIncludes = setToStringSlice(t.(*schema.Set))
-	}
+	var c3dCertExtensionCustomOids []string
 	if t, ok := d.GetOk("c3d_cert_extension_custom_oids"); ok {
-		c3dCertExtensionCustomOids = setToStringSlice(t.(*schema.Set))
+		c3dCertExtensionCustomOids = listToStringSlice(t.([]interface{}))
 	}
+	var c3dCertExtensionIncludes []string
+	if t, ok := d.GetOk("c3d_cert_extension_includes"); ok {
+		c3dCertExtensionIncludes = listToStringSlice(t.([]interface{}))
+	}
+	sslC3d := d.Get("ssl_c3d").(string)
+	c3dCaCert := d.Get("c3d_ca_cert").(string)
+	c3dCaKey := d.Get("c3d_ca_key").(string)
+
+	if sslC3d == "enabled" {
+		if c3dCaCert == "none" {
+			c3dCaCert = "/Common/default.crt"
+		}
+		if c3dCaKey == "none" {
+			c3dCaKey = "/Common/default.key"
+		}
+		if len(c3dCertExtensionIncludes) == 0 {
+			c3dCertExtensionIncludes = []string{"basic-constraints", "extended-key-usage", "key-usage", "subject-alternative-name"}
+		}
+	} else {
+		c3dCaCert = "none"
+		c3dCaKey = "none"
+	}
+
 	pss := &bigip.ServerSSLProfile{
 		Name:                       d.Get("name").(string),
 		Partition:                  d.Get("partition").(string),
@@ -461,8 +484,8 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		AlertTimeout:               d.Get("alert_timeout").(string),
 		Authenticate:               d.Get("authenticate").(string),
 		AuthenticateDepth:          d.Get("authenticate_depth").(int),
-		C3dCaCert:                  d.Get("c3d_ca_cert").(string),
-		C3dCaKey:                   d.Get("c3d_ca_key").(string),
+		C3dCaCert:                  c3dCaCert,
+		C3dCaKey:                   c3dCaKey,
 		C3dCaPassphrase:            d.Get("c3d_ca_passphrase").(string),
 		C3dCertExtensionCustomOids: c3dCertExtensionCustomOids,
 		C3dCertExtensionIncludes:   c3dCertExtensionIncludes,
@@ -496,7 +519,7 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		SessionTicket:                d.Get("session_ticket").(string),
 		SniDefault:                   d.Get("sni_default").(string),
 		SniRequire:                   d.Get("sni_require").(string),
-		SslC3d:                       d.Get("ssl_c3d").(string),
+		SslC3d:                       sslC3d,
 		SslForwardProxy:              sslForwardProxyEnabled,
 		SslForwardProxyBypass:        d.Get("ssl_forward_proxy_bypass").(string),
 		SslSignHash:                  d.Get("ssl_sign_hash").(string),
