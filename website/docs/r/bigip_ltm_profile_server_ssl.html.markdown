@@ -28,9 +28,7 @@ resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
 
 ## Argument Reference
 
-* `name` (Required) Specifies the name of the profile. (type `string`)
-
-* `partition` - (Optional) Device partition to manage resources on.
+* `name` (Required,type `string`) Specifies the name of the profile.Name of Profile should be full path,full path is the combination of the `partition + profile name`. For example `/Common/test-serverssl-profile`.
 
 * `defaults_from` - (Optional) The parent template of this monitor template. Once this value has been set, it cannot be changed. By default, this value is `/Common/serverssl`.
 
@@ -43,6 +41,12 @@ resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
 * `ciphers` - (Optional) Specifies the list of ciphers that the system supports. When creating a new profile, the default cipher list is provided by the parent profile.
 
 * `peer_cert_mode` - (Optional) Specifies the way the system handles client certificates.When ignore, specifies that the system ignores certificates from client systems.When require, specifies that the system requires a client to present a valid certificate.When request, specifies that the system requests a valid certificate from a client but always authenticate the client.
+
+* `authenticate` - (Optional) Specifies the frequency of server authentication for an SSL session.When `once`,specifies that the system authenticates the server once for an SSL session.
+When `always`, specifies that the system authenticates the server once for an SSL session and also upon reuse of that session.
+
+* `tm_options` - (Optional,type `list`) List of Enabled selection from a set of industry standard options for handling SSL processing.By default,
+Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usage` : tm_options    = ["dont-insert-empty-fragments","no-tlsv1.3"]
 
 * `renegotiation` - (Optional) Enables or disables SSL renegotiation.When creating a new profile, the setting is provided by the parent profile
 

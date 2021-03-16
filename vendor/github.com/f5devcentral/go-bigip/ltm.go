@@ -28,48 +28,48 @@ type ServerSSLProfiles struct {
 // ServerSSLProfile contains information about each server-ssl profile. You can use all
 // of these fields when modifying a server-ssl profile.
 type ServerSSLProfile struct {
-	Name                      string `json:"name,omitempty"`
-	Partition                 string `json:"partition,omitempty"`
-	FullPath                  string `json:"fullPath,omitempty"`
-	Generation                int    `json:"generation,omitempty"`
-	AlertTimeout              string `json:"alertTimeout,omitempty"`
-	Authenticate              string `json:"authenticate,omitempty"`
-	AuthenticateDepth         int    `json:"authenticateDepth,omitempty"`
-	CaFile                    string `json:"caFile,omitempty"`
-	CacheSize                 int    `json:"cacheSize,omitempty"`
-	CacheTimeout              int    `json:"cacheTimeout,omitempty"`
-	Cert                      string `json:"cert,omitempty"`
-	Chain                     string `json:"chain,omitempty"`
-	Ciphers                   string `json:"ciphers,omitempty"`
-	DefaultsFrom              string `json:"defaultsFrom,omitempty"`
-	ExpireCertResponseControl string `json:"expireCertResponseControl,omitempty"`
-	GenericAlert              string `json:"genericAlert,omitempty"`
-	HandshakeTimeout          string `json:"handshakeTimeout,omitempty"`
-	Key                       string `json:"key,omitempty"`
-	ModSslMethods             string `json:"modSslMethods,omitempty"`
-	Mode                      string `json:"mode,omitempty"`
-	//TmOptions                    []string `json:"tmOptions,omitempty"`
-	Passphrase                   string `json:"passphrase,omitempty"`
-	PeerCertMode                 string `json:"peerCertMode,omitempty"`
-	ProxyCaCert                  string `json:"proxyCaCert,omitempty"`
-	ProxyCaKey                   string `json:"proxyCaKey,omitempty"`
-	ProxySsl                     string `json:"proxySsl,omitempty"`
-	RenegotiatePeriod            string `json:"renegotiatePeriod,omitempty"`
-	RenegotiateSize              string `json:"renegotiateSize,omitempty"`
-	Renegotiation                string `json:"renegotiation,omitempty"`
-	RetainCertificate            string `json:"retainCertificate,omitempty"`
-	SecureRenegotiation          string `json:"secureRenegotiation,omitempty"`
-	ServerName                   string `json:"serverName,omitempty"`
-	SessionMirroring             string `json:"sessionMirroring,omitempty"`
-	SessionTicket                string `json:"sessionTicket,omitempty"`
-	SniDefault                   string `json:"sniDefault,omitempty"`
-	SniRequire                   string `json:"sniRequire,omitempty"`
-	SslForwardProxy              string `json:"sslForwardProxy,omitempty"`
-	SslForwardProxyBypass        string `json:"sslForwardProxyBypass,omitempty"`
-	SslSignHash                  string `json:"sslSignHash,omitempty"`
-	StrictResume                 string `json:"strictResume,omitempty"`
-	UncleanShutdown              string `json:"uncleanShutdown,omitempty"`
-	UntrustedCertResponseControl string `json:"untrustedCertResponseControl,omitempty"`
+	Name                         string      `json:"name,omitempty"`
+	Partition                    string      `json:"partition,omitempty"`
+	FullPath                     string      `json:"fullPath,omitempty"`
+	Generation                   int         `json:"generation,omitempty"`
+	AlertTimeout                 string      `json:"alertTimeout,omitempty"`
+	Authenticate                 string      `json:"authenticate,omitempty"`
+	AuthenticateDepth            int         `json:"authenticateDepth,omitempty"`
+	CaFile                       string      `json:"caFile,omitempty"`
+	CacheSize                    int         `json:"cacheSize,omitempty"`
+	CacheTimeout                 int         `json:"cacheTimeout,omitempty"`
+	Cert                         string      `json:"cert,omitempty"`
+	Chain                        string      `json:"chain,omitempty"`
+	Ciphers                      string      `json:"ciphers,omitempty"`
+	DefaultsFrom                 string      `json:"defaultsFrom,omitempty"`
+	ExpireCertResponseControl    string      `json:"expireCertResponseControl,omitempty"`
+	GenericAlert                 string      `json:"genericAlert,omitempty"`
+	HandshakeTimeout             string      `json:"handshakeTimeout,omitempty"`
+	Key                          string      `json:"key,omitempty"`
+	ModSslMethods                string      `json:"modSslMethods,omitempty"`
+	Mode                         string      `json:"mode,omitempty"`
+	TmOptions                    interface{} `json:"tmOptions,omitempty"`
+	Passphrase                   string      `json:"passphrase,omitempty"`
+	PeerCertMode                 string      `json:"peerCertMode,omitempty"`
+	ProxyCaCert                  string      `json:"proxyCaCert,omitempty"`
+	ProxyCaKey                   string      `json:"proxyCaKey,omitempty"`
+	ProxySsl                     string      `json:"proxySsl,omitempty"`
+	RenegotiatePeriod            string      `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize              string      `json:"renegotiateSize,omitempty"`
+	Renegotiation                string      `json:"renegotiation,omitempty"`
+	RetainCertificate            string      `json:"retainCertificate,omitempty"`
+	SecureRenegotiation          string      `json:"secureRenegotiation,omitempty"`
+	ServerName                   string      `json:"serverName,omitempty"`
+	SessionMirroring             string      `json:"sessionMirroring,omitempty"`
+	SessionTicket                string      `json:"sessionTicket,omitempty"`
+	SniDefault                   string      `json:"sniDefault,omitempty"`
+	SniRequire                   string      `json:"sniRequire,omitempty"`
+	SslForwardProxy              string      `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass        string      `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash                  string      `json:"sslSignHash,omitempty"`
+	StrictResume                 string      `json:"strictResume,omitempty"`
+	UncleanShutdown              string      `json:"uncleanShutdown,omitempty"`
+	UntrustedCertResponseControl string      `json:"untrustedCertResponseControl,omitempty"`
 }
 
 // ClientSSLProfiles
@@ -102,44 +102,44 @@ type ClientSSLProfile struct {
 		Key        string `json:"key,omitempty"`
 		Passphrase string `json:"passphrase,omitempty"`
 	} `json:"certKeyChain,omitempty"`
-	CertExtensionIncludes           []string `json:"certExtensionIncludes,omitempty"`
-	CertLifespan                    int      `json:"certLifespan,omitempty"`
-	CertLookupByIpaddrPort          string   `json:"certLookupByIpaddrPort,omitempty"`
-	Chain                           string   `json:"chain,omitempty"`
-	Ciphers                         string   `json:"ciphers,omitempty"`
-	ClientCertCa                    string   `json:"clientCertCa,omitempty"`
-	CrlFile                         string   `json:"crlFile,omitempty"`
-	DefaultsFrom                    string   `json:"defaultsFrom,omitempty"`
-	ForwardProxyBypassDefaultAction string   `json:"forwardProxyBypassDefaultAction,omitempty"`
-	GenericAlert                    string   `json:"genericAlert,omitempty"`
-	HandshakeTimeout                string   `json:"handshakeTimeout,omitempty"`
-	InheritCertkeychain             string   `json:"inheritCertkeychain,omitempty"`
-	Key                             string   `json:"key,omitempty"`
-	ModSslMethods                   string   `json:"modSslMethods,omitempty"`
-	Mode                            string   `json:"mode,omitempty"`
-	//TmOptions                       []string `json:"tmOptions,omitempty"`
-	Passphrase            string `json:"passphrase,omitempty"`
-	PeerCertMode          string `json:"peerCertMode,omitempty"`
-	ProxyCaCert           string `json:"proxyCaCert,omitempty"`
-	ProxyCaKey            string `json:"proxyCaKey,omitempty"`
-	ProxyCaPassphrase     string `json:"proxyCaPassphrase,omitempty"`
-	ProxySsl              string `json:"proxySsl,omitempty"`
-	ProxySslPassthrough   string `json:"proxySslPassthrough,omitempty"`
-	RenegotiatePeriod     string `json:"renegotiatePeriod,omitempty"`
-	RenegotiateSize       string `json:"renegotiateSize,omitempty"`
-	Renegotiation         string `json:"renegotiation,omitempty"`
-	RetainCertificate     string `json:"retainCertificate,omitempty"`
-	SecureRenegotiation   string `json:"secureRenegotiation,omitempty"`
-	ServerName            string `json:"serverName,omitempty"`
-	SessionMirroring      string `json:"sessionMirroring,omitempty"`
-	SessionTicket         string `json:"sessionTicket,omitempty"`
-	SniDefault            string `json:"sniDefault,omitempty"`
-	SniRequire            string `json:"sniRequire,omitempty"`
-	SslForwardProxy       string `json:"sslForwardProxy,omitempty"`
-	SslForwardProxyBypass string `json:"sslForwardProxyBypass,omitempty"`
-	SslSignHash           string `json:"sslSignHash,omitempty"`
-	StrictResume          string `json:"strictResume,omitempty"`
-	UncleanShutdown       string `json:"uncleanShutdown,omitempty"`
+	CertExtensionIncludes           []string    `json:"certExtensionIncludes,omitempty"`
+	CertLifespan                    int         `json:"certLifespan,omitempty"`
+	CertLookupByIpaddrPort          string      `json:"certLookupByIpaddrPort,omitempty"`
+	Chain                           string      `json:"chain,omitempty"`
+	Ciphers                         string      `json:"ciphers,omitempty"`
+	ClientCertCa                    string      `json:"clientCertCa,omitempty"`
+	CrlFile                         string      `json:"crlFile,omitempty"`
+	DefaultsFrom                    string      `json:"defaultsFrom,omitempty"`
+	ForwardProxyBypassDefaultAction string      `json:"forwardProxyBypassDefaultAction,omitempty"`
+	GenericAlert                    string      `json:"genericAlert,omitempty"`
+	HandshakeTimeout                string      `json:"handshakeTimeout,omitempty"`
+	InheritCertkeychain             string      `json:"inheritCertkeychain,omitempty"`
+	Key                             string      `json:"key,omitempty"`
+	ModSslMethods                   string      `json:"modSslMethods,omitempty"`
+	Mode                            string      `json:"mode,omitempty"`
+	TmOptions                       interface{} `json:"tmOptions,omitempty"`
+	Passphrase                      string      `json:"passphrase,omitempty"`
+	PeerCertMode                    string      `json:"peerCertMode,omitempty"`
+	ProxyCaCert                     string      `json:"proxyCaCert,omitempty"`
+	ProxyCaKey                      string      `json:"proxyCaKey,omitempty"`
+	ProxyCaPassphrase               string      `json:"proxyCaPassphrase,omitempty"`
+	ProxySsl                        string      `json:"proxySsl,omitempty"`
+	ProxySslPassthrough             string      `json:"proxySslPassthrough,omitempty"`
+	RenegotiatePeriod               string      `json:"renegotiatePeriod,omitempty"`
+	RenegotiateSize                 string      `json:"renegotiateSize,omitempty"`
+	Renegotiation                   string      `json:"renegotiation,omitempty"`
+	RetainCertificate               string      `json:"retainCertificate,omitempty"`
+	SecureRenegotiation             string      `json:"secureRenegotiation,omitempty"`
+	ServerName                      string      `json:"serverName,omitempty"`
+	SessionMirroring                string      `json:"sessionMirroring,omitempty"`
+	SessionTicket                   string      `json:"sessionTicket,omitempty"`
+	SniDefault                      string      `json:"sniDefault,omitempty"`
+	SniRequire                      string      `json:"sniRequire,omitempty"`
+	SslForwardProxy                 string      `json:"sslForwardProxy,omitempty"`
+	SslForwardProxyBypass           string      `json:"sslForwardProxyBypass,omitempty"`
+	SslSignHash                     string      `json:"sslSignHash,omitempty"`
+	StrictResume                    string      `json:"strictResume,omitempty"`
+	UncleanShutdown                 string      `json:"uncleanShutdown,omitempty"`
 }
 
 // Nodes contains a list of every node on the BIG-IP system.
@@ -540,7 +540,7 @@ type VirtualServer struct {
 	Mirror                     string `json:"mirror,omitempty"`
 	MobileAppTunnel            string `json:"mobileAppTunnel,omitempty"`
 	NAT64                      string `json:"nat64,omitempty"`
-	Pool                       string `json:"pool,omitempty"`
+	Pool                       string `json:"pool"`
 	RateLimit                  string `json:"rateLimit,omitempty"`
 	RateLimitDestinationMask   int    `json:"rateLimitDstMask,omitempty"`
 	RateLimitMode              string `json:"rateLimitMode,omitempty"`
@@ -2298,7 +2298,6 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 
 	if strings.Contains(destination, ":") {
 		subnetMask := mask
-
 		config := &VirtualServer{
 			Name:             name,
 			Destination:      fmt.Sprintf("%s.%d", destination, port),
@@ -2320,7 +2319,6 @@ func (b *BigIP) VirtualServers() (*VirtualServers, error) {
 		TranslateAddress: translate_address,
 		TranslatePort:    translate_port,
 	}
-
 	return b.post(config, uriLtm, uriVirtual)
 }*/
 func (b *BigIP) CreateVirtualServer(config *VirtualServer) error {
@@ -2366,7 +2364,7 @@ func (b *BigIP) DeleteVirtualServer(name string) error {
 // ModifyVirtualServer allows you to change any attribute of a virtual server. Fields that
 // can be modified are referenced in the VirtualServer struct.
 func (b *BigIP) ModifyVirtualServer(name string, config *VirtualServer) error {
-	return b.put(config, uriLtm, uriVirtual, name)
+	return b.patch(config, uriLtm, uriVirtual, name)
 }
 
 // VirtualServerProfiles gets the profiles currently associated with a virtual server.

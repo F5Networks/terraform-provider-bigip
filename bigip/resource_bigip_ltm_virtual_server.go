@@ -574,6 +574,9 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	if d.Get("state").(string) == "disabled" {
 		vs.Disabled = true
 	}
+	if d.Get("state").(string) == "enabled" {
+		vs.Enabled = true
+	}
 	err := client.ModifyVirtualServer(name, vs)
 	if err != nil {
 		return err
