@@ -29,7 +29,7 @@ These BIG-IP versions are supported in these Terraform versions.
 | BIG-IP 16.x	    |      X        |       X         |       X         |
 | BIG-IP 15.x	    |      X        |       X         |       X         |
 | BIG-IP 14.x	    | 	   X        |       X         |       X         |
-| BIG-IP 12.x	    |      X        |      	X         |      	X         |
+| BIG-IP 12.x	    |      X        |      	X         |       X         |
 | BIG-IP 13.x	    |      X        |       X         |       X         |
 
 
@@ -66,7 +66,7 @@ If you wish to work on the provider, you'll first need Go installed on your mach
 To compile the provider, run make build. This will build the provider and put the provider binary in the $GOPATH/bin directory.
 
 ```
-$ make build
+$ GOFLAGS=-mod=vendor GO111MODULE=on make build
 ...
 $ $GOPATH/bin/terraform-provider-bigip
 ...
