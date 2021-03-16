@@ -7,6 +7,7 @@ package bigip
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
@@ -14,19 +15,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_SERVERSSL_NAME = fmt.Sprintf("/%s/test-ServerSsl", TEST_PARTITION)
+var resNameserver = "bigip_ltm_profile_server_ssl"
 
-var TEST_SERVERSSL_RESOURCE = `
-resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
-  name = "/Common/test-ServerSsl"
-  partition = "Common"
-  defaults_from = "/Common/serverssl"
-  authenticate = "always"
-  ciphers = "DEFAULT"
-}
-`
+func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ServerSsl"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 
-func TestAccBigipLtmProfileServerSsl_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -35,45 +31,126 @@ func TestAccBigipLtmProfileServerSsl_create(t *testing.T) {
 		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SERVERSSL_RESOURCE,
+				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(TEST_SERVERSSL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "name", "/Common/test-ServerSsl"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "partition", "Common"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "defaults_from", "/Common/serverssl"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "alert_timeout", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "authenticate", "always"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "authenticate_depth", "9"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cache_size", "262144"),
-					//resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cache_timeout", "3600"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ca_file", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "cert", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "chain", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ciphers", "DEFAULT"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "expire_cert_response_control", "drop"),
-					//resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "generic_alert", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "handshake_timeout", "10"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "key", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "mod_ssl_methods", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "mode", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "peer_cert_mode", "ignore"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "proxy_ssl", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "renegotiate_period", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "renegotiate_size", "indefinite"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "renegotiation", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "retain_certificate", "true"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "secure_renegotiation", "require-strict"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "server_name", "none"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "session_mirroring", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "session_ticket", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "sni_default", "false"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "sni_require", "false"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ssl_forward_proxy", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ssl_forward_proxy_bypass", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "ssl_sign_hash", "any"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "strict_resume", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "unclean_shutdown", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_server_ssl.test-ServerSsl", "untrusted_cert_response_control", "drop"),
+					testCheckServerSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
+					resource.TestCheckResourceAttr(resFullName, "alert_timeout", "indefinite"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "9"),
+					resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
+					//resource.TestCheckResourceAttr(resFullName, "cache_timeout", "3600"),
+					resource.TestCheckResourceAttr(resFullName, "ca_file", "none"),
+					resource.TestCheckResourceAttr(resFullName, "cert", "none"),
+					resource.TestCheckResourceAttr(resFullName, "chain", "none"),
+					resource.TestCheckResourceAttr(resFullName, "ciphers", "DEFAULT"),
+					resource.TestCheckResourceAttr(resFullName, "expire_cert_response_control", "drop"),
+					//resource.TestCheckResourceAttr(resFullName, "generic_alert", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "handshake_timeout", "10"),
+					resource.TestCheckResourceAttr(resFullName, "key", "none"),
+					resource.TestCheckResourceAttr(resFullName, "mod_ssl_methods", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "mode", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "peer_cert_mode", "ignore"),
+					resource.TestCheckResourceAttr(resFullName, "proxy_ssl", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "renegotiate_period", "indefinite"),
+					resource.TestCheckResourceAttr(resFullName, "renegotiate_size", "indefinite"),
+					resource.TestCheckResourceAttr(resFullName, "renegotiation", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "retain_certificate", "true"),
+					resource.TestCheckResourceAttr(resFullName, "secure_renegotiation", "require-strict"),
+					resource.TestCheckResourceAttr(resFullName, "server_name", "none"),
+					resource.TestCheckResourceAttr(resFullName, "session_mirroring", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "session_ticket", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "sni_default", "false"),
+					resource.TestCheckResourceAttr(resFullName, "sni_require", "false"),
+					resource.TestCheckResourceAttr(resFullName, "ssl_forward_proxy", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "ssl_forward_proxy_bypass", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "ssl_sign_hash", "any"),
+					resource.TestCheckResourceAttr(resFullName, "strict_resume", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "unclean_shutdown", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "untrusted_cert_response_control", "drop"),
+				),
+			},
+		},
+	})
+}
+
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+//
+func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ServerSsl-UpdateAuthenticate"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckServerSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileServerSsl_UpdateParam(instName, "authenticate"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckServerSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "always"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
+				),
+			},
+		},
+	})
+}
+
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+//
+func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ServerSsl-UpdateTmoptions"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckServerSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")), "dont-insert-empty-fragments"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileServerSsl_UpdateParam(instName, "tm_options"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckServerSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
 				),
 			},
 		},
@@ -81,6 +158,9 @@ func TestAccBigipLtmProfileServerSsl_create(t *testing.T) {
 }
 
 func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
+	var instName = "test-ServerSsl"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	//resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -89,11 +169,11 @@ func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SERVERSSL_RESOURCE,
+				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(TEST_SERVERSSL_NAME, true),
+					testCheckServerSslExists(instFullName, true),
 				),
-				ResourceName:      TEST_SERVERSSL_NAME,
+				ResourceName:      instFullName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -136,4 +216,28 @@ func testCheckServerSslDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+func testaccbigipltmprofileserversslDefaultcreate(instName string) string {
+	return fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			  name = "/Common/%[2]s"
+			  //defaults_from = "/Common/serverssl"
+		}`, resNameserver, instName)
+}
+
+func testAccBigipLtmProfileServerSsl_UpdateParam(instName, updateParam string) string {
+	resPrefix := fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			  name = "/Common/%[2]s"
+			  defaults_from = "/Common/serverssl"`, resNameserver, instName)
+	switch updateParam {
+	case "authenticate":
+		resPrefix = fmt.Sprintf(`%s
+			  authenticate = "always"`, resPrefix)
+	case "tm_options":
+		resPrefix = fmt.Sprintf(`%s
+			  tm_options = ["no-tlsv1.3"]`, resPrefix)
+	}
+	return fmt.Sprintf(`%s
+		}`, resPrefix)
 }

@@ -8,6 +8,7 @@ package bigip
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -435,12 +436,13 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 
 	name := d.Id()
 
-	//log.Println("[INFO] Updating Route " + description)
+	log.Printf("[INFO] Updating Route:%+v ", name)
 
-	/*var tmOptions []string
+	var tmOptions []string
 	if t, ok := d.GetOk("tm_options"); ok {
 		tmOptions = setToStringSlice(t.(*schema.Set))
-	}*/
+	}
+
 	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
 	proxyCaCert := d.Get("proxy_ca_cert").(string)
 	proxyCaKey := d.Get("proxy_ca_key").(string)
@@ -477,33 +479,32 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 	}
 
 	pss := &bigip.ServerSSLProfile{
-		Name:                       d.Get("name").(string),
-		Partition:                  d.Get("partition").(string),
-		FullPath:                   d.Get("full_path").(string),
-		Generation:                 d.Get("generation").(int),
-		AlertTimeout:               d.Get("alert_timeout").(string),
-		Authenticate:               d.Get("authenticate").(string),
-		AuthenticateDepth:          d.Get("authenticate_depth").(int),
-		C3dCaCert:                  c3dCaCert,
-		C3dCaKey:                   c3dCaKey,
-		C3dCaPassphrase:            d.Get("c3d_ca_passphrase").(string),
-		C3dCertExtensionCustomOids: c3dCertExtensionCustomOids,
-		C3dCertExtensionIncludes:   c3dCertExtensionIncludes,
-		C3dCertLifespan:            d.Get("c3d_cert_lifespan").(int),
-		CaFile:                     d.Get("ca_file").(string),
-		CacheSize:                  d.Get("cache_size").(int),
-		CacheTimeout:               d.Get("cache_timeout").(int),
-		Cert:                       d.Get("cert").(string),
-		Chain:                      d.Get("chain").(string),
-		Ciphers:                    d.Get("ciphers").(string),
-		DefaultsFrom:               d.Get("defaults_from").(string),
-		ExpireCertResponseControl:  d.Get("expire_cert_response_control").(string),
-		GenericAlert:               d.Get("generic_alert").(string),
-		HandshakeTimeout:           d.Get("handshake_timeout").(string),
-		Key:                        d.Get("key").(string),
-		ModSslMethods:              d.Get("mod_ssl_methods").(string),
-		Mode:                       d.Get("mode").(string),
-		//TmOptions:                    tmOptions,
+		Name:                         d.Get("name").(string),
+		Partition:                    d.Get("partition").(string),
+		FullPath:                     d.Get("full_path").(string),
+		Generation:                   d.Get("generation").(int),
+		AlertTimeout:                 d.Get("alert_timeout").(string),
+		Authenticate:                 d.Get("authenticate").(string),
+		AuthenticateDepth:            d.Get("authenticate_depth").(int),
+		C3dCaCert:                    c3dCaCert,
+		C3dCaKey:                     c3dCaKey,
+		C3dCaPassphrase:              d.Get("c3d_ca_passphrase").(string),
+		C3dCertExtensionCustomOids:   c3dCertExtensionCustomOids,
+		C3dCertExtensionIncludes:     c3dCertExtensionIncludes,
+		C3dCertLifespan:              d.Get("c3d_cert_lifespan").(int),
+		CaFile:                       d.Get("ca_file").(string),
+		CacheSize:                    d.Get("cache_size").(int),
+		CacheTimeout:                 d.Get("cache_timeout").(int),
+		Cert:                         d.Get("cert").(string),
+		Chain:                        d.Get("chain").(string),
+		Ciphers:                      d.Get("ciphers").(string),
+		DefaultsFrom:                 d.Get("defaults_from").(string),
+		ExpireCertResponseControl:    d.Get("expire_cert_response_control").(string),
+		GenericAlert:                 d.Get("generic_alert").(string),
+		HandshakeTimeout:             d.Get("handshake_timeout").(string),
+		Key:                          d.Get("key").(string),
+		ModSslMethods:                d.Get("mod_ssl_methods").(string),
+		Mode:                         d.Get("mode").(string),
 		ProxyCaCert:                  proxyCaCert,
 		ProxyCaKey:                   proxyCaKey,
 		Passphrase:                   d.Get("passphrase").(string),
@@ -527,10 +528,13 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		UncleanShutdown:              d.Get("unclean_shutdown").(string),
 		UntrustedCertResponseControl: d.Get("untrusted_cert_response_control").(string),
 	}
+	if len(tmOptions) > 0 {
+		pss.TmOptions = tmOptions
+	}
 
 	err := client.ModifyServerSSLProfile(name, pss)
 	if err != nil {
-		return fmt.Errorf("Error create profile Ssl (%s): %s", name, err)
+		return fmt.Errorf(" Error create profile Ssl (%s): %s", name, err)
 	}
 	return resourceBigipLtmProfileServerSslRead(d, meta)
 }
@@ -553,8 +557,8 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 		return nil
 	}
 
-	d.Set("name", name)
-	d.Set("partition", obj.Partition)
+	_ = d.Set("name", name)
+	_ = d.Set("partition", obj.Partition)
 
 	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Ssl profile  (%s): %s", d.Id(), err)
@@ -641,10 +645,21 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
-
-	/*if err := d.Set("tm_options", obj.TmOptions); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-	}*/
+	if obj.TmOptions != "none" {
+		tmOptions := strings.Split(obj.TmOptions.(string), " ")
+		if len(tmOptions) > 0 {
+			tmOptions = tmOptions[1:]
+			tmOptions = tmOptions[:len(tmOptions)-1]
+		}
+		if err := d.Set("tm_options", tmOptions); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+	} else {
+		tmOptions := []string{}
+		if err := d.Set("tm_options", tmOptions); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+	}
 
 	if err := d.Set("passphrase", obj.Passphrase); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)
