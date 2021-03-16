@@ -84,16 +84,23 @@ There can be only one SSL profile with this setting enabled.
 * `c3d_cert_extension_includes` (Optional) Specifies the extensions of the client certificates to be included in the generated certificates using SSL client certificate constrained delegation. For example, { basic-constraints }. The default value is { basic-constraints extended-key-usage key-usage subject-alternative-name }. The extensions are:
 
 	    basic-constraints
-		  Basic constraints are used to indicate whether the certificate belongs to a CA.
+		  Basic constraints are used to indicate whether the certificate belongs
+      to a CA.
 
 	    extended-key-usage
-		  Extended Key Usage is used, typically on a leaf certificate, to indicate the purpose of the public key contained in the certificate.
+		  Extended Key Usage is used, typically on a leaf certificate, to 
+      indicate the purpose of the public key contained in the certificate.
 
 	    key-usage
-		  Key Usage provides a bitmap specifying the cryptographic operations which may be performed using the public key contained in the certificate; for example, it could indicate that the key should be used for signature but not for encipherment.
+		  Key Usage provides a bitmap specifying the cryptographic operations 
+      which may be performed using the public key contained in the 
+      certificate; for example, it could indicate that the key should be 
+      used for signature but not for encipherment.
 
 	    subject-alternative-name
-		  Subject Alternative Name allows identities to be bound to the subject of the certificate. These identities may be included in addition to or in place of the identity in the subject field of the certificate.
+		  Subject Alternative Name allows identities to be bound to the subject
+      of the certificate. These identities may be included in addition to 
+      or in place of the identity in the subject field of the certificate.
 
 * `c3d-cert-lifespan` Specifies the lifespan of the certificate generated using the SSL client certificate constrained delegation. The default value is 24.
 
