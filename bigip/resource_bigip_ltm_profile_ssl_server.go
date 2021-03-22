@@ -74,6 +74,59 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description: "Client certificate chain traversal depth.  Default 9.",
 			},
 
+			"c3d_ca_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "none",
+				Description: "CA Certificate. Default none.",
+			},
+
+			"c3d_ca_key": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "none",
+				Description: "CA Key.  Default none.",
+			},
+
+			"c3d_ca_passphrase": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "CA Passphrase. Default",
+			},
+
+			"c3d_certificate_extensions": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "CA Passphrase. Default enabled",
+			},
+
+			"c3d_cert_extension_custom_oids": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "Certificate Extensions List.  Default",
+			},
+
+			"c3d_cert_extension_includes": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "Certificate Extensions Includes. Default Extensions List",
+			},
+
+			"c3d_cert_lifespan": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Certificate Lifespan.  Default",
+			},
+
 			"ca_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -277,6 +330,13 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description: "SNI Require (true / false)",
 			},
 
+			"ssl_c3d": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "disabled",
+				Description: "Client Certificate Constrained Delegation. Default disabled",
+			},
+
 			"ssl_forward_proxy": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -390,6 +450,33 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		proxyCaCert = "/Common/default.crt"
 		proxyCaKey = "/Common/default.key"
 	}
+	// Funky stuff toi get c3d to work
+	var c3dCertExtensionCustomOids []string
+	if t, ok := d.GetOk("c3d_cert_extension_custom_oids"); ok {
+		c3dCertExtensionCustomOids = listToStringSlice(t.([]interface{}))
+	}
+	var c3dCertExtensionIncludes []string
+	if t, ok := d.GetOk("c3d_cert_extension_includes"); ok {
+		c3dCertExtensionIncludes = listToStringSlice(t.([]interface{}))
+	}
+	sslC3d := d.Get("ssl_c3d").(string)
+	c3dCaCert := d.Get("c3d_ca_cert").(string)
+	c3dCaKey := d.Get("c3d_ca_key").(string)
+
+	if sslC3d == "enabled" {
+		if c3dCaCert == "none" {
+			c3dCaCert = "/Common/default.crt"
+		}
+		if c3dCaKey == "none" {
+			c3dCaKey = "/Common/default.key"
+		}
+		if len(c3dCertExtensionIncludes) == 0 {
+			c3dCertExtensionIncludes = []string{"basic-constraints", "extended-key-usage", "key-usage", "subject-alternative-name"}
+		}
+	} else {
+		c3dCaCert = "none"
+		c3dCaKey = "none"
+	}
 
 	pss := &bigip.ServerSSLProfile{
 		Name:                         d.Get("name").(string),
@@ -399,6 +486,12 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		AlertTimeout:                 d.Get("alert_timeout").(string),
 		Authenticate:                 d.Get("authenticate").(string),
 		AuthenticateDepth:            d.Get("authenticate_depth").(int),
+		C3dCaCert:                    c3dCaCert,
+		C3dCaKey:                     c3dCaKey,
+		C3dCaPassphrase:              d.Get("c3d_ca_passphrase").(string),
+		C3dCertExtensionCustomOids:   c3dCertExtensionCustomOids,
+		C3dCertExtensionIncludes:     c3dCertExtensionIncludes,
+		C3dCertLifespan:              d.Get("c3d_cert_lifespan").(int),
 		CaFile:                       d.Get("ca_file").(string),
 		CacheSize:                    d.Get("cache_size").(int),
 		CacheTimeout:                 d.Get("cache_timeout").(int),
@@ -427,6 +520,7 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 		SessionTicket:                d.Get("session_ticket").(string),
 		SniDefault:                   d.Get("sni_default").(string),
 		SniRequire:                   d.Get("sni_require").(string),
+		SslC3d:                       sslC3d,
 		SslForwardProxy:              sslForwardProxyEnabled,
 		SslForwardProxyBypass:        d.Get("ssl_forward_proxy_bypass").(string),
 		SslSignHash:                  d.Get("ssl_sign_hash").(string),
@@ -479,6 +573,30 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("authenticate_depth", obj.AuthenticateDepth); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AuthenticateDepth to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_ca_cert", obj.C3dCaCert); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCaCert to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_ca_key", obj.C3dCaKey); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCaKey to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_ca_passphrase", obj.C3dCaPassphrase); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCaPassphrase to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_cert_extension_custom_oids", obj.C3dCertExtensionCustomOids); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCertExtensionCustomOids to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_cert_extension_includes", obj.C3dCertExtensionIncludes); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("c3d_cert_lifespan", obj.C3dCertLifespan); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving C3dCertLifespan to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("ca_file", obj.CaFile); err != nil {
@@ -593,6 +711,10 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 
 	if err := d.Set("sni_require", obj.SniRequire); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving SniRequire to state for Ssl profile  (%s): %s", d.Id(), err)
+	}
+
+	if err := d.Set("ssl_c3d", obj.SslC3d); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving SslC3d to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
 	if err := d.Set("ssl_forward_proxy", obj.SslForwardProxy); err != nil {

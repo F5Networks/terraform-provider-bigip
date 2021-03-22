@@ -35,6 +35,12 @@ type ServerSSLProfile struct {
 	AlertTimeout                 string      `json:"alertTimeout,omitempty"`
 	Authenticate                 string      `json:"authenticate,omitempty"`
 	AuthenticateDepth            int         `json:"authenticateDepth,omitempty"`
+	C3dCaCert                    string      `json:"c3dCaCert,omitempty"`
+	C3dCaKey                     string      `json:"c3dCaKey,omitempty"`
+	C3dCaPassphrase              string      `json:"c3dCaPassphrase,omitempty"`
+	C3dCertExtensionCustomOids   []string    `json:"c3dCertExtensionCustomOids,omitempty"`
+	C3dCertExtensionIncludes     interface{} `json:"c3dCertExtensionIncludes,omitempty"`
+	C3dCertLifespan              int         `json:"c3dCertLifespan,omitempty"`
 	CaFile                       string      `json:"caFile,omitempty"`
 	CacheSize                    int         `json:"cacheSize,omitempty"`
 	CacheTimeout                 int         `json:"cacheTimeout,omitempty"`
@@ -64,6 +70,7 @@ type ServerSSLProfile struct {
 	SessionTicket                string      `json:"sessionTicket,omitempty"`
 	SniDefault                   string      `json:"sniDefault,omitempty"`
 	SniRequire                   string      `json:"sniRequire,omitempty"`
+	SslC3d                       string      `json:"sslC3d,omitempty"`
 	SslForwardProxy              string      `json:"sslForwardProxy,omitempty"`
 	SslForwardProxyBypass        string      `json:"sslForwardProxyBypass,omitempty"`
 	SslSignHash                  string      `json:"sslSignHash,omitempty"`
@@ -83,19 +90,22 @@ type ClientSSLProfiles struct {
 // ClientSSLProfile contains information about each client-ssl profile. You can use all
 // of these fields when modifying a client-ssl profile.
 type ClientSSLProfile struct {
-	Name              string `json:"name,omitempty"`
-	Partition         string `json:"partition,omitempty"`
-	FullPath          string `json:"fullPath,omitempty"`
-	Generation        int    `json:"generation,omitempty"`
-	AlertTimeout      string `json:"alertTimeout,omitempty"`
-	AllowNonSsl       string `json:"allowNonSsl,omitempty"`
-	Authenticate      string `json:"authenticate,omitempty"`
-	AuthenticateDepth int    `json:"authenticateDepth,omitempty"`
-	CaFile            string `json:"caFile,omitempty"`
-	CacheSize         int    `json:"cacheSize,omitempty"`
-	CacheTimeout      int    `json:"cacheTimeout,omitempty"`
-	Cert              string `json:"cert,omitempty"`
-	CertKeyChain      []struct {
+	Name                     string `json:"name,omitempty"`
+	Partition                string `json:"partition,omitempty"`
+	FullPath                 string `json:"fullPath,omitempty"`
+	Generation               int    `json:"generation,omitempty"`
+	AlertTimeout             string `json:"alertTimeout,omitempty"`
+	AllowNonSsl              string `json:"allowNonSsl,omitempty"`
+	Authenticate             string `json:"authenticate,omitempty"`
+	AuthenticateDepth        int    `json:"authenticateDepth,omitempty"`
+	C3dClientFallbackCert    string `json:"c3dClientFallbackCert,omitempty"`
+	C3dDropUnknownOcspStatus string `json:"c3dDropUnknownOcspStatus,omitempty"`
+	C3dOcsp                  string `json:"c3dOcsp,omitempty"`
+	CaFile                   string `json:"caFile,omitempty"`
+	CacheSize                int    `json:"cacheSize,omitempty"`
+	CacheTimeout             int    `json:"cacheTimeout,omitempty"`
+	Cert                     string `json:"cert,omitempty"`
+	CertKeyChain             []struct {
 		Name       string `json:"name,omitempty"`
 		Cert       string `json:"cert,omitempty"`
 		Chain      string `json:"chain,omitempty"`
@@ -135,6 +145,7 @@ type ClientSSLProfile struct {
 	SessionTicket                   string      `json:"sessionTicket,omitempty"`
 	SniDefault                      string      `json:"sniDefault,omitempty"`
 	SniRequire                      string      `json:"sniRequire,omitempty"`
+	SslC3d                          string      `json:"sslC3d,omitempty"`
 	SslForwardProxy                 string      `json:"sslForwardProxy,omitempty"`
 	SslForwardProxyBypass           string      `json:"sslForwardProxyBypass,omitempty"`
 	SslSignHash                     string      `json:"sslSignHash,omitempty"`
