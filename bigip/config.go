@@ -18,7 +18,7 @@ type Config struct {
 	Port           string
 	Username       string
 	Password       string
-	LoginReference string
+	LoginReference string `json:"loginProviderName"`
 	ConfigOptions  *bigip.ConfigOptions
 }
 

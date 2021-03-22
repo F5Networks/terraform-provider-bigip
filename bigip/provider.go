@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -148,6 +149,9 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		return cfg, err
 	}
 	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
+	cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
+	log.Printf("[DEBUG] Terraform Provider Version:%+v", cfg.UserAgent)
+	//log.Printf("my app %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 	cfg.Teem = d.Get("teem_disable").(bool)
 	return cfg, err
 }
@@ -235,4 +239,8 @@ func toSnakeCase(str string) string {
 	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
 	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
 	return strings.ToLower(snake)
+}
+
+func getVersion() string {
+	return ProviderVersion
 }
