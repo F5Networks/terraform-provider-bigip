@@ -8,7 +8,6 @@ package bigip
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -32,6 +31,7 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Management Port to connect to Bigip",
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_PORT", nil),
 			},
 			"username": {
 				Type:        schema.TypeString,
@@ -120,6 +120,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
 			"bigip_bigiq_as3":                       resourceBigiqAs3(),
 			"bigip_event_service_discovery":         resourceServiceDiscovery(),
+			"bigip_traffic_selector":                resourceBigipTrafficselector(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
@@ -150,7 +151,6 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	}
 	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
 	cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
-	log.Printf("[DEBUG] Terraform Provider Version:%+v", cfg.UserAgent)
 	//log.Printf("my app %s, commit %s, built at %s by %s", version, commit, date, builtBy)
 	cfg.Teem = d.Get("teem_disable").(bool)
 	return cfg, err
