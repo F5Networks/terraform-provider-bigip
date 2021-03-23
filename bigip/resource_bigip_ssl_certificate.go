@@ -1,10 +1,12 @@
 package bigip
 
 import (
+	"errors"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"strings"
 )
 
 func resourceBigipSslCertificate() *schema.Resource {
@@ -64,7 +66,18 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	name := d.Id()
 	log.Println("[INFO] Reading Certificate : " + name)
 	partition := d.Get("partition").(string)
-	name = "/" + partition + "/" + name
+
+	if partition == "" {
+		if strings.HasPrefix(name, "/") != true {
+			err := errors.New("the name must be in full_path format when partition is not specified")
+			fmt.Print(err)
+		}
+	} else {
+		if strings.HasPrefix(name, "/") != true {
+			name = "/" + partition + "/" + name
+		}
+	}
+
 	certificate, err := client.GetCertificate(name)
 	log.Printf("[INFO] Certificate content:%+v", certificate)
 	d.Set("name", certificate.Name)
@@ -81,7 +94,16 @@ func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{})
 	log.Println("[INFO] Checking certificate " + name + " exists.")
 	partition := d.Get("partition").(string)
 
-	name = "/" + partition + "/" + name
+	if partition == "" {
+		if strings.HasPrefix(name, "/") != true {
+			err := errors.New("the name must be in full_path format when partition is not specified")
+			fmt.Print(err)
+		}
+	} else {
+		if strings.HasPrefix(name, "/") != true {
+			name = "/" + partition + "/" + name
+		}
+	}
 	certificate, err := client.GetCertificate(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve certificate   (%s) (%v) ", name, err)
