@@ -591,7 +591,7 @@ type VirtualAddress struct {
 	ConnectionLimit       int
 	Enabled               bool
 	Floating              bool
-	ICMPEcho              bool
+	ICMPEcho              string
 	InheritedTrafficGroup bool
 	Mask                  string
 	RouteAdvertisement    string
@@ -611,7 +611,7 @@ type virtualAddressDTO struct {
 	ConnectionLimit       int    `json:"connectionLimit,omitempty"`
 	Enabled               string `json:"enabled,omitempty" bool:"yes"`
 	Floating              string `json:"floating,omitempty" bool:"enabled"`
-	ICMPEcho              string `json:"icmpEcho,omitempty" bool:"enabled"`
+	ICMPEcho              string `json:"icmpEcho,omitempty"`
 	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty" bool:"yes"`
 	Mask                  string `json:"mask,omitempty"`
 	RouteAdvertisement    string `json:"routeAdvertisement,omitempty"`

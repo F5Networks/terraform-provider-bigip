@@ -10,7 +10,7 @@ description: |-
 
 `bigip_ltm_virtual_address` Configures Virtual Server
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
+For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/virtual_server.
 
 
 ## Example Usage
@@ -18,7 +18,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_virtual_address" "vs_va" {
-  name            = "/Common/vs_va"
+  name            = "/Common/xxxxx"
   advertize_route = "enabled"
 }
 
@@ -40,6 +40,6 @@ resource "bigip_ltm_virtual_address" "vs_va" {
 
 * `auto_delete` - (Optional, Default=true) Automatically delete the virtual address with the virtual server
 
-* `icmp_echo` - (Optional, Default=true) Enable/Disable ICMP response to the virtual address
+* `icmp_echo` - (Optional, Default=enabled) Specifies how the system sends responses to ICMP echo requests on a per-virtual address basis.
 
 * `traffic_group` - (Optional, Default=/Common/traffic-group-1) Specify the partition and traffic group
