@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -316,16 +317,17 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 			client.UserAgent,
 			uniqueID,
 		}
-		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Terraform Version": client.UserAgent,
 		}
-		err = teemDevice.Report(f, "bigip_ltm_virtual_server", "1")
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_virtual_server", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-
 	return resourceBigipLtmVirtualServerRead(d, meta)
 }
 

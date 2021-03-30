@@ -54,31 +54,29 @@ func resourceBigiqAs3() *schema.Resource {
 				Type:      schema.TypeBool,
 				Optional:  true,
 				Sensitive: true,
-				Default:   false,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-					if old != new {
-						return true
-					}
-					return false
-				},
+				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+				//	if old != new {
+				//		return true
+				//	}
+				//	return false
+				//},
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Sensitive: true,
-				Default:   "tmos",
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-					if old != new {
-						return true
-					}
-					return false
-				},
+				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+				//	if old != new {
+				//		return true
+				//	}
+				//	return false
+				//},
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
 			"as3_json": {
 				Type:        schema.TypeString,
@@ -110,11 +108,11 @@ func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	q.Lock()
 	defer q.Unlock()
-	as3_json := d.Get("as3_json").(string)
-	tenantList, _, _ := bigiqRef.GetTenantList(as3_json)
+	as3Json := d.Get("as3_json").(string)
+	tenantList, _, _ := bigiqRef.GetTenantList(as3Json)
 	log.Println(tenantList)
 	_ = d.Set("tenant_list", tenantList)
-	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3_json)
+	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3Json)
 	if err != nil {
 		if successfulTenants == "" {
 			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
@@ -167,11 +165,11 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("tenant_list").(string)
 	tenantList, _, _ := bigiqRef.GetTenantList(as3Json)
 	if tenantList != name {
-		d.Set("tenant_list", tenantList)
-		new_list := strings.Split(tenantList, ",")
-		old_list := strings.Split(name, ",")
-		deleted_tenants := bigiqRef.TenantDifference(old_list, new_list)
-		if deleted_tenants != "" {
+		_ = d.Set("tenant_list", tenantList)
+		newList := strings.Split(tenantList, ",")
+		oldList := strings.Split(name, ",")
+		deletedTenants := bigiqRef.TenantDifference(oldList, newList)
+		if deletedTenants != "" {
 			//err, _ := bigiqRef.DeleteAs3Bigip(deleted_tenants)
 			//if err != nil {
 			//	log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
