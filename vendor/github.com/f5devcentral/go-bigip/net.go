@@ -593,11 +593,11 @@ func (b *BigIP) AddTunnel(config *Tunnel) error {
 }
 
 // CreateTunnel adds a new tunnel to the BIG-IP system.
-func (b *BigIP) CreateTunnel(name, profile string) error {
-	config := &Tunnel{
+func (b *BigIP) CreateTunnel(config *Tunnel) error {
+	/*config := &Tunnel{
 		Name:    name,
 		Profile: profile,
-	}
+	}*/
 
 	return b.post(config, uriNet, uriTunnels, uriTunnel)
 }

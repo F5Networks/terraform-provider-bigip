@@ -52,6 +52,56 @@ func resourceBigipAs3() *schema.Resource {
 
 					return json
 				},
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					old_resp := []byte(old)
+					new_resp := []byte(new)
+					old_jsonRef := make(map[string]interface{})
+					new_jsonRef := make(map[string]interface{})
+					json.Unmarshal(old_resp, &old_jsonRef)
+					json.Unmarshal(new_resp, &new_jsonRef)
+					json_equality_before := reflect.DeepEqual(old_jsonRef, new_jsonRef)
+					if json_equality_before == true {
+						return true
+					}
+					for key, value := range old_jsonRef {
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for range rec {
+								delete(rec, "updateMode")
+								delete(rec, "schemaVersion")
+								delete(rec, "id")
+								delete(rec, "label")
+								delete(rec, "remark")
+							}
+						}
+					}
+					for key, value := range new_jsonRef {
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for range rec {
+								delete(rec, "updateMode")
+								delete(rec, "schemaVersion")
+								delete(rec, "id")
+								delete(rec, "label")
+								delete(rec, "remark")
+							}
+						}
+					}
+
+					ignore_metadata := d.Get("ignore_metadata").(bool)
+					json_equality_after := reflect.DeepEqual(old_jsonRef, new_jsonRef)
+					if ignore_metadata == true {
+						if json_equality_after == true {
+							return true
+						} else {
+							return false
+						}
+
+					} else {
+						if json_equality_before == false {
+							return false
+						}
+					}
+					return true
+				},
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					if _, err := structure.NormalizeJsonString(v); err != nil {
 						errors = append(errors, fmt.Errorf("%q contains an invalid JSON: %s", k, err))
@@ -74,6 +124,12 @@ func resourceBigipAs3() *schema.Resource {
 					}
 					return
 				},
+			},
+			"ignore_metadata": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set True if you want to ignore metadata update",
+				Default:     false,
 			},
 			"tenant_name": {
 				Type:        schema.TypeString,
