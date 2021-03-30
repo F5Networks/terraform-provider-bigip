@@ -3167,11 +3167,11 @@ func (b *BigIP) GetDestAddrPersistenceProfile(name string) (*DestAddrPersistence
 }
 
 // CreateDestAddrPersistenceProfile creates a new dest-addr persist profile on the BIG-IP system.
-func (b *BigIP) CreateDestAddrPersistenceProfile(name string, parent string) error {
-	config := &PersistenceProfile{
+func (b *BigIP) CreateDestAddrPersistenceProfile(config *PersistenceProfile) error {
+	/*config := &PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
-	}
+	}*/
 
 	return b.post(config, uriLtm, uriPersistence, uriDestAddr)
 }
@@ -3189,7 +3189,7 @@ func (b *BigIP) DeleteDestAddrPersistenceProfile(name string) error {
 // ModifyDestAddrPersistenceProfile allows you to change any attribute of a dest-addr persist profile.
 // Fields that can be modified are referenced in the DestAddrPersistenceProfile struct.
 func (b *BigIP) ModifyDestAddrPersistenceProfile(name string, config *DestAddrPersistenceProfile) error {
-	return b.put(config, uriLtm, uriPersistence, uriDestAddr, name)
+	return b.patch(config, uriLtm, uriPersistence, uriDestAddr, name)
 }
 
 // HashPersistenceProfiles returns a list of hash persist profiles
