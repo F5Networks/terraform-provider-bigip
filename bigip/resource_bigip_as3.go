@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"log"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 )
