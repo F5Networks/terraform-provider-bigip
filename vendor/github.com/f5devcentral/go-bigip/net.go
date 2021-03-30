@@ -240,20 +240,21 @@ type TrafficSelector struct {
 }
 
 type IPSecPolicy struct {
-	Name                 			string `json:"name,omitempty"`
-	FullPath             			string `json:"fullPath,omitempty"`
-	Description             		string `json:"description,omitempty"`
-	IkePhase2AuthAlgorithm          string `json:"ikePhase2AuthAlgorithm,omitempty"`
-	IkePhase2EncryptAlgorithm       string `json:"ikePhase2EncryptAlgorithm,omitempty"`
-	IkePhase2Lifetime          		int `json:"ikePhase2Lifetime,omitempty"`
-	IkePhase2LifetimeKilobytes      int `json:"ikePhase2LifetimeKilobytes,omitempty"`
-	IkePhase2PerfectForwardSecrecy  string `json:"ikePhase2PerfectForwardSecrecy,omitempty"`
-	Ipcomp          				string `json:"ipcomp,omitempty"`
-	Mode                			string `json:"mode,omitempty"`
-	Protocol            			string `json:"protocol,omitempty"`
-	TunnelLocalAddress  			string `json:"tunnelLocalAddress,omitempty"`
-	TunnelRemoteAddress 			string `json:"tunnelRemoteAddress,omitempty"`
+	Name                           string `json:"name,omitempty"`
+	FullPath                       string `json:"fullPath,omitempty"`
+	Description                    string `json:"description,omitempty"`
+	IkePhase2AuthAlgorithm         string `json:"ikePhase2AuthAlgorithm,omitempty"`
+	IkePhase2EncryptAlgorithm      string `json:"ikePhase2EncryptAlgorithm,omitempty"`
+	IkePhase2Lifetime              int    `json:"ikePhase2Lifetime,omitempty"`
+	IkePhase2LifetimeKilobytes     int    `json:"ikePhase2LifetimeKilobytes,omitempty"`
+	IkePhase2PerfectForwardSecrecy string `json:"ikePhase2PerfectForwardSecrecy,omitempty"`
+	Ipcomp                         string `json:"ipcomp,omitempty"`
+	Mode                           string `json:"mode,omitempty"`
+	Protocol                       string `json:"protocol,omitempty"`
+	TunnelLocalAddress             string `json:"tunnelLocalAddress,omitempty"`
+	TunnelRemoteAddress            string `json:"tunnelRemoteAddress,omitempty"`
 }
+
 const (
 	uriNet             = "net"
 	uriInterface       = "interface"
@@ -268,7 +269,7 @@ const (
 	uriRouteDomain     = "route-domain"
 	uriIpsec           = "ipsec"
 	uriTrafficselector = "traffic-selector"
-	uriIpsecPolicy = "ipsec-policy"
+	uriIpsecPolicy     = "ipsec-policy"
 )
 
 // formatResourceID takes the resource name to
