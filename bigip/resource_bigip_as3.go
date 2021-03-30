@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"log"
+	"os"
 	"strings"
 	"sync"
 )
@@ -58,7 +59,7 @@ func resourceBigipAs3() *schema.Resource {
 					as3json := v.(string)
 					resp := []byte(as3json)
 					jsonRef := make(map[string]interface{})
-					json.Unmarshal(resp, &jsonRef)
+					_ = json.Unmarshal(resp, &jsonRef)
 					for key, value := range jsonRef {
 						if key == "class" && value != "AS3" {
 							errors = append(errors, fmt.Errorf("Json must have AS3 class"))
@@ -140,12 +141,14 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 			client.UserAgent,
 			uniqueID,
 		}
-		teemDevice := f5teem.AnonymousClient(assetInfo, "")
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Number_of_tenants": len(tenantCount),
 			"Terraform Version": client.UserAgent,
 		}
-		err = teemDevice.Report(f, "bigip_as3", "1")
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_as3", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}

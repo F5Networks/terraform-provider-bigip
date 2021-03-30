@@ -351,7 +351,9 @@ func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
 	as3Json["class"] = "AS3"
 	as3Json["action"] = "deploy"
 	as3Json["persist"] = true
-	adcJson := make(map[string]interface{})
+	//adcJson := make(map[string]interface{})
+	adcJson := []map[string]interface{}{}
+
 	err, ok := b.getForEntityNew(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
 	if err != nil {
 		return "", err
@@ -359,7 +361,29 @@ func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
 	if !ok {
 		return "", nil
 	}
-	as3Json["declaration"] = adcJson
+	as3JsonNew := make(map[string]interface{})
+	for _, adcJsonvalue := range adcJson {
+		if adcJsonvalue[name] != nil {
+			for k, v := range adcJsonvalue[name].(map[string]interface{}) {
+				if k != "class" {
+					delete(v.(map[string]interface{}), "schemaOverlay")
+					ss := v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"].(string)
+					ss1 := strings.Split(ss, "/")
+					v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+				}
+			}
+			as3JsonNew[name] = adcJsonvalue[name]
+			//delete(adcJsonvalue[name].(map[string]interface{}),"schemaOverlay")
+			as3JsonNew["id"] = adcJsonvalue["id"]
+			as3JsonNew["class"] = adcJsonvalue["class"]
+			as3JsonNew["label"] = adcJsonvalue["label"]
+			as3JsonNew["remark"] = adcJsonvalue["remark"]
+			as3JsonNew["target"] = adcJsonvalue["target"]
+			//as3JsonNew["updateMode"] = adcJsonvalue["updateMode"]
+			as3JsonNew["schemaVersion"] = adcJsonvalue["schemaVersion"]
+		}
+	}
+	as3Json["declaration"] = as3JsonNew
 	out, _ := json.Marshal(as3Json)
 	as3String := string(out)
 	return as3String, nil

@@ -53,31 +53,29 @@ func resourceBigiqLicenseManage() *schema.Resource {
 				Type:      schema.TypeBool,
 				Optional:  true,
 				Sensitive: true,
-				Default:   false,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-					if old != new {
-						return true
-					}
-					return false
-				},
+				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+				//	if old != new {
+				//		return true
+				//	}
+				//	return false
+				//},
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Sensitive: true,
-				Default:   "tmos",
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-					if old != new {
-						return true
-					}
-					return false
-				},
+				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
+				//	if old != new {
+				//		return true
+				//	}
+				//	return false
+				//},
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
 			"assignment_type": {
 				Type:         schema.TypeString,
@@ -534,8 +532,16 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 		Username: d.Get("bigiq_user").(string),
 		Password: d.Get("bigiq_password").(string),
 	}
+	//type loginReference struct {
+	//	Link string `json:"link"`
+	//}
+	//
+	//logRef := loginReference{
+	//	fmt.Sprintf("https://localhost/mgmt/cm/system/authn/providers/%s/login",d.Get("bigiq_login_ref").(string)),
+	//}
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)
 	}
+	log.Printf("[DEBUG] BIGIQ CONFIG:%+v", bigiqConfig)
 	return bigiqConfig.Client()
 }
