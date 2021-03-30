@@ -239,6 +239,21 @@ type TrafficSelector struct {
 	SourcePort    int    `json:"sourcePort,omitempty"`
 }
 
+type IPSecPolicy struct {
+	Name                 			string `json:"name,omitempty"`
+	FullPath             			string `json:"fullPath,omitempty"`
+	Description             		string `json:"description,omitempty"`
+	IkePhase2AuthAlgorithm          string `json:"ikePhase2AuthAlgorithm,omitempty"`
+	IkePhase2EncryptAlgorithm       string `json:"ikePhase2EncryptAlgorithm,omitempty"`
+	IkePhase2Lifetime          		int `json:"ikePhase2Lifetime,omitempty"`
+	IkePhase2LifetimeKilobytes      int `json:"ikePhase2LifetimeKilobytes,omitempty"`
+	IkePhase2PerfectForwardSecrecy  string `json:"ikePhase2PerfectForwardSecrecy,omitempty"`
+	Ipcomp          				string `json:"ipcomp,omitempty"`
+	Mode                			string `json:"mode,omitempty"`
+	Protocol            			string `json:"protocol,omitempty"`
+	TunnelLocalAddress  			string `json:"tunnelLocalAddress,omitempty"`
+	TunnelRemoteAddress 			string `json:"tunnelRemoteAddress,omitempty"`
+}
 const (
 	uriNet             = "net"
 	uriInterface       = "interface"
@@ -253,6 +268,7 @@ const (
 	uriRouteDomain     = "route-domain"
 	uriIpsec           = "ipsec"
 	uriTrafficselector = "traffic-selector"
+	uriIpsecPolicy = "ipsec-policy"
 )
 
 // formatResourceID takes the resource name to
@@ -672,4 +688,32 @@ func (b *BigIP) GetTrafficselctor(name string) (*TrafficSelector, error) {
 	}
 
 	return &ts, nil
+}
+
+// CreateIPSecPolicy adds a new IPSec policy to the BIG-IP system.
+func (b *BigIP) CreateIPSecPolicy(config *IPSecPolicy) error {
+	return b.post(config, uriNet, uriIpsec, uriIpsecPolicy)
+}
+
+// ModifyIPSecPolicy allows you to change any attribute of a IPSec policy.
+// Fields that can be modified are referenced in the IPSec policy struct.
+func (b *BigIP) ModifyIPSecPolicy(name string, config *IPSecPolicy) error {
+	return b.patch(config, uriNet, uriIpsec, uriIpsecPolicy, name)
+}
+
+// DeleteIPSecPolicy removes specified IPSec policy.
+func (b *BigIP) DeleteIPSecPolicy(name string) error {
+	return b.delete(uriNet, uriIpsec, uriIpsecPolicy, name)
+}
+
+// GetIPSecPolicy returns a named IPsec policy.
+func (b *BigIP) GetIPSecPolicy(name string) (*IPSecPolicy, error) {
+	var ipsec IPSecPolicy
+	err, _ := b.getForEntity(&ipsec, uriNet, uriIpsec, uriIpsecPolicy, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &ipsec, nil
 }
