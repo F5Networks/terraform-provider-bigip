@@ -143,6 +143,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
+									"connection": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+									},
 									"cookie_hash": {
 										Type:     schema.TypeBool,
 										Optional: true,
@@ -490,6 +495,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Computed: true,
 									},
 									"set_variable": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+									},
+									"shutdown": {
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
