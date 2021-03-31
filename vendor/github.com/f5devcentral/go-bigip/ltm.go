@@ -2366,7 +2366,7 @@ func (b *BigIP) DeleteVirtualServer(name string) error {
 // ModifyVirtualServer allows you to change any attribute of a virtual server. Fields that
 // can be modified are referenced in the VirtualServer struct.
 func (b *BigIP) ModifyVirtualServer(name string, config *VirtualServer) error {
-	return b.put(config, uriLtm, uriVirtual, name)
+	return b.patch(config, uriLtm, uriVirtual, name)
 }
 
 // VirtualServerProfiles gets the profiles currently associated with a virtual server.
