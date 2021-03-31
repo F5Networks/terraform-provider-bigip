@@ -367,9 +367,14 @@ func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
 			for k, v := range adcJsonvalue[name].(map[string]interface{}) {
 				if k != "class" {
 					delete(v.(map[string]interface{}), "schemaOverlay")
-					ss := v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"].(string)
-					ss1 := strings.Split(ss, "/")
-					v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+					if val, ok := v.(map[string]interface{})["serviceMain"]; ok {
+						ss := val.(map[string]interface{})["pool"].(string)
+						ss1 := strings.Split(ss, "/")
+						val.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+					}
+					//ss := v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"].(string)
+					//ss1 := strings.Split(ss, "/")
+					//v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"] = ss1[len(ss1)-1]
 				}
 			}
 			as3JsonNew[name] = adcJsonvalue[name]
