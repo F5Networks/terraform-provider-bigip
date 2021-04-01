@@ -38,6 +38,8 @@ resource "bigip_as3"  "as3-example1" {
 
 * `tenant_filter` - (Optional) If there are multiple tenants on a BIG-IP, this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified.
 
+* `ignore_metadata` - (Optional) Set True if you want to ignore metadata changes during update. By default it is set to false
+
 * `as3_example1.json` - Example  AS3 Declarative JSON file with single tenant
 
 ```hcl
