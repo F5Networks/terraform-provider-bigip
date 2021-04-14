@@ -7,11 +7,11 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"reflect"
+	"strings"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
@@ -645,13 +645,23 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
-	if obj.TmOptions != "none" {
+	xt := reflect.TypeOf(obj.TmOptions).Kind()
+	if obj.TmOptions != "none" && xt == reflect.String {
 		tmOptions := strings.Split(obj.TmOptions.(string), " ")
 		if len(tmOptions) > 0 {
 			tmOptions = tmOptions[1:]
 			tmOptions = tmOptions[:len(tmOptions)-1]
 		}
 		if err := d.Set("tm_options", tmOptions); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+
+	} else if obj.TmOptions != "none" && xt != reflect.String {
+		var newObj []string
+		for _, v := range obj.TmOptions.([]interface{}) {
+			newObj = append(newObj, v.(string))
+		}
+		if err := d.Set("tm_options", newObj); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
 		}
 	} else {
