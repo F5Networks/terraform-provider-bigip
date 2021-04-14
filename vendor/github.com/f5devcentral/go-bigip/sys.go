@@ -748,17 +748,16 @@ func (b *BigIP) CreateTRAP(name string, authPasswordEncrypted string, authProtoc
 		SecurityName:             securityName,
 		Version:                  version,
 	}
-
 	return b.post(config, uriSys, uriSnmp, uriTraps)
 }
 
 func (b *BigIP) ModifyTRAP(config *TRAP) error {
-	return b.put(config, uriSys, uriSnmp, uriTraps)
+	return b.patch(config, uriSys, uriSnmp, uriTraps)
 }
 
-func (b *BigIP) TRAPs() (*TRAP, error) {
+func (b *BigIP) TRAPs(name string) (*TRAP, error) {
 	var traps TRAP
-	err, _ := b.getForEntity(&traps, uriSys, uriSnmp, uriTraps)
+	err, _ := b.getForEntity(&traps, uriSys, uriSnmp, uriTraps, name)
 
 	if err != nil {
 		return nil, err

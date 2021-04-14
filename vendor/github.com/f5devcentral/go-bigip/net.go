@@ -201,6 +201,45 @@ type Tunnel struct {
 	UsePmtu          string `json:"usePmtu,omitempty"`
 }
 
+
+type IkePeer struct {
+	Name             string `json:"name,omitempty"`
+	AppService       string `json:"appService,omitempty"`
+	CaCertFile             string `json:"caCertFile,omitempty"`
+	CrlFile             string `json:"crlFile,omitempty"`
+	DpdDelay             int `json:"dpdDelay,omitempty"`
+	Lifetime             int `json:"lifetime,omitempty"`
+	Description             string `json:"description,omitempty"`
+	GeneratePolicy             string `json:"generatePolicy,omitempty"`
+	Mode             string `json:"mode,omitempty"`
+	MyCertFile             string `json:"myCertFile,omitempty"`
+	MyCertKeyFile             string `json:"myCertKeyFile,omitempty"`
+	MyCertKeyPassphrase             string `json:"myCertKeyPassphrase,omitempty"`
+	MyIdType             string `json:"myIdType,omitempty"`
+	MyIdValue             string `json:"myIdValue,omitempty"`
+	NatTraversal             string `json:"natTraversal,omitempty"`
+	Passive             string `json:"passive,omitempty"`
+	PeersCertFile             string `json:"peersCertFile,omitempty"`
+	PeersCertType             string `json:"peersCertType,omitempty"`
+	PeersIdType             string `json:"peersIdType,omitempty"`
+	PeersIdValue             string `json:"peersIdValue,omitempty"`
+	Phase1AuthMethod             string `json:"phase1AuthMethod,omitempty"`
+	Phase1EncryptAlgorithm             string `json:"phase1EncryptAlgorithm,omitempty"`
+	Phase1HashAlgorithm             string `json:"phase1HashAlgorithm,omitempty"`
+	Phase1PerfectForwardSecrecy             string `json:"phase1PerfectForwardSecrecy,omitempty"`
+	PresharedKey             string `json:"presharedKey,omitempty"`
+	PresharedKeyEncrypted             string `json:"presharedKeyEncrypted,omitempty"`
+	Prf             string `json:"prf,omitempty"`
+	ProxySupport             string `json:"proxySupport,omitempty"`
+	RemoteAddress             string `json:"remoteAddress,omitempty"`
+	ReplayWindowSize             int `json:"replayWindowSize,omitempty"`
+	State             string `json:"state,omitempty"`
+	TrafficSelector             string `json:"trafficSelector,omitempty"`
+	VerifyCert             string `json:"verifyCert,omitempty"`
+	Version             []string `json:"version,omitempty"`
+}
+
+
 // Vxlans contains a list of vlxan profiles on the BIG-IP system.
 type Vxlans struct {
 	Vxlans []Vxlan `json:"items"`
@@ -270,6 +309,7 @@ const (
 	uriIpsec           = "ipsec"
 	uriTrafficselector = "traffic-selector"
 	uriIpsecPolicy     = "ipsec-policy"
+	uriIkePeer         = "ike-peer"
 )
 
 // formatResourceID takes the resource name to
@@ -611,6 +651,29 @@ func (b *BigIP) DeleteTunnel(name string) error {
 // ModifyTunnel allows you to change any attribute of a tunnel.
 func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
 	return b.put(config, uriNet, uriTunnels, uriTunnel, name)
+}
+
+func (b *BigIP) GetIkePeer(name string) (*IkePeer, error) {
+	var ikepeer IkePeer
+	result := formatResourceID(name)
+	err, ok := b.getForEntity(&ikepeer, uriNet, uriIpsec, uriIkePeer, result)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &ikepeer, nil
+}
+func (b *BigIP) CreateIkePeer(config *IkePeer) error {
+    return b.post(config, uriNet, uriIpsec, uriIkePeer)
+}
+func (b *BigIP) DeleteIkePeer(name string) error {
+	return b.delete(uriNet, uriIpsec, uriIkePeer, name)
+}
+func (b *BigIP) ModifyIkePeer(name string, config *IkePeer) error {
+	return b.patch(config, uriNet, uriIpsec, uriIkePeer, name)
 }
 
 // Vxlans returns a list of vxlan profiles.
