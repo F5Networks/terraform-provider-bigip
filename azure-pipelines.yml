@@ -28,7 +28,6 @@ steps:
       echo $PATH'
 
 
-
 - task: Go@0
   inputs:
     command: 'build'
