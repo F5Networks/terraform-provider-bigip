@@ -89,6 +89,7 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 			"security_level": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies whether or not traffic is encrypted and whether or not authentication is required.",
 			},
 
@@ -101,6 +102,7 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 			"version": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "SNMP version used for sending the trap. ",
 			},
 		},
@@ -174,6 +176,7 @@ func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 		SecurityLevel:            d.Get("security_level").(string),
 		SecurityName:             d.Get("security_name").(string),
 		Version:                  d.Get("version").(string),
+		Port:                     d.Get("port").(int),
 	}
 
 	err := client.ModifyTRAP(r)
@@ -191,7 +194,7 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 
 	log.Println("[INFO] Reading SNMP traps " + host)
 
-	traps, err := client.TRAPs()
+	traps, err := client.TRAPs(host)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve SNMP trap (%v) ", err)
 		return err
