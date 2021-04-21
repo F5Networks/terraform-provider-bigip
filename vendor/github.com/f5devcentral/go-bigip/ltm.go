@@ -795,6 +795,7 @@ type PolicyRuleAction struct {
 	ClonePool          string `json:"clonePool,omitempty"`
 	Code               int    `json:"code,omitempty"`
 	Compress           bool   `json:"compress,omitempty"`
+	Connection         bool   `json:"connection,omitempty"`
 	Content            string `json:"content,omitempty"`
 	CookieHash         bool   `json:"cookieHash,omitempty"`
 	CookieInsert       bool   `json:"cookieInsert,omitempty"`
@@ -866,6 +867,7 @@ type PolicyRuleAction struct {
 	Select             bool   `json:"select,omitempty"`
 	ServerSsl          bool   `json:"serverSsl,omitempty"`
 	SetVariable        bool   `json:"setVariable,omitempty"`
+	Shutdown           bool   `json:"setVariable,omitempty"`
 	Snat               string `json:"snat,omitempty"`
 	Snatpool           string `json:"snatpool,omitempty"`
 	SourceAddress      bool   `json:"sourceAddress,omitempty"`
