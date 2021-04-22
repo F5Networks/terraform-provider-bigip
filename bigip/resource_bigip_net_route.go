@@ -8,8 +8,9 @@ package bigip
 
 import (
 	"fmt"
+	//"fmt"
 	"log"
-	"regexp"
+	//"regexp"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -24,28 +25,37 @@ func resourceBigipNetRoute() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the route",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the route",
 			},
-
 			"network": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Destination network",
 			},
-
 			"gw": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Gateway address",
 			},
+			"tunnel_ref": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "tunnel_ref to route traffic",
+			},
+			"reject": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "reject route",
+			},
 		},
 	}
-
 }
 
 func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error {
@@ -54,14 +64,25 @@ func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error
 	name := d.Get("name").(string)
 	network := d.Get("network").(string)
 	gw := d.Get("gw").(string)
+	tunnelRef := d.Get("tunnel_ref").(string)
+	reject := d.Get("reject").(bool)
 
 	log.Println("[INFO] Creating Route")
+	config := &bigip.Route{
+		Name:    name,
+		Network: network,
+	}
+	if gw != "" {
+		config.Gateway = gw
+	}
+	if tunnelRef != "" {
+		config.TmInterface = tunnelRef
+	}
+	if reject {
+		config.Blackhole = reject
+	}
 
-	err := client.CreateRoute(
-		name,
-		network,
-		gw,
-	)
+	err := client.CreateRoute(config)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Route  (%s) (%v)", name, err)
@@ -77,13 +98,26 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 	name := d.Id()
 
 	log.Println("[INFO] Updating Route " + name)
+	network := d.Get("network").(string)
+	gw := d.Get("gw").(string)
+	tunnelRef := d.Get("tunnel_ref").(string)
+	reject := d.Get("reject").(bool)
 
-	r := &bigip.Route{
+	config := &bigip.Route{
 		Name:    name,
-		Network: d.Get("network").(string),
+		Network: network,
+	}
+	if gw != "" {
+		config.Gateway = gw
+	}
+	if tunnelRef != "" {
+		config.TmInterface = tunnelRef
+	}
+	if reject {
+		config.Blackhole = reject
 	}
 
-	err := client.ModifyRoute(name, r)
+	err := client.ModifyRoute(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
 		return err
@@ -94,6 +128,7 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
+	log.Printf("[DEBUG] Reading Net Route config :%+v", name)
 	obj, err := client.GetRoute(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
@@ -104,20 +139,20 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
+	//log.Printf("[DEBUG] Read call Response: %+v", obj)
+	d.Set("name", obj.FullPath)
 
-	regex := regexp.MustCompile(`(default|(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2})(?:\%\d+)?`)
-	network := regex.FindStringSubmatch(obj.Network)
-
-	regex = regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?`)
-	gw := regex.FindStringSubmatch(obj.Gateway)
-
-	if err := d.Set("network", network[1]); err != nil {
+	if err := d.Set("network", obj.Network); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Network to state for Route (%s): %s", d.Id(), err)
 	}
-
-	if err := d.Set("gw", gw[1]); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Gateway to state for Route (%s): %s", d.Id(), err)
+	if obj.Gateway != "" || d.Get("gw").(string) != "" {
+		d.Set("gw", obj.Gateway)
+	}
+	if obj.TmInterface != "" || d.Get("tunnel_ref").(string) != "" {
+		d.Set("tunnel_ref", obj.TmInterface)
+	}
+	if obj.Blackhole {
+		d.Set("reject", obj.Blackhole)
 	}
 	return nil
 }

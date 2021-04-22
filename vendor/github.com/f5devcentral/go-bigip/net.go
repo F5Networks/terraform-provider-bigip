@@ -147,13 +147,18 @@ type Routes struct {
 // Route contains information about each individual route. You can use all
 // of these fields when modifying a route.
 type Route struct {
-	Name       string `json:"name,omitempty"`
-	Partition  string `json:"partition,omitempty"`
-	FullPath   string `json:"fullPath,omitempty"`
-	Generation int    `json:"generation,omitempty"`
-	Gateway    string `json:"gw,omitempty"`
-	MTU        int    `json:"mtu,omitempty"`
-	Network    string `json:"network,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Partition   string `json:"partition,omitempty"`
+	FullPath    string `json:"fullPath,omitempty"`
+	Generation  int    `json:"generation,omitempty"`
+	Gateway     string `json:"gw,omitempty"`
+	MTU         int    `json:"mtu,omitempty"`
+	TmInterface string `json:"tmInterface,omitempty"`
+	Blackhole   bool   `json:"blackhole,omitempty"`
+	//TmInterfaceReference struct {
+	//	Link string `json:"link"`
+	//} `json:"tmInterfaceReference,omitempty"`
+	Network string `json:"network,omitempty"`
 }
 
 // RouteDomains contains a list of every route domain on the BIG-IP system.
@@ -201,44 +206,42 @@ type Tunnel struct {
 	UsePmtu          string `json:"usePmtu,omitempty"`
 }
 
-
 type IkePeer struct {
-	Name             string `json:"name,omitempty"`
-	AppService       string `json:"appService,omitempty"`
-	CaCertFile             string `json:"caCertFile,omitempty"`
-	CrlFile             string `json:"crlFile,omitempty"`
-	DpdDelay             int `json:"dpdDelay,omitempty"`
-	Lifetime             int `json:"lifetime,omitempty"`
-	Description             string `json:"description,omitempty"`
-	GeneratePolicy             string `json:"generatePolicy,omitempty"`
-	Mode             string `json:"mode,omitempty"`
-	MyCertFile             string `json:"myCertFile,omitempty"`
-	MyCertKeyFile             string `json:"myCertKeyFile,omitempty"`
-	MyCertKeyPassphrase             string `json:"myCertKeyPassphrase,omitempty"`
-	MyIdType             string `json:"myIdType,omitempty"`
-	MyIdValue             string `json:"myIdValue,omitempty"`
-	NatTraversal             string `json:"natTraversal,omitempty"`
-	Passive             string `json:"passive,omitempty"`
-	PeersCertFile             string `json:"peersCertFile,omitempty"`
-	PeersCertType             string `json:"peersCertType,omitempty"`
-	PeersIdType             string `json:"peersIdType,omitempty"`
-	PeersIdValue             string `json:"peersIdValue,omitempty"`
-	Phase1AuthMethod             string `json:"phase1AuthMethod,omitempty"`
-	Phase1EncryptAlgorithm             string `json:"phase1EncryptAlgorithm,omitempty"`
-	Phase1HashAlgorithm             string `json:"phase1HashAlgorithm,omitempty"`
-	Phase1PerfectForwardSecrecy             string `json:"phase1PerfectForwardSecrecy,omitempty"`
-	PresharedKey             string `json:"presharedKey,omitempty"`
-	PresharedKeyEncrypted             string `json:"presharedKeyEncrypted,omitempty"`
-	Prf             string `json:"prf,omitempty"`
-	ProxySupport             string `json:"proxySupport,omitempty"`
-	RemoteAddress             string `json:"remoteAddress,omitempty"`
-	ReplayWindowSize             int `json:"replayWindowSize,omitempty"`
-	State             string `json:"state,omitempty"`
-	TrafficSelector             string `json:"trafficSelector,omitempty"`
-	VerifyCert             string `json:"verifyCert,omitempty"`
-	Version             []string `json:"version,omitempty"`
+	Name                        string   `json:"name,omitempty"`
+	AppService                  string   `json:"appService,omitempty"`
+	CaCertFile                  string   `json:"caCertFile,omitempty"`
+	CrlFile                     string   `json:"crlFile,omitempty"`
+	DpdDelay                    int      `json:"dpdDelay,omitempty"`
+	Lifetime                    int      `json:"lifetime,omitempty"`
+	Description                 string   `json:"description,omitempty"`
+	GeneratePolicy              string   `json:"generatePolicy,omitempty"`
+	Mode                        string   `json:"mode,omitempty"`
+	MyCertFile                  string   `json:"myCertFile,omitempty"`
+	MyCertKeyFile               string   `json:"myCertKeyFile,omitempty"`
+	MyCertKeyPassphrase         string   `json:"myCertKeyPassphrase,omitempty"`
+	MyIdType                    string   `json:"myIdType,omitempty"`
+	MyIdValue                   string   `json:"myIdValue,omitempty"`
+	NatTraversal                string   `json:"natTraversal,omitempty"`
+	Passive                     string   `json:"passive,omitempty"`
+	PeersCertFile               string   `json:"peersCertFile,omitempty"`
+	PeersCertType               string   `json:"peersCertType,omitempty"`
+	PeersIdType                 string   `json:"peersIdType,omitempty"`
+	PeersIdValue                string   `json:"peersIdValue,omitempty"`
+	Phase1AuthMethod            string   `json:"phase1AuthMethod,omitempty"`
+	Phase1EncryptAlgorithm      string   `json:"phase1EncryptAlgorithm,omitempty"`
+	Phase1HashAlgorithm         string   `json:"phase1HashAlgorithm,omitempty"`
+	Phase1PerfectForwardSecrecy string   `json:"phase1PerfectForwardSecrecy,omitempty"`
+	PresharedKey                string   `json:"presharedKey,omitempty"`
+	PresharedKeyEncrypted       string   `json:"presharedKeyEncrypted,omitempty"`
+	Prf                         string   `json:"prf,omitempty"`
+	ProxySupport                string   `json:"proxySupport,omitempty"`
+	RemoteAddress               string   `json:"remoteAddress,omitempty"`
+	ReplayWindowSize            int      `json:"replayWindowSize,omitempty"`
+	State                       string   `json:"state,omitempty"`
+	TrafficSelector             string   `json:"trafficSelector,omitempty"`
+	VerifyCert                  string   `json:"verifyCert,omitempty"`
+	Version                     []string `json:"version,omitempty"`
 }
-
 
 // Vxlans contains a list of vlxan profiles on the BIG-IP system.
 type Vxlans struct {
@@ -511,16 +514,20 @@ func (b *BigIP) Routes() (*Routes, error) {
 
 func (b *BigIP) GetRoute(name string) (*Route, error) {
 	var route Route
-	values := []string{}
-	regex := regexp.MustCompile(`^(\/.+\/)?(.+)`)
-	match := regex.FindStringSubmatch(name)
-	if match[1] == "" {
-		values = append(values, "~Common~")
-	}
-	values = append(values, name)
-	// Join the strings into one.
-	result := strings.Join(values, "")
-	err, ok := b.getForEntity(&route, uriNet, uriRoute, result)
+	//values := []string{}
+	//regex := regexp.MustCompile(`^(\/.+\/)?(.+)`)
+	//match := regex.FindStringSubmatch(name)
+	//log.Printf("[DEBUG] match :%+v", match)
+	//if match[1] == "" {
+	//	values = append(values, "~Common~")
+	//}
+	//values = append(values, name)
+	//// Join the strings into one.
+	//result := strings.Join(values, "")
+	//log.Printf("[DEBUG] Route :%+v", result)
+	//log.Printf("[DEBUG] Name :%+v", name)
+
+	err, ok := b.getForEntity(&route, uriNet, uriRoute, name)
 	if err != nil {
 		return nil, err
 	}
@@ -533,13 +540,7 @@ func (b *BigIP) GetRoute(name string) (*Route, error) {
 
 // CreateRoute adds a new static route to the BIG-IP system. <dest> must include the
 // subnet mask in CIDR notation, i.e.: "10.1.1.0/24".
-func (b *BigIP) CreateRoute(name, dest, gateway string) error {
-	config := &Route{
-		Name:    name,
-		Network: dest,
-		Gateway: gateway,
-	}
-
+func (b *BigIP) CreateRoute(config *Route) error {
 	return b.post(config, uriNet, uriRoute)
 }
 
@@ -667,7 +668,7 @@ func (b *BigIP) GetIkePeer(name string) (*IkePeer, error) {
 	return &ikepeer, nil
 }
 func (b *BigIP) CreateIkePeer(config *IkePeer) error {
-    return b.post(config, uriNet, uriIpsec, uriIkePeer)
+	return b.post(config, uriNet, uriIpsec, uriIkePeer)
 }
 func (b *BigIP) DeleteIkePeer(name string) error {
 	return b.delete(uriNet, uriIpsec, uriIkePeer, name)

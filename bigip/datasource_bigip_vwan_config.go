@@ -61,11 +61,6 @@ func dataSourceBigipVwanconfig() *schema.Resource {
 				Required:    true,
 				Description: "partition of resource group",
 			},
-			"full_path": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The full path, if found.",
-			},
 		},
 	}
 }
