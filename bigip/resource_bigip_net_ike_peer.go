@@ -26,10 +26,11 @@ func resourceBigipNetIkePeer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Name of the IKE PEER",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
+				Description:  "Name of the IKE PEER",
 			},
 			"app_service": {
 				Type:        schema.TypeString,
@@ -67,17 +68,15 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Description: "Defines the exchange mode for phase 1 when racoon is the initiator, or the acceptable exchange mode when racoon is the responder",
 			},
 			"my_cert_file": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "default.crt",
-				//				Computed:    true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the name of the certificate file object",
 			},
 			"my_cert_key_file": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "default.key",
-				//				Computed:    true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the name of the certificate key file object",
 			},
 			"my_cert_key_passphrase": {
@@ -159,9 +158,9 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Description: "Defines the Diffie-Hellman group for key exchange to provide perfect forward secrecy",
 			},
 			"preshared_key": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:    true,
 				Description: "Specifies the preshared key for ISAKMP SAs",
 			},
 			"preshared_key_encrypted": {
@@ -194,7 +193,10 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Description: "Enables or disables this IKE remote node",
 			},
 			"traffic_selector": {
-				Type:        schema.TypeString,
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional:    true,
 				Computed:    true,
 				Description: "Specifies the names of the traffic-selector objects associated with this ike-peer",
@@ -210,9 +212,8 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional: true,
-				Computed: true,
-
+				Optional:    true,
+				Computed:    true,
 				Description: "Specifies which version of IKE to be used",
 			},
 			"dpd_delay": {
@@ -253,7 +254,6 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 		log.Printf("[ERROR] Unable to Create IkePeer %s %v :", name, err)
 		return err
 	}
-
 	d.SetId(name)
 
 	err = resourceBigipNetIkePeerUpdate(d, meta)
@@ -261,7 +261,6 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 		client.DeleteIkePeer(name)
 		return err
 	}
-
 	return resourceBigipNetIkePeerRead(d, meta)
 }
 func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error {
@@ -282,6 +281,21 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 	if err := d.Set("app_service", ikepeer.AppService); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AppService to state for IkePeer (%s): %s", d.Id(), err)
 	}
+	if err := d.Set("my_cert_file", ikepeer.MyCertFile); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MyCertFile to state for IkePeer (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("my_cert_key_file", ikepeer.MyCertKeyFile); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MyCertKeyFile to state for IkePeer (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("my_cert_key_passphrase", ikepeer.MyCertKeyPassphrase); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving MyCertKeyPassphrase to state for IkePeer (%s): %s", d.Id(), err)
+	}
+	if ikepeer.PresharedKey != "" && d.Get("preshared_key").(string) != "" {
+		d.Set("preshared_key", ikepeer.PresharedKey)
+	}
+	if err := d.Set("preshared_key_encrypted", ikepeer.PresharedKeyEncrypted); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving PresharedKeyEncrypted to state for IkePeer (%s): %s", d.Id(), err)
+	}
 	if err := d.Set("ca_cert_file", ikepeer.CaCertFile); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving CaCertFile to state for IkePeer (%s): %s", d.Id(), err)
 	}
@@ -296,15 +310,6 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 	}
 	if err := d.Set("mode", ikepeer.Mode); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_file", ikepeer.MyCertFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_key_file", ikepeer.MyCertKeyFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertKeyFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_key_passphrase", ikepeer.MyCertKeyPassphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertKeyPassphrase to state for IkePeer (%s): %s", d.Id(), err)
 	}
 	if err := d.Set("my_id_type", ikepeer.MyIdType); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving MyIdType to state for IkePeer (%s): %s", d.Id(), err)
@@ -342,12 +347,7 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 	if err := d.Set("phase1_perfect_forward_secrecy", ikepeer.Phase1PerfectForwardSecrecy); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Phase1PerfectForwardSecrecy to state for IkePeer (%s): %s", d.Id(), err)
 	}
-	if err := d.Set("preshared_key", ikepeer.PresharedKey); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PresharedKey to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("preshared_key_encrypted", ikepeer.PresharedKeyEncrypted); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PresharedKeyEncrypted to state for IkePeer (%s): %s", d.Id(), err)
-	}
+
 	if err := d.Set("prf", ikepeer.Prf); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Prf to state for IkePeer (%s): %s", d.Id(), err)
 	}
@@ -392,6 +392,10 @@ func resourceBigipNetIkePeerUpdate(d *schema.ResourceData, meta interface{}) err
 	if t, ok := d.GetOk("version"); ok {
 		version = listToStringSlice(t.([]interface{}))
 	}
+	var trafficSelectors []string
+	if t, ok := d.GetOk("traffic_selector"); ok {
+		trafficSelectors = listToStringSlice(t.([]interface{}))
+	}
 
 	r := &bigip.IkePeer{
 		Name:                        name,
@@ -419,20 +423,20 @@ func resourceBigipNetIkePeerUpdate(d *schema.ResourceData, meta interface{}) err
 		Phase1HashAlgorithm:         d.Get("phase1_hash_algorithm").(string),
 		Phase1PerfectForwardSecrecy: d.Get("phase1_perfect_forward_secrecy").(string),
 		PresharedKey:                d.Get("preshared_key").(string),
-		PresharedKeyEncrypted:       d.Get("preshared_key_encrypted").(string),
-		Prf:                         d.Get("prf").(string),
-		ProxySupport:                d.Get("proxy_support").(string),
-		RemoteAddress:               d.Get("remote_address").(string),
-		ReplayWindowSize:            d.Get("replay_window_size").(int),
-		State:                       d.Get("state").(string),
-		TrafficSelector:             d.Get("traffic_selector").(string),
-		VerifyCert:                  d.Get("verify_cert").(string),
-		Version:                     version,
+		//PresharedKeyEncrypted:       d.Get("preshared_key_encrypted").(string),
+		Prf:              d.Get("prf").(string),
+		ProxySupport:     d.Get("proxy_support").(string),
+		RemoteAddress:    d.Get("remote_address").(string),
+		ReplayWindowSize: d.Get("replay_window_size").(int),
+		State:            d.Get("state").(string),
+		TrafficSelector:  trafficSelectors,
+		VerifyCert:       d.Get("verify_cert").(string),
+		Version:          version,
 	}
 
 	err := client.ModifyIkePeer(name, r)
 	if err != nil {
-		return fmt.Errorf("Error modifying IkePeer %s: %v", name, err)
+		return fmt.Errorf(" Error modifying IkePeer %s: %v", name, err)
 	}
 
 	return resourceBigipNetIkePeerRead(d, meta)
@@ -446,7 +450,7 @@ func resourceBigipNetIkePeerDelete(d *schema.ResourceData, meta interface{}) err
 
 	err := client.DeleteIkePeer(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting IkePeer : %s", err)
+		return fmt.Errorf(" Error Deleting IkePeer : %s", err)
 	}
 
 	d.SetId("")

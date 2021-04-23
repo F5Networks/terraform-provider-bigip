@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and limitations 
 package bigip
 
 import (
+	"log"
 	"regexp"
 	"strings"
 )
@@ -208,6 +209,7 @@ type Tunnel struct {
 
 type IkePeer struct {
 	Name                        string   `json:"name,omitempty"`
+	FullPath                    string   `json:"fullPath,omitempty"`
 	AppService                  string   `json:"appService,omitempty"`
 	CaCertFile                  string   `json:"caCertFile,omitempty"`
 	CrlFile                     string   `json:"crlFile,omitempty"`
@@ -238,9 +240,10 @@ type IkePeer struct {
 	RemoteAddress               string   `json:"remoteAddress,omitempty"`
 	ReplayWindowSize            int      `json:"replayWindowSize,omitempty"`
 	State                       string   `json:"state,omitempty"`
-	TrafficSelector             string   `json:"trafficSelector,omitempty"`
-	VerifyCert                  string   `json:"verifyCert,omitempty"`
-	Version                     []string `json:"version,omitempty"`
+	TrafficSelector             []string `json:"trafficSelector,omitempty"`
+	//TrafficSelector             string   `json:"trafficSelector,omitempty"`
+	VerifyCert string   `json:"verifyCert,omitempty"`
+	Version    []string `json:"version,omitempty"`
 }
 
 // Vxlans contains a list of vlxan profiles on the BIG-IP system.
@@ -656,17 +659,19 @@ func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
 
 func (b *BigIP) GetIkePeer(name string) (*IkePeer, error) {
 	var ikepeer IkePeer
-	result := formatResourceID(name)
-	err, ok := b.getForEntity(&ikepeer, uriNet, uriIpsec, uriIkePeer, result)
+	//result := formatResourceID(name)
+	log.Printf("[DEBUG] Reading IKE Peer:%+v", name)
+	//log.Printf("[DEBUG] Reading IKE Peer from result:%+v",result)
+	err, ok := b.getForEntity(&ikepeer, uriNet, uriIpsec, uriIkePeer, name)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
 		return nil, nil
 	}
-
 	return &ikepeer, nil
 }
+
 func (b *BigIP) CreateIkePeer(config *IkePeer) error {
 	return b.post(config, uriNet, uriIpsec, uriIkePeer)
 }
