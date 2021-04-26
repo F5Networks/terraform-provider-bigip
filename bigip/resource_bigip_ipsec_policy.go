@@ -27,7 +27,7 @@ func resourceBigipIpsecPolicy() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				Description:  "Specifies the name of the IPsec policy",
+				Description:  "Specifies the name of the IPsec policy.",
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
