@@ -127,7 +127,8 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	siteId := fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/Microsoft.Network/vpnSites/%s", subscriptionID, resourceGroupName, siteName)
 	siteList := []string{siteId}
 	accountName := "config1615488359837"
-	accountKey := "NU9LJJFmjkmTD7Cd2d2uobdH+0CpjGspJUnXA435uXRYtO89wWheXh+D5s4q7r/H/U0wRyN9pvdPt17LD9q4Ow=="
+	//accountKey := "NU9LJJFmjkmTD7Cd2d2uobdH+0CpjGspJUnXA435uXRYtO89wWheXh+D5s4q7r/H/U0wRyN9pvdPt17LD9q4Ow=="
+	accountKey := "XXXXXXX"
 	destFileName := "vpnconfigdownload.json"
 
 	// From the Azure portal, get your Storage account blob service URL endpoint.
