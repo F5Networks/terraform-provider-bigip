@@ -13,15 +13,17 @@ Use this data source (`bigip_vwan_config`) to get the vWAN site config from Azur
  
 ## Example Usage
 ```hcl
-
 data "bigip_vwan_config" "vwanconfig" {
   azure_vwan_resourcegroup = "azurevwan-bigip-rg-9c8d"
   azure_vwan_name          = "azurevwan-bigip-vwan-9c8d"
   azure_vwan_vpnsite       = "azurevwan-bigip-vsite-9c8d"
-  azure_client_id          = "bd28e9c9-ef78-4aac-8517-16384384c80d"
-  azure_client_secret      = "6907c06b-3166-404a-9fd4-b288326503f8"
-  azure_subsciption_id     = "d31e4e54-7577-4f43-b407-bae6cc0f4f55"
-  azure_tenant_id          = "d106871e-7b91-4733-8423-f98586303b68"
+  azure_client_id          = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  azure_client_secret      = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  azure_subsciption_id     = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  azure_tenant_id          = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  storage_accounnt_name    = "XXXXXXXXXXXXXXXX"
+  storage_accounnt_key     = "XXXXXXXXXXXXXXXXXXXXX"
+
 }
 
 
@@ -43,8 +45,6 @@ data "bigip_vwan_config" "vwanconfig" {
 
 * `azure_tenant_id` - (Required) Specifies the Tenant to which to authenticate,can be set as Environment Variable `AZURE_TENANT_ID`.
 
-## Attributes Reference
+* `storage_accounnt_name` - (Required) Specifies the storage account for download config,can be set as Environment Variable `STORAGE_ACCOUNT_NAME`.
 
-* `type` - The Data Group type (string, ip, integer)"
-
-* `record` - Specifies record of type (string/ip/integer)
+* `storage_accounnt_key` - (Required) Specifies the storage account key to authenticate,can be set as Environment Variable `STORAGE_ACCOUNT_KEY`.
