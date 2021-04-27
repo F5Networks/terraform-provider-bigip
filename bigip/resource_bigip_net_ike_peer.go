@@ -258,7 +258,7 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 
 	err = resourceBigipNetIkePeerUpdate(d, meta)
 	if err != nil {
-		client.DeleteIkePeer(name)
+		_ = client.DeleteIkePeer(name)
 		return err
 	}
 	return resourceBigipNetIkePeerRead(d, meta)
@@ -291,7 +291,7 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("[DEBUG] Error saving MyCertKeyPassphrase to state for IkePeer (%s): %s", d.Id(), err)
 	}
 	if ikepeer.PresharedKey != "" && d.Get("preshared_key").(string) != "" {
-		d.Set("preshared_key", ikepeer.PresharedKey)
+		_ = d.Set("preshared_key", ikepeer.PresharedKey)
 	}
 	if err := d.Set("preshared_key_encrypted", ikepeer.PresharedKeyEncrypted); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving PresharedKeyEncrypted to state for IkePeer (%s): %s", d.Id(), err)
@@ -347,7 +347,6 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 	if err := d.Set("phase1_perfect_forward_secrecy", ikepeer.Phase1PerfectForwardSecrecy); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Phase1PerfectForwardSecrecy to state for IkePeer (%s): %s", d.Id(), err)
 	}
-
 	if err := d.Set("prf", ikepeer.Prf); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Prf to state for IkePeer (%s): %s", d.Id(), err)
 	}
