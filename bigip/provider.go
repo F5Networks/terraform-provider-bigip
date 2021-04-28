@@ -114,6 +114,8 @@ func Provider() terraform.ResourceProvider {
 			"bigip_sys_bigiplicense":                resourceBigipSysBigiplicense(),
 			"bigip_as3":                             resourceBigipAs3(),
 			"bigip_do":                              resourceBigipDo(),
+			"bigip_fast_template":                   resourceBigipFastTemplate(),
+			"bigip_fast_application":                resourceBigipFastApp(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
