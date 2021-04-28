@@ -8,6 +8,7 @@ package bigip
 import (
 	"context"
 	"encoding/json"
+	//"errors"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 	//"github.com/Azure/azure-sdk-for-go/storage"
@@ -20,6 +21,16 @@ import (
 	"net/url"
 	"os"
 	"time"
+)
+
+const (
+	azureEnvErr = `Azure Environment is not set,please set Below Environment variables
+AZURE_SUBSCRIPTION_ID
+AZURE_CLIENT_ID
+AZURE_CLIENT_SECRET
+AZURE_TENANT_ID
+STORAGE_ACCOUNT_NAME
+STORAGE_ACCOUNT_KEY`
 )
 
 func dataSourceBigipVwanconfig() *schema.Resource {
@@ -41,41 +52,37 @@ func dataSourceBigipVwanconfig() *schema.Resource {
 				Required:    true,
 				Description: "Name azure_vwan_vpnsite",
 			},
-			"azure_subsciption_id": {
+			"bigip_gw_ip": {
 				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("AZURE_SUBSCRIPTION_ID", nil),
-				Description: "Specifies the Azure subscription ID to use",
+				Computed:    true,
+				Description: "IP address of BIGIP GW to vwan will establish tunnel",
 			},
-			"azure_client_id": {
+			"preshared_key": {
 				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("AZURE_CLIENT_ID", nil),
-				Description: "Specifies the app client ID to use",
+				Computed:    true,
+				Sensitive:   true,
+				Description: "preshared_key used for establish tunnel",
 			},
-			"azure_client_secret": {
+			"hub_address_space": {
 				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("AZURE_CLIENT_SECRET", nil),
-				Description: "Specifies the app secret to use",
+				Computed:    true,
+				Description: "vWAN Hub address space",
 			},
-			"azure_tenant_id": {
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("AZURE_TENANT_ID", nil),
-				Description: "Specifies the Tenant to which to authenticate",
+			"hub_connected_subnets": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "vWAN Hub connected subnets ",
 			},
-			"storage_accounnt_name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("STORAGE_ACCOUNT_NAME", nil),
-				Description: "Specifies the Azure subscription ID to use",
-			},
-			"storage_accounnt_key": {
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("STORAGE_ACCOUNT_KEY", nil),
-				Description: "Specifies the Azure subscription ID to use",
+			"vwan_gw_address": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "IP address of vWAN GW  that will establish tunnel",
 			},
 		},
 	}
@@ -84,22 +91,52 @@ func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) err
 	//client := meta.(*bigip.BigIP)
 	d.SetId("")
 	log.Println("[INFO] Reading VWAN Config for site:" + d.Get("azure_vwan_vpnsite").(string))
+
+	if os.Getenv("AZURE_SUBSCRIPTION_ID") == "" || os.Getenv("AZURE_CLIENT_ID") == "" || os.Getenv("AZURE_CLIENT_SECRET") == "" || os.Getenv("AZURE_TENANT_ID") == "" || os.Getenv("STORAGE_ACCOUNT_NAME") == "" || os.Getenv("STORAGE_ACCOUNT_KEY") == "" {
+		return fmt.Errorf("%s", azureEnvErr)
+	}
 	config := azureConfig{
-		subscriptionID:    d.Get("azure_subsciption_id").(string),
-		clientID:          d.Get("azure_client_id").(string),
-		clientPassword:    d.Get("azure_client_secret").(string),
-		tenantID:          d.Get("azure_tenant_id").(string),
+		subscriptionID:    os.Getenv("AZURE_SUBSCRIPTION_ID"),
+		clientID:          os.Getenv("AZURE_CLIENT_ID"),
+		clientPassword:    os.Getenv("AZURE_CLIENT_SECRET"),
+		tenantID:          os.Getenv("AZURE_TENANT_ID"),
 		resourceGroupName: d.Get("azure_vwan_resourcegroup").(string),
 		virtualWANName:    d.Get("azure_vwan_name").(string),
 		siteName:          d.Get("azure_vwan_vpnsite").(string),
-		accountName:       d.Get("storage_accounnt_name").(string),
-		accountKey:        d.Get("storage_accounnt_key").(string),
+		accountName:       os.Getenv("STORAGE_ACCOUNT_NAME"),
+		accountKey:        os.Getenv("STORAGE_ACCOUNT_KEY"),
 	}
 	res, err := DownloadVwanConfig(config)
 	if err != nil {
 		log.Printf("failed to download vpnClient Config: %+v", err.Error())
+		return err
 	}
 	log.Printf("[DEBUG] Unmarshed Data : %+v", res)
+	for _, v := range res {
+		if v["vpnSiteConfiguration"].(map[string]interface{})["Name"] == config.siteName {
+			log.Printf("[DEBUG] IPAddress : %+v", v["vpnSiteConfiguration"].(map[string]interface{})["IPAddress"])
+			_ = d.Set("bigip_gw_ip", v["vpnSiteConfiguration"].(map[string]interface{})["IPAddress"])
+			//v.(map[string]interface{})["configurationVersion"]
+			for _, vv := range v["vpnSiteConnections"].([]interface{}) {
+				//log.Printf("[DEBUG] vpnSiteConnections : %+v", vv)
+				//log.Printf("[DEBUG] hubConfiguration : %+v", vv.(map[string]interface{})["hubConfiguration"])
+				_ = d.Set("hub_address_space", vv.(map[string]interface{})["hubConfiguration"].(map[string]interface{})["AddressSpace"])
+				var hubSubnet []string
+				for _, val := range vv.(map[string]interface{})["hubConfiguration"].(map[string]interface{})["ConnectedSubnets"].([]interface{}) {
+					hubSubnet = append(hubSubnet, val.(string))
+				}
+				log.Printf("[DEBUG] hub_connected_subnets : %+v", hubSubnet)
+				_ = d.Set("hub_connected_subnets", hubSubnet)
+				var vwanGWIPs []string
+				vwanGWIPs = append(vwanGWIPs, vv.(map[string]interface{})["gatewayConfiguration"].(map[string]interface{})["IpAddresses"].(map[string]interface{})["Instance0"].(string))
+				vwanGWIPs = append(vwanGWIPs, vv.(map[string]interface{})["gatewayConfiguration"].(map[string]interface{})["IpAddresses"].(map[string]interface{})["Instance1"].(string))
+				log.Printf("[DEBUG] connectionConfiguration : %+v", vv.(map[string]interface{})["connectionConfiguration"])
+				_ = d.Set("preshared_key", vv.(map[string]interface{})["connectionConfiguration"].(map[string]interface{})["PSK"])
+				log.Printf("[DEBUG] vwan_gw_address : %+v", vwanGWIPs)
+				_ = d.Set("vwan_gw_address", vwanGWIPs)
+			}
+		}
+	}
 	//log.Println("[INFO] Reading VWAN Config : " + d.Get("azure_vwan_resourcegroup").(string))
 	//DownloadVwanConfig()
 

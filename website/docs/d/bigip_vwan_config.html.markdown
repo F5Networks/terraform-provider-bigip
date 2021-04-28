@@ -17,34 +17,42 @@ data "bigip_vwan_config" "vwanconfig" {
   azure_vwan_resourcegroup = "azurevwan-bigip-rg-9c8d"
   azure_vwan_name          = "azurevwan-bigip-vwan-9c8d"
   azure_vwan_vpnsite       = "azurevwan-bigip-vsite-9c8d"
-  azure_client_id          = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  azure_client_secret      = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  azure_subsciption_id     = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  azure_tenant_id          = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  storage_accounnt_name    = "XXXXXXXXXXXXXXXX"
-  storage_accounnt_key     = "XXXXXXXXXXXXXXXXXXXXX"
-
 }
-
 
 ```      
 
 ## Argument Reference
 
-* `azure_vwan_resourcegroup` - (Required) Name of the Azure vWAN resource group
+* `azure_vwan_resourcegroup` - (Required, type `string`) Name of the Azure vWAN resource group
 
-* `azure_vwan_name` - (Required) Name of the Azure vWAN Name
+* `azure_vwan_name` - (Required,type `string`) Name of the Azure vWAN Name
 
-* `azure_vwan_vpnsite` - (Required) Name of the Azure vWAN VPN site from which configuration to be download
+* `azure_vwan_vpnsite` - (Required,type `string`) Name of the Azure vWAN VPN site from which configuration to be download
 
-* `azure_client_id` - (Required) Specifies the Azure app client ID to use,can be set as Environment Variable `AZURE_CLIENT_ID`.
 
-* `azure_client_secret` - (Required) Specifies the Azure app secret to use,can be set as Environment Variable `AZURE_CLIENT_SECRET`.
+## Pre-required Environment Settings:
 
-* `azure_subsciption_id` - (Required) Specifies the Azure subscription ID to use,can be set as Environment Variable `AZURE_SUBSCRIPTION_ID`.
+* `AZURE_CLIENT_ID` - (Required) Set this environment variable with the Azure app client ID to use.
 
-* `azure_tenant_id` - (Required) Specifies the Tenant to which to authenticate,can be set as Environment Variable `AZURE_TENANT_ID`.
+* `AZURE_CLIENT_SECRET` - (Required) Set this environment variable with the Azure app secret to use.
 
-* `storage_accounnt_name` - (Required) Specifies the storage account for download config,can be set as Environment Variable `STORAGE_ACCOUNT_NAME`.
+* `AZURE_SUBSCRIPTION_ID` - (Required) Set this environment variable with the Azure subscription ID to use.
 
-* `storage_accounnt_key` - (Required) Specifies the storage account key to authenticate,can be set as Environment Variable `STORAGE_ACCOUNT_KEY`.
+* `AZURE_TENANT_ID` - (Required) Set this environment variable with the Tenant ID to which to authenticate.
+
+* `STORAGE_ACCOUNT_NAME` - (Required) Set this environment variable with the storage account for download config.
+
+* `STORAGE_ACCOUNT_KEY` - (Required) Specifies the storage account key to authenticate,set this Environment variable with account key value.
+
+## Attributes Reference
+
+* `bigip_gw_ip` - (type `string`) provides IP address of BIGIP G/W for IPSec Endpoint.
+
+* `preshared_key` - (type `string`) provides pre-shared-key used for IPSec Tunnel creation.
+
+* `hub_address_space` - (type `string`) Provides IP Address space used on vWAN Hub.
+
+* `hub_connected_subnets` - (type `list`) Provides Subnets connected to vWAN Hub.
+
+* `vwan_gw_address` - (type `list`) Provides vWAN Gateway Address for IPSec End point
+

@@ -189,6 +189,8 @@ type Tunnels struct {
 type Tunnel struct {
 	Name             string `json:"name,omitempty"`
 	AppService       string `json:"appService,omitempty"`
+	Partition        string `json:"partition,omitempty"`
+	FullPath         string `json:"fullPath,omitempty"`
 	AutoLasthop      string `json:"autoLasthop,omitempty"`
 	Description      string `json:"description,omitempty"`
 	IdleTimeout      int    `json:"idleTimeout,omitempty"`
@@ -197,7 +199,6 @@ type Tunnel struct {
 	LocalAddress     string `json:"localAddress,omitempty"`
 	Mode             string `json:"mode,omitempty"`
 	Mtu              int    `json:"mtu,omitempty"`
-	Partition        string `json:"partition,omitempty"`
 	Profile          string `json:"profile,omitempty"`
 	RemoteAddress    string `json:"remoteAddress,omitempty"`
 	SecondaryAddress string `json:"secondaryAddress,omitempty"`
@@ -620,8 +621,8 @@ func (b *BigIP) Tunnels() (*Tunnels, error) {
 // GetTunnel fetches the tunnel by it's name.
 func (b *BigIP) GetTunnel(name string) (*Tunnel, error) {
 	var tunnel Tunnel
-	result := formatResourceID(name)
-	err, ok := b.getForEntity(&tunnel, uriNet, uriTunnels, uriTunnel, result)
+	//result := formatResourceID(name)
+	err, ok := b.getForEntity(&tunnel, uriNet, uriTunnels, uriTunnel, name)
 	if err != nil {
 		return nil, err
 	}
