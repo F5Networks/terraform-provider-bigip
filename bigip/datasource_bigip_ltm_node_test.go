@@ -16,7 +16,6 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 	t.Parallel()
 	resName := "bigip_ltm_node.NODETEST"
 	var nodeName = "test-node"
-	var address = "google.com"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAcctPreCheck(t) },
@@ -27,16 +26,14 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 				Config: testAccCheckNodeConfigBasic(nodeName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckNodeExists(nodeName, true),
-					resource.TestCheckResourceAttr(resName, "name", nodeName),
-					resource.TestCheckResourceAttr(resName, "address", address),
-					resource.TestCheckResourceAttr(resName, "fqdn.0.name", address),
-					resource.TestCheckResourceAttr(resName, "fqdn.0.address_family", "ipv4"),
+					resource.TestCheckResourceAttr(resName, "name", "/Common/test-node"),
+					resource.TestCheckResourceAttr(resName, "address", "192.168.30.1"),
 				),
 			},
 			{
 				ResourceName:      resName,
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 			},
 		},
 	})
@@ -45,10 +42,7 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 func testAccCheckNodeConfigBasic(nodeName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_node" "NODETEST" {
-	name = "%s"
-    address = google.com
-	fqdn {
-		address_family = ipv4
-	}
-}`, nodeName)
+	name = "/%s/%s"
+    address = "192.168.30.1"
+}`, "Common", nodeName)
 }
