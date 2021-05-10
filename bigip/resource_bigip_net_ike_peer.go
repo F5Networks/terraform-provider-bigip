@@ -242,13 +242,12 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	address := d.Get("remote_address").(string)
-	config := &bigip.IkePeer{
-		Name:          name,
-		RemoteAddress: address,
-		MyCertFile:    d.Get("my_cert_file").(string),
-		MyCertKeyFile: d.Get("my_cert_key_file").(string),
+
+	r := &bigip.IkePeer{
+		Name: name,
 	}
+	config := getIkeConfig(d, r)
+
 	err := client.CreateIkePeer(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create IkePeer %s %v :", name, err)
@@ -256,11 +255,6 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	d.SetId(name)
 
-	err = resourceBigipNetIkePeerUpdate(d, meta)
-	if err != nil {
-		_ = client.DeleteIkePeer(name)
-		return err
-	}
 	return resourceBigipNetIkePeerRead(d, meta)
 }
 func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error {
@@ -387,53 +381,12 @@ func resourceBigipNetIkePeerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] Updating IkePeer %s", name)
 
-	var version []string
-	if t, ok := d.GetOk("version"); ok {
-		version = listToStringSlice(t.([]interface{}))
-	}
-	var trafficSelectors []string
-	if t, ok := d.GetOk("traffic_selector"); ok {
-		trafficSelectors = listToStringSlice(t.([]interface{}))
-	}
-
 	r := &bigip.IkePeer{
-		Name:                        name,
-		AppService:                  d.Get("app_service").(string),
-		CaCertFile:                  d.Get("ca_cert_file").(string),
-		CrlFile:                     d.Get("crl_file").(string),
-		DpdDelay:                    d.Get("dpd_delay").(int),
-		Lifetime:                    d.Get("lifetime").(int),
-		Description:                 d.Get("description").(string),
-		GeneratePolicy:              d.Get("generate_policy").(string),
-		Mode:                        d.Get("mode").(string),
-		MyCertFile:                  d.Get("my_cert_file").(string),
-		MyCertKeyFile:               d.Get("my_cert_key_file").(string),
-		MyCertKeyPassphrase:         d.Get("my_cert_key_passphrase").(string),
-		MyIdType:                    d.Get("my_id_type").(string),
-		MyIdValue:                   d.Get("my_id_value").(string),
-		NatTraversal:                d.Get("nat_traversal").(string),
-		Passive:                     d.Get("passive").(string),
-		PeersCertFile:               d.Get("peers_cert_file").(string),
-		PeersCertType:               d.Get("peers_cert_type").(string),
-		PeersIdType:                 d.Get("peers_id_type").(string),
-		PeersIdValue:                d.Get("peers_id_value").(string),
-		Phase1AuthMethod:            d.Get("phase1_auth_method").(string),
-		Phase1EncryptAlgorithm:      d.Get("phase1_encrypt_algorithm").(string),
-		Phase1HashAlgorithm:         d.Get("phase1_hash_algorithm").(string),
-		Phase1PerfectForwardSecrecy: d.Get("phase1_perfect_forward_secrecy").(string),
-		PresharedKey:                d.Get("preshared_key").(string),
-		//PresharedKeyEncrypted:       d.Get("preshared_key_encrypted").(string),
-		Prf:              d.Get("prf").(string),
-		ProxySupport:     d.Get("proxy_support").(string),
-		RemoteAddress:    d.Get("remote_address").(string),
-		ReplayWindowSize: d.Get("replay_window_size").(int),
-		State:            d.Get("state").(string),
-		TrafficSelector:  trafficSelectors,
-		VerifyCert:       d.Get("verify_cert").(string),
-		Version:          version,
+		Name: name,
 	}
+	config := getIkeConfig(d, r)
 
-	err := client.ModifyIkePeer(name, r)
+	err := client.ModifyIkePeer(name, config)
 	if err != nil {
 		return fmt.Errorf(" Error modifying IkePeer %s: %v", name, err)
 	}
@@ -454,4 +407,49 @@ func resourceBigipNetIkePeerDelete(d *schema.ResourceData, meta interface{}) err
 
 	d.SetId("")
 	return nil
+}
+
+func getIkeConfig(d *schema.ResourceData, config *bigip.IkePeer) *bigip.IkePeer {
+	var version []string
+	if t, ok := d.GetOk("version"); ok {
+		version = listToStringSlice(t.([]interface{}))
+	}
+	var trafficSelectors []string
+	if t, ok := d.GetOk("traffic_selector"); ok {
+		trafficSelectors = listToStringSlice(t.([]interface{}))
+	}
+	config.AppService = d.Get("app_service").(string)
+	config.CaCertFile = d.Get("ca_cert_file").(string)
+	config.CrlFile = d.Get("crl_file").(string)
+	config.DpdDelay = d.Get("dpd_delay").(int)
+	config.Lifetime = d.Get("lifetime").(int)
+	config.Description = d.Get("description").(string)
+	config.GeneratePolicy = d.Get("generate_policy").(string)
+	config.Mode = d.Get("mode").(string)
+	config.MyCertFile = d.Get("my_cert_file").(string)
+	config.MyCertKeyFile = d.Get("my_cert_key_file").(string)
+	config.MyCertKeyPassphrase = d.Get("my_cert_key_passphrase").(string)
+	config.MyIdType = d.Get("my_id_type").(string)
+	config.MyIdValue = d.Get("my_id_value").(string)
+	config.NatTraversal = d.Get("nat_traversal").(string)
+	config.Passive = d.Get("passive").(string)
+	config.PeersCertFile = d.Get("peers_cert_file").(string)
+	config.PeersCertType = d.Get("peers_cert_type").(string)
+	config.PeersIdType = d.Get("peers_id_type").(string)
+	config.PeersIdValue = d.Get("peers_id_value").(string)
+	config.Phase1AuthMethod = d.Get("phase1_auth_method").(string)
+	config.Phase1EncryptAlgorithm = d.Get("phase1_encrypt_algorithm").(string)
+	config.Phase1HashAlgorithm = d.Get("phase1_hash_algorithm").(string)
+	config.Phase1PerfectForwardSecrecy = d.Get("phase1_perfect_forward_secrecy").(string)
+	config.PresharedKey = d.Get("preshared_key").(string)
+	config.Prf = d.Get("prf").(string)
+	config.ProxySupport = d.Get("proxy_support").(string)
+	config.RemoteAddress = d.Get("remote_address").(string)
+	config.ReplayWindowSize = d.Get("replay_window_size").(int)
+	config.State = d.Get("state").(string)
+	config.TrafficSelector = trafficSelectors
+	config.VerifyCert = d.Get("verify_cert").(string)
+	config.Version = version
+
+	return config
 }

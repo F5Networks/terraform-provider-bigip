@@ -134,13 +134,12 @@ func resourceBigipNetTunnelCreate(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	localAddress := d.Get("local_address").(string)
-	profile := d.Get("profile").(string)
-	config := &bigip.Tunnel{
-		Name:         name,
-		LocalAddress: localAddress,
-		Profile:      profile,
+
+	r := &bigip.Tunnel{
+		Name: name,
 	}
+	config := getConfig(d, r)
+
 	err := client.CreateTunnel(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Tunnel %s %v :", name, err)
@@ -148,12 +147,6 @@ func resourceBigipNetTunnelCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.SetId(name)
-
-	err = resourceBigipNetTunnelUpdate(d, meta)
-	if err != nil {
-		_ = client.DeleteTunnel(name)
-		return err
-	}
 
 	return resourceBigipNetTunnelRead(d, meta)
 }
@@ -238,29 +231,13 @@ func resourceBigipNetTunnelUpdate(d *schema.ResourceData, meta interface{}) erro
 	log.Printf("[DEBUG] Updating Tunnel %s", name)
 
 	r := &bigip.Tunnel{
-		Name:        name,
-		AppService:  d.Get("app_service").(string),
-		AutoLasthop: d.Get("auto_last_hop").(string),
-		Description: d.Get("description").(string),
-		IdleTimeout: d.Get("idle_timeout").(int),
-		//IfIndex:d.Get("if_index").(int),
-		Key:              d.Get("key").(int),
-		LocalAddress:     d.Get("local_address").(string),
-		Mode:             d.Get("mode").(string),
-		Mtu:              d.Get("mtu").(int),
-		Partition:        d.Get("partition").(string),
-		Profile:          d.Get("profile").(string),
-		RemoteAddress:    d.Get("remote_address").(string),
-		SecondaryAddress: d.Get("secondary_address").(string),
-		Tos:              d.Get("tos").(string),
-		TrafficGroup:     d.Get("traffic_group").(string),
-		Transparent:      d.Get("transparent").(string),
-		UsePmtu:          d.Get("use_pmtu").(string),
+		Name: name,
 	}
+	config := getConfig(d, r)
 
-	err := client.ModifyTunnel(name, r)
+	err := client.ModifyTunnel(name, config)
 	if err != nil {
-		return fmt.Errorf("Error modifying TUNNEL %s: %v", name, err)
+		return fmt.Errorf("Error modifying TUNNEL %s: %v ", name, err)
 	}
 
 	return resourceBigipNetTunnelRead(d, meta)
@@ -275,9 +252,30 @@ func resourceBigipNetTunnelDelete(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.DeleteTunnel(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting Tunnel : %s", err)
+		return fmt.Errorf("Error Deleting Tunnel : %s ", err)
 	}
 
 	d.SetId("")
 	return nil
+}
+
+func getConfig(d *schema.ResourceData, config *bigip.Tunnel) *bigip.Tunnel {
+	config.AppService = d.Get("app_service").(string)
+	config.AutoLasthop = d.Get("auto_last_hop").(string)
+	config.Description = d.Get("description").(string)
+	config.LocalAddress = d.Get("local_address").(string)
+	config.Profile = d.Get("profile").(string)
+	config.IdleTimeout = d.Get("idle_timeout").(int)
+	//IfIndex:d.Get("if_index").(int),
+	config.Key = d.Get("key").(int)
+	config.Mode = d.Get("mode").(string)
+	config.Mtu = d.Get("mtu").(int)
+	config.Partition = d.Get("partition").(string)
+	config.RemoteAddress = d.Get("remote_address").(string)
+	config.SecondaryAddress = d.Get("secondary_address").(string)
+	config.Tos = d.Get("tos").(string)
+	config.TrafficGroup = d.Get("traffic_group").(string)
+	config.Transparent = d.Get("transparent").(string)
+	config.UsePmtu = d.Get("use_pmtu").(string)
+	return config
 }
