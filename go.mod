@@ -6,6 +6,12 @@
 module github.com/F5Networks/terraform-provider-bigip
 
 require (
+	github.com/Azure/azure-sdk-for-go v53.4.0+incompatible
+	github.com/Azure/azure-storage-blob-go v0.13.0
+	github.com/Azure/go-autorest/autorest v0.11.18
+	github.com/Azure/go-autorest/autorest/adal v0.9.13
+	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
+	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/f5devcentral/go-bigip v0.0.0-20210331192832-a618463885c6
 	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210331192832-a618463885c6
 	github.com/google/uuid v1.1.1
