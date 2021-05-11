@@ -188,6 +188,11 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Set:      schema.HashString,
 				Optional: true,
 			},
+			"per_flow_request_access_policy": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -448,6 +453,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	}
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	_ = d.Set("security_log_profiles", vs.SecurityLogProfiles)
+	_ = d.Set("per_flow_request_access_policy", vs.PerFlowRequestAccessPolicy)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
@@ -581,10 +587,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 			Type: d.Get("source_address_translation").(string),
 			Pool: d.Get("snatpool").(string),
 		},
-		TranslatePort:       d.Get("translate_port").(string),
-		TranslateAddress:    d.Get("translate_address").(string),
-		VlansEnabled:        d.Get("vlans_enabled").(bool),
-		SecurityLogProfiles: security_log_profiles,
+		TranslatePort:              d.Get("translate_port").(string),
+		TranslateAddress:           d.Get("translate_address").(string),
+		VlansEnabled:               d.Get("vlans_enabled").(bool),
+		SecurityLogProfiles:        security_log_profiles,
+		PerFlowRequestAccessPolicy: d.Get("per_flow_request_access_policy").(string),
 	}
 	if d.Get("state").(string) == "disabled" {
 		vs.Disabled = true
