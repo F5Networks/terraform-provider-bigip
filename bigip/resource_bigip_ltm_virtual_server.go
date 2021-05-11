@@ -182,6 +182,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed:    true,
 				Description: "Enables the virtual server on the VLANs specified by the VLANs option.",
 			},
+			"security_log_profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -441,6 +447,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
 	}
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
+	_ = d.Set("security_log_profiles", vs.SecurityLogProfiles)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
@@ -539,6 +546,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		vlans = setToStringSlice(v.(*schema.Set))
 	}
 
+	var security_log_profiles []string
+	if v, ok := d.GetOk("securityLogProfiles"); ok {
+		security_log_profiles = setToStringSlice(v.(*schema.Set))
+	}
+
 	var rules []string
 	if cfgRules, ok := d.GetOk("irules"); ok {
 		rules = listToStringSlice(cfgRules.([]interface{}))
@@ -569,9 +581,10 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 			Type: d.Get("source_address_translation").(string),
 			Pool: d.Get("snatpool").(string),
 		},
-		TranslatePort:    d.Get("translate_port").(string),
-		TranslateAddress: d.Get("translate_address").(string),
-		VlansEnabled:     d.Get("vlans_enabled").(bool),
+		TranslatePort:       d.Get("translate_port").(string),
+		TranslateAddress:    d.Get("translate_address").(string),
+		VlansEnabled:        d.Get("vlans_enabled").(bool),
+		SecurityLogProfiles: security_log_profiles,
 	}
 	if d.Get("state").(string) == "disabled" {
 		vs.Disabled = true

@@ -572,6 +572,7 @@ type VirtualServer struct {
 	PersistenceProfiles []Profile `json:"persist"`
 	Profiles            []Profile `json:"profiles,omitempty"`
 	Policies            []string  `json:"policies"`
+	SecurityLogProfiles []string  `json:"securityLogProfiles,omitempty"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
