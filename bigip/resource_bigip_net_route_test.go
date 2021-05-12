@@ -33,10 +33,33 @@ resource "bigip_net_selfip" "test-selfip" {
 	depends_on = ["bigip_net_vlan.test-vlan"]
 }
 resource "bigip_net_route" "test-route" {
-	  name = "test-route"
+	  name = "` + TEST_ROUTE_NAME + `"
 	  network = "10.10.10.0/24"
 	  gw      = "11.1.1.2"
 	  depends_on = ["bigip_net_selfip.test-selfip"]
+}
+`
+var TEST_ROUTE_RESOURCE_UPDATE = `
+
+resource "bigip_net_vlan" "test-vlan" {
+        name = "` + TEST_VLAN_NAME + `"
+        tag = 101
+        interfaces {
+                vlanport = 1.1
+                tagged = false
+        }
+}
+resource "bigip_net_selfip" "test-selfip" {
+        name = "` + TEST_SELFIP_NAME + `"
+        ip = "11.1.1.1/24"
+        vlan = "/Common/test-vlan"
+        depends_on = ["bigip_net_vlan.test-vlan"]
+}
+resource "bigip_net_route" "test-route" {
+          name = "` + TEST_ROUTE_NAME + `"
+          network = "10.10.10.0/24"
+          gw      = "11.1.1.3"
+          depends_on = ["bigip_net_selfip.test-selfip"]
 }
 `
 
@@ -52,7 +75,7 @@ func TestAccBigipNetroute_create(t *testing.T) {
 				Config: TEST_ROUTE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckrouteExists(TEST_ROUTE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_net_route.test-route", "name", "test-route"),
+					resource.TestCheckResourceAttr("bigip_net_route.test-route", "name", "/Common/test-route"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "network", "10.10.10.0/24"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.2"),
 				),
@@ -60,7 +83,29 @@ func TestAccBigipNetroute_create(t *testing.T) {
 		},
 	})
 }
-
+func TestAccBigipNetroute_update(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckroutesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_ROUTE_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.2"),
+				),
+			},
+			{
+				Config: TEST_ROUTE_RESOURCE_UPDATE,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.3"),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipNetroute_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
