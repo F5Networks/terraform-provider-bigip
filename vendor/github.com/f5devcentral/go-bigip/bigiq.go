@@ -346,15 +346,18 @@ func (b *BigIP) PostAs3Bigiq(as3NewJson string) (error, string) {
 
 }
 
-func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
+func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 	as3Json := make(map[string]interface{})
 	as3Json["class"] = "AS3"
 	as3Json["action"] = "deploy"
 	as3Json["persist"] = true
+	//var adcJson
 	//adcJson := make(map[string]interface{})
-	adcJson := []map[string]interface{}{}
-
-	err, ok := b.getForEntityNew(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	//adcJson := []map[string]interface{}{}
+	var adcJson interface{}
+	tenantList := strings.Split(tenantRef, ",")
+	//log.Printf("[DEBUG] tenantList:%+v",tenantList)
+	err, ok := b.getForEntityNew(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantRef)
 	if err != nil {
 		return "", err
 	}
@@ -362,30 +365,76 @@ func (b *BigIP) GetAs3Bigiq(name string) (string, error) {
 		return "", nil
 	}
 	as3JsonNew := make(map[string]interface{})
-	for _, adcJsonvalue := range adcJson {
-		if adcJsonvalue[name] != nil {
-			for k, v := range adcJsonvalue[name].(map[string]interface{}) {
-				if k != "class" {
-					delete(v.(map[string]interface{}), "schemaOverlay")
-					if val, ok := v.(map[string]interface{})["serviceMain"]; ok {
-						ss := val.(map[string]interface{})["pool"].(string)
-						ss1 := strings.Split(ss, "/")
-						val.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+	as3jsonType := reflect.TypeOf(adcJson).Kind()
+	//log.Printf("[DEBUG] as3jsonType:%+v",as3jsonType)
+	if as3jsonType == reflect.Map {
+		adcJsonvalue := adcJson.(map[string]interface{})
+		if adcJsonvalue["target"].(map[string]interface{})["address"].(string) == targetRef {
+			for _, name := range tenantList {
+				if adcJsonvalue[name] != nil {
+					for k, v := range adcJsonvalue[name].(map[string]interface{}) {
+						if k != "class" {
+							delete(v.(map[string]interface{}), "schemaOverlay")
+							for _, v1 := range v.(map[string]interface{}) {
+								if reflect.TypeOf(v1).Kind() == reflect.Map && v1.(map[string]interface{})["class"] == "Service_HTTP" {
+									if _, ok := v1.(map[string]interface{})["pool"]; ok {
+										ss := v1.(map[string]interface{})["pool"].(string)
+										ss1 := strings.Split(ss, "/")
+										v1.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+									}
+								}
+							}
+						}
 					}
-					//ss := v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"].(string)
-					//ss1 := strings.Split(ss, "/")
-					//v.(map[string]interface{})["serviceMain"].(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+					as3JsonNew[name] = adcJsonvalue[name]
+					//delete(adcJsonvalue[name].(map[string]interface{}),"schemaOverlay")
+					as3JsonNew["id"] = adcJsonvalue["id"]
+					as3JsonNew["class"] = adcJsonvalue["class"]
+					as3JsonNew["label"] = adcJsonvalue["label"]
+					as3JsonNew["remark"] = adcJsonvalue["remark"]
+					as3JsonNew["target"] = adcJsonvalue["target"]
+					//as3JsonNew["updateMode"] = adcJsonvalue["updateMode"]
+					as3JsonNew["schemaVersion"] = adcJsonvalue["schemaVersion"]
 				}
 			}
-			as3JsonNew[name] = adcJsonvalue[name]
-			//delete(adcJsonvalue[name].(map[string]interface{}),"schemaOverlay")
-			as3JsonNew["id"] = adcJsonvalue["id"]
-			as3JsonNew["class"] = adcJsonvalue["class"]
-			as3JsonNew["label"] = adcJsonvalue["label"]
-			as3JsonNew["remark"] = adcJsonvalue["remark"]
-			as3JsonNew["target"] = adcJsonvalue["target"]
-			//as3JsonNew["updateMode"] = adcJsonvalue["updateMode"]
-			as3JsonNew["schemaVersion"] = adcJsonvalue["schemaVersion"]
+		}
+	} else {
+		for _, adcJsonvalue1 := range adcJson.([]interface{}) {
+			adcJsonvalue := adcJsonvalue1.(map[string]interface{})
+			if adcJsonvalue["target"].(map[string]interface{})["address"].(string) == targetRef {
+				for _, name := range tenantList {
+					if adcJsonvalue[name] != nil {
+						for k, v := range adcJsonvalue[name].(map[string]interface{}) {
+							if k != "class" {
+								delete(v.(map[string]interface{}), "schemaOverlay")
+								for _, v1 := range v.(map[string]interface{}) {
+									if reflect.TypeOf(v1).Kind() == reflect.Map && v1.(map[string]interface{})["class"] == "Service_HTTP" {
+										if _, ok := v1.(map[string]interface{})["pool"]; ok {
+											ss := v1.(map[string]interface{})["pool"].(string)
+											ss1 := strings.Split(ss, "/")
+											v1.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+										}
+									}
+								}
+								//if val, ok := v.(map[string]interface{})["serviceMain"]; ok {
+								//      ss := val.(map[string]interface{})["pool"].(string)
+								//      ss1 := strings.Split(ss, "/")
+								//      val.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+								//}
+							}
+						}
+						as3JsonNew[name] = adcJsonvalue[name]
+						//delete(adcJsonvalue[name].(map[string]interface{}),"schemaOverlay")
+						as3JsonNew["id"] = adcJsonvalue["id"]
+						as3JsonNew["class"] = adcJsonvalue["class"]
+						as3JsonNew["label"] = adcJsonvalue["label"]
+						as3JsonNew["remark"] = adcJsonvalue["remark"]
+						as3JsonNew["target"] = adcJsonvalue["target"]
+						//as3JsonNew["updateMode"] = adcJsonvalue["updateMode"]
+						as3JsonNew["schemaVersion"] = adcJsonvalue["schemaVersion"]
+					}
+				}
+			}
 		}
 	}
 	as3Json["declaration"] = as3JsonNew

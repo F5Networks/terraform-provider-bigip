@@ -74,6 +74,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
 			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
 			"bigip_ltm_node":        dataSourceBigipLtmNode(),
+			"bigip_vwan_config":     dataSourceBigipVwanconfig(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -114,6 +115,8 @@ func Provider() terraform.ResourceProvider {
 			"bigip_sys_bigiplicense":                resourceBigipSysBigiplicense(),
 			"bigip_as3":                             resourceBigipAs3(),
 			"bigip_do":                              resourceBigipDo(),
+			"bigip_fast_template":                   resourceBigipFastTemplate(),
+			"bigip_fast_application":                resourceBigipFastApp(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
@@ -123,6 +126,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_traffic_selector":                resourceBigipTrafficselector(),
 			"bigip_ipsec_policy":                    resourceBigipIpsecPolicy(),
 			"bigip_net_tunnel":                      resourceBigipNetTunnel(),
+			"bigip_net_ike_peer":                    resourceBigipNetIkePeer(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {

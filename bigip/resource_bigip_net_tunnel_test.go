@@ -26,13 +26,30 @@ resource "bigip_net_tunnel" "test_tunnel" {
     local_address     = "192.16.81.240"
     mode              = "bidirectional"
     mtu               = 0
-    partition         = "Common"
     profile           = "/Common/dslite"
     remote_address    = "any6"
     secondary_address = "any6"
     tos               = "preserve"
     transparent       = "disabled"
     use_pmtu          = "enabled"        
+}
+`
+var TEST_TUNNEL_RESOURCE_UPDATE = `
+resource "bigip_net_tunnel" "test_tunnel" {
+    name = "` + TEST_TUNNEL_NAME + `"
+    auto_last_hop     = "default"
+    idle_timeout      = 300
+//    if_index          = 464
+    key               = 0
+    local_address     = "192.16.81.240"
+    mode              = "bidirectional"
+    mtu               = 0
+    profile           = "/Common/dslite"
+    remote_address    = "any6"
+    secondary_address = "any6"
+    tos               = "preserve"
+    transparent       = "enabled"
+    use_pmtu          = "disabled"
 }
 `
 
@@ -56,7 +73,6 @@ func TestAccBigipNetTunnelCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "local_address", "192.16.81.240"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "mode", "bidirectional"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "mtu", "0"),
-					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "partition", "Common"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "profile", "/Common/dslite"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "remote_address", "any6"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "secondary_address", "any6"),
@@ -68,6 +84,31 @@ func TestAccBigipNetTunnelCreate(t *testing.T) {
 		},
 	})
 
+}
+func TestAccBigipNetTunnelUpdate(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_TUNNEL_RESOURCE,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "transparent", "disabled"),
+					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "use_pmtu", "enabled"),
+				),
+			},
+			{
+				Config: TEST_TUNNEL_RESOURCE_UPDATE,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "transparent", "enabled"),
+					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "use_pmtu", "disabled"),
+				),
+			},
+		},
+	})
 }
 func TestAccBigipNetTunnelImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
