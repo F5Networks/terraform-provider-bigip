@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and limitations 
 package bigip
 
 import (
-	"log"
 	"regexp"
 	"strings"
 )
@@ -157,7 +156,7 @@ type Route struct {
 	TmInterface string `json:"tmInterface,omitempty"`
 	Blackhole   bool   `json:"blackhole,omitempty"`
 	//TmInterfaceReference struct {
-	//	Link string `json:"link"`
+	//      Link string `json:"link"`
 	//} `json:"tmInterfaceReference,omitempty"`
 	Network string `json:"network,omitempty"`
 }
@@ -523,7 +522,7 @@ func (b *BigIP) GetRoute(name string) (*Route, error) {
 	//match := regex.FindStringSubmatch(name)
 	//log.Printf("[DEBUG] match :%+v", match)
 	//if match[1] == "" {
-	//	values = append(values, "~Common~")
+	//      values = append(values, "~Common~")
 	//}
 	//values = append(values, name)
 	//// Join the strings into one.
@@ -661,7 +660,7 @@ func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
 func (b *BigIP) GetIkePeer(name string) (*IkePeer, error) {
 	var ikepeer IkePeer
 	//result := formatResourceID(name)
-	log.Printf("[DEBUG] Reading IKE Peer:%+v", name)
+	//log.Printf("[DEBUG] Reading IKE Peer:%+v", name)
 	//log.Printf("[DEBUG] Reading IKE Peer from result:%+v",result)
 	err, ok := b.getForEntity(&ikepeer, uriNet, uriIpsec, uriIkePeer, name)
 	if err != nil {

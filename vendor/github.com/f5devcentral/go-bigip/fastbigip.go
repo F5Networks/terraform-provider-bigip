@@ -1,48 +1,48 @@
 package bigip
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
-	"fmt"
-	"encoding/json"
 	"time"
 )
 
 const (
-	uriFast = "fast"
+	uriFast     = "fast"
 	uriFasttask = "tasks"
-	uriTempl = "templatesets"
-	uriFastApp = "applications"
+	uriTempl    = "templatesets"
+	uriFastApp  = "applications"
 )
 
 type FastPayload struct {
-	Name	string	`json:"name,omitempty"`
+	Name       string                 `json:"name,omitempty"`
 	Parameters map[string]interface{} `json:"parameters,omitempty"`
 }
 
 type FastTask struct {
-	Id 					string `json:"id,omitempty"`
-	Code 				int64 `json:"code,omitempty"`
-	Message 			string `json:"message,omitempty"`
-	Tenant 				string `json:"tenant,omitempty"`
-	Parameters 			map[string]interface{} `json:"parameters,omitempty"`
-	Application 		string `json:"application,omitempty"`
-	Operation 			string `json:"operation,omitempty"`
+	Id          string                 `json:"id,omitempty"`
+	Code        int64                  `json:"code,omitempty"`
+	Message     string                 `json:"message,omitempty"`
+	Tenant      string                 `json:"tenant,omitempty"`
+	Parameters  map[string]interface{} `json:"parameters,omitempty"`
+	Application string                 `json:"application,omitempty"`
+	Operation   string                 `json:"operation,omitempty"`
 }
 
 type FastTemplateSet struct {
-	Name               		string  `json:"name,omitempty"`
-	Hash    		   		string	`json:"hash,omitempty"`
-	Supported 				bool 	`json:"supported,omitempty"`
-	Templates 				[]TmplArrType `json:"templates,omitempty"`
-	Schemas 				[]TmplArrType `json:"schemas,omitempty"`
-	Enabled 				bool `json:"enabled,omitempty"`
-	UpdateAvailable 		bool `json:"updateAvailable,omitempty"`
+	Name            string        `json:"name,omitempty"`
+	Hash            string        `json:"hash,omitempty"`
+	Supported       bool          `json:"supported,omitempty"`
+	Templates       []TmplArrType `json:"templates,omitempty"`
+	Schemas         []TmplArrType `json:"schemas,omitempty"`
+	Enabled         bool          `json:"enabled,omitempty"`
+	UpdateAvailable bool          `json:"updateAvailable,omitempty"`
 }
 
 type TmplArrType struct {
-	Name	string	`json:"name,omitempty"`
-	Hash    string	`json:"hash,omitempty"`
+	Name string `json:"name,omitempty"`
+	Hash string `json:"hash,omitempty"`
 }
 
 // UploadFastTemplate copies a template set from local disk to BIGIP
@@ -53,7 +53,7 @@ func (b *BigIP) UploadFastTemplate(tmplpath *os.File, tmplname string) error {
 	}
 	log.Println("string:", tmplpath)
 	payload := FastTemplateSet{
-		Name:       tmplname,
+		Name: tmplname,
 	}
 	log.Printf("%+v\n", payload)
 	err = b.AddTemplateSet(&payload)
@@ -88,7 +88,7 @@ func (b *BigIP) DeleteTemplateSet(name string) error {
 }
 
 // GetFastApp retrieves a Application set by tenant and app name. Returns nil if the application does not exist
-func (b *BigIP) GetFastApp(tenant, app  string) (string, error) {
+func (b *BigIP) GetFastApp(tenant, app string) (string, error) {
 	var out []byte
 	fastJson := make(map[string]interface{})
 	err, ok := b.getForEntity(&fastJson, uriMgmt, uriShared, uriFast, uriFastApp, tenant, app)
@@ -103,7 +103,7 @@ func (b *BigIP) GetFastApp(tenant, app  string) (string, error) {
 			for k, v := range rec {
 				if rec2, ok := v.(map[string]interface{}); ok && k == "fast" {
 					for k1, v1 := range rec2 {
-						if rec3, ok := v1.(map[string]interface{}); ok   {
+						if rec3, ok := v1.(map[string]interface{}); ok {
 							if k1 == "view" {
 								out, _ = json.Marshal(rec3)
 							}
@@ -116,15 +116,16 @@ func (b *BigIP) GetFastApp(tenant, app  string) (string, error) {
 	}
 	fastString := string(out)
 
-return fastString, nil
+	return fastString, nil
 }
+
 // PostFastAppBigip used for posting FAST json file to BIGIP
 func (b *BigIP) PostFastAppBigip(body, fastTemplate string) (tenant, app string, err error) {
 	param := []byte(body)
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(param, &jsonRef)
 	payload := &FastPayload{
-		Name: fastTemplate,
+		Name:       fastTemplate,
 		Parameters: jsonRef,
 	}
 	resp, err := b.postReq(payload, uriMgmt, uriShared, uriFast, uriFastApp)
@@ -158,8 +159,9 @@ func (b *BigIP) PostFastAppBigip(body, fastTemplate string) (tenant, app string,
 	}
 	return taskStatus.Tenant, taskStatus.Application, err
 }
+
 // ModifyFastAppBigip used for updating FAST application on BIGIP
-func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) (error) {
+func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) error {
 	param := []byte(body)
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(param, &jsonRef)
@@ -198,7 +200,7 @@ func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) (error) {
 }
 
 // DeleteFastAppBigip used for deleting FAST application on BIGIP
-func (b *BigIP) DeleteFastAppBigip(fastTenant, fastApp string) (error) {
+func (b *BigIP) DeleteFastAppBigip(fastTenant, fastApp string) error {
 	resp, err := b.deleteReq(uriMgmt, uriShared, uriFast, uriFastApp, fastTenant, fastApp)
 	if err != nil {
 		return err

@@ -290,6 +290,7 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	req := &APIRequest{
 		Method:      "post",
 		URL:         b.iControlPath(path),
@@ -446,6 +447,7 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
+
 	resp, err := b.APICall(req)
 	if err != nil {
 		var reqError RequestError

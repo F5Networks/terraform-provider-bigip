@@ -417,9 +417,9 @@ func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 									}
 								}
 								//if val, ok := v.(map[string]interface{})["serviceMain"]; ok {
-								//	ss := val.(map[string]interface{})["pool"].(string)
-								//	ss1 := strings.Split(ss, "/")
-								//	val.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
+								//      ss := val.(map[string]interface{})["pool"].(string)
+								//      ss1 := strings.Split(ss, "/")
+								//      val.(map[string]interface{})["pool"] = ss1[len(ss1)-1]
 								//}
 							}
 						}
