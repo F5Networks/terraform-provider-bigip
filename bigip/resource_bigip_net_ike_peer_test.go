@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_IKE_PEER_NAME = "testpeer"
+var TEST_IKE_PEER_NAME = "/Common/testpeer"
 
 var TEST_IKE_PEER_RESOURCE = `
 resource "bigip_net_ike_peer"  "test_ike_peer" {
