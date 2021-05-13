@@ -10,7 +10,7 @@ description: |-
 
 `bigip_ltm_profile_tcp` Configures a custom profile_tcp for use by health checks.
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
+Resources should be named with their "full path". The full path is the combination of the partition + name (example: /Common/my-pool ) or  partition + directory + name of the resource  (example: /Common/test/my-pool )
 
 ## Example Usage
 
