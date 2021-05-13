@@ -23,7 +23,7 @@ resource "bigip_net_vlan" "test-vlan" {
 	tag = 101
 	interfaces {
 		vlanport = 1.1
-		tagged = false
+		tagged = true
 	}
 }
 resource "bigip_net_selfip" "test-selfip" {
@@ -46,7 +46,7 @@ resource "bigip_net_vlan" "test-vlan" {
         tag = 101
         interfaces {
                 vlanport = 1.1
-                tagged = false
+                tagged = true
         }
 }
 resource "bigip_net_selfip" "test-selfip" {
