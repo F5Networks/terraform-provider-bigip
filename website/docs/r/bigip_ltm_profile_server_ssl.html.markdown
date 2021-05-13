@@ -10,7 +10,7 @@ description: |-
 
 `bigip_ltm_profile_server_ssl` Manages server SSL profiles on a BIG-IP
 
-
+Resources should be named with their "full path". The full path is the combination of the partition + name (example: /Common/my-pool ) or  partition + directory + name of the resource  (example: /Common/test/my-pool )
 
 ## Example Usage
     
