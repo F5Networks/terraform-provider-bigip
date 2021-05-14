@@ -7,10 +7,11 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"os"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 var TEST_PARTITION = "Common"
@@ -39,7 +40,7 @@ func TestAccProvider(t *testing.T) {
 }
 
 func testAcctPreCheck(t *testing.T) {
-	if os.Getenv("BIGIP_TOKEN_AUTH") != "" && os.Getenv("BIGIP_LOGIN_REF") != "" {
+	if os.Getenv("BIGIP_TOKEN_VALUE") != "" || (os.Getenv("BIGIP_TOKEN_AUTH") != "" && os.Getenv("BIGIP_LOGIN_REF") != "") {
 		return
 	}
 	for _, s := range [...]string{"BIGIP_HOST", "BIGIP_USER", "BIGIP_PASSWORD"} {
