@@ -131,6 +131,16 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
+			"security_log_profiles": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+			},
+			"per_flow_request_access_policy": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"source_address_translation": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -408,6 +418,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		_ = d.Set("port", parsedPort)
 	}
 	_ = d.Set("irules", makeStringList(&vs.Rules))
+	_ = d.Set("security_log_profiles", makeStringList(&vs.SecurityLogProfiles))
+	_ = d.Set("per_flow_request_access_policy", vs.PerFlowRequestAccessPolicy)
 	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("description", vs.Description)
 	if vs.Enabled {
@@ -544,6 +556,11 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		rules = listToStringSlice(cfgRules.([]interface{}))
 	}
 
+	var securityLogProfiles []string
+	if cfgLogProfiles, ok := d.GetOk("security_log_profiles"); ok {
+		securityLogProfiles = listToStringSlice(cfgLogProfiles.([]interface{}))
+	}
+
 	destPort := fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int))
 	if strings.Contains(d.Get("destination").(string), ":") {
 		destPort = fmt.Sprintf("%s.%d", d.Get("destination").(string), d.Get("port").(int))
@@ -557,6 +574,8 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 		Mask:                       d.Get("mask").(string),
 		Description:                d.Get("description").(string),
 		Rules:                      rules,
+		SecurityLogProfiles:        securityLogProfiles,
+		PerFlowRequestAccessPolicy: d.Get("per_flow_request_access_policy").(string),
 		PersistenceProfiles:        persistenceProfiles,
 		Profiles:                   profiles,
 		Policies:                   policies,
