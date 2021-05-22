@@ -379,6 +379,23 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
 	finalApplicationList := strings.Join(applicationList[:], ",")
 	return finalTenantlist, len(tenantList), finalApplicationList
 }
+
+func (b *BigIP) GetTarget(body interface{}) string {
+	as3json := body.(string)
+	resp := []byte(as3json)
+	jsonRef := make(map[string]interface{})
+	json.Unmarshal(resp, &jsonRef)
+	for key, value := range jsonRef {
+		if _, ok := value.(map[string]interface{}); ok && key == "declaration" {
+			if val, ok := value.(map[string]interface{})["target"]; ok {
+				//log.Printf("[DEBUG]: target:%+v", val.(map[string]interface{})["address"])
+				return val.(map[string]interface{})["address"].(string)
+			}
+		}
+	}
+	return ""
+}
+
 func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	var s string
 	as3json := body.(string)

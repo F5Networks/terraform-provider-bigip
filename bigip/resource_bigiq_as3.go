@@ -110,7 +110,7 @@ func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
 	defer q.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	tenantList, _, _ := bigiqRef.GetTenantList(as3Json)
-	log.Println(tenantList)
+	targetInfo := bigiqRef.GetTarget(as3Json)
 	_ = d.Set("tenant_list", tenantList)
 	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3Json)
 	if err != nil {
@@ -119,7 +119,8 @@ func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 	}
-	d.SetId("tenantList")
+	as3ID := fmt.Sprintf("%s_%s", targetInfo, successfulTenants)
+	d.SetId(as3ID)
 	p = p + 1
 	return resourceBigiqAs3Read(d, meta)
 }
@@ -131,19 +132,36 @@ func resourceBigiqAs3Read(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
 		return err
 	}
-	log.Printf("[INFO] Reading As3 config")
-	name := d.Get("tenant_list").(string)
-	as3Resp, err := bigiqRef.GetAs3Bigiq(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve json ")
-		return err
+	tenantRef := d.Id()
+	log.Println("[INFO] Reading As3 config")
+	targetRef := strings.Split(tenantRef, "_")[0]
+	name := strings.Split(tenantRef, "_")[1]
+	if name != d.Get("tenant_list").(string) {
+		as3Resp, err := bigiqRef.GetAs3Bigiq(targetRef, d.Get("tenant_list").(string))
+		if err != nil {
+			log.Printf("[ERROR] Unable to retrieve json ")
+			return err
+		}
+		if as3Resp == "" {
+			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
+		_ = d.Set("as3_json", as3Resp)
+	} else {
+		as3Resp, err := bigiqRef.GetAs3Bigiq(targetRef, name)
+		if err != nil {
+			log.Printf("[ERROR] Unable to retrieve json ")
+			return err
+		}
+		if as3Resp == "" {
+			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
+		_ = d.Set("as3_json", as3Resp)
+
 	}
-	if as3Resp == "" {
-		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-	_ = d.Set("as3_json", as3Resp)
 	return nil
 }
 
@@ -177,9 +195,12 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 			//}
 		}
 	}
-	err, _ = bigiqRef.PostAs3Bigiq(as3Json)
+	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3Json)
 	if err != nil {
-		return fmt.Errorf("Error updating json  %s: %v", tenantList, err)
+		if successfulTenants == "" {
+			return fmt.Errorf("Error creating json  %s: %v", tenantList, err)
+		}
+		_ = d.Set("tenant_list", successfulTenants)
 	}
 	p = p + 1
 	return resourceBigiqAs3Read(d, meta)

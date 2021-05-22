@@ -29,7 +29,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the Ssl Profile",
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 
 			"partition": {

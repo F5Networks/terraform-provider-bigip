@@ -9,7 +9,7 @@ services:
   - docker
 language: go
 go:
-  - "1.11.x"
+  - "1.16.x"
 
 git:
   depth: 1
@@ -25,7 +25,6 @@ install:
 script:
 - make test
 - make website-lint
-- make website-test
 
 branches:
   only:

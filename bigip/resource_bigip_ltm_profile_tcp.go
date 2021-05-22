@@ -27,7 +27,7 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 				Description:  "Name of the TCP Profile",
 			},
 			"partition": {

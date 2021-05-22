@@ -97,7 +97,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
-				Computed: true,
+				//Computed: true,
 			},
 
 			"server_profiles": {
@@ -105,7 +105,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
-				Computed: true,
+				//Computed: true,
 			},
 			"persistence_profiles": {
 				Type:     schema.TypeSet,
