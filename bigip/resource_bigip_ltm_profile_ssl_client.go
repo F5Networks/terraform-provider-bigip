@@ -565,14 +565,18 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 	}
 
 	log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
-	for i, c := range obj.CertKeyChain {
-		ckc := fmt.Sprintf("cert_key_chain.%d", i)
-		_ = d.Set(fmt.Sprintf("%s.name", ckc), c.Name)
-		_ = d.Set(fmt.Sprintf("%s.cert", ckc), c.Cert)
-		_ = d.Set(fmt.Sprintf("%s.chain", ckc), c.Chain)
-		_ = d.Set(fmt.Sprintf("%s.key", ckc), c.Key)
-		_ = d.Set(fmt.Sprintf("%s.passphrase", ckc), c.Passphrase)
+
+	certMap := make(map[string]interface{})
+	var certMapList []interface{}
+	for _, c := range obj.CertKeyChain {
+		certMap["name"] = c.Name
+		certMap["cert"] = c.Cert
+		certMap["key"] = c.Key
+		certMap["chain"] = c.Chain
+		certMap["passphrase"] = c.Passphrase
+		certMapList = append(certMapList, certMap)
 	}
+	_ = d.Set("cert_key_chain", certMapList)
 
 	if err := d.Set("cert_extension_includes", obj.CertExtensionIncludes); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving CertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
