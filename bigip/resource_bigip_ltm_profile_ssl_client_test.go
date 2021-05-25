@@ -127,6 +127,58 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateAuthenticateDepth"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "9"),
+					resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "authenticate_depth"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
+					resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "cache_size"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
+					resource.TestCheckResourceAttr(resFullName, "cache_size", "262100"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
 //
 //This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
@@ -193,6 +245,56 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 					resource.TestCheckResourceAttr(resFullName, "cert", "/Common/lbeform_2020_INT.crt"),
 					resource.TestCheckResourceAttr(resFullName, "key", "/Common/lbeform_2020_INT.key"),
+				),
+			},
+		},
+	})
+}
+
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/449
+//
+func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-CertkeyChain"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslCerkeychain(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "chain"), "/Common/ca-bundle.crt"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslCerkeychainissue449(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "chain"), "/Common/ca-bundle.crt"),
 				),
 			},
 		},
@@ -268,6 +370,34 @@ func testaccbigipltmprofileclientsslDefaultcreate(instName string) string {
 		}`, resName, instName)
 }
 
+func testaccbigipltmprofileclientsslCerkeychain(instName string) string {
+	return fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			name = "/Common/%[2]s"
+			authenticate = "always"
+  			cert_key_chain {
+    			name = "default"
+    			cert = "/Common/default.crt"
+				key  = "/Common/default.key"
+    			chain = "/Common/ca-bundle.crt"
+  			}
+		}`, resName, instName)
+}
+
+func testaccbigipltmprofileclientsslCerkeychainissue449(instName string) string {
+	return fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			name = "/Common/%[2]s"
+			authenticate = "once"
+  			cert_key_chain {
+    			name = "default"
+    			cert = "/Common/default.crt"
+				key  = "/Common/default.key"
+    			chain = "/Common/ca-bundle.crt"
+  			}
+		}`, resName, instName)
+}
+
 //func testAccBigipLtmProfileClientSsl_UpdateAuthenticate(instName string) string {
 //	return fmt.Sprintf(`
 //		resource "%[1]s" "%[2]s" {
@@ -290,6 +420,12 @@ func testAccBigipLtmProfileClientSsl_UpdateParam(instName, updateParam string) s
 	case "tm_options":
 		resPrefix = fmt.Sprintf(`%s
 			  tm_options = ["no-tlsv1.3"]`, resPrefix)
+	case "authenticate_depth":
+		resPrefix = fmt.Sprintf(`%s
+			  authenticate_depth = 8`, resPrefix)
+	case "cache_size":
+		resPrefix = fmt.Sprintf(`%s
+			  cache_size = 262100`, resPrefix)
 	}
 	return fmt.Sprintf(`%s
 		}`, resPrefix)
