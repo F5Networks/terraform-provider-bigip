@@ -148,18 +148,51 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Cert file name",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"chain": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Chain file name",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"key": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Key filename",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"passphrase": {
@@ -469,12 +502,6 @@ func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interfa
 
 	d.SetId(name)
 
-	//err = resourceBigipLtmProfileClientSSLUpdate(d, meta)
-	//if err != nil {
-	//	_ = client.DeleteClientSSLProfile(name)
-	//	return err
-	//}
-
 	return resourceBigipLtmProfileClientSSLRead(d, meta)
 }
 
@@ -564,8 +591,7 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
-	log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
-
+	//log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
 	certMap := make(map[string]interface{})
 	var certMapList []interface{}
 	for _, c := range obj.CertKeyChain {
