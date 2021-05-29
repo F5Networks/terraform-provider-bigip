@@ -8,8 +8,11 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -386,34 +389,15 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	parent := d.Get("defaults_from").(string)
+
 	log.Println("[INFO] Creating Server Ssl Profile " + name)
 
-	/*err := client.CreateServerSSLProfile(
-		name,
-		parent,
-	)*/
-	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
-	proxyCaCert := d.Get("proxy_ca_cert").(string)
-	proxyCaKey := d.Get("proxy_ca_key").(string)
-	sslForwardProxyBypass := d.Get("ssl_forward_proxy_bypass").(string)
-	if sslForwardProxyEnabled == "enabled" {
-		proxyCaCert = "/Common/default.crt"
-		proxyCaKey = "/Common/default.key"
-		if sslForwardProxyBypass == "" {
-			sslForwardProxyBypass = "disabled"
-		}
-	}
-
 	pss := &bigip.ServerSSLProfile{
-		Name:                  name,
-		DefaultsFrom:          parent,
-		ProxyCaCert:           proxyCaCert,
-		ProxyCaKey:            proxyCaKey,
-		SslForwardProxy:       sslForwardProxyEnabled,
-		SslForwardProxyBypass: sslForwardProxyBypass,
+		Name: name,
 	}
-	err := client.CreateServerSSLProfile(pss)
+	config := getServerSslConfig(d, pss)
+
+	err := client.CreateServerSSLProfile(config)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Server Ssl Profile (%s) (%v)", name, err)
@@ -422,10 +406,24 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 
 	d.SetId(name)
 
-	err = resourceBigipLtmProfileServerSslUpdate(d, meta)
-	if err != nil {
-		client.DeleteServerSSLProfile(name)
-		return err
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_profile_server_ssl", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 
 	return resourceBigipLtmProfileServerSslRead(d, meta)
@@ -436,103 +434,14 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 
 	name := d.Id()
 
-	log.Printf("[INFO] Updating Route:%+v ", name)
-
-	var tmOptions []string
-	if t, ok := d.GetOk("tm_options"); ok {
-		tmOptions = setToStringSlice(t.(*schema.Set))
-	}
-
-	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
-	proxyCaCert := d.Get("proxy_ca_cert").(string)
-	proxyCaKey := d.Get("proxy_ca_key").(string)
-	if sslForwardProxyEnabled == "enabled" {
-		proxyCaCert = "/Common/default.crt"
-		proxyCaKey = "/Common/default.key"
-	}
-	// Funky stuff toi get c3d to work
-	var c3dCertExtensionCustomOids []string
-	if t, ok := d.GetOk("c3d_cert_extension_custom_oids"); ok {
-		c3dCertExtensionCustomOids = listToStringSlice(t.([]interface{}))
-	}
-	var c3dCertExtensionIncludes []string
-	if t, ok := d.GetOk("c3d_cert_extension_includes"); ok {
-		c3dCertExtensionIncludes = listToStringSlice(t.([]interface{}))
-	}
-	sslC3d := d.Get("ssl_c3d").(string)
-	c3dCaCert := d.Get("c3d_ca_cert").(string)
-	c3dCaKey := d.Get("c3d_ca_key").(string)
-
-	if sslC3d == "enabled" {
-		if c3dCaCert == "none" {
-			c3dCaCert = "/Common/default.crt"
-		}
-		if c3dCaKey == "none" {
-			c3dCaKey = "/Common/default.key"
-		}
-		if len(c3dCertExtensionIncludes) == 0 {
-			c3dCertExtensionIncludes = []string{"basic-constraints", "extended-key-usage", "key-usage", "subject-alternative-name"}
-		}
-	} else {
-		c3dCaCert = "none"
-		c3dCaKey = "none"
-	}
+	log.Printf("[INFO] Updating ServerSSL Profile:%+v ", name)
 
 	pss := &bigip.ServerSSLProfile{
-		Name:                         d.Get("name").(string),
-		Partition:                    d.Get("partition").(string),
-		FullPath:                     d.Get("full_path").(string),
-		Generation:                   d.Get("generation").(int),
-		AlertTimeout:                 d.Get("alert_timeout").(string),
-		Authenticate:                 d.Get("authenticate").(string),
-		AuthenticateDepth:            d.Get("authenticate_depth").(int),
-		C3dCaCert:                    c3dCaCert,
-		C3dCaKey:                     c3dCaKey,
-		C3dCaPassphrase:              d.Get("c3d_ca_passphrase").(string),
-		C3dCertExtensionCustomOids:   c3dCertExtensionCustomOids,
-		C3dCertExtensionIncludes:     c3dCertExtensionIncludes,
-		C3dCertLifespan:              d.Get("c3d_cert_lifespan").(int),
-		CaFile:                       d.Get("ca_file").(string),
-		CacheSize:                    d.Get("cache_size").(int),
-		CacheTimeout:                 d.Get("cache_timeout").(int),
-		Cert:                         d.Get("cert").(string),
-		Chain:                        d.Get("chain").(string),
-		Ciphers:                      d.Get("ciphers").(string),
-		DefaultsFrom:                 d.Get("defaults_from").(string),
-		ExpireCertResponseControl:    d.Get("expire_cert_response_control").(string),
-		GenericAlert:                 d.Get("generic_alert").(string),
-		HandshakeTimeout:             d.Get("handshake_timeout").(string),
-		Key:                          d.Get("key").(string),
-		ModSslMethods:                d.Get("mod_ssl_methods").(string),
-		Mode:                         d.Get("mode").(string),
-		ProxyCaCert:                  proxyCaCert,
-		ProxyCaKey:                   proxyCaKey,
-		Passphrase:                   d.Get("passphrase").(string),
-		PeerCertMode:                 d.Get("peer_cert_mode").(string),
-		ProxySsl:                     d.Get("proxy_ssl").(string),
-		RenegotiatePeriod:            d.Get("renegotiate_period").(string),
-		RenegotiateSize:              d.Get("renegotiate_size").(string),
-		Renegotiation:                d.Get("renegotiation").(string),
-		RetainCertificate:            d.Get("retain_certificate").(string),
-		SecureRenegotiation:          d.Get("secure_renegotiation").(string),
-		ServerName:                   d.Get("server_name").(string),
-		SessionMirroring:             d.Get("session_mirroring").(string),
-		SessionTicket:                d.Get("session_ticket").(string),
-		SniDefault:                   d.Get("sni_default").(string),
-		SniRequire:                   d.Get("sni_require").(string),
-		SslC3d:                       sslC3d,
-		SslForwardProxy:              sslForwardProxyEnabled,
-		SslForwardProxyBypass:        d.Get("ssl_forward_proxy_bypass").(string),
-		SslSignHash:                  d.Get("ssl_sign_hash").(string),
-		StrictResume:                 d.Get("strict_resume").(string),
-		UncleanShutdown:              d.Get("unclean_shutdown").(string),
-		UntrustedCertResponseControl: d.Get("untrusted_cert_response_control").(string),
+		Name: name,
 	}
-	if len(tmOptions) > 0 {
-		pss.TmOptions = tmOptions
-	}
+	config := getServerSslConfig(d, pss)
 
-	err := client.ModifyServerSSLProfile(name, pss)
+	err := client.ModifyServerSSLProfile(name, config)
 	if err != nil {
 		return fmt.Errorf(" Error create profile Ssl (%s): %s", name, err)
 	}
@@ -754,29 +663,6 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	return nil
 }
 
-/*
-func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	obj, err := client.GetServerSSLProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Ssl Profile  (%s) (%v)", name, err)
-		return err
-	}
-	if obj == nil {
-		log.Printf("[WARN] Ssl  Profile (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return nil
-	}
-	d.Set("name", name)
-	d.Set("partition", obj.Partition)
-
-
-
-	return nil
-}
-*/
-
 func resourceBigipLtmProfileServerSslDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
@@ -790,4 +676,106 @@ func resourceBigipLtmProfileServerSslDelete(d *schema.ResourceData, meta interfa
 	}
 	d.SetId("")
 	return nil
+}
+
+func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) *bigip.ServerSSLProfile {
+
+	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
+	proxyCaCert := d.Get("proxy_ca_cert").(string)
+	proxyCaKey := d.Get("proxy_ca_key").(string)
+	sslForwardProxyBypass := d.Get("ssl_forward_proxy_bypass").(string)
+	if sslForwardProxyEnabled == "enabled" {
+		proxyCaCert = "/Common/default.crt"
+		proxyCaKey = "/Common/default.key"
+		if sslForwardProxyBypass == "" {
+			sslForwardProxyBypass = "disabled"
+		}
+	}
+
+	var tmOptions []string
+	if t, ok := d.GetOk("tm_options"); ok {
+		tmOptions = setToStringSlice(t.(*schema.Set))
+	}
+
+	// Funky stuff toi get c3d to work
+	var c3dCertExtensionCustomOids []string
+	if t, ok := d.GetOk("c3d_cert_extension_custom_oids"); ok {
+		c3dCertExtensionCustomOids = listToStringSlice(t.([]interface{}))
+	}
+	var c3dCertExtensionIncludes []string
+	if t, ok := d.GetOk("c3d_cert_extension_includes"); ok {
+		c3dCertExtensionIncludes = listToStringSlice(t.([]interface{}))
+	}
+	sslC3d := d.Get("ssl_c3d").(string)
+	c3dCaCert := d.Get("c3d_ca_cert").(string)
+	c3dCaKey := d.Get("c3d_ca_key").(string)
+
+	if sslC3d == "enabled" {
+		if c3dCaCert == "none" {
+			c3dCaCert = "/Common/default.crt"
+		}
+		if c3dCaKey == "none" {
+			c3dCaKey = "/Common/default.key"
+		}
+		if len(c3dCertExtensionIncludes) == 0 {
+			c3dCertExtensionIncludes = []string{"basic-constraints", "extended-key-usage", "key-usage", "subject-alternative-name"}
+		}
+	} else {
+		c3dCaCert = "none"
+		c3dCaKey = "none"
+	}
+
+	config.DefaultsFrom = d.Get("defaults_from").(string)
+	config.Partition = d.Get("partition").(string)
+	config.FullPath = d.Get("full_path").(string)
+	config.Generation = d.Get("generation").(int)
+	config.AlertTimeout = d.Get("alert_timeout").(string)
+	config.Authenticate = d.Get("authenticate").(string)
+	config.AuthenticateDepth = d.Get("authenticate_depth").(int)
+	config.C3dCaCert = c3dCaCert
+	config.C3dCaKey = c3dCaKey
+	config.C3dCaPassphrase = d.Get("c3d_ca_passphrase").(string)
+	config.C3dCertExtensionCustomOids = c3dCertExtensionCustomOids
+	config.C3dCertExtensionIncludes = c3dCertExtensionIncludes
+	config.C3dCertLifespan = d.Get("c3d_cert_lifespan").(int)
+	config.CaFile = d.Get("ca_file").(string)
+	config.CacheSize = d.Get("cache_size").(int)
+	config.CacheTimeout = d.Get("cache_timeout").(int)
+	config.Cert = d.Get("cert").(string)
+	config.Chain = d.Get("chain").(string)
+	config.Ciphers = d.Get("ciphers").(string)
+	config.ExpireCertResponseControl = d.Get("expire_cert_response_control").(string)
+	config.GenericAlert = d.Get("generic_alert").(string)
+	config.HandshakeTimeout = d.Get("handshake_timeout").(string)
+	config.Key = d.Get("key").(string)
+	config.ModSslMethods = d.Get("mod_ssl_methods").(string)
+	config.Mode = d.Get("mode").(string)
+	config.ProxyCaCert = proxyCaCert
+	config.ProxyCaKey = proxyCaKey
+	config.Passphrase = d.Get("passphrase").(string)
+	config.PeerCertMode = d.Get("peer_cert_mode").(string)
+	config.ProxySsl = d.Get("proxy_ssl").(string)
+	config.RenegotiatePeriod = d.Get("renegotiate_period").(string)
+	config.RenegotiateSize = d.Get("renegotiate_size").(string)
+	config.Renegotiation = d.Get("renegotiation").(string)
+	config.RetainCertificate = d.Get("retain_certificate").(string)
+	config.SecureRenegotiation = d.Get("secure_renegotiation").(string)
+	config.ServerName = d.Get("server_name").(string)
+	config.SessionMirroring = d.Get("session_mirroring").(string)
+	config.SessionTicket = d.Get("session_ticket").(string)
+	config.SniDefault = d.Get("sni_default").(string)
+	config.SniRequire = d.Get("sni_require").(string)
+	config.SslC3d = sslC3d
+	config.SslForwardProxy = sslForwardProxyEnabled
+	config.SslForwardProxyBypass = sslForwardProxyBypass
+	//config.SslForwardProxyBypass = d.Get("ssl_forward_proxy_bypass").(string)
+	config.SslSignHash = d.Get("ssl_sign_hash").(string)
+	config.StrictResume = d.Get("strict_resume").(string)
+	config.UncleanShutdown = d.Get("unclean_shutdown").(string)
+	config.UntrustedCertResponseControl = d.Get("untrusted_cert_response_control").(string)
+
+	if len(tmOptions) > 0 {
+		config.TmOptions = tmOptions
+	}
+	return config
 }
