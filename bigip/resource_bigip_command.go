@@ -8,6 +8,7 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 )
@@ -76,6 +77,26 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 		_ = d.Set("command_result", resultList)
 	}
 	d.SetId(d.Get("when").(string))
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_command", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 	return nil
 }
 
