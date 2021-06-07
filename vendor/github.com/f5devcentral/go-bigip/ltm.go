@@ -869,7 +869,7 @@ type PolicyRuleAction struct {
 	Select             bool   `json:"select,omitempty"`
 	ServerSsl          bool   `json:"serverSsl,omitempty"`
 	SetVariable        bool   `json:"setVariable,omitempty"`
-	Shutdown           bool   `json:"setVariable,omitempty"`
+	Shutdown           bool   `json:"shutdown,omitempty"`
 	Snat               string `json:"snat,omitempty"`
 	Snatpool           string `json:"snatpool,omitempty"`
 	SourceAddress      bool   `json:"sourceAddress,omitempty"`
