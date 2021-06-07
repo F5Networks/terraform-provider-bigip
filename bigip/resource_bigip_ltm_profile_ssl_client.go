@@ -542,53 +542,73 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	_ = d.Set("name", name)
 	_ = d.Set("partition", obj.Partition)
-
 	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
-
-	if err := d.Set("alert_timeout", obj.AlertTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AlertTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("alert_timeout"); ok {
+		if err := d.Set("alert_timeout", obj.AlertTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving AlertTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("allow_non_ssl", obj.AllowNonSsl); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowNonSsl to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("allow_non_ssl"); ok {
+		if err := d.Set("allow_non_ssl", obj.AllowNonSsl); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving AllowNonSsl to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("authenticate", obj.Authenticate); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Authenticate to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("authenticate"); ok {
+		if err := d.Set("authenticate", obj.Authenticate); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Authenticate to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("authenticate_depth", obj.AuthenticateDepth); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AuthenticateDepth to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("authenticate_depth"); ok {
+		if err := d.Set("authenticate_depth", obj.AuthenticateDepth); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving AuthenticateDepth to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("c3d_client_fallback_cert", obj.C3dClientFallbackCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dClientFallbackCert to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("c3d_client_fallback_cert"); ok {
+		if err := d.Set("c3d_client_fallback_cert", obj.C3dClientFallbackCert); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving C3dClientFallbackCert to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("c3d_drop_unknown_ocsp_status", obj.C3dDropUnknownOcspStatus); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dDropUnknownOcspStatus to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("c3d_drop_unknown_ocsp_status"); ok {
+		if err := d.Set("c3d_drop_unknown_ocsp_status", obj.C3dDropUnknownOcspStatus); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving C3dDropUnknownOcspStatus to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("c3d_ocsp", obj.C3dOcsp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dOcsp to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("c3d_ocsp"); ok {
+		if err := d.Set("c3d_ocsp", obj.C3dOcsp); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving C3dOcsp to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ca_file", obj.CaFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CaFile to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ca_file"); ok {
+		if err := d.Set("ca_file", obj.CaFile); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CaFile to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("cache_size", obj.CacheSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CacheSize to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cache_size"); ok {
+		if err := d.Set("cache_size", obj.CacheSize); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CacheSize to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("cache_timeout", obj.CacheTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CacheTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cache_timeout"); ok {
+		if err := d.Set("cache_timeout", obj.CacheTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CacheTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("cert", obj.Cert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cert"); ok {
+		if err := d.Set("cert", obj.Cert); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
 	//log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
@@ -604,61 +624,89 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 	}
 	_ = d.Set("cert_key_chain", certMapList)
 
-	if err := d.Set("cert_extension_includes", obj.CertExtensionIncludes); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cert_extension_includes"); ok {
+		if err := d.Set("cert_extension_includes", obj.CertExtensionIncludes); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("cert_life_span", obj.CertLifespan); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CertLifespan to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cert_life_span"); ok {
+		if err := d.Set("cert_life_span", obj.CertLifespan); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CertLifespan to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("cert_lookup_by_ipaddr_port", obj.CertLookupByIpaddrPort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CertLookupByIpaddrPort to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("cert_lookup_by_ipaddr_port"); ok {
+		if err := d.Set("cert_lookup_by_ipaddr_port", obj.CertLookupByIpaddrPort); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CertLookupByIpaddrPort to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("chain", obj.Chain); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Chain to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("chain"); ok {
+		if err := d.Set("chain", obj.Chain); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Chain to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ciphers", obj.Ciphers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Ciphers to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ciphers"); ok {
+		if err := d.Set("ciphers", obj.Ciphers); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Ciphers to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("client_cert_ca", obj.ClientCertCa); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ClientCertCa to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("client_cert_ca"); ok {
+		if err := d.Set("client_cert_ca", obj.ClientCertCa); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ClientCertCa to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("crl_file", obj.CrlFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CrlFile to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("crl_file"); ok {
+		if err := d.Set("crl_file", obj.CrlFile); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving CrlFile to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("forward_proxy_bypass_default_action", obj.ForwardProxyBypassDefaultAction); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ForwardProxyBypassDefaultAction to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("forward_proxy_bypass_default_action"); ok {
+		if err := d.Set("forward_proxy_bypass_default_action", obj.ForwardProxyBypassDefaultAction); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ForwardProxyBypassDefaultAction to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("generic_alert", obj.GenericAlert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving GenericAlert to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("generic_alert"); ok {
+		if err := d.Set("generic_alert", obj.GenericAlert); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving GenericAlert to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("handshake_timeout", obj.HandshakeTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving HandshakeTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("handshake_timeout"); ok {
+		if err := d.Set("handshake_timeout", obj.HandshakeTimeout); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving HandshakeTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("inherit_cert_keychain", obj.InheritCertkeychain); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving InheritCertkeychain to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("key", obj.Key); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Key to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("mod_ssl_methods", obj.ModSslMethods); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ModSslMethods to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("inherit_cert_keychain"); ok {
+		if err := d.Set("inherit_cert_keychain", obj.InheritCertkeychain); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving InheritCertkeychain to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("mode", obj.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("key"); ok {
+		if err := d.Set("key", obj.Key); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Key to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
+	if _, ok := d.GetOk("mod_ssl_methods"); ok {
+		if err := d.Set("mod_ssl_methods", obj.ModSslMethods); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ModSslMethods to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+	}
+
+	if _, ok := d.GetOk("mode"); ok {
+		if err := d.Set("mode", obj.Mode); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+	}
 	xt := reflect.TypeOf(obj.TmOptions).Kind()
 	if obj.TmOptions != "none" && xt == reflect.String {
 		tmOptions := strings.Split(obj.TmOptions.(string), " ")
@@ -683,95 +731,143 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
 		}
 	}
-	if err := d.Set("proxy_ca_cert", obj.ProxyCaCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+
+	if _, ok := d.GetOk("proxy_ca_cert"); ok {
+		if err := d.Set("proxy_ca_cert", obj.ProxyCaCert); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("passphrase", obj.Passphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("proxy_ca_key"); ok {
+		if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("peer_cert_mode", obj.PeerCertMode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeerCertMode to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("passphrase"); ok {
+		if err := d.Set("passphrase", obj.Passphrase); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("proxy_ca_passphrase", obj.ProxyCaPassphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxyCaPassphrase to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("peer_cert_mode"); ok {
+		if err := d.Set("peer_cert_mode", obj.PeerCertMode); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving PeerCertMode to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("proxy_ssl", obj.ProxySsl); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxySsl to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("proxy_ca_passphrase"); ok {
+		if err := d.Set("proxy_ca_passphrase", obj.ProxyCaPassphrase); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ProxyCaPassphrase to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("proxy_ssl_passthrough", obj.ProxySslPassthrough); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxySslPassthrough to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("proxy_ssl"); ok {
+		if err := d.Set("proxy_ssl", obj.ProxySsl); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ProxySsl to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("renegotiate_period", obj.RenegotiatePeriod); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RenegotiatePeriod to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("proxy_ssl_passthrough"); ok {
+		if err := d.Set("proxy_ssl_passthrough", obj.ProxySslPassthrough); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ProxySslPassthrough to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("renegotiate_size", obj.RenegotiateSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RenegotiateSize to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("renegotiate_period"); ok {
+		if err := d.Set("renegotiate_period", obj.RenegotiatePeriod); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving RenegotiatePeriod to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("renegotiation", obj.Renegotiation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Renegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("renegotiate_size"); ok {
+		if err := d.Set("renegotiate_size", obj.RenegotiateSize); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving RenegotiateSize to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("retain_certificate", obj.RetainCertificate); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RetainCertificate to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("renegotiation"); ok {
+		if err := d.Set("renegotiation", obj.Renegotiation); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Renegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("secure_renegotiation", obj.SecureRenegotiation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SecureRenegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("retain_certificate"); ok {
+		if err := d.Set("retain_certificate", obj.RetainCertificate); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving RetainCertificate to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("server_name", obj.ServerName); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ServerName to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("secure_renegotiation"); ok {
+		if err := d.Set("secure_renegotiation", obj.SecureRenegotiation); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SecureRenegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("session_mirroring", obj.SessionMirroring); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SessionMirroring to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("server_name"); ok {
+		if err := d.Set("server_name", obj.ServerName); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving ServerName to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("session_ticket", obj.SessionTicket); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SessionTicket to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("session_mirroring"); ok {
+		if err := d.Set("session_mirroring", obj.SessionMirroring); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SessionMirroring to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("sni_default", obj.SniDefault); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SniDefault to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("session_ticket"); ok {
+		if err := d.Set("session_ticket", obj.SessionTicket); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SessionTicket to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("sni_require", obj.SniRequire); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SniRequire to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("sni_default"); ok {
+		if err := d.Set("sni_default", obj.SniDefault); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SniDefault to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ssl_c3d", obj.SslC3d); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslC3d to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("sni_require"); ok {
+		if err := d.Set("sni_require", obj.SniRequire); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SniRequire to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ssl_forward_proxy", obj.SslForwardProxy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslForwardProxy to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ssl_c3d"); ok {
+		if err := d.Set("ssl_c3d", obj.SslC3d); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SslC3d to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ssl_forward_proxy_bypass", obj.SslForwardProxyBypass); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslForwardProxyBypass to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ssl_forward_proxy"); ok {
+		if err := d.Set("ssl_forward_proxy", obj.SslForwardProxy); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SslForwardProxy to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("ssl_sign_hash", obj.SslSignHash); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslSignHash to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ssl_forward_proxy_bypass"); ok {
+		if err := d.Set("ssl_forward_proxy_bypass", obj.SslForwardProxyBypass); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SslForwardProxyBypass to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("strict_resume", obj.StrictResume); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving StrictResume to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("ssl_sign_hash"); ok {
+		if err := d.Set("ssl_sign_hash", obj.SslSignHash); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving SslSignHash to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
-	if err := d.Set("unclean_shutdown", obj.UncleanShutdown); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UncleanShutdown to state for Ssl profile  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("strict_resume"); ok {
+		if err := d.Set("strict_resume", obj.StrictResume); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving StrictResume to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
+	}
+
+	if _, ok := d.GetOk("unclean_shutdown"); ok {
+		if err := d.Set("unclean_shutdown", obj.UncleanShutdown); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving UncleanShutdown to state for Ssl profile  (%s): %s", d.Id(), err)
+		}
 	}
 
 	return nil
