@@ -8,9 +8,13 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
+	"os"
+	"strings"
 )
 
 func resourceBigipIpsecPolicy() *schema.Resource {
@@ -137,6 +141,25 @@ func resourceBigipIpsecPolicyCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 	d.SetId(name)
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ipsec_policy", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 	return resourceBigipIpsecPolicyRead(d, meta)
 }
 
