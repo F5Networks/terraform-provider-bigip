@@ -9,8 +9,11 @@ import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
+	"strings"
 )
 
 func resourceBigipCommand() *schema.Resource {
@@ -92,7 +95,7 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 			"Terraform Version": client.UserAgent,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
-		err = teemDevice.Report(f, "bigip_command", tsVer[3])
+		err := teemDevice.Report(f, "bigip_command", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
