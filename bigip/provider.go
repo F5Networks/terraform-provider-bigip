@@ -42,8 +42,14 @@ func Provider() terraform.ResourceProvider {
 			"password": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The user's password",
+				Description: "The user's password. Leave empty if using token_value",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_PASSWORD", nil),
+			},
+			"token_value": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "A token generated outside the provider, in place of password",
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_VALUE", nil),
 			},
 			"token_auth": {
 				Type:        schema.TypeBool,
@@ -147,6 +153,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		Port:     d.Get("port").(string),
 		Username: d.Get("username").(string),
 		Password: d.Get("password").(string),
+		Token:    d.Get("token_value").(string),
 	}
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)

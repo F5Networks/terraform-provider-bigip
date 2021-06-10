@@ -54,17 +54,17 @@ func resourceBigipAs3() *schema.Resource {
 					return json
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					old_resp := []byte(old)
-					new_resp := []byte(new)
-					old_jsonRef := make(map[string]interface{})
-					new_jsonRef := make(map[string]interface{})
-					json.Unmarshal(old_resp, &old_jsonRef)
-					json.Unmarshal(new_resp, &new_jsonRef)
-					json_equality_before := reflect.DeepEqual(old_jsonRef, new_jsonRef)
-					if json_equality_before == true {
+					oldResp := []byte(old)
+					newResp := []byte(new)
+					oldJsonref := make(map[string]interface{})
+					newJsonref := make(map[string]interface{})
+					_ = json.Unmarshal(oldResp, &oldJsonref)
+					_ = json.Unmarshal(newResp, &newJsonref)
+					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
+					if jsonEqualityBefore == true {
 						return true
 					}
-					for key, value := range old_jsonRef {
+					for key, value := range oldJsonref {
 						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 							for range rec {
 								delete(rec, "updateMode")
@@ -75,7 +75,7 @@ func resourceBigipAs3() *schema.Resource {
 							}
 						}
 					}
-					for key, value := range new_jsonRef {
+					for key, value := range newJsonref {
 						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 							for range rec {
 								delete(rec, "updateMode")
@@ -87,17 +87,17 @@ func resourceBigipAs3() *schema.Resource {
 						}
 					}
 
-					ignore_metadata := d.Get("ignore_metadata").(bool)
-					json_equality_after := reflect.DeepEqual(old_jsonRef, new_jsonRef)
-					if ignore_metadata == true {
-						if json_equality_after == true {
+					ignoreMetadata := d.Get("ignore_metadata").(bool)
+					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
+					if ignoreMetadata == true {
+						if jsonEqualityAfter == true {
 							return true
 						} else {
 							return false
 						}
 
 					} else {
-						if json_equality_before == false {
+						if jsonEqualityBefore == false {
 							return false
 						}
 					}

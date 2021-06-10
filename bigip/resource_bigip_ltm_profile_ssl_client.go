@@ -8,8 +8,11 @@ package bigip
 import (
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -501,6 +504,26 @@ func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interfa
 	}
 
 	d.SetId(name)
+
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_profile_client_ssl", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 
 	return resourceBigipLtmProfileClientSSLRead(d, meta)
 }

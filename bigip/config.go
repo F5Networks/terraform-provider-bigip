@@ -18,17 +18,22 @@ type Config struct {
 	Port           string
 	Username       string
 	Password       string
+	Token          string
 	LoginReference string `json:"loginProviderName"`
 	ConfigOptions  *bigip.ConfigOptions
 }
 
 func (c *Config) Client() (*bigip.BigIP, error) {
 
-	if c.Address != "" && c.Username != "" && c.Password != "" {
+	if c.Address != "" && c.Username != "" && (c.Token != "" || c.Password != "") {
 		log.Println("[INFO] Initializing BigIP connection")
 		var client *bigip.BigIP
 		var err error
-		if c.LoginReference != "" {
+		// If we have a token value, we do not want to authenticate using a
+		// Token Session. The user has already authenticated with the BigIP
+		// outside of the provider, so even if the BigIP is using Token Auth,
+		// we don't want to do that here. We want to use bigip.NewSession
+		if c.LoginReference != "" && c.Token == "" {
 			client, err = bigip.NewTokenSession(c.Address, c.Port, c.Username, c.Password, c.LoginReference, c.ConfigOptions)
 			if err != nil {
 				log.Printf("[ERROR] Error creating New Token Session %s ", err)
@@ -37,6 +42,10 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 
 		} else {
 			client = bigip.NewSession(c.Address, c.Port, c.Username, c.Password, c.ConfigOptions)
+			// The provider will use the Token value instead of the password
+			if c.Token != "" {
+				client.Token = c.Token
+			}
 		}
 		err = c.validateConnection(client)
 		if err == nil {
@@ -44,7 +53,7 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 		}
 		return nil, err
 	}
-	return nil, fmt.Errorf("BigIP provider requires address, username and password")
+	return nil, fmt.Errorf("BigIP provider requires address, username and one of password or token_value")
 }
 
 func (c *Config) validateConnection(client *bigip.BigIP) error {
