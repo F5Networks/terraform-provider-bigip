@@ -33,6 +33,11 @@ func resourceBigipFastTemplate() *schema.Resource {
 				ForceNew:    true,
 				Description: "Location of the fast template set package on disk",
 			},
+			"md5_hash": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "MD5 hash of the fast template zip file",
+			},
 		},
 	}
 }
@@ -41,6 +46,7 @@ func resourceBigipFastCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	tmplPath := d.Get("source").(string)
 	tmplName := filepath.Base(tmplPath)
+	checksum := d.Get("md5_hash").(string)
 	var name string
 	if _, ok := d.GetOk("name"); ok {
 		name = d.Get("name").(string)
@@ -63,6 +69,7 @@ func resourceBigipFastCreate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("error in creating FAST template set (%s): %s", name, err)
 	}
+	_ = d.Set("md5_hash", checksum)
 	d.SetId(name)
 	return resourceBigipFastRead(d, meta)
 }
@@ -70,13 +77,14 @@ func resourceBigipFastCreate(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipFastRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
+	checksum := d.Get("md5_hash").(string)
 	log.Println("[INFO] Reading Fast Template Set : " + name)
 
 	template, err := client.GetTemplateSet(name)
 
 	log.Printf("[INFO] Fast Template Set content: %+v", template)
-
 	d.Set("name", template.Name)
+	d.Set("md5_hash", checksum)
 
 	if err != nil {
 		return err

@@ -22,6 +22,7 @@ var TEST_FAST_TEMPLATE = `
 resource "bigip_fast_template" "foo-template" {
   name		= "` + TEST_TEMPLATE + `"
   source   = "${"` + folder2 + `/../examples/fast/foo_template.zip"}"
+  md5_hash = "89011331d11ac8bac2a1ad3235f38c80"
 }
 `
 
@@ -38,6 +39,7 @@ func TestAccFastTemplateCreateOnBigip(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastTemplateExists(TEST_TEMPLATE, true),
 					resource.TestCheckResourceAttr("bigip_fast_template.foo-template", "name", TEST_TEMPLATE),
+					resource.TestCheckResourceAttr("bigip_fast_template.foo-template", "md5_hash", "89011331d11ac8bac2a1ad3235f38c80"),
 				),
 			},
 		},
