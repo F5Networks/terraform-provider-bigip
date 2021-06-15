@@ -121,7 +121,7 @@ func dataSourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) err
 	}
 	for _, m := range monitors {
 		if m.FullPath == name {
-			_ = d.Set("defaults_from", m.DefaultsFrom)
+			_ = d.Set("defaults_from", m.ParentMonitor)
 			_ = d.Set("interval", m.Interval)
 			_ = d.Set("timeout", m.Timeout)
 			_ = d.Set("receive_disable", m.ReceiveDisable)

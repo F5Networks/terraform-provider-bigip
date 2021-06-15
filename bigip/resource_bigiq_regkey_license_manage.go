@@ -518,7 +518,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 				devicePort,
 			}
 			log.Printf("config = %+v", config)
-			bigiqRef.LicenseRevoke(config, poolId, regKey, memID)
+			_ = bigiqRef.LicenseRevoke(config, poolId, regKey, memID)
 		}
 	}
 	d.SetId("")
@@ -542,6 +542,6 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)
 	}
-	log.Printf("[DEBUG] BIGIQ CONFIG:%+v", bigiqConfig)
+	//log.Printf("[DEBUG] BIGIQ CONFIG:%+v", bigiqConfig)
 	return bigiqConfig.Client()
 }
