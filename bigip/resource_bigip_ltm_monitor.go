@@ -159,13 +159,13 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "ftp adaptive",
+				Description: "Specifies whether adaptive response time monitoring is enabled for this monitor. The default is Disabled",
 			},
 			"adaptive_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "Integer value",
+				Description: "Specifies the absolute number of milliseconds that may not be exceeded by a monitor probe, regardless of Allowed Divergence",
 			},
 			"password": {
 				Type:        schema.TypeString,
