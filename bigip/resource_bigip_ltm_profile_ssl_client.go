@@ -32,6 +32,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "Name of the Ssl Profile",
+				ForceNew:     true,
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 
@@ -749,7 +750,7 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
 		}
 	} else {
-		tmOptions := []string{}
+		var tmOptions []string
 		if err := d.Set("tm_options", tmOptions); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
 		}

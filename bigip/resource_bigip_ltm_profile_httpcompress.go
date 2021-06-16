@@ -28,6 +28,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validateF5NameWithDirectory,
 				Description:  "Name of the Httpcompress Profile",
 			},

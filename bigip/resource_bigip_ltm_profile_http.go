@@ -25,6 +25,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				Description:  "Name of the profile",
 				ValidateFunc: validateF5Name,
 			},
