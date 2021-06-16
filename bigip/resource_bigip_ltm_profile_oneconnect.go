@@ -27,6 +27,7 @@ func resourceBigipLtmProfileOneconnect() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validateF5NameWithDirectory,
 				Description:  "Name of the Oneconnect Profile",
 			},

@@ -6,9 +6,10 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
@@ -25,6 +26,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				Description:  "Name of the profile",
 				ValidateFunc: validateF5Name,
 			},
