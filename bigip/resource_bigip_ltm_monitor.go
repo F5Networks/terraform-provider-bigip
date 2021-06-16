@@ -54,23 +54,23 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				ForceNew:     true,
 				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
 			},
-			"defaults_from": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
-			},
-
 			"interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Check interval in seconds",
+				Description: "Specifies, in seconds, the frequency at which the system issues the monitor check when either the resource is down or the status of the resource is unknown. The default is 5",
+				Computed:    true,
+			},
+			"up_interval": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Specifies the interval for the system to use to perform the health check when a resource is up. The default is 0 (Disabled)",
 				Computed:    true,
 			},
 
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Timeout in seconds",
+				Description: "Specifies the number of seconds the target has in which to respond to the monitor request. The default is 16 seconds",
 				Computed:    true,
 			},
 
@@ -78,7 +78,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Request string to send.",
+				Description: "Specifies the text string that the monitor sends to the target object.",
 				StateFunc: func(s interface{}) string {
 					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
 				},
@@ -87,46 +87,49 @@ func resourceBigipLtmMonitor() *schema.Resource {
 			"receive": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Expected response string.",
+				Description: "Specifies the regular expression representing the text string that the monitor looks for in the returned resource.",
 			},
 
 			"receive_disable": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Expected response string.",
+				Description: "The system marks the node or pool member disabled when its response matches Receive Disable String but not Receive String.",
 			},
 
 			"reverse": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Instructs the system to mark the target resource down when the test is successful.",
+				Computed:    true,
 			},
 
 			"transparent": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies whether the monitor operates in transparent mode.",
+				Computed:    true,
 			},
 
 			"manual_resume": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies whether the system automatically changes the status of a resource to Enabled at the next successful monitor check",
+				Computed:    true,
 			},
 
 			"ip_dscp": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Displays the differentiated services code point (DSCP).The default is 0 (zero)",
+				Computed:    true,
 			},
 
 			"time_until_up": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "Time in seconds",
+				Description: "Specifies the number of seconds to wait after a resource first responds correctly to the monitor before setting the resource to up.",
 			},
-
 			"destination": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -156,13 +159,13 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "ftp adaptive",
+				Description: "Specifies whether adaptive response time monitoring is enabled for this monitor. The default is Disabled",
 			},
 			"adaptive_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "Integer value",
+				Description: "Specifies the absolute number of milliseconds that may not be exceeded by a monitor probe, regardless of Allowed Divergence",
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -188,28 +191,21 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 
-	log.Println("[INFO] Creating monitor " + name + " :: " + monitorParent(d.Get("parent").(string)))
+	log.Println("[INFO] Creating LTM Monitor " + name + " :: " + monitorParent(d.Get("parent").(string)))
+	pss := &bigip.Monitor{
+		Name: name,
+	}
+	config := getLtmMonitorConfig(d, pss)
 
-	err := client.CreateMonitor(
-		name,
-		monitorParent(d.Get("parent").(string)),
-		d.Get("defaults_from").(string),
-		d.Get("interval").(int),
-		d.Get("timeout").(int),
-		d.Get("send").(string),
-		d.Get("receive").(string),
-		d.Get("receive_disable").(string),
-		d.Get("compatibility").(string),
-		d.Get("destination").(string),
-	)
+	err := client.CreateMonitor(config)
+
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
 		return err
 	}
 
 	d.SetId(name)
-
-	resourceBigipLtmMonitorUpdate(d, meta)
+	//_ = resourceBigipLtmMonitorUpdate(d, meta)
 	return resourceBigipLtmMonitorRead(d, meta)
 }
 
@@ -218,9 +214,11 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 	name := d.Id()
 
-	parent_monitor := d.Get("parent").(string)
+	log.Printf("[INFO] Reading LTM Monitor: %+v", name)
+
+	parentMonitor := d.Get("parent").(string)
 	re := regexp.MustCompile("/.*/https$")
-	matchresult := re.MatchString(parent_monitor)
+	matchresult := re.MatchString(parentMonitor)
 
 	monitors, err := client.Monitors()
 	if err != nil {
@@ -234,49 +232,51 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 	}
 	for _, m := range monitors {
 		if m.FullPath == name {
-			d.Set("defaults_from", m.DefaultsFrom)
-			d.Set("interval", m.Interval)
-			d.Set("timeout", m.Timeout)
+			_ = d.Set("interval", m.Interval)
+			_ = d.Set("up_interval", m.UpInterval)
+			_ = d.Set("timeout", m.Timeout)
 			if err := d.Set("send", m.SendString); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err)
 			}
 			if err := d.Set("receive", m.ReceiveString); err != nil {
 				return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
 			}
-			d.Set("receive_disable", m.ReceiveDisable)
-			d.Set("reverse", m.Reverse)
-			d.Set("transparent", m.Transparent)
-			d.Set("ip_dscp", m.IPDSCP)
-			d.Set("time_until_up", m.TimeUntilUp)
-			d.Set("manual_resume", m.ManualResume)
-			d.Set("destination", m.Destination)
+			_ = d.Set("receive_disable", m.ReceiveDisable)
+			_ = d.Set("reverse", m.Reverse)
+			_ = d.Set("transparent", m.Transparent)
+			_ = d.Set("ip_dscp", m.IPDSCP)
+			_ = d.Set("parent", m.ParentMonitor)
+			_ = d.Set("time_until_up", m.TimeUntilUp)
+			_ = d.Set("manual_resume", m.ManualResume)
+			_ = d.Set("destination", m.Destination)
 			if matchresult {
-				d.Set("compatibility", m.Compatibility)
+				_ = d.Set("compatibility", m.Compatibility)
 			} else {
-				d.Set("compatibility", d.Get("compatibility").(string))
+				_ = d.Set("compatibility", d.Get("compatibility").(string))
 			}
-			d.Set("filename", m.Filename)
-			d.Set("mode", m.Mode)
-			d.Set("adaptive", m.Adaptive)
-			d.Set("adaptive_limit", m.AdaptiveLimit)
-			d.Set("username", m.Username)
-			d.Set("password", m.Password)
-			d.Set("name", name)
-			d.Set("database", m.Database)
+			_ = d.Set("filename", m.Filename)
+			_ = d.Set("mode", m.Mode)
+			_ = d.Set("adaptive", m.Adaptive)
+			_ = d.Set("adaptive_limit", m.AdaptiveLimit)
+			_ = d.Set("username", m.Username)
+			_ = d.Set("password", m.Password)
+			_ = d.Set("name", name)
+			_ = d.Set("database", m.Database)
 			return nil
 		}
 	}
-	return fmt.Errorf("Couldn't find monitor %s", name)
-
+	return fmt.Errorf("Couldn't find LTM Monitor %s ", name)
 }
 
 func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Println("[INFO] Fetching monitor " + name)
+
+	log.Printf("[INFO] Checking LTM Monitor: %+v Exist", name)
 
 	monitors, err := client.Monitors()
+
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
 		return false, err
@@ -300,28 +300,12 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 
 	name := d.Id()
 
-	m := &bigip.Monitor{
-		Interval:       d.Get("interval").(int),
-		Timeout:        d.Get("timeout").(int),
-		SendString:     d.Get("send").(string),
-		ReceiveString:  d.Get("receive").(string),
-		ReceiveDisable: d.Get("receive_disable").(string),
-		Reverse:        d.Get("reverse").(string),
-		Transparent:    d.Get("transparent").(string),
-		IPDSCP:         d.Get("ip_dscp").(int),
-		TimeUntilUp:    d.Get("time_until_up").(int),
-		ManualResume:   d.Get("manual_resume").(string),
-		Destination:    d.Get("destination").(string),
-		Compatibility:  d.Get("compatibility").(string),
-		Filename:       d.Get("filename").(string),
-		Mode:           d.Get("mode").(string),
-		Adaptive:       d.Get("adaptive").(string),
-		Username:       d.Get("username").(string),
-		Password:       d.Get("password").(string),
-		Database:       d.Get("database").(string),
+	pss := &bigip.Monitor{
+		Name: name,
 	}
+	config := getLtmMonitorConfig(d, pss)
 
-	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), m)
+	err := client.ModifyMonitor(name, monitorParent(d.Get("parent").(string)), config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Monitor (%s) (%v) ", name, err)
 		return err
@@ -334,7 +318,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	parent := monitorParent(d.Get("parent").(string))
-	log.Println("[Info] Deleting monitor " + name + "::" + parent)
+	log.Println("[INFO] Deleting monitor " + name + "::" + parent)
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Monitor (%s) (%v) ", name, err)
@@ -355,4 +339,30 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 
 func monitorParent(s string) string {
 	return strings.TrimPrefix(s, "/Common/")
+}
+
+func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.Monitor {
+	config.ParentMonitor = monitorParent(d.Get("parent").(string))
+	config.Adaptive = d.Get("adaptive").(string)
+	config.AdaptiveLimit = d.Get("adaptive_limit").(int)
+	config.Compatibility = d.Get("compatibility").(string)
+	config.Database = d.Get("database").(string)
+	config.Destination = d.Get("destination").(string)
+	config.Interval = d.Get("interval").(int)
+	config.IPDSCP = d.Get("ip_dscp").(int)
+	config.Mode = d.Get("mode").(string)
+	config.Filename = d.Get("filename").(string)
+	config.ReceiveDisable = d.Get("receive_disable").(string)
+	config.ReceiveString = d.Get("receive").(string)
+	config.Reverse = d.Get("reverse").(string)
+	config.SendString = d.Get("send").(string)
+	config.Timeout = d.Get("timeout").(int)
+	config.TimeUntilUp = d.Get("time_until_up").(int)
+	config.ManualResume = d.Get("manual_resume").(string)
+	config.Transparent = d.Get("transparent").(string)
+	config.Username = d.Get("username").(string)
+	config.Password = d.Get("password").(string)
+	config.UpInterval = d.Get("up_interval").(int)
+	//config.Description
+	return config
 }

@@ -15,15 +15,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_MONITOR_NAME = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
-var TEST_HTTPS_MONITOR_NAME = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
-var TEST_FTP_MONITOR_NAME = fmt.Sprintf("/%s/test-ftp-monitor", TEST_PARTITION)
-var TEST_UDP_MONITOR_NAME = fmt.Sprintf("/%s/test-udp-monitor", TEST_PARTITION)
-var TEST_POSTGRESQL_MONITOR_NAME = fmt.Sprintf("/%s/test-postgresql-monitor", TEST_PARTITION)
+var resLmName = "bigip_ltm_monitor"
 
-var TEST_MONITOR_RESOURCE = `
+var TestMonitorName = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
+var TestHttpsMonitorName = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
+var TestFtpMonitorName = fmt.Sprintf("/%s/test-ftp-monitor", TEST_PARTITION)
+var TestUdpMonitorName = fmt.Sprintf("/%s/test-udp-monitor", TEST_PARTITION)
+var TestPostgresqlMonitorName = fmt.Sprintf("/%s/test-postgresql-monitor", TEST_PARTITION)
+
+var TestMonitorResource = `
 resource "bigip_ltm_monitor" "test-monitor" {
-	name = "` + TEST_MONITOR_NAME + `"
+	name = "` + TestMonitorName + `"
 	parent = "/Common/http"
 	send = "GET /some/path\r\n"
 	timeout = 999
@@ -39,9 +41,9 @@ resource "bigip_ltm_monitor" "test-monitor" {
 }
 `
 
-var TEST_HTTPS_MONITOR_RESOURCE = `
+var TestHttpsMonitorResource = `
 resource "bigip_ltm_monitor" "test-https-monitor" {
-	name = "` + TEST_HTTPS_MONITOR_NAME + `"
+	name = "` + TestHttpsMonitorName + `"
 	parent = "/Common/https"
 	interval          = 5
 	time_until_up     = 0
@@ -53,9 +55,9 @@ resource "bigip_ltm_monitor" "test-https-monitor" {
 }
 `
 
-var TEST_FTP_MONITOR_RESOURCE = `
+var TestFtpMonitorResource = `
 resource "bigip_ltm_monitor" "test-ftp-monitor" {
-	name = "` + TEST_FTP_MONITOR_NAME + `"
+	name = "` + TestFtpMonitorName + `"
 	parent = "/Common/ftp"
 	interval          = 5
 	time_until_up     = 0
@@ -69,9 +71,9 @@ resource "bigip_ltm_monitor" "test-ftp-monitor" {
 }
 `
 
-var TEST_UDP_MONITOR_RESOURCE = `
+var TestUdpMonitorResource = `
 resource "bigip_ltm_monitor" "test-udp-monitor" {
-        name = "` + TEST_UDP_MONITOR_NAME + `"
+        name = "` + TestUdpMonitorName + `"
         parent = "/Common/udp"
         interval          = 5
         time_until_up     = 0
@@ -81,9 +83,9 @@ resource "bigip_ltm_monitor" "test-udp-monitor" {
 }
 `
 
-var TEST_POSTGRESQL_MONITOR_RESOURCE = `
+var TestPostgresqlMonitorResource = `
 resource "bigip_ltm_monitor" "test-postgresql-monitor" {
-        name = "` + TEST_POSTGRESQL_MONITOR_NAME + `"
+        name = "` + TestPostgresqlMonitorName + `"
         parent = "/Common/postgresql"
         interval          = 5
         time_until_up     = 0
@@ -92,6 +94,32 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 }
 `
 
+func TestAccBigipLtmMonitor_HttpCreate(t *testing.T) {
+	t.Parallel()
+	var instName = "test-monitor-http"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resLmName, instName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmmonitorUpdateparam(instName, "http", ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "send", "GET /\\r\\n"),
+					resource.TestCheckResourceAttr(resFullName, "timeout", "16"),
+					resource.TestCheckResourceAttr(resFullName, "interval", "5"),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipLtmMonitor_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -101,9 +129,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_MONITOR_RESOURCE,
+				Config: TestMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_MONITOR_NAME),
+					testCheckMonitorExists(TestMonitorName),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "parent", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "send", "GET /some/path\\r\\n"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "timeout", "999"),
@@ -120,7 +148,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
-
+}
+func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -129,9 +158,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_HTTPS_MONITOR_RESOURCE,
+				Config: TestHttpsMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_HTTPS_MONITOR_NAME),
+					testCheckMonitorExists(TestHttpsMonitorName),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "parent", "/Common/https"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "interval", "5"),
@@ -144,6 +173,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
+}
+func TestAccBigipLtmMonitor_FtpCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -152,9 +183,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FTP_MONITOR_RESOURCE,
+				Config: TestFtpMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_FTP_MONITOR_NAME),
+					testCheckMonitorExists(TestFtpMonitorName),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "parent", "/Common/ftp"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ftp-monitor", "interval", "5"),
@@ -169,6 +200,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
+}
+func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -177,9 +210,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_UDP_MONITOR_RESOURCE,
+				Config: TestUdpMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_UDP_MONITOR_NAME),
+					testCheckMonitorExists(TestUdpMonitorName),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "parent", "/Common/udp"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-udp-monitor", "interval", "5"),
@@ -190,6 +223,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
+}
+func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -198,9 +233,9 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POSTGRESQL_MONITOR_RESOURCE,
+				Config: TestPostgresqlMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_POSTGRESQL_MONITOR_NAME),
+					testCheckMonitorExists(TestPostgresqlMonitorName),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "parent", "/Common/postgresql"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-postgresql-monitor", "interval", "5"),
@@ -210,7 +245,6 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 			},
 		},
 	})
-
 }
 
 func TestAccBigipLtmMonitor_import(t *testing.T) {
@@ -222,11 +256,11 @@ func TestAccBigipLtmMonitor_import(t *testing.T) {
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_MONITOR_RESOURCE,
+				Config: TestMonitorResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TEST_MONITOR_NAME),
+					testCheckMonitorExists(TestMonitorName),
 				),
-				ResourceName:      TEST_MONITOR_NAME,
+				ResourceName:      TestMonitorName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -248,7 +282,7 @@ func testCheckMonitorExists(name string) resource.TestCheckFunc {
 				return nil
 			}
 		}
-		return fmt.Errorf("Monitor %s was not created.", name)
+		return fmt.Errorf("Monitor %s was not created ", name)
 	}
 }
 
@@ -268,9 +302,52 @@ func testMonitorsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		for _, m := range monitors {
 			if m.FullPath == name {
-				return fmt.Errorf("Monitor %s not destroyed.", name)
+				return fmt.Errorf("Monitor %s not destroyed ", name)
 			}
 		}
 	}
 	return nil
+}
+
+func testaccbigipltmmonitorUpdateparam(instName, parentM, updateParam string) string {
+	resPrefix := fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			  name = "/Common/%[2]s"`, resLmName, instName)
+	switch parentM {
+	case "http":
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/http"`, resPrefix)
+	case "https":
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/https"`, resPrefix)
+	case "udp":
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/udp"`, resPrefix)
+	case "ftp":
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/ftp"`, resPrefix)
+	case "postgresql":
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/postgresql"`, resPrefix)
+	default:
+		resPrefix = fmt.Sprintf(`%s
+			  parent = "/Common/http"`, resPrefix)
+	}
+	switch updateParam {
+	case "timeout":
+		resPrefix = fmt.Sprintf(`%s
+			  timeout = "always"`, resPrefix)
+	case "interval":
+		resPrefix = fmt.Sprintf(`%s
+			  interval = ["no-tlsv1.3"]`, resPrefix)
+	case "send":
+		resPrefix = fmt.Sprintf(`%s
+			  send = 8`, resPrefix)
+	case "receive":
+		resPrefix = fmt.Sprintf(`%s
+			  receive = 262100`, resPrefix)
+	default:
+	}
+	return fmt.Sprintf(`%s
+		}`, resPrefix)
 }

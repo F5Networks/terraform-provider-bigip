@@ -2,7 +2,6 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -99,8 +98,8 @@ func resourceBigiqAs3() *schema.Resource {
 }
 
 func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
-	bigipRef := meta.(*bigip.BigIP)
-	log.Println(bigipRef)
+	//bigipRef := meta.(*bigip.BigIP)
+	//log.Println(bigipRef)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
