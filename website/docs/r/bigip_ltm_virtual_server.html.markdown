@@ -45,6 +45,7 @@ resource "bigip_ltm_virtual_server" "https" {
   port                       = 443
   client_profiles            = ["/Common/clientssl"]
   server_profiles            = ["/Common/serverssl"]
+  security_log_profiles      = ["/Common/global-network"]
   source_address_translation = "automap"
 }
 
@@ -94,3 +95,5 @@ resource "bigip_ltm_virtual_server" "https" {
 * `persistence_profiles` - (Optional) List of persistence profiles associated with the Virtual Server.
 
 * `fallback_persistence_profile` - (Optional) Specifies a fallback persistence profile for the Virtual Server to use when the default persistence profile is not available.
+
+* `security_log_profiles` - (Optional) Specifies the log profile applied to the virtual server.

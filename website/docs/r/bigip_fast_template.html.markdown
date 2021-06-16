@@ -20,6 +20,7 @@ Template set can be imported from zip archive files on the local disk.
 resource "bigip_fast_template" "foo-template" {
   name		= "foo_template"
   source   = "foo_template.zip"
+  md5_hash = filemd5("foo_template.zip")
 }
 
 ```      
@@ -29,4 +30,6 @@ resource "bigip_fast_template" "foo-template" {
 
 * `name`- (Optional) Name of the FAST template set to be created on to BIGIP
 
-* `source` - (Required) Path to the zip archive file containing FAST template set on Local Disk 
+* `source` - (Required) Path to the zip archive file containing FAST template set on Local Disk
+
+* `md5_hash` - (Required) MD5 hash of the zip archive file containing FAST template

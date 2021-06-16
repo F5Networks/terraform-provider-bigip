@@ -148,18 +148,51 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Cert file name",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"chain": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Chain file name",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"key": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Key filename",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								oldList := strings.Split(old, "/")
+								newList := strings.Split(new, "/")
+								if old == new {
+									return true
+								}
+								if oldList[len(oldList)-1] == newList[len(newList)-1] {
+									return true
+								}
+								return false
+							},
 						},
 
 						"passphrase": {
@@ -454,33 +487,13 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	parent := d.Get("defaults_from").(string)
-
 	log.Printf("[INFO] Creating Client Ssl Profile:%+v ", name)
 
-	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
-	inheritCertkeychain := d.Get("inherit_cert_keychain").(string)
-	proxyCaCert := d.Get("proxy_ca_cert").(string)
-	proxyCaKey := d.Get("proxy_ca_key").(string)
-	sslForwardProxyBypass := d.Get("ssl_forward_proxy_bypass").(string)
-	if sslForwardProxyEnabled == "enabled" {
-		proxyCaCert = "/Common/default.crt"
-		proxyCaKey = "/Common/default.key"
-		inheritCertkeychain = "true"
-		if sslForwardProxyBypass == "" {
-			sslForwardProxyBypass = "disabled"
-		}
-	}
 	pss := &bigip.ClientSSLProfile{
-		Name:                  name,
-		DefaultsFrom:          parent,
-		InheritCertkeychain:   inheritCertkeychain,
-		ProxyCaCert:           proxyCaCert,
-		ProxyCaKey:            proxyCaKey,
-		SslForwardProxy:       sslForwardProxyEnabled,
-		SslForwardProxyBypass: sslForwardProxyBypass,
+		Name: name,
 	}
-	err := client.CreateClientSSLProfile(pss)
+	config := getClientSslConfig(d, pss)
+	err := client.CreateClientSSLProfile(config)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Client Ssl Profile (%s) (%v)", name, err)
@@ -488,12 +501,6 @@ func resourceBigipLtmProfileClientSSLCreate(d *schema.ResourceData, meta interfa
 	}
 
 	d.SetId(name)
-
-	err = resourceBigipLtmProfileClientSSLUpdate(d, meta)
-	if err != nil {
-		_ = client.DeleteClientSSLProfile(name)
-		return err
-	}
 
 	return resourceBigipLtmProfileClientSSLRead(d, meta)
 }
@@ -504,117 +511,11 @@ func resourceBigipLtmProfileClientSSLUpdate(d *schema.ResourceData, meta interfa
 
 	log.Printf("[INFO] Updating Clientssl Profile : %v", name)
 
-	var tmOptions []string
-	if t, ok := d.GetOk("tm_options"); ok {
-		tmOptions = setToStringSlice(t.(*schema.Set))
-	}
-
-	var CertExtensionIncludes []string
-	if cei, ok := d.GetOk("cert_extension_includes"); ok {
-		CertExtensionIncludes = setToStringSlice(cei.(*schema.Set))
-	}
-
-	type certKeyChain struct {
-		Name       string "json:\"name,omitempty\""
-		Cert       string "json:\"cert,omitempty\""
-		Chain      string "json:\"chain,omitempty\""
-		Key        string "json:\"key,omitempty\""
-		Passphrase string "json:\"passphrase,omitempty\""
-	}
-
-	var certKeyChains []struct {
-		Name       string "json:\"name,omitempty\""
-		Cert       string "json:\"cert,omitempty\""
-		Chain      string "json:\"chain,omitempty\""
-		Key        string "json:\"key,omitempty\""
-		Passphrase string "json:\"passphrase,omitempty\""
-	}
-
-	certKeyChainCount := d.Get("cert_key_chain.#").(int)
-	for i := 0; i < certKeyChainCount; i++ {
-		prefix := fmt.Sprintf("cert_key_chain.%d", i)
-		certKeyChains = append(certKeyChains, certKeyChain{
-			Name:       d.Get(prefix + ".name").(string),
-			Cert:       d.Get(prefix + ".cert").(string),
-			Chain:      d.Get(prefix + ".chain").(string),
-			Key:        d.Get(prefix + ".key").(string),
-			Passphrase: d.Get(prefix + ".passphrase").(string),
-		})
-	}
-	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
-	inheritCertkeychain := d.Get("inherit_cert_keychain").(string)
-	proxyCaCert := d.Get("proxy_ca_cert").(string)
-	proxyCaKey := d.Get("proxy_ca_key").(string)
-	if sslForwardProxyEnabled == "enabled" {
-		proxyCaCert = "/Common/default.crt"
-		proxyCaKey = "/Common/default.key"
-		inheritCertkeychain = "true"
-	}
-
 	pss := &bigip.ClientSSLProfile{
-		Name:                            d.Get("name").(string),
-		Partition:                       d.Get("partition").(string),
-		FullPath:                        d.Get("full_path").(string),
-		Generation:                      d.Get("generation").(int),
-		AlertTimeout:                    d.Get("alert_timeout").(string),
-		AllowNonSsl:                     d.Get("allow_non_ssl").(string),
-		Authenticate:                    d.Get("authenticate").(string),
-		AuthenticateDepth:               d.Get("authenticate_depth").(int),
-		C3dClientFallbackCert:           d.Get("c3d_client_fallback_cert").(string),
-		C3dDropUnknownOcspStatus:        d.Get("c3d_drop_unknown_ocsp_status").(string),
-		C3dOcsp:                         d.Get("c3d_ocsp").(string),
-		CaFile:                          d.Get("ca_file").(string),
-		CacheSize:                       d.Get("cache_size").(int),
-		CacheTimeout:                    d.Get("cache_timeout").(int),
-		Cert:                            d.Get("cert").(string),
-		CertExtensionIncludes:           CertExtensionIncludes,
-		CertKeyChain:                    certKeyChains,
-		CertLifespan:                    d.Get("cert_life_span").(int),
-		CertLookupByIpaddrPort:          d.Get("cert_lookup_by_ipaddr_port").(string),
-		Chain:                           d.Get("chain").(string),
-		Ciphers:                         d.Get("ciphers").(string),
-		ClientCertCa:                    d.Get("client_cert_ca").(string),
-		CrlFile:                         d.Get("crl_file").(string),
-		DefaultsFrom:                    d.Get("defaults_from").(string),
-		ForwardProxyBypassDefaultAction: d.Get("forward_proxy_bypass_default_action").(string),
-		GenericAlert:                    d.Get("generic_alert").(string),
-		HandshakeTimeout:                d.Get("handshake_timeout").(string),
-		InheritCertkeychain:             inheritCertkeychain,
-		Key:                             d.Get("key").(string),
-		ModSslMethods:                   d.Get("mod_ssl_methods").(string),
-		Mode:                            d.Get("mode").(string),
-		Passphrase:                      d.Get("passphrase").(string),
-		PeerCertMode:                    d.Get("peer_cert_mode").(string),
-		ProxyCaPassphrase:               d.Get("proxy_ca_passphrase").(string),
-		ProxySsl:                        d.Get("proxy_ssl").(string),
-		ProxySslPassthrough:             d.Get("proxy_ssl_passthrough").(string),
-		RenegotiatePeriod:               d.Get("renegotiate_period").(string),
-		RenegotiateSize:                 d.Get("renegotiate_size").(string),
-		Renegotiation:                   d.Get("renegotiation").(string),
-		RetainCertificate:               d.Get("retain_certificate").(string),
-		SecureRenegotiation:             d.Get("secure_renegotiation").(string),
-		ServerName:                      d.Get("server_name").(string),
-		SessionMirroring:                d.Get("session_mirroring").(string),
-		SessionTicket:                   d.Get("session_ticket").(string),
-		SniDefault:                      d.Get("sni_default").(string),
-		SniRequire:                      d.Get("sni_require").(string),
-		SslC3d:                          d.Get("ssl_c3d").(string),
-		SslForwardProxy:                 sslForwardProxyEnabled,
-		SslForwardProxyBypass:           d.Get("ssl_forward_proxy_bypass").(string),
-		SslSignHash:                     d.Get("ssl_sign_hash").(string),
-		StrictResume:                    d.Get("strict_resume").(string),
-		UncleanShutdown:                 d.Get("unclean_shutdown").(string),
+		Name: name,
 	}
-	if len(tmOptions) > 0 {
-		pss.TmOptions = tmOptions
-	}
-	if proxyCaCert != "none" {
-		pss.ProxyCaCert = proxyCaCert
-	}
-	if proxyCaKey != "none" {
-		pss.ProxyCaKey = proxyCaKey
-	}
-	err := client.ModifyClientSSLProfile(name, pss)
+	config := getClientSslConfig(d, pss)
+	err := client.ModifyClientSSLProfile(name, config)
 	if err != nil {
 		return fmt.Errorf(" Error create profile Ssl (%s): %s", name, err)
 	}
@@ -690,14 +591,18 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
-	for i, c := range obj.CertKeyChain {
-		ckc := fmt.Sprintf("cert_key_chain.%d", i)
-		_ = d.Set(fmt.Sprintf("%s.name", ckc), c.Name)
-		_ = d.Set(fmt.Sprintf("%s.cert", ckc), c.Cert)
-		_ = d.Set(fmt.Sprintf("%s.chain", ckc), c.Chain)
-		_ = d.Set(fmt.Sprintf("%s.key", ckc), c.Key)
-		_ = d.Set(fmt.Sprintf("%s.passphrase", ckc), c.Passphrase)
+	//log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
+	certMap := make(map[string]interface{})
+	var certMapList []interface{}
+	for _, c := range obj.CertKeyChain {
+		certMap["name"] = c.Name
+		certMap["cert"] = c.Cert
+		certMap["key"] = c.Key
+		certMap["chain"] = c.Chain
+		certMap["passphrase"] = c.Passphrase
+		certMapList = append(certMapList, certMap)
 	}
+	_ = d.Set("cert_key_chain", certMapList)
 
 	if err := d.Set("cert_extension_includes", obj.CertExtensionIncludes); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving CertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
@@ -885,4 +790,123 @@ func resourceBigipLtmProfileClientSSLDelete(d *schema.ResourceData, meta interfa
 	}
 	d.SetId("")
 	return nil
+}
+
+func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) *bigip.ClientSSLProfile {
+
+	var tmOptions []string
+	if t, ok := d.GetOk("tm_options"); ok {
+		tmOptions = setToStringSlice(t.(*schema.Set))
+	}
+	var CertExtensionIncludes []string
+	if cei, ok := d.GetOk("cert_extension_includes"); ok {
+		CertExtensionIncludes = setToStringSlice(cei.(*schema.Set))
+	}
+	type certKeyChain struct {
+		Name       string "json:\"name,omitempty\""
+		Cert       string "json:\"cert,omitempty\""
+		Chain      string "json:\"chain,omitempty\""
+		Key        string "json:\"key,omitempty\""
+		Passphrase string "json:\"passphrase,omitempty\""
+	}
+
+	var certKeyChains []struct {
+		Name       string "json:\"name,omitempty\""
+		Cert       string "json:\"cert,omitempty\""
+		Chain      string "json:\"chain,omitempty\""
+		Key        string "json:\"key,omitempty\""
+		Passphrase string "json:\"passphrase,omitempty\""
+	}
+
+	certKeyChainCount := d.Get("cert_key_chain.#").(int)
+	for i := 0; i < certKeyChainCount; i++ {
+		prefix := fmt.Sprintf("cert_key_chain.%d", i)
+		certKeyChains = append(certKeyChains, certKeyChain{
+			Name:       d.Get(prefix + ".name").(string),
+			Cert:       d.Get(prefix + ".cert").(string),
+			Chain:      d.Get(prefix + ".chain").(string),
+			Key:        d.Get(prefix + ".key").(string),
+			Passphrase: d.Get(prefix + ".passphrase").(string),
+		})
+	}
+
+	sslForwardProxyEnabled := d.Get("ssl_forward_proxy").(string)
+	sslForwardProxyBypass := d.Get("ssl_forward_proxy_bypass").(string)
+	inheritCertkeychain := d.Get("inherit_cert_keychain").(string)
+	proxyCaCert := d.Get("proxy_ca_cert").(string)
+	proxyCaKey := d.Get("proxy_ca_key").(string)
+	if sslForwardProxyEnabled == "enabled" {
+		proxyCaCert = "/Common/default.crt"
+		proxyCaKey = "/Common/default.key"
+		inheritCertkeychain = "true"
+		if sslForwardProxyBypass == "" {
+			sslForwardProxyBypass = "disabled"
+		}
+	}
+	config.DefaultsFrom = d.Get("defaults_from").(string)
+	config.Partition = d.Get("partition").(string)
+	config.FullPath = d.Get("full_path").(string)
+	config.Generation = d.Get("generation").(int)
+	config.AlertTimeout = d.Get("alert_timeout").(string)
+	config.AllowNonSsl = d.Get("allow_non_ssl").(string)
+	config.Authenticate = d.Get("authenticate").(string)
+	config.AuthenticateDepth = d.Get("authenticate_depth").(int)
+	config.C3dClientFallbackCert = d.Get("c3d_client_fallback_cert").(string)
+	config.C3dDropUnknownOcspStatus = d.Get("c3d_drop_unknown_ocsp_status").(string)
+	config.C3dOcsp = d.Get("c3d_ocsp").(string)
+	config.CaFile = d.Get("ca_file").(string)
+	config.CacheSize = d.Get("cache_size").(int)
+	config.CacheTimeout = d.Get("cache_timeout").(int)
+	log.Printf("[DEBUG] Length of certKeyChains :%+v", len(certKeyChains))
+	log.Printf("[DEBUG] certKeyChains :%+v", certKeyChains)
+	if len(certKeyChains) == 0 {
+		config.Cert = d.Get("cert").(string)
+		config.Key = d.Get("key").(string)
+		config.Chain = d.Get("chain").(string)
+		config.Passphrase = d.Get("passphrase").(string)
+	}
+	config.CertExtensionIncludes = CertExtensionIncludes
+	config.CertKeyChain = certKeyChains
+	config.CertLifespan = d.Get("cert_life_span").(int)
+	config.CertLookupByIpaddrPort = d.Get("cert_lookup_by_ipaddr_port").(string)
+	config.Ciphers = d.Get("ciphers").(string)
+	config.ClientCertCa = d.Get("client_cert_ca").(string)
+	config.CrlFile = d.Get("crl_file").(string)
+	config.ForwardProxyBypassDefaultAction = d.Get("forward_proxy_bypass_default_action").(string)
+	config.GenericAlert = d.Get("generic_alert").(string)
+	config.HandshakeTimeout = d.Get("handshake_timeout").(string)
+	config.InheritCertkeychain = inheritCertkeychain
+	config.ModSslMethods = d.Get("mod_ssl_methods").(string)
+	config.Mode = d.Get("mode").(string)
+	config.PeerCertMode = d.Get("peer_cert_mode").(string)
+	config.ProxyCaPassphrase = d.Get("proxy_ca_passphrase").(string)
+	config.ProxySsl = d.Get("proxy_ssl").(string)
+	config.ProxySslPassthrough = d.Get("proxy_ssl_passthrough").(string)
+	config.RenegotiatePeriod = d.Get("renegotiate_period").(string)
+	config.RenegotiateSize = d.Get("renegotiate_size").(string)
+	config.Renegotiation = d.Get("renegotiation").(string)
+	config.RetainCertificate = d.Get("retain_certificate").(string)
+	config.SecureRenegotiation = d.Get("secure_renegotiation").(string)
+	config.ServerName = d.Get("server_name").(string)
+	config.SessionMirroring = d.Get("session_mirroring").(string)
+	config.SessionTicket = d.Get("session_ticket").(string)
+	config.SniDefault = d.Get("sni_default").(string)
+	config.SniRequire = d.Get("sni_require").(string)
+	config.SslC3d = d.Get("ssl_c3d").(string)
+	config.SslForwardProxy = sslForwardProxyEnabled
+	config.SslForwardProxyBypass = sslForwardProxyBypass
+	config.SslSignHash = d.Get("ssl_sign_hash").(string)
+	config.StrictResume = d.Get("strict_resume").(string)
+	config.UncleanShutdown = d.Get("unclean_shutdown").(string)
+
+	if len(tmOptions) > 0 {
+		config.TmOptions = tmOptions
+	}
+	if proxyCaCert != "none" {
+		config.ProxyCaCert = proxyCaCert
+	}
+	if proxyCaKey != "none" {
+		config.ProxyCaKey = proxyCaKey
+	}
+	return config
 }
