@@ -31,6 +31,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				Description:  "Name of the Ssl Profile",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
