@@ -18,7 +18,7 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_net_route" "route2" {
-  name    = "external-route"
+  name    = "/Common/external-route"
   network = "10.10.10.0/24"
   gw      = "1.1.1.2"
 }
@@ -27,7 +27,7 @@ resource "bigip_net_route" "route2" {
 
 ## Argument Reference
 
-* `name` - (Required) Name of the route
+* `name` - (Required) Name of the route.Name of Route should be full path,full path is the combination of the `partition + route name`,For ex: `/Common/test-net-route`.
 
 * `network` - (Optional) The destination subnet and netmask for the route.
 

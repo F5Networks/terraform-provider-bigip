@@ -97,7 +97,8 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 					log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
 					break // break here
 				} else if success_count == 0 {
-					return fmt.Errorf("Tenant Creation failed"), ""
+					j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
+					return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), ""
 				} else {
 					finallist := strings.Join(successfulTenants[:], ",")
 					j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
@@ -109,13 +110,18 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 				break // break here
 			}
 			if respCode >= 400 {
-				return fmt.Errorf("Tenant Creation failed"), ""
+				j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
+				return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), ""
 			}
 		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
 				return err, ""
+			}
+			if len(taskIds) == 0 {
+				time.Sleep(2 * time.Second)
+				return b.PostAs3Bigip(as3NewJson, tenantFilter)
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id) {
@@ -178,13 +184,18 @@ func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
 				break // break here
 			}
 			if respCode >= 400 {
-				return errors.New(fmt.Sprintf("Tenant Deletion failed")), ""
+				j, _ := json.MarshalIndent(fastTask, "", "\t")
+				return fmt.Errorf("Tenant Deletion failed with Response: \n %+v", string(j)), ""
 			}
 		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
 				return err, ""
+			}
+			if len(taskIds) == 0 {
+				time.Sleep(2 * time.Second)
+				return b.DeleteAs3Bigip(tenantName)
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id) {
