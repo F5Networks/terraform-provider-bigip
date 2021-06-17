@@ -7,6 +7,7 @@ terraformv16:
   stage: Test
   before_script:
     - echo "build terraform binary"
+    - export GOFLAGS=-mod=vendor
     - make fmt
     - go build
     - ls -lrt
