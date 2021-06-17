@@ -1,33 +1,39 @@
-variables:
-  GIT_DEPTH: 1
-
-image: golang:1.12.6
 stages:
-  - build
-  - test
+  - Test
 
-before_script:
-  - bash scripts/gogetcookie.sh
-  - make tools
-  - export GOFLAGS=-mod=vendor
-  - export GO111MODULE=on
-  - pwd
-  - go version
-  - echo $GOPATH
-
-Build-Image:
-  stage: build
+terraformv16:
   tags:
-    - docker-executor
+    - terraform
+  stage: Test
+  before_script:
+    - echo "build terraform binary"
+    - make fmt
+    - go build
+    - ls -lrt
+  allow_failure: true
   script:
-    - make build
-    - make website-lint
+    - echo "Running tests on bigip version 16"
+    - BIGIP_USER="$BIGIP_USERNAME_V16" BIGIP_PASSWORD="$BIGIP_PASSWORD_V16" BIGIP_HOST="$BIGIP_HOST_V16" TF_ACC=1 make testacc
 
-Test-Image:
-  stage: test
+terraformv15:
   tags:
-    - docker-executor
+    - terraform
+  stage: Test
+  before_script:  
+    - echo "Running tests on bigip version 15"
+    - ls -lrt
+  allow_failure: true
   script:
-    - make test
-    - make testacc
+    - BIGIP_USER="$BIGIP_USERNAME_V15" BIGIP_PASSWORD="$BIGIP_PASSWORD_V15" BIGIP_HOST="$BIGIP_HOST_V15" TF_ACC=1 make testacc
+
+terraformv14:
+  tags:
+    - terraform
+  stage: Test
+  before_script:
+    - echo "Running tests on bigip version 14"
+    - ls -lrt
+  script:  
+    - BIGIP_USER="$BIGIP_USERNAME_V14" BIGIP_PASSWORD="$BIGIP_PASSWORD_V14" BIGIP_HOST="$BIGIP_HOST_V14" TF_ACC=1 make testacc
+  
 
