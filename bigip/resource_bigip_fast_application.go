@@ -8,10 +8,14 @@ package bigip
 import (
 	"encoding/json"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"log"
+	"os"
 	"reflect"
+	"strings"
 )
 
 func resourceBigipFastApp() *schema.Resource {
@@ -35,29 +39,29 @@ func resourceBigipFastApp() *schema.Resource {
 					return fjson
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					old_resp := []byte(old)
-					new_resp := []byte(new)
-					old_jsonRef := make(map[string]interface{})
-					new_jsonRef := make(map[string]interface{})
-					json.Unmarshal(old_resp, &old_jsonRef)
-					json.Unmarshal(new_resp, &new_jsonRef)
-					json_equality_before := reflect.DeepEqual(old_jsonRef, new_jsonRef)
-					if json_equality_before == true {
+					oldResp := []byte(old)
+					newResp := []byte(new)
+					oldJsonref := make(map[string]interface{})
+					newJsonref := make(map[string]interface{})
+					_ = json.Unmarshal(oldResp, &oldJsonref)
+					_ = json.Unmarshal(newResp, &newJsonref)
+					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
+					if jsonEqualityBefore == true {
 						return true
 					}
 					iterate := make(map[string]interface{})
 
-					for k, v := range old_jsonRef {
+					for k, v := range oldJsonref {
 						iterate[k] = v
 					}
 					for k1 := range iterate {
-						_, ok := new_jsonRef[k1]
+						_, ok := newJsonref[k1]
 						if !ok {
-							delete(old_jsonRef, k1)
+							delete(oldJsonref, k1)
 						}
 					}
-					json_equality_after := reflect.DeepEqual(old_jsonRef, new_jsonRef)
-					if json_equality_after == true {
+					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
+					if jsonEqualityAfter == true {
 						return true
 					} else {
 						return false
@@ -98,6 +102,26 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 	_ = d.Set("application", app)
 	log.Printf("[DEBUG] ID for resource :%+v", app)
 	d.SetId(d.Get("application").(string))
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_fast_application", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 	return resourceBigipFastAppRead(d, meta)
 }
 func resourceBigipFastAppRead(d *schema.ResourceData, meta interface{}) error {

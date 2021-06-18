@@ -561,19 +561,19 @@ type VirtualServer struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`
 	} `json:"sourceAddressTranslation,omitempty"`
-	SourcePort          string    `json:"sourcePort,omitempty"`
-	SYNCookieStatus     string    `json:"synCookieStatus,omitempty"`
-	TranslateAddress    string    `json:"translateAddress,omitempty"`
-	TranslatePort       string    `json:"translatePort,omitempty"`
-	VlansEnabled        bool      `json:"vlansEnabled,omitempty"`
-	VSIndex             int       `json:"vsIndex,omitempty"`
-	Vlans               []string  `json:"vlans,omitempty"`
-	Rules               []string  `json:"rules,omitempty"`
-        SecurityLogProfiles []string  `json:"securityLogProfiles,omitempty"`
-        PerFlowRequestAccessPolicy string `json:"perFlowRequestAccessPolicy,omitempty"`
-	PersistenceProfiles []Profile `json:"persist"`
-	Profiles            []Profile `json:"profiles,omitempty"`
-	Policies            []string  `json:"policies"`
+	SourcePort                 string    `json:"sourcePort,omitempty"`
+	SYNCookieStatus            string    `json:"synCookieStatus,omitempty"`
+	TranslateAddress           string    `json:"translateAddress,omitempty"`
+	TranslatePort              string    `json:"translatePort,omitempty"`
+	VlansEnabled               bool      `json:"vlansEnabled,omitempty"`
+	VSIndex                    int       `json:"vsIndex,omitempty"`
+	Vlans                      []string  `json:"vlans,omitempty"`
+	Rules                      []string  `json:"rules,omitempty"`
+	SecurityLogProfiles        []string  `json:"securityLogProfiles,omitempty"`
+	PerFlowRequestAccessPolicy string    `json:"perFlowRequestAccessPolicy,omitempty"`
+	PersistenceProfiles        []Profile `json:"persist"`
+	Profiles                   []Profile `json:"profiles,omitempty"`
+	Policies                   []string  `json:"policies"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.
@@ -869,7 +869,7 @@ type PolicyRuleAction struct {
 	Select             bool   `json:"select,omitempty"`
 	ServerSsl          bool   `json:"serverSsl,omitempty"`
 	SetVariable        bool   `json:"setVariable,omitempty"`
-	Shutdown           bool   `json:"setVariable,omitempty"`
+	Shutdown           bool   `json:"shutdown,omitempty"`
 	Snat               string `json:"snat,omitempty"`
 	Snatpool           string `json:"snatpool,omitempty"`
 	SourceAddress      bool   `json:"sourceAddress,omitempty"`
@@ -1013,9 +1013,9 @@ type Monitors struct {
 
 // Monitor contains information about each individual monitor.
 type Monitor struct {
-	Name           string
-	Partition      string
-	DefaultsFrom   string
+	Name      string
+	Partition string
+	//DefaultsFrom   string
 	FullPath       string
 	Generation     int
 	ParentMonitor  string
@@ -1043,9 +1043,9 @@ type Monitor struct {
 }
 
 type monitorDTO struct {
-	Name           string `json:"name,omitempty"`
-	Partition      string `json:"partition,omitempty"`
-	DefaultsFrom   string `json:"defaultsFrom,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	//DefaultsFrom   string `json:"defaultsFrom,omitempty"`
 	FullPath       string `json:"fullPath,omitempty"`
 	Generation     int    `json:"generation,omitempty"`
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
@@ -2474,20 +2474,22 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-func (b *BigIP) CreateMonitor(name, parent, defaults_from string, interval, timeout int, send, receive, receive_disable, compatibility string, destination string) error {
-	config := &Monitor{
-		Name:           name,
-		ParentMonitor:  parent,
-		DefaultsFrom:   defaults_from,
-		Interval:       interval,
-		Timeout:        timeout,
-		SendString:     send,
-		ReceiveString:  receive,
-		ReceiveDisable: receive_disable,
-		Compatibility:  compatibility,
-		Destination:    destination,
-	}
-
+//func (b *BigIP) CreateMonitor(config *Monitor) error
+//This Function expects Monitor struct type as input,posts the config on to BIGIP to configure LTM Monitor Objects
+//Returns Nil If Post is Success,err in case Failure
+func (b *BigIP) CreateMonitor(config *Monitor) error {
+	//config := &Monitor{
+	//	Name:           name,
+	//	ParentMonitor:  parent,
+	//	DefaultsFrom:   defaults_from,
+	//	Interval:       interval,
+	//	Timeout:        timeout,
+	//	SendString:     send,
+	//	ReceiveString:  receive,
+	//	ReceiveDisable: receive_disable,
+	//	Compatibility:  compatibility,
+	//	Destination:    destination,
+	//}
 	return b.AddMonitor(config)
 }
 

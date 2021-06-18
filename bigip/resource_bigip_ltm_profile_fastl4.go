@@ -28,6 +28,7 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 				Description:  "Name of the Fastl4 Profile",
 			},

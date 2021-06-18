@@ -4,8 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -58,6 +61,26 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error in Importing certificate (%s): %s", name, err)
 	}
 	d.SetId(name)
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ssl_certificate", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 	return resourceBigipSslCertificateRead(d, meta)
 }
 
