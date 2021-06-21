@@ -1,15 +1,27 @@
 stages:
-  - Test
+  - build
+  - test_v16
+  - test_v15
+  - test_v14
+  
 
-terraformv16:
+terraformbuild:
   tags:
     - terraform
-  stage: Test
-  before_script:
+  stage: build
+  script:  
     - echo "build terraform binary"
     - make fmt
     - go build
     - ls -lrt
+
+terraformv16:
+  tags:
+    - terraform
+  stage: test_v16
+  before_script:
+    - ls -lrt
+    -  env
   allow_failure: true
   script:
     - echo "Running tests on bigip version 16"
@@ -18,22 +30,23 @@ terraformv16:
 terraformv15:
   tags:
     - terraform
-  stage: Test
+  stage: test_v15
   before_script:  
-    - echo "Running tests on bigip version 15"
     - ls -lrt
+    - env
   allow_failure: true
   script:
+    - echo "Running tests on bigip version 15"
     - BIGIP_USER="$BIGIP_USERNAME_V15" BIGIP_PASSWORD="$BIGIP_PASSWORD_V15" BIGIP_HOST="$BIGIP_HOST_V15" TF_ACC=1 make testacc
 
 terraformv14:
   tags:
     - terraform
-  stage: Test
+  stage: test_v14
   before_script:
-    - echo "Running tests on bigip version 14"
     - ls -lrt
   script:  
+    - echo "Running tests on bigip version 14"
     - BIGIP_USER="$BIGIP_USERNAME_V14" BIGIP_PASSWORD="$BIGIP_PASSWORD_V14" BIGIP_HOST="$BIGIP_HOST_V14" TF_ACC=1 make testacc
   
 
