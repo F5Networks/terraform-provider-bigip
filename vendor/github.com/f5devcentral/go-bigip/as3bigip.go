@@ -427,13 +427,13 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	//log.Printf("[DEBUG] Terraform version:%+v", userAgent)
 	res1 := strings.Split(as3ver.Version, ".")
 	for key, value := range jsonRef {
-	    if key == "declaration" {
-		if rec, ok := value.(map[string]interface{}); ok {
-			if intConvert(res1[0]) > 3 || intConvert(res1[1]) >= 18 {
-				rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": b.UserAgent}
+		if key == "declaration" {
+			if rec, ok := value.(map[string]interface{}); ok {
+				if intConvert(res1[0]) > 3 || intConvert(res1[1]) >= 18 {
+					rec["controls"] = map[string]interface{}{"class": "Controls", "userAgent": b.UserAgent}
+				}
 			}
 		}
-            }
 	}
 	jsonData, err := json.Marshal(jsonRef)
 	if err != nil {
