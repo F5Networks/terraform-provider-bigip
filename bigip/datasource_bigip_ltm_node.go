@@ -7,10 +7,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func dataSourceBigipLtmNode() *schema.Resource {
@@ -66,6 +67,11 @@ func dataSourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The current state of the node.",
+			},
+			"session": {
+				Type:        schema.TypeString,
+				Description: "Enables or disables the node for new sessions.",
+				Computed:    true,
 			},
 			"fqdn": {
 				Type:     schema.TypeList,
@@ -146,6 +152,7 @@ func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error 
 	_ = d.Set("rate_limit", node.RateLimit)
 	_ = d.Set("ratio", node.Ratio)
 	_ = d.Set("state", node.State)
+	_ = d.Set("session", node.Session)
 
 	var fqdn []map[string]interface{}
 

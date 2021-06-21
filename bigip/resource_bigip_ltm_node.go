@@ -82,6 +82,12 @@ func resourceBigipLtmNode() *schema.Resource {
 				Optional:    true,
 				Description: "Marks the node up or down. The default value is user-up.",
 			},
+			"session": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enables or disables the node for new sessions. The default value is user-enabled.",
+				Computed:    true,
+			},
 			"fqdn": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -133,49 +139,42 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	dynamic_ratio := d.Get("dynamic_ratio").(int)
 	monitor := d.Get("monitor").(string)
 	state := d.Get("state").(string)
+	session := d.Get("session").(string)
 	description := d.Get("description").(string)
 	ratio := d.Get("ratio").(int)
 
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
-	var err error
+
+	nodeConfig := &bigip.Node{
+		Name:            name,
+		RateLimit:       rate_limit,
+		ConnectionLimit: connection_limit,
+		DynamicRatio:    dynamic_ratio,
+		Monitor:         monitor,
+		State:           state,
+		Session:         session,
+		Description:     description,
+		Ratio:           ratio,
+	}
+
 	if r.MatchString(address) {
-		err = client.CreateNode(
-			name,
-			address,
-			rate_limit,
-			connection_limit,
-			dynamic_ratio,
-			monitor,
-			state,
-			description,
-			ratio,
-		)
+		nodeConfig.Address = address
 	} else {
 		interval := d.Get("fqdn.0.interval").(string)
 		address_family := d.Get("fqdn.0.address_family").(string)
 		autopopulate := d.Get("fqdn.0.autopopulate").(string)
 		downinterval := d.Get("fqdn.0.downinterval").(int)
 
-		err = client.CreateFQDNNode(
-			name,
-			address,
-			rate_limit,
-			connection_limit,
-			dynamic_ratio,
-			monitor,
-			state,
-			description,
-			ratio,
-			interval,
-			address_family,
-			autopopulate,
-			downinterval,
-		)
+		nodeConfig.FQDN.Name = address
+		nodeConfig.FQDN.Interval = interval
+		nodeConfig.FQDN.AddressFamily = address_family
+		nodeConfig.FQDN.AutoPopulate = autopopulate
+		nodeConfig.FQDN.DownInterval = downinterval
 	}
 
-	if err != nil {
+	if err := client.AddNode(nodeConfig); err != nil {
 		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
 
@@ -224,6 +223,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//d.Set("state", node.State)
+	d.Set("session", node.Session)
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
@@ -262,34 +262,25 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	address := d.Get("address").(string)
 	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
-	var node *bigip.Node
-	if r.MatchString(address) {
-		node = &bigip.Node{
-			Address:         address,
-			ConnectionLimit: d.Get("connection_limit").(int),
-			DynamicRatio:    d.Get("dynamic_ratio").(int),
-			Monitor:         d.Get("monitor").(string),
-			RateLimit:       d.Get("rate_limit").(string),
-			State:           d.Get("state").(string),
-			Description:     d.Get("description").(string),
-			Ratio:           d.Get("ratio").(int),
-		}
-	} else {
-		node = &bigip.Node{
-			ConnectionLimit: d.Get("connection_limit").(int),
-			DynamicRatio:    d.Get("dynamic_ratio").(int),
-			Monitor:         d.Get("monitor").(string),
-			RateLimit:       d.Get("rate_limit").(string),
-			State:           d.Get("state").(string),
-			Description:     d.Get("description").(string),
-			Ratio:           d.Get("ratio").(int),
-		}
+	nodeConfig := &bigip.Node{
+		ConnectionLimit: d.Get("connection_limit").(int),
+		DynamicRatio:    d.Get("dynamic_ratio").(int),
+		Monitor:         d.Get("monitor").(string),
+		RateLimit:       d.Get("rate_limit").(string),
+		State:           d.Get("state").(string),
+		Session:         d.Get("session").(string),
+		Description:     d.Get("description").(string),
+		Ratio:           d.Get("ratio").(int),
 	}
 
-	err := client.ModifyNode(name, node)
-	if err != nil {
+	if r.MatchString(address) {
+		nodeConfig.Address = address
+	}
+
+	if err := client.ModifyNode(name, nodeConfig); err != nil {
 		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
+
 	return resourceBigipLtmNodeRead(d, meta)
 }
 
