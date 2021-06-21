@@ -78,6 +78,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "monitor", "/Common/icmp"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "state", "user-up"),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "session", "user-enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "ratio", "91"),
 				),
 			},
