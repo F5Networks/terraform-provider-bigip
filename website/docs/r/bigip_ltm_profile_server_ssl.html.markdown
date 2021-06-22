@@ -69,3 +69,37 @@ There can be only one SSL profile with this setting enabled.
 * `ssl_forward_proxy` - (Optional) Specifies whether SSL forward proxy feature is enabled or not. The default value is disabled.
 
 * `ssl_forward_proxy_bypass` - (Optional) Specifies whether SSL forward proxy bypass feature is enabled or not. The default value is disabled. 
+
+* `ssl_c3d` (Optional) Enables or disables SSL forward proxy bypass on receiving
+ handshake_failure, protocol_version or unsupported_extension alert message during the serverside SSL handshake. When enabled and there is an SSL handshake_failure, protocol_version or unsupported_extension alert during the serverside SSL handshake, SSL traffic bypasses the BIG-IP system untouched, without decryption/encryption. The default value is disabled. Conversely, you can specify enabled to use this feature.
+
+* `c3d_ca_cert` (Optional) Specifies the name of the certificate file that is used as the certification authority certificate when SSL client certificate constrained delegation is enabled. The certificate should be generated and installed by you on the system. When selecting this option, type a certificate file name.
+
+* `c3d_ca_key` (Optional) Specifies the name of the key file that is used as the certification authority key when SSL client certificate constrained delegation is enabled. The key should be generated and installed by you on the system. When selecting this option, type a key file name.
+
+* `c3d-ca-passphrase` (Optional) Specifies the passphrase of the key file that is used as the certification authority key when SSL client certificate constrained delegation is enabled. When selecting this option, type the passphrase corresponding to the selected c3d-ca-key.
+
+* `c3d-cert-extension-custom-oids` (Optional) Specifies the custom extension OID of the client certificates to be included in the generated certificates using SSL client certificate constrained delegation.
+
+* `c3d_cert_extension_includes` (Optional) Specifies the extensions of the client certificates to be included in the generated certificates using SSL client certificate constrained delegation. For example, { basic-constraints }. The default value is { basic-constraints extended-key-usage key-usage subject-alternative-name }. The extensions are:
+
+	    basic-constraints
+		  Basic constraints are used to indicate whether the certificate belongs
+      to a CA.
+
+	    extended-key-usage
+		  Extended Key Usage is used, typically on a leaf certificate, to 
+      indicate the purpose of the public key contained in the certificate.
+
+	    key-usage
+		  Key Usage provides a bitmap specifying the cryptographic operations 
+      which may be performed using the public key contained in the 
+      certificate; for example, it could indicate that the key should be 
+      used for signature but not for encipherment.
+
+	    subject-alternative-name
+		  Subject Alternative Name allows identities to be bound to the subject
+      of the certificate. These identities may be included in addition to 
+      or in place of the identity in the subject field of the certificate.
+
+* `c3d-cert-lifespan` Specifies the lifespan of the certificate generated using the SSL client certificate constrained delegation. The default value is 24.
