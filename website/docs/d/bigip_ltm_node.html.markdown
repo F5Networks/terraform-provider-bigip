@@ -9,8 +9,8 @@ description: |-
 # bigip\_ltm\_node
 
 Use this data source (`bigip_ltm_node`) to get the ltm node details available on BIG-IP
- 
- 
+
+
 ## Example Usage
 ```hcl
 
@@ -32,7 +32,7 @@ output "bigip_node" {
   value = "${data.bigip_ltm_node.test.fqdn[0].address_family}"
 }
 
-```      
+```
 
 ## Argument Reference
 
@@ -44,12 +44,14 @@ output "bigip_node" {
 
 Additionally, the following attributes are exported:
 * `address` - The address of the node.
-  
+
 * `description` - User defined description of the node.
 
 * `connection_limit` - Node connection limit.
 
 * `dynamic_ratio` - The dynamic ratio number for the node.
+
+* `full_path` - Full path of the node (partition and name)
 
 * `monitor` - Specifies the health monitors the system currently uses to monitor this node.
 
