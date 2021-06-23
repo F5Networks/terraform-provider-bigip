@@ -169,6 +169,10 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
 	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
+		log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
+		if !contains(tenantCount, tenantFilter) {
+			return fmt.Errorf("tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
+		}
 		tenantList = tenantFilter
 	}
 	_ = d.Set("tenant_list", tenantList)
@@ -253,7 +257,11 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 	applicationList := d.Get("application_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter != "" {
-		name = tenantFilter
+		if !contains(strings.Split(name, ","), tenantFilter) {
+			log.Printf("[WARNING]tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
+		} else {
+			name = tenantFilter
+		}
 	}
 	as3Resp, err := client.GetAs3(name, applicationList)
 	if err != nil {
@@ -299,7 +307,11 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			}
 		}
 	} else {
-		tenantList = tenantFilter
+		if !contains(strings.Split(tenantList, ","), tenantFilter) {
+			log.Printf("[WARNING]tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
+		} else {
+			tenantList = tenantFilter
+		}
 	}
 	strTrimSpace, err := client.AddTeemAgent(as3Json)
 	if err != nil {
@@ -342,4 +354,13 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	//m.Unlock()
 	d.SetId("")
 	return nil
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
