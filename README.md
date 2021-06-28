@@ -15,11 +15,7 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 # Requirements
-<<<<<<< HEAD
--	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x / 0.13.x
-=======
 -	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x /0.13.x
->>>>>>> master
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
 # F5 BigIP LTM requirements
@@ -28,13 +24,13 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 These BIG-IP versions are supported in these Terraform versions.
 
-| BIG-IP version	| Terraform 0.13 | Terraform 0.12 |	Terraform 0.11 |
-|-------------------|----------------|----------------|----------------|
-| BIG-IP 16.x	    |       X        | 	    X         |       X        |
-| BIG-IP 15.x	    |       X        | 	    X         |       X        |
-| BIG-IP 14.x	    |       X        | 	    X         |       X        |
-| BIG-IP 13.x	    | 	    X        |      X         |       X        |
-| BIG-IP 12.x	    | 	    X        |      X         |       X        |
+| BIG-IP version    | Terraform 0.14 | Terraform 0.13 | Terraform 0.12 | Terraform 0.11 |
+|-------------------|----------------|----------------|----------------|----------------|
+| BIG-IP 16.x       |       X        |       X        |      X         |       X        |
+| BIG-IP 15.x       |       X        |       X        |      X         |       X        |
+| BIG-IP 14.x       |       X        |       X        |      X         |       X        |
+| BIG-IP 13.x       |       X        |       X        |      X         |       X        |
+| BIG-IP 12.x       |       X        |       X        |      X         |       X        |
 
 
 # Documentation
