@@ -16,7 +16,7 @@ Prerequisites
 
    This module is supported on Terraform version 0.13 and newer.
 
-The templates below are tested on Terraform v0.13.0
+The templates below are tested on Terraform v0.13.0 and v0.14.0:
 
 - provider registry.terraform.io/hashicorp/aws v3.8.0
 - provider registry.terraform.io/hashicorp/random v2.3.0
@@ -25,15 +25,15 @@ The templates below are tested on Terraform v0.13.0
 
 |
 
-+-------------------------+----------------------+
-| BIG-IP version          | Terraform v0.13      |
-+=========================+======================+
-| BIG-IP 15.x             | X                    | 
-+-------------------------+----------------------+
-| BIG-IP 14.x             | X                    |
-+-------------------------+----------------------+
-| BIG-IP 13.x             | X                    |
-+-------------------------+----------------------+
++-------------------------+----------------------+----------------------+
+| BIG-IP version          | Terraform v0.13      | Terraform v0.14      |
++=========================+======================+======================+
+| BIG-IP 15.x             | X                    | X                    |
++-------------------------+----------------------+----------------------+
+| BIG-IP 14.x             | X                    | X                    |
++-------------------------+----------------------+----------------------+
+| BIG-IP 13.x             | X                    | X                    |
++-------------------------+----------------------+----------------------+
 
 Password Management
 ```````````````````
@@ -406,7 +406,7 @@ Prerequisites
 
    This module is supported on Terraform version 0.13 and newer.
 
-The templates below are tested on Terraform v0.13.0:
+The templates below are tested on Terraform v0.13.0 and v0.14.0:
 
 - provider registry.terraform.io/hashicorp/azurerm v2.28.0
 - provider registry.terraform.io/hashicorp/null v2.1.2
@@ -416,15 +416,15 @@ The templates below are tested on Terraform v0.13.0:
 
 |
 
-+-------------------------+----------------------+
-| BIG-IP version          | Terraform v0.13      |
-+=========================+======================+
-| BIG-IP 15.x             | X                    | 
-+-------------------------+----------------------+
-| BIG-IP 14.x             | X                    |
-+-------------------------+----------------------+
-| BIG-IP 13.x             | X                    |
-+-------------------------+----------------------+
++-------------------------+----------------------+----------------------+
+| BIG-IP version          | Terraform v0.13      | Terraform v0.14      |
++=========================+======================+======================+
+| BIG-IP 15.x             | X                    | X                    | 
++-------------------------+----------------------+----------------------+
+| BIG-IP 14.x             | X                    | X                    |
++-------------------------+----------------------+----------------------+
+| BIG-IP 13.x             | X                    | X                    |
++-------------------------+----------------------+----------------------+
 
 Password Management
 ```````````````````
