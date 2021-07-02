@@ -28,6 +28,11 @@ func dataSourceBigipLtmNode() *schema.Resource {
 				Required:    true,
 				Description: "Partition of resource group",
 			},
+			"full_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Full path of the node (partition and name)",
+			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -146,6 +151,7 @@ func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error 
 
 	_ = d.Set("name", node.Name)
 	_ = d.Set("partition", node.Partition)
+	_ = d.Set("full_path", node.FullPath)
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)
 	_ = d.Set("monitor", node.Monitor)
