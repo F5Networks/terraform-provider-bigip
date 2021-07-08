@@ -135,7 +135,7 @@ You can use dynamic or static private IP allocation. If the primary or secondary
 
 |
 
-Required and Optional Input Variables 
+Required and Optional Input Variables
 `````````````````````````````````````
 Required variables must be set in the module block when using this module. Optional variables have default values and do not need to be set to use this module. You may set these variables to override their default values.
 
