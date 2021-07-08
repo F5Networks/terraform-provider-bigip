@@ -16,7 +16,7 @@ User Guide Index
    /userguide/overview
    /userguide/installing
    /userguide/configuring
-   /userguide/big-ip-modules
+   /userguide/bigip-modules
    /userguide/as3-integration
    /userguide/do-integration
    /userguide/bigiq-licensing
