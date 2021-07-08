@@ -75,6 +75,7 @@ func testCheckIRuleExists(name string) resource.TestCheckFunc {
 			return fmt.Errorf("Error while fetching irule: %v", err)
 
 		}
+
 		body := s.RootModule().Resources["bigip_ltm_irule.test-rule"].Primary.Attributes["irule"]
 		if irule.Rule != body {
 			return fmt.Errorf("IRule body does not match. Expecting %s got %s.", body, irule.Rule)
