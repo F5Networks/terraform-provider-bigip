@@ -1154,6 +1154,50 @@ type Tcp struct {
 	FastOpen          string
 }
 
+
+type Ftp struct {
+        Name              string
+	AllowFtps	  string
+        AppService        string
+        DefaultsFrom      string
+        Description       string
+	InheritParentProfile  string
+        InheritVlanList	  string
+	LogProfile	  string
+	LogPublisher      string
+	TmPartition  	  string
+	Port		  int
+	Security 	  string
+        FtpsMode          string
+        EnforceTlsSesionReuse  string
+        AllowActiveMode   string
+        TranslateExtended string
+}     
+
+type Ftps struct {
+        Ftps []Ftp `json:"items"`
+}
+
+type ftpDTO struct {
+        Name              string  `json:"name,omitempty"`
+        AllowFtps         string  `json:"allowFtps,omitempty"`
+        AppService        string  `json:"appService,omitempty"`
+        DefaultsFrom      string  `json:"defaultsFrom,omitempty"`
+        Description       string  `json:"description,omitempty"`
+        InheritParentProfile  string  `json:"inheritParentProfile,omitempty"`
+        InheritVlanList   string   `json:"inheritVlanList,omitempty"`
+        LogProfile        string   `json:"logProfile,omitempty"`
+        LogPublisher      string   `json:"logPublisher,omitempty"`
+        TmPartition       string   `json:"tmPartition,omitempty"`
+        Port              int      `json:"port,omitempty"`
+        Security          string   `json:"security,omitempty"`
+        FtpsMode          string   `json:"ftpsMode,omitempty"`
+        EnforceTlsSesionReuse  string   `json:"enforceTlsSessionReuse,omitempty"`
+        AllowActiveMode   string   `json:"allowActiveMode,omitempty"` 
+        TranslateExtended string   `json:"translateExtended,omitempty"`
+}
+
+
 type fasthttpDTO struct {
 	Name                        string `json:"name,omitempty"`
 	DefaultsFrom                string `json:"defaultsFrom,omitempty"`
@@ -1383,6 +1427,21 @@ func (p *Tcp) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	return marshal(p, &dto)
+}
+
+func (p *Ftp) MarshalJSON() ([]byte, error) {
+        var dto ftpDTO
+        marshal(&dto, p)
+        return json.Marshal(dto)
+}
+
+func (p *Ftp) UnmarshalJSON(b []byte) error {
+        var dto ftpDTO
+        err := json.Unmarshal(b, &dto)
+        if err != nil {
+                return err
+        }
+        return marshal(p, &dto)
 }
 
 func (p *Fasthttp) MarshalJSON() ([]byte, error) {
@@ -1785,6 +1844,7 @@ const (
 	CONTEXT_CLIENT    = "clientside"
 	CONTEXT_ALL       = "all"
 	uriTcp            = "tcp"
+        uriFtp            = "ftp"
 	uriFasthttp       = "fasthttp"
 	uriFastl4         = "fastl4"
 	uriHttpcompress   = "http-compression"
@@ -2790,6 +2850,37 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 	}
 
 	return &tcp, nil
+}
+
+
+// Create FTP profile 
+
+func (b *BigIP) CreateFtp(ftp *Ftp) error {
+        return b.post(ftp, uriLtm, uriProfile, uriFtp)
+}
+
+// DeleteFtp removes an Ftp profile from the system.
+func (b *BigIP) DeleteFtp(name string) error {
+        return b.delete(uriLtm, uriProfile, uriFtp, name)
+}
+
+// ModifyFtp updates the given Ftp profile with any changed values.
+func (b *BigIP) ModifyFtp(name string, ftp *Ftp) error {
+        ftp.Name = name
+        return b.patch(ftp, uriLtm, uriProfile, uriFtp, name)
+}
+
+func (b *BigIP) GetFtp(name string) (*Ftp, error) {
+        var ftp Ftp
+        err, ok := b.getForEntity(&ftp, uriLtm, uriProfile, uriFtp, name)
+        if err != nil {
+                return nil, err
+        }
+        if !ok {
+                return nil, nil
+        }
+
+        return &ftp, nil
 }
 
 func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
