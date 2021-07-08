@@ -12,7 +12,7 @@ Prerequisites
 
 .. seealso::
 
-   Getting Started with the Google Provider <https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started>`_
+   `Getting Started with the Google Provider <https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started>`_
 
 The templates below are tested on Terraform v0.14.0:
 
@@ -43,7 +43,7 @@ Example Usage
 
    `Common deployment examples <https://github.com/f5devcentral/terraform-gcp-bigip-module/tree/main/examples>`_.
 
-You can use dynamic or static private IP allocation. If the primary or secondary private IP value is null, it will default to dynamic IP allocation. With static private IP allocation, you can assign primary and secondary private IPs for external interfaces. If you are using static private IP allocation, you cannot use module count because the same private IPs will be allocateD for multiple BIG-IP instances based on module count. If you are using dynamic private IP allocation, you must pass a null value to primary/secondary private IP declaration and module count will be supported.
+You can use dynamic or static private IP allocation. If the primary or secondary private IP value is null, it will default to dynamic IP allocation. With static private IP allocation, you can assign primary and secondary private IPs for external interfaces. If you are using static private IP allocation, you cannot use module count because the same private IPs will be allocated for multiple BIG-IP instances based on module count. If you are using dynamic private IP allocation, you must pass a null value to primary/secondary private IP declaration and module count will be supported.
 
 .. code-block:: javascript
    :caption: Example Deployment with Dynamic Private IP Allocation
@@ -268,24 +268,24 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                             |                                         |
 |                             |         |          |                             |                                         |
 +-----------------------------+---------+----------+-----------------------------+-----------------------------------------+
-| mgmt_subnet_ids             | List of | Optional | ``[{ "subnet_id" = null,``  | The list of maps of subnet IDs of the   |
-|                             | Maps    |          | ``"public_ip" = null,``     | virtual network where the virtual       |
-|                             |         |          | ``"private_ip_primary" =``  | machines will reside.                   |
-|                             |         |          | `` "" }]``                  |                                         |
+| mgmt_subnet_ids             | List of | Optional | [{ "subnet_id" = null,      | The list of maps of subnet IDs of the   |
+|                             | Maps    |          | "public_ip" = null,"private | virtual network where the virtual       |
+|                             |         |          | _ip_primary" = "" }]        | machines will reside.                   |
+|                             |         |          |                             |                                         |
+|                             |         |          |                             |                                         |
+|                             |         |          |                             |                                         |
++-----------------------------+---------+----------+-----------------------------+-----------------------------------------+
+| external_subnet_ids         | List of | Optional | [{ "subnet_id" = null,      | The list of maps of subnet IDs of the   |
+|                             | Maps    |          | "public_ip" = null,"private | virtual network where the virtual       |
+|                             |         |          | _ip_primary" = "", "private | machines will reside.                   |
+|                             |         |          | _ip_secondary" = "" }]      |                                         |
 |                             |         |          |                             |                                         |
 |                             |         |          |                             |                                         |
 +-----------------------------+---------+----------+-----------------------------+-----------------------------------------+
-| external_subnet_ids         | List of | Optional | ``[{ "subnet_id" = null,``  | The list of maps of subnet IDs of the   |
-|                             | Maps    |          | `` "public_ip" = null,``    | virtual network where the virtual       |
-|                             |         |          | ``"private_ip_primary" = `` | machines will reside.                   |
-|                             |         |          | ``"", "private_ip_``        |                                         |
-|                             |         |          | ``secondary" = "" }] ``     |                                         |
+| internal_subnet_ids         | List of | Optional | [{ "subnet_id" = null,      | The list of maps of subnet IDs of the   |
+|                             | Maps    |          | "public_ip" = null,"private | virtual network where the virtual       |
+|                             |         |          | _ip_primary" = "" }]        | machines will reside.                   |
 |                             |         |          |                             |                                         |
-+-----------------------------+---------+----------+-----------------------------+-----------------------------------------+
-| internal_subnet_ids         | List of | Optional | ``[{ "subnet_id" = null,``  | The list of maps of subnet IDs of the   |
-|                             | Maps    |          | ``"public_ip" = null,"``    | virtual network where the virtual       |
-|                             |         |          | ``private_ip_primary" =``   | machines will reside.                   |
-|                             |         |          | ``"" }]``                   |                                         |
 |                             |         |          |                             |                                         |
 |                             |         |          |                             |                                         |
 +-----------------------------+---------+----------+-----------------------------+-----------------------------------------+
