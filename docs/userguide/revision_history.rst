@@ -14,12 +14,12 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Description
         - Date
 
-      * - 1.5.1
-        - Updated the documentation with the following changes: |br| • Updating version tables.
-        - 07-02-21   
+      * - 1.6
+        - Updated the documentation with the following changes: |br| • Updated version charts. |br| • Added section :ref:`bigip-modules-gcp`. 
+        - 07-07-21   
 
       * - 1.5  
-        - Updated the documentation with the following changes: |br| • Added new section: :ref:`big-ip-modules`
+        - Updated the documentation with the following changes: |br| • Added new section: :ref:`bigip-modules`
         - 01-20-21   
 
       * - 1.4  
