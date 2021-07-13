@@ -42,6 +42,12 @@ func resourceBigipSslKey() *schema.Resource {
 				Description:  "Partition of ssl certificate key",
 				ValidateFunc: validatePartitionName,
 			},
+			"full_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Full Path Name of ssl key",
+			},
 		},
 	}
 }
@@ -57,7 +63,7 @@ func resourceBigipSslKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	}*/
 	err := client.UploadKey(name, certpath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate key (%s): %s", name, err)
+		return fmt.Errorf("Error in Importing certificate key (%s): %s ", name, err)
 	}
 
 	d.SetId(name)
@@ -84,8 +90,9 @@ func resourceBigipSslKeyRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	certkey, err := client.GetKey(name)
 	log.Printf("[INFO] SSL key content:%+v", certkey)
-	d.Set("name", certkey.Name)
-	d.Set("partition", certkey.Partition)
+	_ = d.Set("name", certkey.Name)
+	_ = d.Set("partition", certkey.Partition)
+	_ = d.Set("full_path", certkey.FullPath)
 	if err != nil {
 		return err
 	}

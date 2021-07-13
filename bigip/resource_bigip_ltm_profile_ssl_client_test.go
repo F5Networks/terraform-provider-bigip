@@ -106,7 +106,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "authenticate"),
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "authenticate"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
@@ -137,31 +137,25 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "9"),
-					//resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
 			},
 			{
-				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "authenticate_depth"),
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "authenticate_depth"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
-					//resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
 			},
 			{
-				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "cache_size"),
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cache_size"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
 					resource.TestCheckResourceAttr(resFullName, "cache_size", "262100"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -199,7 +193,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBigipLtmProfileClientSsl_UpdateParam(instName, "tm_options"),
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "tm_options"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
@@ -293,6 +287,135 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 	})
 }
 
+//
+//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+//
+func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateCachetimeout"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cache_timeout"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "cache_timeout", "2400"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileClientSsl_UpdateCertlifespan(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateCertlifespan"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cert_life_span"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "cert_life_span", "40"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "handshake_timeout"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "cert_life_span", "40"),
+					resource.TestCheckResourceAttr(resFullName, "handshake_timeout", "40"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateCipher"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "ciphers"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "ciphers", "AES"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "ciphers", "AES"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 	var instName = "test-ClientSsl"
 	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
@@ -326,10 +449,10 @@ func testCheckClientSslExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("ClientSsl Profile %s was not created.", name)
+			return fmt.Errorf("ClientSsl Profile %s was not created ", name)
 		}
 		if !exists && p == nil {
-			return fmt.Errorf("ClientSsl Profile %s still exists.", name)
+			return fmt.Errorf("ClientSsl Profile %s still exists ", name)
 		}
 		return nil
 	}
@@ -349,7 +472,7 @@ func testCheckClientSslDestroyed(s *terraform.State) error {
 			return err
 		}
 		if ClientSsl != nil {
-			return fmt.Errorf("ClientSsl Profile %s not destroyed.", name)
+			return fmt.Errorf("ClientSsl Profile %s not destroyed. ", name)
 		}
 	}
 	return nil
@@ -398,17 +521,7 @@ func testaccbigipltmprofileclientsslCerkeychainissue449(instName string) string 
 		}`, resName, instName)
 }
 
-//func testAccBigipLtmProfileClientSsl_UpdateAuthenticate(instName string) string {
-//	return fmt.Sprintf(`
-//		resource "%[1]s" "%[2]s" {
-//			  name = "/Common/%[2]s"
-//			  defaults_from = "/Common/clientssl"
-//			  authenticate = "always"
-//			  //ciphers = "DEFAULT"
-//		}`, resName, instName)
-//}
-
-func testAccBigipLtmProfileClientSsl_UpdateParam(instName, updateParam string) string {
+func testaccbigipltmprofileclientsslUpdateparam(instName, updateParam string) string {
 	resPrefix := fmt.Sprintf(`
 		resource "%[1]s" "%[2]s" {
 			  name = "/Common/%[2]s"
@@ -426,6 +539,19 @@ func testAccBigipLtmProfileClientSsl_UpdateParam(instName, updateParam string) s
 	case "cache_size":
 		resPrefix = fmt.Sprintf(`%s
 			  cache_size = 262100`, resPrefix)
+	case "cache_timeout":
+		resPrefix = fmt.Sprintf(`%s
+			  cache_timeout = 2400`, resPrefix)
+	case "cert_life_span":
+		resPrefix = fmt.Sprintf(`%s
+			  cert_life_span = 40`, resPrefix)
+	case "handshake_timeout":
+		resPrefix = fmt.Sprintf(`%s
+			  handshake_timeout = 40`, resPrefix)
+	case "ciphers":
+		resPrefix = fmt.Sprintf(`%s
+			  ciphers = "AES"`, resPrefix)
+	default:
 	}
 	return fmt.Sprintf(`%s
 		}`, resPrefix)

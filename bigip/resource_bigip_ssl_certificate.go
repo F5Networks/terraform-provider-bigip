@@ -45,6 +45,12 @@ func resourceBigipSslCertificate() *schema.Resource {
 				Description:  "Partition of ssl certificate",
 				ValidateFunc: validatePartitionName,
 			},
+			"full_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Full Path Name of ssl certificate",
+			},
 		},
 	}
 }
@@ -58,7 +64,7 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 	partition := d.Get("partition").(string)
 	err := client.UploadCertificate(name, certPath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s", name, err)
+		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -103,8 +109,9 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 
 	certificate, err := client.GetCertificate(name)
 	log.Printf("[INFO] Certificate content:%+v", certificate)
-	d.Set("name", certificate.Name)
-	d.Set("partition", certificate.Partition)
+	_ = d.Set("name", certificate.Name)
+	_ = d.Set("partition", certificate.Partition)
+	_ = d.Set("full_path", certificate.FullPath)
 	if err != nil {
 		return err
 	}
@@ -152,7 +159,7 @@ func resourceBigipSslCertificateUpdate(d *schema.ResourceData, meta interface{})
 	}*/
 	err := client.UpdateCertificate(name, certpath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s", name, err)
+		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
 	}
 
 	return resourceBigipSslCertificateRead(d, meta)
