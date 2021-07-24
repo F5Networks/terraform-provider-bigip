@@ -1683,33 +1683,33 @@ type HttpProfiles struct {
 }
 
 type HttpProfile struct {
-	AcceptXff                 string   `json:"acceptXff,omitempty"`
-	AppService                string   `json:"appService,omitempty"`
-	BasicAuthRealm            string   `json:"basicAuthRealm,omitempty"`
-	DefaultsFrom              string   `json:"defaultsFrom,omitempty"`
-	Description               string   `json:"description,omitempty"`
-	EncryptCookieSecret       string   `json:"encryptCookieSecret,omitempty"`
-	EncryptCookies            []string `json:"encryptCookies,omitempty"`
-	FallbackHost              string   `json:"fallbackHost,omitempty"`
-	FallbackStatusCodes       []string `json:"fallbackStatusCodes,omitempty"`
-	HeaderErase               string   `json:"headerErase,omitempty"`
-	HeaderInsert              string   `json:"headerInsert,omitempty"`
-	InsertXforwardedFor       string   `json:"insertXforwardedFor,omitempty"`
-	LwsSeparator              string   `json:"lwsSeparator,omitempty"`
-	LwsWidth                  int      `json:"lwsWidth,omitempty"`
-	Name                      string   `json:"name,omitempty"`
-	OneconnectTransformations string   `json:"oneconnectTransformations,omitempty"`
-	TmPartition               string   `json:"tmPartition,omitempty"`
-	ProxyType                 string   `json:"proxyType,omitempty"`
-	RedirectRewrite           string   `json:"redirectRewrite,omitempty"`
-	RequestChunking           string   `json:"requestChunking,omitempty"`
-	ResponseChunking          string   `json:"responseChunking,omitempty"`
-	ResponseHeadersPermitted  []string `json:"responseHeadersPermitted,omitempty"`
-	ServerAgentName           string   `json:"serverAgentName,omitempty"`
-	ViaHostName               string   `json:"viaHostName,omitempty"`
-	ViaRequest                string   `json:"viaRequest,omitempty"`
-	ViaResponse               string   `json:"viaResponse,omitempty"`
-	XffAlternativeNames       []string `json:"xffAlternativeNames,omitempty"`
+	AcceptXff                 string        `json:"acceptXff,omitempty"`
+	AppService                string        `json:"appService,omitempty"`
+	BasicAuthRealm            string        `json:"basicAuthRealm,omitempty"`
+	DefaultsFrom              string        `json:"defaultsFrom,omitempty"`
+	Description               string        `json:"description,omitempty"`
+	EncryptCookieSecret       string        `json:"encryptCookieSecret,omitempty"`
+	EncryptCookies            []string      `json:"encryptCookies,omitempty"`
+	FallbackHost              string        `json:"fallbackHost,omitempty"`
+	FallbackStatusCodes       []string      `json:"fallbackStatusCodes,omitempty"`
+	HeaderErase               string        `json:"headerErase,omitempty"`
+	HeaderInsert              string        `json:"headerInsert,omitempty"`
+	InsertXforwardedFor       string        `json:"insertXforwardedFor,omitempty"`
+	LwsSeparator              string        `json:"lwsSeparator,omitempty"`
+	LwsWidth                  int           `json:"lwsWidth,omitempty"`
+	Name                      string        `json:"name,omitempty"`
+	OneconnectTransformations string        `json:"oneconnectTransformations,omitempty"`
+	TmPartition               string        `json:"tmPartition,omitempty"`
+	ProxyType                 string        `json:"proxyType,omitempty"`
+	RedirectRewrite           string        `json:"redirectRewrite,omitempty"`
+	RequestChunking           string        `json:"requestChunking,omitempty"`
+	ResponseChunking          string        `json:"responseChunking,omitempty"`
+	ResponseHeadersPermitted  []interface{} `json:"responseHeadersPermitted,omitempty"`
+	ServerAgentName           string        `json:"serverAgentName,omitempty"`
+	ViaHostName               string        `json:"viaHostName,omitempty"`
+	ViaRequest                string        `json:"viaRequest,omitempty"`
+	ViaResponse               string        `json:"viaResponse,omitempty"`
+	XffAlternativeNames       []interface{} `json:"xffAlternativeNames,omitempty"`
 }
 
 type OneconnectProfiles struct {
@@ -3597,6 +3597,7 @@ func (b *BigIP) CreateHttpProfile(name string, parent string) error {
 	return b.post(config, uriLtm, uriProfile, uriHttp)
 }
 
+// AddHttpProfile creates a new http profile on the BIG-IP system.
 func (b *BigIP) AddHttpProfile(config *HttpProfile) error {
 	return b.post(config, uriLtm, uriProfile, uriHttp)
 }
