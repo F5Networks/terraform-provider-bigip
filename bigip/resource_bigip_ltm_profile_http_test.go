@@ -226,6 +226,110 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-fallbackStatusCodes"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_status_codes"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("fallback_status_codes.%d", schema.HashString("300")), "300"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("fallback_status_codes.%d", schema.HashString("500")), "500"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-headerInsert"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, "head_insert"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, "head_insert", "X-Forwarded-IP: [expr { [IP::client_addr] }]"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-encryptCookies"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, "encrypt_cookies"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName, true),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("peanutButter")), "peanutButter"),
+					//resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("500")), "500"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileHttpImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -320,6 +424,13 @@ func testaccbigipltmprofilehttpUpdateParam(instName, updateParam string) string 
 	case "fallback_host":
 		resPrefix = fmt.Sprintf(`%s
 			  fallback_host = "titanic"`, resPrefix)
+	case "fallback_status_codes":
+		resPrefix = fmt.Sprintf(`%s
+			  fallback_host = "titanic"
+			  fallback_status_codes = ["300","500"]`, resPrefix)
+	case "encrypt_cookies":
+		resPrefix = fmt.Sprintf(`%s
+			  encrypt_cookies = ["peanutButter"]`, resPrefix)
 	case "head_erase":
 		resPrefix = fmt.Sprintf(`%s
 			  head_erase = "titanic"`, resPrefix)
@@ -328,7 +439,7 @@ func testaccbigipltmprofilehttpUpdateParam(instName, updateParam string) string 
 			  description = "my-http-profile"`, resPrefix)
 	case "head_insert":
 		resPrefix = fmt.Sprintf(`%s
-			  head_insert = 8`, resPrefix)
+			  head_insert = "X-Forwarded-IP: [expr { [IP::client_addr] }]"`, resPrefix)
 	case "insert_xforwarded_for":
 		resPrefix = fmt.Sprintf(`%s
 			  insert_xforwarded_for = 262100`, resPrefix)
