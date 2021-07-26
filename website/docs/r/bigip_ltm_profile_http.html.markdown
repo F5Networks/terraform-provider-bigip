@@ -31,11 +31,9 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `proxy_type` - (optional,type `string`) Specifies the proxy mode for this profile: reverse, explicit, or transparent. The default is `reverse`.
 
-* `defaults_from` - (optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
-* `app_service` -
-
-* `description` - (optional) Specifies user-defined description.
+* `description` - (optional,type `string`) Specifies user-defined description.
 
 * `basic_auth_realm` - (Optional) Specifies a quoted string for the basic authentication realm. The system sends this string to a client whenever authorization fails. The default value is `none`
 
