@@ -7,8 +7,12 @@ package bigip
 
 import (
 	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"os"
+	"strings"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
@@ -23,11 +27,19 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				Description:  "Name of the profile",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "Name of the profile",
+				//ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
+			},
+			"proxy_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
+				Description: "Specifies the proxy mode for this profile: reverse, explicit, or transparent. The default is Reverse.",
 			},
 			"defaults_from": {
 				Type:         schema.TypeString,
@@ -35,12 +47,6 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Computed:     true,
 				Description:  "Inherit defaults from parent profile",
 				ValidateFunc: validateF5Name,
-			},
-			"accept_xff": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Optional:    true,
-				Description: "Enables or disables trusting the client IP address, and statistics from the client IP address, based on the request's XFF (X-forwarded-for) headers, if they exist.",
 			},
 			"app_service": {
 				Type:        schema.TypeString,
@@ -59,17 +65,17 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Computed:    true,
 				Description: "User defined description",
 			},
-			"encrypt_cookie_secret": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies a passphrase for the cookie encryption",
-			},
 			"encrypt_cookies": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Description: "Encrypts specified cookies that the BIG-IP system sends to a client system",
+			},
+			"encrypt_cookie_secret": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies a passphrase for the cookie encryption",
 			},
 			"fallback_host": {
 				Type:        schema.TypeString,
@@ -82,37 +88,49 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Description: "Specifies one or more three-digit status codes that can be returned by an HTTP server.",
+				Description: "Specifies one or more three-digit status codes that can be returned by an HTTP server,that should trigger a redirection to the fallback host",
 			},
 			"head_erase": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies the header string that you want to erase from an HTTP request. You can also specify none",
+				Description: "Specifies the header string that you want to erase from an HTTP request. Default is none",
 			},
 			"head_insert": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies a quoted header string that you want to insert into an HTTP request. You can also specify none. ",
+				Description: "Specifies a quoted header string that you want to insert into an HTTP request. Default is none",
 			},
 			"insert_xforwarded_for": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				Description: "When using connection pooling, which allows clients to make use of other client requests' server-side connections,	you can insert the X-Forwarded-For header and specify a client IP address. ",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies, when enabled, that the system inserts an X-Forwarded-For header in an HTTP request with the client IP address, to use with connection pooling. The default is Disabled.",
+			},
+			"lws_width": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies the maximum column width for any given line, when inserting an HTTP header in an HTTP request. The default is 80",
 			},
 			"lws_separator": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies a quoted header string that you want to insert into an HTTP request. You can also specify none. ",
+				Description: "Specifies the linear white space (LWS) separator that the system inserts when a header exceeds the maximum width you specify in the LWS Maximum Columns setting.",
+			},
+			"accept_xff": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "Enables or disables trusting the client IP address, and statistics from the client IP address, based on the request's XFF (X-forwarded-for) headers, if they exist.",
 			},
 			"oneconnect_transformations": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Enables the system to perform HTTP header transformations for the purpose of  keeping server-side connections open. This feature requires configuration of a OneConnect profile.",
+				Description: "Enables the system to perform HTTP header transformations for the purpose of keeping server-side connections open. This feature requires configuration of a OneConnect profile.",
 			},
 			"tm_partition": {
 				Type:        schema.TypeString,
@@ -120,29 +138,11 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Default:     "",
 				Description: "Displays the administrative partition within which this profile resides. ",
 			},
-			"proxy_type": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Specifies the type of HTTP proxy. ",
-			},
 			"redirect_rewrite": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies which of the application HTTP redirects the system rewrites to HTTPS.",
-			},
-			"request_chunking": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Specifies how to handle chunked and unchunked requests.",
-			},
-			"response_chunking": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Specifies how to handle chunked and unchunked responses.",
+				Description: "Specifies whether the system rewrites the URIs that are part of HTTP redirect (3XX) responses. The default is None",
 			},
 			"response_headers_permitted": {
 				Type:        schema.TypeSet,
@@ -150,7 +150,19 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies headers that the BIG-IP system allows in an HTTP response.",
+				Description: "Specifies headers that the BIG-IP system allows in an HTTP response.If you are specifying more than one header, separate the headers with a blank space",
+			},
+			"request_chunking": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies how the system handles HTTP content that is chunked by a client. The default is Preserve",
+			},
+			"response_chunking": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies how the system handles HTTP content that is chunked by a server. The default is Selective",
 			},
 			"server_agent_name": {
 				Type:        schema.TypeString,
@@ -192,25 +204,39 @@ func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	parent := d.Get("defaults_from").(string)
+	log.Printf("[INFO] Creating HTTP Profile Profile:%+v ", name)
 
-	err := client.CreateHttpProfile(
-		name,
-		parent,
-	)
+	pss := &bigip.HttpProfile{
+		Name: name,
+	}
+	config := getHttpProfileConfig(d, pss)
+
+	err := client.AddHttpProfile(config)
 	if err != nil {
 		return err
 	}
 	d.SetId(name)
 
-	err = resourceBigipLtmProfileHttpUpdate(d, meta)
-	if err != nil {
-		_ = client.DeleteHttpProfile(name)
-		return err
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			"Terraform-provider-bigip",
+			client.UserAgent,
+			uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_profile_http", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
-
 	return resourceBigipLtmProfileHttpRead(d, meta)
-
 }
 
 func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) error {
@@ -232,6 +258,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	}
 	_ = d.Set("name", name)
 	_ = d.Set("defaults_from", pp.DefaultsFrom)
+	_ = d.Set("proxy_type", pp.ProxyType)
 
 	if _, ok := d.GetOk("accept_xff"); ok {
 		_ = d.Set("accept_xff", pp.AcceptXff)
@@ -272,9 +299,6 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("tm_partition"); ok {
 		_ = d.Set("tm_partition", pp.TmPartition)
 	}
-	if _, ok := d.GetOk("proxy_type"); ok {
-		_ = d.Set("proxy_type", pp.ProxyType)
-	}
 	if _, ok := d.GetOk("redirect_rewrite"); ok {
 		_ = d.Set("redirect_rewrite", pp.RedirectRewrite)
 	}
@@ -284,9 +308,12 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("response_chunking"); ok {
 		_ = d.Set("response_chunking", pp.ResponseChunking)
 	}
-	if _, ok := d.GetOk("response_headers_permitted"); ok {
-		_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
-	}
+	log.Printf("[DEBUG] response_headers_permitted:%+v", pp.ResponseHeadersPermitted)
+	_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
+	//if _, ok := d.GetOk("response_headers_permitted"); ok {
+	//	log.Printf("[DEBUG]response_headers_permitted:%+v", pp.ResponseHeadersPermitted)
+	//	_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
+	//}
 	if _, ok := d.GetOk("server_agent_name"); ok {
 		_ = d.Set("server_agent_name", pp.ServerAgentName)
 	}
@@ -299,46 +326,26 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("via_response"); ok {
 		_ = d.Set("via_response", pp.ViaResponse)
 	}
-	if _, ok := d.GetOk("xff_alternative_names"); ok {
-		_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
-	}
+	log.Printf("[DEBUG] xff_alternative_names:%+v", pp.XffAlternativeNames)
+	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
+
+	//if _, ok := d.GetOk("xff_alternative_names"); ok {
+	//	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
+	//}
 	return nil
 }
 
 func resourceBigipLtmProfileHttpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
+	log.Printf("[INFO] Updating HTTP Profile Profile:%+v ", name)
 
-	pp := &bigip.HttpProfile{
-		AppService:                d.Get("app_service").(string),
-		DefaultsFrom:              d.Get("defaults_from").(string),
-		AcceptXff:                 d.Get("accept_xff").(string),
-		BasicAuthRealm:            d.Get("basic_auth_realm").(string),
-		Description:               d.Get("description").(string),
-		EncryptCookieSecret:       d.Get("encrypt_cookie_secret").(string),
-		EncryptCookies:            setToStringSlice(d.Get("encrypt_cookies").(*schema.Set)),
-		FallbackHost:              d.Get("fallback_host").(string),
-		FallbackStatusCodes:       setToStringSlice(d.Get("fallback_status_codes").(*schema.Set)),
-		HeaderErase:               d.Get("head_erase").(string),
-		HeaderInsert:              d.Get("head_insert").(string),
-		InsertXforwardedFor:       d.Get("insert_xforwarded_for").(string),
-		LwsSeparator:              d.Get("lws_separator").(string),
-		OneconnectTransformations: d.Get("oneconnect_transformations").(string),
-		TmPartition:               d.Get("tm_partition").(string),
-		ProxyType:                 d.Get("proxy_type").(string),
-		RedirectRewrite:           d.Get("redirect_rewrite").(string),
-		RequestChunking:           d.Get("request_chunking").(string),
-		ResponseChunking:          d.Get("response_chunking").(string),
-		ResponseHeadersPermitted:  setToStringSlice(d.Get("response_headers_permitted").(*schema.Set)),
-		ServerAgentName:           d.Get("server_agent_name").(string),
-		ViaHostName:               d.Get("via_host_name").(string),
-		ViaRequest:                d.Get("via_request").(string),
-		ViaResponse:               d.Get("via_response").(string),
-		XffAlternativeNames:       setToStringSlice(d.Get("xff_alternative_names").(*schema.Set)),
+	pss := &bigip.HttpProfile{
+		Name: name,
 	}
+	config := getHttpProfileConfig(d, pss)
+	err := client.ModifyHttpProfile(name, config)
 
-	err := client.ModifyHttpProfile(name, pp)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify HTTP Profile  (%s) (%v)", name, err)
 		return err
@@ -378,4 +385,36 @@ func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{})
 	}
 
 	return pp != nil, nil
+}
+
+func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bigip.HttpProfile {
+	config.AppService = d.Get("app_service").(string)
+	config.DefaultsFrom = d.Get("defaults_from").(string)
+	config.AcceptXff = d.Get("accept_xff").(string)
+	config.BasicAuthRealm = d.Get("basic_auth_realm").(string)
+	config.Description = d.Get("description").(string)
+	config.EncryptCookieSecret = d.Get("encrypt_cookie_secret").(string)
+	config.EncryptCookies = setToStringSlice(d.Get("encrypt_cookies").(*schema.Set))
+	config.FallbackHost = d.Get("fallback_host").(string)
+	config.FallbackStatusCodes = setToStringSlice(d.Get("fallback_status_codes").(*schema.Set))
+	config.HeaderErase = d.Get("head_erase").(string)
+	config.HeaderInsert = d.Get("head_insert").(string)
+	config.InsertXforwardedFor = d.Get("insert_xforwarded_for").(string)
+	config.LwsSeparator = d.Get("lws_separator").(string)
+	config.OneconnectTransformations = d.Get("oneconnect_transformations").(string)
+	config.TmPartition = d.Get("tm_partition").(string)
+	config.ProxyType = d.Get("proxy_type").(string)
+	config.RedirectRewrite = d.Get("redirect_rewrite").(string)
+	config.RequestChunking = d.Get("request_chunking").(string)
+	config.ResponseChunking = d.Get("response_chunking").(string)
+	//config.ResponseHeadersPermitted = setToStringSlice(d.Get("response_headers_permitted").(*schema.Set))
+	config.ResponseHeadersPermitted = setToInterfaceSlice(d.Get("response_headers_permitted").(*schema.Set))
+	config.ServerAgentName = d.Get("server_agent_name").(string)
+	config.ViaHostName = d.Get("via_host_name").(string)
+	config.ViaRequest = d.Get("via_request").(string)
+	config.ViaResponse = d.Get("via_response").(string)
+	//config.XffAlternativeNames = setToStringSlice(d.Get("xff_alternative_names").(*schema.Set))
+	config.XffAlternativeNames = setToInterfaceSlice(d.Get("xff_alternative_names").(*schema.Set))
+	//log.Printf("[DEBUG]Connfig: %+v", config)
+	return config
 }

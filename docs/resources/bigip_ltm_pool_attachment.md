@@ -12,6 +12,12 @@ description: |-
 
 ## Example Usage
 
+
+There are two ways to use ltm_pool_attachment resource, where we can take node reference from ltm_node or we can specify node directly with ip:port/fqdn:port which will also create node and atach to pool.
+
+
+Pool attachment with node directly taking ip:port/fqdn:port
+
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
   name     = "/Common/terraform_monitor"
@@ -31,18 +37,42 @@ resource "bigip_ltm_pool" "pool" {
 resource "bigip_ltm_pool_attachment" "attach_node" {
   pool                  = bigip_ltm_pool.pool.name
   node                  = "1.1.1.1:80"
-  ratio                 = 2
-  connection_limit      = 2
-  connection_rate_limit = 2
-  priority_group        = 2
-  dynamic_ratio         = 3
 }
 
-```      
+```
+
+Pool attachment with node reference from ltm_node
+
+```hcl
+resource "bigip_ltm_monitor" "monitor" {
+  name     = "/Common/terraform_monitor"
+  parent   = "/Common/http"
+  send     = "GET /some/path\r\n"
+  timeout  = "999"
+  interval = "998"
+}
+resource "bigip_ltm_pool" "pool" {
+  name                = "/Common/terraform-pool"
+  load_balancing_mode = "round-robin"
+  monitors            = ["${bigip_ltm_monitor.monitor.name}"]
+  allow_snat          = "yes"
+  allow_nat           = "yes"
+}
+
+resource "bigip_ltm_node" "node" {	
+  name    = "/Common/terraform_node"	
+  address = "192.168.30.2"	
+}
+
+resource "bigip_ltm_pool_attachment" "attach_node" {
+  pool = bigip_ltm_pool.pool.name
+  node = "${bigip_ltm_node.node.name}:80"
+}
+```
 
 ## Argument Reference
 
-* `pool` - (Required) Name of the pool to which members should be attached,it should be "full path".The full path is the combination of the partition + name of the pool.(For example `/Common/my-pool`)
+* `pool` - (Required) Name of the pool to which members should be attached,it should be "full path".The full path is the combination of the partition + name of the pool.(For example `/Common/my-pool`) or partition + directory + name of the pool (For example `/Common/test/my-pool`).When including directory in fullpath we have to make sure it is created in the given partition before using it.
 
 * `node` - (Required) Pool member address/fqdn with service port, (ex: `1.1.1.1:80/www.google.com:80`). (Note: Member will be in same partition of Pool)
 
