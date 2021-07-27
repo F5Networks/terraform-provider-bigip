@@ -42,6 +42,7 @@ resource "bigip_ltm_policy" "test-policy" {
 
 ## Argument Reference
 
+
 * `name`- (Required) Name of the Policy ( policy name should be in full path which is combination of partition and policy name )
 
 * `strategy` - (Optional) Specifies the match strategy

@@ -65,7 +65,6 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
   license_poolname = "purchased_pool_name"
   assignment_type = "MANAGED"
 }
-
 # UNMANAGED Purchased Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
   bigiq_address = var.bigiq
@@ -108,5 +107,3 @@ resource "bigip_common_license_manage_bigiq" "test_example" {
 * `tenant` - (Optional) For an unreachable BIG-IP, you can provide an optional description for the assignment in this field.
 
 * `key` - (Optional) License Assignment is done with specified `key`, supported only with RegKeypool type License assignement. type `string`
-
-

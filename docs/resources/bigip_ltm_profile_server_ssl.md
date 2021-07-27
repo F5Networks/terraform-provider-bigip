@@ -103,4 +103,3 @@ There can be only one SSL profile with this setting enabled.
       or in place of the identity in the subject field of the certificate.
 
 * `c3d-cert-lifespan` Specifies the lifespan of the certificate generated using the SSL client certificate constrained delegation. The default value is 24.
-

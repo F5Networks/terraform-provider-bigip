@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_fast_application"
-sidebar_current: "docs-bigip-resource-fast-template-x"
+sidebar_current: "docs-bigip-resource-fast-application-x"
 description: |-
     Provides details about bigip_fast_application resource
 ---
