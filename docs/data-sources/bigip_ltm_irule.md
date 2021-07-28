@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_irule"
-sidebar_current: "docs-bigip-datasource-irule-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_irule data source
+  Provides details about bigip_ltm_irule data source
 ---
 
 # bigip\_ltm\_irule

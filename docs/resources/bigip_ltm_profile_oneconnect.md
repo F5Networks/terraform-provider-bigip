@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_oneconnect"
-sidebar_current: "docs-bigip-resource-profile_oneconnect-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_oneconnect resource
+  Provides details about bigip_ltm_profile_oneconnect resource
 ---
 
 # bigip\_ltm\_profile_oneconnect

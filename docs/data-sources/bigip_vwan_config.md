@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_vwan_config"
-sidebar_current: "docs-bigip-datasource-vwan-config-x"
+subcategory: "vWAN"
 description: |-
-    Provides details about bigip_vwan_config data source
+  Provides details about bigip_vwan_config data source
 ---
 
 # bigip_vwan_config

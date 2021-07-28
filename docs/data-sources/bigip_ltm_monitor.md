@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_monitor"
-sidebar_current: "docs-bigip-datasource-monitor-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_monitor data source
+  Provides details about bigip_ltm_monitor data source
 ---
 
 # bigip\_ltm\_monitor

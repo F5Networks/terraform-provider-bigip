@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_httpcompress"
-sidebar_current: "docs-bigip-resource-profile_httpcompress-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_httpcompress resource
+  Provides details about bigip_ltm_profile_httpcompress resource
 ---
 
 # bigip\_ltm\_profile_httpcompress

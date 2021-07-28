@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_iapp"
-sidebar_current: "docs-bigip-resource-iapp-x"
+subcategory: "System"
 description: |-
-    Provides details about bigip  iapp resource for BIG-IP
+  Provides details about bigip_sys_iapp resource
 ---
 
 # bigip\_sys\_iapp

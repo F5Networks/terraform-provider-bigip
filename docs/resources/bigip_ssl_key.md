@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ssl_key"
-sidebar_current: "docs-bigip-resource-ssl-key-x"
+subcategory: "System"
 description: |-
-    Provides details about bigip_ssl_key resource
+  Provides details about bigip_ssl_key resource
 ---
 
 # bigip_ssl_key

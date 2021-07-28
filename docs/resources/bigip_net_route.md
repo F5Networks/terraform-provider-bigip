@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_route"
-sidebar_current: "docs-bigip-resource-route-x"
+subcategory: "Network"
 description: |-
-    Provides details about bigip_net_route resource
+  Provides details about bigip_net_route resource
 ---
 
 # bigip\_net\_route

@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_provision"
-sidebar_current: "docs-bigip-resource-provision-x"
+subcategory: "System"
 description: |-
-   Provides details about bigip  provision resource for BIG-IP
+  Provides details about module provision resource for BIG-IP
 ---
 
 # bigip\_sys\_provision

@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_node"
-sidebar_current: "docs-bigip-datasource-node-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_node data source
+  Provides details about bigip_ltm_node data source
 ---
 
 # bigip\_ltm\_node

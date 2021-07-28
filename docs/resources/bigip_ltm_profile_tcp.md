@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_tcp"
-sidebar_current: "docs-bigip-resource-profile_tcp-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_tcp resource
+  Provides details about bigip_ltm_profile_tcp resource
 ---
 
 # bigip\_ltm\_profile_tcp

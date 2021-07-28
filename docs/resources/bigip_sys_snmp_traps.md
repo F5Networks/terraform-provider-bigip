@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_snmp_traps"
-sidebar_current: "docs-bigip-resource-snmp_traps-x"
+subcategory: "System"
 description: |-
-    Provides details about bigip  snmp_traps resource for BIG-IP
+  Provides details about snmp_traps resource for BIG-IP
 ---
 
 # bigip\_sys\_snmp\_traps
