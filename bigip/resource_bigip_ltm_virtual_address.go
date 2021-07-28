@@ -202,6 +202,13 @@ func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface
 	name := d.Get("name").(string)
 	log.Printf("[INFO] Deleting virtual address " + name)
 	client := meta.(*bigip.BigIP)
+	vs, err_check := resourceBigipLtmVirtualAddressExists(d, meta)
+
+	if vs == false {
+		log.Printf("[ERROR] Unable to get Virtual Address  (%v)  (%v) ", vs, err_check)
+		d.SetId("")
+		return nil
+	}
 	err := client.DeleteVirtualAddress(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Virtual Address  (%s) (%v)", name, err)

@@ -174,6 +174,8 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 		nodeConfig.FQDN.DownInterval = downinterval
 	}
 
+	log.Printf("[DEBUG] node in add is :%+v", nodeConfig)
+
 	if err := client.AddNode(nodeConfig); err != nil {
 		return fmt.Errorf("Error modifying node %s: %v", name, err)
 	}
@@ -222,8 +224,16 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
 
+	if (node.Session == "monitor-enabled") || (node.Session == "user-enabled") {
+		log.Printf("[DEBUG] node session is :%s", node.Session)
+		d.Set("session", "user-enabled")
+	} else {
+		log.Printf("[DEBUG] node session is :%s", node.Session)
+		d.Set("session", "user-disabled")
+	}
+
 	//d.Set("state", node.State)
-	d.Set("session", node.Session)
+	//d.Set("session", node.Session)
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
