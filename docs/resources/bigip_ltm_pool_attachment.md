@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_pool_attachment"
-sidebar_current: "docs-bigip-resource-pool-attachment-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_pool_attachment resource
+  Provides details about bigip_ltm_pool_attachment resource
 ---
 
 # bigip\_ltm\_pool\_attachment

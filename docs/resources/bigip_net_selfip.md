@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_selfip"
-sidebar_current: "docs-bigip-resource-selfip-x"
+subcategory: "Network"
 description: |-
-    Provides details about bigip_net_selfip resource
+  Provides details about bigip_net_selfip resource
 ---
 
 # bigip\_net\_selfip

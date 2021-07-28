@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_node"
-sidebar_current: "docs-bigip-resource-node-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-   Provides details about bigip_ltm_node resource
+  Provides details about bigip_ltm_node resource
 ---
 
 # bigip\_ltm\_node

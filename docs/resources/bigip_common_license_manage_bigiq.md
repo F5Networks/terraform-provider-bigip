@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_common_license_manage_bigiq"
-sidebar_current: "docs-bigip-resource-node-x"
+subcategory: "BIG-IQ"
 description: |-
   Provides details about bigip_common_license_manage_bigiq resource
 ---

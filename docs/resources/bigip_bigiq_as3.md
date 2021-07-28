@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_bigiq_as3"
-sidebar_current: "docs-bigip-resource-x"
+subcategory: "BIG-IQ"
 description: |-
-    Provides details about bigiq as3 resource
+  Provides details about bigip_bigiq_as3 resource
 ---
 
 # bigip_bigiq_as3

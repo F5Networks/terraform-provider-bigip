@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_http"
-sidebar_current: "docs-bigip-resource-profile_http-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_http resource
+  Provides details about bigip_ltm_profile_http resource
 ---
 
 # bigip\_ltm\_profile_http

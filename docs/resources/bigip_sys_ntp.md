@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_sys_ntp"
-sidebar_current: "docs-bigip-resource-ntp-x"
+subcategory: "System"
 description: |-
-    Provides details about bigip ntp
+  Provides details about bigip_sys_ntp resource
 ---
 
 # bigip\_sys\_ntp

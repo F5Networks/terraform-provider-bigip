@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_event_service_discovery"
-sidebar_current: "docs-bigip-resource-event_service_discovery-x"
+subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-   Provides details about bigip_event_service_discovery resource
+  Provides details about bigip_event_service_discovery resource
 ---
 
 # bigip_event_service_discovery

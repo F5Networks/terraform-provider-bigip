@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_fast_application"
-sidebar_current: "docs-bigip-resource-fast-application-x"
+subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-    Provides details about bigip_fast_application resource
+  Provides details about bigip_fast_application resource
 ---
 
 # bigip_fast_application

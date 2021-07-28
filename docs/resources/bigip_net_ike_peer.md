@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_ike_peer"
-sidebar_current: "docs-bigip-resource-ike_peer-x"
+subcategory: "Network"
 description: |-
-    Provides details about bigip_net_ike_peer resource
+  Provides details about bigip_net_ike_peer resource
 ---
 
 # bigip\_net\_ike_peer

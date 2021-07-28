@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_fast_template"
-sidebar_current: "docs-bigip-resource-fast-template-x"
+subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-Provides details about bigip_fast_template resource
+  Provides details about bigip_fast_template resource
 ---
 
 # bigip_fast_template
@@ -14,19 +14,15 @@ Template set can be imported from zip archive files on the local disk.
 
 ## Example Usage
 
-
 ```hcl
-
 resource "bigip_fast_template" "foo-template" {
   name		= "foo_template"
-  source   = "foo_template.zip"
-  md5_hash = filemd5("foo_template.zip")
+  source    = "foo_template.zip"
+  md5_hash  = filemd5("foo_template.zip")
 }
-
 ```      
 
 ## Argument Reference
-
 
 * `name`- (Optional) Name of the FAST template set to be created on to BIGIP
 

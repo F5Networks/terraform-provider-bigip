@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_virtual_address"
-sidebar_current: "docs-bigip-resource-virtual_address-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_virtual_address resource
+  Provides details about bigip_ltm_virtual_address resource
 ---
 
 # bigip\_ltm\_virtual\_address
