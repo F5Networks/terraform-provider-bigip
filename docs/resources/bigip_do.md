@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_do"
-sidebar_current: "docs-bigip-resource-x"
+subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-    Provides details about bigip do resource
+  Provides details about bigip_do resource
 ---
 
 # bigip_do

@@ -1154,49 +1154,47 @@ type Tcp struct {
 	FastOpen          string
 }
 
-
 type Ftp struct {
-        Name              string
-	AllowFtps	  string
-        AppService        string
-        DefaultsFrom      string
-        Description       string
+	Name                  string
+	AllowFtps             string
+	AppService            string
+	DefaultsFrom          string
+	Description           string
 	InheritParentProfile  string
-        InheritVlanList	  string
-	LogProfile	  string
-	LogPublisher      string
-	TmPartition  	  string
-	Port		  int
-	Security 	  string
-        FtpsMode          string
-        EnforceTlsSesionReuse  string
-        AllowActiveMode   string
-        TranslateExtended string
-}     
+	InheritVlanList       string
+	LogProfile            string
+	LogPublisher          string
+	TmPartition           string
+	Port                  int
+	Security              string
+	FtpsMode              string
+	EnforceTlsSesionReuse string
+	AllowActiveMode       string
+	TranslateExtended     string
+}
 
 type Ftps struct {
-        Ftps []Ftp `json:"items"`
+	Ftps []Ftp `json:"items"`
 }
 
 type ftpDTO struct {
-        Name              string  `json:"name,omitempty"`
-        AllowFtps         string  `json:"allowFtps,omitempty"`
-        AppService        string  `json:"appService,omitempty"`
-        DefaultsFrom      string  `json:"defaultsFrom,omitempty"`
-        Description       string  `json:"description,omitempty"`
-        InheritParentProfile  string  `json:"inheritParentProfile,omitempty"`
-        InheritVlanList   string   `json:"inheritVlanList,omitempty"`
-        LogProfile        string   `json:"logProfile,omitempty"`
-        LogPublisher      string   `json:"logPublisher,omitempty"`
-        TmPartition       string   `json:"tmPartition,omitempty"`
-        Port              int      `json:"port,omitempty"`
-        Security          string   `json:"security,omitempty"`
-        FtpsMode          string   `json:"ftpsMode,omitempty"`
-        EnforceTlsSesionReuse  string   `json:"enforceTlsSessionReuse,omitempty"`
-        AllowActiveMode   string   `json:"allowActiveMode,omitempty"` 
-        TranslateExtended string   `json:"translateExtended,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	AllowFtps             string `json:"allowFtps,omitempty"`
+	AppService            string `json:"appService,omitempty"`
+	DefaultsFrom          string `json:"defaultsFrom,omitempty"`
+	Description           string `json:"description,omitempty"`
+	InheritParentProfile  string `json:"inheritParentProfile,omitempty"`
+	InheritVlanList       string `json:"inheritVlanList,omitempty"`
+	LogProfile            string `json:"logProfile,omitempty"`
+	LogPublisher          string `json:"logPublisher,omitempty"`
+	TmPartition           string `json:"tmPartition,omitempty"`
+	Port                  int    `json:"port,omitempty"`
+	Security              string `json:"security,omitempty"`
+	FtpsMode              string `json:"ftpsMode,omitempty"`
+	EnforceTlsSesionReuse string `json:"enforceTlsSessionReuse,omitempty"`
+	AllowActiveMode       string `json:"allowActiveMode,omitempty"`
+	TranslateExtended     string `json:"translateExtended,omitempty"`
 }
-
 
 type fasthttpDTO struct {
 	Name                        string `json:"name,omitempty"`
@@ -1210,6 +1208,21 @@ type fasthttpDTO struct {
 	ConnpoolStep                int    `json:"deferredAccept,omitempty"`
 	ForceHttp_10Response        string `json:"forceHttp_10Response,omitempty"`
 	MaxHeaderSize               int    `json:"maxHeaderSize,omitempty"`
+}
+
+func (p *Ftp) MarshalJSON() ([]byte, error) {
+	var dto ftpDTO
+	marshal(&dto, p)
+	return json.Marshal(dto)
+}
+
+func (p *Ftp) UnmarshalJSON(b []byte) error {
+	var dto ftpDTO
+	err := json.Unmarshal(b, &dto)
+	if err != nil {
+		return err
+	}
+	return marshal(p, &dto)
 }
 
 type Fasthttps struct {
@@ -1427,21 +1440,6 @@ func (p *Tcp) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	return marshal(p, &dto)
-}
-
-func (p *Ftp) MarshalJSON() ([]byte, error) {
-        var dto ftpDTO
-        marshal(&dto, p)
-        return json.Marshal(dto)
-}
-
-func (p *Ftp) UnmarshalJSON(b []byte) error {
-        var dto ftpDTO
-        err := json.Unmarshal(b, &dto)
-        if err != nil {
-                return err
-        }
-        return marshal(p, &dto)
 }
 
 func (p *Fasthttp) MarshalJSON() ([]byte, error) {
@@ -1742,33 +1740,33 @@ type HttpProfiles struct {
 }
 
 type HttpProfile struct {
-	AcceptXff                 string   `json:"acceptXff,omitempty"`
-	AppService                string   `json:"appService,omitempty"`
-	BasicAuthRealm            string   `json:"basicAuthRealm,omitempty"`
-	DefaultsFrom              string   `json:"defaultsFrom,omitempty"`
-	Description               string   `json:"description,omitempty"`
-	EncryptCookieSecret       string   `json:"encryptCookieSecret,omitempty"`
-	EncryptCookies            []string `json:"encryptCookies,omitempty"`
-	FallbackHost              string   `json:"fallbackHost,omitempty"`
-	FallbackStatusCodes       []string `json:"fallbackStatusCodes,omitempty"`
-	HeaderErase               string   `json:"headerErase,omitempty"`
-	HeaderInsert              string   `json:"headerInsert,omitempty"`
-	InsertXforwardedFor       string   `json:"insertXforwardedFor,omitempty"`
-	LwsSeparator              string   `json:"lwsSeparator,omitempty"`
-	LwsWidth                  int      `json:"lwsWidth,omitempty"`
-	Name                      string   `json:"name,omitempty"`
-	OneconnectTransformations string   `json:"oneconnectTransformations,omitempty"`
-	TmPartition               string   `json:"tmPartition,omitempty"`
-	ProxyType                 string   `json:"proxyType,omitempty"`
-	RedirectRewrite           string   `json:"redirectRewrite,omitempty"`
-	RequestChunking           string   `json:"requestChunking,omitempty"`
-	ResponseChunking          string   `json:"responseChunking,omitempty"`
-	ResponseHeadersPermitted  []string `json:"responseHeadersPermitted,omitempty"`
-	ServerAgentName           string   `json:"serverAgentName,omitempty"`
-	ViaHostName               string   `json:"viaHostName,omitempty"`
-	ViaRequest                string   `json:"viaRequest,omitempty"`
-	ViaResponse               string   `json:"viaResponse,omitempty"`
-	XffAlternativeNames       []string `json:"xffAlternativeNames,omitempty"`
+	AcceptXff                 string        `json:"acceptXff,omitempty"`
+	AppService                string        `json:"appService,omitempty"`
+	BasicAuthRealm            string        `json:"basicAuthRealm,omitempty"`
+	DefaultsFrom              string        `json:"defaultsFrom,omitempty"`
+	Description               string        `json:"description,omitempty"`
+	EncryptCookieSecret       string        `json:"encryptCookieSecret,omitempty"`
+	EncryptCookies            []string      `json:"encryptCookies,omitempty"`
+	FallbackHost              string        `json:"fallbackHost,omitempty"`
+	FallbackStatusCodes       []string      `json:"fallbackStatusCodes,omitempty"`
+	HeaderErase               string        `json:"headerErase,omitempty"`
+	HeaderInsert              string        `json:"headerInsert,omitempty"`
+	InsertXforwardedFor       string        `json:"insertXforwardedFor,omitempty"`
+	LwsSeparator              string        `json:"lwsSeparator,omitempty"`
+	LwsWidth                  int           `json:"lwsWidth,omitempty"`
+	Name                      string        `json:"name,omitempty"`
+	OneconnectTransformations string        `json:"oneconnectTransformations,omitempty"`
+	TmPartition               string        `json:"tmPartition,omitempty"`
+	ProxyType                 string        `json:"proxyType,omitempty"`
+	RedirectRewrite           string        `json:"redirectRewrite,omitempty"`
+	RequestChunking           string        `json:"requestChunking,omitempty"`
+	ResponseChunking          string        `json:"responseChunking,omitempty"`
+	ResponseHeadersPermitted  []interface{} `json:"responseHeadersPermitted,omitempty"`
+	ServerAgentName           string        `json:"serverAgentName,omitempty"`
+	ViaHostName               string        `json:"viaHostName,omitempty"`
+	ViaRequest                string        `json:"viaRequest,omitempty"`
+	ViaResponse               string        `json:"viaResponse,omitempty"`
+	XffAlternativeNames       []interface{} `json:"xffAlternativeNames,omitempty"`
 }
 
 type OneconnectProfiles struct {
@@ -1844,7 +1842,7 @@ const (
 	CONTEXT_CLIENT    = "clientside"
 	CONTEXT_ALL       = "all"
 	uriTcp            = "tcp"
-        uriFtp            = "ftp"
+	uriFtp            = "ftp"
 	uriFasthttp       = "fasthttp"
 	uriFastl4         = "fastl4"
 	uriHttpcompress   = "http-compression"
@@ -2852,35 +2850,34 @@ func (b *BigIP) GetTcp(name string) (*Tcp, error) {
 	return &tcp, nil
 }
 
-
-// Create FTP profile 
+// Create FTP profile
 
 func (b *BigIP) CreateFtp(ftp *Ftp) error {
-        return b.post(ftp, uriLtm, uriProfile, uriFtp)
+	return b.post(ftp, uriLtm, uriProfile, uriFtp)
 }
 
 // DeleteFtp removes an Ftp profile from the system.
 func (b *BigIP) DeleteFtp(name string) error {
-        return b.delete(uriLtm, uriProfile, uriFtp, name)
+	return b.delete(uriLtm, uriProfile, uriFtp, name)
 }
 
 // ModifyFtp updates the given Ftp profile with any changed values.
 func (b *BigIP) ModifyFtp(name string, ftp *Ftp) error {
-        ftp.Name = name
-        return b.patch(ftp, uriLtm, uriProfile, uriFtp, name)
+	ftp.Name = name
+	return b.patch(ftp, uriLtm, uriProfile, uriFtp, name)
 }
 
 func (b *BigIP) GetFtp(name string) (*Ftp, error) {
-        var ftp Ftp
-        err, ok := b.getForEntity(&ftp, uriLtm, uriProfile, uriFtp, name)
-        if err != nil {
-                return nil, err
-        }
-        if !ok {
-                return nil, nil
-        }
+	var ftp Ftp
+	err, ok := b.getForEntity(&ftp, uriLtm, uriProfile, uriFtp, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
 
-        return &ftp, nil
+	return &ftp, nil
 }
 
 func (b *BigIP) CreateFasthttp(config *Fasthttp) error {
@@ -3688,6 +3685,7 @@ func (b *BigIP) CreateHttpProfile(name string, parent string) error {
 	return b.post(config, uriLtm, uriProfile, uriHttp)
 }
 
+// AddHttpProfile creates a new http profile on the BIG-IP system.
 func (b *BigIP) AddHttpProfile(config *HttpProfile) error {
 	return b.post(config, uriLtm, uriProfile, uriHttp)
 }

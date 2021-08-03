@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_snatpool"
-sidebar_current: "docs-bigip-resource-snatpool-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_snatpool resource
+  Provides details about bigip_ltm_snatpool resource
 ---
 
 # bigip\_ltm\_snatpool

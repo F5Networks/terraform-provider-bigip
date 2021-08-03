@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_net_tunnel"
-sidebar_current: "docs-bigip-resource-tunnel-x"
+subcategory: "Network"
 description: |-
-    Provides details about bigip_net_tunnel resource
+  Provides details about bigip_net_tunnel resource
 ---
 
 # bigip\_net\_tunnel

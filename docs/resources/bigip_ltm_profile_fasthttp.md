@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_fasthttp"
-sidebar_current: "docs-bigip-resource-profile_fasthttp-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_fasthttp resource
+  Provides details about bigip_ltm_profile_fasthttp resource
 ---
 
 # bigip\_ltm\_profile_fasthttp

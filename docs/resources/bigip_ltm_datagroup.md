@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_datagroup"
-sidebar_current: "docs-bigip-resource-datagroup-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_datagroup resource
+  Provides details about bigip_ltm_datagroup resource
 ---
 
 # bigip\_ltm\_datagroup

@@ -1,34 +1,51 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP Provider : Index"
-sidebar_current: "docs-bigip-index"
+page_title: "Provider: BIG-IP"
 description: |-
-    Provides details about provider bigip
+  Provides details about BIG-IP Terraform Provider
 ---
 
-# F5 BIG-IP Provider
+# F5 BIG-IP Terraform Provider
 
-A [Terraform](https://terraform.io) provider for F5 BIG-IP. Resources are currently available for LTM.
+Use the F5 BIG-IP Terraform Provider to manage and provision your BIG-IP
+configurations in Terraform. Using BIG-IP Provider you can manage LTM(Local Traffic Manager),Network,System objects and it also supports AS3/DO integration.
 
 ### Requirements
 
 This provider uses the iControlREST API. All the resources are validated with BigIP v12.1.1 and above.
-## Example
 
-```
+## Example Usage
+```hcl
+variable hostname {}
+variable username {}
+variable password {}
+
+terraform {
+  required_providers {
+    bigip = {
+      source = "terraform-providers/bigip"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
 provider "bigip" {
-  address = "${var.url}"
-  username = "${var.username}"
-  password = "${var.password}"
+  address = var.hostname
+  username = var.username
+  password = var.password
 }
 ```
 
-## Reference
+## Argument Reference
 
-- `address` - (Required) Address of the device
-- `username` - (Required) Username for authentication
-- `password` - (Required) Password for authentication
+- `address` - (type `string`) Domain name or IP address of the BIG-IP. Can be set via the `BIGIP_HOST` environment variable.
+- `username` - (type `string`) BIG-IP Username for authentication. Can be set via the `BIGIP_USER` environment variable.
+- `password` - (type `string`) BIG-IP Password for authentication. Can be set via the `BIGIP_PASSWORD` environment variable.
+- `token_auth` - (Optional, Default `false`) Enable to use an external authentication source (LDAP, TACACS, etc). Can be set via the `BIGIP_TOKEN_AUTH` environment variable.
 - `token_value` - (Optional) A token generated outside the provider, in place of password
-- `token_auth` - (Optional, Default=false) Enable to use an external authentication source (LDAP, TACACS, etc)
-- `login_ref` - (Optional, Default="tmos") Login reference for token authentication (see BIG-IP REST docs for details)
-- `port` - (Optional) Management Port to connect to Bigip.This is mainly required if we have single nic bigip or any custom managemt port other than 443
+- `login_ref` - (Optional,Default `tmos`) Login reference for token authentication (see BIG-IP REST docs for details). May be set via the `BIGIP_LOGIN_REF` environment variable.
+- `port` - (Optional) Management Port to connect to BIG-IP,this is mainly required if we have single nic BIG-IP in AWS/Azure/GCP (or) Management port other than `443`. Can be set via `BIGIP_PORT` environment variable.
+
+~> **Note** For BIG-IQ resources these provider credentials `address`,`username`,`password` can be set to BIG-IQ credentials.
+
+~> **Note** The F5 BIG-IP provider gathers non-identifiable usage data for the purposes of improving the product as outlined in the end user license agreement for BIG-IP. To opt out of data collection, use the following : `export TEEM_DISABLE=true`

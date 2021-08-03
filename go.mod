@@ -12,8 +12,8 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.13
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
-	github.com/f5devcentral/go-bigip v0.0.0-20210621162944-38d486e26398
-	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210621162944-38d486e26398
+	github.com/f5devcentral/go-bigip v0.0.0-20210803181007-f01422f8be0e
+	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210803181007-f01422f8be0e
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect

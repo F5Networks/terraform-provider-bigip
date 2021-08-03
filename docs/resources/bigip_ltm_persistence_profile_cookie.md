@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_persistence_profile_cookie"
-sidebar_current: "docs-bigip-resource-persistence_profile_cookie-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_persistence_profile_cookie resource
+  Provides details about bigip_ltm_persistence_profile_cookie resource
 ---
 
 # bigip_ltm_persistence_profile_cookie

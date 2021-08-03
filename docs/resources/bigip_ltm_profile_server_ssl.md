@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_profile_server_ssl"
-sidebar_current: "docs-bigip-resource-profile_server_ssl-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_profile_server_ssl resource
+  Provides details about bigip_ltm_profile_server_ssl resource
 ---
 
 # bigip_ltm_profile_server_ssl
@@ -103,4 +103,3 @@ There can be only one SSL profile with this setting enabled.
       or in place of the identity in the subject field of the certificate.
 
 * `c3d-cert-lifespan` Specifies the lifespan of the certificate generated using the SSL client certificate constrained delegation. The default value is 24.
-

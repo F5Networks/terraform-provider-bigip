@@ -36,6 +36,13 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 
+			"defaults_from": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "/Common/clientssl",
+				Description: "Profile name that this profile defaults from.",
+			},
+
 			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -257,13 +264,6 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "Certificate revocation file name",
-			},
-
-			"defaults_from": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/clientssl",
-				Description: "Profile name that this profile defaults from.",
 			},
 
 			"forward_proxy_bypass_default_action": {
@@ -566,9 +566,8 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 
 	_ = d.Set("name", name)
 	_ = d.Set("partition", obj.Partition)
-	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("defaults_from", obj.DefaultsFrom)
+
 	if _, ok := d.GetOk("alert_timeout"); ok {
 		if err := d.Set("alert_timeout", obj.AlertTimeout); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving AlertTimeout to state for Ssl profile  (%s): %s", d.Id(), err)

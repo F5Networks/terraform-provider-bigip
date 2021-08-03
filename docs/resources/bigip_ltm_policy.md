@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_policy"
-sidebar_current: "docs-bigip-resource-policy-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-    Provides details about bigip_ltm_policy resource
+  Provides details about bigip_ltm_policy resource
 ---
 
 # bigip\_ltm\_policy
@@ -41,6 +41,7 @@ resource "bigip_ltm_policy" "test-policy" {
 ```      
 
 ## Argument Reference
+
 
 * `name`- (Required) Name of the Policy ( policy name should be in full path which is combination of partition and policy name )
 

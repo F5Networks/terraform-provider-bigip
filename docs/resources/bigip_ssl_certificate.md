@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ssl_certificate"
-sidebar_current: "docs-bigip-resource-ssl-certificate-x"
+subcategory: "System"
 description: |-
-    Provides details about bigip_ssl_certificate resource
+  Provides details about bigip_ssl_certificate resource
 ---
 
 # bigip_ssl_certificate

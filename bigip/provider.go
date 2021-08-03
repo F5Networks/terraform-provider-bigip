@@ -23,7 +23,7 @@ func Provider() terraform.ResourceProvider {
 		Schema: map[string]*schema.Schema{
 			"address": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Domain name/IP of the BigIP",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_HOST", nil),
 			},
@@ -35,13 +35,13 @@ func Provider() terraform.ResourceProvider {
 			},
 			"username": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Username with API access to the BigIP",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_USER", nil),
 			},
 			"password": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "The user's password. Leave empty if using token_value",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_PASSWORD", nil),
 			},
@@ -163,10 +163,11 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	if err != nil {
 		return cfg, err
 	}
-	cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
-	cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
-	//log.Printf("my app %s, commit %s, built at %s by %s", version, commit, date, builtBy)
-	cfg.Teem = d.Get("teem_disable").(bool)
+	if cfg != nil {
+		cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
+		cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
+		cfg.Teem = d.Get("teem_disable").(bool)
+	}
 	return cfg, err
 }
 
@@ -200,6 +201,15 @@ func listToStringSlice(s []interface{}) []string {
 //Convert schema.Set to a slice of strings
 func setToStringSlice(s *schema.Set) []string {
 	list := make([]string, s.Len())
+	for i, v := range s.List() {
+		list[i] = v.(string)
+	}
+	return list
+}
+
+//Convert schema.Set to a slice of interface
+func setToInterfaceSlice(s *schema.Set) []interface{} {
+	list := make([]interface{}, s.Len())
 	for i, v := range s.List() {
 		list[i] = v.(string)
 	}

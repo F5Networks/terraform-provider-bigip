@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_traffic_selector"
-sidebar_current: "docs-bigip-resource-traffic-selector-x"
+subcategory: "Network"
 description: |-
-   Provides details about bigip_traffic_selector resource
+  Provides details about bigip_traffic_selector resource
 ---
 
 # bigip_traffic_selector

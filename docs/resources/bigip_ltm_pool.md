@@ -1,20 +1,19 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_pool"
-sidebar_current: "docs-bigip-resource-pool-x"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
-   Provides details about bigip_ltm_pool resource
+  Provides details about bigip_ltm_pool resource
 ---
 
 # bigip\_ltm\_pool
 
 `bigip_ltm_pool` Manages F5 BIG-IP LTM pools via iControl REST API.
 
-Resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
+Resources should be named with their "full path". The full path is the combination of the partition + name (example: /Common/my-pool ) or  partition + directory + name of the resource  (example: /Common/test/my-pool )
 
 
 ## Example Usage
-
 
 ```hcl
 
