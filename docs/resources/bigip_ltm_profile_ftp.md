@@ -1,9 +1,9 @@
 ---
-layout: "bigip"
-page_title: "BIG-IP: bigip_ltm_profile_ftp"
-sidebar_current: "docs-bigip-resource-profile_ftp-x"
-description: |-
-    Provides details about bigip_ltm_profile_ftp resource
+   layout: "bigip"
+   page_title: "BIG-IP: bigip_ltm_profile_ftp"
+   subcategory: "Local Traffic Manager(LTM)"
+   description: |-
+     Provides details about bigip_ltm_profile_ftp resource
 ---
 
 # bigip\_ltm\_profile_ftp
@@ -27,6 +27,7 @@ resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
   enforce_tlssession_reuse = "enabled"
   allow_active_mode = "enabled"
 }
+
 ```      
 
 ### For Bigip versions (12.x - 13.x)
@@ -40,6 +41,7 @@ resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
   allow_ftps = "enabled"
   translate_extended = "enabled"
 }
+
 ```
 
 
