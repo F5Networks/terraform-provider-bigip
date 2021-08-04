@@ -24,13 +24,13 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 These BIG-IP versions are supported in these Terraform versions.
 
-| BIG-IP version	|Terraform 0.13 |	Terraform 0.12  |	Terraform 0.11  |
-|-----------------|---------------|-----------------|-----------------|
-| BIG-IP 16.x	    |      X        |       X         |       X         |
-| BIG-IP 15.x	    |      X        |       X         |       X         |
-| BIG-IP 14.x	    | 	   X        |       X         |       X         |
-| BIG-IP 12.x	    |      X        |      	X         |       X         |
-| BIG-IP 13.x	    |      X        |       X         |       X         |
+| BIG-IP version	|Terraform 1.x  |	Terraform 0.13  |	Terraform 0.12  | Terraform 0.11  |
+|-----------------|---------------|-----------------|-----------------|-----------------|
+| BIG-IP 16.x	    |      X        |       X         |       X         |      X          |
+| BIG-IP 15.x	    |      X        |       X         |       X         |      X          |
+| BIG-IP 14.x	    | 	   X        |       X         |       X         |      X          |
+| BIG-IP 12.x	    |      X        |      	X         |       X         |      X          | 
+| BIG-IP 13.x	    |      X        |       X         |       X         |      X          |
 
 
 # Documentation
