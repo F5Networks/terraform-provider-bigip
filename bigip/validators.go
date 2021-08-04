@@ -93,6 +93,34 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 	return
 }
 
+func validateVirtualAddressName(value interface{}, field string) (ws []string, errors []error) {
+        var values []string
+        switch value.(type) {
+        case *schema.Set:
+                values = setToStringSlice(value.(*schema.Set))
+                break
+        case []string:
+                values = value.([]string)
+                break
+        case *[]string:
+                values = *(value.(*[]string))
+                break
+        case string:
+                values = []string{value.(string)}
+                break
+        default:
+                errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName", reflect.TypeOf(value)))
+        }
+
+        for _, v := range values {
+                match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+[\\%\\d_]*$", v)
+                if !match {
+                        errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:%]. e.g. /Common/172.16.124.156%61", field))
+                }
+        }
+        return
+}
+
 func validatePartitionName(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
 	switch value.(type) {
