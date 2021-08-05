@@ -466,8 +466,10 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			switch profile.Context {
 			case bigip.CONTEXT_CLIENT:
 				clientProfileNames.Add(profile.FullPath)
+				break
 			case bigip.CONTEXT_SERVER:
 				serverProfileNames.Add(profile.FullPath)
+				break
 			default:
 				profileNames.Add(profile.FullPath)
 			}

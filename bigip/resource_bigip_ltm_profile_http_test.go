@@ -109,7 +109,6 @@ func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "fallback_host", "none"),
 				),
 			},
 			{
@@ -142,7 +141,6 @@ func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "basic_auth_realm", "none"),
 				),
 			},
 			{
@@ -176,7 +174,6 @@ func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
 				),
 			},
 			{
@@ -210,7 +207,6 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
 				),
 			},
 			{
@@ -278,7 +274,6 @@ func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
 				),
 			},
 			{
