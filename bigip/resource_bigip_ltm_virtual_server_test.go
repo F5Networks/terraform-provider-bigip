@@ -153,9 +153,6 @@ func TestAccBigipLtmVS_CreateV4V6(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
 						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/hash")),
 						"/Common/hash"),
-					//resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-					//		fmt.Sprintf("policies.%d", schema.HashString("http_to_https_redirect")),
-					//	"http_to_https_redirect"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
@@ -305,8 +302,6 @@ func TestAccBigipLtmVS_Policyattach_detach(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists("test-vs-sample", true),
 					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
-					//resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("")), ""),
-					//resource.TestCheckResourceAttr(rsName, "policies.0", ""),
 				),
 			},
 		},
@@ -333,7 +328,6 @@ func TestAccBigipLtmVS_Pooolattach_detatch(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists(vsName, true),
 					resource.TestCheckResourceAttr(rsName, "name", vsFullname),
-					//resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("/Common/test-policy")), "/Common/test-policy"),
 				),
 			},
 			{

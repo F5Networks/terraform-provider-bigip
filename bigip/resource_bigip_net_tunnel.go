@@ -158,7 +158,6 @@ func resourceBigipNetTunnelRead(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	log.Printf("[DEBUG] Reading TUNNEL %s", name)
-	//name = strings.Replace(name, "/", "~", -1)
 	tunnel, err := client.GetTunnel(name)
 	log.Printf("[DEBUG] TUNNEL Output :%+v", tunnel)
 	if err != nil {

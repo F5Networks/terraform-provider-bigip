@@ -62,7 +62,7 @@ func resourceBigipAs3() *schema.Resource {
 					_ = json.Unmarshal(oldResp, &oldJsonref)
 					_ = json.Unmarshal(newResp, &newJsonref)
 					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityBefore == true {
+					if jsonEqualityBefore {
 						return true
 					}
 					for key, value := range oldJsonref {
@@ -90,15 +90,15 @@ func resourceBigipAs3() *schema.Resource {
 
 					ignoreMetadata := d.Get("ignore_metadata").(bool)
 					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
-					if ignoreMetadata == true {
-						if jsonEqualityAfter == true {
+					if ignoreMetadata {
+						if jsonEqualityAfter {
 							return true
 						} else {
 							return false
 						}
 
 					} else {
-						if jsonEqualityBefore == false {
+						if !jsonEqualityBefore {
 							return false
 						}
 					}
@@ -215,7 +215,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
 	d.SetId(d.Get("tenant_list").(string))
-	x = x + 1
+	x++
 	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
@@ -248,7 +248,6 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
-	//name := d.Get("tenant_list").(string)
 	name := d.Id()
 	applicationList := d.Get("application_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
@@ -321,7 +320,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			log.Printf("%v", err)
 		}
 	}
-	x = x + 1
+	x++
 	return resourceBigipAs3Read(d, meta)
 }
 
@@ -340,7 +339,7 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		_ = d.Set("tenant_list", name)
 		return resourceBigipAs3Read(d, meta)
 	}
-	x = x + 1
+	x++
 	d.SetId("")
 	return nil
 }

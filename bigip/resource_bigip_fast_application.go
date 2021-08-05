@@ -47,7 +47,7 @@ func resourceBigipFastApp() *schema.Resource {
 					_ = json.Unmarshal(oldResp, &oldJsonref)
 					_ = json.Unmarshal(newResp, &newJsonref)
 					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityBefore == true {
+					if jsonEqualityBefore {
 						return true
 					}
 					iterate := make(map[string]interface{})
@@ -62,7 +62,7 @@ func resourceBigipFastApp() *schema.Resource {
 						}
 					}
 					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityAfter == true {
+					if jsonEqualityAfter {
 						return true
 					} else {
 						return false

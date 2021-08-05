@@ -125,12 +125,12 @@ func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{})
 	partition := d.Get("partition").(string)
 
 	if partition == "" {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			err := errors.New("the name must be in full_path format when partition is not specified")
 			fmt.Print(err)
 		}
 	} else {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			name = "/" + partition + "/" + name
 		}
 	}

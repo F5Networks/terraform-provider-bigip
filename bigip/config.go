@@ -24,7 +24,6 @@ type Config struct {
 
 func (c *Config) Client() (*bigip.BigIP, error) {
 
-	//if c.Address != "" && c.Username != "" && (c.Token != "" || c.Password != "") {
 	log.Println("[INFO] Initializing BigIP connection")
 	var client *bigip.BigIP
 	var err error
@@ -53,8 +52,7 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 		}
 	}
 	return nil, err
-	//}
-	//return nil, fmt.Errorf("BigIP provider requires address, username and one of password or token_value")
+
 }
 
 func (c *Config) validateConnection(client *bigip.BigIP) error {

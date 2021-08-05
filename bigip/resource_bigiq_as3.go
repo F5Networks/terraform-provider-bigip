@@ -106,7 +106,7 @@ func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	as3ID := fmt.Sprintf("%s_%s", targetInfo, successfulTenants)
 	d.SetId(as3ID)
-	p = p + 1
+	p++
 	return resourceBigiqAs3Read(d, meta)
 }
 
@@ -169,16 +169,6 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 	tenantList, _, _ := bigiqRef.GetTenantList(as3Json)
 	if tenantList != name {
 		_ = d.Set("tenant_list", tenantList)
-		newList := strings.Split(tenantList, ",")
-		oldList := strings.Split(name, ",")
-		deletedTenants := bigiqRef.TenantDifference(oldList, newList)
-		if deletedTenants != "" {
-			//err, _ := bigiqRef.DeleteAs3Bigip(deleted_tenants)
-			//if err != nil {
-			//	log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
-			//	return err
-			//}
-		}
 	}
 	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3Json)
 	if err != nil {
@@ -187,7 +177,7 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 	}
-	p = p + 1
+	p++
 	return resourceBigiqAs3Read(d, meta)
 }
 
@@ -212,8 +202,7 @@ func resourceBigiqAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		_ = d.Set("tenant_list", name)
 		return resourceBigipAs3Read(d, meta)
 	}
-	p = p + 1
-	//m.Unlock()
+	p++
 	d.SetId("")
 	return nil
 }

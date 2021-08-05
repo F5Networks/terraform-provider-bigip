@@ -244,7 +244,6 @@ func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
 				),
 			},
 			{
@@ -313,7 +312,6 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 					testCheckhttpExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					//resource.TestCheckResourceAttr(resFullName, "head_erase", "none"),
 				),
 			},
 			{
@@ -323,7 +321,6 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("peanutButter")), "peanutButter"),
-					//resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("500")), "500"),
 				),
 			},
 		},

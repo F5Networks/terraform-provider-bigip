@@ -180,7 +180,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	re := regexp.MustCompile(`^(12)|(13).*`)
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
-	if matchresult == true {
+	if matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		err = client.ModifyInternalDataGroupRecords(dgver1213)
 		if err != nil {

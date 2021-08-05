@@ -135,6 +135,6 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
-	//API is not supported for Deleting
+	// API is not supported for Deleting
 	return nil
 }

@@ -139,7 +139,7 @@ func resourceBigipLtmProfileFtpCreate(d *schema.ResourceData, meta interface{}) 
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		ftpProfileConfig := &bigip.Ftp{
 			Name:                  name,
@@ -206,7 +206,7 @@ func resourceBigipLtmProfileFtpUpdate(d *schema.ResourceData, meta interface{}) 
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		log.Println("[INFO] Updating TCP Profile Route " + name)
 		ftpProfileConfig := &bigip.Ftp{
@@ -281,7 +281,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 
 		if _, ok := d.GetOk("ftps_mode"); ok {

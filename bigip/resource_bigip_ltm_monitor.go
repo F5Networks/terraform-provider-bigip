@@ -206,7 +206,6 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(name)
-	//_ = resourceBigipLtmMonitorUpdate(d, meta)
 	return resourceBigipLtmMonitorRead(d, meta)
 }
 
@@ -364,6 +363,6 @@ func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.M
 	config.Username = d.Get("username").(string)
 	config.Password = d.Get("password").(string)
 	config.UpInterval = d.Get("up_interval").(int)
-	//config.Description
+	// config.Description
 	return config
 }

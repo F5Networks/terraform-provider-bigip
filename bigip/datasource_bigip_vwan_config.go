@@ -8,7 +8,6 @@ package bigip
 import (
 	"context"
 	"encoding/json"
-
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
@@ -117,7 +116,6 @@ func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) err
 		if v["vpnSiteConfiguration"].(map[string]interface{})["Name"] == config.siteName {
 			log.Printf("[DEBUG] IPAddress : %+v", v["vpnSiteConfiguration"].(map[string]interface{})["IPAddress"])
 			_ = d.Set("bigip_gw_ip", v["vpnSiteConfiguration"].(map[string]interface{})["IPAddress"])
-			//v.(map[string]interface{})["configurationVersion"]
 			for _, vv := range v["vpnSiteConnections"].([]interface{}) {
 
 				_ = d.Set("hub_address_space", vv.(map[string]interface{})["hubConfiguration"].(map[string]interface{})["AddressSpace"])
@@ -172,7 +170,6 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	vpnconfigClient := network.NewVpnSitesConfigurationClient(subscriptionID)
 	_, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer cancel()
-	//defer resources.Cleanup(ctx)
 	resourceGroupName := config.resourceGroupName
 	virtualWANName := config.virtualWANName
 	siteName := config.siteName
@@ -256,6 +253,11 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	time.Sleep(10 * time.Second)
 
 	destFile, err := os.Create(destFileName)
+	if err != nil {
+		log.Printf("Unable to create destination file %+v", err.Error())
+		return nil, err
+	}
+
 	defer destFile.Close()
 
 	// Perform download
@@ -279,7 +281,7 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	return result, nil
 }
 
-//CreateToken creates a service principal token
+// CreateToken creates a service principal token
 func CreateToken(tenantID, clientID, clientSecret string) (adal.OAuthTokenProvider, error) {
 	const activeDirectoryEndpoint = "https://login.microsoftonline.com/"
 	var token adal.OAuthTokenProvider

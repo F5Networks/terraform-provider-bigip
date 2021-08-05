@@ -263,7 +263,6 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 	if poolInfo == nil {
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
-	//poolLicenseType := d.Get("pool_license_type").(string)
 	poolName := d.Get("license_poolname").(string)
 	regKey := d.Get("key").(string)
 	poolId, err := bigiqRef.GetRegkeyPoolId(poolName)
