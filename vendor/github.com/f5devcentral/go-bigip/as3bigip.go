@@ -399,7 +399,7 @@ func (b *BigIP) GetTarget(body interface{}) string {
 	for key, value := range jsonRef {
 		if _, ok := value.(map[string]interface{}); ok && key == "declaration" {
 			if val, ok := value.(map[string]interface{})["target"]; ok {
-				//log.Printf("[DEBUG]: target:%+v", val.(map[string]interface{})["address"])
+
 				return val.(map[string]interface{})["address"].(string)
 			}
 		}
@@ -413,7 +413,7 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	resp := []byte(as3json)
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(resp, &jsonRef)
-	//jsonRef["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
+
 	as3ver, err := b.getAs3version()
 	if err != nil {
 		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
@@ -423,8 +423,7 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	}
 	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
 	log.Printf("[DEBUG] Terraform Version:%+v", b.UserAgent)
-	//userAgent, err := getVersion("/usr/local/bin/terraform")
-	//log.Printf("[DEBUG] Terraform version:%+v", userAgent)
+
 	res1 := strings.Split(as3ver.Version, ".")
 	for key, value := range jsonRef {
 		if key == "declaration" {
@@ -437,7 +436,6 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	}
 	jsonData, err := json.Marshal(jsonRef)
 	if err != nil {
-		//log.Println(err)
 		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
 	}
 	s = string(jsonData)

@@ -9,12 +9,10 @@ import (
 	"context"
 	"encoding/json"
 
-	//"errors"
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 
-	//"github.com/Azure/azure-sdk-for-go/storage"
 	"io/ioutil"
 	"log"
 	"net/url"
@@ -92,7 +90,6 @@ func dataSourceBigipVwanconfig() *schema.Resource {
 	}
 }
 func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) error {
-	//client := meta.(*bigip.BigIP)
 	d.SetId("")
 	log.Println("[INFO] Reading VWAN Config for site:" + d.Get("azure_vwan_vpnsite").(string))
 
@@ -122,8 +119,7 @@ func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) err
 			_ = d.Set("bigip_gw_ip", v["vpnSiteConfiguration"].(map[string]interface{})["IPAddress"])
 			//v.(map[string]interface{})["configurationVersion"]
 			for _, vv := range v["vpnSiteConnections"].([]interface{}) {
-				//log.Printf("[DEBUG] vpnSiteConnections : %+v", vv)
-				//log.Printf("[DEBUG] hubConfiguration : %+v", vv.(map[string]interface{})["hubConfiguration"])
+
 				_ = d.Set("hub_address_space", vv.(map[string]interface{})["hubConfiguration"].(map[string]interface{})["AddressSpace"])
 				var hubSubnet []string
 				for _, val := range vv.(map[string]interface{})["hubConfiguration"].(map[string]interface{})["ConnectedSubnets"].([]interface{}) {
@@ -141,8 +137,6 @@ func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) err
 			}
 		}
 	}
-	//log.Println("[INFO] Reading VWAN Config : " + d.Get("azure_vwan_resourcegroup").(string))
-	//DownloadVwanConfig()
 
 	d.SetId(d.Get("azure_vwan_vpnsite").(string))
 
@@ -188,11 +182,7 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	accountKey := config.accountKey
 	containerName := "myvpnsiteconfig"
 	destFileName := "vpnconfigdownload.json"
-	//strorageClient, err := storage.NewBasicClient(accountName, accountKey)
-	//log.Printf("[DEBUG] strorageClient : %+v", strorageClient)
 
-	// From the Azure portal, get your Storage account blob service URL endpoint.
-	//cURL, _ := url.Parse(fmt.Sprintf("https://%s.blob.core.windows.net/vpnsiteconfig/%s", accountName, destFileName))
 	cURL, _ := url.Parse(fmt.Sprintf("https://%s.blob.core.windows.net/%s", accountName, containerName))
 	credential, err := azblob.NewSharedKeyCredential(accountName, accountKey)
 	if err != nil {
@@ -205,12 +195,10 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	if err != nil {
 		log.Printf("NewContainerURL failed %+v", err.Error())
 		return nil, err
-		//c.Fatal(err)
 	}
 	containerURL, _ := url.Parse(fmt.Sprintf("%s", containerURL1))
 
 	cURL1, _ := url.Parse(fmt.Sprintf("%s/%s", containerURL, destFileName))
-	//log.Printf("[DEBUG] cURL1  : %+v", cURL1)
 
 	// Set the desired SAS signature values and sign them with the shared key credentials to get the SAS query parameters.
 	sasQueryParams, err := azblob.AccountSASSignatureValues{
@@ -240,26 +228,18 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	// Now, you can use this serviceURL just like any other to make requests of the resource.
 
 	// You can parse a URL into its constituent parts:
-	//blobURLParts := azblob.NewBlobURLParts(serviceURL.URL())
 
 	p := azblob.NewPipeline(credential, azblob.PipelineOptions{})
 
-	// // From the Azure portal, get your Storage account blob service URL endpoint.
-	// cURL, _ := url.Parse(fmt.Sprintf("https://%s.blob.core.windows.net/mycontainer", accountName))
-
-	// Create an ServiceURL object that wraps the service URL and a request pipeline to making requests.
-	//containerURL := azblob.NewContainerURL(*cURL, p)
-	//log.Printf("containerURL : %+v", containerURL)
 	// Here's how to create a blob with HTTP headers and metadata (I'm using the same metadata that was put on the container):
 	blobURL := azblob.NewBlockBlobURL(*cURL1, p)
-	//sasUrl := fmt.Sprintf("%s", blobURL.BlobURL)
+
 	sasUrl := fmt.Sprintf("%s", serviceURL)
 	log.Printf("[DEBUG] sasUrl : %+v", sasUrl)
-	//log.Printf("blobURL : %+v", blobURL.BlobURL)
 
 	token, _ := CreateToken(tenantID, clientID, clientPassword)
 	vpnconfigClient.Authorizer = autorest.NewBearerAuthorizer(token)
-	//log.Printf("[INFO]vpnconfigClient:%+v", vpnconfigClient.Authorizer)
+
 	_, err = vpnconfigClient.Download(
 		context.Background(),
 		resourceGroupName,
@@ -268,7 +248,7 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 			OutputBlobSasURL: &sasUrl,
 			VpnSites:         &siteList,
 		})
-	//err = future1.WaitForCompletionRef(ctx, vpnconfigClient.Client)
+
 	if err != nil {
 		log.Printf("Push vWAN config to sasUrl Failed : %+v", err.Error())
 		return nil, err

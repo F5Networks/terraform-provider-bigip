@@ -51,30 +51,16 @@ func resourceBigiqAs3() *schema.Resource {
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
-				Type:      schema.TypeBool,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
@@ -99,8 +85,7 @@ func resourceBigiqAs3() *schema.Resource {
 }
 
 func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
-	//bigipRef := meta.(*bigip.BigIP)
-	//log.Println(bigipRef)
+
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)

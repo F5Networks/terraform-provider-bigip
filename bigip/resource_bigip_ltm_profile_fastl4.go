@@ -133,8 +133,6 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 
 	name := d.Id()
 
-	//log.Println("[INFO] Updating Route " + description)
-
 	r := &bigip.Fastl4{
 		Name:                  name,
 		Partition:             d.Get("partition").(string),

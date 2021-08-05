@@ -2741,10 +2741,6 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 	values := []string{}
 	values = append(values, "~Common~Drafts~")
 	values = append(values, name)
-	// Join three strings into one.
-	//result := strings.Join(values, "")
-
-	//log.Println("  ================== here in publish ", result, publish)
 
 	return b.post(config, uriLtm, uriPolicy)
 }

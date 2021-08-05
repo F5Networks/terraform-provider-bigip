@@ -70,12 +70,10 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 				Command:     "run",
 				UtilCmdArgs: str,
 			}
-			//log.Printf("[INFO] Command struct:%+v", commandConfig)
 			resultCmd, err := client.RunCommand(commandConfig)
 			if err != nil {
 				return fmt.Errorf("error retrieving Command Result: %v", err)
 			}
-			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
 			resultList = append(resultList, resultCmd.CommandResult)
 		}
 		_ = d.Set("command_result", resultList)
@@ -84,7 +82,6 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
-		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
 		assetInfo := f5teem.AssetInfo{
 			"Terraform-provider-bigip",
 			client.UserAgent,
@@ -120,17 +117,14 @@ func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
 		var resultList []string
 		for _, str := range commandList {
-			//log.Printf("[INFO] Command to run:%v", str)
 			commandConfig := &bigip.BigipCommand{
 				Command:     "run",
 				UtilCmdArgs: str,
 			}
-			//log.Printf("[INFO] Command struct:%+v", commandConfig)
 			resultCmd, err := client.RunCommand(commandConfig)
 			if err != nil {
 				return fmt.Errorf("error retrieving Command Result: %v", err)
 			}
-			//log.Printf("[INFO] Result Command struct:%+v", resultCmd)
 			resultList = append(resultList, resultCmd.CommandResult)
 		}
 		_ = d.Set("command_result", resultList)
@@ -162,7 +156,6 @@ func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error 
 			}
 			log.Printf("[INFO] Result Command struct:%+v", resultCmd)
 			resultList = append(resultList, resultCmd.CommandResult)
-			//d.Set()
 		}
 	}
 	d.SetId("")

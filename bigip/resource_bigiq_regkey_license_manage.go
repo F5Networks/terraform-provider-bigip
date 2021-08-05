@@ -51,30 +51,16 @@ func resourceBigiqLicenseManage() *schema.Resource {
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
-				Type:      schema.TypeBool,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
@@ -155,7 +141,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	if poolInfo == nil {
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
-	//log.Printf("poolInfo:%+v", poolInfo)
+
 	var licenseType string
 	if poolInfo.SortName == "Registration Key Pool" {
 		licenseType = poolInfo.SortName
@@ -234,13 +220,11 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 				Password:      bigipRef.Password,
 				HTTPSPort:     devicePort,
 			}
-			//log.Printf("config2 = %+v", config)
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
 				return err
 			}
-			//log.Printf("Resp from Post = %+v", resp)
 			respID = resp.ID
 		}
 	}
@@ -413,13 +397,13 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 				Password:      bigipRef.Password,
 				HTTPSPort:     devicePort,
 			}
-			//log.Printf("config2 = %+v", config)
+
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
 				return err
 			}
-			//log.Printf("Resp from Post = %+v", resp)
+
 			respID = resp.ID
 		}
 	}
@@ -533,16 +517,10 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 		Username: d.Get("bigiq_user").(string),
 		Password: d.Get("bigiq_password").(string),
 	}
-	//type loginReference struct {
-	//	Link string `json:"link"`
-	//}
-	//
-	//logRef := loginReference{
-	//	fmt.Sprintf("https://localhost/mgmt/cm/system/authn/providers/%s/login",d.Get("bigiq_login_ref").(string)),
-	//}
+
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)
 	}
-	//log.Printf("[DEBUG] BIGIQ CONFIG:%+v", bigiqConfig)
+
 	return bigiqConfig.Client()
 }

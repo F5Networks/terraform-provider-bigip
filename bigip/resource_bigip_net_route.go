@@ -139,7 +139,7 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	//log.Printf("[DEBUG] Read call Response: %+v", obj)
+
 	d.Set("name", obj.FullPath)
 
 	if err := d.Set("network", obj.Network); err != nil {

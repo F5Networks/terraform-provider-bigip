@@ -635,7 +635,6 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		}
 	}
 
-	//log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
 	certMap := make(map[string]interface{})
 	var certMapList []interface{}
 	for _, c := range obj.CertKeyChain {

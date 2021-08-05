@@ -182,10 +182,8 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	//log.Printf("[INFO] Tenants in Json:%+v", tenantList)
 	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
 	err, successfulTenants := client.PostAs3Bigip(strTrimSpace, tenantList)
-	//log.Printf("[DEBUG] successfulTenants: %+v , err: %+v", successfulTenants, err)
 	if err != nil {
 		if successfulTenants == "" {
 			return fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err)
@@ -217,15 +215,12 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
 	d.SetId(d.Get("tenant_list").(string))
-	//d.SetId(tenantList)
 	x = x + 1
-	//m.Unlock()
 	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading As3 config")
-	//name := d.Get("tenant_list").(string)
 	name := d.Id()
 	applicationList := d.Get("application_list").(string)
 	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
@@ -285,11 +280,9 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	as3Json := d.Get("as3_json").(string)
-	//m.Lock()
 	m.Lock()
 	defer m.Unlock()
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
-	//name := d.Get("tenant_list").(string)
 	name := d.Id()
 	tenantList, _, _ := client.GetTenantList(as3Json)
 	tenantFilter := d.Get("tenant_filter").(string)
@@ -329,18 +322,14 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	x = x + 1
-	//m.Unlock()
 	return resourceBigipAs3Read(d, meta)
 }
 
 func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	//as3Json := d.Get("as3_json").(string)
 	m.Lock()
 	defer m.Unlock()
-	//m.Lock()
 	log.Printf("[INFO] Deleting As3 config")
-	//name := d.Get("tenant_list").(string)
 	name := d.Id()
 	err, failedTenants := client.DeleteAs3Bigip(name)
 	if err != nil {
@@ -352,7 +341,6 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		return resourceBigipAs3Read(d, meta)
 	}
 	x = x + 1
-	//m.Unlock()
 	d.SetId("")
 	return nil
 }

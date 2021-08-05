@@ -155,8 +155,6 @@ func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interfac
 
 	name := d.Id()
 
-	//log.Println("[INFO] Updating Route " + description)
-
 	r := &bigip.Fasthttp{
 		Name:                        name,
 		DefaultsFrom:                d.Get("defaults_from").(string),

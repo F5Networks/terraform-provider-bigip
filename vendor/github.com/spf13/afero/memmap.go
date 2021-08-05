@@ -92,12 +92,10 @@ func (m *MemMapFs) registerWithParent(f *mem.FileData) {
 		pdir := filepath.Dir(filepath.Clean(f.Name()))
 		err := m.lockfreeMkdir(pdir, 0777)
 		if err != nil {
-			//log.Println("Mkdir error:", err)
 			return
 		}
 		parent, err = m.lockfreeOpen(pdir)
 		if err != nil {
-			//log.Println("Open after Mkdir error:", err)
 			return
 		}
 	}

@@ -106,7 +106,6 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
-		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
 		assetInfo := f5teem.AssetInfo{
 			"Terraform-provider-bigip",
 			client.UserAgent,

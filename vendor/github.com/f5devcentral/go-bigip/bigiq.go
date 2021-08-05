@@ -155,7 +155,7 @@ func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
 	}
 	licStatus := licRes["status"].(string)
 	for licStatus != "FINISHED" {
-		//log.Printf(" status response is :%s", licStatus)
+
 		if licStatus == "FAILED" {
 			log.Println("[ERROR]License assign/revoke status failed")
 			return licRes, nil
@@ -172,7 +172,7 @@ func (b *BigIP) GetDeviceLicenseStatus(path ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//log.Printf(" Initial status response is :%s", licRes["status"])
+
 	return licRes["status"].(string), nil
 }
 func (b *BigIP) GetRegPools() (*regKeyPools, error) {
@@ -351,12 +351,10 @@ func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 	as3Json["class"] = "AS3"
 	as3Json["action"] = "deploy"
 	as3Json["persist"] = true
-	//var adcJson
-	//adcJson := make(map[string]interface{})
-	//adcJson := []map[string]interface{}{}
+
 	var adcJson interface{}
 	tenantList := strings.Split(tenantRef, ",")
-	//log.Printf("[DEBUG] tenantList:%+v",tenantList)
+
 	err, ok := b.getForEntityNew(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantRef)
 	if err != nil {
 		return "", err
@@ -366,7 +364,7 @@ func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 	}
 	as3JsonNew := make(map[string]interface{})
 	as3jsonType := reflect.TypeOf(adcJson).Kind()
-	//log.Printf("[DEBUG] as3jsonType:%+v",as3jsonType)
+
 	if as3jsonType == reflect.Map {
 		adcJsonvalue := adcJson.(map[string]interface{})
 		if adcJsonvalue["target"].(map[string]interface{})["address"].(string) == targetRef {
