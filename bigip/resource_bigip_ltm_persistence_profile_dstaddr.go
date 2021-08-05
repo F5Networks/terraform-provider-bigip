@@ -156,7 +156,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive DestAdd Persistence Profile %s %v :", name, err)
+		log.Printf("[ERROR] Unable to retrieve DestAdd Persistence Profile %s %v :", name, err)
 		return err
 	}
 	if pp == nil {
@@ -285,7 +285,7 @@ func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, met
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Destination Address Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve Destination Address Persistence Profile  (%s) ", err)
 		return false, err
 	}
 

@@ -153,7 +153,7 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 	p, err := client.Devicegroups(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Devicegroup (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve Devicegroup (%s) (%v) ", name, err)
 		return err
 	}
 

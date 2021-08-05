@@ -8,19 +8,23 @@ package bigip
 import (
 	"context"
 	"encoding/json"
+
 	//"errors"
 	"fmt"
+
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
+
 	//"github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/Azure/azure-storage-blob-go/azblob"
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 const (

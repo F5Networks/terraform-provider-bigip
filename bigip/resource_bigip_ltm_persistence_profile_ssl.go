@@ -133,7 +133,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
@@ -242,12 +242,12 @@ func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta in
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile (%s) (%v) ", name, err)
 		return false, err
 	}
 
 	if pp == nil {
-		log.Printf("[WARN] persistance profile SSL  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistence profile SSL  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

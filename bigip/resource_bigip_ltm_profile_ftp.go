@@ -7,10 +7,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmProfileFtp() *schema.Resource {
@@ -259,7 +260,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 	obj, err := client.GetFtp(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive ftp Profile  (%s) (%v)", name, err)
+		log.Printf("[ERROR] Unable to retrieve ftp Profile  (%s) (%v)", name, err)
 		return err
 	}
 	if obj == nil {

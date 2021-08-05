@@ -8,11 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"

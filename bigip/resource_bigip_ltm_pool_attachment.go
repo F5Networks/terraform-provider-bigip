@@ -10,11 +10,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
@@ -271,7 +272,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 
 	pool, err := client.GetPool(poolName)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrive Pool (%s)  (%v) ", poolName, err)
+		log.Printf("[ERROR] Unable to Retrieve Pool (%s)  (%v) ", poolName, err)
 		return err
 	}
 	if pool == nil {

@@ -7,15 +7,16 @@ package bigip
 
 import (
 	"encoding/json"
+	"log"
+	"os"
+	"reflect"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"log"
-	"os"
-	"reflect"
-	"strings"
 )
 
 func resourceBigipFastApp() *schema.Resource {

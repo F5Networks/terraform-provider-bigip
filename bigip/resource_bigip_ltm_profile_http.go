@@ -6,13 +6,14 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"log"
+	"os"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
-	"os"
-	"strings"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
@@ -248,7 +249,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive HTTP Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve HTTP Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
@@ -375,7 +376,7 @@ func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{})
 	log.Println("[INFO] Fetching HTTPProfile " + name)
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive HTTPProfile (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve HTTPProfile (%s) (%v) ", name, err)
 		return false, err
 	}
 

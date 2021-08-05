@@ -7,14 +7,15 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
-	"os"
-	"strings"
 )
 
 func resourceBigipIpsecPolicy() *schema.Resource {
