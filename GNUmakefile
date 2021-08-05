@@ -33,11 +33,11 @@ fmtcheck:
 
 lint:
 	@echo "==> Checking source code against linters..."
-	@gometalinter ./$(PKG_NAME)
+	golangci-lint run ./...
 
 tools:
-	GO111MODULE=off go get -u github.com/alecthomas/gometalinter
-	GO111MODULE=off gometalinter --install
+	@echo "==> installing required tooling..."
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH || $$GOPATH)/bin v1.32.0
 
 
 test-compile:
