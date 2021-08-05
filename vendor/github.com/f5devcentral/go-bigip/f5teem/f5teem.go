@@ -21,14 +21,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	uuid "github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	uuid "github.com/google/uuid"
 )
 
 func AnonymousClient(assetInfo AssetInfo, apiKey string) *TeemObject {
@@ -151,6 +150,6 @@ func (b *TeemObject) Report(telemetry map[string]interface{}, telemetryType, tel
 	if resp.StatusCode != 204 {
 		return fmt.Errorf("telemetry request to teem server failed with:%v", string(data[:]))
 	}
-
+	//log.Printf("Resp Body:%v", string(data[:]))
 	return nil
 }

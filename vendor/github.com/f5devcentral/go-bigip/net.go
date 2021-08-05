@@ -517,6 +517,18 @@ func (b *BigIP) Routes() (*Routes, error) {
 
 func (b *BigIP) GetRoute(name string) (*Route, error) {
 	var route Route
+	//values := []string{}
+	//regex := regexp.MustCompile(`^(\/.+\/)?(.+)`)
+	//match := regex.FindStringSubmatch(name)
+	//log.Printf("[DEBUG] match :%+v", match)
+	//if match[1] == "" {
+	//      values = append(values, "~Common~")
+	//}
+	//values = append(values, name)
+	//// Join the strings into one.
+	//result := strings.Join(values, "")
+	//log.Printf("[DEBUG] Route :%+v", result)
+	//log.Printf("[DEBUG] Name :%+v", name)
 
 	err, ok := b.getForEntity(&route, uriNet, uriRoute, name)
 	if err != nil {
@@ -647,7 +659,9 @@ func (b *BigIP) ModifyTunnel(name string, config *Tunnel) error {
 
 func (b *BigIP) GetIkePeer(name string) (*IkePeer, error) {
 	var ikepeer IkePeer
-
+	//result := formatResourceID(name)
+	//log.Printf("[DEBUG] Reading IKE Peer:%+v", name)
+	//log.Printf("[DEBUG] Reading IKE Peer from result:%+v",result)
 	err, ok := b.getForEntity(&ikepeer, uriNet, uriIpsec, uriIkePeer, name)
 	if err != nil {
 		return nil, err
