@@ -15,7 +15,7 @@ Use this data source (`bigip_ltm_datagroup`) to get the data group details avail
 ```hcl
 
 data "bigip_ltm_datagroup" "DG-TC3" {
-  name = "test-dg"
+  name      = "test-dg"
   partition = "Common"
 }
 

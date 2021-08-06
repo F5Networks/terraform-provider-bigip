@@ -16,20 +16,20 @@ This resource is helpful to send TMSH command to an BIG-IP node and returns the 
 
 ```hcl
 resource "bigip_command" "test-command" {
-  commands   = ["show sys version"]
+  commands = ["show sys version"]
 }
 
 
 #create ltm node
 resource "bigip_command" "test-command" {
-  commands   = ["create ltm node 10.10.10.70"]
+  commands = ["create ltm node 10.10.10.70"]
 }
 
 # Destroy ltm node
 
 resource "bigip_command" "test-command" {
-  when ="destroy"
-  commands   = ["delete ltm node 10.10.10.70"]
+  when     = "destroy"
+  commands = ["delete ltm node 10.10.10.70"]
 }
 
 ```   

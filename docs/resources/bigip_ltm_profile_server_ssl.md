@@ -23,7 +23,7 @@ resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
   authenticate  = "always"
   ciphers       = "DEFAULT"
 }
-  
+
 ```      
 
 ## Argument Reference

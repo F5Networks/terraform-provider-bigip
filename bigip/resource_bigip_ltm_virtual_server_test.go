@@ -372,10 +372,11 @@ func TestAccBigipLtmVS_import(t *testing.T) {
 func testaccBigipLtmVSImportConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test_vs_import" {
-  name = "%s"
+  name        = "%s"
   destination = "192.168.11.11"
-  port = 80
-}`, "/Common/test-vs")
+  port        = 80
+}
+`, "/Common/test-vs")
 }
 
 func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
@@ -398,33 +399,36 @@ func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 func testVSCreatestatedisabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
-        name = "/Common/%s"
-        destination = "192.168.50.1"
-        port = 800
-        mask = "255.255.255.255"
-        state = "disabled"
-}`, vsName)
+  name        = "/Common/%s"
+  destination = "192.168.50.1"
+  port        = 800
+  mask        = "255.255.255.255"
+  state       = "disabled"
+}
+`, vsName)
 }
 
 func testVSCreatestateenabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
-        name = "/Common/%s"
-        destination = "192.168.50.1"
-        port = 800
-        mask = "255.255.255.255"
-        state = "enabled"
-}`, vsName)
+  name        = "/Common/%s"
+  destination = "192.168.50.1"
+  port        = 800
+  mask        = "255.255.255.255"
+  state       = "enabled"
+}
+`, vsName)
 }
 
 func testVSCreateDefaultstate(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
-        name = "/Common/%s"
-        destination = "192.168.50.1"
-        port = 800
-        mask = "255.255.255.255"
-}`, vsName)
+  name        = "/Common/%s"
+  destination = "192.168.50.1"
+  port        = 800
+  mask        = "255.255.255.255"
+}
+`, vsName)
 }
 
 func testVSCreatePolicyAttach(vsName string) string {
@@ -435,10 +439,11 @@ resource "bigip_ltm_pool" "mypool" {
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
+
 resource "bigip_ltm_policy" "test-policy" {
-  name      = "/Common/test-policy"
-  strategy  = "first-match"
-  requires  = ["http"]
+  name     = "/Common/test-policy"
+  strategy = "first-match"
+  requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"
@@ -449,12 +454,13 @@ resource "bigip_ltm_policy" "test-policy" {
   }
   depends_on = [bigip_ltm_pool.mypool]
 }
+
 resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
-  name = "/Common/%s"
+  name        = "/Common/%s"
   destination = "192.168.10.11"
-  port = 80
+  port        = 80
   description = "Test virtual server"
-  pool = bigip_ltm_pool.mypool.name
+  pool        = bigip_ltm_pool.mypool.name
   ip_protocol = "tcp"
   profiles = [
     "/Common/tcp",
@@ -464,11 +470,12 @@ resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
     "/Common/cookie"
   ]
   source_address_translation = "automap"
-  translate_address = "enabled"
+  translate_address          = "enabled"
   policies = [
     bigip_ltm_policy.test-policy.name
   ]
-}`, vsName)
+}
+`, vsName)
 }
 
 func testVSCreateAttach(poolName, policyName, vsName string) string {
@@ -479,10 +486,11 @@ resource "bigip_ltm_pool" "%[1]s" {
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
+
 resource "bigip_ltm_policy" "%[2]s" {
-  name      = "/Common/%[2]s"
-  strategy  = "first-match"
-  requires  = ["http"]
+  name     = "/Common/%[2]s"
+  strategy = "first-match"
+  requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"
@@ -493,12 +501,13 @@ resource "bigip_ltm_policy" "%[2]s" {
   }
   depends_on = [bigip_ltm_pool.%[1]s]
 }
+
 resource "bigip_ltm_virtual_server" "%[3]s" {
-  name = "/Common/%[3]s"
+  name        = "/Common/%[3]s"
   destination = "192.168.10.11"
-  port = 80
+  port        = 80
   description = "Test virtual server"
-  pool = bigip_ltm_pool.%[1]s.name
+  pool        = bigip_ltm_pool.%[1]s.name
   ip_protocol = "tcp"
   profiles = [
     "/Common/tcp",
@@ -508,11 +517,12 @@ resource "bigip_ltm_virtual_server" "%[3]s" {
     "/Common/cookie"
   ]
   source_address_translation = "automap"
-  translate_address = "enabled"
+  translate_address          = "enabled"
   policies = [
     bigip_ltm_policy.%[2]s.name
   ]
-}`, poolName, policyName, vsName)
+}
+`, poolName, policyName, vsName)
 }
 
 func testVSCreateDetatch(poolName, policyName, vsName string) string {
@@ -523,10 +533,11 @@ resource "bigip_ltm_pool" "%[1]s" {
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
+
 resource "bigip_ltm_policy" "%[2]s" {
-  name      = "/Common/%[2]s"
-  strategy  = "first-match"
-  requires  = ["http"]
+  name     = "/Common/%[2]s"
+  strategy = "first-match"
+  requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"
@@ -537,10 +548,11 @@ resource "bigip_ltm_policy" "%[2]s" {
   }
   depends_on = [bigip_ltm_pool.%[1]s]
 }
+
 resource "bigip_ltm_virtual_server" "%[3]s" {
-  name = "/Common/%[3]s"
+  name        = "/Common/%[3]s"
   destination = "192.168.10.11"
-  port = 80
+  port        = 80
   description = "Test virtual server"
   //pool = bigip_ltm_pool.%[1]s.name
   ip_protocol = "tcp"
@@ -552,11 +564,12 @@ resource "bigip_ltm_virtual_server" "%[3]s" {
     "/Common/cookie"
   ]
   source_address_translation = "automap"
-  translate_address = "enabled"
+  translate_address          = "enabled"
   policies = [
     bigip_ltm_policy.%[2]s.name
   ]
-}`, poolName, policyName, vsName)
+}
+`, poolName, policyName, vsName)
 }
 
 func testVSCreatePolicyDettach(vsName string) string {
@@ -567,10 +580,11 @@ resource "bigip_ltm_pool" "mypool" {
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
+
 resource "bigip_ltm_policy" "test-policy" {
-  name      = "/Common/test-policy"
-  strategy  = "first-match"
-  requires  = ["http"]
+  name     = "/Common/test-policy"
+  strategy = "first-match"
+  requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"
@@ -581,12 +595,13 @@ resource "bigip_ltm_policy" "test-policy" {
   }
   depends_on = [bigip_ltm_pool.mypool]
 }
+
 resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
-  name = "/Common/%s"
+  name        = "/Common/%s"
   destination = "192.168.10.11"
-  port = 80
+  port        = 80
   description = "Test virtual server"
-  pool = bigip_ltm_pool.mypool.name
+  pool        = bigip_ltm_pool.mypool.name
   ip_protocol = "tcp"
   profiles = [
     "/Common/tcp",
@@ -596,11 +611,12 @@ resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
     "/Common/cookie"
   ]
   source_address_translation = "automap"
-  translate_address = "enabled"
+  translate_address          = "enabled"
   //policies = [
   //  bigip_ltm_policy.test-policy.name
   //]
-}`, vsName)
+}
+`, vsName)
 }
 
 func testCheckVSsDestroyed(s *terraform.State) error {

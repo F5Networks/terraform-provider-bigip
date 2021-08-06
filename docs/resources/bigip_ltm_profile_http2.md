@@ -17,24 +17,24 @@ For resources should be named with their "full path". The full path is the combi
 ```hcl
 
 resource "bigip_ltm_profile_http2" "nyhttp2" {
-  name = "/Common/test-profile-http2"
-  frame_size               = 2021
-  receive_window           = 31
-  write_size               = 16380
-  header_table_size        = 4092
-  include_content_length   = "enabled"
-  enforce_tls_requirements = "enabled"
-  insert_header            = "disabled"
+  name                              = "/Common/test-profile-http2"
+  frame_size                        = 2021
+  receive_window                    = 31
+  write_size                        = 16380
+  header_table_size                 = 4092
+  include_content_length            = "enabled"
+  enforce_tls_requirements          = "enabled"
+  insert_header                     = "disabled"
   concurrent_streams_per_connection = 30
   connection_idle_timeout           = 100
-  activation_modes = ["always"]
+  activation_modes                  = ["always"]
 }
 
 #Child Profile which inherits parent http2 profile
 
 resource "bigip_ltm_profile_http2" "nyhttp2-child" {
-  name                              = "/Common/test-profile-http2-child"
-  defaults_from                     = bigip_ltm_profile_http2.nyhttp2.name
+  name          = "/Common/test-profile-http2-child"
+  defaults_from = bigip_ltm_profile_http2.nyhttp2.name
 }
 
 ```      

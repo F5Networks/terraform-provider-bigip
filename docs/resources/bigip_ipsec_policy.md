@@ -17,16 +17,16 @@ Resources should be named with their "full path". The full path is the combinati
 
 ```hcl
 resource "bigip_ipsec_policy" "test-policy" {
-   name = "/Common/test-policy"
-   description = "created by terraform provider"
-   protocol = "esp"
-   mode = "tunnel"
-   tunnel_local_address = "192.168.1.1"
-   tunnel_remote_address = "10.10.1.1"
-   auth_algorithm = "sha1"
-   encrypt_algorithm = "3des"
-   lifetime = 3
-   ipcomp = "deflate"
+  name                  = "/Common/test-policy"
+  description           = "created by terraform provider"
+  protocol              = "esp"
+  mode                  = "tunnel"
+  tunnel_local_address  = "192.168.1.1"
+  tunnel_remote_address = "10.10.1.1"
+  auth_algorithm        = "sha1"
+  encrypt_algorithm     = "3des"
+  lifetime              = 3
+  ipcomp                = "deflate"
 }
 ```      
 

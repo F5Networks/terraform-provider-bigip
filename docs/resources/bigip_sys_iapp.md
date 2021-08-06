@@ -14,10 +14,10 @@ description: |-
 
 
 ```hcl
- resource "bigip_sys_iapp" "simplehttp" {
-   name     = "simplehttp"
-   jsonfile = file("simplehttp.json")
- }
+resource "bigip_sys_iapp" "simplehttp" {
+  name     = "simplehttp"
+  jsonfile = file("simplehttp.json")
+}
 ```
 
 ## Argument Reference

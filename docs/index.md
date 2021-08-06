@@ -30,7 +30,7 @@ terraform {
 }
 
 provider "bigip" {
-  address = var.hostname
+  address  = var.hostname
   username = var.username
   password = var.password
 }

@@ -17,7 +17,7 @@ Resources should be named with their "full path". The full path is the combinati
 
 ```hcl
 resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {
-  name                  = "/Common/test-oneconnect"
+  name = "/Common/test-oneconnect"
 }
 
 ```      

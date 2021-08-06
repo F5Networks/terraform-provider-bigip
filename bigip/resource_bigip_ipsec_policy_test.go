@@ -7,10 +7,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"testing"
 )
 
 func TestAccBigipNetIPsecPolicy_create(t *testing.T) {
@@ -75,7 +76,8 @@ func testCheckIPSecPolicyDestroyed(s *terraform.State) error {
 }
 func testaccNetIpsecPolicyDefaultCreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name = "/Common/%[2]s"
+}
+		`, resName, instName)
 }

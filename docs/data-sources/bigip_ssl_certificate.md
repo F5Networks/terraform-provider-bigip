@@ -15,7 +15,7 @@ Use this data source (`bigip_ssl_certificate`) to get the ssl-certificate detail
 ```hcl
 
 data "bigip_ssl_certificate" "test" {
-  name = "terraform_ssl_certificate"
+  name      = "terraform_ssl_certificate"
   partition = "Common"
 }
 

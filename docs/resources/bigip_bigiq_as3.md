@@ -19,10 +19,10 @@ This resource is helpful to configure as3 declarative JSON on BIG-IP through BIG
 
 # Example Usage for json file
 resource "bigip_bigiq_as3" "exampletask" {
-bigiq_address = "xx.xx.xxx.xx"
-bigiq_user = "xxxxx"
-bigiq_password = "xxxxxxxxx"
-as3_json = "${file("bigiq_example.json")}"
+  bigiq_address  = "xx.xx.xxx.xx"
+  bigiq_user     = "xxxxx"
+  bigiq_password = "xxxxxxxxx"
+  as3_json       = "${file("bigiq_example.json")}"
 }
 
 
@@ -41,7 +41,7 @@ as3_json = "${file("bigiq_example.json")}"
 
 * `bigiq_example.json` - Example  AS3 Declarative JSON file
 
-```hcl
+```json
 
 {
     "class": "AS3",

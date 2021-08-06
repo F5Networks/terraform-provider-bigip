@@ -14,17 +14,17 @@ import (
 
 func testBigipSysNtpInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-		resource "bigip_sys_ntp" "test-ntp" {
-			description = "%s"
-			servers = ["10.10.10.10"]
-	                timezone = "America/Los_Angeles"
-			invalidkey = "foo"
-		}
-		provider "bigip" {
-			address = "xxx.xxx.xxx.xxx"
-			username = "xxxxx"
-			password = "xxxxx"
-		}
+resource "bigip_sys_ntp" "test-ntp" {
+  description = "%s"
+  servers     = ["10.10.10.10"]
+  timezone    = "America/Los_Angeles"
+  invalidkey  = "foo"
+}
+provider "bigip" {
+  address  = "xxx.xxx.xxx.xxx"
+  username = "xxxxx"
+  password = "xxxxx"
+}
 	`, resourceName)
 }
 

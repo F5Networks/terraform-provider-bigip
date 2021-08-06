@@ -7,8 +7,9 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -219,10 +220,11 @@ func testCheckServerSslDestroyed(s *terraform.State) error {
 }
 func testaccbigipltmprofileserversslDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-			  //defaults_from = "/Common/serverssl"
-		}`, resNameserver, instName)
+resource "%[1]s" "%[2]s" {
+  name = "/Common/%[2]s"
+  //defaults_from = "/Common/serverssl"
+}
+		`, resNameserver, instName)
 }
 
 func testAccBigipLtmProfileServerSsl_UpdateParam(instName, updateParam string) string {
