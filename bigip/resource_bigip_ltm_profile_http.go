@@ -6,13 +6,14 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"log"
+	"os"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
-	"os"
-	"strings"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
@@ -248,7 +249,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive HTTP Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve HTTP Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
@@ -310,10 +311,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	}
 	log.Printf("[DEBUG] response_headers_permitted:%+v", pp.ResponseHeadersPermitted)
 	_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
-	//if _, ok := d.GetOk("response_headers_permitted"); ok {
-	//	log.Printf("[DEBUG]response_headers_permitted:%+v", pp.ResponseHeadersPermitted)
-	//	_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
-	//}
+
 	if _, ok := d.GetOk("server_agent_name"); ok {
 		_ = d.Set("server_agent_name", pp.ServerAgentName)
 	}
@@ -329,9 +327,6 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] xff_alternative_names:%+v", pp.XffAlternativeNames)
 	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
 
-	//if _, ok := d.GetOk("xff_alternative_names"); ok {
-	//	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
-	//}
 	return nil
 }
 
@@ -375,7 +370,7 @@ func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{})
 	log.Println("[INFO] Fetching HTTPProfile " + name)
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive HTTPProfile (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve HTTPProfile (%s) (%v) ", name, err)
 		return false, err
 	}
 
@@ -407,14 +402,12 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 	config.RedirectRewrite = d.Get("redirect_rewrite").(string)
 	config.RequestChunking = d.Get("request_chunking").(string)
 	config.ResponseChunking = d.Get("response_chunking").(string)
-	//config.ResponseHeadersPermitted = setToStringSlice(d.Get("response_headers_permitted").(*schema.Set))
 	config.ResponseHeadersPermitted = setToInterfaceSlice(d.Get("response_headers_permitted").(*schema.Set))
 	config.ServerAgentName = d.Get("server_agent_name").(string)
 	config.ViaHostName = d.Get("via_host_name").(string)
 	config.ViaRequest = d.Get("via_request").(string)
 	config.ViaResponse = d.Get("via_response").(string)
-	//config.XffAlternativeNames = setToStringSlice(d.Get("xff_alternative_names").(*schema.Set))
 	config.XffAlternativeNames = setToInterfaceSlice(d.Get("xff_alternative_names").(*schema.Set))
-	//log.Printf("[DEBUG]Connfig: %+v", config)
+
 	return config
 }

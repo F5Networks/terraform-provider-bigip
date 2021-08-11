@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipTrafficselector() *schema.Resource {
@@ -156,7 +157,7 @@ func resourceBigipTrafficselectorRead(d *schema.ResourceData, meta interface{}) 
 func resourceBigipTrafficselectorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Printf("[INFO] Check existance of Traffic Selector: %+v ", name)
+	log.Printf("[INFO] Check existence of Traffic Selector: %+v ", name)
 	ts, err := client.GetTrafficselctor(name)
 	if err != nil {
 		return false, err

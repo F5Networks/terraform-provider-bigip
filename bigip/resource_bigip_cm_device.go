@@ -109,7 +109,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 
 	members, err := client.Devices(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Device (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve Device (%s) (%v) ", name, err)
 		return err
 	}
 	if members == nil {

@@ -8,11 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 //Validate the incoming set only contains values from the specified set
@@ -42,16 +43,12 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
@@ -70,16 +67,12 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
@@ -126,16 +119,12 @@ func validatePartitionName(value interface{}, field string) (ws []string, errors
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName", reflect.TypeOf(value)))
 	}
@@ -154,16 +143,12 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 	switch value.(type) {
 	case *schema.Set:
 		values = setToStringSlice(value.(*schema.Set))
-		break
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolMemberName", reflect.TypeOf(value)))
 	}
@@ -186,10 +171,7 @@ func validatePoolMemberName(value interface{}, field string) (ws []string, error
 
 // IsValidIP tests that the argument is a valid IP address.
 func IsValidIP(value string) bool {
-	if net.ParseIP(value) == nil {
-		return false
-	}
-	return true
+	return net.ParseIP(value) != nil
 }
 
 func validateEnabledDisabled(value interface{}, field string) (ws []string, errors []error) {
@@ -199,13 +181,10 @@ func validateEnabledDisabled(value interface{}, field string) (ws []string, erro
 		values = setToStringSlice(value.(*schema.Set))
 	case []string:
 		values = value.([]string)
-		break
 	case *[]string:
 		values = *(value.(*[]string))
-		break
 	case string:
 		values = []string{value.(string)}
-		break
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateEnabledDisabled", reflect.TypeOf(value)))
 	}

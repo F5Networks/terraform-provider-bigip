@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"regexp"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 func testBigipSysNtpInvalid(resourceName string) string {

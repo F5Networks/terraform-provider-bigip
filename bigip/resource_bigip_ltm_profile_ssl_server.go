@@ -7,14 +7,15 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
@@ -769,7 +770,6 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.SslC3d = sslC3d
 	config.SslForwardProxy = sslForwardProxyEnabled
 	config.SslForwardProxyBypass = sslForwardProxyBypass
-	//config.SslForwardProxyBypass = d.Get("ssl_forward_proxy_bypass").(string)
 	config.SslSignHash = d.Get("ssl_sign_hash").(string)
 	config.StrictResume = d.Get("strict_resume").(string)
 	config.UncleanShutdown = d.Get("unclean_shutdown").(string)

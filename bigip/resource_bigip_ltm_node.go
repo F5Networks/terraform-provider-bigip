@@ -217,9 +217,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	d.Set("name", name)
-	//if err := d.Set("monitor", node.Monitor); err != nil {
-	//	return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
-	//}
+
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
@@ -232,8 +230,6 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		d.Set("session", "user-disabled")
 	}
 
-	//d.Set("state", node.State)
-	//d.Set("session", node.Session)
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)

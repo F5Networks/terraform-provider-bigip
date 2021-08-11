@@ -10,11 +10,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
@@ -122,7 +123,6 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			}
 			err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
 			if err != nil {
-				//_ = client.DeleteHttpProfile(name)
 				return err
 			}
 
@@ -137,7 +137,6 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
 		err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
 		if err != nil {
-			//_ = client.DeleteHttpProfile(name)
 			return err
 		}
 		return nil
@@ -148,7 +147,6 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			Partition: poolPartition,
 		}
 		if !IsValidIP(parts[0]) {
-			//log.Printf("[INFO] Adding FQDN node %s to pool: %s", nodeName, poolName)
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {
 				autoPopulate = "enabled"
@@ -166,7 +164,6 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		d.SetId(poolName)
 		err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
 		if err != nil {
-			//_ = client.DeleteHttpProfile(name)
 			return err
 		}
 	}
@@ -271,7 +268,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 
 	pool, err := client.GetPool(poolName)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrive Pool (%s)  (%v) ", poolName, err)
+		log.Printf("[ERROR] Unable to Retrieve Pool (%s)  (%v) ", poolName, err)
 		return err
 	}
 	if pool == nil {
@@ -304,7 +301,6 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		for _, node := range nodes.PoolMembers {
 			if expected == node.Name {
 				_ = d.Set("node", expected)
-				//_ = d.Set("node_fullpath", node.FullPath)
 				found = true
 				break
 			}

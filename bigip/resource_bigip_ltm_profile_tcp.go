@@ -142,7 +142,7 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 	obj, err := client.GetTcp(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive tcp Profile  (%s) (%v)", name, err)
+		log.Printf("[ERROR] Unable to retrieve tcp Profile  (%s) (%v)", name, err)
 		return err
 	}
 	if obj == nil {

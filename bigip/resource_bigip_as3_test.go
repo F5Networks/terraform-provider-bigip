@@ -8,14 +8,15 @@ package bigip
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"testing"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 //var TEST_DEVICE_NAME = fmt.Sprintf("/%s/test-device", TEST_PARTITION)

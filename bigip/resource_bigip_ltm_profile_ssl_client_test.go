@@ -44,7 +44,7 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/505
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/505
 //
 func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 	t.Parallel()
@@ -81,7 +81,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
@@ -101,7 +101,6 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
 			},
@@ -166,7 +165,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
@@ -186,7 +185,6 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")), "dont-insert-empty-fragments"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -198,7 +196,6 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
@@ -208,12 +205,11 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/318
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/318
 //
 func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl"
-	//var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
 	resFullName := fmt.Sprintf("%s.%s", resName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -259,8 +255,6 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
-					//resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
-					//resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),
@@ -273,10 +267,7 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 					testCheckClientSslExists(instFullName, true),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					//resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
-					//resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
-					//resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),

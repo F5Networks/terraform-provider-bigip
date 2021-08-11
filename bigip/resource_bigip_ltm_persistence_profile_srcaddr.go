@@ -300,7 +300,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, met
 	}
 
 	if pp == nil {
-		log.Printf("[WARN] persistance profile src_addr  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistence profile src_addr  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

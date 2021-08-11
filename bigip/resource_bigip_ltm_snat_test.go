@@ -8,10 +8,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"testing"
 )
 
 var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)

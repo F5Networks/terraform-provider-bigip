@@ -355,7 +355,7 @@ func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta
 		return false, err
 	}
 	if pp == nil {
-		log.Printf("[WARN] persistance profile cookie (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistence profile cookie (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}

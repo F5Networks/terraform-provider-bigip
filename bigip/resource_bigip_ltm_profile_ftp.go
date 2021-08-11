@@ -7,10 +7,11 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmProfileFtp() *schema.Resource {
@@ -138,7 +139,7 @@ func resourceBigipLtmProfileFtpCreate(d *schema.ResourceData, meta interface{}) 
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		ftpProfileConfig := &bigip.Ftp{
 			Name:                  name,
@@ -205,7 +206,7 @@ func resourceBigipLtmProfileFtpUpdate(d *schema.ResourceData, meta interface{}) 
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 		log.Println("[INFO] Updating TCP Profile Route " + name)
 		ftpProfileConfig := &bigip.Ftp{
@@ -259,7 +260,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 	obj, err := client.GetFtp(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive ftp Profile  (%s) (%v)", name, err)
+		log.Printf("[ERROR] Unable to retrieve ftp Profile  (%s) (%v)", name, err)
 		return err
 	}
 	if obj == nil {
@@ -280,7 +281,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	matchresult := re.MatchString(bigipversion)
 	regversion := re.FindAllString(bigipversion, -1)
 
-	if matchresult == false {
+	if !matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
 
 		if _, ok := d.GetOk("ftps_mode"); ok {

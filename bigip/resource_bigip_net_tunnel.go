@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipNetTunnel() *schema.Resource {
@@ -157,7 +158,6 @@ func resourceBigipNetTunnelRead(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	log.Printf("[DEBUG] Reading TUNNEL %s", name)
-	//name = strings.Replace(name, "/", "~", -1)
 	tunnel, err := client.GetTunnel(name)
 	log.Printf("[DEBUG] TUNNEL Output :%+v", tunnel)
 	if err != nil {

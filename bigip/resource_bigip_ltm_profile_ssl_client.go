@@ -7,14 +7,15 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmProfileClientSsl() *schema.Resource {
@@ -634,7 +635,6 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		}
 	}
 
-	//log.Printf("[DEBUG] CertKeyChain:%+v", obj.CertKeyChain)
 	certMap := make(map[string]interface{})
 	var certMapList []interface{}
 	for _, c := range obj.CertKeyChain {

@@ -9,8 +9,9 @@ package bigip
 import (
 	"fmt"
 	//"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 func TestAccBigipLtmDataGroup_basic(t *testing.T) {

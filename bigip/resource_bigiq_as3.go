@@ -2,13 +2,14 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 var p = 0
@@ -50,30 +51,16 @@ func resourceBigiqAs3() *schema.Resource {
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
-				Type:      schema.TypeBool,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
@@ -98,8 +85,7 @@ func resourceBigiqAs3() *schema.Resource {
 }
 
 func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
-	//bigipRef := meta.(*bigip.BigIP)
-	//log.Println(bigipRef)
+
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -120,7 +106,7 @@ func resourceBigiqAs3Create(d *schema.ResourceData, meta interface{}) error {
 	}
 	as3ID := fmt.Sprintf("%s_%s", targetInfo, successfulTenants)
 	d.SetId(as3ID)
-	p = p + 1
+	p++
 	return resourceBigiqAs3Read(d, meta)
 }
 
@@ -183,16 +169,6 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 	tenantList, _, _ := bigiqRef.GetTenantList(as3Json)
 	if tenantList != name {
 		_ = d.Set("tenant_list", tenantList)
-		newList := strings.Split(tenantList, ",")
-		oldList := strings.Split(name, ",")
-		deletedTenants := bigiqRef.TenantDifference(oldList, newList)
-		if deletedTenants != "" {
-			//err, _ := bigiqRef.DeleteAs3Bigip(deleted_tenants)
-			//if err != nil {
-			//	log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
-			//	return err
-			//}
-		}
 	}
 	err, successfulTenants := bigiqRef.PostAs3Bigiq(as3Json)
 	if err != nil {
@@ -201,7 +177,7 @@ func resourceBigiqAs3Update(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 	}
-	p = p + 1
+	p++
 	return resourceBigiqAs3Read(d, meta)
 }
 
@@ -226,8 +202,7 @@ func resourceBigiqAs3Delete(d *schema.ResourceData, meta interface{}) error {
 		_ = d.Set("tenant_list", name)
 		return resourceBigipAs3Read(d, meta)
 	}
-	p = p + 1
-	//m.Unlock()
+	p++
 	d.SetId("")
 	return nil
 }

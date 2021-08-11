@@ -171,7 +171,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	return cfg, err
 }
 
-//Convert slice of strings to schema.TypeSet
+// Convert slice of strings to schema.TypeSet
 func makeStringList(list *[]string) []interface{} {
 	ilist := make([]interface{}, len(*list))
 	for i, v := range *list {
@@ -180,7 +180,7 @@ func makeStringList(list *[]string) []interface{} {
 	return ilist
 }
 
-//Convert slice of strings to schema.Set
+// Convert slice of strings to schema.Set
 func makeStringSet(list *[]string) *schema.Set {
 	ilist := make([]interface{}, len(*list))
 	for i, v := range *list {
@@ -189,7 +189,7 @@ func makeStringSet(list *[]string) *schema.Set {
 	return schema.NewSet(schema.HashString, ilist)
 }
 
-//Convert schema.TypeList to a slice of strings
+// Convert schema.TypeList to a slice of strings
 func listToStringSlice(s []interface{}) []string {
 	list := make([]string, len(s))
 	for i, v := range s {
@@ -198,7 +198,7 @@ func listToStringSlice(s []interface{}) []string {
 	return list
 }
 
-//Convert schema.Set to a slice of strings
+// Convert schema.Set to a slice of strings
 func setToStringSlice(s *schema.Set) []string {
 	list := make([]string, s.Len())
 	for i, v := range s.List() {
@@ -207,7 +207,7 @@ func setToStringSlice(s *schema.Set) []string {
 	return list
 }
 
-//Convert schema.Set to a slice of interface
+// Convert schema.Set to a slice of interface
 func setToInterfaceSlice(s *schema.Set) []interface{} {
 	list := make([]interface{}, s.Len())
 	for i, v := range s.List() {
@@ -216,7 +216,7 @@ func setToInterfaceSlice(s *schema.Set) []interface{} {
 	return list
 }
 
-//Copy map values into an object where map key == object field name (e.g. map[foo] == &{Foo: ...}
+// Copy map values into an object where map key == object field name (e.g. map[foo] == &{Foo: ...}
 func mapEntity(d map[string]interface{}, obj interface{}) {
 	val := reflect.ValueOf(obj).Elem()
 	for field := range d {
@@ -239,7 +239,7 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 	}
 }
 
-//Break a string in the format /Partition/name into a Partition / Name object
+// Break a string in the format /Partition/name into a Partition / Name object
 func parseF5Identifier(str string) (partition, name string) {
 	if strings.HasPrefix(str, "/") {
 		ary := strings.SplitN(strings.TrimPrefix(str, "/"), "/", 2)
@@ -252,7 +252,7 @@ func parseF5Identifier(str string) (partition, name string) {
 func toCamelCase(str string) string {
 	var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
 	return link.ReplaceAllStringFunc(str, func(s string) string {
-		return strings.ToUpper(strings.Replace(s, "_", "", -1))
+		return strings.ToUpper(strings.ReplaceAll(s, "_", ""))
 	})
 }
 

@@ -97,6 +97,6 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceBigipSysBigiplicenseDelete(d *schema.ResourceData, meta interface{}) error {
-	//API does not Exists
+	// API does not Exists
 	return nil
 }

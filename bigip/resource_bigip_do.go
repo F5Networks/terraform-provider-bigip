@@ -9,16 +9,17 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	uuid "github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	uuid "github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 )
 
 func resourceBigipDo() *schema.Resource {
@@ -235,7 +236,6 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	json.Unmarshal(resp_body, &respRef1)
 	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
 
-	//dojson := make(map[string]interface{})
 	dojson := respRef1["declaration"]
 	out, _ := json.Marshal(dojson)
 	doString := string(out)
@@ -355,7 +355,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	if do_success == false {
+	if !do_success {
 		log.Printf("[DEBUG] Didn't get successful response within timeout")
 		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 		req, _ := http.NewRequest("GET", url, nil)
