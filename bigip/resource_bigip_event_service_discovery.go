@@ -89,9 +89,7 @@ func resourceServiceDiscoveryRead(d *schema.ResourceData, meta interface{}) erro
 	var nodeList []interface{}
 	log.Printf("[INFO] Get Event driven service discovery nodes for Application:%+v", taskid)
 	if m, ok := d.GetOk("node"); ok {
-		for _, node := range m.(*schema.Set).List() {
-			nodeList = append(nodeList, node)
-		}
+		nodeList = append(nodeList, m.(*schema.Set).List()...)
 	}
 	serviceDiscoveryResp, err := client.GetServiceDiscoveryNodes(taskid)
 	log.Printf("[DEBUG] serviceDiscoveryResp is :%v", serviceDiscoveryResp)

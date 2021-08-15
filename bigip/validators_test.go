@@ -23,7 +23,7 @@ func TestInvalidStringValue(t *testing.T) {
 }
 
 func TestF5NameString(t *testing.T) {
-	//test string => expected error count
+	// test string => expected error count
 	data := map[string]int{
 		"/Common/foo":                           0,
 		"/My-Partition_name/object-name_string": 0,
@@ -40,7 +40,7 @@ func TestF5NameString(t *testing.T) {
 }
 
 func TestF5NameSet(t *testing.T) {
-	//test string => expected error count
+	// test string => expected error count
 	data := map[*schema.Set]int{
 		makeStringSet(&[]string{"/Common/foo", "/Common/bar"}): 0,
 		makeStringSet(&[]string{"/Common/foo", "bar"}):         1,
@@ -54,7 +54,7 @@ func TestF5NameSet(t *testing.T) {
 }
 
 func TestF5NameList(t *testing.T) {
-	//test string => expected error count
+	// test string => expected error count
 	data := map[*[]string]int{
 		{"/Common/foo", "/Common/bar"}: 0,
 		{"/Common/foo", "bar"}:         1,

@@ -168,7 +168,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	if do_success == false {
+	if !do_success {
 		log.Printf("[DEBUG] Didn't get successful response within timeout")
 		url := client_bigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 		req, _ := http.NewRequest("GET", url, nil)

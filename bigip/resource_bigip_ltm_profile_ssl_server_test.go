@@ -76,7 +76,7 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
@@ -115,7 +115,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
@@ -159,7 +159,6 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 	var instName = "test-ServerSsl"
 	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
-	//resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

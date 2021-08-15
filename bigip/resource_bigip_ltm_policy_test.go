@@ -110,8 +110,8 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 			{
 				Config: TestPolicyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TestPolicyName, true),
-					testCheckPolicyExists("/Common/test-policy-again", true),
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists("/Common/test-policy-again"),
 				),
 			},
 		},
@@ -129,7 +129,7 @@ func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
 			{
 				Config: TestPolicyResource2,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TestPolicyName, true),
+					testCheckPolicyExists(TestPolicyName),
 				),
 			},
 		},
@@ -147,7 +147,7 @@ func TestAccBigipLtmPolicy_import(t *testing.T) {
 			{
 				Config: TestPolicyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TestPolicyName, true),
+					testCheckPolicyExists(TestPolicyName),
 				),
 				ResourceName:      TestPolicyName,
 				ImportState:       false,
@@ -168,7 +168,7 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 			{
 				Config: TestPolicyResource2,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TestPolicyName, true),
+					testCheckPolicyExists(TestPolicyName),
 				),
 				ResourceName:      TestPolicyName,
 				ImportState:       false,
@@ -178,7 +178,7 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 	})
 }
 
-func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckPolicyExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -193,12 +193,10 @@ func testCheckPolicyExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return fmt.Errorf("Error while fetching policy: %v ", err)
 		}
-		if exists && policy == nil {
+		if policy == nil {
 			return fmt.Errorf("Policy %s was not created ", name)
 		}
-		if !exists && policy != nil {
-			return fmt.Errorf("Policy %s still exists ", name)
-		}
+
 		log.Printf("[DEBUG] Policy \"%s\" Created ", name)
 		return nil
 	}

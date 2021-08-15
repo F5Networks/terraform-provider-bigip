@@ -69,7 +69,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			{
 				Config: TEST_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_NODE_NAME, true),
+					testCheckNodeExists(TEST_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "192.168.30.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
@@ -95,7 +95,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			{
 				Config: TEST_V6_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_V6_NODE_NAME, true),
+					testCheckNodeExists(TEST_V6_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_V6_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "fe80::10"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
@@ -118,7 +118,7 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			{
 				Config: TEST_FQDN_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_FQDN_NODE_NAME, true),
+					testCheckNodeExists(TEST_FQDN_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "name", TEST_FQDN_NODE_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "address", "f5.com"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "connection_limit", "0"),
@@ -146,7 +146,7 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 			{
 				Config: TEST_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_NODE_NAME, true),
+					testCheckNodeExists(TEST_NODE_NAME),
 				),
 				ResourceName:      TEST_NODE_NAME,
 				ImportState:       false,
@@ -165,7 +165,7 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 			{
 				Config: TEST_V6_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_V6_NODE_NAME, true),
+					testCheckNodeExists(TEST_V6_NODE_NAME),
 				),
 				ResourceName:      TEST_V6_NODE_NAME,
 				ImportState:       false,
@@ -184,7 +184,7 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 			{
 				Config: TEST_FQDN_NODE_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_FQDN_NODE_NAME, true),
+					testCheckNodeExists(TEST_FQDN_NODE_NAME),
 				),
 				ResourceName:      TEST_FQDN_NODE_NAME,
 				ImportState:       false,
@@ -194,7 +194,7 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 	})
 }
 
-func testCheckNodeExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckNodeExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -202,12 +202,10 @@ func testCheckNodeExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return err
 		}
-		if exists && node == nil {
+		if node == nil {
 			return fmt.Errorf("Node %s was not created.", name)
 		}
-		if !exists && node != nil {
-			return fmt.Errorf("Node %s still exists.", name)
-		}
+
 		return nil
 	}
 }
