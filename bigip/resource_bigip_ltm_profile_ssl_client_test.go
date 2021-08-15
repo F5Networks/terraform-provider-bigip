@@ -234,7 +234,7 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 }
 
 //
-// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/449
+// This TC is added baseddded based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/449
 //
 func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 	t.Parallel()
@@ -279,7 +279,7 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
 	t.Parallel()
@@ -410,7 +410,6 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 	var instName = "test-ClientSsl"
 	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
-	//resFullName := fmt.Sprintf("%s.%s", resName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

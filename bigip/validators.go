@@ -11,20 +11,9 @@ import (
 	"net"
 	"reflect"
 	"regexp"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
-
-//Validate the incoming set only contains values from the specified set
-func validateSetValues(valid *schema.Set) schema.SchemaValidateFunc {
-	return func(value interface{}, field string) (ws []string, errors []error) {
-		if valid.Intersection(value.(*schema.Set)).Len() != value.(*schema.Set).Len() {
-			errors = append(errors, fmt.Errorf("%q can only contain %v", field, value.(*schema.Set).List()))
-		}
-		return
-	}
-}
 
 func validateStringValue(values []string) schema.SchemaValidateFunc {
 	return func(value interface{}, field string) (ws []string, errors []error) {
@@ -40,15 +29,15 @@ func validateStringValue(values []string) schema.SchemaValidateFunc {
 
 func validateF5Name(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
@@ -64,15 +53,15 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 
 func validateF5NameWithDirectory(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
@@ -87,44 +76,40 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 }
 
 func validateVirtualAddressName(value interface{}, field string) (ws []string, errors []error) {
-        var values []string
-        switch value.(type) {
-        case *schema.Set:
-                values = setToStringSlice(value.(*schema.Set))
-                break
-        case []string:
-                values = value.([]string)
-                break
-        case *[]string:
-                values = *(value.(*[]string))
-                break
-        case string:
-                values = []string{value.(string)}
-                break
-        default:
-                errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName", reflect.TypeOf(value)))
-        }
+	var values []string
+	switch val := value.(type) {
+	case *schema.Set:
+		values = setToStringSlice(val)
+	case []string:
+		values = val
+	case *[]string:
+		values = *(val)
+	case string:
+		values = []string{val}
+	default:
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName", reflect.TypeOf(value)))
+	}
 
-        for _, v := range values {
-                match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+[\\%\\d_]*$", v)
-                if !match {
-                        errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:%]. e.g. /Common/172.16.124.156%61", field))
-                }
-        }
-        return
+	for _, v := range values {
+		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+[\\%\\d_]*$", v)
+		if !match {
+			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:%%]. e.g. /Common/172.16.124.156%%61", field))
+		}
+	}
+	return
 }
 
 func validatePartitionName(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName", reflect.TypeOf(value)))
 	}
@@ -138,37 +123,6 @@ func validatePartitionName(value interface{}, field string) (ws []string, errors
 	return
 }
 
-func validatePoolMemberName(value interface{}, field string) (ws []string, errors []error) {
-	var values []string
-	switch value.(type) {
-	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
-	case []string:
-		values = value.([]string)
-	case *[]string:
-		values = *(value.(*[]string))
-	case string:
-		values = []string{value.(string)}
-	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolMemberName", reflect.TypeOf(value)))
-	}
-
-	for _, v := range values {
-		if strings.Count(v, ":") >= 2 {
-			match, _ := regexp.MatchString("^\\/[\\w_\\-.]+\\/[\\w_\\-.:]+.\\d+$", v)
-			if !match {
-				errors = append(errors, fmt.Errorf("%q must match /Partition/Node_Name:Port and contain letters, numbers or [:._-]. e.g. /Common/node1:80", field))
-			}
-		} else {
-			match, _ := regexp.MatchString("^[\\w_\\-.]+:\\d+$", v)
-			if !match {
-				errors = append(errors, fmt.Errorf("%q must match Node-address:Port and Node Address is IP/FQDN. e.g. 1.1.1.1:80/www.google.com:80", field))
-			}
-		}
-	}
-	return
-}
-
 // IsValidIP tests that the argument is a valid IP address.
 func IsValidIP(value string) bool {
 	return net.ParseIP(value) != nil
@@ -176,15 +130,15 @@ func IsValidIP(value string) bool {
 
 func validateEnabledDisabled(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateEnabledDisabled", reflect.TypeOf(value)))
 	}
@@ -200,15 +154,15 @@ func validateEnabledDisabled(value interface{}, field string) (ws []string, erro
 
 func validateReqPrefDisabled(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateReqPrefDisabled", reflect.TypeOf(value)))
 	}
@@ -224,15 +178,15 @@ func validateReqPrefDisabled(value interface{}, field string) (ws []string, erro
 
 func validateDataGroupType(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateDataGroupType", reflect.TypeOf(value)))
 	}
@@ -245,39 +199,18 @@ func validateDataGroupType(value interface{}, field string) (ws []string, errors
 	}
 	return
 }
-func validatePoolLicenseType(value interface{}, field string) (ws []string, errors []error) {
-	var values []string
-	switch value.(type) {
-	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
-	case []string:
-		values = value.([]string)
-	case *[]string:
-		values = *(value.(*[]string))
-	case string:
-		values = []string{value.(string)}
-	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
-	}
-	for _, v := range values {
-		match, _ := regexp.MatchString("(?mi)^Utility$|^regkey$", v)
-		if !match {
-			errors = append(errors, fmt.Errorf("%q must match as Utility (or) Regkey", field))
-		}
-	}
-	return
-}
+
 func validateAssignmentType(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
-	switch value.(type) {
+	switch val := value.(type) {
 	case *schema.Set:
-		values = setToStringSlice(value.(*schema.Set))
+		values = setToStringSlice(val)
 	case []string:
-		values = value.([]string)
+		values = val
 	case *[]string:
-		values = *(value.(*[]string))
+		values = *(val)
 	case string:
-		values = []string{value.(string)}
+		values = []string{val}
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
 	}
@@ -290,10 +223,10 @@ func validateAssignmentType(value interface{}, field string) (ws []string, error
 	return
 }
 
-func getDeviceUri(str string) ([]string, error) {
+func getDeviceUri(str string) []string {
 	re := regexp.MustCompile(`^(?:(?:(https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?`)
 	if len(re.FindStringSubmatch(str)) > 0 {
-		return re.FindStringSubmatch(str), nil
+		return re.FindStringSubmatch(str)
 	}
-	return []string{}, nil
+	return []string{}
 }

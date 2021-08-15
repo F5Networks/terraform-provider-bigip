@@ -73,9 +73,9 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client_bigip.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client_bigip.UserAgent,
+			Id:      uniqueID,
 		}
 		teemDevice := f5teem.AnonymousClient(assetInfo, "")
 		f := map[string]interface{}{
@@ -104,20 +104,28 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[DEBUG] Could not close the request to %s", url)
+		}
+	}()
+
 	if err != nil {
 		return fmt.Errorf("Error while receiving  http response with DO json:%v", err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Errorf("Error while reading http response with DO json:%v", err)
+		return fmt.Errorf("Error while reading http response with DO json:%v", err)
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 202 {
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	respRef := make(map[string]interface{})
-	json.Unmarshal(body, &respRef)
+	if err := json.Unmarshal(body, &respRef); err != nil {
+		return err
+	}
 	respID := respRef["id"].(string)
 
 	var do_success = false
@@ -156,7 +164,9 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 					return fmt.Errorf("Error while reading the response body :%v", err)
 				}
 				respRef1 := make(map[string]interface{})
-				json.Unmarshal(resp_body, &respRef1)
+				if err := json.Unmarshal(resp_body, &respRef1); err != nil {
+					return err
+				}
 				log.Printf("[DEBUG] Got success and setting state id")
 				do_success = true
 				d.SetId(respID)
@@ -191,7 +201,9 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
 		}
 		respRef2 := make(map[string]interface{})
-		json.Unmarshal(resp_body, &respRef2)
+		if err := json.Unmarshal(resp_body, &respRef2); err != nil {
+			return err
+		}
 		log.Printf("[DEBUG] timeout resp_body is :%v", respRef2)
 		result_map := respRef2["result"]
 		d.SetId("")
@@ -220,6 +232,12 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 
 	resp, err := client.Do(req)
 
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[DEBUG] Could not close the request to %s", url)
+		}
+	}()
+
 	if err != nil {
 		return fmt.Errorf("Error while receiving http response body in read call :%v", err)
 	}
@@ -229,11 +247,13 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	bodyString := string(resp_body)
 	if resp.Status != "200 OK" {
-		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/fetching http request :%s", bodyString)
 	}
+
 	respRef1 := make(map[string]interface{})
-	json.Unmarshal(resp_body, &respRef1)
+	if err := json.Unmarshal(resp_body, &respRef1); err != nil {
+		return err
+	}
 	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
 
 	dojson := respRef1["declaration"]
@@ -241,7 +261,6 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	doString := string(out)
 	d.Set("do_json", doString)
 
-	defer resp.Body.Close()
 	return nil
 
 }
@@ -264,14 +283,23 @@ func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, erro
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[DEBUG] Could not close the request to %s", url)
+		}
+	}()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
 	if resp.Status == "204 No Content" || err != nil {
 		log.Printf("[ERROR] Error while checking doresource present in bigip :%s  %v", bodyString, err)
-		defer resp.Body.Close()
 		return false, err
 	}
-	defer resp.Body.Close()
+
 	return true, nil
 }
 
@@ -298,19 +326,28 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[DEBUG] Could not close the request to %s", url)
+		}
+	}()
+
 	if err != nil {
 		return fmt.Errorf("Error while receiving  http response with DO json:%v", err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Errorf("Error while reading http response with DO json:%v", err)
+		return fmt.Errorf("Error while reading http response with DO json:%v", err)
 	}
-	defer resp.Body.Close()
+
 	if resp.StatusCode < 200 || resp.StatusCode > 202 {
 		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
 	}
 	respRef := make(map[string]interface{})
-	json.Unmarshal(body, &respRef)
+	if err := json.Unmarshal(body, &respRef); err != nil {
+		return err
+	}
 	respID := respRef["id"].(string)
 
 	var do_success = false
@@ -331,7 +368,13 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 			req.Header.Set("Content-Type", "application/json")
 
 			taskResp, err := client.Do(req)
-			defer taskResp.Body.Close()
+
+			defer func() {
+				if err := taskResp.Body.Close(); err != nil {
+					log.Printf("[DEBUG] Could not close the request to %s", url)
+				}
+			}()
+
 			if err != nil {
 				log.Printf("[DEBUG]Polling the task id until the timeout")
 				time.Sleep(1 * time.Second)
@@ -344,7 +387,9 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 					return fmt.Errorf("Error while reading the response body :%v", err)
 				}
 				respRef1 := make(map[string]interface{})
-				json.Unmarshal(resp_body, &respRef1)
+				if err := json.Unmarshal(resp_body, &respRef1); err != nil {
+					return err
+				}
 				do_success = true
 				d.SetId(respID)
 				break
@@ -363,7 +408,13 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
-		defer taskResp.Body.Close()
+
+		defer func() {
+			if err := taskResp.Body.Close(); err != nil {
+				log.Printf("[DEBUG] Could not close the request to %s", url)
+			}
+		}()
+
 		if err != nil {
 			d.SetId("")
 			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
@@ -374,7 +425,10 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
 		}
 		respRef2 := make(map[string]interface{})
-		json.Unmarshal(resp_body, &respRef2)
+		if err := json.Unmarshal(resp_body, &respRef2); err != nil {
+			return err
+		}
+
 		result_map := respRef2["result"]
 		d.SetId("")
 		return fmt.Errorf("Timeout while polling the DO task id with result:%v", result_map)

@@ -145,7 +145,9 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 
 	err = resourceBigipLtmPersistenceProfileSrcAddrUpdate(d, meta)
 	if err != nil {
-		client.DeleteSourceAddrPersistenceProfile(name)
+		if errdel := client.DeleteSourceAddrPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 

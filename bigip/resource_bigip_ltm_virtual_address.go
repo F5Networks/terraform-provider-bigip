@@ -162,7 +162,7 @@ func resourceBigipLtmVirtualAddressExists(d *schema.ResourceData, meta interface
 		}
 	}
 
-	if &va == nil {
+	if va == nil {
 		d.SetId("")
 	}
 

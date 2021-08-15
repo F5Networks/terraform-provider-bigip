@@ -223,7 +223,7 @@ func resourceBigipSysIappCreate(d *schema.ResourceData, meta interface{}) error 
 	description := d.Get("description").(string)
 
 	log.Println("[INFO] Creating Iapp       " + name)
-	p := dataToIapp(name, d)
+	p := dataToIapp(d)
 	d.SetId(name)
 	d.SetId(description)
 	err := client.CreateIapp(&p)
@@ -240,7 +240,7 @@ func resourceBigipSysIappUpdate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Updating Iapp " + name)
-	p := dataToIapp(name, d)
+	p := dataToIapp(d)
 	err := client.UpdateIapp(name, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Iapp  (%s) ", err)
@@ -317,7 +317,7 @@ func IappToData(p *bigip.Iapp, d *schema.ResourceData) error {
 	return nil
 }
 
-func dataToIapp(name string, d *schema.ResourceData) bigip.Iapp {
+func dataToIapp(d *schema.ResourceData) bigip.Iapp {
 	var p bigip.Iapp
 
 	jsonblob := []byte(d.Get("jsonfile").(string))

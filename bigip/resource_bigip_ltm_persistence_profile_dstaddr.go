@@ -137,9 +137,10 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 
 	d.SetId(name)
 
-	err = resourceBigipLtmPersistenceProfileDstAddrUpdate(d, meta)
-	if err != nil {
-		client.DeleteDestAddrPersistenceProfile(name)
+	if err := resourceBigipLtmPersistenceProfileDstAddrUpdate(d, meta); err != nil {
+		if errdel := client.DeleteDestAddrPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 

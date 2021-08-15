@@ -17,7 +17,6 @@ import (
 func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 	t.Parallel()
 	resName := "bigip_ltm_datagroup.DGTEST"
-	//var dataGroupName = acctest.RandomWithPrefix("tf-test") + ".example"
 	var dataGroupName = "test-rg"
 	var dataGroupFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, dataGroupName)
 

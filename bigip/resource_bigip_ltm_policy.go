@@ -1278,7 +1278,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		r.Name = d.Get(prefix + ".name").(string)
 
 		actionCount := d.Get(prefix + ".action.#").(int)
-		r.Actions = make([]bigip.PolicyRuleAction, actionCount, actionCount)
+		r.Actions = make([]bigip.PolicyRuleAction, actionCount)
 		for x := 0; x < actionCount; x++ {
 			var a bigip.PolicyRuleAction
 			mapEntity(d.Get(fmt.Sprintf("%s.action.%d", prefix, x)).(map[string]interface{}), &a)
@@ -1286,7 +1286,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		}
 
 		conditionCount := d.Get(prefix + ".condition.#").(int)
-		r.Conditions = make([]bigip.PolicyRuleCondition, conditionCount, conditionCount)
+		r.Conditions = make([]bigip.PolicyRuleCondition, conditionCount)
 		for x := 0; x < conditionCount; x++ {
 			var c bigip.PolicyRuleCondition
 			mapEntity(d.Get(fmt.Sprintf("%s.condition.%d", prefix, x)).(map[string]interface{}), &c)

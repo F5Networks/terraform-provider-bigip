@@ -278,7 +278,12 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 func CreateToken(tenantID, clientID, clientSecret string) (adal.OAuthTokenProvider, error) {
 	const activeDirectoryEndpoint = "https://login.microsoftonline.com/"
 	var token adal.OAuthTokenProvider
+
 	oauthConfig, err := adal.NewOAuthConfig(activeDirectoryEndpoint, tenantID)
+	if err != nil {
+		return nil, err
+	}
+
 	// The resource for which the token is acquired
 	activeDirectoryResourceID := "https://management.azure.com/"
 	token, err = adal.NewServicePrincipalToken(
@@ -286,5 +291,6 @@ func CreateToken(tenantID, clientID, clientSecret string) (adal.OAuthTokenProvid
 		clientID,
 		clientSecret,
 		activeDirectoryResourceID)
+
 	return token, err
 }

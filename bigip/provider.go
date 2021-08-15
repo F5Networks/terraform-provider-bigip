@@ -239,15 +239,6 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 	}
 }
 
-// Break a string in the format /Partition/name into a Partition / Name object
-func parseF5Identifier(str string) (partition, name string) {
-	if strings.HasPrefix(str, "/") {
-		ary := strings.SplitN(strings.TrimPrefix(str, "/"), "/", 2)
-		return ary[0], ary[1]
-	}
-	return "", str
-}
-
 // Convert Snakecase to Camelcase
 func toCamelCase(str string) string {
 	var link = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")

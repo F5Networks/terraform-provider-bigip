@@ -148,7 +148,9 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 		prefix := fmt.Sprintf("device.%d", i)
 		r.Name = d.Get(prefix + ".name").(string)
 		Rname := r.Name
-		client.DevicegroupsDevices(name, Rname)
+		if _, err := client.DevicegroupsDevices(name, Rname); err != nil {
+			log.Printf("[ERROR] Unable to retrieve DevicegroupsDevices (%s,%s) (%v) ", name, Rname, err)
+		}
 	}
 
 	p, err := client.Devicegroups(name)

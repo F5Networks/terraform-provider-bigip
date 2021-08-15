@@ -198,7 +198,9 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 
 	err = resourceBigipLtmPersistenceProfileCookieUpdate(d, meta)
 	if err != nil {
-		client.DeleteCookiePersistenceProfile(name)
+		if errdel := client.DeleteCookiePersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 

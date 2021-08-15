@@ -179,6 +179,10 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 	if match != nil {
 		parts := strings.Split(nodeName, ":")
 		node1, err := client.GetNode(parts[0])
+		if err != nil {
+			return err
+		}
+
 		if node1 == nil {
 			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
 			d.SetId("")
@@ -375,17 +379,9 @@ func resourceBigipLtmPoolAttachmentImport(d *schema.ResourceData, meta interface
 		return nil, fmt.Errorf("cannot locate node %s in pool %s", expectedNode, poolName)
 	}
 
-	nodeName := d.Get("node").(string)
+	_ = d.Set("pool", poolName)
+	_ = d.Set("node", expectedNode)
 
-	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
-	match := re.FindStringSubmatch(nodeName)
-	if match != nil {
-		_ = d.Set("pool", poolName)
-		_ = d.Set("node", expectedNode)
-	} else {
-		_ = d.Set("pool", poolName)
-		_ = d.Set("node", expectedNode)
-	}
 	d.SetId(id)
 
 	return []*schema.ResourceData{d}, nil
