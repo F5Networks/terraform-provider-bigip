@@ -41,9 +41,9 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
-
+	re := regexp.MustCompile(`^/[\w_\-.]+/[\w_\-.:]+$`)
 	for _, v := range values {
-		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+$", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:]. e.g. /Common/my-pool", field))
 		}
@@ -65,9 +65,9 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
 	}
-
+	re := regexp.MustCompile(`(^/[\w_\-.]+/[\w_\-.:]+/[\w_\-.:]+$)|(^/[\w_\-.]+/[\w_\-.:]+$)`)
 	for _, v := range values {
-		match, _ := regexp.MatchString("(^/[\\w_\\-.]+/[\\w_\\-.:]+/[\\w_\\-.:]+$)|(^/[\\w_\\-.]+/[\\w_\\-.:]+$)", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match /Partition/Name or /Partition/Directory/Name  e.g. /Common/my-node or /Common/test/my-node", field))
 		}
@@ -89,9 +89,9 @@ func validateVirtualAddressName(value interface{}, field string) (ws []string, e
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName", reflect.TypeOf(value)))
 	}
-
+	re := regexp.MustCompile(`^/[\w_\-.]+/[\w_\-.:]+[\%\d_]*$`)
 	for _, v := range values {
-		match, _ := regexp.MatchString("^/[\\w_\\-.]+/[\\w_\\-.:]+[\\%\\d_]*$", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match /Partition/Name and contain letters, numbers or [._-:%%]. e.g. /Common/172.16.124.156%%61", field))
 		}
@@ -113,9 +113,9 @@ func validatePartitionName(value interface{}, field string) (ws []string, errors
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName", reflect.TypeOf(value)))
 	}
-
+	re := regexp.MustCompile(`^[^/][^\s]+$`)
 	for _, v := range values {
-		match, _ := regexp.MatchString(`^[^/][^\s]+$`, v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q name should not start with `/`, e.g Common [or] test-partition are valid ", field))
 		}
@@ -143,34 +143,11 @@ func validateEnabledDisabled(value interface{}, field string) (ws []string, erro
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateEnabledDisabled", reflect.TypeOf(value)))
 	}
 
+	re := regexp.MustCompile("^enabled$|^disabled$")
 	for _, v := range values {
-		match, _ := regexp.MatchString("^enabled$|^disabled$", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match as enabled or disabled", field))
-		}
-	}
-	return
-}
-
-func validateReqPrefDisabled(value interface{}, field string) (ws []string, errors []error) {
-	var values []string
-	switch val := value.(type) {
-	case *schema.Set:
-		values = setToStringSlice(val)
-	case []string:
-		values = val
-	case *[]string:
-		values = *(val)
-	case string:
-		values = []string{val}
-	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateReqPrefDisabled", reflect.TypeOf(value)))
-	}
-
-	for _, v := range values {
-		match, _ := regexp.MatchString("^required$|^preferred$|^disabled$", v)
-		if !match {
-			errors = append(errors, fmt.Errorf("%q must match as required, preferred, or disabled", field))
 		}
 	}
 	return
@@ -191,8 +168,9 @@ func validateDataGroupType(value interface{}, field string) (ws []string, errors
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateDataGroupType", reflect.TypeOf(value)))
 	}
 
+	re := regexp.MustCompile("^string$|^ip$|^integer$")
 	for _, v := range values {
-		match, _ := regexp.MatchString("^string$|^ip$|^integer$", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match as string, ip, or integer", field))
 		}
@@ -214,8 +192,9 @@ func validateAssignmentType(value interface{}, field string) (ws []string, error
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
 	}
+	re := regexp.MustCompile("(?mi)^MANAGED$|^UNMANAGED$|^UNREACHABLE$")
 	for _, v := range values {
-		match, _ := regexp.MatchString("(?mi)^MANAGED$|^UNMANAGED$|^UNREACHABLE$", v)
+		match := re.MatchString(v)
 		if !match {
 			errors = append(errors, fmt.Errorf("%q must match as MANAGED/UNMANAGED/UNREACHABLE", field))
 		}

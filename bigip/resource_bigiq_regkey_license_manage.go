@@ -142,17 +142,6 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
 
-	var licenseType string
-	if poolInfo.SortName == "Registration Key Pool" {
-		licenseType = poolInfo.SortName
-	} else if poolInfo.SortName == "Utility" {
-		licenseType = poolInfo.SortName
-		if d.Get("unit_of_measure").(string) == "" {
-			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
-		}
-	} else if poolInfo.SortName == "Purchased Pool" {
-		licenseType = poolInfo.SortName
-	}
 	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
 		if d.Get("mac_address").(string) == "" || d.Get("hypervisor").(string) == "" {
@@ -301,7 +290,10 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		}
 		d.Set("device_license_status", deviceStatus)
 	} else {
-		bigiqRef.GetMemberStatus(poolId, regKey, memID)
+		log.Printf("[DEBUG] GetMemberStatus using regKey")
+		if _, err := bigiqRef.GetMemberStatus(poolId, regKey, memID); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -328,17 +320,11 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
 	log.Printf("poolInfo:%+v", poolInfo)
-	var licenseType string
-	if poolInfo.SortName == "Registration Key Pool" {
-		licenseType = poolInfo.SortName
-	} else if poolInfo.SortName == "Utility" {
-		licenseType = poolInfo.SortName
-		if d.Get("unit_of_measure").(string) == "" {
-			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
-		}
-	} else if poolInfo.SortName == "Purchased Pool" {
-		licenseType = poolInfo.SortName
+
+	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
+		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
 	}
+
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {
 		return fmt.Errorf("getting Poolid failed with :%v", err)

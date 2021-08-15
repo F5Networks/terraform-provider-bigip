@@ -59,9 +59,8 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
 			"teem_disable": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				//Default:     false,
+				Type:        schema.TypeBool,
+				Optional:    true,
 				Description: "If this flag set to true,sending telemetry data to TEEM will be disabled",
 				DefaultFunc: schema.EnvDefaultFunc("TEEM_DISABLE", false),
 			},

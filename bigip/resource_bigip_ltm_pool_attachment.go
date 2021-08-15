@@ -36,10 +36,9 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"node": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				//ValidateFunc: validatePoolMemberName,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 				Description: "Poolmember to add/remove to/from the pool. Format node_address:port. e.g 1.1.1.1:80",
 			},
 			"ratio": {
@@ -77,10 +76,9 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Computed:    true,
 			},
 			"fqdn_autopopulate": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				//Default:     "enabled",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
 				Description: "Specifies whether the node should scale to the IP address set returned by DNS.",
 			},
 		},

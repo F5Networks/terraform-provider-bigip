@@ -28,11 +28,10 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Name of the profile",
-				//ValidateFunc: validateF5Name,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				Description:  "Name of the profile",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"proxy_type": {

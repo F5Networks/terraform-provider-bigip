@@ -1326,12 +1326,9 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 			return p.Rules[i].Ordinal < p.Rules[j].Ordinal
 		})
 
-		rule, err := flattenPolicyRules(p.Rules, d)
-		if err != nil {
-			return err
-		}
+		rule := flattenPolicyRules(p.Rules)
 
-		err = d.Set("rule", rule)
+		err := d.Set("rule", rule)
 		if err != nil {
 			return err
 		}
@@ -1340,7 +1337,7 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 	return nil
 }
 
-func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]interface{}, error) {
+func flattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
 	att := make([]interface{}, len(rules))
 	for i, v := range rules {
 		obj := make(map[string]interface{})
@@ -1350,40 +1347,34 @@ func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]int
 		}
 
 		if len(v.Actions) > 0 {
-			r, err := flattenPolicyRuleActions(v.Actions)
-			if err != nil {
-				return []interface{}{att}, err
-			}
+			r := flattenPolicyRuleActions(v.Actions)
 			obj["action"] = r
 		}
 
 		if len(v.Conditions) > 0 {
-			r, err := flattenPolicyRuleConditions(v.Conditions)
-			if err != nil {
-				return []interface{}{att}, err
-			}
+			r := flattenPolicyRuleConditions(v.Conditions)
 			obj["condition"] = r
 		}
 
 		att[i] = obj
 	}
-	return att, nil
+	return att
 }
 
-func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) ([]interface{}, error) {
+func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) []interface{} {
 	att := make([]interface{}, len(actions))
 	for x, a := range actions {
 		att[x] = interfaceToResourceData(a)
 	}
-	return att, nil
+	return att
 }
 
-func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) ([]interface{}, error) {
+func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) []interface{} {
 	att := make([]interface{}, len(conditions))
 	for x, a := range conditions {
 		att[x] = interfaceToResourceData(a)
 	}
-	return att, nil
+	return att
 }
 
 func interfaceToResourceData(a interface{}) map[string]interface{} {

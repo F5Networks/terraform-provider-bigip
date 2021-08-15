@@ -731,22 +731,25 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		}
 	}
 	xt := reflect.TypeOf(obj.TmOptions).Kind()
-	if obj.TmOptions != "none" && xt == reflect.String {
-		tmOptions := strings.Split(obj.TmOptions.(string), " ")
-		if len(tmOptions) > 0 {
-			tmOptions = tmOptions[1:]
-			tmOptions = tmOptions[:len(tmOptions)-1]
-		}
-		if err := d.Set("tm_options", tmOptions); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-		}
-	} else if obj.TmOptions != "none" && xt != reflect.String {
-		var newObj []string
-		for _, v := range obj.TmOptions.([]interface{}) {
-			newObj = append(newObj, v.(string))
-		}
-		if err := d.Set("tm_options", newObj); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+	if obj.TmOptions != "none" {
+
+		if xt == reflect.String {
+			tmOptions := strings.Split(obj.TmOptions.(string), " ")
+			if len(tmOptions) > 0 {
+				tmOptions = tmOptions[1:]
+				tmOptions = tmOptions[:len(tmOptions)-1]
+			}
+			if err := d.Set("tm_options", tmOptions); err != nil {
+				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+			}
+		} else {
+			var newObj []string
+			for _, v := range obj.TmOptions.([]interface{}) {
+				newObj = append(newObj, v.(string))
+			}
+			if err := d.Set("tm_options", newObj); err != nil {
+				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+			}
 		}
 	} else {
 		var tmOptions []string

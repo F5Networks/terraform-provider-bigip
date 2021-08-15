@@ -81,22 +81,3 @@ func TestValidateEnabledDisabledString(t *testing.T) {
 		assert.Equal(t, ec, len(errs), "%s did not throw %d errors", d, ec)
 	}
 }
-
-func TestValidateReqPrefDisabledString(t *testing.T) {
-	data := map[*[]string]int{
-		{"required"}:        0,
-		{"preferred"}:       0,
-		{"disabled"}:        0,
-		{"requiredpotato"}:  1,
-		{"preferredpotato"}: 1,
-		{"disabledpotato"}:  1,
-		{"potatorequired"}:  1,
-		{"potatopreferred"}: 1,
-		{"potatodisabled"}:  1,
-	}
-
-	for d, ec := range data {
-		_, errs := validateReqPrefDisabled(d, "testField")
-		assert.Equal(t, ec, len(errs), "%s did not throw %d errors", d, ec)
-	}
-}

@@ -8,7 +8,6 @@ package bigip
 
 import (
 	"fmt"
-	//"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"

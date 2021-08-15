@@ -140,7 +140,9 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
-
+	if err != nil {
+		return err
+	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("[DEBUG] Could not close the request to %s", url)

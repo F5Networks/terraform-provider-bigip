@@ -142,7 +142,7 @@ func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error 
 			}
 		}
 		log.Printf("[INFO] Running Delete TMSH Command: %v ", commandList)
-		var resultList []string
+
 		for _, str := range commandList {
 			log.Printf("[INFO] Command to run:%v", str)
 			commandConfig := &bigip.BigipCommand{
@@ -155,9 +155,10 @@ func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error 
 				return fmt.Errorf("error retrieving Command Result: %v", err)
 			}
 			log.Printf("[INFO] Result Command struct:%+v", resultCmd)
-			resultList = append(resultList, resultCmd.CommandResult)
+
 		}
 	}
+
 	d.SetId("")
 	return nil
 }

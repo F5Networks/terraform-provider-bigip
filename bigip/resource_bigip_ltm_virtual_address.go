@@ -92,7 +92,9 @@ func resourceBigipLtmVirtualAddressCreate(d *schema.ResourceData, meta interface
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating virtual address " + name)
 
-	client.CreateVirtualAddress(name, hydrateVirtualAddress(d))
+	if err := client.CreateVirtualAddress(name, hydrateVirtualAddress(d)); err != nil {
+		return err
+	}
 
 	d.SetId(name)
 	return resourceBigipLtmVirtualAddressRead(d, meta)

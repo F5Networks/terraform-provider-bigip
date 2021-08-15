@@ -30,7 +30,6 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Name",
-				//ValidateFunc: validateF5Name,
 			},
 			"auth_passwordencrypted": {
 				Type:        schema.TypeString,

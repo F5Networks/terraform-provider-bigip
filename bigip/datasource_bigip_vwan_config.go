@@ -181,12 +181,18 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	}
 	containerURL1 := azblob.NewContainerURL(*cURL, azblob.NewPipeline(credential, azblob.PipelineOptions{}))
 	_, err = containerURL1.Create(context.Background(), nil, "")
-	defer containerURL1.Delete(context.Background(), azblob.ContainerAccessConditions{})
+
+	defer func() {
+		if _, err := containerURL1.Delete(context.Background(), azblob.ContainerAccessConditions{}); err != nil {
+			log.Printf("[DEBUG] Could not delete contrainer: %v", err)
+		}
+	}()
+
 	if err != nil {
 		log.Printf("NewContainerURL failed %+v", err.Error())
 		return nil, err
 	}
-	containerURL, _ := url.Parse(fmt.Sprintf("%s", containerURL1))
+	containerURL, _ := url.Parse(containerURL1.String())
 
 	cURL1, _ := url.Parse(fmt.Sprintf("%s/%s", containerURL, destFileName))
 
@@ -224,7 +230,7 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 	// Here's how to create a blob with HTTP headers and metadata (I'm using the same metadata that was put on the container):
 	blobURL := azblob.NewBlockBlobURL(*cURL1, p)
 
-	sasUrl := fmt.Sprintf("%s", serviceURL)
+	sasUrl := serviceURL.String()
 	log.Printf("[DEBUG] sasUrl : %+v", sasUrl)
 
 	token, _ := CreateToken(tenantID, clientID, clientPassword)

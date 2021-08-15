@@ -33,7 +33,7 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -61,7 +61,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -70,7 +70,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateName(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(fmt.Sprintf("%s-%s", instFullName, "new"), true),
+					testCheckClientSslExists(fmt.Sprintf("%s-%s", instFullName, "new")),
 					resource.TestCheckResourceAttr(resFullName, "name", fmt.Sprintf("%s-%s", instFullName, "new")),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -98,7 +98,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -107,7 +107,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "authenticate"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "always"),
@@ -133,7 +133,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -142,7 +142,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "authenticate_depth"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
@@ -152,7 +152,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cache_size"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "8"),
@@ -182,7 +182,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")), "dont-insert-empty-fragments"),
@@ -193,7 +193,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "tm_options"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
@@ -221,7 +221,7 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslNondefaultcertconfigbasic("Common", instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists("/Common/lbeform_INT", true),
+					testCheckClientSslExists("/Common/lbeform_INT"),
 					resource.TestCheckResourceAttr(resFullName, "name", "/Common/lbeform_INT"),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -251,7 +251,7 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslCerkeychain(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -264,7 +264,7 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslCerkeychainissue449(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -296,7 +296,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -305,7 +305,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cache_timeout"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "cache_timeout", "2400"),
@@ -331,7 +331,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCertlifespan(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -340,7 +340,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCertlifespan(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cert_life_span"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "cert_life_span", "40"),
@@ -350,7 +350,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCertlifespan(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "handshake_timeout"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "cert_life_span", "40"),
@@ -377,7 +377,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
@@ -386,7 +386,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "ciphers"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "ciphers", "AES"),
@@ -396,7 +396,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileclientsslUpdateparam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "ciphers", "AES"),
@@ -421,7 +421,7 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 				//Config: TestClientsslResource,
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckClientSslExists(instFullName, true),
+					testCheckClientSslExists(instFullName),
 				),
 				ResourceName:      instFullName,
 				ImportState:       false,
@@ -431,19 +431,17 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 	})
 }
 
-func testCheckClientSslExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckClientSslExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.GetClientSSLProfile(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if p == nil {
 			return fmt.Errorf("ClientSsl Profile %s was not created ", name)
 		}
-		if !exists && p == nil {
-			return fmt.Errorf("ClientSsl Profile %s still exists ", name)
-		}
+
 		return nil
 	}
 }

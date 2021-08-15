@@ -47,9 +47,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "0.0.0.0/0",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Computed:    true,
 				Description: "Source IP and mask for the virtual server",
 			},
@@ -78,9 +77,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"mask": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "255.255.255.255",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Computed:    true,
 				Description: "subnet mask",
 			},
@@ -466,10 +464,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			switch profile.Context {
 			case bigip.CONTEXT_CLIENT:
 				clientProfileNames.Add(profile.FullPath)
-				break
 			case bigip.CONTEXT_SERVER:
 				serverProfileNames.Add(profile.FullPath)
-				break
 			default:
 				profileNames.Add(profile.FullPath)
 			}

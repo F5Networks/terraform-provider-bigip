@@ -45,9 +45,8 @@ func resourceBigipSysIapp() *schema.Resource {
 			},
 
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "This is iApp template for application objects",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Address of the Iapp which needs to be Iappensed",
 			},
 
@@ -116,13 +115,11 @@ func resourceBigipSysIapp() *schema.Resource {
 							Optional:    true,
 							Default:     "no",
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 						"value": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Name of origin",
-							//ValidateFunc: validateF5Name,
 						},
 					},
 				},
