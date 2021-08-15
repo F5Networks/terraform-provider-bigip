@@ -17,8 +17,6 @@ import (
 
 var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
-var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
 
 var TEST_POOL_RESOURCE = `
 /*resource "bigip_ltm_node" "test-node" {
