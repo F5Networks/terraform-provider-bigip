@@ -142,6 +142,10 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
 
+	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
+		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
+	}
+
 	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
 		if d.Get("mac_address").(string) == "" || d.Get("hypervisor").(string) == "" {
