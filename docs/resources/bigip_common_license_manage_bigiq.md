@@ -19,59 +19,59 @@ description: |-
 
 # MANAGED Regkey Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address = var.bigiq
-  bigiq_user = var.bigiq_un
-  bigiq_password = var.bigiq_pw
+  bigiq_address    = var.bigiq
+  bigiq_user       = var.bigiq_un
+  bigiq_password   = var.bigiq_pw
   license_poolname = "regkeypool_name"
-  assignment_type = "MANAGED"
+  assignment_type  = "MANAGED"
 }
 
 # UNMANAGED Regkey Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address = var.bigiq
-  bigiq_user = var.bigiq_un
-  bigiq_password = var.bigiq_pw
+  bigiq_address    = var.bigiq
+  bigiq_user       = var.bigiq_un
+  bigiq_password   = var.bigiq_pw
   license_poolname = "regkeypool_name"
-  assignment_type = "UNMANAGED"
-} 
+  assignment_type  = "UNMANAGED"
+}
 
 # UNMANAGED Utility Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address = var.bigiq
-  bigiq_user = var.bigiq_un
-  bigiq_password = var.bigiq_pw
+  bigiq_address    = var.bigiq
+  bigiq_user       = var.bigiq_un
+  bigiq_password   = var.bigiq_pw
   license_poolname = "utilitypool_name"
-  assignment_type = "UNMANAGED"
-  unit_of_measure = "yearly"
-  skukeyword1 = "BTHSM200M"
+  assignment_type  = "UNMANAGED"
+  unit_of_measure  = "yearly"
+  skukeyword1      = "BTHSM200M"
 }
 
 # UNREACHABLE Regkey Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address="xxx.xxx.xxx.xxx"
-  bigiq_user="xxxx"
-  bigiq_password="xxxxx"
+  bigiq_address    = "xxx.xxx.xxx.xxx"
+  bigiq_user       = "xxxx"
+  bigiq_password   = "xxxxx"
   license_poolname = "regkey_pool_name"
-  assignment_type = "UNREACHABLE"
-  mac_address = "FA:16:3E:1B:6D:32"
-  hypervisor = "azure"
+  assignment_type  = "UNREACHABLE"
+  mac_address      = "FA:16:3E:1B:6D:32"
+  hypervisor       = "azure"
 }
 
 # MANAGED Purchased Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address = var.bigiq
-  bigiq_user = var.bigiq_un
-  bigiq_password = var.bigiq_pw
+  bigiq_address    = var.bigiq
+  bigiq_user       = var.bigiq_un
+  bigiq_password   = var.bigiq_pw
   license_poolname = "purchased_pool_name"
-  assignment_type = "MANAGED"
+  assignment_type  = "MANAGED"
 }
 # UNMANAGED Purchased Pool
 resource "bigip_common_license_manage_bigiq" "test_example" {
-  bigiq_address = var.bigiq
-  bigiq_user = var.bigiq_un
-  bigiq_password = var.bigiq_pw
+  bigiq_address    = var.bigiq
+  bigiq_user       = var.bigiq_un
+  bigiq_password   = var.bigiq_pw
   license_poolname = "purchased_pool_name"
-  assignment_type = "UNMANAGED"
+  assignment_type  = "UNMANAGED"
 }
 
 ```      

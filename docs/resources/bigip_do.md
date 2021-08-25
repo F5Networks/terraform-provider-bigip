@@ -16,10 +16,10 @@ This resource is helpful to configure do declarative JSON on BIG-IP.
 
 ```hcl
 
-resource "bigip_do"  "do-example" {
-     do_json = "${file("example.json")}"
-     timeout = 15
- }
+resource "bigip_do" "do-example" {
+  do_json = "${file("example.json")}"
+  timeout = 15
+}
 
 ```
 
@@ -35,7 +35,7 @@ resource "bigip_do"  "do-example" {
 
 * `example.json` - Example of DO Declarative JSON
 
-```hcl
+```json
 {
     "schemaVersion": "1.0.0",
     "class": "Device",

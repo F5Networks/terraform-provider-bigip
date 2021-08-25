@@ -45,14 +45,15 @@ func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 func testAccCheckDatagroupConfigBasic(dataGroupName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_datagroup" "DGTEST" {
-	name = "/%s/%s"
-    type = "string"
-    record {
-       name = "test-name1"
-       data = "test-data1"
-     }
-    record {
-       name = "test-name2"
-       }
-}`, "Common", dataGroupName)
+  name = "/%s/%s"
+  type = "string"
+  record {
+    name = "test-name1"
+    data = "test-data1"
+  }
+  record {
+    name = "test-name2"
+  }
+}
+`, "Common", dataGroupName)
 }

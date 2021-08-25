@@ -22,16 +22,16 @@ import (
 
 func testBigipLtmNodeInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-		resource "bigip_ltm_node" "test-node" {
-			name = "%s"
-			address = "10.10.10.10"
-	                invalidkey = "foo"
-		}
-		provider "bigip" {
-			address = "xxx.xxx.xxx.xxx"
-			username = "xxx"
-			password = "xxx"
-		}
+resource "bigip_ltm_node" "test-node" {
+  name       = "%s"
+  address    = "10.10.10.10"
+  invalidkey = "foo"
+}
+provider "bigip" {
+  address  = "xxx.xxx.xxx.xxx"
+  username = "xxx"
+  password = "xxx"
+}
 	`, resourceName)
 }
 
@@ -51,15 +51,15 @@ func TestAccBigipLtmNodeInvalid(t *testing.T) {
 
 func testBigipLtmNodeCreate(resourceName string, url string, address string) string {
 	return fmt.Sprintf(`
-		resource "bigip_ltm_node" "test-node" {
-			name = "%s"
-			address = "%s"
-		}
-		provider "bigip" {
-			address = "%s"
-			username = "xxxx"
-			password = "xxxx"
-		}
+resource "bigip_ltm_node" "test-node" {
+  name    = "%s"
+  address = "%s"
+}
+provider "bigip" {
+  address  = "%s"
+  username = "xxxx"
+  password = "xxxx"
+}
 	`, resourceName, address, url)
 }
 

@@ -218,10 +218,11 @@ func testCheckServerSslDestroyed(s *terraform.State) error {
 }
 func testaccbigipltmprofileserversslDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-			  //defaults_from = "/Common/serverssl"
-		}`, resNameserver, instName)
+resource "%[1]s" "%[2]s" {
+  name = "/Common/%[2]s"
+  //defaults_from = "/Common/serverssl"
+}
+		`, resNameserver, instName)
 }
 
 func testAccBigipLtmProfileServerSsl_UpdateParam(instName, updateParam string) string {

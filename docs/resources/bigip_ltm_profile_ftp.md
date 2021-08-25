@@ -19,13 +19,13 @@ Resources should be named with their "full path". The full path is the combinati
 
 ```hcl
 resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
-  name  = "/Common/sanjose-ftp-profile"
-  defaults_from = "/Common/ftp"
-  port  = 2020
-  description = "test-tftp-profile"  
-  ftps_mode = "allow"
+  name                     = "/Common/sanjose-ftp-profile"
+  defaults_from            = "/Common/ftp"
+  port                     = 2020
+  description              = "test-tftp-profile"
+  ftps_mode                = "allow"
   enforce_tlssession_reuse = "enabled"
-  allow_active_mode = "enabled"
+  allow_active_mode        = "enabled"
 }
 
 ```      
@@ -34,11 +34,11 @@ resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
 
 ```hcl
 resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
-  name  = "/Common/sanjose-ftp-profile"
-  defaults_from = "/Common/ftp"
-  port  = 2020
-  description = "test-tftp-profile"
-  allow_ftps = "enabled"
+  name               = "/Common/sanjose-ftp-profile"
+  defaults_from      = "/Common/ftp"
+  port               = 2020
+  description        = "test-tftp-profile"
+  allow_ftps         = "enabled"
   translate_extended = "enabled"
 }
 

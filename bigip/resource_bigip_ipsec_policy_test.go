@@ -76,7 +76,8 @@ func testCheckIPSecPolicyDestroyed(s *terraform.State) error {
 }
 func testaccNetIpsecPolicyDefaultCreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name = "/Common/%[2]s"
+}
+		`, resName, instName)
 }

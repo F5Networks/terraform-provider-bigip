@@ -383,7 +383,7 @@ func testCheckHttpsDestroyed(s *terraform.State) error {
 func testaccbigipltmprofilehttpDefaultConfig(partition, profileName, resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_http" "%[3]s" {
-  name = "%[2]s"
+  name          = "%[2]s"
   defaults_from = "/%[1]s/http"
 }
 `, partition, profileName, resourceName)
@@ -392,8 +392,8 @@ resource "bigip_ltm_profile_http" "%[3]s" {
 func testaccbigipltmprofilehttpUpdateServeragentConfig(partition, profileName, resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_http" "%[3]s" {
-  name = "%[2]s"
-  defaults_from = "/%[1]s/http"
+  name              = "%[2]s"
+  defaults_from     = "/%[1]s/http"
   server_agent_name = "myBIG-IP"
 }
 `, partition, profileName, resourceName)
@@ -402,9 +402,10 @@ resource "bigip_ltm_profile_http" "%[3]s" {
 func testaccBigipLtmHttpProfileImportConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_http" "test-http" {
-  name = "%s"
+  name          = "%s"
   defaults_from = "/Common/http"
-}`, "/Common/test-http")
+}
+`, "/Common/test-http")
 }
 
 func testaccbigipltmprofilehttpUpdateParam(instName, updateParam string) string {

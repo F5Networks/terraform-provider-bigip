@@ -153,7 +153,7 @@ func testCheckfastl4sDestroyed(s *terraform.State) error {
 func testAccBigipLtmProfileFastl4_default_Config(partition, profileName, resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_fastl4" "%[3]s" {
-  name = "%[2]s"
+  name          = "%[2]s"
   defaults_from = "/%[1]s/fastL4"
 }
 `, partition, profileName, resourceName)
@@ -162,9 +162,9 @@ resource "bigip_ltm_profile_fastl4" "%[3]s" {
 func testAccBigipLtmProfileFastl4_update_IdleTimeout_Config_(partition, profileName, resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_fastl4" "%[3]s" {
-  name = "%[2]s"
+  name          = "%[2]s"
   defaults_from = "/%[1]s/fastL4"
-  idle_timeout = "307"
+  idle_timeout  = "307"
 }
 `, partition, profileName, resourceName)
 }

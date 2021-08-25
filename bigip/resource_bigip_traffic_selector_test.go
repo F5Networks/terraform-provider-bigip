@@ -78,9 +78,10 @@ func testCheckIPSectsDestroyed(s *terraform.State) error {
 }
 func testaccNetIpsecTsDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
- 			  destination_address = "3.10.11.2/32"
-			  source_address      = "2.10.11.12/32"
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name                = "/Common/%[2]s"
+  destination_address = "3.10.11.2/32"
+  source_address      = "2.10.11.12/32"
+}
+		`, resName, instName)
 }

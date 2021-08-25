@@ -470,46 +470,50 @@ func testCheckClientSslDestroyed(s *terraform.State) error {
 }
 func testaccbigipltmprofileclientsslDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-			  defaults_from = "/Common/clientssl"
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name          = "/Common/%[2]s"
+  defaults_from = "/Common/clientssl"
+}
+		`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslUpdateName(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s-new"
-			  defaults_from = "/Common/clientssl"
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name          = "/Common/%[2]s-new"
+  defaults_from = "/Common/clientssl"
+}
+		`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslCerkeychain(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			name = "/Common/%[2]s"
-			authenticate = "always"
-  			cert_key_chain {
-    			name = "default"
-    			cert = "/Common/default.crt"
-				key  = "/Common/default.key"
-    			chain = "/Common/ca-bundle.crt"
-  			}
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name         = "/Common/%[2]s"
+  authenticate = "always"
+  cert_key_chain {
+    name  = "default"
+    cert  = "/Common/default.crt"
+    key   = "/Common/default.key"
+    chain = "/Common/ca-bundle.crt"
+  }
+}
+		`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslCerkeychainissue449(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			name = "/Common/%[2]s"
-			authenticate = "once"
-  			cert_key_chain {
-    			name = "default"
-    			cert = "/Common/default.crt"
-				key  = "/Common/default.key"
-    			chain = "/Common/ca-bundle.crt"
-  			}
-		}`, resName, instName)
+resource "%[1]s" "%[2]s" {
+  name         = "/Common/%[2]s"
+  authenticate = "once"
+  cert_key_chain {
+    name  = "default"
+    cert  = "/Common/default.crt"
+    key   = "/Common/default.key"
+    chain = "/Common/ca-bundle.crt"
+  }
+}
+		`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslUpdateparam(instName, updateParam string) string {
@@ -550,30 +554,31 @@ func testaccbigipltmprofileclientsslUpdateparam(instName, updateParam string) st
 
 func testaccbigipltmprofileclientsslNondefaultcertconfigbasic(partition, instName string) string {
 	return fmt.Sprintf(`
-	variable vs_lb {
-		type = object({
-		client_profile = string
-	})
-	default = { "client_profile" = "lbeform" }
-	}
-	variable env {
-		type    = string
-		default = "INT"
-	}
-	resource "bigip_ssl_certificate" "test-cert" {
-		name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
-		content   = file("`+dir+`/../examples/servercert.crt")
-		partition = "%[1]s"
-	}
-	resource "bigip_ssl_key" "test-key" {
-		name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
-		content   = file("`+dir+`/../examples/serverkey.key")
-		partition = "%[1]s"
-	}
-	resource "%[2]s" "%[3]s" {
-		name = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_${var.env}"
-		cert = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
-		key  = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
-		depends_on = [bigip_ssl_certificate.test-cert, bigip_ssl_key.test-key]
-	}`, partition, resName, instName)
+variable vs_lb {
+  type = object({
+    client_profile = string
+  })
+  default = { "client_profile" = "lbeform" }
+}
+variable env {
+  type    = string
+  default = "INT"
+}
+resource "bigip_ssl_certificate" "test-cert" {
+  name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
+  content   = file("`+dir+`/../examples/servercert.crt")
+  partition = "%[1]s"
+}
+resource "bigip_ssl_key" "test-key" {
+  name      = "${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
+  content   = file("`+dir+`/../examples/serverkey.key")
+  partition = "%[1]s"
+}
+resource "%[2]s" "%[3]s" {
+  name       = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_${var.env}"
+  cert       = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.crt"
+  key        = "/%[1]s/${lookup(var.vs_lb, "client_profile")}_2020_${var.env}.key"
+  depends_on = [bigip_ssl_certificate.test-cert, bigip_ssl_key.test-key]
+}
+	`, partition, resName, instName)
 }
