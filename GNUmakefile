@@ -37,8 +37,8 @@ lint:
 
 tools:
 	@echo "==> installing required tooling..."
+	go install github.com/katbyte/terrafmt
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH || $$GOPATH)/bin v1.41.1
-
 
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
@@ -66,4 +66,13 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build sweep test testacc fmt fmtcheck lint tools test-compile website website-lint website-test
+tflint:
+	./scripts/run-tflint.sh
+
+tffmtfix:
+	@echo "==> Fixing acceptance test terraform blocks code with terrafmt..."
+	@find ./bigip -type f -name "*_test.go" | sort | while read f; do terrafmt fmt -f $$f; done
+	@echo "==> Fixing docs terraform blocks code with terrafmt..."
+	@find ./docs -type f -name "*.md" | sort | while read f; do terrafmt fmt $$f; done
+
+.PHONY: build sweep test testacc fmt fmtcheck lint tools test-compile website website-lint website-test tflint tffmtfix

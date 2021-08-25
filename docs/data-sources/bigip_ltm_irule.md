@@ -15,7 +15,7 @@ Use this data source (`bigip_ltm_irule`) to get the ltm irule details available 
 ```hcl
 
 data "bigip_ltm_irule" "test" {
-  name = "terraform_irule"
+  name      = "terraform_irule"
   partition = "Common"
 }
 

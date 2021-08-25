@@ -113,7 +113,7 @@ func TestAccBigipLtmPoolAttachment_create(t *testing.T) {
 			{
 				Config: TestPoolResource1,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
@@ -133,7 +133,7 @@ func TestAccBigipLtmPoolAttachment_createFqdn(t *testing.T) {
 			{
 				Config: TestPoolResource3,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFqdnFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMemberFqdn),
@@ -153,7 +153,7 @@ func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
 			{
 				Config: TestPoolResource1,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
@@ -171,7 +171,7 @@ func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
 			{
 				Config: TestPoolResource2,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
@@ -194,7 +194,7 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 			{
 				Config: TestPoolResource1,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember),
@@ -203,7 +203,7 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 			{
 				Config: TestPoolResource4,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					testCheckPoolAttachment(TEST_POOL_NAME, poolMemberFullpath, false),
 				),
 			},

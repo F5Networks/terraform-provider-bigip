@@ -16,10 +16,10 @@ description: |-
 
 
 ```hcl
-resource "bigip_net_ike_peer"  "example1" {
-       name = "example1"
-       local_address = "192.16.81.240"
-       profile = "/Common/dslite"
+resource "bigip_net_ike_peer" "example1" {
+  name          = "example1"
+  local_address = "192.16.81.240"
+  profile       = "/Common/dslite"
 }
 ```
 

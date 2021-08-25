@@ -27,7 +27,7 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 			{
 				Config: testAccCheckNodeConfigBasic(nodeName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(nodeName, true),
+					testCheckNodeExists(nodeName),
 					resource.TestCheckResourceAttrPair(dataSourceName, "full_path", resName, "name"),
 					resource.TestCheckResourceAttrPair(dataSourceName, "address", resName, "address"),
 				),
@@ -44,15 +44,15 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 func testAccCheckNodeConfigBasic(nodeName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_node" "NODETEST" {
-	name = "/%s/%s"
-    address = "192.168.30.1"
+  name    = "/%s/%s"
+  address = "192.168.30.1"
 }
 
 # We can't easily reference the node resource above because name includes the
 # partition. Instead we have to split and pull out the separate pieces.
 data "bigip_ltm_node" "NODETEST" {
-	name = split("/", bigip_ltm_node.NODETEST.name)[2]
-	partition = split("/", bigip_ltm_node.NODETEST.name)[1]
+  name      = split("/", bigip_ltm_node.NODETEST.name)[2]
+  partition = split("/", bigip_ltm_node.NODETEST.name)[1]
 }
 `, "Common", nodeName)
 }

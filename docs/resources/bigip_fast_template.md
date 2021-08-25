@@ -16,9 +16,9 @@ Template set can be imported from zip archive files on the local disk.
 
 ```hcl
 resource "bigip_fast_template" "foo-template" {
-  name		= "foo_template"
-  source    = "foo_template.zip"
-  md5_hash  = filemd5("foo_template.zip")
+  name     = "foo_template"
+  source   = "foo_template.zip"
+  md5_hash = filemd5("foo_template.zip")
 }
 ```      
 

@@ -35,8 +35,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 			},
 
 			"app_service": {
-				Type: schema.TypeString,
-				//Default:  "",
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -52,32 +51,28 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across pools with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_services": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_virtuals": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"mirror": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"timeout": {
@@ -88,30 +83,25 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type: schema.TypeString,
-				//Default:      false,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			// Specific to SourceAddrPersistenceProfile
 			"hash_algorithm": {
-				Type: schema.TypeString,
-				//Default:     "default",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specify the hash algorithm",
 				Computed:    true,
 			},
 
 			"map_proxies": {
-				Type: schema.TypeString,
-				//Default:      true,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable directs all to the same single pool member",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"mask": {
@@ -145,7 +135,9 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 
 	err = resourceBigipLtmPersistenceProfileSrcAddrUpdate(d, meta)
 	if err != nil {
-		client.DeleteSourceAddrPersistenceProfile(name)
+		if errdel := client.DeleteSourceAddrPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 

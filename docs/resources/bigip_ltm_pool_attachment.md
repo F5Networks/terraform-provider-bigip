@@ -35,8 +35,8 @@ resource "bigip_ltm_pool" "pool" {
 }
 
 resource "bigip_ltm_pool_attachment" "attach_node" {
-  pool                  = bigip_ltm_pool.pool.name
-  node                  = "1.1.1.1:80"
+  pool = bigip_ltm_pool.pool.name
+  node = "1.1.1.1:80"
 }
 
 ```
@@ -59,9 +59,9 @@ resource "bigip_ltm_pool" "pool" {
   allow_nat           = "yes"
 }
 
-resource "bigip_ltm_node" "node" {	
-  name    = "/Common/terraform_node"	
-  address = "192.168.30.2"	
+resource "bigip_ltm_node" "node" {
+  name    = "/Common/terraform_node"
+  address = "192.168.30.2"
 }
 
 resource "bigip_ltm_pool_attachment" "attach_node" {

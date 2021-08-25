@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-//var TEST_DG_NAME = fmt.Sprintf("/%s/test-devicegroup", TEST_PARTITION)
 var TEST_DG_NAME = "test-devicegroup"
 
 var TEST_DG_RESOURCE = `

@@ -17,8 +17,8 @@ description: |-
 ```hcl
 
 resource "bigip_fast_application" "foo-app" {
-  template		= "examples/simple_http"
-  fast_json   = "${file("new_fast_app.json")}"
+  template  = "examples/simple_http"
+  fast_json = "${file("new_fast_app.json")}"
 }
 
 ```      

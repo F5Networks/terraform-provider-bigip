@@ -114,10 +114,7 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	defaultsFrom := d.Get("defaults_from").(string)
-	//concurrentStreamsPerConnection := d.Get("concurrent_streams_per_connection").(int)
-	//connectionIdleTimeout := d.Get("connection_idle_timeout").(int)
-	//headerTableSize := d.Get("header_table_size").(int)
-	//activationModes := setToStringSlice(d.Get("activation_modes").(*schema.Set))
+
 	log.Println("[INFO] Creating Http2 profile")
 	r := &bigip.Http2{
 		Name:                           name,

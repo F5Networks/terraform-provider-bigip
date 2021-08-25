@@ -15,7 +15,7 @@ Use this data source (`bigip_ltm_pool`) to get the ltm monitor details available
 ```hcl
 
 data "bigip_ltm_pool" "Pool-Example" {
-  name = "example-pool"
+  name      = "example-pool"
   partition = "Common"
 }
 

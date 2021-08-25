@@ -35,9 +35,7 @@ func resourceBigipAs3() *schema.Resource {
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				// d.Id() here is the last argument passed to the `terraform import RESOURCE_TYPE.RESOURCE_NAME RESOURCE_ID` command
 				// Here we use a function to parse the import ID (like the example above) to simplify our logic
-				//if err != nil {
-				//    return nil, err
-				//}
+
 				_ = d.Set("tenant_list", d.Id())
 				_ = d.Set("tenant_filter", d.Id())
 
@@ -197,9 +195,9 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)

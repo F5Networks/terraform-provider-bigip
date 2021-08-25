@@ -72,9 +72,9 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
@@ -97,12 +97,12 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	partition := d.Get("partition").(string)
 
 	if partition == "" {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			err := errors.New("the name must be in full_path format when partition is not specified")
 			fmt.Print(err)
 		}
 	} else {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			name = "/" + partition + "/" + name
 		}
 	}
