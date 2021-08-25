@@ -27,7 +27,7 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 			{
 				Config: testAccCheckNodeConfigBasic(nodeName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(nodeName, true),
+					testCheckNodeExists(nodeName),
 					resource.TestCheckResourceAttrPair(dataSourceName, "full_path", resName, "name"),
 					resource.TestCheckResourceAttrPair(dataSourceName, "address", resName, "address"),
 				),

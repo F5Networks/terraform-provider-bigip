@@ -39,7 +39,7 @@ func TestAccBigipLtmProfileHttpCreate(t *testing.T) {
 			{
 				Config: TestHttpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName, true),
+					testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "name", "/Common/test-http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "description", "some http"),
@@ -73,7 +73,7 @@ func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpDefaultConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName, true),
+					testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -81,7 +81,7 @@ func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateServeragentConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName, true),
+					testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "server_agent_name", "myBIG-IP"),
@@ -106,7 +106,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -114,7 +114,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_host"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "fallback_host", "titanic"),
@@ -138,7 +138,7 @@ func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -146,7 +146,7 @@ func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "basic_auth_realm"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "basic_auth_realm", "titanic"),
@@ -171,7 +171,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -179,7 +179,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "head_erase"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "head_erase", "titanic"),
@@ -204,7 +204,7 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -212,7 +212,7 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "description"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "description", "my-http-profile"),
@@ -237,7 +237,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -245,7 +245,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_status_codes"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("fallback_status_codes.%d", schema.HashString("300")), "300"),
@@ -271,7 +271,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -279,7 +279,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "head_insert"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "head_insert", "X-Forwarded-IP: [expr { [IP::client_addr] }]"),
@@ -304,7 +304,7 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -312,7 +312,7 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "encrypt_cookies"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName, true),
+					testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("peanutButter")), "peanutButter"),
@@ -343,19 +343,17 @@ func TestAccBigipLtmProfileHttpImport(t *testing.T) {
 	})
 }
 
-func testCheckhttpExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckhttpExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.GetHttpProfile(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if p == nil {
 			return fmt.Errorf("http %s was not created", name)
 		}
-		if !exists && p == nil {
-			return fmt.Errorf("http %s still exists", name)
-		}
+
 		return nil
 	}
 }

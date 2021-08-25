@@ -17,8 +17,6 @@ import (
 
 var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
 var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
-var TEST_POOLNODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-var TEST_POOLNODE_NAMEPORT = fmt.Sprintf("%s:443", TEST_POOLNODE_NAME)
 
 var TEST_POOL_RESOURCE = `
 /*resource "bigip_ltm_node" "test-node" {
@@ -59,7 +57,7 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 			{
 				Config: TEST_POOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "name", TEST_POOL_NAME),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_nat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "yes"),
@@ -87,7 +85,7 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 			{
 				Config: TEST_POOL_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME, true),
+					testCheckPoolExists(TEST_POOL_NAME),
 				),
 				ResourceName:      TEST_POOL_RESOURCE,
 				ImportState:       false,
@@ -99,7 +97,7 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 
 //TODO: test adding/removing nodes
 
-func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckPoolExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -107,12 +105,10 @@ func testCheckPoolExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if p == nil {
 			return fmt.Errorf("Pool %s does not exist.", name)
 		}
-		if !exists && p != nil {
-			return fmt.Errorf("Pool %s exists.", name)
-		}
+
 		return nil
 	}
 }

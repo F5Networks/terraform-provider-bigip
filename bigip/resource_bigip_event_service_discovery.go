@@ -86,13 +86,7 @@ func resourceServiceDiscoveryCreate(d *schema.ResourceData, meta interface{}) er
 func resourceServiceDiscoveryRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	taskid := d.Id()
-	var nodeList []interface{}
-	log.Printf("[INFO] Get Event driven service discovery nodes for Application:%+v", taskid)
-	if m, ok := d.GetOk("node"); ok {
-		for _, node := range m.(*schema.Set).List() {
-			nodeList = append(nodeList, node)
-		}
-	}
+
 	serviceDiscoveryResp, err := client.GetServiceDiscoveryNodes(taskid)
 	log.Printf("[DEBUG] serviceDiscoveryResp is :%v", serviceDiscoveryResp)
 	if err != nil {
@@ -100,11 +94,7 @@ func resourceServiceDiscoveryRead(d *schema.ResourceData, meta interface{}) erro
 	}
 	nodeList1 := serviceDiscoveryResp.(map[string]interface{})["result"].(map[string]interface{})["providerOptions"].(map[string]interface{})["nodeList"]
 	log.Printf("[DEBUG] nodeList1 is :%v", nodeList1)
-	//	nodeListCount := d.Get("node.#").(int)
-	//	if len(nodeList1.([]interface{})) != nodeListCount {
-	//		d.SetId("")
-	//		return fmt.Errorf("[DEBUG] Get Node list failed for  (%s): %s", d.Id(), err)
-	//	}
+
 	if serviceDiscoveryResp == nil {
 		d.SetId("")
 		return fmt.Errorf("[DEBUG]serviceDiscoveryResp is : %s", serviceDiscoveryResp)
@@ -150,13 +140,25 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[DEBUG] Could not close the request to %s", url)
+		}
+	}()
+
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
 	bodyString := string(body)
 	if resp.Status != "200 OK" || err != nil {
-		defer resp.Body.Close()
 		return fmt.Errorf("Error while Sending/Posting http request for Delete operation :%s  %v", bodyString, err)
 	}
-	defer resp.Body.Close()
+
 	d.SetId("")
 	return nil
 }

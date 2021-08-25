@@ -59,9 +59,8 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
 			"teem_disable": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				//Default:     false,
+				Type:        schema.TypeBool,
+				Optional:    true,
 				Description: "If this flag set to true,sending telemetry data to TEEM will be disabled",
 				DefaultFunc: schema.EnvDefaultFunc("TEEM_DISABLE", false),
 			},
@@ -237,15 +236,6 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 			f.Set(reflect.ValueOf(d[field]))
 		}
 	}
-}
-
-// Break a string in the format /Partition/name into a Partition / Name object
-func parseF5Identifier(str string) (partition, name string) {
-	if strings.HasPrefix(str, "/") {
-		ary := strings.SplitN(strings.TrimPrefix(str, "/"), "/", 2)
-		return ary[0], ary[1]
-	}
-	return "", str
 }
 
 // Convert Snakecase to Camelcase

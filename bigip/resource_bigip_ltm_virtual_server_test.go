@@ -86,7 +86,7 @@ func TestAccBigipLtmVS_CreateV4V6(t *testing.T) {
 			{
 				Config: TestVsResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TestVsName, true),
+					testCheckVSExists(TestVsName),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVsName),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "10.255.255.254"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
@@ -127,7 +127,7 @@ func TestAccBigipLtmVS_CreateV4V6(t *testing.T) {
 			{
 				Config: TestVs6Resource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(TestVs6Name, true),
+					testCheckVSExists(TestVs6Name),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVs6Name),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "fe80::11"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
@@ -173,7 +173,7 @@ func TestAccBigipLtmVS_create_Defaultstate(t *testing.T) {
 			{
 				Config: testVSCreateDefaultstate("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", ""),
@@ -200,7 +200,7 @@ func TestAccBigipLtmVS_Modify_stateDisabledtoEnabled(t *testing.T) {
 			{
 				Config: testVSCreatestatedisabled("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
@@ -216,7 +216,7 @@ func TestAccBigipLtmVS_Modify_stateDisabledtoEnabled(t *testing.T) {
 			{
 				Config: testVSCreatestateenabled("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
@@ -246,7 +246,7 @@ func TestAccBigipLtmVS_Modify_stateEnabledtoDisabled(t *testing.T) {
 			{
 				Config: testVSCreatestateenabled("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
@@ -262,7 +262,7 @@ func TestAccBigipLtmVS_Modify_stateEnabledtoDisabled(t *testing.T) {
 			{
 				Config: testVSCreatestatedisabled("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "800"),
@@ -292,7 +292,7 @@ func TestAccBigipLtmVS_Policyattach_detach(t *testing.T) {
 			{
 				Config: testVSCreatePolicyAttach("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
 					resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("/Common/test-policy")), "/Common/test-policy"),
 				),
@@ -300,7 +300,7 @@ func TestAccBigipLtmVS_Policyattach_detach(t *testing.T) {
 			{
 				Config: testVSCreatePolicyDettach("test-vs-sample"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("test-vs-sample", true),
+					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
 				),
 			},
@@ -326,14 +326,14 @@ func TestAccBigipLtmVS_Pooolattach_detatch(t *testing.T) {
 			{
 				Config: testVSCreateAttach(poolName, policyName, vsName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(vsName, true),
+					testCheckVSExists(vsName),
 					resource.TestCheckResourceAttr(rsName, "name", vsFullname),
 				),
 			},
 			{
 				Config: testVSCreateDetatch(poolName, policyName, vsName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(vsName, true),
+					testCheckVSExists(vsName),
 					resource.TestCheckResourceAttr(rsName, "name", vsFullname),
 				),
 			},
@@ -351,7 +351,7 @@ func TestAccBigipLtmVS_import(t *testing.T) {
 			{
 				Config: testaccBigipLtmVSImportConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("/Common/test-vs", true),
+					testCheckVSExists("/Common/test-vs"),
 				),
 			},
 			{
@@ -373,7 +373,7 @@ resource "bigip_ltm_virtual_server" "test_vs_import" {
 `, "/Common/test-vs")
 }
 
-func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckVSExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -381,12 +381,10 @@ func testCheckVSExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return err
 		}
-		if exists && vs == nil {
+		if vs == nil {
 			return fmt.Errorf("Virtual server %s does not exist.", name)
 		}
-		if !exists && vs != nil {
-			return fmt.Errorf("Virtual server %s exists.", name)
-		}
+
 		return nil
 	}
 }

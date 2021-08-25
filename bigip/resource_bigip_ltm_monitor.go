@@ -81,7 +81,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "Specifies the text string that the monitor sends to the target object.",
 				StateFunc: func(s interface{}) string {
-					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
+					return strings.ReplaceAll(s.(string), "\r\n", "\\r\\n")
 				},
 			},
 

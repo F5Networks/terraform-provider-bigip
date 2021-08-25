@@ -51,32 +51,28 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across pools with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_services": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_virtuals": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"mirror": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"timeout": {
@@ -86,12 +82,10 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type: schema.TypeString,
-				//Default:      false,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 		},
 	}
@@ -116,7 +110,9 @@ func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta in
 
 	err = resourceBigipLtmPersistenceProfileSSLUpdate(d, meta)
 	if err != nil {
-		client.DeleteSSLPersistenceProfile(name)
+		if errdel := client.DeleteSSLPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 

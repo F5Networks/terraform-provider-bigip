@@ -175,6 +175,9 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	ver, err := client.BigipVersion()
+	if err != nil {
+		return fmt.Errorf("Could not get BigipVersion: %v ", err)
+	}
 
 	bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
 	re := regexp.MustCompile(`^(12)|(13).*`)
@@ -182,16 +185,16 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 	regversion := re.FindAllString(bigipversion, -1)
 	if matchresult {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
-		err = client.ModifyInternalDataGroupRecords(dgver1213)
-		if err != nil {
+		if err := client.ModifyInternalDataGroupRecords(dgver1213); err != nil {
 			return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
 		}
 	} else {
-		err = client.ModifyInternalDataGroupRecords(dgver)
-		if err != nil {
+		log.Printf("[DEBUG] Bigip version is : %s", regversion)
+		if err := client.ModifyInternalDataGroupRecords(dgver); err != nil {
 			return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
 		}
 	}
+
 	return resourceBigipLtmDataGroupRead(d, meta)
 }
 
