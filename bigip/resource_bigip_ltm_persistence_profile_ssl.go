@@ -51,32 +51,28 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across pools with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_services": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_virtuals": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"mirror": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"timeout": {
@@ -86,12 +82,10 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type: schema.TypeString,
-				//Default:      false,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 		},
 	}
@@ -116,7 +110,9 @@ func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta in
 
 	err = resourceBigipLtmPersistenceProfileSSLUpdate(d, meta)
 	if err != nil {
-		client.DeleteSSLPersistenceProfile(name)
+		if errdel := client.DeleteSSLPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 
@@ -133,7 +129,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile  (%s) ", err)
 		return err
 	}
 	if pp == nil {
@@ -242,12 +238,12 @@ func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta in
 
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive SSL Persistence Profile (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile (%s) (%v) ", name, err)
 		return false, err
 	}
 
 	if pp == nil {
-		log.Printf("[WARN] persistance profile SSL  (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistence profile SSL  (%s) not found, removing from state", d.Id())
 		d.SetId("")
 	}
 

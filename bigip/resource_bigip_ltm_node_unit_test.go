@@ -8,9 +8,10 @@ package bigip
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/stretchr/testify/assert"
-	//"io/ioutil"
+
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -20,16 +21,16 @@ import (
 
 func testBigipLtmNodeInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-		resource "bigip_ltm_node" "test-node" {
-			name = "%s"
-			address = "10.10.10.10"
-	                invalidkey = "foo"
-		}
-		provider "bigip" {
-			address = "xxx.xxx.xxx.xxx"
-			username = "xxx"
-			password = "xxx"
-		}
+resource "bigip_ltm_node" "test-node" {
+  name       = "%s"
+  address    = "10.10.10.10"
+  invalidkey = "foo"
+}
+provider "bigip" {
+  address  = "xxx.xxx.xxx.xxx"
+  username = "xxx"
+  password = "xxx"
+}
 	`, resourceName)
 }
 
@@ -49,15 +50,15 @@ func TestAccBigipLtmNodeInvalid(t *testing.T) {
 
 func testBigipLtmNodeCreate(resourceName string, url string, address string) string {
 	return fmt.Sprintf(`
-		resource "bigip_ltm_node" "test-node" {
-			name = "%s"
-			address = "%s"
-		}
-		provider "bigip" {
-			address = "%s"
-			username = "xxxx"
-			password = "xxxx"
-		}
+resource "bigip_ltm_node" "test-node" {
+  name    = "%s"
+  address = "%s"
+}
+provider "bigip" {
+  address  = "%s"
+  username = "xxxx"
+  password = "xxxx"
+}
 	`, resourceName, address, url)
 }
 
@@ -66,7 +67,6 @@ func TestAccBigipLtmNodeCreate(t *testing.T) {
 	address := "10.10.10.10"
 	setup()
 	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		//fmt.Println(r)
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
 		log.Println(" value of t  ")
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
@@ -74,15 +74,10 @@ func TestAccBigipLtmNodeCreate(t *testing.T) {
 }`)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/node", func(w http.ResponseWriter, r *http.Request) {
-		//fmt.Println(r)
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		//b, _ := ioutil.ReadAll(r.Body)
-		//defer r.Body.Close()
-		//fmt.Println(string(b))
 		fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
-		//fmt.Println(r)
 		fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
 	})
 	defer teardown()

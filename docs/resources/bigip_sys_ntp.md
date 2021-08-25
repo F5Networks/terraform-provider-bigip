@@ -16,7 +16,7 @@ This resource is helpful when configuring NTP server on the BIG-IP.
 
 ```hcl
 provider "bigip" {
-  address = "xxx.xxx.xxx.xxx"
+  address  = "xxx.xxx.xxx.xxx"
   username = "xxxxx"
   password = "xxxxx"
 }

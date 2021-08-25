@@ -8,12 +8,13 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigiqLicenseManage() *schema.Resource {
@@ -50,30 +51,16 @@ func resourceBigiqLicenseManage() *schema.Resource {
 				Description: "The registration key pool to use",
 			},
 			"bigiq_token_auth": {
-				Type:      schema.TypeBool,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_TOKEN_AUTH", true),
 			},
 			"bigiq_login_ref": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	//log.Printf("Value of k=%v,old=%v,new%v", k, old, new)
-				//	if old != new {
-				//		return true
-				//	}
-				//	return false
-				//},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Login reference for token authentication (see BIG-IQ REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIQ_LOGIN_REF", "local"),
 			},
@@ -143,7 +130,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	}
 	var deviceIP []string
 	var respID string
-	deviceIP, _ = getDeviceUri(bigipRef.Host)
+	deviceIP = getDeviceUri(bigipRef.Host)
 	devicePort, _ := strconv.Atoi(deviceIP[3])
 	licensePoolName := d.Get("license_poolname").(string)
 	log.Printf("[INFO] BIGIP License Assignment Started on Pool:%v", licensePoolName)
@@ -154,18 +141,11 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	if poolInfo == nil {
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
-	//log.Printf("poolInfo:%+v", poolInfo)
-	var licenseType string
-	if poolInfo.SortName == "Registration Key Pool" {
-		licenseType = poolInfo.SortName
-	} else if poolInfo.SortName == "Utility" {
-		licenseType = poolInfo.SortName
-		if d.Get("unit_of_measure").(string) == "" {
-			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
-		}
-	} else if poolInfo.SortName == "Purchased Pool" {
-		licenseType = poolInfo.SortName
+
+	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
+		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
 	}
+
 	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
 		if d.Get("mac_address").(string) == "" || d.Get("hypervisor").(string) == "" {
@@ -233,13 +213,11 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 				Password:      bigipRef.Password,
 				HTTPSPort:     devicePort,
 			}
-			//log.Printf("config2 = %+v", config)
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
 				return err
 			}
-			//log.Printf("Resp from Post = %+v", resp)
 			respID = resp.ID
 		}
 	}
@@ -278,7 +256,6 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 	if poolInfo == nil {
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
-	//poolLicenseType := d.Get("pool_license_type").(string)
 	poolName := d.Get("license_poolname").(string)
 	regKey := d.Get("key").(string)
 	poolId, err := bigiqRef.GetRegkeyPoolId(poolName)
@@ -303,6 +280,10 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		licenseAssignmentReference := licenseStatus["licenseAssignmentReference"].(map[string]interface{})["link"].(string)
 		assignmentRef := strings.Split(licenseAssignmentReference, "/")
 		deviceStatus, err := bigiqRef.GetDeviceLicenseStatus(assignmentRef[3:]...)
+		if err != nil {
+			return fmt.Errorf("getting license assignment status from bigip failed with :%v", err)
+		}
+
 		bigipLicence, err := bigipRef.GetBigipLiceseStatus()
 		if err != nil {
 			return fmt.Errorf("getting license assignment status from bigip failed with :%v", err)
@@ -313,7 +294,10 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 		}
 		d.Set("device_license_status", deviceStatus)
 	} else {
-		bigiqRef.GetMemberStatus(poolId, regKey, memID)
+		log.Printf("[DEBUG] GetMemberStatus using regKey")
+		if _, err := bigiqRef.GetMemberStatus(poolId, regKey, memID); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -329,7 +313,7 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 
 	var deviceIP []string
 	var respID string
-	deviceIP, _ = getDeviceUri(bigipRef.Host)
+	deviceIP = getDeviceUri(bigipRef.Host)
 	devicePort, _ := strconv.Atoi(deviceIP[3])
 	licensePoolName := d.Get("license_poolname").(string)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
@@ -340,17 +324,11 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
 	}
 	log.Printf("poolInfo:%+v", poolInfo)
-	var licenseType string
-	if poolInfo.SortName == "Registration Key Pool" {
-		licenseType = poolInfo.SortName
-	} else if poolInfo.SortName == "Utility" {
-		licenseType = poolInfo.SortName
-		if d.Get("unit_of_measure").(string) == "" {
-			return fmt.Errorf("unit_of_measure is required parameter for %s licese type pool :%v", licenseType, licensePoolName)
-		}
-	} else if poolInfo.SortName == "Purchased Pool" {
-		licenseType = poolInfo.SortName
+
+	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
+		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
 	}
+
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {
 		return fmt.Errorf("getting Poolid failed with :%v", err)
@@ -412,13 +390,13 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 				Password:      bigipRef.Password,
 				HTTPSPort:     devicePort,
 			}
-			//log.Printf("config2 = %+v", config)
+
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
 				return err
 			}
-			//log.Printf("Resp from Post = %+v", resp)
+
 			respID = resp.ID
 		}
 	}
@@ -446,9 +424,12 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 	if v, ok := d.GetOk("key"); ok {
 		regKey = v.(string)
 	}
-	var deviceIP []string
-	deviceIP, _ = getDeviceUri(bigipRef.Host)
-	devicePort, _ := strconv.Atoi(deviceIP[3])
+
+	deviceIP := getDeviceUri(bigipRef.Host)
+	devicePort, err := strconv.Atoi(deviceIP[3])
+	if err != nil {
+		return err
+	}
 	assignmentType := d.Get("assignment_type").(string)
 	if regKey == "" {
 		address := deviceIP[2]
@@ -504,7 +485,9 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		log.Printf("[INFO] License Revoking for Device %+v Success", bigipRef.Host)
 	} else {
 		if strings.ToUpper(assignmentType) == "MANAGED" {
-			bigiqRef.RegkeylicenseRevoke(poolId, regKey, memID)
+			if err := bigiqRef.RegkeylicenseRevoke(poolId, regKey, memID); err != nil {
+				return fmt.Errorf("Error in RegkeylicenseRevoke: %v", err)
+			}
 		} else if strings.ToUpper(assignmentType) == "UNMANAGED" {
 			config := &struct {
 				ID        string `json:"id"`
@@ -532,16 +515,10 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 		Username: d.Get("bigiq_user").(string),
 		Password: d.Get("bigiq_password").(string),
 	}
-	//type loginReference struct {
-	//	Link string `json:"link"`
-	//}
-	//
-	//logRef := loginReference{
-	//	fmt.Sprintf("https://localhost/mgmt/cm/system/authn/providers/%s/login",d.Get("bigiq_login_ref").(string)),
-	//}
+
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)
 	}
-	//log.Printf("[DEBUG] BIGIQ CONFIG:%+v", bigiqConfig)
+
 	return bigiqConfig.Client()
 }

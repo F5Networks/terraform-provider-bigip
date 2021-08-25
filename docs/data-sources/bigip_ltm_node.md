@@ -12,11 +12,12 @@ Use this data source (`bigip_ltm_node`) to get the ltm node details available on
 
 
 ## Example Usage
+
 ```hcl
 
 
 data "bigip_ltm_node" "test" {
-  name = "terraform_node"
+  name      = "terraform_node"
   partition = "Common"
 }
 
@@ -26,7 +27,7 @@ output "bigip_node" {
 }
 
 
-if it is fqdn address we can get fqdn elements as below
+# if it is fqdn address we can get fqdn elements as below
 
 output "bigip_node" {
   value = "${data.bigip_ltm_node.test.fqdn[0].address_family}"

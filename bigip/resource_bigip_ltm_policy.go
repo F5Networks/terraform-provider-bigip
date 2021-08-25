@@ -7,21 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
 	"log"
 	"os"
 
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"reflect"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adpatation", "server-ssl"})
+var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adaptation", "server-ssl"})
 var REQUIRES = schema.NewSet(schema.HashString, []interface{}{"client-ssl", "ssl-persistence", "tcp", "http"})
 
 func resourceBigipLtmPolicy() *schema.Resource {
@@ -1111,9 +1113,9 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
@@ -1276,7 +1278,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		r.Name = d.Get(prefix + ".name").(string)
 
 		actionCount := d.Get(prefix + ".action.#").(int)
-		r.Actions = make([]bigip.PolicyRuleAction, actionCount, actionCount)
+		r.Actions = make([]bigip.PolicyRuleAction, actionCount)
 		for x := 0; x < actionCount; x++ {
 			var a bigip.PolicyRuleAction
 			mapEntity(d.Get(fmt.Sprintf("%s.action.%d", prefix, x)).(map[string]interface{}), &a)
@@ -1284,7 +1286,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		}
 
 		conditionCount := d.Get(prefix + ".condition.#").(int)
-		r.Conditions = make([]bigip.PolicyRuleCondition, conditionCount, conditionCount)
+		r.Conditions = make([]bigip.PolicyRuleCondition, conditionCount)
 		for x := 0; x < conditionCount; x++ {
 			var c bigip.PolicyRuleCondition
 			mapEntity(d.Get(fmt.Sprintf("%s.condition.%d", prefix, x)).(map[string]interface{}), &c)
@@ -1324,12 +1326,9 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 			return p.Rules[i].Ordinal < p.Rules[j].Ordinal
 		})
 
-		rule, err := flattenPolicyRules(p.Rules, d)
-		if err != nil {
-			return err
-		}
+		rule := flattenPolicyRules(p.Rules)
 
-		err = d.Set("rule", rule)
+		err := d.Set("rule", rule)
 		if err != nil {
 			return err
 		}
@@ -1338,7 +1337,7 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 	return nil
 }
 
-func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]interface{}, error) {
+func flattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
 	att := make([]interface{}, len(rules))
 	for i, v := range rules {
 		obj := make(map[string]interface{})
@@ -1348,40 +1347,34 @@ func flattenPolicyRules(rules []bigip.PolicyRule, d *schema.ResourceData) ([]int
 		}
 
 		if len(v.Actions) > 0 {
-			r, err := flattenPolicyRuleActions(v.Actions)
-			if err != nil {
-				return []interface{}{att}, err
-			}
+			r := flattenPolicyRuleActions(v.Actions)
 			obj["action"] = r
 		}
 
 		if len(v.Conditions) > 0 {
-			r, err := flattenPolicyRuleConditions(v.Conditions)
-			if err != nil {
-				return []interface{}{att}, err
-			}
+			r := flattenPolicyRuleConditions(v.Conditions)
 			obj["condition"] = r
 		}
 
 		att[i] = obj
 	}
-	return att, nil
+	return att
 }
 
-func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) ([]interface{}, error) {
+func flattenPolicyRuleActions(actions []bigip.PolicyRuleAction) []interface{} {
 	att := make([]interface{}, len(actions))
 	for x, a := range actions {
 		att[x] = interfaceToResourceData(a)
 	}
-	return att, nil
+	return att
 }
 
-func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) ([]interface{}, error) {
+func flattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) []interface{} {
 	att := make([]interface{}, len(conditions))
 	for x, a := range conditions {
 		att[x] = interfaceToResourceData(a)
 	}
-	return att, nil
+	return att
 }
 
 func interfaceToResourceData(a interface{}) map[string]interface{} {

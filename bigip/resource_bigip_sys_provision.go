@@ -8,9 +8,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
@@ -134,6 +135,6 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
-	//API is not supported for Deleting
+	// API is not supported for Deleting
 	return nil
 }

@@ -143,7 +143,7 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	description := d.Get("description").(string)
 	ratio := d.Get("ratio").(int)
 
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
+	r := regexp.MustCompile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
 
@@ -217,9 +217,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	d.Set("name", name)
-	//if err := d.Set("monitor", node.Monitor); err != nil {
-	//	return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
-	//}
+
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
 	}
@@ -232,8 +230,6 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		d.Set("session", "user-disabled")
 	}
 
-	//d.Set("state", node.State)
-	//d.Set("session", node.Session)
 	d.Set("connection_limit", node.ConnectionLimit)
 	d.Set("description", node.Description)
 	d.Set("dynamic_ratio", node.DynamicRatio)
@@ -270,7 +266,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 	address := d.Get("address").(string)
-	r, _ := regexp.Compile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
+	r := regexp.MustCompile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	nodeConfig := &bigip.Node{
 		ConnectionLimit: d.Get("connection_limit").(int),

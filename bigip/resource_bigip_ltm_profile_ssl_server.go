@@ -7,14 +7,15 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
@@ -411,9 +412,9 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
@@ -556,23 +557,25 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 	xt := reflect.TypeOf(obj.TmOptions).Kind()
-	if obj.TmOptions != "none" && xt == reflect.String {
-		tmOptions := strings.Split(obj.TmOptions.(string), " ")
-		if len(tmOptions) > 0 {
-			tmOptions = tmOptions[1:]
-			tmOptions = tmOptions[:len(tmOptions)-1]
-		}
-		if err := d.Set("tm_options", tmOptions); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-		}
+	if obj.TmOptions != "none" {
+		if xt == reflect.String {
+			tmOptions := strings.Split(obj.TmOptions.(string), " ")
+			if len(tmOptions) > 0 {
+				tmOptions = tmOptions[1:]
+				tmOptions = tmOptions[:len(tmOptions)-1]
+			}
+			if err := d.Set("tm_options", tmOptions); err != nil {
+				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+			}
 
-	} else if obj.TmOptions != "none" && xt != reflect.String {
-		var newObj []string
-		for _, v := range obj.TmOptions.([]interface{}) {
-			newObj = append(newObj, v.(string))
-		}
-		if err := d.Set("tm_options", newObj); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+		} else {
+			var newObj []string
+			for _, v := range obj.TmOptions.([]interface{}) {
+				newObj = append(newObj, v.(string))
+			}
+			if err := d.Set("tm_options", newObj); err != nil {
+				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+			}
 		}
 	} else {
 		tmOptions := []string{}
@@ -769,7 +772,6 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.SslC3d = sslC3d
 	config.SslForwardProxy = sslForwardProxyEnabled
 	config.SslForwardProxyBypass = sslForwardProxyBypass
-	//config.SslForwardProxyBypass = d.Get("ssl_forward_proxy_bypass").(string)
 	config.SslSignHash = d.Get("ssl_sign_hash").(string)
 	config.StrictResume = d.Get("strict_resume").(string)
 	config.UncleanShutdown = d.Get("unclean_shutdown").(string)

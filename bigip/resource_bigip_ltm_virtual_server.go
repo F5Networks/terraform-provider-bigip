@@ -8,15 +8,16 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipLtmVirtualServer() *schema.Resource {
@@ -46,9 +47,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"source": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "0.0.0.0/0",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Computed:    true,
 				Description: "Source IP and mask for the virtual server",
 			},
@@ -77,9 +77,8 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 			},
 
 			"mask": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "255.255.255.255",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Computed:    true,
 				Description: "subnet mask",
 			},
@@ -321,11 +320,10 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
-		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
@@ -466,10 +464,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 			switch profile.Context {
 			case bigip.CONTEXT_CLIENT:
 				clientProfileNames.Add(profile.FullPath)
-				break
 			case bigip.CONTEXT_SERVER:
 				serverProfileNames.Add(profile.FullPath)
-				break
 			default:
 				profileNames.Add(profile.FullPath)
 			}

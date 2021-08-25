@@ -15,7 +15,7 @@ Use this data source (`bigip_ltm_monitor`) to get the ltm monitor details availa
 ```hcl
 
 data "bigip_ltm_monitor" "Monitor-TC1" {
-  name = "test-monitor"
+  name      = "test-monitor"
   partition = "Common"
 }
 

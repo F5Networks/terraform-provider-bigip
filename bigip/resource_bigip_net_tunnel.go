@@ -7,9 +7,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceBigipNetTunnel() *schema.Resource {
@@ -36,9 +37,8 @@ func resourceBigipNetTunnel() *schema.Resource {
 				Description: "The application service that the object belongs to",
 			},
 			"auto_last_hop": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "default",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Specifies whether auto lasthop is enabled or not",
 			},
 			"description": {
@@ -52,15 +52,13 @@ func resourceBigipNetTunnel() *schema.Resource {
 				Description: "Specifies a local IP address. This option is required",
 			},
 			"mode": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "bidirectional",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Specifies how the tunnel carries traffic",
 			},
 			"partition": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "Common",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Displays the admin-partition within which this component resides",
 			},
 			"profile": {
@@ -79,9 +77,8 @@ func resourceBigipNetTunnel() *schema.Resource {
 				Description: "Specifies a secondary non-floating IP address when the local-address is set to a floating address",
 			},
 			"tos": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "65535",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Specifies a value for insertion into the Type of Service (ToS) octet within the IP header of the encapsulating header of transmitted packets",
 			},
 			"traffic_group": {
@@ -90,33 +87,24 @@ func resourceBigipNetTunnel() *schema.Resource {
 				Description: "Specifies a traffic-group for use with the tunnel",
 			},
 			"transparent": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "disabled",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Enables or disables the tunnel to be transparent",
 			},
 			"use_pmtu": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:     "enabled",
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "Enables or disables the tunnel to use the PMTU (Path MTU) information provided by ICMP NeedFrag error messages",
 			},
 			"idle_timeout": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				//Default:     300,
+				Type:        schema.TypeInt,
+				Optional:    true,
 				Description: "Specifies an idle timeout for wildcard tunnels in seconds",
 			},
-			/*"if_index": {
-			        Type:        schema.TypeInt,
-			        Optional:    true,
-			        //Default:     0,
-			        Description: "Displays the index assigned to this tunnel",
-			},*/
+
 			"key": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				//Default:     0,
+				Type:        schema.TypeInt,
+				Optional:    true,
 				Description: "The key field may represent different values depending on the type of the tunnel",
 			},
 			"mtu": {
@@ -157,7 +145,6 @@ func resourceBigipNetTunnelRead(d *schema.ResourceData, meta interface{}) error 
 	name := d.Id()
 
 	log.Printf("[DEBUG] Reading TUNNEL %s", name)
-	//name = strings.Replace(name, "/", "~", -1)
 	tunnel, err := client.GetTunnel(name)
 	log.Printf("[DEBUG] TUNNEL Output :%+v", tunnel)
 	if err != nil {

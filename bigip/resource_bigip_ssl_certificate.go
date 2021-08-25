@@ -3,13 +3,14 @@ package bigip
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
-	"os"
-	"strings"
 )
 
 func resourceBigipSslCertificate() *schema.Resource {
@@ -70,11 +71,10 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
-		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
@@ -97,12 +97,12 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	partition := d.Get("partition").(string)
 
 	if partition == "" {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			err := errors.New("the name must be in full_path format when partition is not specified")
 			fmt.Print(err)
 		}
 	} else {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			name = "/" + partition + "/" + name
 		}
 	}
@@ -125,12 +125,12 @@ func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{})
 	partition := d.Get("partition").(string)
 
 	if partition == "" {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			err := errors.New("the name must be in full_path format when partition is not specified")
 			fmt.Print(err)
 		}
 	} else {
-		if strings.HasPrefix(name, "/") != true {
+		if !strings.HasPrefix(name, "/") {
 			name = "/" + partition + "/" + name
 		}
 	}

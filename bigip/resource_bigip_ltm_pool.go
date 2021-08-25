@@ -8,11 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -114,9 +115,9 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)

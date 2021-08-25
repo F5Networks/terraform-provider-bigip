@@ -8,11 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 var parentMonitors = map[string]bool{
@@ -80,7 +81,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "Specifies the text string that the monitor sends to the target object.",
 				StateFunc: func(s interface{}) string {
-					return strings.Replace(s.(string), "\r\n", "\\r\\n", -1)
+					return strings.ReplaceAll(s.(string), "\r\n", "\\r\\n")
 				},
 			},
 
@@ -205,7 +206,6 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(name)
-	//_ = resourceBigipLtmMonitorUpdate(d, meta)
 	return resourceBigipLtmMonitorRead(d, meta)
 }
 
@@ -363,6 +363,6 @@ func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.M
 	config.Username = d.Get("username").(string)
 	config.Password = d.Get("password").(string)
 	config.UpInterval = d.Get("up_interval").(int)
-	//config.Description
+	// config.Description
 	return config
 }

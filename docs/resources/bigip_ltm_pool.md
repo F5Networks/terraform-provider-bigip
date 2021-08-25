@@ -22,10 +22,10 @@ resource "bigip_ltm_monitor" "monitor" {
   parent = "/Common/http"
 }
 resource "bigip_ltm_pool" "pool" {
-  name                      = "/Common/Axiom_Environment_APP1_Pool"
-  load_balancing_mode       = "round-robin"
+  name                   = "/Common/Axiom_Environment_APP1_Pool"
+  load_balancing_mode    = "round-robin"
   minimum_active_members = 1
-  monitors                  = [bigip_ltm_monitor.monitor.name]
+  monitors               = [bigip_ltm_monitor.monitor.name]
 }
 ```      
 

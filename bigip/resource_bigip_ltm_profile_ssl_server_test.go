@@ -7,8 +7,9 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -33,7 +34,7 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/serverssl"),
@@ -41,13 +42,11 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate_depth", "9"),
 					resource.TestCheckResourceAttr(resFullName, "cache_size", "262144"),
-					//resource.TestCheckResourceAttr(resFullName, "cache_timeout", "3600"),
 					resource.TestCheckResourceAttr(resFullName, "ca_file", "none"),
 					resource.TestCheckResourceAttr(resFullName, "cert", "none"),
 					resource.TestCheckResourceAttr(resFullName, "chain", "none"),
 					resource.TestCheckResourceAttr(resFullName, "ciphers", "DEFAULT"),
 					resource.TestCheckResourceAttr(resFullName, "expire_cert_response_control", "drop"),
-					//resource.TestCheckResourceAttr(resFullName, "generic_alert", "disabled"),
 					resource.TestCheckResourceAttr(resFullName, "handshake_timeout", "10"),
 					resource.TestCheckResourceAttr(resFullName, "key", "none"),
 					resource.TestCheckResourceAttr(resFullName, "mod_ssl_methods", "disabled"),
@@ -77,7 +76,7 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
@@ -94,7 +93,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
@@ -104,7 +103,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 			{
 				Config: testAccBigipLtmProfileServerSsl_UpdateParam(instName, "authenticate"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "always"),
@@ -116,7 +115,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 }
 
 //
-//This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
+// This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
 //
 func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
@@ -133,7 +132,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
@@ -145,7 +144,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 			{
 				Config: testAccBigipLtmProfileServerSsl_UpdateParam(instName, "tm_options"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "authenticate", "once"),
@@ -160,7 +159,6 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 	var instName = "test-ServerSsl"
 	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
-	//resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -171,7 +169,7 @@ func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckServerSslExists(instFullName, true),
+					testCheckServerSslExists(instFullName),
 				),
 				ResourceName:      instFullName,
 				ImportState:       false,
@@ -181,19 +179,17 @@ func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 	})
 }
 
-func testCheckServerSslExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckServerSslExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.GetServerSSLProfile(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if p == nil {
 			return fmt.Errorf("ServerSsl Profile %s was not created.", name)
 		}
-		if !exists && p == nil {
-			return fmt.Errorf("ServerSsl Profile %s still exists.", name)
-		}
+
 		return nil
 	}
 }
@@ -219,10 +215,11 @@ func testCheckServerSslDestroyed(s *terraform.State) error {
 }
 func testaccbigipltmprofileserversslDefaultcreate(instName string) string {
 	return fmt.Sprintf(`
-		resource "%[1]s" "%[2]s" {
-			  name = "/Common/%[2]s"
-			  //defaults_from = "/Common/serverssl"
-		}`, resNameserver, instName)
+resource "%[1]s" "%[2]s" {
+  name = "/Common/%[2]s"
+  //defaults_from = "/Common/serverssl"
+}
+		`, resNameserver, instName)
 }
 
 func testAccBigipLtmProfileServerSsl_UpdateParam(instName, updateParam string) string {

@@ -25,9 +25,9 @@ resource "bigip_ltm_pool" "mypool" {
   load_balancing_mode = "round-robin"
 }
 resource "bigip_ltm_policy" "test-policy" {
-  name      = "/Common/test-policy"
-  strategy  = "first-match"
-  requires  = ["http"]
+  name     = "/Common/test-policy"
+  strategy = "first-match"
+  requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"

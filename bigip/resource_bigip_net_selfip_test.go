@@ -53,8 +53,8 @@ func TestAccBigipNetselfip_create(t *testing.T) {
 			{
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME, true),
-					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME, true),
+					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", TEST_SELFIP_NAME),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "ip", "11.1.1.1/24"),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", TEST_VLAN_NAME),
@@ -79,7 +79,7 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 			{
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME, true),
+					testCheckselfipExists(TEST_SELFIP_NAME),
 				),
 				ResourceName:      TEST_SELFIP_NAME,
 				ImportState:       false,
@@ -98,7 +98,7 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 			{
 				Config: TEST_SELFIP_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME, true),
+					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME),
 				),
 				ResourceName:      TEST_FLOAT_SELFIP_NAME,
 				ImportState:       false,
@@ -108,19 +108,17 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 	})
 }
 
-func testCheckselfipExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckselfipExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.SelfIP(name)
 		if err != nil {
 			return err
 		}
-		if exists && p == nil {
+		if p == nil {
 			return fmt.Errorf("selfip %s was not created.", name)
 		}
-		if !exists && p != nil {
-			return fmt.Errorf("selfip %s still exists.", name)
-		}
+
 		return nil
 	}
 }

@@ -7,15 +7,16 @@ package bigip
 
 import (
 	"encoding/json"
+	"log"
+	"os"
+	"reflect"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
-	"log"
-	"os"
-	"reflect"
-	"strings"
 )
 
 func resourceBigipFastApp() *schema.Resource {
@@ -46,7 +47,7 @@ func resourceBigipFastApp() *schema.Resource {
 					_ = json.Unmarshal(oldResp, &oldJsonref)
 					_ = json.Unmarshal(newResp, &newJsonref)
 					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityBefore == true {
+					if jsonEqualityBefore {
 						return true
 					}
 					iterate := make(map[string]interface{})
@@ -61,7 +62,7 @@ func resourceBigipFastApp() *schema.Resource {
 						}
 					}
 					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityAfter == true {
+					if jsonEqualityAfter {
 						return true
 					} else {
 						return false
@@ -105,11 +106,10 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
-		//log.Printf("[INFO]:TEEM_DISABLE FLAG:%v", client.Teem)
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)

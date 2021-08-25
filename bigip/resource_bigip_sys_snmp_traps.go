@@ -8,9 +8,10 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 // this module does not have DELETE function as there is no API for Delete
@@ -29,7 +30,6 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Name",
-				//ValidateFunc: validateF5Name,
 			},
 			"auth_passwordencrypted": {
 				Type:        schema.TypeString,

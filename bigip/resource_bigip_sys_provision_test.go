@@ -7,10 +7,11 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"testing"
 )
 
 var TEST_PROVISION_NAME = "afm"
@@ -91,7 +92,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "afm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -111,7 +112,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_ASM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ASM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_ASM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_ASM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "asm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -131,7 +132,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_GTM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_GTM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_GTM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_GTM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "gtm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -151,7 +152,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_APM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_APM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_APM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_APM_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "apm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -171,7 +172,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_AVR_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_AVR_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_AVR_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_AVR_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "avr"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -191,7 +192,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			{
 				Config: TEST_ILX_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ILX_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_ILX_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_ILX_PROVISION_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "ilx"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
@@ -214,7 +215,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_PROVISION_NAME),
 				),
 				ResourceName:      TEST_PROVISION_NAME,
 				ImportState:       false,
@@ -231,7 +232,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_ASM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ASM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_ASM_PROVISION_NAME),
 				),
 				ResourceName:      TEST_ASM_PROVISION_NAME,
 				ImportState:       false,
@@ -248,7 +249,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_GTM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_GTM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_GTM_PROVISION_NAME),
 				),
 				ResourceName:      TEST_GTM_PROVISION_NAME,
 				ImportState:       false,
@@ -265,7 +266,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_APM_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_APM_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_APM_PROVISION_NAME),
 				),
 				ResourceName:      TEST_APM_PROVISION_NAME,
 				ImportState:       false,
@@ -282,7 +283,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_AVR_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_AVR_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_AVR_PROVISION_NAME),
 				),
 				ResourceName:      TEST_AVR_PROVISION_NAME,
 				ImportState:       false,
@@ -299,7 +300,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			{
 				Config: TEST_ILX_PROVISION_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ILX_PROVISION_NAME, true),
+					testCheckprovisionExists(TEST_ILX_PROVISION_NAME),
 				),
 				ResourceName:      TEST_ILX_PROVISION_NAME,
 				ImportState:       false,
@@ -309,7 +310,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 	})
 }
 
-func testCheckprovisionExists(name string, exists bool) resource.TestCheckFunc {
+func testCheckprovisionExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
@@ -317,14 +318,11 @@ func testCheckprovisionExists(name string, exists bool) resource.TestCheckFunc {
 		if err != nil {
 			return err
 		}
-		if exists && provision == nil {
+		if provision == nil {
 			return fmt.Errorf("provision %s was not created.", name)
 
 		}
-		if !exists && provision != nil {
-			return fmt.Errorf("provision %s still exists.", name)
 
-		}
 		return nil
 	}
 }

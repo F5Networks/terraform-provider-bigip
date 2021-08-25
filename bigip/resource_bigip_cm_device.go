@@ -109,7 +109,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 
 	members, err := client.Devices(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Device (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to retrieve Device (%s) (%v) ", name, err)
 		return err
 	}
 	if members == nil {
@@ -118,7 +118,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", members.Name)
+	_ = d.Set("name", members.Name)
 
 	if err := d.Set("mirror_ip", members.MirrorIp); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving mirror_ip  to state for Device (%s): %s", d.Id(), err)

@@ -35,8 +35,7 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 			},
 
 			"app_service": {
-				Type: schema.TypeString,
-				//Default:  "",
+				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 			},
@@ -53,7 +52,6 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "To enable _ disable match across pools with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_services": {
@@ -61,7 +59,6 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"match_across_virtuals": {
@@ -69,23 +66,19 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "To enable _ disable match across virtual servers with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 			"method": {
-				Type: schema.TypeString,
-				//Default:     "insert",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Specifies the type of cookie processing that the system uses",
 			},
 
 			"mirror": {
-				Type: schema.TypeString,
-				//Default:      "disabled",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "To enable _ disable",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"timeout": {
@@ -96,31 +89,25 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type: schema.TypeString,
-				//Default:      false,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			// Specific to CookiePersistenceProfile
 			"always_send": {
-				Type: schema.TypeString,
-				//Default:      "default",
+				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
 				Description: "To enable _ disable always sending cookies",
-				//ValidateFunc: validateEnabledDisabled,
 			},
 
 			"cookie_encryption": {
-				Type: schema.TypeString,
-				//Default:      "disabled",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "To required, preferred, or disabled policy for cookie encryption",
-				//ValidateFunc: validateReqPrefDisabled,
 			},
 
 			"cookie_encryption_passphrase": {
@@ -131,44 +118,38 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 			},
 
 			"cookie_name": {
-				Type: schema.TypeString,
-				//Default:     "disabled",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Name of the cookie to track persistence",
 			},
 
 			"expiration": {
-				Type: schema.TypeString,
-				//Default:     "0",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Expiration TTL for cookie specified in D:H:M:S or in seconds",
 			},
 
 			"hash_length": {
-				Type: schema.TypeInt,
-				//Default:     0,
+				Type:        schema.TypeInt,
 				Computed:    true,
 				Optional:    true,
 				Description: "Length of hash to apply to cookie",
 			},
 
 			"hash_offset": {
-				Type: schema.TypeInt,
-				//Default:     0,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 				Description: "Number of characters to skip in the cookie for the hash",
 			},
 
 			"httponly": {
-				Type: schema.TypeString,
-				//Default:      "disabled",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable sending only over http",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 		},
 	}
@@ -198,7 +179,9 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 
 	err = resourceBigipLtmPersistenceProfileCookieUpdate(d, meta)
 	if err != nil {
-		client.DeleteCookiePersistenceProfile(name)
+		if errdel := client.DeleteCookiePersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 
@@ -355,7 +338,7 @@ func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta
 		return false, err
 	}
 	if pp == nil {
-		log.Printf("[WARN] persistance profile cookie (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] persistence profile cookie (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return false, nil
 	}

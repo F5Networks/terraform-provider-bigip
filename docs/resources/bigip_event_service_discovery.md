@@ -18,7 +18,7 @@ The API endpoint for Service discovery tasks should be available before using th
 
 ```hcl
 resource "bigip_event_service_discovery" "test" {
-  taskid   = "~Sample_event_sd~My_app~My_pool"
+  taskid = "~Sample_event_sd~My_app~My_pool"
   node {
     id   = "newNode1"
     ip   = "192.168.2.3"

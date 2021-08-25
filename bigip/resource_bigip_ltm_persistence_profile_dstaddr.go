@@ -35,8 +35,7 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 			},
 
 			"app_service": {
-				Type: schema.TypeString,
-				//Default:  "",
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -52,32 +51,28 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across pools with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_services": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"match_across_virtuals": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable match across services with given persistence record",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"mirror": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			"timeout": {
@@ -88,18 +83,15 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 			},
 
 			"override_conn_limit": {
-				Type: schema.TypeString,
-				//Default:      false,
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "To enable _ disable that pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.",
-				//ValidateFunc: validateEnabledDisabled,
-				Computed: true,
+				Computed:    true,
 			},
 
 			// Specific to DestAddrPersistenceProfile
 			"hash_algorithm": {
-				Type: schema.TypeString,
-				//Default:     "default",
+				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specify the hash algorithm",
 				Computed:    true,
@@ -121,10 +113,6 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	/*err := client.CreateDestAddrPersistenceProfile(
-		name,
-		parent,
-	)*/
 	config := &bigip.PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
@@ -137,9 +125,10 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 
 	d.SetId(name)
 
-	err = resourceBigipLtmPersistenceProfileDstAddrUpdate(d, meta)
-	if err != nil {
-		client.DeleteDestAddrPersistenceProfile(name)
+	if err := resourceBigipLtmPersistenceProfileDstAddrUpdate(d, meta); err != nil {
+		if errdel := client.DeleteDestAddrPersistenceProfile(name); errdel != nil {
+			return errdel
+		}
 		return err
 	}
 
@@ -156,7 +145,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive DestAdd Persistence Profile %s %v :", name, err)
+		log.Printf("[ERROR] Unable to retrieve DestAdd Persistence Profile %s %v :", name, err)
 		return err
 	}
 	if pp == nil {
@@ -285,7 +274,7 @@ func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, met
 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrive Destination Address Persistence Profile  (%s) ", err)
+		log.Printf("[ERROR] Unable to retrieve Destination Address Persistence Profile  (%s) ", err)
 		return false, err
 	}
 

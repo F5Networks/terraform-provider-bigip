@@ -8,19 +8,19 @@ package bigip
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"testing"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-//var TEST_DEVICE_NAME = fmt.Sprintf("/%s/test-device", TEST_PARTITION)
-
-var dir, err = os.Getwd()
+var dir, _ = os.Getwd()
 
 var TestAs3Resource = `
 resource "bigip_as3"  "as3-example" {
@@ -263,13 +263,22 @@ func testCheckAs3Exists(name string, exists bool) resource.TestCheckFunc {
 		req.Header.Set("Content-Type", "application/json")
 
 		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				log.Printf("[DEBUG] Could not close the request to %s", url)
+			}
+		}()
+
 		body, err := ioutil.ReadAll(resp.Body)
 		bodyString := string(body)
 		if (resp.Status == "204 No Content" || err != nil || resp.StatusCode == 404) && exists {
 			return fmt.Errorf("[ERROR] Error while checking as3resource present in bigip :%s  %v", bodyString, err)
-			defer resp.Body.Close()
 		}
-		defer resp.Body.Close()
+
 		return nil
 	}
 }

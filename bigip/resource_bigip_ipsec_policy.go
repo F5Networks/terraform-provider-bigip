@@ -7,14 +7,15 @@ package bigip
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
-	"os"
-	"strings"
 )
 
 func resourceBigipIpsecPolicy() *schema.Resource {
@@ -145,9 +146,9 @@ func resourceBigipIpsecPolicyCreate(d *schema.ResourceData, meta interface{}) er
 		id := uuid.New()
 		uniqueID := id.String()
 		assetInfo := f5teem.AssetInfo{
-			"Terraform-provider-bigip",
-			client.UserAgent,
-			uniqueID,
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
 		}
 		apiKey := os.Getenv("TEEM_API_KEY")
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
