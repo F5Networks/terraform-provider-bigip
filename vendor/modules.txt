@@ -9,22 +9,28 @@ cloud.google.com/go/storage
 # github.com/Azure/azure-pipeline-go v0.2.3
 github.com/Azure/azure-pipeline-go/pipeline
 # github.com/Azure/azure-sdk-for-go v53.4.0+incompatible
+## explicit
 github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network
 github.com/Azure/azure-sdk-for-go/version
 # github.com/Azure/azure-storage-blob-go v0.13.0
+## explicit
 github.com/Azure/azure-storage-blob-go/azblob
 # github.com/Azure/go-autorest v14.2.0+incompatible
 github.com/Azure/go-autorest
 # github.com/Azure/go-autorest/autorest v0.11.18
+## explicit
 github.com/Azure/go-autorest/autorest
 github.com/Azure/go-autorest/autorest/azure
 # github.com/Azure/go-autorest/autorest/adal v0.9.13
+## explicit
 github.com/Azure/go-autorest/autorest/adal
 # github.com/Azure/go-autorest/autorest/date v0.3.0
 github.com/Azure/go-autorest/autorest/date
 # github.com/Azure/go-autorest/autorest/to v0.4.0
+## explicit
 github.com/Azure/go-autorest/autorest/to
 # github.com/Azure/go-autorest/autorest/validation v0.3.1
+## explicit
 github.com/Azure/go-autorest/autorest/validation
 # github.com/Azure/go-autorest/logger v0.2.1
 github.com/Azure/go-autorest/logger
@@ -81,8 +87,10 @@ github.com/bgentry/speakeasy
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/f5devcentral/go-bigip v0.0.0-20210804055259-11b1d1a8dd26
+## explicit
 github.com/f5devcentral/go-bigip
 # github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210804055259-11b1d1a8dd26
+## explicit
 github.com/f5devcentral/go-bigip/f5teem
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
@@ -102,6 +110,7 @@ github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
 # github.com/google/uuid v1.1.1
+## explicit
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.5
 github.com/googleapis/gax-go/v2
@@ -128,6 +137,7 @@ github.com/hashicorp/go-version
 # github.com/hashicorp/golang-lru v0.5.1
 github.com/hashicorp/golang-lru/simplelru
 # github.com/hashicorp/hcl v1.0.0
+## explicit
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/ast
 github.com/hashicorp/hcl/hcl/parser
@@ -149,12 +159,14 @@ github.com/hashicorp/hcl2/hcled
 github.com/hashicorp/hcl2/hclparse
 github.com/hashicorp/hcl2/hclwrite
 # github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93
+## explicit
 github.com/hashicorp/hil/ast
 # github.com/hashicorp/logutils v1.0.0
 github.com/hashicorp/logutils
 # github.com/hashicorp/terraform-config-inspect v0.0.0-20190821133035-82a99dc22ef4
 github.com/hashicorp/terraform-config-inspect/tfconfig
 # github.com/hashicorp/terraform-plugin-sdk v1.1.0
+## explicit
 github.com/hashicorp/terraform-plugin-sdk/helper/hashcode
 github.com/hashicorp/terraform-plugin-sdk/helper/logging
 github.com/hashicorp/terraform-plugin-sdk/helper/resource
@@ -238,6 +250,7 @@ github.com/posener/complete/match
 github.com/spf13/afero
 github.com/spf13/afero/mem
 # github.com/stretchr/testify v1.3.0
+## explicit
 github.com/stretchr/testify/assert
 # github.com/ulikunitz/xz v0.5.5
 github.com/ulikunitz/xz
