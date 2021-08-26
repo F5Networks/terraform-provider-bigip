@@ -37,9 +37,8 @@ lint:
 
 tools:
 	@echo "==> installing required tooling..."
-	go install github.com/katbyte/terrafmt
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH || $$GOPATH)/bin v1.32.0
-
+	go install github.com/katbyte/terrafmt@latest
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH || $$GOPATH)/bin v1.41.1
 
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
