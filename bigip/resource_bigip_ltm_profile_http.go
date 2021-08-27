@@ -204,7 +204,7 @@ func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	log.Printf("[INFO] Creating HTTP Profile Profile:%+v ", name)
+	log.Printf("[INFO] Creating HTTP Profile:%+v ", name)
 
 	pss := &bigip.HttpProfile{
 		Name: name,
