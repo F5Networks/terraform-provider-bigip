@@ -61,10 +61,10 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
-github.com/f5devcentral/go-bigip v0.0.0-20210804055259-11b1d1a8dd26 h1:PvegX15SC9gBqFB3+oldA/xJWsAlbN0/09oP4IB/r1g=
-github.com/f5devcentral/go-bigip v0.0.0-20210804055259-11b1d1a8dd26/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210804055259-11b1d1a8dd26 h1:1LOBrQqai8o6ClACLUmn6rMrjXu23KoKcLoixmj0Fhc=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210804055259-11b1d1a8dd26/go.mod h1:r7o5I22EvO+fps2u10bz4ZUlTlNHopQSWzVcW19hK3U=
+github.com/f5devcentral/go-bigip v0.0.0-20210915090336-5089db0c53ef h1:hhQp/GMJlacwF5GLZSE41sXD/2yk7bOzZprrXMyQdGE=
+github.com/f5devcentral/go-bigip v0.0.0-20210915090336-5089db0c53ef/go.mod h1:JZj/iVxDmEnGPyEwuNj7x0fuH2CtUBbD2J48MMp/SE8=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210915090336-5089db0c53ef h1:RTX4iIPIid9xGDjwhQA3FvE09b5BxpvymY+B2/AYGM4=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20210915090336-5089db0c53ef/go.mod h1:r7o5I22EvO+fps2u10bz4ZUlTlNHopQSWzVcW19hK3U=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible h1:TcekIExNqud5crz4xD2pavyTgWiPvpYe4Xau31I0PRk=

@@ -120,7 +120,7 @@ func (b *BigIP) GetFastApp(tenant, app string) (string, error) {
 }
 
 // PostFastAppBigip used for posting FAST json file to BIGIP
-func (b *BigIP) PostFastAppBigip(body, fastTemplate string) (tenant, app string, err error) {
+func (b *BigIP) PostFastAppBigip(body, fastTemplate, userAgent string) (tenant, app string, err error) {
 	param := []byte(body)
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal(param, &jsonRef)
@@ -128,7 +128,7 @@ func (b *BigIP) PostFastAppBigip(body, fastTemplate string) (tenant, app string,
 		Name:       fastTemplate,
 		Parameters: jsonRef,
 	}
-	resp, err := b.postReq(payload, uriMgmt, uriShared, uriFast, uriFastApp)
+	resp, err := b.postReq(payload, uriMgmt, uriShared, uriFast, uriFastApp, userAgent)
 	if err != nil {
 		return "", "", err
 	}

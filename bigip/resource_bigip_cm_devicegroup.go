@@ -164,8 +164,8 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", p.Name)
-	d.Set("description", p.Description)
+	_ = d.Set("name", p.Name)
+	_ = d.Set("description", p.Description)
 	if err := d.Set("auto_sync", p.AutoSync); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving AutoSync  to state for Devicegroup (%s): %s", d.Id(), err)
 	}
@@ -173,10 +173,10 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	if err := d.Set("type", p.Type); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err)
 	}
-	d.Set("fullLoadOnSync", p.FullLoadOnSync)
-	d.Set("saveOnAutoSync", p.SaveOnAutoSync)
-	d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
-	d.Set("networkFailover", p.NetworkFailover)
+	_ = d.Set("fullLoadOnSync", p.FullLoadOnSync)
+	_ = d.Set("saveOnAutoSync", p.SaveOnAutoSync)
+	_ = d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
+	_ = d.Set("networkFailover", p.NetworkFailover)
 	return nil
 
 }
@@ -233,21 +233,20 @@ func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
 }
 
 func DevicegroupToData(p *bigip.Devicegroup, d *schema.ResourceData) error {
-	d.Set("name", p.Name)
-	d.Set("partition", p.Partition)
-	d.Set("auto_sync", p.AutoSync)
-	d.Set("description", p.Description)
-	d.Set("type", p.Type)
-	d.Set("full_load_on_sync", p.FullLoadOnSync)
-	d.Set("save_on_auto_sync", p.SaveOnAutoSync)
-	d.Set("network_failover", p.NetworkFailover)
-	d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
+	_ = d.Set("name", p.Name)
+	_ = d.Set("partition", p.Partition)
+	_ = d.Set("auto_sync", p.AutoSync)
+	_ = d.Set("description", p.Description)
+	_ = d.Set("type", p.Type)
+	_ = d.Set("full_load_on_sync", p.FullLoadOnSync)
+	_ = d.Set("save_on_auto_sync", p.SaveOnAutoSync)
+	_ = d.Set("network_failover", p.NetworkFailover)
+	_ = d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
 
 	for i, r := range p.Deviceb {
 		device := fmt.Sprintf("device.%d", i)
-
-		d.Set(fmt.Sprintf("%s.name", device), r.Name)
-		d.Set(fmt.Sprintf("%s.set_sync_leader", device), r.SetSyncLeader)
+		_ = d.Set(fmt.Sprintf("%s.name", device), r.Name)
+		_ = d.Set(fmt.Sprintf("%s.set_sync_leader", device), r.SetSyncLeader)
 
 	}
 	return nil

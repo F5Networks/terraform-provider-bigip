@@ -9,6 +9,12 @@ package bigip
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
+
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -36,37 +42,39 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateF5Name,
-				Description:  "Use the parent Http2 profile",
+				Description:  "Name of Parent Http2 profile",
 			},
 			"concurrent_streams_per_connection": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "The number of concurrent connections to allow on a single HTTP/2 connection.Default is 10",
+				Description: "Specifies the number of outstanding concurrent requests that are allowed on a single HTTP/2 connection. The default is 10",
 			},
 			"connection_idle_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "The number of seconds that a HTTP/2 connection is left open idly before it is closed",
+				Description: "Specifies the number of seconds that an HTTP/2 connection is idly left open before being shut down. The default is 300 seconds",
 			},
 			"insert_header": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "This setting specifies whether the BIG-IP system should add an HTTP header to the HTTP request to show that the request was received over HTTP/2,Default:disabled",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
+				Description:  "Specifies whether an HTTP header indicating the use of HTTP/2 should be inserted into the request that goes to the server. The default value is Disabled",
 			},
 			"insert_header_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "This setting specifies the name of the header that the BIG-IP system will add to the HTTP request when the Insert Header is enabled.",
+				Description: "Specifies the name of the HTTP header controlled by Insert Header. The default X-HTTP2.",
 			},
 			"enforce_tls_requirements": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Enable or disable enforcement of TLS requirements,Default:enabled",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
+				Description:  "Enable or disable enforcement of TLS requirements,Default:enabled",
 			},
 			"header_table_size": {
 				Type:        schema.TypeInt,
@@ -93,10 +101,11 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 				Description: "The total size of combined data frames, in bytes, that the HTTP/2 protocol sends in a single write function. Default: 16384",
 			},
 			"include_content_length": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Enable to include content-length in HTTP/2 headers,Default : disabled",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
+				Description:  "Enable to include content-length in HTTP/2 headers,Default : disabled",
 			},
 			"activation_modes": {
 				Type:        schema.TypeSet,
@@ -104,7 +113,7 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
-				Description: "This setting specifies the condition that will cause the BIG-IP system to handle an incoming connection as an HTTP/2 connection.",
+				Description: "Specifies whether to enable all HTTP/2 modes, or only enable the Selected Modes listed in the Enabled column",
 			},
 		},
 	}
@@ -113,52 +122,52 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	defaultsFrom := d.Get("defaults_from").(string)
 
-	log.Println("[INFO] Creating Http2 profile")
-	r := &bigip.Http2{
-		Name:                           name,
-		DefaultsFrom:                   defaultsFrom,
-		ConcurrentStreamsPerConnection: d.Get("concurrent_streams_per_connection").(int),
-		ConnectionIdleTimeout:          d.Get("connection_idle_timeout").(int),
-		HeaderTableSize:                d.Get("header_table_size").(int),
-		ActivationModes:                setToStringSlice(d.Get("activation_modes").(*schema.Set)),
-		EnforceTLSRequirements:         d.Get("enforce_tls_requirements").(string),
-		FrameSize:                      d.Get("frame_size").(int),
-		IncludeContentLength:           d.Get("include_content_length").(string),
-		InsertHeader:                   d.Get("insert_header").(string),
-		InsertHeaderName:               d.Get("insert_header_name").(string),
-		ReceiveWindow:                  d.Get("receive_window").(int),
-		WriteSize:                      d.Get("write_size").(int),
+	log.Printf("[INFO] Creating HTTP2 Profile:%+v ", name)
+
+	pss := &bigip.Http2{
+		Name: name,
 	}
-	err := client.CreateHttp2(r)
+	config := getHttp2ProfileConfig(d, pss)
+
+	err := client.CreateHttp2(config)
 	if err != nil {
 		return fmt.Errorf("Error creating profile Http2 (%s): %s ", name, err)
 	}
 	d.SetId(name)
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_profile_http2", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
 	return resourceBigipLtmProfileHttp2Read(d, meta)
 }
 
 func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Println("[INFO] Updating http2 profile " + name)
-	r := &bigip.Http2{
-		Name:                           name,
-		DefaultsFrom:                   d.Get("defaults_from").(string),
-		ConcurrentStreamsPerConnection: d.Get("concurrent_streams_per_connection").(int),
-		ConnectionIdleTimeout:          d.Get("connection_idle_timeout").(int),
-		HeaderTableSize:                d.Get("header_table_size").(int),
-		ActivationModes:                setToStringSlice(d.Get("activation_modes").(*schema.Set)),
-		EnforceTLSRequirements:         d.Get("enforce_tls_requirements").(string),
-		FrameSize:                      d.Get("frame_size").(int),
-		IncludeContentLength:           d.Get("include_content_length").(string),
-		InsertHeader:                   d.Get("insert_header").(string),
-		InsertHeaderName:               d.Get("insert_header_name").(string),
-		ReceiveWindow:                  d.Get("receive_window").(int),
-		WriteSize:                      d.Get("write_size").(int),
+
+	log.Printf("[INFO] Updating HTTP2 Profile Profile:%+v ", name)
+	pss := &bigip.Http2{
+		Name: name,
 	}
-	err := client.ModifyHttp2(name, r)
+	config := getHttp2ProfileConfig(d, pss)
+
+	err := client.ModifyHttp2(name, config)
 	if err != nil {
 		return fmt.Errorf("Error modifying profile Http2 (%s): %s ", name, err)
 	}
@@ -231,4 +240,21 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 	}
 	d.SetId("")
 	return nil
+}
+
+func getHttp2ProfileConfig(d *schema.ResourceData, config *bigip.Http2) *bigip.Http2 {
+	config.DefaultsFrom = d.Get("defaults_from").(string)
+	config.ConcurrentStreamsPerConnection = d.Get("concurrent_streams_per_connection").(int)
+	config.ConnectionIdleTimeout = d.Get("connection_idle_timeout").(int)
+	config.HeaderTableSize = d.Get("header_table_size").(int)
+	config.ActivationModes = setToStringSlice(d.Get("activation_modes").(*schema.Set))
+	config.EnforceTLSRequirements = d.Get("enforce_tls_requirements").(string)
+	config.FrameSize = d.Get("frame_size").(int)
+	config.IncludeContentLength = d.Get("include_content_length").(string)
+	config.InsertHeader = d.Get("insert_header").(string)
+	config.InsertHeaderName = d.Get("insert_header_name").(string)
+	config.ReceiveWindow = d.Get("receive_window").(int)
+	config.WriteSize = d.Get("write_size").(int)
+
+	return config
 }

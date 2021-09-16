@@ -7,6 +7,7 @@ package bigip
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"reflect"
@@ -95,7 +96,8 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 	m.Lock()
 	defer m.Unlock()
 	log.Printf("[INFO] Creating FastApp config")
-	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl)
+	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, fastTmpl)
+	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl, userAgent)
 	if err != nil {
 		return err
 	}
