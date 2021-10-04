@@ -23,6 +23,8 @@ const (
 	uriPurchased   = "purchased-pool"
 )
 
+var tenantProperties []string = []string{"class", "constants", "controls", "defaultRouteDomain", "enable", "label", "optimisticLockKey", "remark"}
+
 type BigiqDevice struct {
 	Address  string `json:"address"`
 	Username string `json:"username"`
@@ -373,7 +375,7 @@ func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 			for _, name := range tenantList {
 				if adcJsonvalue[name] != nil {
 					for k, v := range adcJsonvalue[name].(map[string]interface{}) {
-						if k != "class" {
+						if !contains(tenantProperties, k) {
 							delete(v.(map[string]interface{}), "schemaOverlay")
 							for _, v1 := range v.(map[string]interface{}) {
 								if reflect.TypeOf(v1).Kind() == reflect.Map && v1.(map[string]interface{})["class"] == "Service_HTTP" {
@@ -405,7 +407,7 @@ func (b *BigIP) GetAs3Bigiq(targetRef, tenantRef string) (string, error) {
 				for _, name := range tenantList {
 					if adcJsonvalue[name] != nil {
 						for k, v := range adcJsonvalue[name].(map[string]interface{}) {
-							if k != "class" {
+							if !contains(tenantProperties, k) {
 								delete(v.(map[string]interface{}), "schemaOverlay")
 								for _, v1 := range v.(map[string]interface{}) {
 									if reflect.TypeOf(v1).Kind() == reflect.Map && v1.(map[string]interface{})["class"] == "Service_HTTP" {
@@ -479,4 +481,12 @@ func tenantTrimToDelete(resp string) (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[item]
+	return ok
 }

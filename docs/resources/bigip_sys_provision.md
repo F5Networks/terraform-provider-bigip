@@ -8,22 +8,17 @@ description: |-
 
 # bigip\_sys\_provision
 
-`bigip_sys_provision` provides details bout how to enable "ilx", "asm" "apm" resource on BIG-IP
+`bigip_sys_provision` Manage BIG-IP module provisioning. This resource will only provision at the standard levels of Dedicated, Nominal, and Minimum.
+
 ## Example Usage
 
-
 ```hcl
-provider "bigip" {
-  address  = "xxx.xxx.xxx.xxx"
-  username = "xxxxx"
-  password = "xxxxx"
-}
-resource "bigip_sys_provision" "test-provision" {
-  name         = "TEST_ASM_PROVISION_NAME"
-  full_path    = "asm"
+
+resource "bigip_sys_provision" "gtm" {
+  name         = "gtm"
   cpu_ratio    = 0
   disk_ratio   = 0
-  level        = "none"
+  level        = "nominal"
   memory_ratio = 0
 }
 
@@ -31,8 +26,35 @@ resource "bigip_sys_provision" "test-provision" {
 
 ## Argument Reference
 
-* `bigip_sys_provision` - Is the resource which is used to provision big-ip modules like asm, afm, ilx etc
-* `Common/ilx` - Common is the partition and ilx is the module being enabled it could be asm, afm apm etc.
-* `cpuRatio` - how much cpu resources you need for this resource
-* `diskRatio` - how much disk space you want to allocate for this resource.
-* `memoryRatio` - how much memory you want to deidcate for this resource
+* `name` - (Required,type `string`) Name of module to provision in BIG-IP. 
+possible options: 
+    * afm
+    * am
+    * apm
+    * cgnat
+    * asm
+    * avr
+    * dos
+    * fps
+    * gtm
+    * ilx
+    * lc
+    * ltm
+    * pem
+    * sslo
+    * swg
+    * urldb
+    
+* `level` - (Optional,type `string`) Sets the provisioning level for the requested modules. Changing the level for one module may require modifying the level of another module. For example, changing one module to `dedicated` requires setting all others to `none`. Setting the level of a module to `none` means the module is not activated.
+default is `nominal`
+possible options: 
+    * nominal
+    * minimum
+    * none
+    * dedicated
+
+* `cpu_ratio` - (Optional,type `int`) Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none
+
+* `disk_ratio` - (Optional,type `int`)  Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none
+
+* `memory_ratio` - (Optional,type `int`)  Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none
