@@ -39,10 +39,11 @@ resource "bigip_bigiq_as3" "exampletask" {
 
 * `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ```file``` function
 
+* `ignore_metadata` - (Optional) Set True if you want to ignore metadata changes during update. By default it is set to `true`
+
 * `bigiq_example.json` - Example  AS3 Declarative JSON file
 
 ```json
-
 {
     "class": "AS3",
     "action": "deploy",
@@ -90,9 +91,8 @@ resource "bigip_bigiq_as3" "exampletask" {
         }
     }
 }
-
 ```
 
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/big-iq.html
 
-* `Note` - This resource does not support teanat_filter parameter as BIG-IP As3 resource
+->  **Note:** This resource does not support `teanat_filter` parameter as BIG-IP As3 resource
