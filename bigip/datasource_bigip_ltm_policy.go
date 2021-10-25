@@ -28,7 +28,7 @@ import (
 
 func dataSourceBigipLtmPolicy() *schema.Resource {
 	return &schema.Resource{
-		Read:   dataSourceBigipLtmPolicyRead,
+		Read: dataSourceBigipLtmPolicyRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -1070,13 +1070,12 @@ func dataSourceBigipLtmPolicy() *schema.Resource {
 	}
 }
 
-
 func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	d.SetId("")
-        name := d.Get("name").(string)
-        log.Println("[DEBUG] Reading policy : " + name)
+	name := d.Get("name").(string)
+	log.Println("[DEBUG] Reading policy : " + name)
 
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
@@ -1117,11 +1116,10 @@ func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) erro
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
-	}	
-        d.SetId(name)
+	}
+	d.SetId(name)
 	return DatapolicyToData(p, d)
 }
-
 
 func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) error {
 
@@ -1152,7 +1150,7 @@ func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) error {
 		})
 
 		rule := DataflattenPolicyRules(p.Rules)
-		log.Printf("[DEBUG] rule is :%v",rule)
+		log.Printf("[DEBUG] rule is :%v", rule)
 		err := d.Set("rule", rule)
 		if err != nil {
 			return err
