@@ -16,7 +16,7 @@ Use this data source (`bigip_ltm_policy`) to get the ltm policy details availabl
 ```hcl
 
 data "bigip_ltm_policy" "test" {
-  name      = "/Common/test-policy"
+  name = "/Common/test-policy"
 }
 
 output "bigip_policy" {
