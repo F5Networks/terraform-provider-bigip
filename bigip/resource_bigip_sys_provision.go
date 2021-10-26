@@ -12,7 +12,6 @@ import (
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
