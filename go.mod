@@ -29,6 +29,7 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/afero v1.4.1 // indirect
 	github.com/stretchr/testify v1.4.0
+	github.com/ulikunitz/xz v0.5.8 //indirect
 	github.com/zclconf/go-cty v1.5.1 // indirect
 	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
