@@ -1,8 +1,15 @@
+/*
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -72,7 +79,62 @@ func resourceBigiqAs3() *schema.Resource {
 					json, _ := structure.NormalizeJsonString(v)
 					return json
 				},
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					oldResp := []byte(old)
+					newResp := []byte(new)
+					oldJsonref := make(map[string]interface{})
+					newJsonref := make(map[string]interface{})
+					_ = json.Unmarshal(oldResp, &oldJsonref)
+					_ = json.Unmarshal(newResp, &newJsonref)
+					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
+					if jsonEqualityBefore {
+						return true
+					}
+					for key, value := range oldJsonref {
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for range rec {
+								delete(rec, "updateMode")
+								delete(rec, "schemaVersion")
+								delete(rec, "id")
+								delete(rec, "label")
+								delete(rec, "remark")
+							}
+						}
+					}
+					for key, value := range newJsonref {
+						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
+							for range rec {
+								delete(rec, "updateMode")
+								delete(rec, "schemaVersion")
+								delete(rec, "id")
+								delete(rec, "label")
+								delete(rec, "remark")
+							}
+						}
+					}
+					ignoreMetadata := d.Get("ignore_metadata").(bool)
+					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
+					if ignoreMetadata {
+						if jsonEqualityAfter {
+							return true
+						} else {
+							return false
+						}
+
+					} else {
+						if !jsonEqualityBefore {
+							return false
+						}
+					}
+					return true
+				},
 				ValidateFunc: validation.ValidateJsonString,
+			},
+			"ignore_metadata": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set True if you want to ignore metadata update",
+				Default:     true,
 			},
 			"tenant_list": {
 				Type:        schema.TypeString,

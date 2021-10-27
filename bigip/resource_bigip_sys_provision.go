@@ -12,6 +12,7 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
@@ -26,36 +27,38 @@ func resourceBigipSysProvision() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the module to be provisioned",
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of module to provision in BIG-IP.",
+				ValidateFunc: validation.StringInSlice([]string{"afm", "am", "apm", "asm", "avr", "cgnat", "dos", "fps", "gtm", "ilx", "lc", "ltm", "pem", "sslo", "swg", "urldb"}, false),
 			},
 			"full_path": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "path",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				//ValidateFunc: validation.StringInSlice([]string{"afm", "am", "apm","asm","avr","dos","fps","gtm","ilx","lc","ltm","pem", "sslo" ,"swg","urldb"}, false),
 			},
 			"cpu_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "cpu Ratio",
+				Description: "Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none",
 			},
 			"disk_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "disk Ratio",
+				Description: "Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none",
 			},
 			"level": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "what level nominal or dedicated",
-				Default:     "nominal",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Sets the provisioning level for the requested modules. Changing the level for one module may require modifying the level of another module. For example, changing one module to dedicated requires setting all others to none. Setting the level of a module to none means the module is not activated.",
+				Default:      "nominal",
+				ValidateFunc: validation.StringInSlice([]string{"nominal", "none", "minimum", "dedicated"}, false),
 			},
 			"memory_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "memory Ratio",
+				Description: "Use this option only when the level option is set to custom.F5 Networks recommends that you do not modify this option. The default value is none",
 			},
 		},
 	}
@@ -64,23 +67,15 @@ func resourceBigipSysProvision() *schema.Resource {
 func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	fullPath := d.Get("full_path").(string)
-	cpuRatio := d.Get("cpu_ratio").(int)
-	diskRatio := d.Get("disk_ratio").(int)
-	level := d.Get("level").(string)
-	memoryRatio := d.Get("memory_ratio").(int)
 
 	log.Printf("[INFO] Provisioning for %v module", name)
 
-	r := &bigip.Provision{
-		Name:        name,
-		FullPath:    fullPath,
-		CpuRatio:    cpuRatio,
-		DiskRatio:   diskRatio,
-		Level:       level,
-		MemoryRatio: memoryRatio,
+	pss := &bigip.Provision{
+		Name: name,
 	}
-	err := client.ProvisionModule(r)
+	config := getsysProvisionConfig(d, pss)
+
+	err := client.ProvisionModule(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Provision  (%s) ", err)
 		return err
@@ -93,15 +88,13 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating Provisioning for :%v module", name)
-	r := &bigip.Provision{
-		Name:        name,
-		FullPath:    d.Get("full_path").(string),
-		CpuRatio:    d.Get("cpu_ratio").(int),
-		DiskRatio:   d.Get("disk_ratio").(int),
-		Level:       d.Get("level").(string),
-		MemoryRatio: d.Get("memory_ratio").(int),
+
+	pss := &bigip.Provision{
+		Name: name,
 	}
-	err := client.ProvisionModule(r)
+	config := getsysProvisionConfig(d, pss)
+
+	err := client.ProvisionModule(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Provision (%v) ", err)
 		return err
@@ -126,10 +119,10 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	if err := d.Set("full_path", p.FullPath); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Provision  (%s): %s", d.Id(), err)
 	}
-	d.Set("cpu_ratio", p.CpuRatio)
-	d.Set("disk_ratio", p.DiskRatio)
-	d.Set("level", p.Level)
-	d.Set("memory_ratio", p.MemoryRatio)
+	_ = d.Set("cpu_ratio", p.CpuRatio)
+	_ = d.Set("disk_ratio", p.DiskRatio)
+	_ = d.Set("level", p.Level)
+	_ = d.Set("memory_ratio", p.MemoryRatio)
 
 	return nil
 }
@@ -137,4 +130,13 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
 	// API is not supported for Deleting
 	return nil
+}
+
+func getsysProvisionConfig(d *schema.ResourceData, config *bigip.Provision) *bigip.Provision {
+	config.FullPath = d.Get("full_path").(string)
+	config.CpuRatio = d.Get("cpu_ratio").(int)
+	config.DiskRatio = d.Get("disk_ratio").(int)
+	config.Level = d.Get("level").(string)
+	config.MemoryRatio = d.Get("memory_ratio").(int)
+	return config
 }

@@ -78,6 +78,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_irule":       dataSourceBigipLtmIrule(),
 			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
 			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
+			"bigip_ltm_policy":      dataSourceBigipLtmPolicy(),
 			"bigip_ltm_node":        dataSourceBigipLtmNode(),
 			"bigip_vwan_config":     dataSourceBigipVwanconfig(),
 		},
