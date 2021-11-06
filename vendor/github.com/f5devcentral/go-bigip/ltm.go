@@ -1013,42 +1013,40 @@ type Monitors struct {
 
 // Monitor contains information about each individual monitor.
 type Monitor struct {
-	Name      string
-	Partition string
-	//DefaultsFrom   string
-	FullPath       string
-	Generation     int
-	ParentMonitor  string
-	Description    string
-	Destination    string
-	Interval       int
-	IPDSCP         int
-	ManualResume   string
-	Password       string
-	ReceiveString  string
-	ReceiveDisable string
-	Reverse        string
-	SendString     string
-	TimeUntilUp    int
-	Timeout        int
-	Transparent    string
-	UpInterval     int
-	Username       string
-	Compatibility  string
-	Filename       string
-	Mode           string
-	Adaptive       string
-	AdaptiveLimit  int
-	Database       string
-	Count          string
-	RecvRow        string
-	RecvColumn     string
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	FullPath       string `json:"fullPath,omitempty"`
+	Generation     int    `json:"generation,omitempty"`
+	ParentMonitor  string `json:"defaultsFrom,omitempty"`
+	Description    string `json:"description,omitempty"`
+	Destination    string `json:"destination,omitempty"`
+	Database       string `json:"database,omitempty"`
+	Interval       int    `json:"interval,omitempty"`
+	IPDSCP         int    `json:"ipDscp,omitempty"`
+	ManualResume   string `json:"manualResume,omitempty"`
+	Password       string `json:"password,omitempty"`
+	ReceiveString  string `json:"recv,omitempty"`
+	ReceiveDisable string `json:"recvDisable,omitempty"`
+	Reverse        string `json:"reverse,omitempty"`
+	SendString     string `json:"send,omitempty"`
+	TimeUntilUp    int    `json:"timeUntilUp,omitempty"`
+	Timeout        int    `json:"timeout,omitempty"`
+	Transparent    string `json:"transparent,omitempty"`
+	UpInterval     int    `json:"upInterval,omitempty"`
+	Username       string `json:"username,omitempty"`
+	Compatibility  string `json:"compatibility,omitempty"`
+	Filename       string `json:"filename,omitempty"`
+	Mode           string `json:"mode,omitempty"`
+	Adaptive       string `json:"adaptive,omitempty"`
+	AdaptiveLimit  int    `json:"adaptiveLimit,omitempty"`
+	Count          string `json:"count,omitempty"`
+	RecvRow        string `json:"recvRow,omitempty"`
+	RecvColumn     string `json:"recvColumn,omitempty"`
 }
 
 type monitorDTO struct {
 	Name      string `json:"name,omitempty"`
 	Partition string `json:"partition,omitempty"`
-	//DefaultsFrom   string `json:"defaultsFrom,omitempty"`
 	FullPath       string `json:"fullPath,omitempty"`
 	Generation     int    `json:"generation,omitempty"`
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
@@ -2541,11 +2539,10 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 //func (b *BigIP) CreateMonitor(config *Monitor) error
 //This Function expects Monitor struct type as input,posts the config on to BIGIP to configure LTM Monitor Objects
 //Returns Nil If Post is Success,err in case Failure
-func (b *BigIP) CreateMonitor(config *Monitor) error {
+func (b *BigIP) CreateMonitor(config *Monitor, parent string) error {
 	//config := &Monitor{
 	//	Name:           name,
 	//	ParentMonitor:  parent,
-	//	DefaultsFrom:   defaults_from,
 	//	Interval:       interval,
 	//	Timeout:        timeout,
 	//	SendString:     send,
@@ -2554,21 +2551,12 @@ func (b *BigIP) CreateMonitor(config *Monitor) error {
 	//	Compatibility:  compatibility,
 	//	Destination:    destination,
 	//}
-	return b.AddMonitor(config)
+	return b.AddMonitor(config, parent)
 }
 
 // Create a monitor by supplying a config
-func (b *BigIP) AddMonitor(config *Monitor) error {
-	if strings.Contains(config.ParentMonitor, "gateway") {
-		config.ParentMonitor = "gatewayIcmp"
-	}
-	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
-		config.ParentMonitor = "tcp-half-open"
-	}
-	if strings.Contains(config.ParentMonitor, "ftp") {
-		config.ParentMonitor = "ftp"
-	}
-	return b.post(config, uriLtm, uriMonitor, config.ParentMonitor)
+func (b *BigIP) AddMonitor(config *Monitor, parent string) error {
+	return b.post(config, uriLtm, uriMonitor, parent)
 }
 
 // GetVirtualServer retrieves a monitor by name. Returns nil if the monitor does not exist
@@ -2595,16 +2583,6 @@ func (b *BigIP) DeleteMonitor(name, parent string) error {
 // one of "http", "https", "icmp", "gateway icmp", or "tcp". Fields that
 // can be modified are referenced in the Monitor struct.
 func (b *BigIP) ModifyMonitor(name, parent string, config *Monitor) error {
-	if strings.Contains(config.ParentMonitor, "gateway") {
-		config.ParentMonitor = "gatewayIcmp"
-	}
-	if strings.Contains(config.ParentMonitor, "tcp-half-open") {
-		config.ParentMonitor = "tcp-half-open"
-	}
-	if strings.Contains(config.ParentMonitor, "ftp") {
-		config.ParentMonitor = "ftp"
-	}
-
 	return b.put(config, uriLtm, uriMonitor, parent, name)
 }
 
