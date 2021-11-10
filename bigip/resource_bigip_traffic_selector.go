@@ -92,23 +92,19 @@ func resourceBigipTrafficselector() *schema.Resource {
 func resourceBigipTrafficselectorCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	log.Println("[INFO] Creating Traffic Selector " + name)
-	selectorConfig := &bigip.TrafficSelector{
-		Name:               d.Get("name").(string),
-		SourceAddress:      d.Get("source_address").(string),
-		DestinationAddress: d.Get("destination_address").(string),
+	log.Println("[INFO] Creating IPSec traffic Selector " + name)
+
+	pss := &bigip.TrafficSelector{
+		Name: name,
 	}
+	selectorConfig := getTrafficSelectorConfig(d, pss)
+
 	err := client.CreateTrafficSelector(selectorConfig)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Create Client Ssl Profile (%s) (%v)", name, err)
+		log.Printf("[ERROR] Unable to Create IPsec Traffic Selector (%s) (%v)", name, err)
 		return err
 	}
 	d.SetId(name)
-	err = resourceBigipTrafficselectorUpdate(d, meta)
-	if err != nil {
-		_ = client.DeleteTrafficSelector(name)
-		return err
-	}
 	return resourceBigipTrafficselectorRead(d, meta)
 }
 
@@ -174,18 +170,12 @@ func resourceBigipTrafficselectorUpdate(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating Traffic Selector:%+v ", name)
-	ts := &bigip.TrafficSelector{
-		Name:               name,
-		DestinationAddress: d.Get("destination_address").(string),
-		DestinationPort:    d.Get("destination_port").(int),
-		Direction:          d.Get("direction").(string),
-		IPProtocol:         d.Get("ip_protocol").(int),
-		IpsecPolicy:        d.Get("ipsec_policy").(string),
-		Order:              d.Get("order").(int),
-		SourceAddress:      d.Get("source_address").(string),
-		SourcePort:         d.Get("source_port").(int),
+	pss := &bigip.TrafficSelector{
+		Name: name,
 	}
-	err := client.ModifyTrafficSelector(name, ts)
+	config := getTrafficSelectorConfig(d, pss)
+
+	err := client.ModifyTrafficSelector(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify IPSec Traffic Selector   (%s) (%v) ", name, err)
 		return err
@@ -202,4 +192,16 @@ func resourceBigipTrafficselectorDelete(d *schema.ResourceData, meta interface{}
 	}
 	d.SetId("")
 	return nil
+}
+
+func getTrafficSelectorConfig(d *schema.ResourceData, config *bigip.TrafficSelector) *bigip.TrafficSelector {
+	config.DestinationAddress = d.Get("destination_address").(string)
+	config.DestinationPort = d.Get("destination_port").(int)
+	config.Direction = d.Get("direction").(string)
+	config.IPProtocol = d.Get("ip_protocol").(int)
+	config.IpsecPolicy = d.Get("ipsec_policy").(string)
+	config.Order = d.Get("order").(int)
+	config.SourceAddress = d.Get("source_address").(string)
+	config.SourcePort = d.Get("source_port").(int)
+	return config
 }

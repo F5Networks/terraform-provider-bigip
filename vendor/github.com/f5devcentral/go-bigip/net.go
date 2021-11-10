@@ -300,6 +300,15 @@ type IPSecPolicy struct {
 	TunnelRemoteAddress            string `json:"tunnelRemoteAddress,omitempty"`
 }
 
+type IPSecProfile struct {
+	Name            string `json:"name,omitempty"`
+	Partition       string `json:"partition,omitempty"`
+	FullPath        string `json:"fullPath,omitempty"`
+	DefaultsFrom    string `json:"defaultsFrom,omitempty"`
+	Description     string `json:"description"`
+	TrafficSelector string `json:"trafficSelector,omitempty"`
+}
+
 const (
 	uriNet             = "net"
 	uriInterface       = "interface"
@@ -780,6 +789,34 @@ func (b *BigIP) DeleteIPSecPolicy(name string) error {
 func (b *BigIP) GetIPSecPolicy(name string) (*IPSecPolicy, error) {
 	var ipsec IPSecPolicy
 	err, _ := b.getForEntity(&ipsec, uriNet, uriIpsec, uriIpsecPolicy, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &ipsec, nil
+}
+
+// CreateIPSecProfile adds a new IPSec profile to the BIG-IP system.
+func (b *BigIP) CreateIPSecProfile(config *IPSecProfile) error {
+	return b.post(config, uriNet, uriTunnels, uriIpsec)
+}
+
+// ModifyIPSecProfile allows you to change any attribute of a IPSec profile.
+// Fields that can be modified are referenced in the IPSec profile struct.
+func (b *BigIP) ModifyIPSecProfile(name string, config *IPSecProfile) error {
+	return b.patch(config, uriNet, uriTunnels, uriIpsec, name)
+}
+
+// DeleteIPSecProfile removes specified IPSec profile.
+func (b *BigIP) DeleteIPSecProfile(name string) error {
+	return b.delete(uriNet, uriTunnels, uriIpsec, name)
+}
+
+// GetIPSecProfile returns a named IPsec profile.
+func (b *BigIP) GetIPSecProfile(name string) (*IPSecProfile, error) {
+	var ipsec IPSecProfile
+	err, _ := b.getForEntity(&ipsec, uriNet, uriTunnels, uriIpsec, name)
 
 	if err != nil {
 		return nil, err
