@@ -34,7 +34,6 @@ func resourceBigipSslCertificate() *schema.Resource {
 			"content": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Sensitive:   true,
 				ForceNew:    true,
 				Description: "Content of certificate on Disk",
 			},
