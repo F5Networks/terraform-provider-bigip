@@ -29,10 +29,10 @@ func resourceBigipSslKey() *schema.Resource {
 				ForceNew:    true,
 			},
 			"content": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				ForceNew:    true,
+				Type:      schema.TypeString,
+				Required:  true,
+				Sensitive: true,
+				//ForceNew:    true,
 				Description: "Content of SSL certificate key present on local Disk",
 			},
 
@@ -143,7 +143,7 @@ func resourceBigipSslKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	partition := d.Get("partition").(string)
 	err := client.UpdateKey(name, certpath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s", name, err)
+		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
 	}
 
 	return resourceBigipSslKeyRead(d, meta)

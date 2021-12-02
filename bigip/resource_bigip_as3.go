@@ -112,12 +112,12 @@ func resourceBigipAs3() *schema.Resource {
 					_ = json.Unmarshal(resp, &jsonRef)
 					for key, value := range jsonRef {
 						if key == "class" && value != "AS3" {
-							errors = append(errors, fmt.Errorf("Json must have AS3 class"))
+							errors = append(errors, fmt.Errorf("JSON must have AS3 class"))
 						}
 						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 							for k, v := range rec {
 								if k == "class" && v != "ADC" {
-									errors = append(errors, fmt.Errorf("Json must have ADC class"))
+									errors = append(errors, fmt.Errorf("JSON must have ADC class"))
 								}
 							}
 						}

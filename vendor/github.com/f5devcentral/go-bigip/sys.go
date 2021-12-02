@@ -12,6 +12,7 @@ package bigip
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	//"strings"
 	"time"
@@ -366,6 +367,11 @@ func (b *BigIP) AddCertificate(cert *Certificate) error {
 	return b.post(cert, uriSys, uriFile, uriSslCert)
 }
 
+// ModifyCertificate installs a certificate.
+func (b *BigIP) ModifyCertificate(certName string, cert *Certificate) error {
+	return b.patch(cert, uriSys, uriFile, uriSslCert, certName)
+}
+
 // UploadCertificate copies a certificate local disk to BIGIP
 func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
 	certbyte := []byte(certpath)
@@ -374,13 +380,13 @@ func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
 		return err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
-	log.Println("string:", sourcepath)
+	log.Printf("[DEBUG] sourcepath :%+v", sourcepath)
 	cert := Certificate{
 		Name:       certname,
 		SourcePath: sourcepath,
 		Partition:  partition,
 	}
-	log.Printf("%+v\n", cert)
+	log.Printf("cert: %+v\n", cert)
 	err = b.AddCertificate(&cert)
 	if err != nil {
 		return err
@@ -419,7 +425,9 @@ func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
 		Name:       certname,
 		SourcePath: sourcepath,
 	}
-	err = b.AddCertificate(&cert)
+	certName := fmt.Sprintf("/%s/%s", partition, certname)
+	log.Printf("certName: %+v\n", certName)
+	err = b.ModifyCertificate(certName, &cert)
 	if err != nil {
 		return err
 	}
@@ -440,7 +448,7 @@ func (b *BigIP) UploadKey(keyname, keypath, partition string) error {
 		SourcePath: sourcepath,
 		Partition:  partition,
 	}
-	log.Printf("%+v\n", certkey)
+	log.Printf("certkey: %+v\n", certkey)
 	err = b.AddKey(&certkey)
 	if err != nil {
 		return err
@@ -462,8 +470,9 @@ func (b *BigIP) UpdateKey(keyname, keypath, partition string) error {
 		SourcePath: sourcepath,
 		Partition:  partition,
 	}
-	log.Printf("%+v\n", certkey)
-	err = b.AddKey(&certkey)
+	keyName := fmt.Sprintf("/%s/%s", partition, keyname)
+	log.Printf("keyName: %+v\n", keyName)
+	err = b.ModifyKey(keyName, &certkey)
 	if err != nil {
 		return err
 	}
@@ -484,6 +493,11 @@ func (b *BigIP) Keys() (*Keys, error) {
 // AddKey installs a key.
 func (b *BigIP) AddKey(config *Key) error {
 	return b.post(config, uriSys, uriFile, uriSslKey)
+}
+
+// ModifyKey Updates a key.
+func (b *BigIP) ModifyKey(keyName string, config *Key) error {
+	return b.patch(config, uriSys, uriFile, uriSslKey, keyName)
 }
 
 // GetKey retrieves a key by name. Returns nil if the key does not exist.

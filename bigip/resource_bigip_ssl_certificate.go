@@ -32,10 +32,10 @@ func resourceBigipSslCertificate() *schema.Resource {
 				ForceNew:    true,
 			},
 			"content": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				ForceNew:    true,
+				Type:      schema.TypeString,
+				Required:  true,
+				Sensitive: true,
+				//ForceNew:    true,
 				Description: "Content of certificate on Disk",
 			},
 
@@ -108,13 +108,14 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	certificate, err := client.GetCertificate(name)
+	if err != nil {
+		return err
+	}
 	log.Printf("[INFO] Certificate content:%+v", certificate)
 	_ = d.Set("name", certificate.Name)
 	_ = d.Set("partition", certificate.Partition)
 	_ = d.Set("full_path", certificate.FullPath)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
