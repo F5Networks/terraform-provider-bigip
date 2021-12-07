@@ -57,17 +57,17 @@ type SelfIPs struct {
 // SelfIP contains information about each individual self IP. You can use all of
 // these fields when modifying a self IP.
 type SelfIP struct {
-	Name                  string `json:"name,omitempty"`
-	Partition             string `json:"partition,omitempty"`
-	FullPath              string `json:"fullPath,omitempty"`
-	Generation            int    `json:"generation,omitempty"`
-	Address               string `json:"address,omitempty"`
-	Floating              string `json:"floating,omitempty"`
-	InheritedTrafficGroup string `json:"inheritedTrafficGroup,omitempty"`
-	TrafficGroup          string `json:"trafficGroup,omitempty"`
-	Unit                  int    `json:"unit,omitempty"`
-	Vlan                  string `json:"vlan,omitempty"`
-	// AllowService          []string `json:"allowService"`
+	Name                  string      `json:"name,omitempty"`
+	Partition             string      `json:"partition,omitempty"`
+	FullPath              string      `json:"fullPath,omitempty"`
+	Generation            int         `json:"generation,omitempty"`
+	Address               string      `json:"address,omitempty"`
+	Floating              string      `json:"floating,omitempty"`
+	InheritedTrafficGroup string      `json:"inheritedTrafficGroup,omitempty"`
+	TrafficGroup          string      `json:"trafficGroup,omitempty"`
+	Unit                  int         `json:"unit,omitempty"`
+	Vlan                  string      `json:"vlan,omitempty"`
+	AllowService          interface{} `json:"allowService"`
 }
 
 // Trunks contains a list of every trunk on the BIG-IP system.
@@ -403,13 +403,7 @@ func (b *BigIP) SelfIP(selfip string) (*SelfIP, error) {
 
 // CreateSelfIP adds a new self IP to the BIG-IP system. For <address>, you
 // must include the subnet mask in CIDR notation, i.e.: "10.1.1.1/24".
-func (b *BigIP) CreateSelfIP(name, address, vlan string) error {
-	config := &SelfIP{
-		Name:    name,
-		Address: address,
-		Vlan:    vlan,
-	}
-
+func (b *BigIP) CreateSelfIP(config *SelfIP) error {
 	return b.post(config, uriNet, uriSelf)
 }
 
