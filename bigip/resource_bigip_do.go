@@ -166,6 +166,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if resp.StatusCode == http.StatusAccepted {
+	forLoop:
 		for i := 0; i <= timeoutSec; i++ {
 			log.Printf("[DEBUG]Value of Timeout counter in seconds :%d", i)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
@@ -186,7 +187,8 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			if taskResp.StatusCode == 200 {
+			switch {
+			case taskResp.StatusCode == 200:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
@@ -199,8 +201,8 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				log.Printf("[DEBUG] Got success and setting state id")
 				doSuccess = true
 				d.SetId(respID)
-				break
-			} else if taskResp.StatusCode == 202 {
+				break forLoop
+			case taskResp.StatusCode == 202:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
@@ -214,7 +216,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				if resultMap.(map[string]interface{})["status"] != "RUNNING" {
 					return fmt.Errorf("Error while reading the response body :%v ", resultMap)
 				}
-			} else {
+			default:
 				log.Printf("StatusCode:%+v", taskResp.StatusCode)
 				time.Sleep(1 * time.Second)
 				continue
@@ -424,6 +426,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if resp.StatusCode == http.StatusAccepted {
+	forLoop:
 		for i := 0; i <= timeoutSec; i++ {
 			log.Printf("[DEBUG]Value of loop counter :%d", i)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
@@ -445,7 +448,8 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			if taskResp.StatusCode == 200 {
+			switch {
+			case taskResp.StatusCode == 200:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
@@ -457,8 +461,8 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				}
 				doSuccess = true
 				d.SetId(respID)
-				break
-			} else if taskResp.StatusCode == 202 {
+				break forLoop
+			case taskResp.StatusCode == 202:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
@@ -472,7 +476,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				if resultMap.(map[string]interface{})["status"] != "RUNNING" {
 					return fmt.Errorf("Error while reading the response body :%v ", resultMap)
 				}
-			} else {
+			default:
 				time.Sleep(1 * time.Second)
 				continue
 			}
