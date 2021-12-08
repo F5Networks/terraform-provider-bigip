@@ -1013,8 +1013,8 @@ type Monitors struct {
 
 // Monitor contains information about each individual monitor.
 type Monitor struct {
-	Name      string `json:"name,omitempty"`
-	Partition string `json:"partition,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Partition      string `json:"partition,omitempty"`
 	FullPath       string `json:"fullPath,omitempty"`
 	Generation     int    `json:"generation,omitempty"`
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
@@ -1045,8 +1045,8 @@ type Monitor struct {
 }
 
 type monitorDTO struct {
-	Name      string `json:"name,omitempty"`
-	Partition string `json:"partition,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Partition      string `json:"partition,omitempty"`
 	FullPath       string `json:"fullPath,omitempty"`
 	Generation     int    `json:"generation,omitempty"`
 	ParentMonitor  string `json:"defaultsFrom,omitempty"`
