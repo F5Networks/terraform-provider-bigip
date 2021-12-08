@@ -34,14 +34,12 @@ func resourceBigipDo() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-
 			"do_json": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "DO json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
-
 					return json
 				},
 			},
@@ -57,18 +55,49 @@ func resourceBigipDo() *schema.Resource {
 				Deprecated:  "this attribute is no longer in use",
 				Description: "unique identifier for DO resource",
 			},
+			"bigip_address": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "IP Address of BIGIP host to be used for this resource",
+			},
+			"bigip_user": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "UserName of BIGIP host to be used for this resource",
+			},
+			"bigip_port": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Port number of BIGIP host to be used for this resource",
+			},
+			"bigip_password": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: "Password of  BIGIP host to be used for this resource",
+			},
+			"bigip_token_auth": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Sensitive:   true,
+				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
+				Default:     false,
+			},
 		},
 	}
 }
 
 func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	clientBigip := meta.(*bigip.BigIP)
-
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+		clientBigip2, err := connectBigIP(d)
+		if err != nil {
+			log.Printf("Connection to BIGIP Failed with :%v", err)
+			return err
+		}
+		clientBigip = clientBigip2
+	}
 	doJson := d.Get("do_json").(string)
-	//	if ok := bigip.ValidateDOTemplate(do_json); !ok {
-	//		return fmt.Errorf("[DO] Error validating template against DO schema \n")
-	//	}
-	//	name := d.Get("tenant_name").(string)
 	if !clientBigip.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -137,6 +166,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if resp.StatusCode == http.StatusAccepted {
+	forLoop:
 		for i := 0; i <= timeoutSec; i++ {
 			log.Printf("[DEBUG]Value of Timeout counter in seconds :%d", i)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
@@ -157,11 +187,12 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			if taskResp.StatusCode == 200 {
+			switch {
+			case taskResp.StatusCode == 200:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
-					return fmt.Errorf("Error while reading the response body :%v", err)
+					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
 				if err := json.Unmarshal(respBody, &respRef1); err != nil {
@@ -170,8 +201,23 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				log.Printf("[DEBUG] Got success and setting state id")
 				doSuccess = true
 				d.SetId(respID)
-				break
-			} else {
+				break forLoop
+			case taskResp.StatusCode == 202:
+				respBody, err := ioutil.ReadAll(taskResp.Body)
+				if err != nil {
+					d.SetId("")
+					return fmt.Errorf("Error while reading the response body :%v ", err)
+				}
+				respRef1 := make(map[string]interface{})
+				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+					return err
+				}
+				resultMap := respRef1["result"]
+				if resultMap.(map[string]interface{})["status"] != "RUNNING" {
+					return fmt.Errorf("Error while reading the response body :%v ", resultMap)
+				}
+			default:
+				log.Printf("StatusCode:%+v", taskResp.StatusCode)
 				time.Sleep(1 * time.Second)
 				continue
 			}
@@ -214,8 +260,15 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
-
 	clientBigip := meta.(*bigip.BigIP)
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+		clientBigip2, err := connectBigIP(d)
+		if err != nil {
+			log.Printf("Connection to BIGIP Failed with :%v", err)
+			return err
+		}
+		clientBigip = clientBigip2
+	}
 	log.Printf("[INFO] Reading Do config")
 	ID := d.Id()
 	tr := &http.Transport{
@@ -224,7 +277,7 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + ID
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return fmt.Errorf("Error while creating http request for reading Do config:%v", err)
+		return fmt.Errorf("Error while creating http request for reading Do config:%v ", err)
 	}
 	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
 	req.Header.Set("Accept", "application/json")
@@ -239,15 +292,15 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	}()
 
 	if err != nil {
-		return fmt.Errorf("Error while receiving http response body in read call :%v", err)
+		return fmt.Errorf("Error while receiving http response body in read call :%v ", err)
 	}
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Error while reading http response body in read call :%v", err)
+		return fmt.Errorf("Error while reading http response body in read call :%v ", err)
 	}
 	bodyString := string(respBody)
 	if resp.Status != "200 OK" {
-		return fmt.Errorf("Error while Sending/fetching http request :%s", bodyString)
+		return fmt.Errorf("Error while Sending/fetching http request :%s ", bodyString)
 	}
 
 	respRef1 := make(map[string]interface{})
@@ -256,17 +309,20 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
 
-	dojson := respRef1["declaration"]
-	out, _ := json.Marshal(dojson)
-	doString := string(out)
-	d.Set("do_json", doString)
-
 	return nil
 
 }
 
 func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	clientBigip := meta.(*bigip.BigIP)
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+		clientBigip2, err := connectBigIP(d)
+		if err != nil {
+			log.Printf("Connection to BIGIP Failed with :%v", err)
+			return false, err
+		}
+		clientBigip = clientBigip2
+	}
 	log.Printf("[INFO] Checking if Do config exists in bigip ")
 
 	tr := &http.Transport{
@@ -304,11 +360,17 @@ func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, erro
 }
 
 func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
-
 	clientBigip := meta.(*bigip.BigIP)
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+		clientBigip2, err := connectBigIP(d)
+		if err != nil {
+			log.Printf("Connection to BIGIP Failed with :%v", err)
+			return err
+		}
+		clientBigip = clientBigip2
+	}
 
 	doJson := d.Get("do_json").(string)
-	//      name := d.Get("tenant_name").(string)
 	timeout := d.Get("timeout").(int)
 	timeoutSec := timeout * 60
 	log.Printf("[DEBUG]timeout_sec is :%d", timeoutSec)
@@ -359,6 +421,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if resp.StatusCode == http.StatusAccepted {
+	forLoop:
 		for i := 0; i <= timeoutSec; i++ {
 			log.Printf("[DEBUG]Value of loop counter :%d", i)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
@@ -380,11 +443,12 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			if taskResp.StatusCode == 200 {
+			switch {
+			case taskResp.StatusCode == 200:
 				respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
-					return fmt.Errorf("Error while reading the response body :%v", err)
+					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
 				if err := json.Unmarshal(respBody, &respRef1); err != nil {
@@ -392,8 +456,22 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				}
 				doSuccess = true
 				d.SetId(respID)
-				break
-			} else {
+				break forLoop
+			case taskResp.StatusCode == 202:
+				respBody, err := ioutil.ReadAll(taskResp.Body)
+				if err != nil {
+					d.SetId("")
+					return fmt.Errorf("Error while reading the response body :%v ", err)
+				}
+				respRef1 := make(map[string]interface{})
+				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+					return err
+				}
+				resultMap := respRef1["result"]
+				if resultMap.(map[string]interface{})["status"] != "RUNNING" {
+					return fmt.Errorf("Error while reading the response body :%v ", resultMap)
+				}
+			default:
 				time.Sleep(1 * time.Second)
 				continue
 			}
@@ -417,12 +495,12 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 
 		if err != nil {
 			d.SetId("")
-			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
 		respBody, err := ioutil.ReadAll(taskResp.Body)
 		if err != nil {
 			d.SetId("")
-			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
 		respRef2 := make(map[string]interface{})
 		if err := json.Unmarshal(respBody, &respRef2); err != nil {
@@ -442,4 +520,19 @@ func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO]:Delete Operation is not supported for this resource")
 	d.SetId("")
 	return nil
+}
+
+func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
+	bigipConfig := Config{
+		Address:  d.Get("bigip_address").(string),
+		Port:     d.Get("bigip_port").(string),
+		Username: d.Get("bigip_user").(string),
+		Password: d.Get("bigip_password").(string),
+	}
+
+	if d.Get("bigip_token_auth").(bool) {
+		bigipConfig.LoginReference = d.Get("bigiq_login_ref").(string)
+	}
+
+	return bigipConfig.Client()
 }

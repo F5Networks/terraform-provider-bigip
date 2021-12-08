@@ -47,15 +47,14 @@ type TmplArrType struct {
 
 // UploadFastTemplate copies a template set from local disk to BIGIP
 func (b *BigIP) UploadFastTemplate(tmplpath *os.File, tmplname string) error {
-	_, err := b.UploadFile(tmplpath)
+	_, err := b.UploadFastTemp(tmplpath, tmplname)
 	if err != nil {
 		return err
 	}
-	log.Println("string:", tmplpath)
+	log.Printf("[DEBUG]Template Path:%+v", tmplpath.Name())
 	payload := FastTemplateSet{
 		Name: tmplname,
 	}
-	log.Printf("%+v\n", payload)
 	err = b.AddTemplateSet(&payload)
 	if err != nil {
 		return err
@@ -240,4 +239,13 @@ func (b *BigIP) getFastTaskStatus(id string) (*FastTask, error) {
 		return nil, err
 	}
 	return &taskList, nil
+}
+
+// Upload a file
+func (b *BigIP) UploadFastTemp(f *os.File, tmpName string) (*Upload, error) {
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, fmt.Sprintf("%s.zip", tmpName))
 }
