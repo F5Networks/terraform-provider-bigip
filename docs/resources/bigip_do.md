@@ -27,11 +27,27 @@ resource "bigip_do" "do-example" {
 
 
 * `do_json` - (Required) Name of the of the Declarative DO JSON file
+ 
+* `bigip_address` - (optional) IP Address of BIGIP Host to be used for this resource,this is optional parameter.
+whenever we specify this parameter it gets overwrite provider configuration
 
-* `timeout(minutes)` - (optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes ) 
+* `bigip_user` - (optional) UserName of BIGIP host to be used for this resource,this is optional parameter.
+whenever we specify this parameter it gets overwrite provider configuration
 
-*  Note: Delete method is not supported by DO, so terraform destroy won't delete configuration in bigip but we will set the terrform
+* `bigip_port` - (optional) Port number of BIGIP host to be used for this resource,this is optional parameter.
+whenever we specify this parameter it gets overwrite provider configuration
+
+* `bigip_password` - (optional) Password of  BIGIP host to be used for this resource,this is optional parameter.
+whenever we specify this parameter it gets overwrite provider configuration
+
+* `timeout(minutes)` - (optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes )
+
+~> **Note:** If we want to replace provider BIGIP with other BIGIPs details we can specify with `bigip_address`,
+`bigip_user`,`bigip_port` and `bigip_password`. All Must be specified in such scenario.
+   
+~> **Note:** Delete method is not supported by DO, so terraform destroy won't delete configuration in bigip but we will set the terrform
    state to empty and won't throw error.
+
 
 * `example.json` - Example of DO Declarative JSON
 
