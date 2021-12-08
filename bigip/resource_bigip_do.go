@@ -309,10 +309,6 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
 
-	//dojson := respRef1["declaration"]
-	//out, _ := json.Marshal(dojson)
-	//doString := string(out)
-	//_ = d.Set("do_json", doString)
 	return nil
 
 }
@@ -375,7 +371,6 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	doJson := d.Get("do_json").(string)
-	//      name := d.Get("tenant_name").(string)
 	timeout := d.Get("timeout").(int)
 	timeoutSec := timeout * 60
 	log.Printf("[DEBUG]timeout_sec is :%d", timeoutSec)
