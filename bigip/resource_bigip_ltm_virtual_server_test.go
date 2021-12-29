@@ -340,6 +340,32 @@ func TestAccBigipLtmVS_Pooolattach_detatch(t *testing.T) {
 		},
 	})
 }
+
+func TestAccBigipLtmVS_Vlan_EnabledDisabled(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: testVSCreatevlanEnabled("test-vs-vlan"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("test-vs-vlan"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "name", "/Common/test-vs-vlan"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "destination", "192.168.50.11"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "port", "80"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "vlans_enabled", "true"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", fmt.Sprintf("vlans.%d", schema.HashString("/Common/external")), "/Common/external"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmVS_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -609,6 +635,18 @@ resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
   //]
 }
 `, vsName)
+}
+
+func testVSCreatevlanEnabled(vsName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "%s" {
+  name        = "/Common/%s"
+  destination = "192.168.50.11"
+  port        = 80
+  vlans_enabled = true
+  vlans = ["/Common/external"]
+}
+`, vsName, vsName)
 }
 
 func testCheckVSsDestroyed(s *terraform.State) error {

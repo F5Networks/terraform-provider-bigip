@@ -86,11 +86,10 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs. DEPRECATED - see Virtual Server Property Groups source-address-translation
 
-* `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs. See vlans-disabled and vlans-enabled.
+* `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs,enable/disabled will be desided by attribute `vlan_enabled`
 
-* `vlans_enabled` - (Optional Bool) Enables the virtual server on the VLANs specified by the VLANs option.
-
-* `vlans_disabled` - (Optional Bool) Disables the virtual server on the VLANs specified by the VLANs option.
+* `vlans_enabled` - (Optional Bool) Enables the virtual server on the VLANs specified by the `vlans` option.
+By default it is `false` i.e vlanDisabled on specified vlans, if we want enable virtual server on VLANs specified by `vlans`, mark this attribute to `true`.
 
 * `persistence_profiles` - (Optional) List of persistence profiles associated with the Virtual Server.
 
