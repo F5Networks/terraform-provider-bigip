@@ -640,11 +640,11 @@ resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
 func testVSCreatevlanEnabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "%s" {
-  name        = "/Common/%s"
-  destination = "192.168.50.11"
-  port        = 80
+  name          = "/Common/%s"
+  destination   = "192.168.50.11"
+  port          = 80
   vlans_enabled = true
-  vlans = ["/Common/external"]
+  vlans         = ["/Common/external"]
 }
 `, vsName, vsName)
 }
