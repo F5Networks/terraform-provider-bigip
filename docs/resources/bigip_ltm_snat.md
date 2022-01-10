@@ -15,11 +15,10 @@ For resources should be named with their `full path`. The full path is the combi
 ## Example Usage
 
 ```hcl
-
 resource "bigip_ltm_snat" "test-snat" {
-  name = "/Common/test-snat"
+  name        = "/Common/test-snat"
   translation = "/Common/136.1.1.2"
-  sourceport    = "preserve"
+  sourceport  = "preserve"
   origins {
     name = "0.0.0.0/0"
   }
@@ -28,7 +27,6 @@ resource "bigip_ltm_snat" "test-snat" {
   ]
   vlansdisabled = false
 }
-
 ```      
 
 ## Argument Reference
