@@ -8,51 +8,43 @@ description: |-
 
 # bigip\_ltm\_snat
 
-`bigip_ltm_snat` Manages a snat configuration
+`bigip_ltm_snat` Manages a SNAT configuration
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
-
+For resources should be named with their `full path`. The full path is the combination of the `partition + name` of the resource.For example `/Common/test-snat`.
 
 ## Example Usage
 
-
 ```hcl
 resource "bigip_ltm_snat" "test-snat" {
-  name        = "TEST_SNAT_NAME"
-  translation = "/Common/136.1.1.1"
+  name        = "/Common/test-snat"
+  translation = "/Common/136.1.1.2"
+  sourceport  = "preserve"
   origins {
-    name = "2.2.2.2"
+    name = "0.0.0.0/0"
   }
-  origins {
-    name = "3.3.3.3"
-  }
-  vlansdisabled = true
-  autolasthop   = "default"
-  mirror        = "disabled"
-  partition     = "Common"
-  full_path     = "/Common/test-snat"
+  vlans = [
+    "/Common/internal",
+  ]
+  vlansdisabled = false
 }
-
 ```      
 
 ## Argument Reference
 
-* `name` - (Required) Name of the snat
+* `name` - (Required) Name of the SNAT, name of SNAT should be full path. Full path is the combination of the `partition + SNAT name`,For example `/Common/test-snat`.
 
-* `partition` - (Optional) Displays the administrative partition within which this profile resides
+* `origins` - (Required) Specifies, for each SNAT that you create, the origin addresses that are to be members of that SNAT. Specify origin addresses by their IP addresses and service ports
 
-* `origins` - (Optional) IP or hostname of the snat
+* `translation` - (Optional) Specifies the IP address configured for translation. Note that translated addresses are outside the traffic management system. You can only use this option when `automap` and `snatpool` are not used.
 
-* `snatpool` - (Optional) Specifies the name of a SNAT pool. You can only use this option when automap and translation are not used.
+* `snatpool` - (Optional) Specifies the name of a SNAT pool. You can only use this option when `automap` and `translation` are not used.
 
 * `mirror` - (Optional) Enables or disables mirroring of SNAT connections.
 
 * `autolasthop` -(Optional) Specifies whether to automatically map last hop for pools or not. The default is to use next level's default.
 
-* `sourceport` - (Optional) Specifies whether the system preserves the source port of the connection. The default is preserve. Use of the preserve-strict setting should be restricted to UDP only under very special circumstances such as nPath or transparent (that is, no translation of any other L3/L4 field), where there is a 1:1 relationship between virtual IP addresses and node addresses, or when clustered multi-processing (CMP) is disabled. The change setting is useful for obfuscating internal network addresses.
+* `sourceport` - (Optional) Specifies how the SNAT object handles the client's source port. The default is `preserve`.
 
-* `translation` - (Optional) Specifies the name of a translated IP address. Note that translated addresses are outside the traffic management system. You can only use this option when automap and snatpool are not used.
+* `vlansdisabled` - (Optional,bool) Specifies the VLANs or tunnels for which the SNAT is enabled or disabled. The default is `true`, vlandisabled on VLANS specified by `vlans`,if set to `false` vlanEnabled set on VLANS specified by `vlans` .
 
-* `vlansdisabled` - (Optional) Disables the SNAT on all VLANs.
-
-* `vlans` - (Optional) Specifies the name of the VLAN to which you want to assign the SNAT. The default is vlans-enabled.
+* `vlans` - (Optional) Specifies the available VLANs or tunnels and those for which the SNAT is enabled or disabled.
