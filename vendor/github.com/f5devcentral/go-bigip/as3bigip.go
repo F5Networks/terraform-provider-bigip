@@ -56,12 +56,12 @@ type Results1 struct {
 /*
 PostAs3Bigip used for posting as3 json file to BIGIP
 */
-func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string, string) {
+func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string) {
 	tenant := tenantFilter + "?async=true"
 	successfulTenants := make([]string, 0)
 	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
-		return err, "", ""
+		return err, ""
 	}
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
@@ -72,14 +72,14 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 	for respCode != 200 {
 		fastTask, err := b.getas3TaskStatus(respID)
 		if err != nil {
-			return err, "", respID
+			return err, ""
 		}
 		respCode = fastTask["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
 		if respCode != 0 && respCode != 503 {
 			tenant_list, tenant_count, _ := b.GetTenantList(as3NewJson)
 			if tenantCompare(tenant_list, tenantFilter) == 1 {
 				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "declaration is invalid" {
-					return fmt.Errorf("Tenant Creation failed with :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), "", respID
+					return fmt.Errorf("Tenant Creation failed with :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), ""
 				}
 				i := tenant_count - 1
 				success_count := 0
@@ -98,11 +98,11 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 					break // break here
 				} else if success_count == 0 {
 					j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
-					return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), "", respID
+					return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), ""
 				} else {
 					finallist := strings.Join(successfulTenants[:], ",")
 					j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
-					return fmt.Errorf("as3 config post error response %+v", string(j)), finallist, respID
+					return fmt.Errorf("as3 config post error response %+v", string(j)), finallist
 				}
 			}
 			if respCode == 200 {
@@ -111,13 +111,13 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 			}
 			if respCode >= 400 {
 				j, _ := json.MarshalIndent(fastTask["results"].([]interface{}), "", "\t")
-				return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), "", respID
+				return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), ""
 			}
 		}
 		if respCode == 503 {
 			taskIds, err := b.getas3Taskid()
 			if err != nil {
-				return err, "", respID
+				return err, ""
 			}
 			if len(taskIds) == 0 {
 				time.Sleep(2 * time.Second)
@@ -131,7 +131,8 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 		}
 		time.Sleep(3 * time.Second)
 	}
-	return nil, strings.Join(successfulTenants[:], ","), respID
+
+	return nil, strings.Join(successfulTenants[:], ",")
 }
 
 func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
@@ -320,29 +321,6 @@ func (b *BigIP) getas3TaskStatus(id string) (map[string]interface{}, error) {
 	}
 	return taskList, nil
 }
-
-func (b *BigIP) Getas3TaskResponse(id string) (interface{}, error) {
-	as3Json := make(map[string]interface{})
-	as3Json["class"] = "AS3"
-	as3Json["action"] = "deploy"
-	as3Json["persist"] = true
-	var taskResponse map[string]interface{}
-	err, ok := b.getForEntity(&taskResponse, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return nil, nil
-	}
-	delete(taskResponse["declaration"].(map[string]interface{}), "updateMode")
-	delete(taskResponse["declaration"].(map[string]interface{}), "controls")
-	delete(taskResponse["declaration"].(map[string]interface{}), "id")
-	as3Json["declaration"] = taskResponse["declaration"]
-	out, _ := json.Marshal(as3Json)
-	as3String := string(out)
-	return as3String, nil
-}
-
 func (b *BigIP) getas3Taskid() ([]string, error) {
 	var taskList As3AllTaskType
 	var taskIDs []string

@@ -11,7 +11,7 @@ import (
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // this module does not have DELETE function as there is no API for Delete

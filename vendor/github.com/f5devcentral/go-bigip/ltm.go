@@ -566,7 +566,6 @@ type VirtualServer struct {
 	TranslateAddress           string    `json:"translateAddress,omitempty"`
 	TranslatePort              string    `json:"translatePort,omitempty"`
 	VlansEnabled               bool      `json:"vlansEnabled,omitempty"`
-	VlansDisabled              bool      `json:"vlansDisabled,omitempty"`
 	VSIndex                    int       `json:"vsIndex,omitempty"`
 	Vlans                      []string  `json:"vlans,omitempty"`
 	Rules                      []string  `json:"rules,omitempty"`
@@ -1522,7 +1521,6 @@ type Snat struct {
 	Translation   string
 	Snatpool      string
 	VlansDisabled bool
-	VlansEnabled  bool
 	Vlans         []string
 	Origins       []Originsrecord
 }
@@ -1533,12 +1531,11 @@ type snatDTO struct {
 	FullPath      string   `json:"fullPath,omitempty"`
 	AutoLasthop   string   `json:"autoLastHop,omitempty"`
 	Mirror        string   `json:"mirror,omitempty"`
-	SourcePort    string   `json:"sourcePort,omitempty"`
+	SourcePort    string   `json:"sourePort,omitempty"`
 	Translation   string   `json:"translation,omitempty"`
 	Snatpool      string   `json:"snatpool,omitempty"`
 	Vlans         []string `json:"vlans,omitempty"`
-	VlansDisabled bool     `json:"vlansDisabled,omitempty"`
-	VlansEnabled  bool     `json:"vlansEnabled,omitempty"`
+	VlansDisabled bool     `json:"vlansDisabled,omitempty" bool:"disabled"`
 	Origins       struct {
 		Items []Originsrecord `json:"items,omitempty"`
 	} `json:"originsReference,omitempty"`
@@ -1563,7 +1560,6 @@ func (p *Snat) MarshalJSON() ([]byte, error) {
 		Translation:   p.Translation,
 		Snatpool:      p.Snatpool,
 		VlansDisabled: p.VlansDisabled,
-		VlansEnabled:  p.VlansEnabled,
 		Vlans:         p.Vlans,
 		Origins: struct {
 			Items []Originsrecord `json:"items,omitempty"`
@@ -1587,7 +1583,6 @@ func (p *Snat) UnmarshalJSON(b []byte) error {
 	p.Translation = dto.Translation
 	p.Snatpool = dto.Snatpool
 	p.VlansDisabled = dto.VlansDisabled
-	p.VlansEnabled = dto.VlansEnabled
 	p.Vlans = dto.Vlans
 	p.Origins = dto.Origins.Items
 
@@ -3097,6 +3092,7 @@ func (b *BigIP) AddRecords(name, rname, data string) error {
 	return b.post(snat, uriLtm, uriSnat)
 } */
 func (b *BigIP) CreateSnat(p *Snat) error {
+	log.Println(" what is the complete payload    ", p)
 	return b.post(p, uriLtm, uriSnat)
 }
 
@@ -3123,7 +3119,7 @@ func (b *BigIP) DeleteSnat(name string) error {
 }
 
 func (b *BigIP) UpdateSnat(name string, p *Snat) error {
-	return b.patch(p, uriLtm, uriSnat, name)
+	return b.put(p, uriLtm, uriSnat, name)
 }
 
 // Snats returns a list of snat
