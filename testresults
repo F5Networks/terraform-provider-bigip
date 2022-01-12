@@ -1,0 +1,31 @@
+=== RUN   TestAccBigipAs3_create_SingleTenant
+--- PASS: TestAccBigipAs3_create_SingleTenant (42.57s)
+=== RUN   TestAccBigipAs3_create_MultiTenants
+--- PASS: TestAccBigipAs3_create_MultiTenants (50.63s)
+=== RUN   TestAccBigipAs3_create_PartialSuccess
+--- PASS: TestAccBigipAs3_create_PartialSuccess (63.22s)
+=== RUN   TestAccBigipAs3_addTenantFilter
+--- PASS: TestAccBigipAs3_addTenantFilter (58.07s)
+=== RUN   TestAccBigipAs3_update_addTenant
+--- PASS: TestAccBigipAs3_update_addTenant (110.62s)
+=== RUN   TestAccBigipAs3_update_deleteTenant
+    testing.go:569: Step 0 error: errors during plan:
+        
+        Error: HTTP 503 :: {"code":503,"message":"There is an active asynchronous task executing.","errorStack":[],"apiError":32964609}
+        
+          on <empty> line 0:
+          (source code not available)
+        
+        
+--- FAIL: TestAccBigipAs3_update_deleteTenant (6.25s)
+=== RUN   TestAccBigipAs3_update_config
+--- PASS: TestAccBigipAs3_update_config (60.22s)
+=== RUN   TestAccBigipAs3_import_SingleTenant
+--- PASS: TestAccBigipAs3_import_SingleTenant (39.29s)
+=== RUN   TestAccBigipAs3_import_MultiTenants
+--- PASS: TestAccBigipAs3_import_MultiTenants (45.84s)
+=== RUN   TestAccBigipAs3_badJSON
+--- PASS: TestAccBigipAs3_badJSON (0.02s)
+FAIL
+FAIL	github.com/F5Networks/terraform-provider-bigip/bigip	477.626s
+FAIL
