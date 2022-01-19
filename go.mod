@@ -14,8 +14,8 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/f5devcentral/go-bigip v0.0.0-20211208144806-c9b2472e4619
-	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20211208144806-c9b2472e4619
+	github.com/f5devcentral/go-bigip v0.0.0-20220119082918-5f215f878998
+	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20220119082918-5f215f878998
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
