@@ -16,7 +16,7 @@ description: |-
 There are two ways to use ltm_pool_attachment resource, where we can take node reference from ltm_node or we can specify node directly with ip:port/fqdn:port which will also create node and atach to pool.
 
 
-Pool attachment with node directly taking ip:port/fqdn:port
+### Pool attachment with node directly taking  `ip:port` / `fqdn:port`
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
@@ -41,7 +41,7 @@ resource "bigip_ltm_pool_attachment" "attach_node" {
 
 ```
 
-Pool attachment with node reference from ltm_node
+### Pool attachment with node referenced from `bigip_ltm_node`
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
@@ -69,6 +69,28 @@ resource "bigip_ltm_pool_attachment" "attach_node" {
   node = "${bigip_ltm_node.node.name}:80"
 }
 ```
+
+### Pool attachment resource with attaching multiple nodes in same pool using `for_each`
+
+```hcl
+resource "bigip_ltm_node" "node1" {
+  name    = "/Common/terraform_node1"
+  address = "192.168.30.1"
+}
+resource "bigip_ltm_node" "node2" {
+  name    = "/Common/terraform_node2"
+  address = "192.168.30.2"
+}
+resource "bigip_ltm_pool" "k8s_prod" {
+  name = "/Common/k8prod_Pool"
+}
+resource "bigip_ltm_pool_attachment" "k8sprod" {
+  for_each = toset([bigip_ltm_node.node1.name, bigip_ltm_node.node2.name])
+  pool     = bigip_ltm_pool.k8s_prod.name
+  node     = "${each.key}:80"
+}
+```
+
 
 ## Argument Reference
 
