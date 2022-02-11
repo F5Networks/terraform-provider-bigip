@@ -19,6 +19,8 @@ import (
 var parentMonitors = map[string]bool{
 	"/Common/udp":           true,
 	"/Common/postgresql":    true,
+	"/Common/mysql":         true,
+	"/Common/mssql":         true,
 	"/Common/http":          true,
 	"/Common/https":         true,
 	"/Common/icmp":          true,
@@ -350,7 +352,7 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/mysql,/Common/mssql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
 }
 
 func monitorParent(s string) string {

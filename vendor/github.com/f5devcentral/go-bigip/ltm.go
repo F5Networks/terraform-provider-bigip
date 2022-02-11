@@ -2523,7 +2523,7 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 // Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp", "udp", "postgresql"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp", "udp", "postgresql", "mysql", "mssql"}
 
 	for _, name := range monitorUris {
 		var m Monitors
