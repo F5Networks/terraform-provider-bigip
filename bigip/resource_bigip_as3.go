@@ -45,7 +45,7 @@ func resourceBigipAs3() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"as3_json": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
