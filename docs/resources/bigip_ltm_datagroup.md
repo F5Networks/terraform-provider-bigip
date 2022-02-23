@@ -35,9 +35,9 @@ resource "bigip_ltm_datagroup" "datagroup" {
 ```hcl
 
 resource "bigip_ltm_datagroup" "DG-TC2" {
-  name = "/Common/dgtc2"
-  type = "string"
-  internal = false
+  name        = "/Common/dgtc2"
+  type        = "string"
+  internal    = false
   records_src = "/pathtodatagroup/ext_dg_string.txt"
 }
 ```      
