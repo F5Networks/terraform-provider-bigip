@@ -184,6 +184,13 @@ type Node struct {
 	} `json:"fqdn,omitempty"`
 }
 
+type ExternalDG struct {
+	Name             string `json:"name,omitempty"`
+	FullPath         string `json:"fullPath,omitempty"`
+	ExternalFileName string `json:"externalFileName,omitempty"`
+	Type             string `json:"type,omitempty"`
+}
+
 // DataGroups contains a list of data groups on the BIG-IP system.
 type DataGroups struct {
 	DataGroups []DataGroup `json:"items"`
@@ -1842,6 +1849,7 @@ const (
 	uriIRule          = "rule"
 	uriDatagroup      = "data-group"
 	uriInternal       = "internal"
+	uriExternal       = "external"
 	uriPolicy         = "policy"
 	uriOneconnect     = "one-connect"
 	uriPersistence    = "persistence"
@@ -2174,9 +2182,20 @@ func (b *BigIP) AddInternalDataGroup(config *DataGroup) error {
 	return b.post(config, uriLtm, uriDatagroup, uriInternal)
 }
 
+func (b *BigIP) AddExternalDataGroup(config *ExternalDG) error {
+	return b.post(config, uriLtm, uriDatagroup, uriExternal)
+}
+
+func (b *BigIP) ModifyExternalDataGroup(config *ExternalDG) error {
+	return b.patch(config, uriLtm, uriDatagroup, uriExternal, config.FullPath)
+}
+
 func (b *BigIP) DeleteInternalDataGroup(name string) error {
 	return b.delete(uriLtm, uriDatagroup, uriInternal, name)
+}
 
+func (b *BigIP) DeleteExternalDataGroup(name string) error {
+	return b.delete(uriLtm, uriDatagroup, uriExternal, name)
 }
 
 // Modify a named internal data group, REPLACING all the records
@@ -2195,6 +2214,19 @@ func (b *BigIP) GetInternalDataGroup(name string) (*DataGroup, error) {
 		return nil, nil
 	}
 
+	return &datagroup, nil
+}
+
+// Get an external data group by name, returns nil if the data group does not exist
+func (b *BigIP) GetExternalDataGroup(name string) (*ExternalDG, error) {
+	var datagroup ExternalDG
+	err, ok := b.getForEntity(&datagroup, uriLtm, uriDatagroup, uriExternal, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
 	return &datagroup, nil
 }
 
