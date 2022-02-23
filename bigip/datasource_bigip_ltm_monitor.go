@@ -7,10 +7,9 @@ package bigip
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
 )
 
 func dataSourceBigipLtmMonitor() *schema.Resource {
