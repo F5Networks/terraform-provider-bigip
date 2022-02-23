@@ -960,27 +960,3 @@ func (b *BigIP) UploadDataGroupFile(f *os.File, tmpName string) (*Upload, error)
 	log.Printf("tmpName:%+v", tmpName)
 	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, fmt.Sprintf("%s", tmpName))
 }
-
-//
-//// UploadDatagroup copies a Datagroup files on to local disk BIGIP
-//func (b *BigIP) UploadDatagroup(dgname, dgpath, partition,dgtype string) error {
-//	dgbyte := []byte(dgpath)
-//	_, err := b.UploadBytes(dgbyte, dgname)
-//	if err != nil {
-//		return err
-//	}
-//	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + dgname
-//	log.Printf("[DEBUG] sourcepath :%+v", sourcepath)
-//	dataGroup := ExternalDGFile{
-//		Name:       dgname,
-//		SourcePath: sourcepath,
-//		Partition:  partition,
-//		Type:dgtype,
-//	}
-//	log.Printf("External DG: %+v\n", dataGroup)
-//	err = b.AddExternalDatagroup(&dataGroup)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}

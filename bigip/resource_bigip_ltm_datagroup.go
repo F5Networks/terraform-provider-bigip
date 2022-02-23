@@ -81,7 +81,6 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	rs := d.Get("record").(*schema.Set)
 
 	tmplPath := d.Get("records_src").(string)
-	//tmplName := filepath.Base(tmplPath)
 
 	name = d.Get("name").(string)
 	log.Printf("[DEBUG] Creating Data Group List %s", name)
