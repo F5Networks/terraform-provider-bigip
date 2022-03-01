@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	//"strings"
 	"time"
 )
@@ -229,6 +230,13 @@ type destinationsDTO struct {
 	} `json:"destinationsReference,omitempty"`
 }
 
+type ExternalDGFile struct {
+	Name       string `json:"name"`
+	Partition  string `json:"partition"`
+	SourcePath string `json:"sourcePath"`
+	Type       string `json:"type"`
+}
+
 func (p *LogPublisher) MarshalJSON() ([]byte, error) {
 	return json.Marshal(destinationsDTO{
 		Name: p.Name,
@@ -276,6 +284,7 @@ const (
 	uriFile            = "file"
 	uriSslCert         = "ssl-cert"
 	uriSslKey          = "ssl-key"
+	uriDataGroup       = "data-group"
 	REST_DOWNLOAD_PATH = "/var/config/rest/downloads"
 )
 
@@ -365,6 +374,21 @@ func (b *BigIP) Certificates() (*Certificates, error) {
 // AddCertificate installs a certificate.
 func (b *BigIP) AddCertificate(cert *Certificate) error {
 	return b.post(cert, uriSys, uriFile, uriSslCert)
+}
+
+// AddExternalDatagroupfile adds datagroup file
+func (b *BigIP) AddExternalDatagroupfile(dataGroup *ExternalDGFile) error {
+	return b.post(dataGroup, uriSys, uriFile, uriDataGroup)
+}
+
+// DeleteExternalDatagroupfile removes a Datagroup file.
+func (b *BigIP) DeleteExternalDatagroupfile(name string) error {
+	return b.delete(uriSys, uriFile, uriDataGroup, name)
+}
+
+// ModifyExternalDatagroupfile modify datagroup file
+func (b *BigIP) ModifyExternalDatagroupfile(dgName string, dataGroup *ExternalDGFile) error {
+	return b.patch(dataGroup, uriSys, uriFile, uriDataGroup, dgName)
 }
 
 // ModifyCertificate installs a certificate.
@@ -879,4 +903,60 @@ func (b *BigIP) ModifyLogPublisher(r *LogPublisher) error {
 
 func (b *BigIP) DeleteLogPublisher(name string) error {
 	return b.delete(uriSys, uriLogConfig, uriPublisher, name)
+}
+
+// UploadDatagroup copies a template set from local disk to BIGIP
+func (b *BigIP) UploadDatagroup(tmplpath *os.File, dgname, partition, dgtype string, createDg bool) error {
+	_, err := b.UploadDataGroupFile(tmplpath, dgname)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + dgname
+	log.Printf("[DEBUG] sourcepath :%+v", sourcepath)
+	dataGroup := ExternalDGFile{
+		Name:       dgname,
+		SourcePath: sourcepath,
+		Partition:  partition,
+		Type:       dgtype,
+	}
+	log.Printf("External DG: %+v\n", dataGroup)
+	if createDg {
+		err = b.AddExternalDatagroupfile(&dataGroup)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = b.ModifyExternalDatagroupfile(fmt.Sprintf("/%s/%s", partition, dgname), &dataGroup)
+		if err != nil {
+			return err
+		}
+	}
+
+	dataGroup2 := ExternalDG{
+		Name:             dgname,
+		ExternalFileName: fmt.Sprintf("/%s/%s", partition, dgname),
+		FullPath:         fmt.Sprintf("/%s/%s", partition, dgname),
+	}
+	if createDg {
+		err = b.AddExternalDataGroup(&dataGroup2)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = b.ModifyExternalDataGroup(&dataGroup2)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Upload a file
+func (b *BigIP) UploadDataGroupFile(f *os.File, tmpName string) (*Upload, error) {
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("tmpName:%+v", tmpName)
+	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, fmt.Sprintf("%s", tmpName))
 }
