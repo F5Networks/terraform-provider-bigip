@@ -159,14 +159,14 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func getNetSelfIPConfig(d *schema.ResourceData, config *bigip.SelfIP) *bigip.SelfIP {
-	port_lockdown := d.Get("port_lockdown")
-	if len(port_lockdown.([]interface{})) > 0 && port_lockdown.([]interface{})[0] == "all" {
-		port_lockdown = "all"
+	portLockdown := d.Get("port_lockdown")
+	if len(portLockdown.([]interface{})) > 0 && portLockdown.([]interface{})[0] == "all" {
+		portLockdown = "all"
 	}
 	config.Address = d.Get("ip").(string)
 	config.Vlan = d.Get("vlan").(string)
 	config.TrafficGroup = d.Get("traffic_group").(string)
-	config.AllowService = port_lockdown
+	config.AllowService = portLockdown
 
 	return config
 }
