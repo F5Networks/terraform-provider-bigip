@@ -79,7 +79,10 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 			tenant_list, tenant_count, _ := b.GetTenantList(as3NewJson)
 			if tenantCompare(tenant_list, tenantFilter) == 1 {
 				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "declaration is invalid" {
-					return fmt.Errorf("Tenant Creation failed with :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), "", respID
+					return fmt.Errorf("Error :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), "", respID
+				}
+				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" {
+					return fmt.Errorf("Error:%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["message"]), "", respID
 				}
 				i := tenant_count - 1
 				success_count := 0
