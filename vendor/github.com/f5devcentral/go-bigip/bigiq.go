@@ -155,7 +155,12 @@ func (b *BigIP) GetLicenseStatus(id string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	licStatus := licRes["status"].(string)
+	licStatus, ok := licRes["status"]
+	if ok {
+		licStatus = licStatus.(string)
+	} else {
+		return nil, fmt.Errorf("license status not available")
+	}
 	for licStatus != "FINISHED" {
 		//log.Printf(" status response is :%s", licStatus)
 		if licStatus == "FAILED" {
