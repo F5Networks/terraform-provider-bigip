@@ -159,16 +159,32 @@ func TestAccBigipNetselfipPortlockdown(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.1", "tcp:4040"),
 				),
 			},
+			{
+				Config: testaccselfipPortLockdownParam("none"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckselfipExists(TEST_SELFIP_NAME),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "none"),
+				),
+			},
 		},
 	})
 }
 
 func testaccselfipPortLockdownParam(portLockdown string) string {
 	resPrefix := `
-		resource "bigip_net_selfip" "test-selfip" {
-			name = "/Common/test-selfip"
-			ip   = "11.1.1.1/24"
-			vlan = "/Common/internal"
+	resource "bigip_net_vlan" "test-vlan" {
+      name = "` + TEST_VLAN_NAME + `"
+	  tag = 101
+	  interfaces {
+		vlanport = 1.1
+		tagged = true
+	  }
+	}
+	resource "bigip_net_selfip" "test-selfip" {
+	  name = "/Common/test-selfip"
+		ip   = "11.1.1.1/24"
+		vlan = "/Common/test-vlan"
+		depends_on = ["bigip_net_vlan.test-vlan"]
 	`
 	switch portLockdown {
 	case "all":
@@ -210,6 +226,13 @@ func testaccselfipPortLockdownParam(portLockdown string) string {
 		resPrefix = fmt.Sprintf(
 			`%s
 			port_lockdown = ["default", "tcp:4040"]
+			`,
+			resPrefix,
+		)
+	case "none":
+		resPrefix = fmt.Sprintf(
+			`%s
+			port_lockdown = ["none"]
 			`,
 			resPrefix,
 		)

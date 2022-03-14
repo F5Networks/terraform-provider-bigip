@@ -111,6 +111,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	// Extract Self IP address from "(selfip_address)[%route_domain](/mask)" groups 1 + 2
 	regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
 	selfipAddress := regex.FindStringSubmatch(selfIP.Address)
+	log.Printf("[DEBUG] value of selfipAddress: %v", selfipAddress)
 	parsedSelfipAddress := selfipAddress[1] + selfipAddress[2]
 	d.Set("ip", parsedSelfipAddress)
 
@@ -159,10 +160,20 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func getNetSelfIPConfig(d *schema.ResourceData, config *bigip.SelfIP) *bigip.SelfIP {
-	portLockdown := d.Get("port_lockdown")
-	if len(portLockdown.([]interface{})) > 0 && portLockdown.([]interface{})[0] == "all" {
-		portLockdown = "all"
+	var portLockdown interface{}
+	p := d.Get("port_lockdown").([]interface{})
+
+	if len(p) > 0 {
+		switch p[0] {
+		case "all":
+			portLockdown = "all"
+		case "none":
+			portLockdown = nil
+		default:
+			portLockdown = p
+		}
 	}
+
 	config.Address = d.Get("ip").(string)
 	config.Vlan = d.Get("vlan").(string)
 	config.TrafficGroup = d.Get("traffic_group").(string)
