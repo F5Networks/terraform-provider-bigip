@@ -131,7 +131,10 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	var deviceIP []string
 	var respID string
 	deviceIP = getDeviceUri(bigipRef.Host)
-	devicePort, _ := strconv.Atoi(deviceIP[3])
+	var devicePort int
+	if port, err := strconv.Atoi(deviceIP[3]); err == nil {
+		devicePort = port
+	}
 	licensePoolName := d.Get("license_poolname").(string)
 	log.Printf("[INFO] BIGIP License Assignment Started on Pool:%v", licensePoolName)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
@@ -314,7 +317,10 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 	var deviceIP []string
 	var respID string
 	deviceIP = getDeviceUri(bigipRef.Host)
-	devicePort, _ := strconv.Atoi(deviceIP[3])
+	var devicePort int
+	if port, err := strconv.Atoi(deviceIP[3]); err == nil {
+		devicePort = port
+	}
 	licensePoolName := d.Get("license_poolname").(string)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
 	if err != nil {
@@ -426,9 +432,9 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 	}
 
 	deviceIP := getDeviceUri(bigipRef.Host)
-	devicePort, err := strconv.Atoi(deviceIP[3])
-	if err != nil {
-		return err
+	var devicePort int
+	if port, err := strconv.Atoi(deviceIP[3]); err == nil {
+		devicePort = port
 	}
 	assignmentType := d.Get("assignment_type").(string)
 	if regKey == "" {
@@ -474,13 +480,13 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 			time.Sleep(5 * time.Second)
 		}
 		log.Println("[DEBUG] wait for bigip status with license revoking")
-		bigipLicence, err := bigipRef.GetBigipLiceseStatus()
+		bigipLicence, err := waitLicenseRevoke(bigipRef)
 		if err != nil {
 			return fmt.Errorf("getting license revoking status from bigip failed with :%v", err)
 		}
 		_, ok := bigipLicence["entries"].(map[string]interface{})
 		if ok {
-			return fmt.Errorf("getting license revoking status from bigip failed with :%v", err)
+			return fmt.Errorf("getting license revoking status from bigip failed")
 		}
 		log.Printf("[INFO] License Revoking for Device %+v Success", bigipRef.Host)
 	} else {
@@ -506,6 +512,19 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 	}
 	d.SetId("")
 	return nil
+}
+
+func waitLicenseRevoke(bigipRef *bigip.BigIP) (map[string]interface{}, error) {
+	bigipLicense, err := bigipRef.GetBigipLiceseStatus()
+	if err != nil {
+		return nil, err
+	}
+	retries := 0
+	for _, ok := bigipLicense["entries"]; ok && retries < 3; retries += 1 {
+		time.Sleep(time.Second * 5)
+		bigipLicense, err = bigipRef.GetBigipLiceseStatus()
+	}
+	return bigipLicense, err
 }
 
 func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
