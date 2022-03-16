@@ -42,7 +42,20 @@ resource "bigip_net_selfip" "selfip1" {
   port_lockdown = ["tcp:4040", "udp:5050", "egp:0"]
   depends_on    = [bigip_net_vlan.vlan1]
 }
-```      
+```
+
+### Example usage with `port_lockdown` set to `["none"]`
+
+```hcl
+resource "bigip_net_selfip" "selfip1" {
+  name          = "/Common/internalselfIP"
+  ip            = "11.1.1.1/24"
+  vlan          = "/Common/internal"
+  traffic_group = "traffic-group-1"
+  port_lockdown = ["none"]
+  depends_on    = [bigip_net_vlan.vlan1]
+}
+```
 
 ## Argument Reference
 
