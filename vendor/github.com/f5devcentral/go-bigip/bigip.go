@@ -188,7 +188,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	req, _ = http.NewRequest(strings.ToUpper(options.Method), url, body)
 	if b.Token != "" {
 		req.Header.Set("X-F5-Auth-Token", b.Token)
-	} else {
+	} else if options.URL != "mgmt/shared/authn/login" {
 		req.SetBasicAuth(b.User, b.Password)
 	}
 

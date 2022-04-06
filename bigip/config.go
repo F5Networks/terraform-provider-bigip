@@ -9,7 +9,7 @@ package bigip
 import (
 	"log"
 
-	"github.com/f5devcentral/go-bigip"
+	bigip "github.com/f5devcentral/go-bigip"
 )
 
 type Config struct {

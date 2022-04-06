@@ -15,7 +15,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/f5devcentral/go-bigip"
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -56,6 +56,18 @@ resource "bigip_as3"  "as3-example" {
 var TestAs3Resource5 = `
 resource "bigip_as3"  "as3-example" {
      as3_json = "${file("` + dir + `/../examples/as3/example3.json")}"
+}
+`
+
+var TestAs3Resourcegithub592 = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/github592.json")}"
+}
+`
+
+var TestAs3Resourcegithub600 = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/github600.json")}"
 }
 `
 
@@ -199,6 +211,48 @@ func TestAccBigipAs3_update_config(t *testing.T) {
 				Config: TestAs3Resource5,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("Sample_new", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3Issue592(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub592,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3Issue600(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub592,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+			{
+				Config: TestAs3Resourcegithub600,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
 				),
 			},
 		},

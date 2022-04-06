@@ -81,7 +81,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "declaration is invalid" {
 					return fmt.Errorf("Error :%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["errors"]), "", respID
 				}
-				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" {
+				if len(fastTask["results"].([]interface{})) == 1 && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" && fastTask["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "no change" {
 					return fmt.Errorf("Error:%+v", fastTask["results"].([]interface{})[0].(map[string]interface{})["message"]), "", respID
 				}
 				i := tenant_count - 1
