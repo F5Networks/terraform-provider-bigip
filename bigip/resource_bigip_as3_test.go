@@ -59,6 +59,24 @@ resource "bigip_as3"  "as3-example" {
 }
 `
 
+var TestAs3Resourcegithub592 = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/github592.json")}"
+}
+`
+
+var testAs3Resourcegithub592crash = `
+resource "bigip_as3"  "as3-example" {
+as3_json = "${file("` + dir + `/../examples/as3/github592_crash.json")}"
+}
+`
+
+var TestAs3Resourcegithub600 = `
+resource "bigip_as3"  "as3-example" {
+     as3_json = "${file("` + dir + `/../examples/as3/github600.json")}"
+}
+`
+
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -204,6 +222,67 @@ func TestAccBigipAs3_update_config(t *testing.T) {
 		},
 	})
 }
+
+func TestAccBigipAs3Issue592(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub592,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3Issue600(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub592,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+			{
+				Config: TestAs3Resourcegithub600,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+		},
+	})
+}
+
+//
+//func TestAccBigipAs3Issue592Crash(t *testing.T) {
+//	resource.Test(t, resource.TestCase{
+//		PreCheck: func() {
+//			testAcctPreCheck(t)
+//		},
+//		Providers:    testAccProviders,
+//		CheckDestroy: testCheckAs3Destroy,
+//		Steps: []resource.TestStep{
+//			{
+//				Config: testAs3Resourcegithub592crash,
+//				Check: resource.ComposeTestCheckFunc(
+//					testCheckAs3Exists("A1", false),
+//				),
+//			},
+//		},
+//	})
+//}
 
 func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
