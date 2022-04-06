@@ -37,7 +37,7 @@ lint:
 
 tools:
 	@echo "==> installing required tooling..."
-	go install github.com/katbyte/terrafmt@latest
+	go install github.com/katbyte/terrafmt@d117dc888b365322b5c23e5c41cff1e27c336f7f
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH || $$GOPATH)/bin v1.41.1
 
 test-compile:
