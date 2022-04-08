@@ -1050,6 +1050,7 @@ type Monitor struct {
 	Count          string `json:"count,omitempty"`
 	RecvRow        string `json:"recvRow,omitempty"`
 	RecvColumn     string `json:"recvColumn,omitempty"`
+	SSLProfile     string `json:"sslProfile,omitempty"`
 }
 
 type monitorDTO struct {
@@ -1082,6 +1083,7 @@ type monitorDTO struct {
 	Count          string `json:"count,omitempty"`
 	RecvRow        string `json:"recvRow,omitempty"`
 	RecvColumn     string `json:"recvColumn,omitempty"`
+	SSLProfile     string `json:"sslProfile,omitempty"`
 }
 
 type Profiles struct {

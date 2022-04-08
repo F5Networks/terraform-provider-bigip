@@ -186,6 +186,12 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Optional:    true,
 				Description: "the database in which your user is created",
 			},
+
+			"ssl_profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "the ssl profile",
+			},
 		},
 	}
 }
@@ -258,6 +264,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			_ = d.Set("destination", m.Destination)
 			if matchresult {
 				_ = d.Set("compatibility", m.Compatibility)
+				_ = d.Set("ssl_profile", m.SSLProfile)
 			} else {
 				_ = d.Set("compatibility", d.Get("compatibility").(string))
 			}
@@ -381,5 +388,6 @@ func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.M
 	config.Username = d.Get("username").(string)
 	config.Password = d.Get("password").(string)
 	config.UpInterval = d.Get("up_interval").(int)
+	config.SSLProfile = d.Get("ssl_profile").(string)
 	return config
 }
