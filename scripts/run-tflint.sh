@@ -2,6 +2,7 @@
 
 function tfAccTestsLint {
   echo "==> Checking acceptance test terraform blocks are formatted..."
+  terrafmt version
 
 files=$(find ./bigip -type f -name "*_test.go")
 error=false

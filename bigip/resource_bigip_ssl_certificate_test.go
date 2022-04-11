@@ -8,11 +8,10 @@ package bigip
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
-	"os"
-
-	"github.com/f5devcentral/go-bigip"
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )

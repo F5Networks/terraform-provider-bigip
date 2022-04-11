@@ -1,0 +1,46 @@
+{
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "id": "Test-01",
+        "label": "Test 1",
+        "remark": "Simple HTTP application with round robin pool",
+        "A1": {
+            "class": "Tenant",
+            "defaultRouteDomain": 0,
+            "Application_1": {
+                "class": "Application",
+                "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "iRules": [
+                        "app01_irule"
+                    ],
+                    "virtualAddresses": [
+                        "192.168.1.99"
+                    ],
+                    "pool": "web_pool1"
+                },
+                "web_pool1": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "192.2.1.100",
+                                "192.2.1.110"
+                            ]
+                        }
+                    ]
+                },
+                "app01_irule": {
+                    "class": "iRule",
+                    "Irule": "when HTTP_REQUEST { HTTP::respond 200 content {<html><head><title>Hi team</title</head><body><h1>Hello team!</h1></body></html> }}"
+                }
+            }
+        }
+    }
+}
