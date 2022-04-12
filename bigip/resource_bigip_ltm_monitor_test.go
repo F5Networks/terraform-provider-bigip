@@ -53,6 +53,7 @@ resource "bigip_ltm_monitor" "test-https-monitor" {
 	reverse = "disabled"
 	destination       = "*:8008"
 	compatibility    = "enabled"
+	ssl_profile      = "/Common/serverssl"
 }
 `
 
@@ -202,6 +203,7 @@ func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "destination", "*:8008"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "compatibility", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "reverse", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-https-monitor", "ssl_profile", "/Common/serverssl"),
 				),
 			},
 		},

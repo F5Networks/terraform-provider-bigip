@@ -26,6 +26,15 @@ resource "bigip_ltm_monitor" "monitor" {
   destination = "1.2.3.4:1234"
 }
 
+resource "bigip_ltm_monitor" "test-https-monitor" {
+  name        = "/Common/terraform_monitor"
+  parent      = "/Common/http"
+  ssl_profile = "/Common/serverssl"
+  send        = "GET /some/path\r\n"
+  timeout     = "999"
+  interval    = "999"
+}
+
 resource "bigip_ltm_monitor" "test-ftp-monitor" {
   name          = "/Common/ftp-test"
   parent        = "/Common/ftp"
@@ -93,3 +102,5 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 * `filename` - (Optional,type `string`) Specifies the full path and file name of the file that the system attempts to download. The health check is successful if the system can download the file.
 
 * `mode` - (Optional,type `string`) Specifies the data transfer process (DTP) mode. The default value is passive. The options are passive (Specifies that the monitor sends a data transfer request to the FTP server. When the FTP server receives the request, the FTP server then initiates and establishes the data connection.) and active (Specifies that the monitor initiates and establishes the data connection with the FTP server.).
+
+* `ssl_profile` - (Optional,type `string`) Specifies the ssl profile for the monitor. It only makes sense when the parent is `/Common/https`
