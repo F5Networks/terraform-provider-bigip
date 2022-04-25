@@ -81,6 +81,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_policy":      dataSourceBigipLtmPolicy(),
 			"bigip_ltm_node":        dataSourceBigipLtmNode(),
 			"bigip_vwan_config":     dataSourceBigipVwanconfig(),
+			"bigip_waf_signatures":  dataSourceBigipWafSignatures(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
