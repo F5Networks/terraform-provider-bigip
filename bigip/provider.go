@@ -8,15 +8,14 @@ package bigip
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"reflect"
 	"regexp"
 	"strings"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
-
-const DEFAULT_PARTITION = "Common"
 
 func Provider() terraform.ResourceProvider {
 	p := &schema.Provider{
@@ -81,6 +80,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_policy":      dataSourceBigipLtmPolicy(),
 			"bigip_ltm_node":        dataSourceBigipLtmNode(),
 			"bigip_vwan_config":     dataSourceBigipVwanconfig(),
+			"bigip_waf_signatures":  dataSourceBigipWafSignatures(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -221,7 +221,7 @@ func setToInterfaceSlice(s *schema.Set) []interface{} {
 func mapEntity(d map[string]interface{}, obj interface{}) {
 	val := reflect.ValueOf(obj).Elem()
 	for field := range d {
-		f := val.FieldByName(strings.Title(field))
+		f := val.FieldByName(cases.Title(language.Und, cases.NoLower).String(field))
 		if f.IsValid() {
 			if f.Kind() == reflect.Slice {
 				incoming := d[field].([]interface{})
@@ -234,7 +234,7 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
-			f := val.FieldByName(strings.Title(toCamelCase(field)))
+			f := val.FieldByName(cases.Title(language.Und, cases.NoLower).String(toCamelCase(field)))
 			f.Set(reflect.ValueOf(d[field]))
 		}
 	}

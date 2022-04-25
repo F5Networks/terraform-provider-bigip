@@ -1,6 +1,14 @@
 package bigip
+import (
+	"fmt"
+)
 
-import "fmt"
+const (
+	uriWafPol             = "policies"
+	uriUrls       		  = "urls"
+	uriParams          	  = "parameters"
+	uriWafSign				  = "signatures"
+)
 
 type WafEntityParameters struct {
 	WafEntityParametersList []WafEntityParameter `json:"items"`
@@ -39,13 +47,8 @@ type WafPolicy struct {
 	Partition             string        `json:"partition,omitempty"`
 	Description           string        `json:"description,omitempty"`
 	Template              string        `json:"template,omitempty"`
-	Tags                  string        `json:"tags"`
 	ApplicationLanguage   string        `json,"applicationLanguage,omitempty"`
-	PolicyEnforcement     string        `json:"policyEnforcement,omitempty"`
-	ServerTechnoDetection bool          `json:"serverTechnodetection,omitempty"`
-	ServerTechnologies    []string      `json:"serverTechnologies,omitempty"`
-	PolicyAdjustments     []interface{} `json:"polcyAdjustments,omitempty"`
-	PolicyModifications   []interface{} `json:"policyModifications,omitempty"`
+	EnforcementMode     string          `json:"enforcementMode,omitempty"`
 }
 
 type WafEntityURLs struct {
@@ -60,30 +63,66 @@ type WafEntityURL struct {
 	Method                     string `json:"method,omitempty"`
 	MethodOverrides            string `json:"methodOverrides,omitempty"`
 	PerformStaging             bool   `json:"performStaging,omitempty"`
-	SignatureOverrides_disable bool   `json:"signatureOverrides_disable,omitempty"`
+	SignatureOverrides     	   []SignatureIDs `json:"signatureOverrides,omitempty"`
+}
+
+type SignatureIDs struct{
+	SignatureReference []SigIDs
+	Enabled 			bool `json:"enabled,omitempty"`
+}
+
+type SigIDs struct{
+	Link			string `json:"link,omitempty"`
+	IsUserDefined	bool   `json:"isUserDefined,omitempty"`
+	Name			string `json:"name,omitempty"`
+	SignatureId		int `json:"signatureId,omitempty"`
+}
+
+type Signatures struct {
+	Signatures []Signature `json:"items"`
+}
+
+type Signature struct {
+	Name			string `json:"name,omitempty"`
+	ResourceId		string `json:"id,omitempty"`
+	Description		string `json:"description,omitempty"`
+	SignatureId		int `json:"signatureId,omitempty"`
+	Type			string `json:"signatureType,omitempty"`
+	Accuracy		string `json:"accuracy,omitempty"`
+	Risk			string `json:"risk,omitempty"`
+}
+
+func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {
+	var signature Signatures
+	var query = fmt.Sprintf("?$filter=signatureId+eq+%d", signatureid)
+	err, _ := b.getForEntity(&signature, uriMgmt, uriTm, uriAsm, uriWafSign, query)
+	if err != nil {
+		return nil, err
+	}
+	return &signature, nil
 }
 
 // This method is not correct as of now, it tries to access keys that are not there in WafPolicy struct yet
-func (b *BigIP) GetPolicyId(policyName string) (string, error) {
-	var self WafPolicies
-	err, _ := b.getForEntity(&self, uriMgmt, uriTm, uriAsm, "policies")
-
-	if err != nil {
-		return "", err
-	}
-
-	for _, policy := range self.WafPolicyList {
-		if policy.FullPath == "policyName" {
-			return policy.Id, nil
-		}
-	}
-
-	return "", fmt.Errorf("could not get the policy ID")
-}
+//func (b *BigIP) GetPolicyId(policyName string) (string, error) {
+//	var self WafPolicies
+//	err, _ := b.getForEntity(&self, uriMgmt, uriTm, uriAsm, uriWafPol)
+//
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	for _, policy := range self.WafPolicyList {
+//		if policy.FullPath == "policyName" {
+//			return policy.Id, nil
+//		}
+//	}
+//
+//	return "", fmt.Errorf("could not get the policy ID")
+//}
 
 func (b *BigIP) WafEntityParameters(policyId string) (*WafEntityParameters, error) {
 	var self WafEntityParameters
-	err, _ := b.getForEntity(&self, uriMgmt, uriTm, uriAsm, "policies", "parameters")
+	err, _ := b.getForEntity(&self, uriMgmt, uriTm, uriAsm, uriWafPol, uriParams)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +131,7 @@ func (b *BigIP) WafEntityParameters(policyId string) (*WafEntityParameters, erro
 
 func (b *BigIP) GetEntityParameters(policyId, parameterId string) (*WafEntityParameter, error) {
 	var wafEntityParameter WafEntityParameter
-	err, _ := b.getForEntity(wafEntityParameter, uriMgmt, uriTm, uriAsm, "policies", policyId, "parameters", parameterId)
+	err, _ := b.getForEntity(&wafEntityParameter, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriParams, parameterId)
 	if err != nil {
 		return nil, err
 	}
@@ -100,20 +139,20 @@ func (b *BigIP) GetEntityParameters(policyId, parameterId string) (*WafEntityPar
 }
 
 func (b *BigIP) CreateWafEntityParameter(config *WafEntityParameter, policyId string) error {
-	return b.post(config, uriMgmt, uriTm, uriAsm, "policies", policyId, "parameters")
+	return b.post(config, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriParams)
 }
 
-func (b *BigIP) ModifyWafEntityParameter(config *WafEntityParameter, policyId string) error {
-	return b.patch(config, uriMgmt, uriTm, uriAsm, "policies", policyId, "parameters")
+func (b *BigIP) ModifyWafEntityParameter(config *WafEntityParameter, parameterId, policyId string) error {
+	return b.patch(config, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriParams, parameterId)
 }
 
 func (b *BigIP) DeleteWafEntityParameter(parameterId, policyId string) error {
-	return b.delete(uriMgmt, uriTm, uriAsm, "policies", policyId, "parameters", parameterId)
+	return b.delete(uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriParams, parameterId)
 }
 
-func (b *BigIP) GetWafPolicies(policyId string) (*WafPolicy, error) {
+func (b *BigIP) GetWafEntityUrls(policyId string) (*WafPolicy, error) {
 	var wafPolicy WafPolicy
-	err, _ := b.getForEntity(&wafPolicy, uriMgmt, uriTm, uriAsm, "policies", policyId)
+	err, _ := b.getForEntity(&wafPolicy, uriMgmt, uriTm, uriAsm, uriWafPol, policyId)
 
 	if err != nil {
 		return nil, err
@@ -123,13 +162,43 @@ func (b *BigIP) GetWafPolicies(policyId string) (*WafPolicy, error) {
 }
 
 func (b *BigIP) CreateWafPolicy(config *WafPolicy) error {
-	return b.post(config, uriMgmt, uriTm, uriAsm, "policies")
+	return b.post(config, uriMgmt, uriTm, uriAsm, uriWafPol)
 }
 
 func (b *BigIP) ModifyWafPolicy(config *WafPolicy, policyId string) error {
-	return b.patch(config, uriMgmt, uriTm, uriAsm, "policies", policyId)
+	return b.patch(config, uriMgmt, uriTm, uriAsm, uriWafPol, policyId)
 }
 
 func (b *BigIP) DeleteWafPolicy(config *WafPolicy, policyId string) error {
-	return b.delete(uriMgmt, uriTm, uriAsm, "policies", policyId)
+	return b.delete(uriMgmt, uriTm, uriAsm, uriWafPol, policyId)
+}
+
+func (b *BigIP) WafEntityUrls(policyId string) (*WafEntityURLs, error) {
+	var self WafEntityURLs
+	err, _ := b.getForEntity(&self, uriMgmt, uriTm, uriAsm, uriWafPol, uriUrls)
+	if err != nil {
+		return nil, err
+	}
+	return &self, nil
+}
+
+func (b *BigIP) GetEntityUrls(policyId, urlId string) (*WafEntityURL, error) {
+	var wafEntityurl WafEntityURL
+	err, _ := b.getForEntity(&wafEntityurl, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriUrls, urlId)
+	if err != nil {
+		return nil, err
+	}
+	return &wafEntityurl, nil
+}
+
+func (b *BigIP) CreateWafEntityUrl(config *WafEntityURL, policyId string) error {
+	return b.post(config, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriUrls)
+}
+
+func (b *BigIP) ModifyWafEntityUrl(config *WafEntityURL, urlId, policyId string) error {
+	return b.patch(config, uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriUrls, urlId)
+}
+
+func (b *BigIP) DeleteWafEntityUrl(urlId, policyId string) error {
+	return b.delete(uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriUrls, urlId)
 }
