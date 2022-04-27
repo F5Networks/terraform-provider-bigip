@@ -1,13 +1,17 @@
 package bigip
+
 import (
 	"fmt"
+	"strings"
+	"log"
 )
 
 const (
-	uriWafPol             = "policies"
-	uriUrls       		  = "urls"
-	uriParams          	  = "parameters"
-	uriWafSign				  = "signatures"
+	uriWafPol  = "policies"
+	uriUrls    = "urls"
+	uriParams  = "parameters"
+	uriWafSign = "signatures"
+	uriImportpolicy = "import-policy"
 )
 
 type WafEntityParameters struct {
@@ -39,16 +43,29 @@ type WafEntityParameter struct {
 }
 
 type WafPolicies struct {
-	WafPolicyList []WafPolicy `json:"items"`
+	WafPolicies []WafPolicy `json:"items,omitempty"`
 }
 
 type WafPolicy struct {
-	Name                  string        `json:"name,omitempty"`
-	Partition             string        `json:"partition,omitempty"`
-	Description           string        `json:"description,omitempty"`
-	Template              string        `json:"template,omitempty"`
-	ApplicationLanguage   string        `json,"applicationLanguage,omitempty"`
-	EnforcementMode     string          `json:"enforcementMode,omitempty"`
+	Name                string        `json:"name,omitempty"`
+	Partition           string        `json:"partition,omitempty"`
+	Description         string        `json:"description,omitempty"`
+	FullPath            string        `json:"fullPath,omitempty"`
+	ID                  string        `json:"id,omitempty"`
+	Template            string        `json:"template,omitempty"`
+	HasParent           bool          `json:"hasParent,omitempty"`
+	ApplicationLanguage string        `json,"applicationLanguage,omitempty"`
+	EnablePassiveMode   bool          `json:"enablePassiveMode,omitempty"`
+	CaseInsensitive     bool          `json:"caseInsensitive,omitempty"`
+	EnforcementMode     string        `json:"enforcementMode,omitempty"`
+	VirtualServers      []interface{} `json:"virtualServers,omitempty"`
+}
+
+type ApplywafPolicy struct {
+	Filename string `json:"filename,omitempty"`
+	Policy   struct {
+		FullPath string `json:"fullPath,omitempty"`
+	} `json:"policy,omitempty"`
 }
 
 type WafEntityURLs struct {
@@ -56,26 +73,26 @@ type WafEntityURLs struct {
 }
 
 type WafEntityURL struct {
-	Name                       string `json:"name,omitempty"`
-	Description                string `json:"description,omitempty"`
-	Type                       string `json:"type,omitempty"`
-	Protocol                   string `json:"protocol,omitempty"`
-	Method                     string `json:"method,omitempty"`
-	MethodOverrides            string `json:"methodOverrides,omitempty"`
-	PerformStaging             bool   `json:"performStaging,omitempty"`
-	SignatureOverrides     	   []SignatureIDs `json:"signatureOverrides,omitempty"`
+	Name               string         `json:"name,omitempty"`
+	Description        string         `json:"description,omitempty"`
+	Type               string         `json:"type,omitempty"`
+	Protocol           string         `json:"protocol,omitempty"`
+	Method             string         `json:"method,omitempty"`
+	MethodOverrides    string         `json:"methodOverrides,omitempty"`
+	PerformStaging     bool           `json:"performStaging,omitempty"`
+	SignatureOverrides []SignatureIDs `json:"signatureOverrides,omitempty"`
 }
 
-type SignatureIDs struct{
+type SignatureIDs struct {
 	SignatureReference []SigIDs
-	Enabled 			bool `json:"enabled,omitempty"`
+	Enabled            bool `json:"enabled,omitempty"`
 }
 
-type SigIDs struct{
-	Link			string `json:"link,omitempty"`
-	IsUserDefined	bool   `json:"isUserDefined,omitempty"`
-	Name			string `json:"name,omitempty"`
-	SignatureId		int `json:"signatureId,omitempty"`
+type SigIDs struct {
+	Link          string `json:"link,omitempty"`
+	IsUserDefined bool   `json:"isUserDefined,omitempty"`
+	Name          string `json:"name,omitempty"`
+	SignatureId   int    `json:"signatureId,omitempty"`
 }
 
 type Signatures struct {
@@ -83,13 +100,13 @@ type Signatures struct {
 }
 
 type Signature struct {
-	Name			string `json:"name,omitempty"`
-	ResourceId		string `json:"id,omitempty"`
-	Description		string `json:"description,omitempty"`
-	SignatureId		int `json:"signatureId,omitempty"`
-	Type			string `json:"signatureType,omitempty"`
-	Accuracy		string `json:"accuracy,omitempty"`
-	Risk			string `json:"risk,omitempty"`
+	Name        string `json:"name,omitempty"`
+	ResourceId  string `json:"id,omitempty"`
+	Description string `json:"description,omitempty"`
+	SignatureId int    `json:"signatureId,omitempty"`
+	Type        string `json:"signatureType,omitempty"`
+	Accuracy    string `json:"accuracy,omitempty"`
+	Risk        string `json:"risk,omitempty"`
 }
 
 func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {
@@ -100,6 +117,22 @@ func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {
 		return nil, err
 	}
 	return &signature, nil
+}
+
+func (b *BigIP) GetWafPolicy(wafPolicyName string) (*WafPolicy, error) {
+	var wafPolicies WafPolicies
+	var query = fmt.Sprintf("?$filter=name+eq+%s", wafPolicyName)
+	err, _ := b.getForEntity(&wafPolicies, uriMgmt, uriTm, uriAsm, uriWafPol, query)
+	if err != nil {
+		return nil, err
+	}
+	if len(wafPolicies.WafPolicies) == 0 {
+		return nil, fmt.Errorf("[ERROR] WafPolicy: %+v not found", wafPolicyName)
+	}
+	// if successful filter query will return a list with a single item
+	wafPolicy := wafPolicies.WafPolicies[0]
+
+	return &wafPolicy, nil
 }
 
 // This method is not correct as of now, it tries to access keys that are not there in WafPolicy struct yet
@@ -201,4 +234,31 @@ func (b *BigIP) ModifyWafEntityUrl(config *WafEntityURL, urlId, policyId string)
 
 func (b *BigIP) DeleteWafEntityUrl(urlId, policyId string) error {
 	return b.delete(uriMgmt, uriTm, uriAsm, uriWafPol, policyId, uriUrls, urlId)
+}
+
+// ImportAwafJson import Awaf Json from local machine to BIGIP
+func (b *BigIP) ImportAwafJson(awafPolicyName, awafJsonContent string) error {
+	certbyte := []byte(awafJsonContent)
+	policyName := awafPolicyName[strings.LastIndex(awafPolicyName, "/")+1:]
+	_, err := b.UploadAsmBytes(certbyte, fmt.Sprintf("%s.json",policyName))
+	if err != nil {
+		return err
+	}
+	policyPath := struct {
+		FullPath string `json:"fullPath,omitempty"`
+	}{
+		FullPath:awafPolicyName,
+	}
+	applywaf := ApplywafPolicy{
+		Filename:fmt.Sprintf("%s.json",policyName),
+		Policy:policyPath,
+	}
+
+	resp, err := b.postReq(applywaf, uriMgmt, uriTm, uriAsm, uriTasks, uriImportpolicy)
+	log.Printf("Response:%+v",resp)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }

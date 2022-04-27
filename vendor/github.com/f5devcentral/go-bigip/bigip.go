@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -198,6 +199,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
 
+	log.Printf("Request in APICall:%+v", req)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -388,7 +390,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		format = "%s/mgmt/%s"
 	}
 	url := fmt.Sprintf(format, b.Host, options.URL)
-	chunkSize := 512 * 1024
+	chunkSize := 1024 * 7168
 	var start, end int64
 	for {
 		// Read next chunk
@@ -403,6 +405,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 			chunk = chunk[:n]
 		}
 		body := bytes.NewReader(chunk)
+		//log.Printf("Request body:%+v",string(body))
 		req, _ := http.NewRequest(strings.ToUpper(options.Method), url, body)
 		if b.Token != "" {
 			req.Header.Set("X-F5-Auth-Token", b.Token)
@@ -411,17 +414,19 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		}
 		req.Header.Add("Content-Type", options.ContentType)
 		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
+
+		log.Printf("Request:%+v", req)
 		// Try to upload chunk
 		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		data, _ := ioutil.ReadAll(res.Body)
+		log.Printf("Response data :%+v", string(data))
 		if res.StatusCode >= 400 {
 			if res.Header.Get("Content-Type") == "application/json" {
 				return nil, b.checkError(data)
 			}
-
 			return nil, fmt.Errorf("HTTP %d :: %s", res.StatusCode, string(data[:]))
 		}
 		defer res.Body.Close()
