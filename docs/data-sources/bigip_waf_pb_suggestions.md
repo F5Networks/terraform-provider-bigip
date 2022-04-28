@@ -12,16 +12,13 @@ Use this data source (`bigip_waf_pb_suggestions`) to export PB suggestions from 
  
  
 ## Example Usage
+
 ```hcl
 
 data "bigip_waf_pb_suggestions" "PBWAF1" {
   policy_name = "protect_me_policy"
   partition = "Common"
   minimum_learning_score = 20
-}
-
-output "bigip_waf_pb_suggestions_json" {
-  value = "${data.bigip_waf_pb_suggestions.PBWAF1.json}"
 }
 
 ```      
