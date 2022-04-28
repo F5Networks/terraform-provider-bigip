@@ -12,9 +12,10 @@ Use this data source (`bigip_waf_signatures`) to get the details of attack signa
  
  
 ## Example Usage
+
 ```hcl
 
-data "bigip_waf_signatures" "DG-TC3" {
+data "bigip_waf_signatures" "WAFSIG1" {
   signature_id = 200104004
 }
 
