@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -199,7 +198,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
 
-	log.Printf("Request in APICall:%+v", req)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -415,14 +413,12 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		req.Header.Add("Content-Type", options.ContentType)
 		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
 
-		log.Printf("Request:%+v", req)
 		// Try to upload chunk
 		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		data, _ := ioutil.ReadAll(res.Body)
-		log.Printf("Response data :%+v", string(data))
 		if res.StatusCode >= 400 {
 			if res.Header.Get("Content-Type") == "application/json" {
 				return nil, b.checkError(data)
