@@ -60,6 +60,10 @@ In addition to all arguments above, the following attributes are exported:
 
 
 ## Import
+An existing WAF Policy or if the WAF Policy has been manually created or modified on the BIG-IP WebUI, it can be imported using its `id`.
 
+e.g:
 
-
+```
+terraform import bigip_waf_policy.example <id>
+```
