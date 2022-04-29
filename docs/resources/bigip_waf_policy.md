@@ -16,16 +16,13 @@ It outputs an up-to-date WAF Policy in a JSON format
 ## Example Usage 
 
 ```hcl
-
 resource "bigip_waf_policy" "test-awaf" {
-  name = "/Common/testpolicyravi"
-  template_name= "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
+  name                 = "/Common/testpolicyravi"
+  template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
   application_language = "utf-8"
-  enforcement_mode = "blocking"
-  server_technologies = ["MySQL","Unix/Linux","MongoDB"]
-  content = file("/Users/chinthalapalli/devsettings/Terraform/AWAF/testrapid3.json")
+  enforcement_mode     = "blocking"
+  server_technologies  = ["MySQL", "Unix/Linux", "MongoDB"]
 }
-
 ```
 
 ## Argument Reference

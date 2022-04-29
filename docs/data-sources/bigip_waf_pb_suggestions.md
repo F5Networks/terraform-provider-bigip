@@ -16,8 +16,8 @@ Use this data source (`bigip_waf_pb_suggestions`) to export PB suggestions from 
 ```hcl
 
 data "bigip_waf_pb_suggestions" "PBWAF1" {
-  policy_name = "protect_me_policy"
-  partition = "Common"
+  policy_name            = "protect_me_policy"
+  partition              = "Common"
   minimum_learning_score = 20
 }
 
