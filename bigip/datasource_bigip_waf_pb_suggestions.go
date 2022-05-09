@@ -37,8 +37,7 @@ func dataSourceBigipWafPb() *schema.Resource {
 				Description: "System generated id of the WAF policy",
 			},
 			"json": {
-				Type:        schema.TypeList,
-				Optional:    true,
+				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The return payload of the queried PB suggestions",
 			},
@@ -100,7 +99,7 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		_ = d.Set("policy_id", policyId)
-		_ = d.Set("json", pbJson)
+		_ = d.Set("json", string(pbJson))
 		d.SetId(policyName)
 	}
 	return nil

@@ -37,7 +37,7 @@ type Signature struct {
 	Name			string `json:"name,omitempty"`
 	ResourceId		string `json:"id,omitempty"`
 	Description		string `json:"description,omitempty"`
-	SignatureId		int `json:"signatureId,omitempty"`
+	SignatureId		int    `json:"signatureId,omitempty"`
 	Type			string `json:"signatureType,omitempty"`
 	Accuracy		string `json:"accuracy,omitempty"`
 	Risk			string `json:"risk,omitempty"`
@@ -82,7 +82,7 @@ func (b *BigIP) PostPbExport(payload interface{}) (*PbExport, error) {
 }
 func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	var pbexport PbExport
-	err, _ := b.getForEntity(id, uriMgmt, uriShared, uriFast, uriFasttask, id)
+	err, _ := b.getForEntity(&pbexport, uriMgmt, uriShared, uriFast, uriFasttask, id)
 	if err != nil {
 		return nil, err
 	}
