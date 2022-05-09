@@ -8,13 +8,14 @@ package bigip
 
 import (
 	"fmt"
+	"reflect"
+	"regexp"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"reflect"
-	"regexp"
-	"strings"
 )
 
 func Provider() terraform.ResourceProvider {
