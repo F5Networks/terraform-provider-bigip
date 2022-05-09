@@ -90,14 +90,14 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"content": {
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
-				//ForceNew:    true,
-				Description: "Content of certificate on Disk",
-			},
 			"parameters": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
+			"urls": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -120,54 +120,13 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Println("[INFO] AWAF Name " + name)
 
-	certPath := d.Get("content").(string)
-
-	policyWaf := &bigip.WafPolicy{
-		Name:                name,
-		ApplicationLanguage: d.Get("application_language").(string),
-	}
-	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
-	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
-	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
-	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
-	policyWaf.Type = d.Get("type").(string)
-	policyWaf.Template = struct {
-		Name string `json:"name,omitempty"`
-	}{
-		Name: d.Get("template_name").(string),
-	}
-	p := d.Get("server_technologies").([]interface{})
-
-	log.Printf("[INFO] server_technologies: %+v ", p)
-	var sts []struct {
-		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-	}
-	for i := 0; i < len(p); i++ {
-		st1 := struct {
-			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-		}{
-			p[i].(string),
-		}
-		sts = append(sts, st1)
-	}
-
-	log.Printf("[INFO] server technologies: %+v ", sts)
-	policyWaf.ServerTechnologies = sts
-
-	policyJson := struct {
-		Policy interface{} `json:"policy"`
-	}{
-		policyWaf,
-	}
-	data, err := json.Marshal(policyJson)
+	config, err := getpolicyConfig(d)
 	if err != nil {
-		return err
+		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
-	log.Printf("[INFO] AWAF Json content: %+v ", certPath)
 
-	log.Printf("[INFO] AWAF Json struct: %+v ", string(data))
-
-	taskId, err := client.ImportAwafJson(name, string(data))
+	log.Printf("[INFO] AWAF Json struct: %+v ", config)
+	taskId, err := client.ImportAwafJson(name, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
@@ -180,9 +139,8 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
 	}
-
 	d.SetId(wafpolicy.ID)
-	_ = d.Set("policy_json", string(data))
+	_ = d.Set("policy_json", config)
 	return resourceBigipAwafPolicyRead(d, meta)
 }
 
@@ -206,8 +164,30 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
-	name := d.Id()
+	client := meta.(*bigip.BigIP)
+	_ = d.Id()
+	name := d.Get("name").(string)
 	log.Printf("[DEBUG] Updating AWAF Policy : %+v", name)
+
+	config, err := getpolicyConfig(d)
+	if err != nil {
+		return fmt.Errorf("error in Json encode for waf policy %+v", err)
+	}
+
+	log.Printf("[INFO] AWAF Json struct: %+v ", config)
+	taskId, err := client.ImportAwafJson(name, config)
+	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+	}
+	err = client.GetImportStatus(taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+	}
+	wafpolicy, err := client.GetWafPolicyQuery(name)
+	if err != nil {
+		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+	}
 	return resourceBigipAwafPolicyRead(d, meta)
 }
 
@@ -223,4 +203,59 @@ func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	d.SetId("")
 	return nil
+}
+
+func getpolicyConfig(d *schema.ResourceData) (string, error) {
+	name := d.Get("name").(string)
+	policyWaf := &bigip.WafPolicy{
+		Name:                name,
+		ApplicationLanguage: d.Get("application_language").(string),
+	}
+	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
+	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
+	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
+	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
+	policyWaf.Type = d.Get("type").(string)
+	policyWaf.Template = struct {
+		Name string `json:"name,omitempty"`
+	}{
+		Name: d.Get("template_name").(string),
+	}
+	p := d.Get("server_technologies").([]interface{})
+
+	var sts []struct {
+		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
+	}
+	for i := 0; i < len(p); i++ {
+		st1 := struct {
+			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
+		}{
+			p[i].(string),
+		}
+		sts = append(sts, st1)
+	}
+
+	log.Printf("[INFO] URLS: %+v ", d.Get("urls"))
+
+	var wafUrls []bigip.WafEntityUrl
+	urls := d.Get("urls").([]interface{})
+	for i := 0; i < len(urls); i++ {
+		var wafUrl bigip.WafEntityUrl
+		_ = json.Unmarshal([]byte(urls[i].(string)), &wafUrl)
+		wafUrls = append(wafUrls, wafUrl)
+	}
+	policyWaf.Urls = wafUrls
+
+	policyWaf.ServerTechnologies = sts
+
+	policyJson := struct {
+		Policy interface{} `json:"policy"`
+	}{
+		policyWaf,
+	}
+	data, err := json.Marshal(policyJson)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }

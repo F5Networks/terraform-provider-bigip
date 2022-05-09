@@ -3,7 +3,7 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
@@ -37,8 +37,11 @@ func dataSourceBigipWafPb() *schema.Resource {
 				Description: "System generated id of the WAF policy",
 			},
 			"json": {
-				Type:        schema.TypeList,
-				Optional:    true,
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Computed:    true,
 				Description: "The return payload of the queried PB suggestions",
 			},

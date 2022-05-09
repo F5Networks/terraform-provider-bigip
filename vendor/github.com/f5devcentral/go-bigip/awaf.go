@@ -24,19 +24,19 @@ type PbExport struct {
 }
 
 type WafEntityUrl struct {
-	Name                            string `json:"name"`
-	WildcardOrder                   int    `json:"wildcardOrder"`
-	Protocol                        string `json:"protocol"`
-	Method                          string `json:"method"`
-	Type                            string `json:"type"`
-	AttackSignaturesCheck           bool   `json:"attackSignaturesCheck"`
-	MetacharsOnURLCheck             bool   `json:"metacharsOnUrlCheck"`
-	CanChangeDomainCookie           bool   `json:"canChangeDomainCookie"`
-	ClickjackingProtection          bool   `json:"clickjackingProtection"`
-	IsAllowed                       bool   `json:"isAllowed"`
+	Name                            string `json:"name,omitempty"`
+	WildcardOrder                   int    `json:"wildcardOrder,omitempty"`
+	Protocol                        string `json:"protocol,omitempty"`
+	Method                          string `json:"method,omitempty"`
+	Type                            string `json:"type,omitempty"`
+	AttackSignaturesCheck           bool   `json:"attackSignaturesCheck,omitempty"`
+	MetacharsOnURLCheck             bool   `json:"metacharsOnUrlCheck,omitempty"`
+	CanChangeDomainCookie           bool   `json:"canChangeDomainCookie,omitempty"`
+	ClickjackingProtection          bool   `json:"clickjackingProtection,omitempty"`
+	IsAllowed                       bool   `json:"isAllowed,omitempty"`
 	MandatoryBody                   bool   `json:"mandatoryBody"`
-	DisallowFileUploadOfExecutables bool   `json:"disallowFileUploadOfExecutables"`
-	AllowRenderingInFrames          string `json:"allowRenderingInFrames"`
+	DisallowFileUploadOfExecutables bool   `json:"disallowFileUploadOfExecutables,omitempty"`
+	AllowRenderingInFrames          string `json:"allowRenderingInFrames,omitempty"`
 }
 
 type WafEntityParameters struct {
