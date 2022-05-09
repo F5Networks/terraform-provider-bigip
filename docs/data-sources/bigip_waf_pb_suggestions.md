@@ -21,7 +21,7 @@ data "bigip_waf_pb_suggestions" "PBWAF1" {
   minimum_learning_score = 20
 }
 
-```      
+```
 
 ## Argument Reference
 

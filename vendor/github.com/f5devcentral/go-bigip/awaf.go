@@ -1,21 +1,22 @@
 package bigip
+
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 )
 
 const (
-	uriWafPol             = "policies"
-	uriUrls       		  = "urls"
-	uriParams          	  = "parameters"
-	uriWafSign			  = "signatures"
-	uriExpPb			  = "export-suggestions"
+	uriWafPol  = "policies"
+	uriUrls    = "urls"
+	uriParams  = "parameters"
+	uriWafSign = "signatures"
+	uriExpPb   = "export-suggestions"
 )
 
 type PbExport struct {
-	Status      string                 `json:"status,omitempty"`
-	Task_id     string				   `json:"id,omitempty"`
-	Result  	map[string]interface{} `json:"result,omitempty"`
+	Status  string                 `json:"status,omitempty"`
+	Task_id string                 `json:"id,omitempty"`
+	Result  map[string]interface{} `json:"result,omitempty"`
 }
 
 type WafQueriedPolicies struct {
@@ -23,24 +24,47 @@ type WafQueriedPolicies struct {
 }
 
 type WafQueriedPolicy struct {
-	Name                  string        `json:"name,omitempty"`
-	Partition             string        `json:"partition,omitempty"`
-	Policy_id			  string		`json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	Policy_id string `json:"id,omitempty"`
 }
-
 
 type Signatures struct {
 	Signatures []Signature `json:"items"`
 }
 
 type Signature struct {
-	Name			string `json:"name,omitempty"`
-	ResourceId		string `json:"id,omitempty"`
-	Description		string `json:"description,omitempty"`
-	SignatureId		int `json:"signatureId,omitempty"`
-	Type			string `json:"signatureType,omitempty"`
-	Accuracy		string `json:"accuracy,omitempty"`
-	Risk			string `json:"risk,omitempty"`
+	Name        string `json:"name,omitempty"`
+	ResourceId  string `json:"id,omitempty"`
+	Description string `json:"description,omitempty"`
+	SignatureId int    `json:"signatureId,omitempty"`
+	Type        string `json:"signatureType,omitempty"`
+	Accuracy    string `json:"accuracy,omitempty"`
+	Risk        string `json:"risk,omitempty"`
+}
+
+type WafUrlJson struct {
+	Name                      string            `json:"name,omitempty"`
+	Description               string            `json:"description,omitempty"`
+	Type                      string            `json:"type,omitempty"`
+	Protocol                  string            `json:"protocol,omitempty"`
+	Method                    string            `json:"method,omitempty"`
+	PerformStaging            bool              `json:"performStaging,omitempty"`
+	SignatureOverrides        []WafUrlSig       `json:"signatureOverrides,omitempty"`
+	MethodOverrides           []MethodOverrides `json:"methodOverrides,omitempty"`
+	AttackSignaturesCheck     bool              `json:"attackSignaturesCheck,omitempty"`
+	IsAllowed                 bool              `json:"isAllowed,omitempty"`
+	MethodsOverrideOnUrlCheck bool              `json:"methodsOverrideOnUrlCheck,omitempty"`
+}
+
+type MethodOverrides struct {
+	Allowed bool   `json:"allowed"` // as we can supply true and false, omitempty would automatically remove allowed = false which we do not want
+	Method  string `json:"method,omitempty"`
+}
+
+type WafUrlSig struct {
+	Enabled bool `json:"enabled"` // as we can supply true and false, omitempty would automatically remove allowed = false which we do not want
+	Id      int  `json:"signatureId,omitempty"`
 }
 
 func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {
@@ -82,7 +106,7 @@ func (b *BigIP) PostPbExport(payload interface{}) (*PbExport, error) {
 }
 func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	var pbexport PbExport
-	err, _ := b.getForEntity(id, uriMgmt, uriShared, uriFast, uriFasttask, id)
+	err, _ := b.getForEntity(&pbexport, uriMgmt, uriShared, uriFast, uriFasttask, id)
 	if err != nil {
 		return nil, err
 	}
