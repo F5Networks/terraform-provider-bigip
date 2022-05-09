@@ -7,7 +7,10 @@ package bigip
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 )
@@ -19,7 +22,7 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of the URL",
+				Description: "Name of the URL.",
 				ForceNew:    true,
 			},
 			"description": {
@@ -28,22 +31,23 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 				Description: "A description of the URL.",
 			},
 			"type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Description: "Specifies whether the parameter is an 'explicit' or a 'wildcard' attribute. " +
-					"Default is: wildcard",
-				Default: "wildcard",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specifies whether the parameter is an 'explicit' or a 'wildcard' attribute.",
+				Default:      "wildcard",
+				ValidateFunc: validation.StringInSlice([]string{"explicit", "wildcard"}, false),
 			},
 			"protocol": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies whether the protocol for the URL is 'http' or 'https'. Default is: http",
-				Default:     "http",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specifies whether the protocol for the URL is 'http' or 'https'.",
+				Default:      "http",
+				ValidateFunc: validation.StringInSlice([]string{"http", "https"}, true),
 			},
 			"method": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Select a Method for the URL to create an API endpoint. Default is : *",
+				Description: "Select a method for the URL to create an API endpoint.",
 				Default:     "*",
 			},
 			"perform_staging": {
@@ -51,6 +55,25 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 				Optional: true,
 				Description: "If true then any violation associated to the respective URL will not be enforced, " +
 					"and the request will not be considered illegal.",
+			},
+			"method_overrides": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "A list of methods that are allowed or disallowed for a specific URL.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"allow": {
+							Type:        schema.TypeBool,
+							Required:    true,
+							Description: "Specifies that the system allows or disallows a method for this URL.",
+						},
+						"method": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies an HTTP method.",
+						},
+					},
+				},
 			},
 			"signature_overrides_disable": {
 				Type:        schema.TypeList,
@@ -68,43 +91,44 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 }
 
 func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) error {
-	_ = meta // we never call the device, to avoid complier errors we zero this out here
+	_ = meta // we never call the device, to avoid compiler errors we zero this out here
 
 	name := d.Get("name").(string)
 	d.SetId(name)
 	log.Println("[INFO] Creating URL " + name)
-	data := make(map[string]interface{})
-	data["name"] = name
 
-	if _, ok := d.GetOk("description"); ok {
-		data["description"] = d.Get("description")
+	urlJson := &bigip.WafUrlJson{
+		Name:                      name,
+		Description:               d.Get("description").(string),
+		Type:                      d.Get("type").(string),
+		Protocol:                  strings.ToUpper(d.Get("protocol").(string)),
+		Method:                    d.Get("method").(string),
+		PerformStaging:            d.Get("perform_staging").(bool),
+		AttackSignaturesCheck:     true,
+		IsAllowed:                 true,
+		MethodsOverrideOnUrlCheck: false,
 	}
-	if _, ok := d.GetOk("type"); ok {
-		data["type"] = d.Get("type")
+	sigCount := d.Get("signature_overrides_disable.#").(int)
+	urlJson.SignatureOverrides = make([]bigip.WafUrlSig, 0, sigCount)
+	for i := 0; i < sigCount; i++ {
+		var s bigip.WafUrlSig
+		prefix := fmt.Sprintf("signature_overrides_disable.%d", i)
+		s.Enabled = false
+		s.Id = d.Get(prefix).(int)
+		urlJson.SignatureOverrides = append(urlJson.SignatureOverrides, s)
 	}
-	if _, ok := d.GetOk("protocol"); ok {
-		data["protocol"] = strings.ToUpper(d.Get("protocol").(string))
-	}
-	if _, ok := d.GetOk("method"); ok {
-		data["method"] = d.Get("method")
-	}
-	if _, ok := d.GetOk("perform_staging"); ok {
-		data["performStaging"] = d.Get("perform_staging")
-	}
-	if _, ok := d.GetOk("signature_overrides_disable"); ok {
-		sigids := d.Get("signature_overrides_disable")
-		var sigs []map[string]interface{}
-		for _, s := range sigids.([]interface{}) {
-			s1 := map[string]interface{}{"enabled": false, "signatureId": s}
-			sigs = append(sigs, s1)
-		}
-		data["signatureOverrides"] = sigs
-	}
-	data["attackSignaturesCheck"] = true
-	data["isAllowed"] = true
-	data["methodsOverrideOnUrlCheck"] = false
 
-	jsonString, err := json.Marshal(data)
+	methodCount := d.Get("method_overrides.#").(int)
+	urlJson.MethodOverrides = make([]bigip.MethodOverrides, 0, methodCount)
+	for i := 0; i < methodCount; i++ {
+		var m bigip.MethodOverrides
+		prefix := fmt.Sprintf("method_overrides.%d", i)
+		m.Allowed = d.Get(prefix + ".allow").(bool)
+		m.Method = d.Get(prefix + ".method").(string)
+		urlJson.MethodOverrides = append(urlJson.MethodOverrides, m)
+	}
+
+	jsonString, err := json.Marshal(urlJson)
 	if err != nil {
 		return err
 	}

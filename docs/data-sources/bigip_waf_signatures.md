@@ -19,7 +19,7 @@ data "bigip_waf_signatures" "WAFSIG1" {
   signature_id = 200104004
 }
 
-```      
+```
 
 ## Argument Reference
 
