@@ -52,3 +52,10 @@ func (b *BigIP) UploadBytes(data []byte, filename string) (*Upload, error) {
 	size := int64(len(data))
 	return b.Upload(r, size, uriShared, uriFileTransfer, uriUploads, filename)
 }
+
+// Upload a file from a byte slice
+func (b *BigIP) UploadAsmBytes(data []byte, filename string) (*Upload, error) {
+	r := bytes.NewReader(data)
+	size := int64(len(data))
+	return b.Upload(r, size, uriTm, uriAsm, uriFileTransfer, uriUploads, filename)
+}

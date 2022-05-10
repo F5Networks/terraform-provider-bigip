@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
-	"strings"
 )
 
 func dataSourceBigipWafEntityUrl() *schema.Resource {
@@ -101,7 +100,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 		Name:                      name,
 		Description:               d.Get("description").(string),
 		Type:                      d.Get("type").(string),
-		Protocol:                  strings.ToUpper(d.Get("protocol").(string)),
+		Protocol:                  d.Get("protocol").(string),
 		Method:                    d.Get("method").(string),
 		PerformStaging:            d.Get("perform_staging").(bool),
 		AttackSignaturesCheck:     true,
