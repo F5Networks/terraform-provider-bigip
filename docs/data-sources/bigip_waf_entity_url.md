@@ -16,18 +16,18 @@ Use this data source (`bigip_waf_pb_suggestions`) to create JSON for WAF URL to 
 ```hcl
 
 data "bigip_waf_entity_url" "WAFURL1" {
-  name = "/foobar"
-  description = "this is a test"
-  type = "explicit"
-  protocol = "HTTP"
-  perform_staging = true
+  name                        = "/foobar"
+  description                 = "this is a test"
+  type                        = "explicit"
+  protocol                    = "HTTP"
+  perform_staging             = true
   signature_overrides_disable = [12345678, 87654321]
   method_overrides {
-    allow = false
+    allow  = false
     method = "BCOPY"
   }
   method_overrides {
-    allow = true
+    allow  = true
     method = "BDELETE"
   }
 }
