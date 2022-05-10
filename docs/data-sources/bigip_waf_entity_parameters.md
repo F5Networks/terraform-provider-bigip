@@ -16,11 +16,11 @@ Use this data source (`bigip_waf_entity_parameter`) to get the details of entity
 ```hcl
 
 data "bigip_waf_entity_parameter" "EPX" {
-  name = "testParamX"
-  type = "explicit"
-  data_type = "alpha-numeric"
-  enable_regular_expression = true
-  perform_staging = true
+  name                        = "testParamX"
+  type                        = "explicit"
+  data_type                   = "alpha-numeric"
+  enable_regular_expression   = true
+  perform_staging             = true
   signature_overrides_disable = [200001494, 200001472]
 }
 
