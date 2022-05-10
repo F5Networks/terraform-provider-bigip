@@ -8,11 +8,11 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
-	"strings"
 )
 
 func dataSourceBigipWafEntityUrl() *schema.Resource {
@@ -101,7 +101,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 		Name:                      name,
 		Description:               d.Get("description").(string),
 		Type:                      d.Get("type").(string),
-		Protocol:                  strings.ToUpper(d.Get("protocol").(string)),
+		Protocol:                  d.Get("protocol").(string),
 		Method:                    d.Get("method").(string),
 		PerformStaging:            d.Get("perform_staging").(bool),
 		AttackSignaturesCheck:     true,
@@ -132,8 +132,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	log.Printf(string(jsonString))
+	log.Printf("[DEBUG] URL Json:%+v", string(jsonString))
 	_ = d.Set("json", string(jsonString))
-
 	return nil
 }
