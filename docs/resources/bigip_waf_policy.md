@@ -74,7 +74,7 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `parameters` - (Optional,type `list`) This section defines parameters that the security policy permits in requests.
 
-* `parameters` - (Optional,type `list`) In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.
+* `urls` - (Optional,type `list`) In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.
 
 ## Attributes Reference
 
