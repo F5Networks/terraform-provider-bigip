@@ -44,26 +44,27 @@ type Signature struct {
 }
 
 type Parameter struct {
-	Name                           string `json:"name,omitempty"`
-	Description                    string `json:"description,omitempty"`
-	Type                           string `json:"type,omitempty"`
-	ValueType                      string `json:"valueType,omitempty"`
-	AllowEmptyValue                bool   `json:"allowEmptyValue,omitempty"`
-	AllowRepeatedParameterName     bool   `json:"allowRepeatedParameterName,omitempty"`
-	AttackSignaturesCheck          bool   `json:"attackSignaturesCheck,omitempty"`
-	CheckMaxValueLength            bool   `json:"checkMaxValueLength,omitempty"`
-	CheckMinValueLength            bool   `json:"checkMinValueLength,omitempty"`
-	DataType                       string `json:"dataType,omitempty"`
-	EnableRegularExpression        bool   `json:"enableRegularExpression,omitempty"`
-	IsBase64                       bool   `json:"isBase64,omitempty"`
-	IsCookie                       bool   `json:"isCookie,omitempty"`
-	IsHeader                       bool   `json:"isHeader,omitempty"`
-	Level                          string `json:"level,omitempty"`
-	Mandatory                      bool   `json:"mandatory,omitempty"`
-	MetacharsOnParameterValueCheck bool   `json:"metacharsOnParameterValueCheck,omitempty"`
-	ParameterLocation              string `json:"parameterLocation,omitempty"`
-	PerformStaging                 bool   `json:"performStaging,omitempty"`
-	SensitiveParameter             bool   `json:"sensitiveParameter,omitempty"`
+	Name                           string                   `json:"name,omitempty"`
+	Description                    string                   `json:"description,omitempty"`
+	Type                           string                   `json:"type,omitempty"`
+	ValueType                      string                   `json:"valueType,omitempty"`
+	AllowEmptyValue                bool                     `json:"allowEmptyValue,omitempty"`
+	AllowRepeatedParameterName     bool                     `json:"allowRepeatedParameterName,omitempty"`
+	AttackSignaturesCheck          bool                     `json:"attackSignaturesCheck,omitempty"`
+	CheckMaxValueLength            bool                     `json:"checkMaxValueLength,omitempty"`
+	CheckMinValueLength            bool                     `json:"checkMinValueLength,omitempty"`
+	DataType                       string                   `json:"dataType,omitempty"`
+	EnableRegularExpression        bool                     `json:"enableRegularExpression,omitempty"`
+	IsBase64                       bool                     `json:"isBase64,omitempty"`
+	IsCookie                       bool                     `json:"isCookie,omitempty"`
+	IsHeader                       bool                     `json:"isHeader,omitempty"`
+	Level                          string                   `json:"level,omitempty"`
+	Mandatory                      bool                     `json:"mandatory,omitempty"`
+	MetacharsOnParameterValueCheck bool                     `json:"metacharsOnParameterValueCheck,omitempty"`
+	ParameterLocation              string                   `json:"parameterLocation,omitempty"`
+	PerformStaging                 bool                     `json:"performStaging,omitempty"`
+	SensitiveParameter             bool                     `json:"sensitiveParameter,omitempty"`
+	SignatureOverrides             []map[string]interface{} `json:"signatureOverrides,omitempty"`
 }
 
 func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {
