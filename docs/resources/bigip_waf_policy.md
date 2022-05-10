@@ -16,13 +16,40 @@ It outputs an up-to-date WAF Policy in a JSON format
 ## Example Usage 
 
 ```hcl
+
+data "bigip_waf_entity_parameter" "Param1" {
+  name            = "Param1"
+  type            = "explicit"
+  data_type       = "alpha-numeric"
+  perform_staging = true
+}
+
+data "bigip_waf_entity_parameter" "Param2" {
+  name            = "Param2"
+  type            = "explicit"
+  data_type       = "alpha-numeric"
+  perform_staging = true
+}
+
+data "bigip_waf_entity_url" "URL" {
+  name     = "URL1"
+  protocol = "http"
+}
+
+data "bigip_waf_entity_url" "URL2" {
+  name = "URL2"
+}
+
 resource "bigip_waf_policy" "test-awaf" {
   name                 = "/Common/testpolicyravi"
   template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
   application_language = "utf-8"
   enforcement_mode     = "blocking"
   server_technologies  = ["MySQL", "Unix/Linux", "MongoDB"]
+  parameters           = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json]
+  urls                 = [data.bigip_waf_entity_url.URL.json, data.bigip_waf_entity_url.URL2.json]
 }
+
 ```
 
 ## Argument Reference
@@ -46,6 +73,8 @@ resource "bigip_waf_policy" "test-awaf" {
 * `server_technologies` - (Optional,type `list`) The server technology is a server-side application, framework, web server or operating system type that is configured in the policy in order to adapt the policy to the checks needed for the respective technology.
 
 * `parameters` - (Optional,type `list`) This section defines parameters that the security policy permits in requests.
+
+* `parameters` - (Optional,type `list`) In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.
 
 ## Attributes Reference
 

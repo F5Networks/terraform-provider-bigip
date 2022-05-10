@@ -8,8 +8,9 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -95,14 +96,16 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional: true,
+				Optional:    true,
+				Description: "This section defines parameters that the security policy permits in requests.",
 			},
 			"urls": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional: true,
+				Optional:    true,
+				Description: "In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.",
 			},
 			"policy_json": {
 				Type:        schema.TypeString,
@@ -125,7 +128,6 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
 
-	log.Printf("[INFO] AWAF Json struct: %+v ", config)
 	taskId, err := client.ImportAwafJson(name, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
@@ -157,7 +159,6 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	_ = d.Set("name", wafpolicy.FullPath)
-	//_ = d.Set("description", wafpolicy.Description)
 	_ = d.Set("policy_id", wafpolicy.ID)
 
 	return nil
@@ -174,7 +175,6 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
 
-	log.Printf("[INFO] AWAF Json struct: %+v ", config)
 	taskId, err := client.ImportAwafJson(name, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
@@ -245,6 +245,15 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		wafUrls = append(wafUrls, wafUrl)
 	}
 	policyWaf.Urls = wafUrls
+
+	var wafParams []bigip.Parameter
+	parmtrs := d.Get("parameters").([]interface{})
+	for i := 0; i < len(parmtrs); i++ {
+		var wafParam bigip.Parameter
+		_ = json.Unmarshal([]byte(parmtrs[i].(string)), &wafParam)
+		wafParams = append(wafParams, wafParam)
+	}
+	policyWaf.Parameters = wafParams
 
 	policyWaf.ServerTechnologies = sts
 
