@@ -8,16 +8,15 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipAwafPolicy() *schema.Resource {
