@@ -8,7 +8,11 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
@@ -140,6 +144,29 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	wafpolicy, err := client.GetWafPolicyQuery(name)
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+	}
+
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"waf_policy_name":            name,
+			"Number_of_entity_url":       len(d.Get("urls").([]interface{})),
+			"Number_of_entity_parameter": len(d.Get("parameters").([]interface{})),
+			"Terraform Version":          client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_as3", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 	d.SetId(wafpolicy.ID)
 	_ = d.Set("policy_json", config)
