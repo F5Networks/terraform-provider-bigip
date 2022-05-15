@@ -30,12 +30,17 @@ resource "bigip_bigiq_as3" "exampletask" {
 
 ## Argument Reference
 
+* `bigiq_address` - (Required, type `string`) Address of the BIG-IQ to which your targer BIG-IP is attached
 
-* `bigiq_address` - (Required) Address of the BIG-IQ to which your targer BIG-IP is attached
+* `bigiq_user` - (Required, type `string`) User name  of the BIG-IQ to which your targer BIG-IP is attached 
 
-* `bigiq_user` - (Required) User name  of the BIG-IQ to which your targer BIG-IP is attached
+* `bigiq_password` - (Required,type `string`) Password of the BIG-IQ to which your targer BIG-IP is attached
 
-* `bigiq_password` - (Required) Password of the BIG-IQ to which your targer BIG-IP is attached
+* `bigiq_port` - (Optional) type `int`, BIGIQ License Manager Port number, specify if port is other than `443`
+
+* `bigiq_token_auth` - (Optional) type `bool`, if set to `true` enables Token based Authentication,default is `false`
+
+* `bigiq_login_ref` - (Optional) BIGIQ Login reference for token authentication
 
 * `as3_json` - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ```file``` function
 
