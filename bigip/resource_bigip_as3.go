@@ -23,6 +23,7 @@ import (
 
 var x = 0
 var m sync.Mutex
+var createdTenants string
 
 func resourceBigipAs3() *schema.Resource {
 	return &schema.Resource{
@@ -225,6 +226,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		d.SetId("Common")
 	}
+	createdTenants = d.Get("tenant_list").(string)
 	x++
 	return resourceBigipAs3Read(d, meta)
 }
@@ -233,9 +235,13 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading As3 config")
 	var name string
 	var tList string
+	as3Json := d.Get("as3_json").(string)
 
 	if d.Get("as3_json") != nil {
-		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
+		tList, _, _ = client.GetTenantList(as3Json)
+		if createdTenants != "" && createdTenants != tList {
+			tList = createdTenants
+		}
 	}
 	if d.Id() != "" && tList != "" {
 		name = tList
@@ -375,6 +381,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			log.Printf("%v", err)
 		}
 	}
+	createdTenants = d.Get("tenant_list").(string)
 	_ = d.Set("task_id", taskID)
 	x++
 	return resourceBigipAs3Read(d, meta)
