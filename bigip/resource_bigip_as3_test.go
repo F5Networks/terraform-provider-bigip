@@ -71,6 +71,18 @@ resource "bigip_as3"  "as3-example" {
 }
 `
 
+var TestAs3Resourcegithub601a = `
+resource "bigip_as3"  "as3-example" {
+	as3_json = "${file("` + dir + `/../examples/as3/github601_a.json")}"
+}
+`
+
+var TestAs3Resourcegithub601b = `
+resource "bigip_as3"  "as3-example" {
+	as3_json = "${file("` + dir + `/../examples/as3/github601_b.json")}"
+}
+`
+
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -253,6 +265,31 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 				Config: TestAs3Resourcegithub600,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("A1", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3Issue601(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub601a,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01", true),
+				),
+			},
+			{
+				Config: TestAs3Resourcegithub601b,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_02", true),
+					testCheckAs3Exists("Sample_01", false),
 				),
 			},
 		},
