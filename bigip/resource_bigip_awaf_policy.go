@@ -79,6 +79,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Description:  "The type of policy you want to create. The default policy type is Security.",
+				Default:      "security",
 				ValidateFunc: validation.StringInSlice([]string{"parent", "security"}, false),
 			},
 			"server_technologies": {
@@ -110,7 +111,13 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.",
 			},
-			"policy_json": {
+			"policy_import_json": {
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:    true,
+				Description: "The payload of the WAF Policy",
+			},
+			"policy_export_json": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
@@ -157,6 +164,7 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"waf_policy_name":            name,
+			"waf_policy_id":              wafpolicy.ID,
 			"Number_of_entity_url":       len(d.Get("urls").([]interface{})),
 			"Number_of_entity_parameter": len(d.Get("parameters").([]interface{})),
 			"Terraform Version":          client.UserAgent,
@@ -168,7 +176,6 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 	d.SetId(wafpolicy.ID)
-	_ = d.Set("policy_json", config)
 	return resourceBigipAwafPolicyRead(d, meta)
 }
 
@@ -177,15 +184,32 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	policyID := d.Id()
 	name := d.Get("name").(string)
 
-	log.Printf("[DEBUG] Reading AWAF Policy : %+v with ID: %+v", name, policyID)
+	log.Printf("[DEBUG] Reading AWAF Policy %v with ID: %+v", name, policyID)
 
 	wafpolicy, err := client.GetWafPolicy(policyID)
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
 	}
 
-	_ = d.Set("name", wafpolicy.FullPath)
+	policyJson, err := client.ExportPolicy(policyID)
+	if err != nil {
+		return fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err)
+	}
+
+	log.Printf("[DEBUG] Policy Json : %+v", policyJson.Policy)
+
+	plJson, err := json.Marshal(policyJson.Policy)
+	if err != nil {
+		return err
+	}
+	_ = d.Set("name", policyJson.Policy.FullPath)
 	_ = d.Set("policy_id", wafpolicy.ID)
+	_ = d.Set("type", policyJson.Policy.Type)
+	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
+	_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
+	_ = d.Set("description", policyJson.Policy.Description)
+	_ = d.Set("template_name", policyJson.Policy.Template.Name)
+	_ = d.Set("policy_export_json", string(plJson))
 
 	return nil
 }
@@ -241,6 +265,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
 	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
 	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
+	policyWaf.Description = d.Get("description").(string)
 	policyWaf.Type = d.Get("type").(string)
 	policyWaf.Template = struct {
 		Name string `json:"name,omitempty"`
@@ -294,3 +319,78 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	}
 	return string(data), nil
 }
+
+//
+//func readPolicyconfig(d *schema.ResourceData, meta interface{}) (string, error) {
+//	client := meta.(*bigip.BigIP)
+//	name := d.Get("name").(string)
+//	policyWaf := &bigip.WafPolicy{
+//		Name:                name,
+//		ApplicationLanguage: d.Get("application_language").(string),
+//	}
+//
+//	wafurls, err := client.GetWafPolicyUrls(name)
+//	if err != nil {
+//		return "", fmt.Errorf("error retrieving waf policy %+v: %v", wafurls, err)
+//	}
+//
+//	log.Printf("[DEBUG]: WAF URL:%+v", wafurls)
+//	log.Printf("[DEBUG] Meta:%+v", meta)
+//
+//	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
+//	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
+//	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
+//	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
+//	policyWaf.Type = d.Get("type").(string)
+//	policyWaf.Template = struct {
+//		Name string `json:"name,omitempty"`
+//	}{
+//		Name: d.Get("template_name").(string),
+//	}
+//	p := d.Get("server_technologies").([]interface{})
+//
+//	var sts []struct {
+//		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
+//	}
+//	for i := 0; i < len(p); i++ {
+//		st1 := struct {
+//			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
+//		}{
+//			p[i].(string),
+//		}
+//		sts = append(sts, st1)
+//	}
+//
+//	log.Printf("[INFO] URLS: %+v ", d.Get("urls"))
+//
+//	var wafUrls []bigip.WafUrlJson
+//	urls := d.Get("urls").([]interface{})
+//	for i := 0; i < len(urls); i++ {
+//		var wafUrl bigip.WafUrlJson
+//		_ = json.Unmarshal([]byte(urls[i].(string)), &wafUrl)
+//		wafUrls = append(wafUrls, wafUrl)
+//	}
+//	policyWaf.Urls = wafUrls
+//
+//	var wafParams []bigip.Parameter
+//	parmtrs := d.Get("parameters").([]interface{})
+//	for i := 0; i < len(parmtrs); i++ {
+//		var wafParam bigip.Parameter
+//		_ = json.Unmarshal([]byte(parmtrs[i].(string)), &wafParam)
+//		wafParams = append(wafParams, wafParam)
+//	}
+//	policyWaf.Parameters = wafParams
+//
+//	policyWaf.ServerTechnologies = sts
+//
+//	policyJson := struct {
+//		Policy interface{} `json:"policy"`
+//	}{
+//		policyWaf,
+//	}
+//	data, err := json.Marshal(policyJson)
+//	if err != nil {
+//		return "", err
+//	}
+//	return string(data), nil
+//}

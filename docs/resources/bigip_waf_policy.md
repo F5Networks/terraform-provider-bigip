@@ -58,6 +58,8 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `template_name` - (Required,type `string`) Specifies the name of the template used for the policy creation.
 
+* `description` - (Optional,type `string`) Specifies the description of the policy.
+
 * `application_language` - (Optional,type `string`) The character encoding for the web application. The character encoding determines how the policy processes the character sets. The default is `utf-8`
 
 * `case_insensitive` - (Optional,type `bool`) Specifies whether the security policy treats microservice URLs, file types, URLs, and parameters as case sensitive or not. When this setting is enabled, the system stores these security policy elements in lowercase in the security policy configuration

@@ -14,6 +14,7 @@ const (
 	uriParams       = "parameters"
 	uriWafSign      = "signatures"
 	uriImportpolicy = "import-policy"
+	uriExportpolicy = "export-policy"
 	uriExpPb        = "export-suggestions"
 )
 
@@ -28,6 +29,15 @@ type PbExport struct {
 	Status  string                 `json:"status,omitempty"`
 	Task_id string                 `json:"id,omitempty"`
 	Result  map[string]interface{} `json:"result,omitempty"`
+}
+
+type ExportPayload struct {
+	Filename        string `json:"filename,omitempty"`
+	Format          string `json:"format"`
+	Inline          bool   `json:"inline,omitempty"`
+	PolicyReference struct {
+		Link string `json:"link"`
+	} `json:"policyReference"`
 }
 
 type WafQueriedPolicies struct {
@@ -52,6 +62,10 @@ type Signature struct {
 	Type        string `json:"signatureType,omitempty"`
 	Accuracy    string `json:"accuracy,omitempty"`
 	Risk        string `json:"risk,omitempty"`
+}
+
+type WafUrlJsons struct {
+	WafUrlJsons []WafUrlJson `json:"items"`
 }
 
 type WafUrlJson struct {
@@ -80,6 +94,10 @@ type WafUrlSig struct {
 
 type WafPolicies struct {
 	WafPolicies []WafPolicy `json:"items,omitempty"`
+}
+
+type PolicyStruct struct {
+	Policy WafPolicy `json:"policy"`
 }
 
 type WafPolicy struct {
@@ -114,8 +132,13 @@ type ImportStatus struct {
 	ID                        string `json:"id"`
 	RetainInheritanceSettings bool   `json:"retainInheritanceSettings"`
 	Result                    struct {
+		File    string `json:"file,omitempty"`
 		Message string `json:"message"`
 	} `json:"result,omitempty"`
+}
+
+type Parameters struct {
+	Parameters []Parameter `json:"items"`
 }
 
 type Parameter struct {
@@ -213,6 +236,74 @@ func (b *BigIP) GetWafPolicy(policyID string) (*WafPolicy, error) {
 		return nil, err
 	}
 	return &wafPolicy, nil
+}
+
+func (b *BigIP) ExportPolicy(policyID string) (*PolicyStruct, error) {
+	//export JSON policy
+	var exportPayload ExportPayload
+	exportPayload.Format = "json"
+	exportPayload.Inline = true
+	exportPayload.PolicyReference.Link = fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID)
+	resp, err := b.postReq(exportPayload, uriMgmt, uriTm, uriAsm, uriTasks, uriExportpolicy)
+	if err != nil {
+		return nil, err
+	}
+	var taskStatus ImportStatus
+	err = json.Unmarshal(resp, &taskStatus)
+	if err != nil {
+		return nil, err
+	}
+	//check export status
+	exportStatus, err := b.GetExportStatus(taskStatus.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var exportData PolicyStruct
+	err = json.Unmarshal([]byte(exportStatus.Result.File), &exportData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &exportData, nil
+}
+
+func (b *BigIP) GetExportStatus(taskId string) (*ImportStatus, error) {
+	var exportStatus ImportStatus
+	err, _ := b.getForEntity(&exportStatus, uriMgmt, uriTm, uriAsm, uriTasks, uriExportpolicy, taskId)
+	if err != nil {
+		return nil, err
+	}
+	if exportStatus.Status != "COMPLETED" && exportStatus.Status != "FAILURE" {
+		time.Sleep(5 * time.Second)
+		return b.GetExportStatus(taskId)
+		//return nil
+	}
+	if exportStatus.Status == "FAILURE" {
+		return nil, fmt.Errorf("[ERROR] WafPolicy import failed with :%+v", exportStatus.Result)
+	}
+	if exportStatus.Status == "COMPLETED" {
+		return &exportStatus, nil
+	}
+	return &exportStatus, nil
+}
+
+func (b *BigIP) GetWafPolicyUrls(policyID string) (*WafUrlJsons, error) {
+	var wafUrls WafUrlJsons
+	err, _ := b.getForEntity(&wafUrls, uriMgmt, uriTm, uriAsm, uriWafPol, policyID, uriUrls)
+	if err != nil {
+		return nil, err
+	}
+	return &wafUrls, nil
+}
+
+func (b *BigIP) GetWafPolicyParameters(policyID string) (*Parameters, error) {
+	var wafParams Parameters
+	err, _ := b.getForEntity(&wafParams, uriMgmt, uriTm, uriAsm, uriWafPol, policyID, uriParams)
+	if err != nil {
+		return nil, err
+	}
+	return &wafParams, nil
 }
 
 func (b *BigIP) GetImportStatus(taskId string) error {

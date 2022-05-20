@@ -82,6 +82,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_ltm_node":             dataSourceBigipLtmNode(),
 			"bigip_vwan_config":          dataSourceBigipVwanconfig(),
 			"bigip_waf_signatures":       dataSourceBigipWafSignatures(),
+			"bigip_waf_policy":           dataSourceBigipWafPolicy(),
 			"bigip_waf_pb_suggestions":   dataSourceBigipWafPb(),
 			"bigip_waf_entity_url":       dataSourceBigipWafEntityUrl(),
 			"bigip_waf_entity_parameter": dataSourceBigipWafEntityParameter(),
