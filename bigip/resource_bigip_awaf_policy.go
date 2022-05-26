@@ -343,35 +343,29 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 
 	policyWaf.ServerTechnologies = sts
 
-	//policyJson := struct {
-	//	Policy interface{} `json:"policy"`
-	//}{
-	//	policyWaf,
-	//}
-
 	policyJson := &bigip.PolicyStruct{}
 	policyJson.Policy = policyWaf
 	var polJsn bigip.WafPolicy
 	if val, ok := d.GetOk("policy_import_json"); ok {
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
-		//log.Printf("[DEBUG] polJson: %+v", polJsn)
-		//log.Printf("[DEBUG] policyWaf: %+v", policyWaf)
 		if polJsn.FullPath != policyWaf.Name {
 			polJsn.FullPath = policyWaf.Name
 			polJsn.Name = policyWaf.Name
 		}
-		if polJsn.Template != polJsn.Template {
+		if polJsn.Template != policyWaf.Template {
 			polJsn.Template = policyWaf.Template
 		}
 		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
-			for _, urlsTemp := range policyWaf.Urls {
-				polJsn.Urls = append(polJsn.Urls, urlsTemp)
-			}
+			polJsn.Urls = append(polJsn.Urls, policyWaf.Urls...)
+			// for _, urlsTemp := range policyWaf.Urls {
+			//	polJsn.Urls = append(polJsn.Urls, urlsTemp)
+			// }
 		}
 		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
-			for _, paramTemp := range policyWaf.Parameters {
-				polJsn.Parameters = append(polJsn.Parameters, paramTemp)
-			}
+			polJsn.Parameters = append(polJsn.Parameters, policyWaf.Parameters...)
+			// for _, paramTemp := range policyWaf.Parameters {
+			// 	polJsn.Parameters = append(polJsn.Parameters, paramTemp)
+			// }
 		}
 		policyJson.Policy = polJsn
 	}
