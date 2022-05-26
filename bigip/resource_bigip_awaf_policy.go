@@ -230,8 +230,12 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
 	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
-	_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
-	_ = d.Set("description", policyJson.Policy.Description)
+	if _, ok := d.GetOk("enforcement_mode"); ok {
+		_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
+	}
+	if _, ok := d.GetOk("description"); ok {
+		_ = d.Set("description", policyJson.Policy.Description)
+	}
 	_ = d.Set("template_name", policyJson.Policy.Template.Name)
 	_ = d.Set("policy_export_json", string(plJson))
 
@@ -346,19 +350,32 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	//}
 
 	policyJson := &bigip.PolicyStruct{}
+	policyJson.Policy = policyWaf
 	var polJsn bigip.WafPolicy
 	if val, ok := d.GetOk("policy_import_json"); ok {
-		log.Printf("[DEBUG] Val: %+v", val)
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
-		log.Printf("[DEBUG] polJson: %+v", polJsn)
-		if polJsn.Name != policyWaf.Name {
-			policyWaf.Name = polJsn.Name
+		//log.Printf("[DEBUG] polJson: %+v", polJsn)
+		//log.Printf("[DEBUG] policyWaf: %+v", policyWaf)
+		if polJsn.FullPath != policyWaf.Name {
+			polJsn.FullPath = policyWaf.Name
+			polJsn.Name = policyWaf.Name
 		}
 		if polJsn.Template != polJsn.Template {
-			policyWaf.Template = polJsn.Template
+			polJsn.Template = policyWaf.Template
 		}
+		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
+			for _, urlsTemp := range policyWaf.Urls {
+				polJsn.Urls = append(polJsn.Urls, urlsTemp)
+			}
+		}
+		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
+			for _, paramTemp := range policyWaf.Parameters {
+				polJsn.Parameters = append(polJsn.Parameters, paramTemp)
+			}
+		}
+		policyJson.Policy = polJsn
 	}
-	policyJson.Policy = policyWaf
+
 	var myModification []interface{}
 	if val, ok := d.GetOk("modifications"); ok {
 		if x, ok := val.([]interface{}); ok {
