@@ -78,13 +78,17 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `urls` - (Optional,type `list`) In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.
 
+* `signature_sets` - (Optional,type `list`) Defines behavior when signatures found within a signature-set are detected in a request. Settings are culmulative, so if a signature is found in any set with block enabled, that signature will have block enabled.
+
+* `signatures` - (Optional,type `list`) This section defines the properties of a signature on the policy.
+
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
 
 * `policy_id` - The id of the A.WAF Policy as it would be calculated on the BIG-IP.
 
-* `policy_json` - The payload of the WAF Policy
+* `policy_export_json` - Exported WAF policy deployed on BIGIP.
 
 
 ## Import

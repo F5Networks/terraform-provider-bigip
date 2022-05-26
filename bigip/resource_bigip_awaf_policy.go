@@ -111,17 +111,41 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "In a security policy, you can manually specify the HTTP URLs that are allowed (or disallowed) in traffic to the web application being protected. If you are using automatic policy building (and the policy includes learning URLs), the system can determine which URLs to add, based on legitimate traffic.",
 			},
+			"signature_sets": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "Defines behavior when signatures found within a signature-set are detected in a request. Settings are culmulative, so if a signature is found in any set with block enabled, that signature will have block enabled.",
+			},
+			"signatures": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "This section defines the properties of a signature on the policy.",
+			},
+			"modifications": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: " the modifications section includes actions that modify the declarative policy as it is defined in the adjustments section. The modifications section is updated manually, with the changes generally driven by the learning suggestions provided by the BIG-IP.",
+			},
 			"policy_import_json": {
 				Type:     schema.TypeString,
 				Optional: true,
 				//Computed:    true,
-				Description: "The payload of the WAF Policy",
+				Description: "The payload of the WAF Policy to be used for IMPORT on to BIGIP",
 			},
 			"policy_export_json": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "The payload of the WAF Policy",
+				Description: "The payload of the WAF Policy to be EXPORTED from BIGIP to OUTPUT",
 			},
 		},
 	}
@@ -206,8 +230,12 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
 	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
-	_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
-	_ = d.Set("description", policyJson.Policy.Description)
+	if _, ok := d.GetOk("enforcement_mode"); ok {
+		_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
+	}
+	if _, ok := d.GetOk("description"); ok {
+		_ = d.Set("description", policyJson.Policy.Description)
+	}
 	_ = d.Set("template_name", policyJson.Policy.Template.Name)
 	_ = d.Set("policy_export_json", string(plJson))
 
@@ -224,7 +252,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
-
+	log.Printf("[DEBUG] Policy config: %+v", config)
 	taskId, err := client.ImportAwafJson(name, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
@@ -257,7 +285,7 @@ func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) err
 
 func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	name := d.Get("name").(string)
-	policyWaf := &bigip.WafPolicy{
+	policyWaf := bigip.WafPolicy{
 		Name:                name,
 		ApplicationLanguage: d.Get("application_language").(string),
 	}
@@ -286,8 +314,6 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		sts = append(sts, st1)
 	}
 
-	log.Printf("[INFO] URLS: %+v ", d.Get("urls"))
-
 	var wafUrls []bigip.WafUrlJson
 	urls := d.Get("urls").([]interface{})
 	for i := 0; i < len(urls); i++ {
@@ -306,91 +332,64 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	}
 	policyWaf.Parameters = wafParams
 
+	var wafsigSets []bigip.SignatureSet
+	sigSets := d.Get("signature_sets").([]interface{})
+	for i := 0; i < len(sigSets); i++ {
+		var sigSet bigip.SignatureSet
+		_ = json.Unmarshal([]byte(urls[i].(string)), &sigSet)
+		wafsigSets = append(wafsigSets, sigSet)
+	}
+	policyWaf.SignatureSets = wafsigSets
+
 	policyWaf.ServerTechnologies = sts
 
-	policyJson := struct {
-		Policy interface{} `json:"policy"`
-	}{
-		policyWaf,
+	//policyJson := struct {
+	//	Policy interface{} `json:"policy"`
+	//}{
+	//	policyWaf,
+	//}
+
+	policyJson := &bigip.PolicyStruct{}
+	policyJson.Policy = policyWaf
+	var polJsn bigip.WafPolicy
+	if val, ok := d.GetOk("policy_import_json"); ok {
+		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
+		//log.Printf("[DEBUG] polJson: %+v", polJsn)
+		//log.Printf("[DEBUG] policyWaf: %+v", policyWaf)
+		if polJsn.FullPath != policyWaf.Name {
+			polJsn.FullPath = policyWaf.Name
+			polJsn.Name = policyWaf.Name
+		}
+		if polJsn.Template != polJsn.Template {
+			polJsn.Template = policyWaf.Template
+		}
+		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
+			for _, urlsTemp := range policyWaf.Urls {
+				polJsn.Urls = append(polJsn.Urls, urlsTemp)
+			}
+		}
+		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
+			for _, paramTemp := range policyWaf.Parameters {
+				polJsn.Parameters = append(polJsn.Parameters, paramTemp)
+			}
+		}
+		policyJson.Policy = polJsn
 	}
+
+	var myModification []interface{}
+	if val, ok := d.GetOk("modifications"); ok {
+		if x, ok := val.([]interface{}); ok {
+			for _, e := range x {
+				myModification = append(myModification, json.RawMessage(e.(string)))
+			}
+		}
+		policyJson.Modifications = myModification
+		log.Printf("[DEBUG] Modifications: %+v", policyJson.Modifications)
+	}
+	log.Printf("[DEBUG] Policy Json: %+v", policyJson)
 	data, err := json.Marshal(policyJson)
 	if err != nil {
 		return "", err
 	}
 	return string(data), nil
 }
-
-//
-//func readPolicyconfig(d *schema.ResourceData, meta interface{}) (string, error) {
-//	client := meta.(*bigip.BigIP)
-//	name := d.Get("name").(string)
-//	policyWaf := &bigip.WafPolicy{
-//		Name:                name,
-//		ApplicationLanguage: d.Get("application_language").(string),
-//	}
-//
-//	wafurls, err := client.GetWafPolicyUrls(name)
-//	if err != nil {
-//		return "", fmt.Errorf("error retrieving waf policy %+v: %v", wafurls, err)
-//	}
-//
-//	log.Printf("[DEBUG]: WAF URL:%+v", wafurls)
-//	log.Printf("[DEBUG] Meta:%+v", meta)
-//
-//	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
-//	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
-//	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
-//	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
-//	policyWaf.Type = d.Get("type").(string)
-//	policyWaf.Template = struct {
-//		Name string `json:"name,omitempty"`
-//	}{
-//		Name: d.Get("template_name").(string),
-//	}
-//	p := d.Get("server_technologies").([]interface{})
-//
-//	var sts []struct {
-//		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-//	}
-//	for i := 0; i < len(p); i++ {
-//		st1 := struct {
-//			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-//		}{
-//			p[i].(string),
-//		}
-//		sts = append(sts, st1)
-//	}
-//
-//	log.Printf("[INFO] URLS: %+v ", d.Get("urls"))
-//
-//	var wafUrls []bigip.WafUrlJson
-//	urls := d.Get("urls").([]interface{})
-//	for i := 0; i < len(urls); i++ {
-//		var wafUrl bigip.WafUrlJson
-//		_ = json.Unmarshal([]byte(urls[i].(string)), &wafUrl)
-//		wafUrls = append(wafUrls, wafUrl)
-//	}
-//	policyWaf.Urls = wafUrls
-//
-//	var wafParams []bigip.Parameter
-//	parmtrs := d.Get("parameters").([]interface{})
-//	for i := 0; i < len(parmtrs); i++ {
-//		var wafParam bigip.Parameter
-//		_ = json.Unmarshal([]byte(parmtrs[i].(string)), &wafParam)
-//		wafParams = append(wafParams, wafParam)
-//	}
-//	policyWaf.Parameters = wafParams
-//
-//	policyWaf.ServerTechnologies = sts
-//
-//	policyJson := struct {
-//		Policy interface{} `json:"policy"`
-//	}{
-//		policyWaf,
-//	}
-//	data, err := json.Marshal(policyJson)
-//	if err != nil {
-//		return "", err
-//	}
-//	return string(data), nil
-//}
