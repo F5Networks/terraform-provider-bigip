@@ -41,7 +41,7 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "the trusted root and intermediate certificate authorities",
+				Description: "The trusted root and intermediate certificate authorities",
 			},
 			"crl_file": {
 				Type:        schema.TypeString,

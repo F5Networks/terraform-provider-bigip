@@ -14,9 +14,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
-
-const DEFAULT_PARTITION = "Common"
 
 func Provider() terraform.ResourceProvider {
 	p := &schema.Provider{
@@ -73,14 +73,19 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"bigip_ltm_datagroup":   dataSourceBigipLtmDataGroup(),
-			"bigip_ltm_monitor":     dataSourceBigipLtmMonitor(),
-			"bigip_ltm_irule":       dataSourceBigipLtmIrule(),
-			"bigip_ssl_certificate": dataSourceBigipSslCertificate(),
-			"bigip_ltm_pool":        dataSourceBigipLtmPool(),
-			"bigip_ltm_policy":      dataSourceBigipLtmPolicy(),
-			"bigip_ltm_node":        dataSourceBigipLtmNode(),
-			"bigip_vwan_config":     dataSourceBigipVwanconfig(),
+			"bigip_ltm_datagroup":        dataSourceBigipLtmDataGroup(),
+			"bigip_ltm_monitor":          dataSourceBigipLtmMonitor(),
+			"bigip_ltm_irule":            dataSourceBigipLtmIrule(),
+			"bigip_ssl_certificate":      dataSourceBigipSslCertificate(),
+			"bigip_ltm_pool":             dataSourceBigipLtmPool(),
+			"bigip_ltm_policy":           dataSourceBigipLtmPolicy(),
+			"bigip_ltm_node":             dataSourceBigipLtmNode(),
+			"bigip_vwan_config":          dataSourceBigipVwanconfig(),
+			"bigip_waf_signatures":       dataSourceBigipWafSignatures(),
+			"bigip_waf_policy":           dataSourceBigipWafPolicy(),
+			"bigip_waf_pb_suggestions":   dataSourceBigipWafPb(),
+			"bigip_waf_entity_url":       dataSourceBigipWafEntityUrl(),
+			"bigip_waf_entity_parameter": dataSourceBigipWafEntityParameter(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -135,6 +140,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_net_tunnel":                      resourceBigipNetTunnel(),
 			"bigip_net_ike_peer":                    resourceBigipNetIkePeer(),
 			"bigip_ipsec_profile":                   resourceBigipIpsecProfile(),
+			"bigip_waf_policy":                      resourceBigipAwafPolicy(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
@@ -221,7 +227,7 @@ func setToInterfaceSlice(s *schema.Set) []interface{} {
 func mapEntity(d map[string]interface{}, obj interface{}) {
 	val := reflect.ValueOf(obj).Elem()
 	for field := range d {
-		f := val.FieldByName(strings.Title(field))
+		f := val.FieldByName(cases.Title(language.Und, cases.NoLower).String(field))
 		if f.IsValid() {
 			if f.Kind() == reflect.Slice {
 				incoming := d[field].([]interface{})
@@ -234,7 +240,7 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				f.Set(reflect.ValueOf(d[field]))
 			}
 		} else {
-			f := val.FieldByName(strings.Title(toCamelCase(field)))
+			f := val.FieldByName(cases.Title(language.Und, cases.NoLower).String(toCamelCase(field)))
 			f.Set(reflect.ValueOf(d[field]))
 		}
 	}

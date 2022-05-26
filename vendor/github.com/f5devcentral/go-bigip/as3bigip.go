@@ -269,7 +269,7 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 	tenantList := strings.Split(appList, ",")
 	found := 0
 	for _, item := range tenantList {
-		if item == "Shared" {
+		if item == "Shared" && name == "Common" {
 			found = 1
 		}
 	}
@@ -290,7 +290,9 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 							}
 						}
 					}
-					delete(rec, sharedTenant)
+					if sharedTenant == "Common" && sharedTenant != name {
+						delete(rec, sharedTenant)
+					}
 				}
 			}
 		}

@@ -251,7 +251,7 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 
 	applicationList := d.Get("application_list").(string)
 	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
-	if name != "Common" {
+	if name != "" {
 		as3Resp, err := client.GetAs3(name, applicationList)
 		log.Printf("[DEBUG] AS3 json retreived from the GET call in Read function : %s", as3Resp)
 		if err != nil {
@@ -270,7 +270,7 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 		}
 		_ = d.Set("as3_json", as3Resp)
 		_ = d.Set("tenant_list", name)
-	} else {
+	} else if d.Get("task_id") != nil {
 		taskResponse, err := client.Getas3TaskResponse(d.Get("task_id").(string))
 		if err != nil {
 			d.SetId("")
@@ -306,7 +306,7 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 			name = tenantFilter
 		}
 	}
-	if name != "Common" {
+	if name != "" {
 		as3Resp, err := client.GetAs3(name, applicationList)
 		if err != nil {
 			log.Printf("[ERROR] Unable to retrieve json ")
@@ -322,7 +322,7 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
 			return false, nil
 		}
-	} else {
+	} else if d.Get("task_id") != nil {
 		taskResponse, err := client.Getas3TaskResponse(d.Get("task_id").(string))
 		if err != nil {
 			d.SetId("")
