@@ -33,7 +33,7 @@ type PbExport struct {
 
 type ExportPayload struct {
 	Filename        string `json:"filename,omitempty"`
-	Format          string `json:"format"`
+	Format          string `json:"format,omitempty"`
 	Inline          bool   `json:"inline,omitempty"`
 	PolicyReference struct {
 		Link string `json:"link"`
@@ -265,7 +265,7 @@ func (b *BigIP) PostPbExport(payload interface{}) (*PbExport, error) {
 }
 func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	var pbexport PbExport
-	err, _ := b.getForEntity(&pbexport, uriMgmt, uriShared, uriFast, uriFasttask, id)
+	err, _ := b.getForEntity(&pbexport, uriMgmt, uriTm, uriAsm, uriTasks, uriExpPb, id)
 	if err != nil {
 		return nil, err
 	}
