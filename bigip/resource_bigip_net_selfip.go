@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -39,6 +40,11 @@ func resourceBigipNetSelfIP() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 				Description: "SelfIP IP address",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					old = strings.Replace(old, "%0", "", 1)
+					new = strings.Replace(new, "%0", "", 1)
+					return old == new
+				},
 			},
 
 			"vlan": {
@@ -107,16 +113,10 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 
 	d.Set("name", selfIP.FullPath)
 	d.Set("vlan", selfIP.Vlan)
-
-	// Extract Self IP address from "(selfip_address)[%route_domain](/mask)" groups 1 + 2
-	regex := regexp.MustCompile(`((?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\%\d+)?(\/\d+)`)
-	selfipAddress := regex.FindStringSubmatch(selfIP.Address)
-	log.Printf("[DEBUG] value of selfipAddress: %v", selfipAddress)
-	parsedSelfipAddress := selfipAddress[1] + selfipAddress[2]
-	d.Set("ip", parsedSelfipAddress)
+	d.Set("ip", selfIP.Address)
 
 	// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
-	regex = regexp.MustCompile(`\/Common\/(.+)`)
+	regex := regexp.MustCompile(`\/Common\/(.+)`)
 	trafficGroup := regex.FindStringSubmatch(selfIP.TrafficGroup)
 	d.Set("traffic_group", trafficGroup[1])
 
