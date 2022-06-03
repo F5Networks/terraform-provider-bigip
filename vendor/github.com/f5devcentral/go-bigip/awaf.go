@@ -124,6 +124,9 @@ type SignatureSet struct {
 	Signatureset SignatureType `json:"signatureSet,omitempty"`
 }
 
+type OpenApiLink struct {
+	Link string `json:"link,omitempty"`
+}
 type MethodOverrides struct {
 	Allowed bool   `json:"allowed"` // as we can supply true and false, omitempty would automatically remove allowed = false which we do not want
 	Method  string `json:"method,omitempty"`
@@ -181,6 +184,7 @@ type WafPolicy struct {
 	DisallowedGeolocations []struct {
 		CountryName string `json:"countryName,omitempty"`
 	} `json:"disallowed-geolocations,omitempty"`
+	OpenAPIFiles   []OpenApiLink  `json:"open-api-files,omitempty"`
 	SignatureSets  []SignatureSet `json:"signature-sets,omitempty"`
 	VirtualServers []interface{}  `json:"virtualServers,omitempty"`
 }
