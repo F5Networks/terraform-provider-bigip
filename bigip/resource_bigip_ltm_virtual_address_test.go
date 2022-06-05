@@ -18,13 +18,15 @@ import (
 )
 
 var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
-
-var TEST_VA_RESOURCE = `
+var TEST_VA_NAME_CHANGED = fmt.Sprintf("/%s/test-va-changed", TEST_PARTITION)
+var TEST_VA_CONFIG = `
 resource "bigip_ltm_virtual_address" "test-va" {
-	name = "` + TEST_VA_NAME + `"
+	name = "%s"
 
 }
 `
+var TEST_VA_RESOURCE = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME)
+var TEST_VA_RESOURCE_NAME_CHANGED = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME_CHANGED)
 
 func TestAccBigipLtmVA_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -38,6 +40,14 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 				Config: TEST_VA_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVAExists(TEST_VA_NAME, true),
+				),
+			},
+			{
+				Config:    TEST_VA_RESOURCE_NAME_CHANGED,
+				PreConfig: func() { testCheckVAExists(TEST_VA_NAME, true) },
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVAExists(TEST_VA_NAME, false),
+					testCheckVAExists(TEST_VA_NAME_CHANGED, true),
 				),
 			},
 		},

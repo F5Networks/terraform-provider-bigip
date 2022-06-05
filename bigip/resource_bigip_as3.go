@@ -23,6 +23,7 @@ import (
 
 var x = 0
 var m sync.Mutex
+var createdTenants string
 
 func resourceBigipAs3() *schema.Resource {
 	return &schema.Resource{
@@ -225,13 +226,29 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		d.SetId("Common")
 	}
+	createdTenants = d.Get("tenant_list").(string)
 	x++
 	return resourceBigipAs3Read(d, meta)
 }
 func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading As3 config")
-	name := d.Id()
+	var name string
+	var tList string
+	as3Json := d.Get("as3_json").(string)
+
+	if d.Get("as3_json") != nil {
+		tList, _, _ = client.GetTenantList(as3Json)
+		if createdTenants != "" && createdTenants != tList {
+			tList = createdTenants
+		}
+	}
+	if d.Id() != "" && tList != "" {
+		name = tList
+	} else {
+		name = d.Id()
+	}
+
 	applicationList := d.Get("application_list").(string)
 	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
 	if name != "" {
@@ -268,7 +285,18 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
-	name := d.Id()
+	var name string
+	var tList string
+
+	if d.Get("as3_json") != nil {
+		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
+	}
+
+	if d.Id() != "" && tList != "" {
+		name = tList
+	} else {
+		name = d.Id()
+	}
 	applicationList := d.Get("application_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter != "" {
@@ -314,14 +342,14 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 	m.Lock()
 	defer m.Unlock()
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
-	name := d.Id()
 	tenantList, _, _ := client.GetTenantList(as3Json)
+	oldTenantList := d.Get("tenant_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
-		if tenantList != name {
+		if tenantList != oldTenantList {
 			_ = d.Set("tenant_list", tenantList)
 			newList := strings.Split(tenantList, ",")
-			oldList := strings.Split(name, ",")
+			oldList := strings.Split(oldTenantList, ",")
 			deletedTenants := client.TenantDifference(oldList, newList)
 			if deletedTenants != "" {
 				err, _ := client.DeleteAs3Bigip(deletedTenants)
@@ -353,6 +381,7 @@ func resourceBigipAs3Update(d *schema.ResourceData, meta interface{}) error {
 			log.Printf("%v", err)
 		}
 	}
+	createdTenants = d.Get("tenant_list").(string)
 	_ = d.Set("task_id", taskID)
 	x++
 	return resourceBigipAs3Read(d, meta)
@@ -363,7 +392,18 @@ func resourceBigipAs3Delete(d *schema.ResourceData, meta interface{}) error {
 	m.Lock()
 	defer m.Unlock()
 	log.Printf("[INFO] Deleting As3 config")
-	name := d.Id()
+	var name string
+	var tList string
+
+	if d.Get("as3_json") != nil {
+		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
+	}
+
+	if d.Id() != "" && tList != "" {
+		name = tList
+	} else {
+		name = d.Id()
+	}
 	err, failedTenants := client.DeleteAs3Bigip(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete: %v :", err)

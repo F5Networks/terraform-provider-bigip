@@ -343,35 +343,23 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 
 	policyWaf.ServerTechnologies = sts
 
-	//policyJson := struct {
-	//	Policy interface{} `json:"policy"`
-	//}{
-	//	policyWaf,
-	//}
-
 	policyJson := &bigip.PolicyStruct{}
 	policyJson.Policy = policyWaf
 	var polJsn bigip.WafPolicy
 	if val, ok := d.GetOk("policy_import_json"); ok {
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
-		//log.Printf("[DEBUG] polJson: %+v", polJsn)
-		//log.Printf("[DEBUG] policyWaf: %+v", policyWaf)
 		if polJsn.FullPath != policyWaf.Name {
 			polJsn.FullPath = policyWaf.Name
 			polJsn.Name = policyWaf.Name
 		}
-		if polJsn.Template != polJsn.Template {
+		if polJsn.Template != policyWaf.Template {
 			polJsn.Template = policyWaf.Template
 		}
 		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
-			for _, urlsTemp := range policyWaf.Urls {
-				polJsn.Urls = append(polJsn.Urls, urlsTemp)
-			}
+			polJsn.Urls = append(polJsn.Urls, policyWaf.Urls...)
 		}
 		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
-			for _, paramTemp := range policyWaf.Parameters {
-				polJsn.Parameters = append(polJsn.Parameters, paramTemp)
-			}
+			polJsn.Parameters = append(polJsn.Parameters, policyWaf.Parameters...)
 		}
 		policyJson.Policy = polJsn
 	}
@@ -380,12 +368,18 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	if val, ok := d.GetOk("modifications"); ok {
 		if x, ok := val.([]interface{}); ok {
 			for _, e := range x {
-				myModification = append(myModification, json.RawMessage(e.(string)))
+				pb := []byte(e.(string))
+				var tmp interface{}
+				_ = json.Unmarshal(pb, &tmp)
+				myMap := tmp.(map[string]interface{})
+				pbList := myMap["suggestions"]
+				myModification = append(myModification, pbList.([]interface{})...)
 			}
 		}
-		policyJson.Modifications = myModification
-		log.Printf("[DEBUG] Modifications: %+v", policyJson.Modifications)
 	}
+	policyJson.Modifications = myModification
+	log.Printf("[DEBUG] Modifications: %+v", policyJson.Modifications)
+
 	log.Printf("[DEBUG] Policy Json: %+v", policyJson)
 	data, err := json.Marshal(policyJson)
 	if err != nil {

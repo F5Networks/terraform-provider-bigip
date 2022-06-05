@@ -33,7 +33,7 @@ type PbExport struct {
 
 type ExportPayload struct {
 	Filename        string `json:"filename,omitempty"`
-	Format          string `json:"format"`
+	Format          string `json:"format,omitempty"`
 	Inline          bool   `json:"inline,omitempty"`
 	PolicyReference struct {
 		Link string `json:"link"`
@@ -140,7 +140,7 @@ type WafPolicies struct {
 
 type PolicyStruct struct {
 	Policy        WafPolicy     `json:"policy,omitempty"`
-	Modifications []interface{} `json:"modifications,string,omitempty"`
+	Modifications []interface{} `json:"modifications,omitempty"`
 }
 
 type WafPolicy struct {
@@ -153,7 +153,7 @@ type WafPolicy struct {
 		Name string `json:"name,omitempty"`
 	} `json:"template,omitempty"`
 	HasParent           bool        `json:"hasParent,omitempty"`
-	ApplicationLanguage string      `json,"applicationLanguage,omitempty"`
+	ApplicationLanguage string      `json:"applicationLanguage,omitempty"`
 	EnablePassiveMode   bool        `json:"enablePassiveMode,omitempty"`
 	ProtocolIndependent bool        `json:"protocolIndependent,omitempty"`
 	CaseInsensitive     bool        `json:"caseInsensitive,omitempty"`
@@ -265,7 +265,7 @@ func (b *BigIP) PostPbExport(payload interface{}) (*PbExport, error) {
 }
 func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	var pbexport PbExport
-	err, _ := b.getForEntity(&pbexport, uriMgmt, uriShared, uriFast, uriFasttask, id)
+	err, _ := b.getForEntity(&pbexport, uriMgmt, uriTm, uriAsm, uriTasks, uriExpPb, id)
 	if err != nil {
 		return nil, err
 	}
