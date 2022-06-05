@@ -140,7 +140,7 @@ type WafPolicies struct {
 
 type PolicyStruct struct {
 	Policy        WafPolicy     `json:"policy,omitempty"`
-	Modifications []interface{} `json:"modifications,string,omitempty"`
+	Modifications []interface{} `json:"modifications,omitempty"`
 }
 
 type WafPolicy struct {
@@ -153,7 +153,7 @@ type WafPolicy struct {
 		Name string `json:"name,omitempty"`
 	} `json:"template,omitempty"`
 	HasParent           bool        `json:"hasParent,omitempty"`
-	ApplicationLanguage string      `json,"applicationLanguage,omitempty"`
+	ApplicationLanguage string      `json:"applicationLanguage,omitempty"`
 	EnablePassiveMode   bool        `json:"enablePassiveMode,omitempty"`
 	ProtocolIndependent bool        `json:"protocolIndependent,omitempty"`
 	CaseInsensitive     bool        `json:"caseInsensitive,omitempty"`

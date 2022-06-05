@@ -357,15 +357,9 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
 			polJsn.Urls = append(polJsn.Urls, policyWaf.Urls...)
-			// for _, urlsTemp := range policyWaf.Urls {
-			//	polJsn.Urls = append(polJsn.Urls, urlsTemp)
-			// }
 		}
 		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
 			polJsn.Parameters = append(polJsn.Parameters, policyWaf.Parameters...)
-			// for _, paramTemp := range policyWaf.Parameters {
-			// 	polJsn.Parameters = append(polJsn.Parameters, paramTemp)
-			// }
 		}
 		policyJson.Policy = polJsn
 	}
@@ -374,12 +368,20 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	if val, ok := d.GetOk("modifications"); ok {
 		if x, ok := val.([]interface{}); ok {
 			for _, e := range x {
-				myModification = append(myModification, json.RawMessage(e.(string)))
+				pb := []byte(e.(string))
+				var tmp interface{}
+				_ = json.Unmarshal(pb, &tmp)
+				myMap := tmp.(map[string]interface{})
+				pbList := myMap["suggestions"]
+				for _, i := range pbList.([]interface{}) {
+					myModification = append(myModification, i)
+				}
 			}
 		}
-		policyJson.Modifications = myModification
-		log.Printf("[DEBUG] Modifications: %+v", policyJson.Modifications)
 	}
+	policyJson.Modifications = myModification
+	log.Printf("[DEBUG] Modifications: %+v", policyJson.Modifications)
+
 	log.Printf("[DEBUG] Policy Json: %+v", policyJson)
 	data, err := json.Marshal(policyJson)
 	if err != nil {
