@@ -373,9 +373,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 				_ = json.Unmarshal(pb, &tmp)
 				myMap := tmp.(map[string]interface{})
 				pbList := myMap["suggestions"]
-				for _, i := range pbList.([]interface{}) {
-					myModification = append(myModification, i)
-				}
+				myModification = append(myModification, pbList.([]interface{})...)
 			}
 		}
 	}
