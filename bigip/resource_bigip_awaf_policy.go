@@ -127,14 +127,6 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "This section defines the properties of a signature on the policy.",
 			},
-			"open_api_files": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional:    true,
-				Description: "This section defines the Link for open api files on the policy.",
-			},
 			"modifications": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
@@ -344,19 +336,10 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	sigSets := d.Get("signature_sets").([]interface{})
 	for i := 0; i < len(sigSets); i++ {
 		var sigSet bigip.SignatureSet
-		_ = json.Unmarshal([]byte(sigSets[i].(string)), &sigSet)
+		_ = json.Unmarshal([]byte(urls[i].(string)), &sigSet)
 		wafsigSets = append(wafsigSets, sigSet)
 	}
 	policyWaf.SignatureSets = wafsigSets
-	var openApiLinks []bigip.OpenApiLink
-	apiLinks := d.Get("open_api_files").([]interface{})
-	for i := 0; i < len(apiLinks); i++ {
-		var apiLink bigip.OpenApiLink
-		apiLink.Link = apiLinks[i].(string)
-		// _ = json.Unmarshal([]byte(apiLinks[i].(string)), &apiLink.Link)
-		openApiLinks = append(openApiLinks, apiLink)
-	}
-	policyWaf.OpenAPIFiles = openApiLinks
 
 	policyWaf.ServerTechnologies = sts
 

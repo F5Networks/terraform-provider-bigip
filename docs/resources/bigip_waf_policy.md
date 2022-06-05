@@ -82,10 +82,6 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `signatures` - (Optional,type `list`) This section defines the properties of a signature on the policy.
 
-* `open_api_files` - (Optional,type `list`) This section defines the Link for open api files on the policy.
-
-* `policy_import_json` - (Optional,type `string`) The payload of the WAF Policy to be used for IMPORT on to BIGIP. 
-
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
