@@ -57,11 +57,24 @@ resource "bigip_net_selfip" "selfip1" {
 }
 ```
 
+### Example usage with route domain embedded in the `ip`
+
+```hcl
+resource "bigip_net_selfip" "selfip1" {
+  name          = "/Common/internalselfIP"
+  ip            = "11.1.1.1%4/24"
+  vlan          = "/Common/internal"
+  traffic_group = "traffic-group-1"
+  port_lockdown = ["none"]
+  depends_on    = [bigip_net_vlan.vlan1]
+}
+```
+
 ## Argument Reference
 
 * `name` - (Required) Name of the selfip
 
-* `ip` - (Required) The Self IP's address and netmask.
+* `ip` - (Required) The Self IP's address and netmask. The IP address could also contain the route domain, e.g. `10.12.13.14%4/24`.
 
 * `vlan` - (Required) Specifies the VLAN for which you are setting a self IP address. This setting must be provided when a self IP is created.
 
