@@ -6,11 +6,12 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-
 	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
+	"strconv"
 )
 
 func dataSourceBigipWafSignatures() *schema.Resource {
@@ -26,7 +27,6 @@ func dataSourceBigipWafSignatures() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Description of the signature",
 			},
 			"system_signature_id": {
@@ -39,6 +39,22 @@ func dataSourceBigipWafSignatures() *schema.Resource {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "ID of the signature in the database",
+			},
+			"perform_staging": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The relative detection accuracy of the signature",
+			},
+			"enabled": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Specifies, if true, that the signature is enabled on the security policy. When false, the signature is disable on the security policy.",
+			},
+			"tag": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The signature tag which, along with the signature name, identifies the signature.",
 			},
 			"type": {
 				Type:        schema.TypeString,
@@ -58,6 +74,11 @@ func dataSourceBigipWafSignatures() *schema.Resource {
 				Computed:    true,
 				Description: "The relative risk level of the attack that matches this signature",
 			},
+			"json": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The created JSON for WAF Signature block",
+			},
 		},
 	}
 }
@@ -70,23 +91,35 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("error retrieving signature %d: %v", sid, err)
 	}
+
 	// filter query always returns a list if the list is empty it means the signature is not found
-	if len(signatures.Signatures) == 0 {
-		log.Printf("[DEBUG] Signature %d not found, removing from state", sid)
-		d.SetId("")
-		return nil
+	if len(signatures.Signatures) != 0 {
+		//log.Printf("[DEBUG] Signature %d not found, removing from state", sid)
+
+		// if successful filter query will return a list with a single item
+		sign := signatures.Signatures[0]
+
+		_ = d.Set("name", sign.Name)
+		_ = d.Set("description", sign.Description)
+		_ = d.Set("system_signature_id", sign.ResourceId)
+		_ = d.Set("signature_id", sign.SignatureId)
+		_ = d.Set("type", sign.Type)
+		_ = d.Set("accuracy", sign.Accuracy)
+		_ = d.Set("risk", sign.Risk)
 	}
-	// if successful filter query will return a list with a single item
-	sign := signatures.Signatures[0]
 
-	_ = d.Set("name", sign.Name)
-	_ = d.Set("description", sign.Description)
-	_ = d.Set("system_signature_id", sign.ResourceId)
-	_ = d.Set("signature_id", sign.SignatureId)
-	_ = d.Set("type", sign.Type)
-	_ = d.Set("accuracy", sign.Accuracy)
-	_ = d.Set("risk", sign.Risk)
+	sigJson := &bigip.WafSignature{
+		SignatureID:    d.Get("signature_id").(int),
+		Enabled:        d.Get("enabled").(bool),
+		PerformStaging: d.Get("perform_staging").(bool),
+	}
+	jsonString, err := json.Marshal(sigJson)
+	if err != nil {
+		return err
+	}
+	log.Printf("[DEBUG] Signature Json:%+v", string(jsonString))
+	_ = d.Set("json", string(jsonString))
 
-	d.SetId(sign.Name)
+	d.SetId(strconv.Itoa(d.Get("signature_id").(int)))
 	return nil
 }
