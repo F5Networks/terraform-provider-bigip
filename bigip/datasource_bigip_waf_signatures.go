@@ -8,10 +8,11 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"strconv"
+
+	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func dataSourceBigipWafSignatures() *schema.Resource {
@@ -94,7 +95,7 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 
 	// filter query always returns a list if the list is empty it means the signature is not found
 	if len(signatures.Signatures) != 0 {
-		//log.Printf("[DEBUG] Signature %d not found, removing from state", sid)
+		// log.Printf("[DEBUG] Signature %d not found, removing from state", sid)
 
 		// if successful filter query will return a list with a single item
 		sign := signatures.Signatures[0]
