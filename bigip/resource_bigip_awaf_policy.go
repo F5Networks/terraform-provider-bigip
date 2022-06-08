@@ -358,6 +358,16 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		wafsigSets = append(wafsigSets, sigSet)
 	}
 	policyWaf.SignatureSets = wafsigSets
+
+	var wafsigSigns []bigip.WafSignature
+	sigNats := d.Get("signatures").([]interface{})
+	for i := 0; i < len(sigNats); i++ {
+		var sigNat bigip.WafSignature
+		_ = json.Unmarshal([]byte(sigNats[i].(string)), &sigNat)
+		wafsigSigns = append(wafsigSigns, sigNat)
+	}
+	policyWaf.Signatures = wafsigSigns
+
 	var openApiLinks []bigip.OpenApiLink
 	apiLinks := d.Get("open_api_files").([]interface{})
 	for i := 0; i < len(apiLinks); i++ {
