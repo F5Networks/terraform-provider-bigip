@@ -35,6 +35,13 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Description: "The unique user-given name of the policy. Policy names cannot contain spaces or special characters. Allowed characters are a-z, A-Z, 0-9, dot, dash (-), colon (:) and underscore (_)",
 				ForceNew:    true,
 			},
+			"partition": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "Common",
+				Description:  "Partition of WAF policy",
+				ValidateFunc: validatePartitionName,
+			},
 			"template_name": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -162,6 +169,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
+	partition := d.Get("partition").(string)
 
 	log.Println("[INFO] AWAF Name " + name)
 
@@ -179,7 +187,7 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
 	}
-	wafpolicy, err := client.GetWafPolicyQuery(name)
+	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
 	}
@@ -235,6 +243,7 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 	_ = d.Set("name", policyJson.Policy.FullPath)
+	_ = d.Set("partition", policyJson.Policy.Partition)
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
 	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
@@ -254,6 +263,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*bigip.BigIP)
 	_ = d.Id()
 	name := d.Get("name").(string)
+	partition := d.Get("partition").(string)
 	log.Printf("[DEBUG] Updating AWAF Policy : %+v", name)
 
 	config, err := getpolicyConfig(d)
@@ -270,7 +280,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
 	}
-	wafpolicy, err := client.GetWafPolicyQuery(name)
+	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
 	}
