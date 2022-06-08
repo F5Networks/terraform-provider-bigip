@@ -177,8 +177,8 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
-
-	taskId, err := client.ImportAwafJson(name, config)
+	polName := fmt.Sprintf("/%s/%s", partition, name)
+	taskId, err := client.ImportAwafJson(polName, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
@@ -242,8 +242,8 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return err
 	}
-	_ = d.Set("name", policyJson.Policy.FullPath)
-	_ = d.Set("partition", policyJson.Policy.Partition)
+	_ = d.Set("name", policyJson.Policy.Name)
+	_ = d.Set("partition", strings.Split(policyJson.Policy.FullPath, "/")[1])
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
 	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
@@ -303,8 +303,10 @@ func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) err
 
 func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	name := d.Get("name").(string)
+	partition := d.Get("partition").(string)
 	policyWaf := bigip.WafPolicy{
 		Name:                name,
+		Partition:           partition,
 		ApplicationLanguage: d.Get("application_language").(string),
 	}
 	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
@@ -386,7 +388,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	if val, ok := d.GetOk("policy_import_json"); ok {
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
 		if polJsn.FullPath != policyWaf.Name {
-			polJsn.FullPath = policyWaf.Name
+			polJsn.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
 			polJsn.Name = policyWaf.Name
 		}
 		if polJsn.Template != policyWaf.Template {
