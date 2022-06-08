@@ -3,7 +3,6 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -276,22 +275,23 @@ func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	return &pbexport, nil
 }
 
-func (b *BigIP) GetWafPolicyQuery(wafPolicyName string) (*WafPolicy, error) {
+func (b *BigIP) GetWafPolicyQuery(wafPolicyName string, partition string) (*WafPolicy, error) {
 	var wafPolicies WafPolicies
-	params := url.Values{}
-	params.Add("filter", fmt.Sprintf("fullPath eq '%s'", wafPolicyName))
-	var query = fmt.Sprintf("?$%v", params.Encode())
+	query := fmt.Sprintf("?$filter=contains(name,'%s')+and+contains(partition,'%s')", wafPolicyName, partition)
 	err, _ := b.getForEntity(&wafPolicies, uriMgmt, uriTm, uriAsm, uriWafPol, query)
 	if err != nil {
 		return nil, err
 	}
 	if len(wafPolicies.WafPolicies) == 0 {
-		return nil, fmt.Errorf("[ERROR] WafPolicy: %+v not found", wafPolicyName)
+		return nil, fmt.Errorf("[ERROR] WafPolicy: %s on partition %s not found", wafPolicyName, partition)
 	}
-	// if successful filter query will return a list with a single item
-	wafPolicy := wafPolicies.WafPolicies[0]
 
-	return &wafPolicy, nil
+	for _, policy := range wafPolicies.WafPolicies{
+		if policy.Name == wafPolicyName && policy.Partition == partition {
+			return &policy, nil
+		}
+	}
+	return nil, fmt.Errorf("[ERROR] WafPolicy: %s on partition %s not found", wafPolicyName, partition)
 }
 
 func (b *BigIP) GetWafPolicy(policyID string) (*WafPolicy, error) {
