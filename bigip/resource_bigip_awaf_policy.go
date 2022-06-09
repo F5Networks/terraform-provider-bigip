@@ -271,7 +271,8 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
 	log.Printf("[DEBUG] Policy config: %+v", config)
-	taskId, err := client.ImportAwafJson(name, config)
+	polName := fmt.Sprintf("/%s/%s", partition, name)
+	taskId, err := client.ImportAwafJson(polName, config)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
