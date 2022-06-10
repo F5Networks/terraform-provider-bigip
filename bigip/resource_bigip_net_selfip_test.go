@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -168,6 +169,58 @@ func TestAccBigipNetselfipPortlockdown(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccBigipNetselfipRouteDomain(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckselfipsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),
+				Check:  testCheckselfipExists(TEST_SELFIP_NAME),
+			},
+			{
+				Config:             testaccselfipRouteDomain("10.11.12.13/24"),
+				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
+				ExpectNonEmptyPlan: true,
+				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
+			},
+			{
+				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),
+				Check:  testCheckselfipExists(TEST_SELFIP_NAME),
+			},
+			{
+				Config:             testaccselfipRouteDomain("10.11.12.13%0/24"),
+				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
+				ExpectNonEmptyPlan: true,
+				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
+			},
+		},
+	})
+}
+
+func testaccselfipRouteDomain(ip string) string {
+	resPrefix := `
+	resource "bigip_net_vlan" "test-vlan" {
+      name = "` + TEST_VLAN_NAME + `"
+	  tag = 101
+	  interfaces {
+		vlanport = 1.1
+		tagged = true
+	  }
+	}
+	resource "bigip_net_selfip" "test-selfip" {
+	  name = "/Common/test-selfip"
+	  ip   = "%s"
+	  vlan = "/Common/test-vlan"
+	  depends_on = ["bigip_net_vlan.test-vlan"]
+	}
+	`
+	return fmt.Sprintf(resPrefix, ip)
 }
 
 func testaccselfipPortLockdownParam(portLockdown string) string {

@@ -281,7 +281,7 @@ func (b *BigIP) GetWafPolicyQuery(wafPolicyName string, partition string) (*WafP
 		return nil, fmt.Errorf("[ERROR] WafPolicy: %s on partition %s not found", wafPolicyName, partition)
 	}
 
-	for _, policy := range wafPolicies.WafPolicies{
+	for _, policy := range wafPolicies.WafPolicies {
 		if policy.Name == wafPolicyName && policy.Partition == partition {
 			return &policy, nil
 		}

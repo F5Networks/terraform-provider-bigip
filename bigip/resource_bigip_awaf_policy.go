@@ -134,14 +134,6 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "This section defines the properties of a signature on the policy.",
 			},
-			"open_api_files": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional:    true,
-				Description: "This section defines the Link for open api files on the policy.",
-			},
 			"modifications": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
