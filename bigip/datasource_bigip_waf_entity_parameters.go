@@ -207,10 +207,8 @@ func getEPConfig(ep *bigip.Parameter, d *schema.ResourceData) {
 		var sigs []map[string]interface{}
 		for _, s := range sigids.([]interface{}) {
 			s1 := map[string]interface{}{
-				"enabled": false,
-				"signatureReference": map[string]interface{}{
-					"signatureId": s,
-				},
+				"enabled":     false,
+				"signatureId": s,
 			}
 			sigs = append(sigs, s1)
 		}
