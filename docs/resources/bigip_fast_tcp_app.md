@@ -1,14 +1,14 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_fast_tcp_application"
+page_title: "BIG-IP: bigip_fast_tcp_app"
 subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-  Provides details about bigip_fast_tcp_application resource
+  Provides details about bigip_fast_tcp_app resource
 ---
 
-# bigip_fast_tcp_application
+# bigip_fast_tcp_app
 
-`bigip_fast_tcp_application` This resource will create and manage FAST TCP applications on BIG-IP from provided JSON declaration. 
+`bigip_fast_tcp_app` This resource will create and manage FAST TCP applications on BIG-IP from provided JSON declaration. 
 
 
 ## Example Usage
@@ -16,7 +16,7 @@ description: |-
 
 ```hcl
 
-resource "bigip_fast_tcp_application" "fast-tcp-app" {
+resource "bigip_fast_tcp_app" "fast-tcp-app" {
   application = "tcp_app_2"
   tenant      = "tcp_app_tenant"
   virtual_server = {
