@@ -8,15 +8,16 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipHttpFastApp() *schema.Resource {
@@ -33,11 +34,13 @@ func resourceBigipHttpFastApp() *schema.Resource {
 			"tenant": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of FAST HTTP application tenant.",
 			},
 			"application": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of FAST HTTP application.",
 			},
 			"virtual_server": {
@@ -162,7 +165,6 @@ func resourceBigipHttpFastApp() *schema.Resource {
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "none",
 				ValidateFunc: validation.StringInSlice([]string{
 					"dynamic-ratio-member",
@@ -188,13 +190,11 @@ func resourceBigipHttpFastApp() *schema.Resource {
 			"slow_ramp_time": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
 				Description: "none",
 			},
 			"monitor": {
 				Type:        schema.TypeMap,
 				Optional:    true,
-				Computed:    true,
 				Description: "foo",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -287,9 +287,11 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Terraform Version": client.UserAgent,
+			"tenant":            tenant,
+			"application":       app,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
-		err = teemDevice.Report(f, "bigip_fast_application", tsVer[3])
+		err = teemDevice.Report(f, "bigip_fast_http_app", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
@@ -435,8 +437,9 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	if v, ok := d.GetOk("virtual_server"); ok {
 		virtual := v.(map[string]interface{})
+		log.Printf("[DEBUG] Virtual address:%+v", virtual)
 		httpJson.VirtualAddress = virtual["ip"].(string)
-		httpJson.VirtualPort = virtual["port"].(int)
+		httpJson.VirtualPort, _ = strconv.Atoi(virtual["port"].(string))
 	}
 	if s, ok := d.GetOk("snat"); ok {
 		snat := s.(map[string]interface{})
