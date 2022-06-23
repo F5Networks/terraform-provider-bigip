@@ -30,10 +30,10 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 				Config: getFastTCPAppConfig(""),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(app_name, tenant_name, true),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "application", "fast_tcp_app"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "tenant", "fast_tcp_tenant"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "virtual_server.ip", "10.20.30.44"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "virtual_server.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "application", "fast_tcp_app"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "tenant", "fast_tcp_tenant"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.ip", "10.20.30.44"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.port", "443"),
 				),
 			},
 			{
@@ -46,9 +46,9 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 				`),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(app_name, tenant_name, true),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "fastl4.enable", "true"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "fastl4.generate_fastl4_profile", "false"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_application.fast_tcp_app", "fastl4.fastl4_profile_name", "/Common/apm-forwarding-fastL4"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.enable", "true"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.generate_fastl4_profile", "false"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.fastl4_profile_name", "/Common/apm-forwarding-fastL4"),
 				),
 			},
 		},
@@ -57,7 +57,7 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 
 func getFastTCPAppConfig(attrs string) string {
 	return fmt.Sprintf(`
-	resource "bigip_fast_tcp_application" "fast_tcp_app" {
+	resource "bigip_fast_tcp_app" "fast_tcp_app" {
 		application = "%v"
 		tenant      = "%v"
 		virtual_server = {
@@ -71,7 +71,7 @@ func getFastTCPAppConfig(attrs string) string {
 func testCheckFastTCPAppDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_fast_tcp_application" {
+		if rs.Type != "bigip_fast_tcp_app" {
 			continue
 		}
 		name := rs.Primary.ID

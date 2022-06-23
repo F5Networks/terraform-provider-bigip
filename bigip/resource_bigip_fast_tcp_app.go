@@ -34,11 +34,13 @@ func resourceBigipFastTcpApp() *schema.Resource {
 			"application": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of the TCP FAST application",
 			},
 			"tenant": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of the TCP FAST application tenant",
 			},
 			"virtual_server": {
