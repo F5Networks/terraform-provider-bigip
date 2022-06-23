@@ -263,6 +263,9 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*bigip.BigIP)
 	fastTmpl := "bigip-fast-templates/http"
 	fastJson, err := getFastHttpConfig(d)
+	if err != nil {
+		return err
+	}
 	m.Lock()
 	defer m.Unlock()
 	log.Printf("[INFO] Creating HTTP FastApp config")
@@ -444,7 +447,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	if s, ok := d.GetOk("snat"); ok {
 		snat := s.(map[string]interface{})
 		if en, ok := snat["enable"].(bool); ok {
-			if en == false {
+			if !en {
 				if _, ok := snat["existing_snat_pool"]; ok {
 					return "", fmt.Errorf("cannot use 'existing_snat_pool' when 'enable' is: %t", en)
 				}
@@ -470,7 +473,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	if p, ok := d.GetOk("pool"); ok {
 		pool := p.(map[string]interface{})
 		if en, ok := pool["enable"].(bool); ok {
-			if en == false {
+			if !en {
 				if _, ok := pool["existing_pool"]; ok {
 					return "", fmt.Errorf("cannot use 'existing_pool' when 'enable' is: %t", en)
 				}
@@ -512,7 +515,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	if m, ok := d.GetOk("monitor"); ok {
 		mon := m.(map[string]interface{})
 		if en, ok := mon["enable"].(bool); ok {
-			if en == false {
+			if !en {
 				if _, ok := mon["existing_monitor"]; ok {
 					return "", fmt.Errorf("cannot use 'existing_monitor' when 'enable' is: %t", en)
 				}
@@ -541,7 +544,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			httpJson.ExistingMonitor = e
 		}
 		if auth, ok := mon["monitor_auth"].(bool); ok {
-			if auth == true {
+			if auth {
 				if u, ok := mon["username"].(string); ok {
 					httpJson.MonitorUsername = u
 				} else {
