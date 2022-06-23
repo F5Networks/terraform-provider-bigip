@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -291,7 +290,6 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("[DEBUG] JSON Body :%+v", string(marshalJSON))
 
 	req := &APIRequest{
 		Method:      "post",
@@ -300,7 +298,6 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		ContentType: "application/json",
 	}
 
-	log.Printf("[DEBUG] Req :%+v", req)
 	resp, callErr := b.APICall(req)
 	return resp, callErr
 }
