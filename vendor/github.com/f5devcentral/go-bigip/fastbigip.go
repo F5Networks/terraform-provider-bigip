@@ -173,7 +173,7 @@ func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) error {
 	}
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
-	respID := respRef["message"].(map[string]interface{})["message"].([]interface{})[0].(map[string]interface{})["id"].(string)
+	respID := respRef["message"].([]interface{})[0].(map[string]interface{})["id"].(string)
 	taskStatus, err := b.getFastTaskStatus(respID)
 	if err != nil {
 		return err
