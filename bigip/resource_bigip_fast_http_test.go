@@ -27,7 +27,7 @@ func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 		CheckDestroy: testCheckFastTCPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: getFastHTTPAppConfig(""),
+				Config: getFastHTTPAppConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(httpAppName, httpTenantName, true),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "application", "fast_http_app"),
@@ -40,14 +40,14 @@ func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 	})
 }
 
-func getFastHTTPAppConfig(attrs string) string {
+func getFastHTTPAppConfig() string {
 	return fmt.Sprintf(`
-resource "bigip_fast_http_app" "fast-http" {
+resource "bigip_fast_http_app" "fast_http_app" {
   tenant = "%v"
   application= "%v"
   virtual_server = {
-    ip = "10.30.30.44"
-    port = 443
+   ip   = "10.30.30.44"
+   port = 443
   }
 }
 `, httpTenantName, httpAppName)

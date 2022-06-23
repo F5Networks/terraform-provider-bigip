@@ -17,10 +17,10 @@ description: |-
 ```hcl
 
 resource "bigip_fast_http_app" "fast-http" {
-  tenant = "httptenant"
-  application= "httpapptest"
+  tenant      = "httptenant"
+  application = "httpapptest"
   virtual_server = {
-    ip = "10.200.20.1"
+    ip   = "10.200.20.1"
     port = 201
   }
 }
