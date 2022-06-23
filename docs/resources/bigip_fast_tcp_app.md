@@ -20,13 +20,13 @@ resource "bigip_fast_tcp_app" "fast-tcp-app" {
   application = "tcp_app_2"
   tenant      = "tcp_app_tenant"
   virtual_server = {
-    ip = "11.12.16.30"
+    ip   = "11.12.16.30"
     port = 443
   }
   fastl4 = {
-    enable = true
+    enable                  = true
     generate_fastl4_profile = false
-    fastl4_profile_name = "/Common/apm-forwarding-fastL4"
+    fastl4_profile_name     = "/Common/apm-forwarding-fastL4"
   }
 }
 
