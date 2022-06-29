@@ -20,15 +20,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
-var fastTmpl = "bigip-fast-templates/http"
-
-func resourceBigipHttpFastApp() *schema.Resource {
+func resourceBigipFastHTTPSApp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipFastHttpAppCreate,
-		Read:   resourceBigipFastHttpAppRead,
-		Update: resourceBigipFastHttpAppUpdate,
-		Delete: resourceBigipFastHttpAppDelete,
-		Exists: resourceBigipFastHttpAppExists,
+		Create: resourceBigipFastHTTPSAppCreate,
+		Read:   resourceBigipFastHTTPSAppRead,
+		Update: resourceBigipFastHTTPSAppUpdate,
+		Delete: resourceBigipFastHTTPSAppDelete,
+		Exists: resourceBigipFastHTTPSAppExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -37,13 +35,13 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Name of FAST HTTP application tenant.",
+				Description: "Name of FAST HTTPS application tenant.",
 			},
 			"application": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Name of FAST HTTP application.",
+				Description: "Name of FAST HTTPS application.",
 			},
 			"virtual_server": {
 				Type:     schema.TypeList,
@@ -76,11 +74,38 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
+			"tls_server_profile_name": {
+				Type:     schema.TypeString,
+				Optional: true,
+				//Default:"/Common/clientssl",
+				Description:   "Select an existing TLS server profile",
+				ConflictsWith: []string{"create_tls_server_profile"},
+			},
+			"create_tls_server_profile": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"tls_cert_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Select an existing BIG-IP SSL certificate",
+						},
+						"tls_key_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Select an existing BIG-IP SSL key",
+						},
+					},
+				},
+				ConflictsWith: []string{"tls_server_profile_name"},
+			},
 			"exist_pool_name": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP Pool",
-				ConflictsWith: []string{"fast_create_pool_members"},
+				ConflictsWith: []string{"fast_create_pool_members", "existing_monitor", "fast_create_monitor"},
 			},
 			"fast_create_pool_members": {
 				Type:     schema.TypeSet,
@@ -121,6 +146,7 @@ func resourceBigipHttpFastApp() *schema.Resource {
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "least-connections-member",
 				Description: "none",
 				ValidateFunc: validation.StringInSlice([]string{
 					"dynamic-ratio-member",
@@ -159,7 +185,6 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Optional:    true,
 				Description: "foo",
 				MaxItems:    1,
-
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"monitor_auth": {
@@ -203,15 +228,16 @@ func resourceBigipHttpFastApp() *schema.Resource {
 	}
 }
 
-func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	fastJson, err := getFastHttpConfig(d)
+	fastJson, err := getFastHTTPSConfig(d)
 	if err != nil {
 		return err
 	}
 	m.Lock()
 	defer m.Unlock()
-	log.Printf("[INFO] Creating HTTP FastApp config")
+	log.Printf("[INFO] Creating HTTPS FastApp config")
+	log.Printf("[DEBUG]: FAST JSON:%+v", fastJson)
 	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, fastTmpl)
 	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl, userAgent)
 	if err != nil {
@@ -237,7 +263,7 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 			"application":       app,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
-		err = teemDevice.Report(f, "bigip_fast_http_app", tsVer[3])
+		err = teemDevice.Report(f, "bigip_fast_https_app", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
@@ -245,7 +271,7 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	return resourceBigipFastHttpAppRead(d, meta)
 }
 
-func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	var fastHttp bigip.FastHttpJson
 	log.Printf("[INFO] Reading FastApp config")
@@ -273,16 +299,16 @@ func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
-	err = setFastHttpData(d, fastHttp)
+	err = setFastHTTPSData(d, fastHttp)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func resourceBigipFastHttpAppUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	fastJson, e := getFastHttpConfig(d)
+	fastJson, e := getFastHTTPSConfig(d)
 	if e != nil {
 		return e
 	}
@@ -298,7 +324,7 @@ func resourceBigipFastHttpAppUpdate(d *schema.ResourceData, meta interface{}) er
 	return resourceBigipFastAppRead(d, meta)
 }
 
-func resourceBigipFastHttpAppDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -312,7 +338,7 @@ func resourceBigipFastHttpAppDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func resourceBigipFastHttpAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+func resourceBigipFastHTTPSAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Checking if FastApp config exists in BIGIP")
 	name := d.Id()
@@ -335,80 +361,53 @@ func resourceBigipFastHttpAppExists(d *schema.ResourceData, meta interface{}) (b
 	return true, nil
 }
 
-func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
-
-	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
-	_ = d.Set("virtual_server.0.port", data.VirtualPort)
-	_ = d.Set("snat.enable", data.SnatEnable)
-	_ = d.Set("snat.automap", data.SnatAutomap)
-	_ = d.Set("snat.existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
-	_ = d.Set("pool.enable", data.PoolEnable)
-	_ = d.Set("pool.existing_pool", data.PoolName)
+func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
+	log.Printf("[DEBUG]: FAST JSON:%+v", data)
+	_ = d.Set("tenant", data.Tenant)
+	_ = d.Set("application", data.Application)
+	log.Printf("[DEBUG]: VirtualAddress :%+v", data.VirtualAddress)
+	if err := d.Set("virtual_server", []interface{}{flattenFastVirtualServers(data)}); err != nil {
+		return fmt.Errorf("error setting virtual_server: %w", err)
+	}
+	_ = d.Set("existing_snat_pool", data.SnatPoolName)
+	_ = d.Set("fast_create_snat_pool_address", data.SnatAddresses)
+	_ = d.Set("exist_pool_name", data.PoolName)
+	_ = d.Set("tls_server_profile_name", data.TlsServerProfileName)
+	if _, ok := d.GetOk("create_tls_server_profile"); ok {
+		if err := d.Set("create_tls_server_profile", []interface{}{flattenFastTlsServerProfile(data)}); err != nil {
+			return fmt.Errorf("error setting create_tls_server_profile: %w", err)
+		}
+	}
 	members := flattenFastPoolMembers(data.PoolMembers)
-	_ = d.Set("pool.pool_members", members)
+	log.Printf("[DEBUG]: Pool Members :%+v", members)
+	_ = d.Set("fast_create_pool_members", members)
 	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
-	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
-	_ = d.Set("fast_create_monitor.0.monitor_auth", data.MonitorAuth)
-	_ = d.Set("fast_create_monitor.0.username", data.MonitorUsername)
-	_ = d.Set("fast_create_monitor.0.password", data.MonitorPassword)
-	_ = d.Set("fast_create_monitor.0.interval", data.MonitorInterval)
-	_ = d.Set("fast_create_monitor.0.send_string", data.MonitorSendString)
-	_ = d.Set("fast_create_monitor.0.response", data.MonitorResponse)
+	if _, ok := d.GetOk("fast_create_monitor"); ok {
+		if err := d.Set("fast_create_monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
+			return fmt.Errorf("error setting fast_create_monitor: %w", err)
+		}
+	}
 	return nil
 }
 
-func flattenFastVirtualServers(data bigip.FastHttpJson) map[string]interface{} {
+func flattenFastTlsServerProfile(data bigip.FastHttpJson) map[string]interface{} {
 	tfMap := map[string]interface{}{}
-	tfMap["ip"] = data.VirtualAddress
-	tfMap["port"] = data.VirtualPort
+	tfMap["tls_cert_name"] = data.TlsCertName
+	tfMap["tls_key_name"] = data.TlsKeyName
 	return tfMap
 }
 
-func flattenFastMonitor(data bigip.FastHttpJson) map[string]interface{} {
-	tfMap := map[string]interface{}{}
-	if data.MonitorAuth {
-		tfMap["monitor_auth"] = data.MonitorAuth
-	}
-	tfMap["username"] = data.MonitorUsername
-	tfMap["password"] = data.MonitorPassword
-	if data.MonitorInterval > 0 {
-		tfMap["interval"] = data.MonitorInterval
-	}
-	tfMap["send_string"] = data.MonitorSendString
-	tfMap["response"] = data.MonitorResponse
-	return tfMap
-}
-
-func flattenFastPoolMembers(members []bigip.FastHttpPool) []interface{} {
-	att := make([]interface{}, len(members))
-	for i, v := range members {
-		obj := make(map[string]interface{})
-		if len(v.ServerAddresses) > 0 {
-			obj["adresses"] = v.ServerAddresses
-		}
-		obj["port"] = v.ServicePort
-		if v.ConnectionLimit > 0 {
-			obj["connection_limit"] = v.ConnectionLimit
-		}
-		obj["priority_group"] = v.PriorityGroup
-		if v.ShareNodes {
-			obj["share_nodes"] = v.ShareNodes
-		}
-		att[i] = obj
-	}
-	return att
-}
-
-func getFastHttpConfig(d *schema.ResourceData) (string, error) {
+func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 	httpJson := &bigip.FastHttpJson{
 		Tenant:      d.Get("tenant").(string),
 		Application: d.Get("application").(string),
 	}
-	httpJson.TlsServerEnable = false
+	httpJson.TlsServerEnable = true
 	httpJson.TlsServerProfileCreate = false
+	//httpJson.TlsServerProfileName = "/Common/clientssl"
+
 	if v, ok := d.GetOk("virtual_server"); ok {
 		vL := v.([]interface{})
 		for _, v := range vL {
@@ -416,7 +415,18 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			httpJson.VirtualPort = v.(map[string]interface{})["port"]
 		}
 	}
-
+	if v, ok := d.GetOk("tls_server_profile_name"); ok {
+		httpJson.TlsServerProfileName = v.(string)
+	}
+	if v, ok := d.GetOk("create_tls_server_profile"); ok {
+		httpJson.TlsServerProfileCreate = true
+		httpJson.TlsServerProfileName = ""
+		tlsSer := v.([]interface{})
+		for _, v := range tlsSer {
+			httpJson.TlsCertName = v.(map[string]interface{})["tls_cert_name"].(string)
+			httpJson.TlsKeyName = v.(map[string]interface{})["tls_key_name"].(string)
+		}
+	}
 	httpJson.PoolEnable = false
 	if v, ok := d.GetOk("exist_pool_name"); ok {
 		httpJson.PoolEnable = true
@@ -426,10 +436,8 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	if p, ok := d.GetOk("fast_create_pool_members"); ok {
 		httpJson.PoolEnable = true
 		httpJson.MakePool = true
-		log.Printf("[DEBUG] Adding Pool Members:%+v", p)
 		var members []bigip.FastHttpPool
 		for _, r := range p.(*schema.Set).List() {
-			log.Printf("[DEBUG] Pool Members:%+v and Type :%T", r, r)
 			memberConfig := bigip.FastHttpPool{}
 			var serAdd []string
 			for _, addr := range r.(map[string]interface{})["addresses"].([]interface{}) {

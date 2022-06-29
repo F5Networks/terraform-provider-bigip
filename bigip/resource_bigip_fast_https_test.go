@@ -15,48 +15,48 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var httpAppName = "fast_http_app"
-var httpTenantName = "fast_http_tenant"
+var httpsAppName = "fast_https_app"
+var httpsTenantName = "fast_https_tenant"
 
-func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
+func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastHTTPAppDestroyed,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: getFastHTTPAppConfig(),
+				Config: getFastHTTPSAppConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(httpAppName, httpTenantName, true),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "application", "fast_http_app"),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "tenant", "fast_http_tenant"),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.ip", "10.30.30.44"),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_http_app"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_http_tenant"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.30.44"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
 				),
 			},
 		},
 	})
 }
 
-func getFastHTTPAppConfig() string {
+func getFastHTTPSAppConfig() string {
 	return fmt.Sprintf(`
-	resource "bigip_fast_http_app" "fast_http_app" {
+	resource "bigip_fast_https_app" "fast_https_app" {
 	  tenant = "%v"
 	  application= "%v"
-	  virtual_server = {
-	   ip   = "10.30.30.44"
+	  virtual_server {
+	   ip   = "10.30.40.44"
 	   port = 443
 	  }
 	}
-`, httpTenantName, httpAppName)
+`, httpsTenantName, httpsAppName)
 }
 
-func testCheckFastHTTPAppDestroyed(s *terraform.State) error {
+func testCheckFastHTTPSAppDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_fast_http_app" {
+		if rs.Type != "bigip_fast_https_app" {
 			continue
 		}
 		name := rs.Primary.ID

@@ -130,6 +130,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_fast_template":                   resourceBigipFastTemplate(),
 			"bigip_fast_application":                resourceBigipFastApp(),
 			"bigip_fast_http_app":                   resourceBigipHttpFastApp(),
+			"bigip_fast_https_app":                  resourceBigipFastHTTPSApp(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
