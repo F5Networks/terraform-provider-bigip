@@ -1,14 +1,14 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_fast_http_app"
+page_title: "BIG-IP: bigip_fast_https_app"
 subcategory: "F5 Automation Tool Chain(ATC)"
 description: |-
-  Provides details about bigip_fast_http_app resource
+  Provides details about bigip_fast_https_app resource
 ---
 
-# bigip_fast_http_app
+# bigip_fast_https_app
 
-`bigip_fast_http_app` This resource will create and manage FAST HTTP applications on BIG-IP 
+`bigip_fast_https_app` This resource will create and manage FAST HTTPS applications on BIG-IP 
 
 [FAST documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/)
 
@@ -16,11 +16,11 @@ description: |-
 
 ```hcl
 
-resource "bigip_fast_http_app" "fast_http_app" {
-  tenant      = "fasthttptenant"
-  application = "fasthttpapp"
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "fasthttpstenant"
+  application = "fasthttpsapp"
   virtual_server {
-    ip   = "10.30.30.44"
+    ip   = "10.30.40.44"
     port = 443
   }
 }
@@ -39,6 +39,11 @@ See [virtual server](#virtual-server) below for more details.
 * `existing_snat_pool` - (Optional,`string`) Name of an existing BIG-IP SNAT pool.
 
 * `fast_create_snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
+
+* `tls_server_profile_name` - (Optional,`string`) Name of an existing TLS server profile.
+
+* `create_tls_server_profile` - (Optional,`set`) `create_tls_server_profile` block takes input for FAST-Generated TLS Server Profile.
+See [TLS Server Profile](#tls-server-profile) below for more details.
 
 * `exist_pool_name` - (Optional,`string`) Name of an existing BIG-IP pool.
 
@@ -62,6 +67,16 @@ The `virtual_server` block supports the following:
 * `ip` - (Optional , `string`) IP4/IPv6 address to be used for virtual server ex: `10.1.1.1`
 
 * `port` -(Optional , `int`) Port number to used for accessing virtual server/application
+
+
+### TLS Server Profile
+Using this block will `enable` for FAST-Generated TLS Server Profile.
+
+The `create_tls_server_profile` block supports the following:
+
+* `tls_cert_name` - (Optional , `string`) Name of existing BIG-IP SSL certificate to be used for FAST-Generated TLS Server Profile.
+
+* `tls_key_name` - (Optional , `string`) Name of existing BIG-IP SSL Key to be used for FAST-Generated TLS Server Profile.
 
 ### Pool Members
 
@@ -97,3 +112,4 @@ The `fast_create_monitor` block supports the following:
 * `send_string` - (Optional , `string`) Specify data to be sent during each health check for FAST-Generated Pool Monitor.
 
 * `response` - (Optional , `string`) The presence of this string anywhere in the HTTP response implies availability.
+

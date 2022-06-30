@@ -29,10 +29,10 @@ func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 			{
 				Config: getFastHTTPSAppConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckFastAppExists(httpAppName, httpTenantName, true),
-					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_http_app"),
-					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_http_tenant"),
-					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.30.44"),
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_app"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenant"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.40.44"),
 					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
 				),
 			},
