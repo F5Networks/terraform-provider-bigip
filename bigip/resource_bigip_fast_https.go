@@ -406,7 +406,6 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 	}
 	httpJson.TlsServerEnable = true
 	httpJson.TlsServerProfileCreate = false
-	//httpJson.TlsServerProfileName = "/Common/clientssl"
 
 	if v, ok := d.GetOk("virtual_server"); ok {
 		vL := v.([]interface{})

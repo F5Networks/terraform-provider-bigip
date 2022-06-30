@@ -42,14 +42,14 @@ func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 
 func getFastHTTPSAppConfig() string {
 	return fmt.Sprintf(`
-	resource "bigip_fast_https_app" "fast_https_app" {
-	  tenant = "%v"
-	  application= "%v"
-	  virtual_server {
-	   ip   = "10.30.40.44"
-	   port = 443
-	  }
-	}
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.30.40.44"
+    port = 443
+  }
+}
 `, httpsTenantName, httpsAppName)
 }
 
