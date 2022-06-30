@@ -45,6 +45,48 @@ type TmplArrType struct {
 	Hash string `json:"hash,omitempty"`
 }
 
+type FastHttpJson struct {
+	Tenant                 string         `json:"tenant_name,omitempty"`
+	Application            string         `json:"app_name,omitempty"`
+	VirtualAddress         string         `json:"virtual_address,omitempty"`
+	VirtualPort            interface{}    `json:"virtual_port,omitempty"`
+	SnatEnable             bool           `json:"enable_snat,omitempty"`
+	SnatAutomap            bool           `json:"snat_automap"`
+	MakeSnatPool           bool           `json:"make_snatpool"`
+	SnatPoolName           string         `json:"snatpool_name,omitempty"`
+	SnatAddresses          []string       `json:"snat_addresses,omitempty"`
+	PoolEnable             bool           `json:"enable_pool"`
+	MakePool               bool           `json:"make_pool"`
+	TlsServerEnable        bool           `json:"enable_tls_server"`
+	TlsClientEnable        bool           `json:"enable_tls_client"`
+	TlsServerProfileCreate bool           `json:"make_tls_server_profile"`
+	TlsServerProfileName   string         `json:"tls_server_profile_name,omitempty"`
+	TlsCertName            string         `json:"tls_cert_name,omitempty"`
+	TlsKeyName             string         `json:"tls_key_name,omitempty"`
+	PoolName               string         `json:"pool_name,omitempty"`
+	PoolMembers            []FastHttpPool `json:"pool_members,omitempty"`
+	LoadBalancingMode      string         `json:"load_balancing_mode,omitempty"`
+	SlowRampTime           int            `json:"slow_ramp_time,omitempty"`
+	MonitorEnable          bool           `json:"enable_monitor,omitempty"`
+	MakeMonitor            bool           `json:"make_monitor"`
+	HTTPMonitor            string         `json:"monitor_name_http,omitempty"`
+	HTTPSMonitor           string         `json:"monitor_name,omitempty"`
+	MonitorAuth            bool           `json:"monitor_credentials"`
+	MonitorUsername        string         `json:"monitor_username,omitempty"`
+	MonitorPassword        string         `json:"monitor_passphrase,omitempty"`
+	MonitorInterval        int            `json:"monitor_interval,omitempty"`
+	MonitorSendString      string         `json:"monitor_send_string,omitempty"`
+	MonitorResponse        string         `json:"monitor_expected_response,omitempty"`
+}
+
+type FastHttpPool struct {
+	ServerAddresses []string `json:"serverAddresses,omitempty"`
+	ServicePort     int      `json:"servicePort,omitempty"`
+	ConnectionLimit int      `json:"connectionLimit,omitempty"`
+	PriorityGroup   int      `json:"priorityGroup,omitempty"`
+	ShareNodes      bool     `json:"shareNodes,omitempty"`
+}
+
 // UploadFastTemplate copies a template set from local disk to BIGIP
 func (b *BigIP) UploadFastTemplate(tmplpath *os.File, tmplname string) error {
 	_, err := b.UploadFastTemp(tmplpath, tmplname)
@@ -127,6 +169,7 @@ func (b *BigIP) PostFastAppBigip(body, fastTemplate, userAgent string) (tenant, 
 		Name:       fastTemplate,
 		Parameters: jsonRef,
 	}
+	log.Printf("[DEBUG]payload = %+v", payload)
 	resp, err := b.postReq(payload, uriMgmt, uriShared, uriFast, uriFastApp, userAgent)
 	if err != nil {
 		return "", "", err
@@ -152,7 +195,7 @@ func (b *BigIP) PostFastAppBigip(body, fastTemplate, userAgent string) (tenant, 
 			break // break here
 		}
 		if respCode >= 400 {
-			return "", "", fmt.Errorf("FAST Application creation failed")
+			return "", "", fmt.Errorf("FAST Application creation failed with :%+v", fastTask.Message)
 		}
 		time.Sleep(3 * time.Second)
 	}
@@ -191,7 +234,8 @@ func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) error {
 			break // break here
 		}
 		if respCode >= 400 {
-			return fmt.Errorf("FAST Application update failed")
+			return fmt.Errorf("FAST Application update failed with :%+v", fastTask.Message)
+			//return fmt.Errorf("FAST Application update failed")
 		}
 		time.Sleep(3 * time.Second)
 	}

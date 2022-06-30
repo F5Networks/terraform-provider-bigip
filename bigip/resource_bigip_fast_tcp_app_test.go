@@ -15,8 +15,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var app_name = "fast_tcp_app"
-var tenant_name = "fast_tcp_tenant"
+var appName = "fast_tcp_app"
+var tenantName = "fast_tcp_tenant"
 
 func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -29,7 +29,7 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 			{
 				Config: getFastTCPAppConfig(""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckFastAppExists(app_name, tenant_name, true),
+					testCheckFastAppExists(appName, tenantName, true),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "application", "fast_tcp_app"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "tenant", "fast_tcp_tenant"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.ip", "10.20.30.44"),
@@ -45,7 +45,7 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 				}
 				`),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckFastAppExists(app_name, tenant_name, true),
+					testCheckFastAppExists(appName, tenantName, true),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.enable", "true"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.generate_fastl4_profile", "false"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.fastl4_profile_name", "/Common/apm-forwarding-fastL4"),
@@ -65,7 +65,7 @@ func getFastTCPAppConfig(attrs string) string {
 			port = 443
 		}
 		%v
-	}`, app_name, tenant_name, attrs)
+	}`, appName, tenantName, attrs)
 }
 
 func testCheckFastTCPAppDestroyed(s *terraform.State) error {
