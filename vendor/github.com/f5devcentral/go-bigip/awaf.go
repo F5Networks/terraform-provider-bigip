@@ -13,6 +13,7 @@ const (
 	uriParams       = "parameters"
 	uriWafSign      = "signatures"
 	uriImportpolicy = "import-policy"
+	uriApplypolicy  = "apply-policy"
 	uriExportpolicy = "export-policy"
 	uriExpPb        = "export-suggestions"
 )
@@ -194,6 +195,15 @@ type ImportStatus struct {
 		File    string `json:"file,omitempty"`
 		Message string `json:"message"`
 	} `json:"result,omitempty"`
+}
+
+type ApplyStatus struct {
+	PolicyReference struct {
+		Link     string `json:"link"`
+		FullPath string `json:"fullPath"`
+	} `json:"policyReference"`
+	Status string `json:"status"`
+	ID     string `json:"id"`
 }
 
 type Parameters struct {
@@ -385,6 +395,25 @@ func (b *BigIP) GetImportStatus(taskId string) error {
 	return nil
 }
 
+func (b *BigIP) GetApplyStatus(taskId string) error {
+	var applyStatus ApplyStatus
+	err, _ := b.getForEntity(&applyStatus, uriMgmt, uriTm, uriAsm, uriTasks, uriApplypolicy, taskId)
+	if err != nil {
+		return err
+	}
+	if applyStatus.Status == "COMPLETED" {
+		return nil
+	}
+	if applyStatus.Status == "FAILURE" {
+		return fmt.Errorf("[ERROR] WafPolicy Apply failed with :%+v", applyStatus)
+	}
+	if applyStatus.Status == "STARTED" {
+		time.Sleep(5 * time.Second)
+		return b.GetApplyStatus(taskId)
+	}
+	return nil
+}
+
 // DeleteWafPolicy removes waf Policy
 func (b *BigIP) DeleteWafPolicy(policyId string) error {
 	return b.delete(uriMgmt, uriTm, uriAsm, uriWafPol, policyId)
@@ -412,6 +441,28 @@ func (b *BigIP) ImportAwafJson(awafPolicyName, awafJsonContent string) (string, 
 		return "", err
 	}
 	var taskStatus ImportStatus
+	err = json.Unmarshal(resp, &taskStatus)
+	if err != nil {
+		return "", err
+	}
+	return taskStatus.ID, nil
+}
+
+// ApplyAwafJson apply Awaf Json policy
+func (b *BigIP) ApplyAwafJson(awafPolicyName string) (string, error) {
+	policyPath := struct {
+		FullPath string `json:"fullPath,omitempty"`
+	}{
+		FullPath: awafPolicyName,
+	}
+	applywaf := ApplywafPolicy{
+		Policy: policyPath,
+	}
+	resp, err := b.postReq(applywaf, uriMgmt, uriTm, uriAsm, uriTasks, uriApplypolicy)
+	if err != nil {
+		return "", err
+	}
+	var taskStatus ApplyStatus
 	err = json.Unmarshal(resp, &taskStatus)
 	if err != nil {
 		return "", err

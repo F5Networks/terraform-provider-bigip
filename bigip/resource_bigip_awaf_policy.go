@@ -134,6 +134,14 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "This section defines the properties of a signature on the policy.",
 			},
+			"open_api_files": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "This section defines the Link for open api files on the policy.",
+			},
 			"modifications": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
@@ -178,6 +186,15 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	err = client.GetImportStatus(taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+	}
+	taskId, err = client.ApplyAwafJson(polName)
+	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+	}
+	err = client.GetApplyStatus(taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
 	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
 	if err != nil {
@@ -272,6 +289,15 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	err = client.GetImportStatus(taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+	}
+	taskId, err = client.ApplyAwafJson(polName)
+	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+	}
+	err = client.GetApplyStatus(taskId)
+	if err != nil {
+		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
 	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
 	if err != nil {

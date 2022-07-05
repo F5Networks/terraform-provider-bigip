@@ -258,9 +258,9 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 			log.Printf("[ERROR] Unable to retrieve json ")
 			if err.Error() == "unexpected end of JSON input" {
 				log.Printf("[ERROR] %v", err)
-				d.SetId("")
 				return nil
 			}
+			d.SetId("")
 			return err
 		}
 		if as3Resp == "" {
@@ -312,9 +312,9 @@ func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, err
 			log.Printf("[ERROR] Unable to retrieve json ")
 			if err.Error() == "unexpected end of JSON input" {
 				log.Printf("[ERROR] %v", err)
-				d.SetId("")
-				return false, nil
+				return true, nil
 			}
+			d.SetId("")
 			return false, err
 		}
 		log.Printf("[INFO] AS3 response Body:%+v", as3Resp)
