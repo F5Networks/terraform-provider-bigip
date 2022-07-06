@@ -19,22 +19,22 @@ description: |-
 resource "bigip_fast_tcp_app" "fast-tcp-app" {
   application = "tcp_app_2"
   tenant      = "tcp_app_tenant"
-  
+
   virtual_server = {
     ip   = "11.12.16.30"
     port = 443
   }
-  
+
   fast_create_pool_members {
-    addresses = ["10.11.34.65", "56.43.23.76"]
-    port = 443
-    priority_group = 1
+    addresses        = ["10.11.34.65", "56.43.23.76"]
+    port             = 443
+    priority_group   = 1
     connection_limit = 4
-    share_nodes = true
+    share_nodes      = true
   }
 }
 
-```      
+```
 
 ## Argument Reference
 
