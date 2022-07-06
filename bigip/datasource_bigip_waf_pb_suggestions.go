@@ -47,9 +47,9 @@ func dataSourceBigipWafPb() *schema.Resource {
 }
 
 type ExportPb struct {
-	PolicyReference map[string]string
-	Inline          bool
-	Filter          string
+	PolicyReference map[string]string `json:"policyReference,omitempty"`
+	Inline          bool              `json:"inline,omitempty"`
+	Filter          string            `json:"filter,omitempty"`
 }
 
 func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
@@ -65,7 +65,7 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	policyLink := fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyId)
 	payload := ExportPb{
-		PolicyReference: map[string]string{"file": policyLink},
+		PolicyReference: map[string]string{"link": policyLink},
 		Inline:          true,
 		Filter:          fmt.Sprintf("score gt %d", score),
 	}
@@ -73,7 +73,6 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("error exporting pb suggestions: %v", err)
 	}
-
 	task, err := client.GetWafPbExportResult(export.Task_id)
 	if err != nil {
 		return err

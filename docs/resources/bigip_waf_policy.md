@@ -41,7 +41,8 @@ data "bigip_waf_entity_url" "URL2" {
 }
 
 resource "bigip_waf_policy" "test-awaf" {
-  name                 = "/Common/testpolicyravi"
+  name                 = "testpolicyravi"
+  partition            = "Common"
   template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
   application_language = "utf-8"
   enforcement_mode     = "blocking"
@@ -54,11 +55,13 @@ resource "bigip_waf_policy" "test-awaf" {
 
 ## Argument Reference
 
-* `name` - (Required,type `string`) The unique user-given name of the policy. Policy names cannot contain spaces or special characters. Allowed characters are a-z, A-Z, 0-9, dot, dash (-), colon (:) and underscore (_). It will be `fullpath`, ex: `/Common/policy1`
+* `name` - (Required,type `string`) The unique user-given name of the policy. Policy names cannot contain spaces or special characters. Allowed characters are a-z, A-Z, 0-9, dot, dash (-), colon (:) and underscore (_).
 
 * `template_name` - (Required,type `string`) Specifies the name of the template used for the policy creation.
 
 * `description` - (Optional,type `string`) Specifies the description of the policy.
+
+* `partition` - (Optional,type `string`) Specifies the partition of the policy. Default is `Common`
 
 * `application_language` - (Optional,type `string`) The character encoding for the web application. The character encoding determines how the policy processes the character sets. The default is `utf-8`
 
@@ -81,6 +84,10 @@ resource "bigip_waf_policy" "test-awaf" {
 * `signature_sets` - (Optional,type `list`) Defines behavior when signatures found within a signature-set are detected in a request. Settings are culmulative, so if a signature is found in any set with block enabled, that signature will have block enabled.
 
 * `signatures` - (Optional,type `list`) This section defines the properties of a signature on the policy.
+
+* `open_api_files` - (Optional,type `list`) This section defines the Link for open api files on the policy.
+
+* `policy_import_json` - (Optional,type `string`) The payload of the WAF Policy to be used for IMPORT on to BIGIP. 
 
 ## Attributes Reference
 
