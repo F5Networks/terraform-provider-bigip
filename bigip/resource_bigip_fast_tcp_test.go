@@ -32,25 +32,30 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 					testCheckFastAppExists(appName, tenantName, true),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "application", "fast_tcp_app"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "tenant", "fast_tcp_tenant"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.ip", "10.20.30.44"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.ip", "10.99.11.88"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.port", "80"),
 				),
 			},
-			{
-				Config: getFastTCPAppConfig(`
-				fastl4 = {
-					enable = true
-					generate_fastl4_profile = false
-					fastl4_profile_name = "/Common/apm-forwarding-fastL4"
-				}
-				`),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckFastAppExists(appName, tenantName, true),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.enable", "true"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.generate_fastl4_profile", "false"),
-					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fastl4.fastl4_profile_name", "/Common/apm-forwarding-fastL4"),
-				),
-			},
+			// {
+			// 	Config: getFastTCPAppConfig(`
+			// 	fast_create_pool_members {
+			// 		addresses = ["10.11.34.65", "56.43.23.76"]
+			// 		port = 443
+			// 		priority_group = 1
+			// 		connection_limit = 4
+			// 		share_nodes = true
+			// 	}
+			// 	`),
+			// 	Check: resource.ComposeTestCheckFunc(
+			// 		testCheckFastAppExists(appName, tenantName, true),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.addresses.0", "10.11.34.65"),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.addresses.1", "56.43.23.76"),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.port", "443"),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.priority_group", "1"),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.connection_limit", "4"),
+			// 		resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "fast_create_pool_members.share_nodes", "true"),
+			// 	),
+			// },
 		},
 	})
 }
@@ -60,9 +65,9 @@ func getFastTCPAppConfig(attrs string) string {
 	resource "bigip_fast_tcp_app" "fast_tcp_app" {
 		application = "%v"
 		tenant      = "%v"
-		virtual_server = {
-			ip   = "10.20.30.44"
-			port = 443
+		virtual_server {
+			ip = "10.99.11.88"
+			port = 80
 		}
 		%v
 	}`, appName, tenantName, attrs)
