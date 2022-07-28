@@ -19,9 +19,10 @@ resource "bigip_ltm_policy" "test-policy" {
     name = "rule6"
 
     action {
-      tm_name = "20"
-      forward = true
-      pool    = "/Common/mypool"
+      tm_name    = "20"
+      forward    = true
+      connection = false
+      pool       = "/Common/mypool"
     }
   }
   depends_on = [bigip_ltm_pool.mypool]

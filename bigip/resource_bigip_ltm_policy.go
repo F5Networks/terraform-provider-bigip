@@ -151,7 +151,8 @@ func resourceBigipLtmPolicy() *schema.Resource {
 									"connection": {
 										Type:     schema.TypeBool,
 										Optional: true,
-										Computed: true,
+										// Computed: true,
+										Default: true,
 									},
 									"cookie_hash": {
 										Type:     schema.TypeBool,
@@ -507,7 +508,8 @@ func resourceBigipLtmPolicy() *schema.Resource {
 									"shutdown": {
 										Type:     schema.TypeBool,
 										Optional: true,
-										Computed: true,
+										// Computed: true,
+										// Default: false,
 									},
 									"snat": {
 										Type:     schema.TypeString,
@@ -893,6 +895,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Computed: true,
 									},
 									"not": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+									},
+									"exists": {
 										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
