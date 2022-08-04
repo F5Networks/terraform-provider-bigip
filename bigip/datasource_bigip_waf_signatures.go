@@ -88,6 +88,16 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	sid := d.Get("signature_id").(int)
+	provision := "asm"
+	p, err := client.Provisions(provision)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", provision, err)
+		return err
+	}
+	if p.Level == "none" {
+		return fmt.Errorf("[ERROR] ASM Module is not rovisioned, it is set to : (%s) ", p.Level)
+	}
+
 	signatures, err := client.GetWafSignature(sid)
 	if err != nil {
 		return fmt.Errorf("error retrieving signature %d: %v", sid, err)

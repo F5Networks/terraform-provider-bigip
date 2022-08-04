@@ -39,6 +39,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "Common",
+				ForceNew:     true,
 				Description:  "Partition of WAF policy",
 				ValidateFunc: validatePartitionName,
 			},
@@ -134,6 +135,68 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "This section defines the properties of a signature on the policy.",
 			},
+			"signatures_settings": {
+				Type:        schema.TypeSet,
+				Description: "bulk signature setting",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"signature_staging": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "setting true will enforce all signature from staging",
+						},
+						"placesignatures_in_staging": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "",
+						},
+					},
+				},
+			},
+			"policy_builder": {
+				Type:        schema.TypeSet,
+				Description: "policy-builder settings for policy",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"learning_mode": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+			"graphql_profile": {
+				Type:        schema.TypeSet,
+				Description: "graphql_profile settings for policy",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+			"file_types": {
+				Type:        schema.TypeSet,
+				Description: "file_types settings for policy",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"open_api_files": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
@@ -173,12 +236,23 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Println("[INFO] AWAF Name " + name)
 
+	provision := "asm"
+	p, err := client.Provisions(provision)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", provision, err)
+		return err
+	}
+	if p.Level == "none" {
+		return fmt.Errorf("[ERROR] ASM Module is not rovisioned, it is set to : (%s) ", p.Level)
+	}
+
 	config, err := getpolicyConfig(d)
 	if err != nil {
 		return fmt.Errorf("error in Json encode for waf policy %+v", err)
 	}
 	polName := fmt.Sprintf("/%s/%s", partition, name)
-	taskId, err := client.ImportAwafJson(polName, config)
+	log.Printf("my json:%+v", config)
+	taskId, err := client.ImportAwafJson(polName, config, "")
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
@@ -187,19 +261,28 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
 	}
-	taskId, err = client.ApplyAwafJson(polName)
+	part := strings.Split(partition, "/")[0]
+	wafpolicy, err := client.GetWafPolicyQuery(name, part)
+	if err != nil {
+		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+	}
+	taskId, err = client.ApplyAwafJson(polName, wafpolicy.ID)
 	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
 	if err != nil {
+		err1 := client.DeleteWafPolicy(wafpolicy.ID)
+		if err1 != nil {
+			return fmt.Errorf(" Error Deleting AWAF Policy : %s", err1)
+		}
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
 	err = client.GetApplyStatus(taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
-	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
-	if err != nil {
-		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
-	}
+	//wafpolicy, err := client.GetWafPolicyQuery(name, partition)
+	//if err != nil {
+	//	return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+	//}
 
 	if !client.Teem {
 		id := uuid.New()
@@ -244,15 +327,17 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err)
 	}
-
-	log.Printf("[DEBUG] Policy Json : %+v", policyJson.Policy)
-
+	//log.Printf("[DEBUG] Policy Json : %+v", policyJson.Policy)
 	plJson, err := json.Marshal(policyJson.Policy)
 	if err != nil {
 		return err
 	}
 	_ = d.Set("name", policyJson.Policy.Name)
-	_ = d.Set("partition", strings.Split(policyJson.Policy.FullPath, "/")[1])
+	part := strings.Split(policyJson.Policy.FullPath, "/")
+	_ = d.Set("partition", part[1])
+	if len(part) > 3 {
+		_ = d.Set("partition", fmt.Sprintf("%s/%s", part[1], part[2]))
+	}
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
 	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
@@ -262,6 +347,8 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if _, ok := d.GetOk("description"); ok {
 		_ = d.Set("description", policyJson.Policy.Description)
 	}
+	//_ = d.Set("signatures_settings", policyJson.Policy.SignatureSettings)
+	log.Printf("SignatureSettings:%+v", policyJson.Policy.SignatureSettings)
 	_ = d.Set("template_name", policyJson.Policy.Template.Name)
 	_ = d.Set("policy_export_json", string(plJson))
 
@@ -270,7 +357,7 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
-	_ = d.Id()
+	policyID := d.Id()
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
 	log.Printf("[DEBUG] Updating AWAF Policy : %+v", name)
@@ -281,7 +368,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 	log.Printf("[DEBUG] Policy config: %+v", config)
 	polName := fmt.Sprintf("/%s/%s", partition, name)
-	taskId, err := client.ImportAwafJson(polName, config)
+	taskId, err := client.ImportAwafJson(polName, config, policyID)
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
@@ -290,7 +377,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
 	}
-	taskId, err = client.ApplyAwafJson(polName)
+	taskId, err = client.ApplyAwafJson(polName, policyID)
 	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
 	if err != nil {
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
@@ -299,10 +386,10 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
-	wafpolicy, err := client.GetWafPolicyQuery(name, partition)
-	if err != nil {
-		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
-	}
+	//wafpolicy, err := client.GetWafPolicyQuery(name, partition)
+	//if err != nil {
+	//	return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+	//}
 	return resourceBigipAwafPolicyRead(d, meta)
 }
 
@@ -323,9 +410,14 @@ func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) err
 func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
+	var fullpa string
+	if partition != "Common" {
+		fullpa = fmt.Sprintf("/%s/%s", partition, name)
+	}
 	policyWaf := bigip.WafPolicy{
 		Name:                name,
 		Partition:           partition,
+		FullPath:            fullpa,
 		ApplicationLanguage: d.Get("application_language").(string),
 	}
 	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
@@ -333,6 +425,36 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	policyWaf.ProtocolIndependent = d.Get("protocol_independent").(bool)
 	policyWaf.EnforcementMode = d.Get("enforcement_mode").(string)
 	policyWaf.Description = d.Get("description").(string)
+	if val, ok := d.GetOk("signatures_settings"); ok {
+		for _, item := range val.(*schema.Set).List() {
+			log.Printf("Value:%+v", item.(map[string]interface{})["signature_staging"].(bool))
+			policyWaf.SignatureSettings.SignatureStaging = item.(map[string]interface{})["signature_staging"].(bool)
+		}
+	}
+	if val, ok := d.GetOk("policy_builder"); ok {
+		for _, item := range val.(*schema.Set).List() {
+			log.Printf("Value:%+v", item.(map[string]interface{})["learning_mode"].(string))
+			policyWaf.PolicyBuilder.LearningMode = item.(map[string]interface{})["learning_mode"].(string)
+		}
+	}
+	var graphProfles []bigip.GraphqlProfile
+	if val, ok := d.GetOk("graphql_profile"); ok {
+		var gralPro bigip.GraphqlProfile
+		for _, item := range val.(*schema.Set).List() {
+			gralPro.Name = item.(map[string]interface{})["name"].(string)
+			graphProfles = append(graphProfles, gralPro)
+		}
+	}
+	var fileTypes []bigip.Filetype
+	if val, ok := d.GetOk("file_types"); ok {
+		var fileType bigip.Filetype
+		for _, item := range val.(*schema.Set).List() {
+			fileType.Name = item.(map[string]interface{})["name"].(string)
+			fileType.Type = item.(map[string]interface{})["name"].(string)
+			fileTypes = append(fileTypes, fileType)
+		}
+	}
+	policyWaf.GraphqlProfiles = graphProfles
 	policyWaf.Type = d.Get("type").(string)
 	policyWaf.Template = struct {
 		Name string `json:"name,omitempty"`
@@ -403,23 +525,26 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 
 	policyJson := &bigip.PolicyStruct{}
 	policyJson.Policy = policyWaf
-	var polJsn bigip.WafPolicy
+
 	if val, ok := d.GetOk("policy_import_json"); ok {
+		var polJsn bigip.PolicyStruct
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
-		if polJsn.FullPath != policyWaf.Name {
-			polJsn.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
-			polJsn.Name = policyWaf.Name
+		if polJsn.Policy.FullPath != policyWaf.Name {
+			polJsn.Policy.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
+			polJsn.Policy.Name = policyWaf.Name
 		}
-		if polJsn.Template != policyWaf.Template {
-			polJsn.Template = policyWaf.Template
+		if polJsn.Policy.Template != policyWaf.Template {
+			polJsn.Policy.Template = policyWaf.Template
 		}
-		if policyWaf.Urls != nil && len(policyWaf.Urls) > 0 {
-			polJsn.Urls = append(polJsn.Urls, policyWaf.Urls...)
-		}
+		polJsn.Policy.Urls = append(polJsn.Policy.Urls, policyWaf.Urls...)
 		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
-			polJsn.Parameters = append(polJsn.Parameters, policyWaf.Parameters...)
+			polJsn.Policy.Parameters = append(polJsn.Policy.Parameters, policyWaf.Parameters...)
 		}
-		policyJson.Policy = polJsn
+		polJsn.Policy.GraphqlProfiles = append(polJsn.Policy.GraphqlProfiles, policyWaf.GraphqlProfiles...)
+		//if policyWaf.GraphqlProfiles != nil && len(policyWaf.GraphqlProfiles) > 0 {
+		//
+		//}
+		policyJson.Policy = polJsn.Policy
 	}
 
 	var myModification []interface{}
