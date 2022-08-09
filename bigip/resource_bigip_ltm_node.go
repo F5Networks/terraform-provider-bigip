@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -34,7 +35,6 @@ func resourceBigipLtmNode() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-
 			"address": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -47,7 +47,6 @@ func resourceBigipLtmNode() *schema.Resource {
 				Description: "Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.",
 				Computed:    true,
 			},
-
 			"connection_limit": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -80,6 +79,7 @@ func resourceBigipLtmNode() *schema.Resource {
 			"state": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Marks the node up or down. The default value is user-up.",
 			},
 			"session": {
@@ -134,9 +134,9 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Get("name").(string)
 	address := d.Get("address").(string)
-	rate_limit := d.Get("rate_limit").(string)
-	connection_limit := d.Get("connection_limit").(int)
-	dynamic_ratio := d.Get("dynamic_ratio").(int)
+	rateLimit := d.Get("rate_limit").(string)
+	connectionLimit := d.Get("connection_limit").(int)
+	dynamicRatio := d.Get("dynamic_ratio").(int)
 	monitor := d.Get("monitor").(string)
 	state := d.Get("state").(string)
 	session := d.Get("session").(string)
@@ -149,9 +149,9 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 
 	nodeConfig := &bigip.Node{
 		Name:            name,
-		RateLimit:       rate_limit,
-		ConnectionLimit: connection_limit,
-		DynamicRatio:    dynamic_ratio,
+		RateLimit:       rateLimit,
+		ConnectionLimit: connectionLimit,
+		DynamicRatio:    dynamicRatio,
 		Monitor:         monitor,
 		State:           state,
 		Session:         session,
@@ -163,25 +163,27 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 		nodeConfig.Address = address
 	} else {
 		interval := d.Get("fqdn.0.interval").(string)
-		address_family := d.Get("fqdn.0.address_family").(string)
+		addressFamily := d.Get("fqdn.0.address_family").(string)
 		autopopulate := d.Get("fqdn.0.autopopulate").(string)
 		downinterval := d.Get("fqdn.0.downinterval").(int)
 
 		nodeConfig.FQDN.Name = address
 		nodeConfig.FQDN.Interval = interval
-		nodeConfig.FQDN.AddressFamily = address_family
+		nodeConfig.FQDN.AddressFamily = addressFamily
 		nodeConfig.FQDN.AutoPopulate = autopopulate
 		nodeConfig.FQDN.DownInterval = downinterval
 	}
 
-	log.Printf("[DEBUG] node in add is :%+v", nodeConfig)
-
-	if err := client.AddNode(nodeConfig); err != nil {
-		return fmt.Errorf("Error modifying node %s: %v", name, err)
-	}
-
+	log.Printf("[DEBUG] config of Node to be add :%+v", nodeConfig)
 	d.SetId(name)
 
+	exist, _ := resourceBigipLtmNodeExists(d, meta)
+	if !exist {
+		if err := client.AddNode(nodeConfig); err != nil {
+			d.SetId("")
+			return fmt.Errorf("Error modifying node %s: %v ", name, err)
+		}
+	}
 	return resourceBigipLtmNodeRead(d, meta)
 }
 
@@ -216,7 +218,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
 		}
 	}
-	d.Set("name", name)
+	_ = d.Set("name", name)
 
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
@@ -224,20 +226,21 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	if (node.Session == "monitor-enabled") || (node.Session == "user-enabled") {
 		log.Printf("[DEBUG] node session is :%s", node.Session)
-		d.Set("session", "user-enabled")
+		_ = d.Set("session", "user-enabled")
 	} else {
 		log.Printf("[DEBUG] node session is :%s", node.Session)
-		d.Set("session", "user-disabled")
+		_ = d.Set("session", "user-disabled")
 	}
 
-	d.Set("connection_limit", node.ConnectionLimit)
-	d.Set("description", node.Description)
-	d.Set("dynamic_ratio", node.DynamicRatio)
-	d.Set("ratio", node.Ratio)
-	d.Set("fqdn.0.interval", node.FQDN.Interval)
-	d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
-	d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
-	d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
+	_ = d.Set("connection_limit", node.ConnectionLimit)
+	_ = d.Set("description", node.Description)
+	_ = d.Set("dynamic_ratio", node.DynamicRatio)
+	_ = d.Set("monitor", strings.TrimSpace(node.Monitor))
+	_ = d.Set("ratio", node.Ratio)
+	_ = d.Set("fqdn.0.interval", node.FQDN.Interval)
+	_ = d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
+	_ = d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
+	_ = d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
 
 	return nil
 }
@@ -258,7 +261,7 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 		log.Printf("[WARN] node (%s) not found, removing from state", d.Id())
 		return false, nil
 	}
-	return node != nil, nil
+	return true, nil
 }
 
 func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -284,7 +287,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	if err := client.ModifyNode(name, nodeConfig); err != nil {
-		return fmt.Errorf("Error modifying node %s: %v", name, err)
+		return fmt.Errorf("Error modifying node %s: %v ", name, err)
 	}
 
 	return resourceBigipLtmNodeRead(d, meta)

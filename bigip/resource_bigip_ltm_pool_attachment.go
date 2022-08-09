@@ -91,11 +91,10 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 	nodeName := d.Get("node").(string)
 	poolPartition := strings.Split(poolName, "/")[1]
 	parts := strings.Split(nodeName, ":")
-	log.Printf("[DEBUG] Name of Node :%s ", nodeName)
+	log.Printf("[INFO][CREATE] Attaching Node :%+v to pool : %+v", nodeName, poolName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
-		log.Println("[DEBUG] Referencing node from ltm_node resource")
 		node1, err := client.GetNode(parts[0])
 		if err != nil {
 			log.Printf("[ERROR] Unable to retrieve node %s  %v :", nodeName, err)
@@ -123,11 +122,10 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			if err != nil {
 				return err
 			}
-
 			d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
 			return nil
 		}
-		log.Printf("[INFO] Adding node %s to pool: %s", nodeName, poolName)
+		log.Printf("[INFO][CREATE] Adding node : %+v to pool: %+v", nodeName, poolName)
 		err = client.AddPoolMemberNode(poolName, nodeName)
 		if err != nil {
 			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
@@ -171,7 +169,7 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	nodeName := d.Get("node").(string)
-	log.Printf("[DEBUG] node name is :%s", nodeName)
+	log.Printf("[DEBUG][UPDATE] node name is :%s", nodeName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
@@ -180,7 +178,6 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		if err != nil {
 			return err
 		}
-
 		if node1 == nil {
 			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
 			d.SetId("")
@@ -188,13 +185,10 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		}
 
 		poolMem := strings.Split(nodeName, ":")[0]
-		log.Printf("[DEBUG] pool member without port is :%s", poolMem)
-		node_name := strings.Split(poolMem, "/")[2]
-		log.Printf("[DEBUG] node_name passing to config is :%s", node_name)
+		nodeName1 := strings.Split(poolMem, "/")[2]
 		poolName := d.Get("pool").(string)
-		log.Printf("[DEBUG] poolName is :%s", poolName)
 		config := &bigip.PoolMember{
-			Name:            node_name,
+			Name:            nodeName1,
 			FullPath:        nodeName,
 			ConnectionLimit: d.Get("connection_limit").(int),
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
@@ -213,13 +207,12 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 			config.FQDN.Name = node1.FQDN.Name
 			config.FQDN.AutoPopulate = autoPopulate
 		}
+		log.Printf("[DEBUG] [UPDATE] pool config :%+v", config)
 		err = client.ModifyPoolMember(poolName, config)
 		if err != nil {
 			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
 		}
-
 	} else {
-
 		poolName := d.Id()
 		poolPartition := strings.Split(poolName, "/")[1]
 		nodeName := d.Get("node").(string)
@@ -234,7 +227,7 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 			RateLimit:       d.Get("connection_rate_limit").(string),
 			Ratio:           d.Get("ratio").(int),
 		}
-		log.Printf("[INFO] Modifying pool member (%s) from pool (%s)", poolMem, poolName)
+		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
 		if !IsValidIP(parts[0]) {
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {
@@ -245,6 +238,7 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 			config.FQDN.Name = parts[0]
 			config.FQDN.AutoPopulate = autoPopulate
 		}
+		log.Printf("[DEBUG] [UPDATE] pool config :%+v", config)
 		err := client.ModifyPoolMember(poolName, config)
 		if err != nil {
 			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
@@ -257,6 +251,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 	var poolName string
 	nodeName := d.Get("node").(string)
+	log.Printf("[DEBUG] Reading node name is :%s", nodeName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {

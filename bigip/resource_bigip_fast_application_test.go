@@ -45,6 +45,12 @@ func TestAccFastAppCreateOnBigip(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_fast_application.foo-app", "template", template),
 				),
 			},
+			{
+				Config: TestFastResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists("sample_app2", "sample_tenant", false),
+				),
+			},
 		},
 	})
 }

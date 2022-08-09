@@ -279,10 +279,6 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
-	//wafpolicy, err := client.GetWafPolicyQuery(name, partition)
-	//if err != nil {
-	//	return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
-	//}
 
 	if !client.Teem {
 		id := uuid.New()
@@ -327,7 +323,6 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err)
 	}
-	//log.Printf("[DEBUG] Policy Json : %+v", policyJson.Policy)
 	plJson, err := json.Marshal(policyJson.Policy)
 	if err != nil {
 		return err
@@ -347,7 +342,6 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if _, ok := d.GetOk("description"); ok {
 		_ = d.Set("description", policyJson.Policy.Description)
 	}
-	//_ = d.Set("signatures_settings", policyJson.Policy.SignatureSettings)
 	log.Printf("SignatureSettings:%+v", policyJson.Policy.SignatureSettings)
 	_ = d.Set("template_name", policyJson.Policy.Template.Name)
 	_ = d.Set("policy_export_json", string(plJson))
@@ -386,10 +380,6 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
 	}
-	//wafpolicy, err := client.GetWafPolicyQuery(name, partition)
-	//if err != nil {
-	//	return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
-	//}
 	return resourceBigipAwafPolicyRead(d, meta)
 }
 
@@ -445,6 +435,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			graphProfles = append(graphProfles, gralPro)
 		}
 	}
+	policyWaf.GraphqlProfiles = graphProfles
 	var fileTypes []bigip.Filetype
 	if val, ok := d.GetOk("file_types"); ok {
 		var fileType bigip.Filetype
@@ -454,7 +445,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			fileTypes = append(fileTypes, fileType)
 		}
 	}
-	policyWaf.GraphqlProfiles = graphProfles
+	policyWaf.Filetypes = fileTypes
 	policyWaf.Type = d.Get("type").(string)
 	policyWaf.Template = struct {
 		Name string `json:"name,omitempty"`
@@ -541,9 +532,6 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn.Policy.Parameters = append(polJsn.Policy.Parameters, policyWaf.Parameters...)
 		}
 		polJsn.Policy.GraphqlProfiles = append(polJsn.Policy.GraphqlProfiles, policyWaf.GraphqlProfiles...)
-		//if policyWaf.GraphqlProfiles != nil && len(policyWaf.GraphqlProfiles) > 0 {
-		//
-		//}
 		policyJson.Policy = polJsn.Policy
 	}
 
