@@ -93,9 +93,11 @@ Terraform Integration Resources and Data Sources
 ------------------------------------------------
 
 AWAF Resources:
+
 - `bigip_waf_policy <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_waf_policy>`_
 
 AWAF Data Sources:
+
 - `bigip_waf_entity_parameters <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_parameters>`_
 - `bigip_waf_entity_url <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_url>`_ 
 - `bigip_waf_pb_suggestions <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_pb_suggestions>`_ 
