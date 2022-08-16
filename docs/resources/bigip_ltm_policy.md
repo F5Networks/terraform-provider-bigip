@@ -30,8 +30,9 @@ resource "bigip_ltm_policy" "test-policy" {
   rule {
     name = "rule6"
     action {
-      forward = true
-      pool    = bigip_ltm_pool.mypool.name
+      forward    = true
+      connection = false
+      pool       = bigip_ltm_pool.mypool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]
@@ -56,10 +57,12 @@ resource "bigip_ltm_policy" "test-policy" {
 
 * `pool` - (Optional ) This action will direct the stream to this pool.
 
+* `connection` - (Optional) This action is set to `true` by default, it needs to be explicitly set to `false` for actions it conflicts with.
+
+
 ## Importing
 An existing monitor can be imported into this resource by supplying monitor Name in `full path` as `id`.
 An example is below:
 ```sh
 $ terraform import bigip_ltm_monitor.monitor /Common/terraform_monitor
 ```
-

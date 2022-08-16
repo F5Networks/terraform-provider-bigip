@@ -37,9 +37,10 @@ resource "bigip_ltm_policy" "test-policy" {
 	rule  {
 	      name = "rule6"
 		      action {
-//			      tm_name = "20"
-			      forward = true
-			      pool = "/Common/test-pool"
+//			      tm_name    = "20"
+			      forward    = true
+				  connection = false
+			      pool       = "/Common/test-pool"
 		      }
 	}
 }
@@ -53,8 +54,9 @@ resource "bigip_ltm_policy" "test-policy-again" {
     name = "testrule"
     action {
   //    tm_name = "http_to_https_redirect"
-      redirect = true
-      location = "tcl:https://[HTTP::host][HTTP::uri]"
+      redirect   = true
+	  connection = false
+      location   = "tcl:https://[HTTP::host][HTTP::uri]"
       http_reply = true
     }
   }
@@ -91,11 +93,132 @@ resource "bigip_ltm_policy" "test-policy" {
         rule  {
               name = "rule6"
                       action {
-//                            tm_name = "20"
-                              forward = true
-                              pool = "/Common/test-pool"
+//                            tm_name    = "20"
+                              forward    = true
+							  connection = false
+                              pool       = "/Common/test-pool"
                       }
         }
+}
+`
+
+var TestPolicyResource3 = `
+resource "bigip_ltm_pool" "test-policy-pool" {
+  name = "/Common/test-policy-pool"
+}
+resource "bigip_ltm_policy" "test-policy-rules" {
+	depends_on = ["bigip_ltm_pool.test-policy-pool"]
+	name       = "/Common/test-policy-rules"
+	strategy   = "first-match"
+	requires   = ["client-ssl"]
+	controls   = ["forwarding"]
+	rule {
+	  name = "Rule-01"
+	  condition {
+		ssl_extension    = true
+		server_name      = true
+		ends_with        = true
+		ssl_client_hello = true
+		values = [
+		  "domain1.net",
+		  "domain2.nl"
+		]
+	  }
+	  action {
+		forward          = true
+		connection       = false
+		pool             = bigip_ltm_pool.test-policy-pool.name
+		ssl_client_hello = true
+	  }
+	}
+	rule {
+	  name = "lastrule-deny"
+	  action {
+		shutdown         = true
+		ssl_client_hello = true
+	  }
+	}
+  }
+`
+
+var TestPolicyResource4 = `
+resource "bigip_ltm_pool" "test-policy-pool" {
+  name = "/Common/test-policy-pool"
+}
+resource "bigip_ltm_policy" "test-policy-rules" {
+	depends_on = ["bigip_ltm_pool.test-policy-pool"]
+	name       = "/Common/test-policy-rules"
+	strategy   = "first-match"
+	requires   = ["client-ssl"]
+	controls   = ["forwarding"]
+	rule {
+	  name = "Rule-01"
+	  condition {
+		ssl_extension    = true
+		server_name      = true
+		ends_with        = true
+		ssl_client_hello = true
+		values = [
+		  "domain1.net",
+		  "domain2.nl"
+		]
+	  }
+	  action {
+		forward          = true
+		connection       = false
+		pool             = bigip_ltm_pool.test-policy-pool.name
+		ssl_client_hello = true
+	  }
+	}
+	rule {
+	  name = "Rule-02"
+	  condition {
+		ssl_extension = true
+		server_name   = true
+		ends_with     = true
+		ssl_client_hello = true
+		values = [
+		  "domain3.net",
+		  "domain4.nl"
+		]
+	  }
+	  action {
+		forward          = true
+		connection       = false
+		pool             = bigip_ltm_pool.test-policy-pool.name
+		ssl_client_hello = true
+	  }
+	}
+	rule {
+	  name = "lastrule-deny"
+	  action {
+		shutdown         = true
+		ssl_client_hello = true
+	  }
+	}
+  }
+`
+
+var TestPolicyResource5 = `
+resource "bigip_ltm_policy" "test-policy-condition" {
+  name     = "/Common/test-policy-condition"
+  strategy = "first-match"
+  requires = ["http"]
+  rule {
+	name = "replace_if_exists"
+	action {
+	  replace     = true
+	  http_header = true
+	  connection  = false
+	  tm_name     = "X-Forwarded"
+	  value       = "https"
+	}
+	condition {
+	  http_header = true
+	  tm_name     = "X-Forwarded"
+	  exists      = true
+	}
+  }
 }
 `
 
@@ -112,6 +235,36 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TestPolicyName),
 					testCheckPolicyExists("/Common/test-policy-again"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_create_update(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestPolicyResource3,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/test-policy-rules"),
+				),
+			},
+			{
+				Config: TestPolicyResource4,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/test-policy-rules"),
+				),
+			},
+			{
+				Config: TestPolicyResource5,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/test-policy-condition"),
 				),
 			},
 		},
