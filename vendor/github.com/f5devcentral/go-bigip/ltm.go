@@ -930,6 +930,7 @@ type PolicyRuleCondition struct {
 	Domain                bool     `json:"domain,omitempty"`
 	EndsWith              bool     `json:"endsWith,omitempty"`
 	Equals                bool     `json:"equals,omitempty"`
+	Exists                bool     `json:"exists,omitempty"`
 	Expiry                bool     `json:"expiry,omitempty"`
 	Extension             bool     `json:"extension,omitempty"`
 	External              bool     `json:"external,omitempty"`
