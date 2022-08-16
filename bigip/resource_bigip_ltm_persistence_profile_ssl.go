@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
@@ -138,32 +137,14 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 		return nil
 	}
 	_ = d.Set("name", name)
-	if _, ok := d.GetOk("defaults_from"); ok {
-		d.Set("defaults_from", pp.DefaultsFrom)
-	}
-	if _, ok := d.GetOk("match_across_pools"); ok {
-		if err := d.Set("match_across_pools", pp.MatchAcrossPools); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MatchAcrossPools to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("match_across_services"); ok {
-		if err := d.Set("match_across_services", pp.MatchAcrossServices); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MatchAcrossServices to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("match_across_virtuals"); ok {
-		if err := d.Set("match_across_virtuals", pp.MatchAcrossVirtuals); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MatchAcrossVirtuals to state for PersistenceProfile SSL  (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("mirror"); ok {
-		d.Set("mirror", pp.Mirror)
-	}
-	if _, ok := d.GetOk("timeout"); ok {
-		d.Set("timeout", pp.Timeout)
-	}
-	if _, ok := d.GetOk("override_conn_limit"); ok {
-		d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	_ = d.Set("defaults_from", pp.DefaultsFrom)
+	_ = d.Set("match_across_pools", pp.MatchAcrossPools)
+	_ = d.Set("match_across_services", pp.MatchAcrossServices)
+	_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	_ = d.Set("mirror", pp.Mirror)
+	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
+		d.Set("timeout", timeout)
 	}
 	return nil
 }
