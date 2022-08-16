@@ -138,18 +138,20 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		return nil
 	} else {
 		log.Println("[DEBUG] creating node from pool attachment resource")
+		ipNode := strings.Split(parts[0], "%")[0]
 		config := &bigip.PoolMember{
 			Name:      nodeName,
 			Partition: poolPartition,
 		}
-		if !IsValidIP(parts[0]) {
+		log.Printf("[DEUBG]: Node info:%+v with part:%+v", nodeName, parts[0])
+		if !IsValidIP(ipNode) {
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {
 				autoPopulate = "enabled"
 			} else {
 				autoPopulate = d.Get("fqdn_autopopulate").(string)
 			}
-			config.FQDN.Name = parts[0]
+			config.FQDN.Name = ipNode
 			config.FQDN.AutoPopulate = autoPopulate
 		}
 		log.Printf("[INFO] Adding Pool member (%s) to pool (%s)", nodeName, poolName)
@@ -217,10 +219,12 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		poolPartition := strings.Split(poolName, "/")[1]
 		nodeName := d.Get("node").(string)
 		parts := strings.Split(nodeName, ":")
+		ipNode := strings.Split(parts[0], "%")[0]
 		poolMem := fmt.Sprintf("/%s/%s", poolPartition, nodeName)
 		config := &bigip.PoolMember{
 			Name:            nodeName,
 			FullPath:        poolMem,
+			Address:         parts[0],
 			ConnectionLimit: d.Get("connection_limit").(int),
 			DynamicRatio:    d.Get("dynamic_ratio").(int),
 			PriorityGroup:   d.Get("priority_group").(int),
@@ -228,18 +232,18 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 			Ratio:           d.Get("ratio").(int),
 		}
 		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
-		if !IsValidIP(parts[0]) {
+		if !IsValidIP(ipNode) {
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {
 				autoPopulate = "enabled"
 			} else {
 				autoPopulate = d.Get("fqdn_autopopulate").(string)
 			}
-			config.FQDN.Name = parts[0]
+			config.FQDN.Name = ipNode
 			config.FQDN.AutoPopulate = autoPopulate
 		}
 		log.Printf("[DEBUG] [UPDATE] pool config :%+v", config)
-		err := client.ModifyPoolMember(poolName, config)
+		err := client.ModifyPoolMember2(poolName, config)
 		if err != nil {
 			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
 		}

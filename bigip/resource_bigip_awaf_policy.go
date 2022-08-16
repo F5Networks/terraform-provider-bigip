@@ -161,13 +161,14 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"learning_mode": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"automatic", "disabled", "manual"}, false),
 						},
 					},
 				},
 			},
-			"graphql_profile": {
+			"graphql_profiles": {
 				Type:        schema.TypeSet,
 				Description: "graphql_profile settings for policy",
 				Optional:    true,
@@ -191,8 +192,9 @@ func resourceBigipAwafPolicy() *schema.Resource {
 							Optional: true,
 						},
 						"type": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"explicit", "wildcard"}, false),
 						},
 					},
 				},
@@ -428,7 +430,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 	}
 	var graphProfles []bigip.GraphqlProfile
-	if val, ok := d.GetOk("graphql_profile"); ok {
+	if val, ok := d.GetOk("graphql_profiles"); ok {
 		var gralPro bigip.GraphqlProfile
 		for _, item := range val.(*schema.Set).List() {
 			gralPro.Name = item.(map[string]interface{})["name"].(string)

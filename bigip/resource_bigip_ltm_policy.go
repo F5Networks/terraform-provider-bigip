@@ -39,10 +39,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Name of the Policy",
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the Policy",
+				ForceNew:     true,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"published_copy": {
 				Type:        schema.TypeString,
@@ -50,28 +51,24 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Description: "Publish the Policy",
 				ForceNew:    true,
 			},
-
 			"controls": {
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
-
 			"requires": {
 				Type:     schema.TypeSet,
 				Set:      schema.HashString,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
-
 			"strategy": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "/Common/first-match",
 				Description: "Policy Strategy (i.e. /Common/first-match)",
 			},
-
 			"rule": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -82,7 +79,6 @@ func resourceBigipLtmPolicy() *schema.Resource {
 							Required:    true,
 							Description: "Rule name",
 						},
-
 						"action": {
 							Type:     schema.TypeList,
 							Optional: true,
@@ -1084,7 +1080,7 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
-		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
+		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name ")
 	}
 	partition := match[1]
 	policyName := match[2]

@@ -10,7 +10,7 @@ description: |-
 
 `bigip_ltm_monitor` Configures a custom monitor for use by health checks.
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
+For resources should be named with their `full path`. The full path is the combination of the `partition + name` of the resource. For example `/Common/test-monitor`.
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ resource "bigip_ltm_monitor" "monitor" {
   parent      = "/Common/http"
   send        = "GET /some/path\r\n"
   timeout     = "999"
-  interval    = "999"
+  interval    = "998"
   destination = "1.2.3.4:1234"
 }
 
@@ -31,8 +31,8 @@ resource "bigip_ltm_monitor" "test-https-monitor" {
   parent      = "/Common/http"
   ssl_profile = "/Common/serverssl"
   send        = "GET /some/path\r\n"
-  timeout     = "999"
   interval    = "999"
+  timeout     = "1000"
 }
 
 resource "bigip_ltm_monitor" "test-ftp-monitor" {
@@ -63,7 +63,7 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 
 * `parent` - (Required,type `string`)  Parent monitor for the system to use for setting initial values for the new monitor.
 
-* `interval` - (Optional,type `int`) Specifies, in seconds, the frequency at which the system issues the monitor check when either the resource is down or the status of the resource is unknown. The default is `5`
+* `interval` - (Optional,type `int`) Specifies, in seconds, the frequency at which the system issues the monitor check when either the resource is down or the status of the resource is unknown,value of `interval` should be always less than `timeout`. Default is `5`.
 
 * `up_interval` - (Optional,type `int`) Specifies the interval for the system to use to perform the health check when a resource is up. The default is `0(Disabled)`
 
@@ -104,3 +104,11 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 * `mode` - (Optional,type `string`) Specifies the data transfer process (DTP) mode. The default value is passive. The options are passive (Specifies that the monitor sends a data transfer request to the FTP server. When the FTP server receives the request, the FTP server then initiates and establishes the data connection.) and active (Specifies that the monitor initiates and establishes the data connection with the FTP server.).
 
 * `ssl_profile` - (Optional,type `string`) Specifies the ssl profile for the monitor. It only makes sense when the parent is `/Common/https`
+
+## Importing
+An existing monitor can be imported into this resource by supplying monitor Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_monitor.monitor /Common/terraform_monitor
+```
+

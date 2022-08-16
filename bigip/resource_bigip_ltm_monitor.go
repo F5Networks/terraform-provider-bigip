@@ -28,6 +28,7 @@ var parentMonitors = map[string]bool{
 	"/Common/tcp":           true,
 	"/Common/tcp-half-open": true,
 	"/Common/ftp":           true,
+	"/Common/ldap":          true,
 }
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -49,7 +50,6 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
-
 			"parent": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -69,14 +69,12 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Description: "Specifies the interval for the system to use to perform the health check when a resource is up. The default is 0 (Disabled)",
 				Computed:    true,
 			},
-
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Specifies the number of seconds the target has in which to respond to the monitor request. The default is 16 seconds",
 				Computed:    true,
 			},
-
 			"send": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -86,7 +84,6 @@ func resourceBigipLtmMonitor() *schema.Resource {
 					return strings.ReplaceAll(s.(string), "\r\n", "\\r\\n")
 				},
 			},
-
 			"receive": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -284,9 +281,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
-
 	log.Printf("[INFO] Checking LTM Monitor: %+v Exist", name)
 
 	monitors, err := client.Monitors()

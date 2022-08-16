@@ -219,6 +219,30 @@ func TestAccBigipLtmPoolAttachment_Issue92(t *testing.T) {
 		},
 	})
 }
+func TestAccBigipLtmPoolAttachment_Issue661(t *testing.T) {
+	t.Parallel()
+	TestPoolName = "/TEST2/test-pool-issue661"
+	poolMemberFullpath1 := "/TEST2/2.3.2.2%30:8080"
+	poolMem2 := "2.3.2.2%30:8080"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmPoolattachIssu661(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolExists(TestPoolName),
+					testCheckPoolAttachment(TestPoolName, poolMemberFullpath1, true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.attach", "pool", TestPoolName),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.attach", "node", poolMem2),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -402,6 +426,24 @@ func testaccbigipltmPoolattachIssu92() string {
 		resource "bigip_ltm_pool_attachment" "example_pool_member_1" {
 		  pool = bigip_ltm_pool.example_pool.name
 		  node = format("%s:%s",bigip_ltm_node.node1.name,0)
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmPoolattachIssu661() string {
+	tfConfig := `
+		resource "bigip_command" "create_partition" {
+			commands = ["create auth partition TEST2","create net route-domain /TEST2/testdomain id 30"]
+			when     = "apply"
+		}
+		resource "bigip_ltm_pool" "example" {
+  			name = "/TEST2/test-pool-issue661"
+			depends_on = [bigip_command.create_partition]
+		}
+		resource "bigip_ltm_pool_attachment" "attach" {
+  			pool = bigip_ltm_pool.example.name
+  			node = "2.3.2.2%30:8080"
+  			connection_limit = 11
 		}`
 	return tfConfig
 }
