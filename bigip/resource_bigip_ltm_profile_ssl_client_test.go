@@ -43,9 +43,7 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/505
-//
 func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-UpdateName"
@@ -80,9 +78,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
-//
 func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-UpdateAuthenticate"
@@ -164,9 +160,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
-//
 func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-UpdateTmoptions"
@@ -204,9 +198,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/318
-//
 func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl"
@@ -233,9 +225,7 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 	})
 }
 
-//
 // This TC is added baseddded based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/449
-//
 func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-CertkeyChain"
@@ -278,9 +268,7 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
-//
 func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-UpdateCachetimeout"

@@ -74,9 +74,7 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
-//
 func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl-UpdateAuthenticate"
@@ -113,9 +111,7 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 	})
 }
 
-//
 // This TC is added based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/213
-//
 func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl-UpdateTmoptions"

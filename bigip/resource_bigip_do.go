@@ -6,10 +6,11 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math"
 	"net/http"
@@ -144,16 +145,18 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error while receiving  http response with DO json:%v", err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	// body, err := os.ReadAll(resp.Body)
+	var body bytes.Buffer
+	_, err = io.Copy(&body, resp.Body)
 	if err != nil {
 		return fmt.Errorf("Error while reading http response with DO json:%v ", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 202 {
-		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
+		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", body.String(), err)
 	}
 	respRef := make(map[string]interface{})
-	if err := json.Unmarshal(body, &respRef); err != nil {
+	if err := json.Unmarshal(body.Bytes(), &respRef); err != nil {
 		return err
 	}
 	respID := respRef["id"].(string)
@@ -191,13 +194,15 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 			}
 			switch {
 			case taskResp.StatusCode == 200:
-				respBody, err := ioutil.ReadAll(taskResp.Body)
+				var body bytes.Buffer
+				_, err = io.Copy(&body, taskResp.Body)
+				// respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
 					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
-				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+				if err := json.Unmarshal(body.Bytes(), &respRef1); err != nil {
 					return err
 				}
 				log.Printf("[DEBUG] Got success and setting state id")
@@ -205,13 +210,15 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				d.SetId(respID)
 				break forLoop
 			case taskResp.StatusCode == 202:
-				respBody, err := ioutil.ReadAll(taskResp.Body)
+				var respBody bytes.Buffer
+				_, err = io.Copy(&body, taskResp.Body)
+				// respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
 					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
-				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+				if err := json.Unmarshal(respBody.Bytes(), &respRef1); err != nil {
 					return err
 				}
 				resultMap := respRef1["result"]
@@ -235,26 +242,27 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 		taskResp, err := client.Do(req)
 		if taskResp == nil {
 			d.SetId("")
-			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
 		defer taskResp.Body.Close()
 		if err != nil {
 			d.SetId("")
-			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
-		respBody, err := ioutil.ReadAll(taskResp.Body)
+		var respBody bytes.Buffer
+		_, err = io.Copy(&respBody, taskResp.Body)
 		if err != nil {
 			d.SetId("")
-			return fmt.Errorf("Timedout while polling the DO task id with error :%v", err)
+			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
 		respRef2 := make(map[string]interface{})
-		if err := json.Unmarshal(respBody, &respRef2); err != nil {
+		if err := json.Unmarshal(respBody.Bytes(), &respRef2); err != nil {
 			return err
 		}
 		log.Printf("[DEBUG] timeout resp_body is :%v", respRef2)
 		resultMap := respRef2["result"]
 		d.SetId("")
-		return fmt.Errorf("Timeout while polling the DO task id with result:%v", resultMap)
+		return fmt.Errorf("Timeout while polling the DO task id with result:%v ", resultMap)
 	}
 
 	return resourceBigipDoRead(d, meta)
@@ -295,17 +303,19 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error while receiving http response body in read call :%v ", err)
 	}
-	respBody, err := ioutil.ReadAll(resp.Body)
+	var respBody bytes.Buffer
+	_, err = io.Copy(&respBody, resp.Body)
+	// respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Error while reading http response body in read call :%v ", err)
 	}
-	bodyString := string(respBody)
+	bodyString := respBody.String()
 	if resp.Status != "200 OK" {
 		return fmt.Errorf("Error while Sending/fetching http request :%s ", bodyString)
 	}
 
 	respRef1 := make(map[string]interface{})
-	if err := json.Unmarshal(respBody, &respRef1); err != nil {
+	if err := json.Unmarshal(respBody.Bytes(), &respRef1); err != nil {
 		return err
 	}
 	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
@@ -349,9 +359,10 @@ func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, erro
 			log.Printf("[DEBUG] Could not close the request to %s", url)
 		}
 	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
+	var body bytes.Buffer
+	_, err = io.Copy(&body, resp.Body)
+	// body, err := ioutil.ReadAll(resp.Body)
+	bodyString := body.String()
 	if resp.Status == "204 No Content" || err != nil {
 		log.Printf("[ERROR] Error while checking doresource present in bigip :%s  %v", bodyString, err)
 		return false, err
@@ -399,16 +410,18 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error while receiving  http response with DO json:%v", err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	var body bytes.Buffer
+	_, err = io.Copy(&body, resp.Body)
+	// body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Error while reading http response with DO json:%v", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 202 {
-		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", string(body), err)
+		return fmt.Errorf("Error while Sending/Posting http request with DO json :%s  %v", body.String(), err)
 	}
 	respRef := make(map[string]interface{})
-	if err := json.Unmarshal(body, &respRef); err != nil {
+	if err := json.Unmarshal(body.Bytes(), &respRef); err != nil {
 		return err
 	}
 	respID := respRef["id"].(string)
@@ -446,26 +459,30 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 			}
 			switch {
 			case taskResp.StatusCode == 200:
-				respBody, err := ioutil.ReadAll(taskResp.Body)
+				var respBody bytes.Buffer
+				_, err = io.Copy(&respBody, taskResp.Body)
+				// respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
 					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
-				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+				if err := json.Unmarshal(respBody.Bytes(), &respRef1); err != nil {
 					return err
 				}
 				doSuccess = true
 				d.SetId(respID)
 				break forLoop
 			case taskResp.StatusCode == 202:
-				respBody, err := ioutil.ReadAll(taskResp.Body)
+				var respBody bytes.Buffer
+				_, err = io.Copy(&respBody, taskResp.Body)
+				// respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
 					return fmt.Errorf("Error while reading the response body :%v ", err)
 				}
 				respRef1 := make(map[string]interface{})
-				if err := json.Unmarshal(respBody, &respRef1); err != nil {
+				if err := json.Unmarshal(respBody.Bytes(), &respRef1); err != nil {
 					return err
 				}
 				resultMap := respRef1["result"]
@@ -498,13 +515,15 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
-		respBody, err := ioutil.ReadAll(taskResp.Body)
+		var respBody bytes.Buffer
+		_, err = io.Copy(&respBody, taskResp.Body)
+		// respBody, err := ioutil.ReadAll(taskResp.Body)
 		if err != nil {
 			d.SetId("")
 			return fmt.Errorf("Timedout while polling the DO task id with error :%v ", err)
 		}
 		respRef2 := make(map[string]interface{})
-		if err := json.Unmarshal(respBody, &respRef2); err != nil {
+		if err := json.Unmarshal(respBody.Bytes(), &respRef2); err != nil {
 			return err
 		}
 

@@ -7,9 +7,10 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -149,13 +150,15 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 		}
 	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	var body bytes.Buffer
+	_, err = io.Copy(&body, resp.Body)
+	// body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
-	bodyString := string(body)
-	if resp.Status != "200 OK" || err != nil {
+	bodyString := body.String()
+	if resp.Status != "200 OK" {
 		return fmt.Errorf("Error while Sending/Posting http request for Delete operation :%s  %v", bodyString, err)
 	}
 
