@@ -15,13 +15,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_NODE_NAME = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-var TEST_V6_NODE_NAME = fmt.Sprintf("/%s/test-v6-node", TEST_PARTITION)
-var TEST_FQDN_NODE_NAME = fmt.Sprintf("/%s/test-fqdn-node", TEST_PARTITION)
+var TestNodeName = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
+var TestV6NodeName = fmt.Sprintf("/%s/test-v6-node", TEST_PARTITION)
+var TestFqdnNodeName = fmt.Sprintf("/%s/test-fqdn-node", TEST_PARTITION)
 
-var TEST_NODE_RESOURCE = `
+var resNodeName = "bigip_ltm_node"
+
+type UpdateParam struct {
+	key   string
+	value string
+}
+
+var TestNodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TEST_NODE_NAME + `"
+	name = "` + TestNodeName + `"
 	address = "192.168.30.1"
 	connection_limit = "0"
 	dynamic_ratio = "1"
@@ -32,9 +39,9 @@ resource "bigip_ltm_node" "test-node" {
 }
 `
 
-var TEST_V6_NODE_RESOURCE = `
+var TestV6NodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TEST_V6_NODE_NAME + `"
+	name = "` + TestV6NodeName + `"
 	address = "fe80::10"
 	connection_limit = "0"
 	dynamic_ratio = "1"
@@ -44,9 +51,9 @@ resource "bigip_ltm_node" "test-node" {
 }
 `
 
-var TEST_FQDN_NODE_RESOURCE = `
+var TestFqdnNodeResource = `
 resource "bigip_ltm_node" "test-fqdn-node" {
-	name = "` + TEST_FQDN_NODE_NAME + `"
+	name = "` + TestFqdnNodeName + `"
 	address = "f5.com"
 	connection_limit = "0"
 	dynamic_ratio = "1"
@@ -58,7 +65,7 @@ resource "bigip_ltm_node" "test-fqdn-node" {
 }
 `
 
-func TestAccBigipLtmNode_create(t *testing.T) {
+func TestAccBigipLtmNode_Create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -67,10 +74,10 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_NODE_RESOURCE,
+				Config: TestNodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_NODE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_NODE_NAME),
+					testCheckNodeExists(TestNodeName),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TestNodeName),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "192.168.30.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
@@ -84,7 +91,9 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			},
 		},
 	})
+}
 
+func TestAccBigipLtmNode_V6create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -93,10 +102,10 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_V6_NODE_RESOURCE,
+				Config: TestV6NodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_V6_NODE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TEST_V6_NODE_NAME),
+					testCheckNodeExists(TestV6NodeName),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "name", TestV6NodeName),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "address", "fe80::10"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "connection_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-node", "dynamic_ratio", "1"),
@@ -107,7 +116,9 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 			},
 		},
 	})
+}
 
+func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -116,10 +127,10 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FQDN_NODE_RESOURCE,
+				Config: TestFqdnNodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_FQDN_NODE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "name", TEST_FQDN_NODE_NAME),
+					testCheckNodeExists(TestFqdnNodeName),
+					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "name", TestFqdnNodeName),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "address", "f5.com"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "connection_limit", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "dynamic_ratio", "1"),
@@ -129,6 +140,43 @@ func TestAccBigipLtmNode_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
+	t.Parallel()
+	var instName = "test-node-monitor"
+	var TestNodeName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNodeName, instName)
+	var moni UpdateParam
+	var moni2 UpdateParam
+	moni.key = "monitor"
+	moni.value = "default"
+	moni2.key = "monitor"
+	moni2.value = "/Common/none"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmNodeUpdateParam(instName, moni),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(TestNodeName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestNodeName),
+					resource.TestCheckResourceAttr(resFullName, "monitor", "default"),
+				),
+			},
+			{
+				Config: testaccbigipltmNodeUpdateParam(instName, moni2),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(TestNodeName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestNodeName),
+					resource.TestCheckResourceAttr(resFullName, "monitor", "/Common/none"),
 				),
 			},
 		},
@@ -144,11 +192,11 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_NODE_RESOURCE,
+				Config: TestNodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_NODE_NAME),
+					testCheckNodeExists(TestNodeName),
 				),
-				ResourceName:      TEST_NODE_NAME,
+				ResourceName:      TestNodeName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -163,11 +211,11 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_V6_NODE_RESOURCE,
+				Config: TestV6NodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_V6_NODE_NAME),
+					testCheckNodeExists(TestV6NodeName),
 				),
-				ResourceName:      TEST_V6_NODE_NAME,
+				ResourceName:      TestV6NodeName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -182,11 +230,11 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FQDN_NODE_RESOURCE,
+				Config: TestFqdnNodeResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckNodeExists(TEST_FQDN_NODE_NAME),
+					testCheckNodeExists(TestFqdnNodeName),
 				),
-				ResourceName:      TEST_FQDN_NODE_NAME,
+				ResourceName:      TestFqdnNodeName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -203,7 +251,7 @@ func testCheckNodeExists(name string) resource.TestCheckFunc {
 			return err
 		}
 		if node == nil {
-			return fmt.Errorf("Node %s was not created.", name)
+			return fmt.Errorf("Node %s was not created ", name)
 		}
 
 		return nil
@@ -224,8 +272,24 @@ func testCheckNodesDestroyed(s *terraform.State) error {
 			return err
 		}
 		if node != nil {
-			return fmt.Errorf("Node %s not destroyed.", name)
+			return fmt.Errorf("Node %s not destroyed ", name)
 		}
 	}
 	return nil
+}
+
+func testaccbigipltmNodeUpdateParam(instName string, updateParam UpdateParam) string {
+	resPrefix := fmt.Sprintf(`
+		resource "%[1]s" "%[2]s" {
+			  name = "/Common/%[2]s"
+              address = "192.168.100.100"
+		`, resNodeName, instName)
+	switch updateParam.key {
+	case "monitor":
+		resPrefix = fmt.Sprintf(`%s
+			  monitor = "%s"`, resPrefix, updateParam.value)
+	default:
+	}
+	return fmt.Sprintf(`%s
+		}`, resPrefix)
 }

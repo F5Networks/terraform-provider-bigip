@@ -3,6 +3,7 @@ package bigip
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -20,9 +21,14 @@ const (
 
 type ApplywafPolicy struct {
 	Filename string `json:"filename,omitempty"`
+	FullPath string `json:"fullPath,omitempty"`
 	Policy   struct {
 		FullPath string `json:"fullPath,omitempty"`
 	} `json:"policy,omitempty"`
+	//PolicyReference struct {
+	//	Link     string `json:"link,omitempty"`
+	//	FullPath string `json:"fullPath,omitempty"`
+	//} `json:"policyReference,omitempty"`
 }
 
 type PbExport struct {
@@ -80,17 +86,63 @@ type WafUrlJsons struct {
 }
 
 type WafUrlJson struct {
-	Name                      string            `json:"name,omitempty"`
-	Description               string            `json:"description,omitempty"`
-	Type                      string            `json:"type,omitempty"`
-	Protocol                  string            `json:"protocol,omitempty"`
-	Method                    string            `json:"method,omitempty"`
-	PerformStaging            bool              `json:"performStaging,omitempty"`
-	SignatureOverrides        []WafUrlSig       `json:"signatureOverrides,omitempty"`
-	MethodOverrides           []MethodOverrides `json:"methodOverrides,omitempty"`
-	AttackSignaturesCheck     bool              `json:"attackSignaturesCheck,omitempty"`
-	IsAllowed                 bool              `json:"isAllowed,omitempty"`
-	MethodsOverrideOnUrlCheck bool              `json:"methodsOverrideOnUrlCheck,omitempty"`
+	Name                                string            `json:"name,omitempty"`
+	Description                         string            `json:"description,omitempty"`
+	Type                                string            `json:"type,omitempty"`
+	Protocol                            string            `json:"protocol,omitempty"`
+	Method                              string            `json:"method,omitempty"`
+	PerformStaging                      bool              `json:"performStaging,omitempty"`
+	SignatureOverrides                  []WafUrlSig       `json:"signatureOverrides,omitempty"`
+	MethodOverrides                     []MethodOverrides `json:"methodOverrides,omitempty"`
+	AttackSignaturesCheck               bool              `json:"attackSignaturesCheck,omitempty"`
+	IsAllowed                           bool              `json:"isAllowed,omitempty"`
+	MethodsOverrideOnUrlCheck           bool              `json:"methodsOverrideOnUrlCheck,omitempty"`
+	ClickjackingProtection              bool              `json:"clickjackingProtection,omitempty"`
+	DisallowFileUploadOfExecutables     bool              `json:"disallowFileUploadOfExecutables,omitempty"`
+	HTML5CrossOriginRequestsEnforcement struct {
+		EnforcementMode string `json:"enforcementMode,omitempty"`
+	} `json:"html5CrossOriginRequestsEnforcement,omitempty"`
+	MandatoryBody      bool `json:"mandatoryBody,omitempty"`
+	URLContentProfiles []struct {
+		ContentProfile struct {
+			Name string `json:"name,omitempty"`
+		} `json:"contentProfile,omitempty"`
+		HeaderName  string `json:"headerName,omitempty"`
+		HeaderOrder string `json:"headerOrder,omitempty"`
+		HeaderValue string `json:"headerValue,omitempty"`
+		Type        string `json:"type,omitempty"`
+	} `json:"urlContentProfiles,omitempty"`
+}
+
+type Filetype struct {
+	Allowed                bool   `json:"allowed,omitempty"`
+	CheckPostDataLength    bool   `json:"checkPostDataLength,omitempty"`
+	CheckQueryStringLength bool   `json:"checkQueryStringLength,omitempty"`
+	CheckRequestLength     bool   `json:"checkRequestLength,omitempty"`
+	CheckURLLength         bool   `json:"checkUrlLength,omitempty"`
+	Name                   string `json:"name,omitempty"`
+	PerformStaging         bool   `json:"performStaging,omitempty"`
+	PostDataLength         int    `json:"postDataLength,omitempty"`
+	QueryStringLength      int    `json:"queryStringLength,omitempty"`
+	RequestLength          int    `json:"requestLength,omitempty"`
+	ResponseCheck          bool   `json:"responseCheck,omitempty"`
+	Type                   string `json:"type,omitempty"`
+	URLLength              int    `json:"urlLength,omitempty"`
+}
+
+type GraphqlProfile struct {
+	AttackSignaturesCheck bool `json:"attackSignaturesCheck"`
+	DefenseAttributes     struct {
+		AllowIntrospectionQueries bool        `json:"allowIntrospectionQueries"`
+		MaximumBatchedQueries     interface{} `json:"maximumBatchedQueries,omitempty"`
+		MaximumStructureDepth     interface{} `json:"maximumStructureDepth,omitempty"`
+		MaximumTotalLength        interface{} `json:"maximumTotalLength,omitempty"`
+		MaximumValueLength        interface{} `json:"maximumValueLength,omitempty"`
+		TolerateParsingWarnings   bool        `json:"tolerateParsingWarnings"`
+	} `json:"defenseAttributes,omitempty"`
+	Description          string `json:"description,omitempty"`
+	MetacharElementCheck bool   `json:"metacharElementCheck"`
+	Name                 string `json:"name,omitempty"`
 }
 
 type SignatureType struct {
@@ -165,7 +217,10 @@ type WafPolicy struct {
 	ServerTechnologies  []struct {
 		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
 	} `json:"server-technologies,omitempty"`
-	Urls              []WafUrlJson `json:"urls,omitempty"`
+	Urls          []WafUrlJson `json:"urls,omitempty"`
+	PolicyBuilder struct {
+		LearningMode string `json:"learningMode,omitempty"`
+	} `json:"policy-builder,omitempty"`
 	SignatureSettings struct {
 		SignatureStaging bool `json:"signatureStaging,omitempty"`
 	} `json:"signature-settings,omitempty"`
@@ -176,6 +231,8 @@ type WafPolicy struct {
 		Description   string `json:"description,omitempty"`
 		BlockRequests string `json:"blockRequests,omitempty"`
 	} `json:"whitelist-ips,omitempty"`
+	GraphqlProfiles        []GraphqlProfile `json:"graphql-profiles,omitempty"`
+	Filetypes              []Filetype       `json:"filetypes,omitempty"`
 	DisallowedGeolocations []struct {
 		CountryName string `json:"countryName,omitempty"`
 	} `json:"disallowed-geolocations,omitempty"`
@@ -204,6 +261,9 @@ type ApplyStatus struct {
 	} `json:"policyReference"`
 	Status string `json:"status"`
 	ID     string `json:"id"`
+	Result struct {
+		Message string `json:"message"`
+	} `json:"result,omitempty"`
 }
 
 type Parameters struct {
@@ -301,6 +361,7 @@ func (b *BigIP) GetWafPolicyQuery(wafPolicyName string, partition string) (*WafP
 
 func (b *BigIP) GetWafPolicy(policyID string) (*WafPolicy, error) {
 	var wafPolicy WafPolicy
+	log.Printf("WAF policy get with ID:%+v", policyID)
 	err, _ := b.getForEntity(&wafPolicy, uriMgmt, uriTm, uriAsm, uriWafPol, policyID)
 	if err != nil {
 		return nil, err
@@ -314,6 +375,8 @@ func (b *BigIP) ExportPolicy(policyID string) (*PolicyStruct, error) {
 	exportPayload.Format = "json"
 	exportPayload.Inline = true
 	exportPayload.PolicyReference.Link = fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID)
+
+	log.Printf("payload:%+v", exportPayload)
 	resp, err := b.postReq(exportPayload, uriMgmt, uriTm, uriAsm, uriTasks, uriExportpolicy)
 	if err != nil {
 		return nil, err
@@ -405,7 +468,7 @@ func (b *BigIP) GetApplyStatus(taskId string) error {
 		return nil
 	}
 	if applyStatus.Status == "FAILURE" {
-		return fmt.Errorf("[ERROR] WafPolicy Apply failed with :%+v", applyStatus)
+		return fmt.Errorf("[ERROR] WafPolicy Apply failed with :%+v", applyStatus.Result.Message)
 	}
 	if applyStatus.Status == "STARTED" {
 		time.Sleep(5 * time.Second)
@@ -420,22 +483,53 @@ func (b *BigIP) DeleteWafPolicy(policyId string) error {
 }
 
 // ImportAwafJson import Awaf Json from local machine to BIGIP
-func (b *BigIP) ImportAwafJson(awafPolicyName, awafJsonContent string) (string, error) {
+func (b *BigIP) ImportAwafJson(awafPolicyName, awafJsonContent, policyID string) (string, error) {
 	certbyte := []byte(awafJsonContent)
 	policyName := awafPolicyName[strings.LastIndex(awafPolicyName, "/")+1:]
 	_, err := b.UploadAsmBytes(certbyte, fmt.Sprintf("%s.json", policyName))
 	if err != nil {
 		return "", err
 	}
-	policyPath := struct {
-		FullPath string `json:"fullPath,omitempty"`
-	}{
-		FullPath: awafPolicyName,
-	}
 	applywaf := ApplywafPolicy{
 		Filename: fmt.Sprintf("%s.json", policyName),
-		Policy:   policyPath,
+		FullPath: awafPolicyName,
 	}
+	if policyID == "" {
+		policyPath := struct {
+			FullPath string `json:"fullPath,omitempty"`
+		}{
+			FullPath: awafPolicyName,
+		}
+		applywaf.Policy = policyPath
+	} else {
+		policyPath := struct {
+			Link     string `json:"link,omitempty"`
+			FullPath string `json:"fullPath,omitempty"`
+		}{
+			Link:     fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID),
+			FullPath: awafPolicyName,
+		}
+		policy := struct {
+			FileName        string      `json:"filename"`
+			PolicyReference interface{} `json:"policyReference"`
+		}{
+			FileName: fmt.Sprintf("%s.json", policyName),
+			//FullPath: awafPolicyName,
+			PolicyReference: policyPath,
+		}
+		log.Printf("import policy:%+v", policy)
+		resp, err := b.postReq(policy, uriMgmt, uriTm, uriAsm, uriTasks, uriImportpolicy)
+		if err != nil {
+			return "", err
+		}
+		var taskStatus ImportStatus
+		err = json.Unmarshal(resp, &taskStatus)
+		if err != nil {
+			return "", err
+		}
+		return taskStatus.ID, nil
+	}
+	log.Printf("import policy:%+v", applywaf)
 	resp, err := b.postReq(applywaf, uriMgmt, uriTm, uriAsm, uriTasks, uriImportpolicy)
 	if err != nil {
 		return "", err
@@ -449,15 +543,42 @@ func (b *BigIP) ImportAwafJson(awafPolicyName, awafJsonContent string) (string, 
 }
 
 // ApplyAwafJson apply Awaf Json policy
-func (b *BigIP) ApplyAwafJson(awafPolicyName string) (string, error) {
-	policyPath := struct {
-		FullPath string `json:"fullPath,omitempty"`
-	}{
-		FullPath: awafPolicyName,
+func (b *BigIP) ApplyAwafJson(awafPolicyName, policyID string) (string, error) {
+	applywaf := ApplywafPolicy{}
+	if policyID == "" {
+		policyPath := struct {
+			FullPath string `json:"fullPath,omitempty"`
+		}{
+			FullPath: awafPolicyName,
+		}
+		applywaf.Policy = policyPath
+	} else {
+		policyPath := struct {
+			Link     string `json:"link,omitempty"`
+			FullPath string `json:"fullPath,omitempty"`
+		}{
+			Link:     fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID),
+			FullPath: awafPolicyName,
+		}
+		policy := struct {
+			PolicyReference interface{} `json:"policyReference,omitempty"`
+		}{
+			PolicyReference: policyPath,
+		}
+		log.Printf("import policy:%+v", policy)
+		resp, err := b.postReq(policy, uriMgmt, uriTm, uriAsm, uriTasks, uriApplypolicy)
+		if err != nil {
+			return "", err
+		}
+		var taskStatus ApplyStatus
+		err = json.Unmarshal(resp, &taskStatus)
+		if err != nil {
+			return "", err
+		}
+		return taskStatus.ID, nil
 	}
-	applywaf := ApplywafPolicy{
-		Policy: policyPath,
-	}
+
+	log.Printf("apply policy body:%+v", applywaf)
 	resp, err := b.postReq(applywaf, uriMgmt, uriTm, uriAsm, uriTasks, uriApplypolicy)
 	if err != nil {
 		return "", err

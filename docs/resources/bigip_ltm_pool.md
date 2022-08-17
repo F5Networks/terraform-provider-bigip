@@ -10,13 +10,12 @@ description: |-
 
 `bigip_ltm_pool` Manages F5 BIG-IP LTM pools via iControl REST API.
 
-Resources should be named with their "full path". The full path is the combination of the partition + name (example: /Common/my-pool ) or  partition + directory + name of the resource  (example: /Common/test/my-pool )
-
+For resources should be named with their `full path`. The full path is the combination of the `partition + name` of the resource or  `partition + directory + name`.
+For example `/Common/my-pool`.
 
 ## Example Usage
 
 ```hcl
-
 resource "bigip_ltm_monitor" "monitor" {
   name   = "/Common/terraform_monitor"
   parent = "/Common/http"
@@ -31,9 +30,9 @@ resource "bigip_ltm_pool" "pool" {
 
 ## Argument Reference
 
-* `name` - (Required) Name of the pool,it should be "full path".The full path is the combination of the partition + name of the pool.(For example `/Common/my-pool`)
+* `name` - (Required,type `string`) Name of the pool,it should be `full path`.The full path is the combination of the `partition + name` of the pool.(For example `/Common/my-pool`)
 
-* `monitors` - (Optional) List of monitor names to associate with the pool
+* `monitors` - (Optional,type `list`) List of monitor names to associate with the pool
 
 * `description` - (Optional,type `string`) Specifies descriptive text that identifies the pool. 
 
@@ -50,3 +49,11 @@ resource "bigip_ltm_pool" "pool" {
 * `service_down_action` - (Optional, type `string`) Specifies how the system should respond when the target pool member becomes unavailable. The default is `None`, Possible values: `[none, reset, reselect, drop]`.
 
 * `reselect_tries` - (Optional, type `int`) Specifies the number of times the system tries to contact a new pool member after a passive failure.
+
+## Importing
+An existing pool can be imported into this resource by supplying pool Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_pool.k8s_prod_import /Common/k8prod_Pool
+
+```

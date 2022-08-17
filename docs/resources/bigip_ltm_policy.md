@@ -10,11 +10,9 @@ description: |-
 
 `bigip_ltm_policy` Configures ltm policies to manage traffic assigned to a virtual server
 
-For resources should be named with their "full path". The full path is the combination of the partition + name of the resource. For example /Common/my-pool.
-
+For resources should be named with their `full path`. The full path is the combination of the `partition + name` of the resource. For example `/Common/test-policy`.
 
 ## Example Usage
-
 
 ```hcl
 
@@ -43,7 +41,6 @@ resource "bigip_ltm_policy" "test-policy" {
 
 ## Argument Reference
 
-
 * `name`- (Required) Name of the Policy ( policy name should be in full path which is combination of partition and policy name )
 
 * `strategy` - (Optional) Specifies the match strategy
@@ -61,3 +58,11 @@ resource "bigip_ltm_policy" "test-policy" {
 * `pool` - (Optional ) This action will direct the stream to this pool.
 
 * `connection` - (Optional) This action is set to `true` by default, it needs to be explicitly set to `false` for actions it conflicts with.
+
+
+## Importing
+An existing monitor can be imported into this resource by supplying monitor Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_monitor.monitor /Common/terraform_monitor
+```

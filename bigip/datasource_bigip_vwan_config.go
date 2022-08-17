@@ -12,7 +12,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -267,12 +266,12 @@ func DownloadVwanConfig(config azureConfig) ([]map[string]interface{}, error) {
 		log.Printf("Download Blob to file failed %+v", err.Error())
 		return nil, err
 	}
-	data, err := ioutil.ReadFile("vpnconfigdownload.json")
+	data, err := os.ReadFile("vpnconfigdownload.json")
 	if err != nil {
 		log.Printf("failed to Read vpnconfigdownload.json: %+v", err.Error())
 		return nil, err
 	}
-	result := []map[string]interface{}{}
+	var result []map[string]interface{}
 	err = json.Unmarshal(data, &result)
 	if err != nil {
 		return nil, err

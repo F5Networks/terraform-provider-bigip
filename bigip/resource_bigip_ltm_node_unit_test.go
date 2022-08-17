@@ -70,15 +70,15 @@ func TestAccBigipLtmNodeCreate(t *testing.T) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
 		log.Println(" value of t  ")
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		fmt.Fprintf(w, `{
+		_, _ = fmt.Fprintf(w, `{
 }`)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/node", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s","monitor":"/Common/icmp"}`, resourceName, address)
 	})
 	defer teardown()
 	resource.Test(t, resource.TestCase{

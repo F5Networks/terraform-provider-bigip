@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"strings"
 )
 
@@ -2317,6 +2318,24 @@ func (b *BigIP) ModifyPoolMember(pool string, config *PoolMember) error {
 	return b.patch(config, uriLtm, uriPool, pool, uriPoolMember, member)
 }
 
+// ModifyPoolMember2 will update the configuration of a particular pool member.
+func (b *BigIP) ModifyPoolMember2(pool string, config *PoolMember) error {
+	member := strings.Split(config.FullPath, "/")
+	p1Mem := member[len(member)-1]
+	member[len(member)-1] = ""
+	member = member[:len(member)-1]
+	member2 := fmt.Sprintf("%s/%s", strings.Join(member, "/"), url.PathEscape(p1Mem))
+
+	// These fields are not used when modifying a pool member; so omit them.
+	config.Name = ""
+	config.Partition = ""
+	config.FullPath = ""
+
+	// This cannot be modified for an existing pool member.
+	config.Address = ""
+	return b.patch(config, uriLtm, uriPool, pool, uriPoolMember, member2)
+}
+
 // UpdatePoolMembers does a replace-all-with for the members of a pool.
 func (b *BigIP) UpdatePoolMembers(pool string, pm *[]PoolMember) error {
 	config := &poolMembers{
@@ -2334,7 +2353,11 @@ func (b *BigIP) RemovePoolMember(pool string, config *PoolMember) error {
 // DeletePoolMember removes a member from the given pool. <member> must be in the form
 // of <node>:<port>, i.e.: "web-server1:443".
 func (b *BigIP) DeletePoolMember(pool string, member string) error {
-	return b.delete(uriLtm, uriPool, pool, uriPoolMember, member)
+	if len(strings.Split(member, "%")) > 1 {
+		return b.delete(uriLtm, uriPool, pool, uriPoolMember, url.PathEscape(member))
+	} else {
+		return b.delete(uriLtm, uriPool, pool, uriPoolMember, member)
+	}
 }
 
 // PoolMemberStatus changes the status of a pool member. <state> can be either
@@ -2558,7 +2581,7 @@ func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
 // Monitors returns a list of all HTTP, HTTPS, Gateway ICMP, ICMP, and TCP monitors.
 func (b *BigIP) Monitors() ([]Monitor, error) {
 	var monitors []Monitor
-	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp", "udp", "postgresql", "mysql", "mssql"}
+	monitorUris := []string{"http", "https", "icmp", "gateway-icmp", "tcp", "tcp-half-open", "ftp", "udp", "postgresql", "mysql", "mssql", "ldap"}
 
 	for _, name := range monitorUris {
 		var m Monitors
@@ -2599,7 +2622,7 @@ func (b *BigIP) AddMonitor(config *Monitor, parent string) error {
 	return b.post(config, uriLtm, uriMonitor, parent)
 }
 
-// GetVirtualServer retrieves a monitor by name. Returns nil if the monitor does not exist
+// GetMonitor retrieves a monitor by name. Returns nil if the monitor does not exist
 func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 	// Add a verification that type is an accepted monitor type
 	var monitor Monitor
@@ -2610,7 +2633,6 @@ func (b *BigIP) GetMonitor(name string, parent string) (*Monitor, error) {
 	if !ok {
 		return nil, nil
 	}
-
 	return &monitor, nil
 }
 

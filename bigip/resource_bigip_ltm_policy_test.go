@@ -21,7 +21,7 @@ var TestPolicyName = "/Common/test-policy"
 
 var TestPolicyResource = `
 resource "bigip_ltm_pool" "test-pool" {
-	name = "` + TEST_POOL_NAME + `"
+	name = "` + TestPoolName + `"
 	monitors = ["/Common/http"]
 	allow_nat = "yes"
 	allow_snat = "yes"
@@ -64,7 +64,7 @@ resource "bigip_ltm_policy" "test-policy-again" {
 `
 var TestPolicyResource2 = `
 resource "bigip_ltm_pool" "test-pool" {
-        name = "` + TEST_POOL_NAME + `"
+        name = "` + TestPoolName + `"
         monitors = ["/Common/http"]
         allow_nat = "yes"
         allow_snat = "yes"

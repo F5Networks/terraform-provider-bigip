@@ -73,7 +73,7 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `enforcement_mode` - (Optional,type `string`) How the system processes a request that triggers a security policy violation
 
-* `type` - (Optional,type `string`) The type of policy you want to create. The default policy type is Security.
+* `type` - (Optional,type `string`) The type of policy you want to create. The default policy type is `security`.
 
 * `server_technologies` - (Optional,type `list`) The server technology is a server-side application, framework, web server or operating system type that is configured in the policy in order to adapt the policy to the checks needed for the respective technology.
 
@@ -85,9 +85,35 @@ resource "bigip_waf_policy" "test-awaf" {
 
 * `signatures` - (Optional,type `list`) This section defines the properties of a signature on the policy.
 
+* `policy_builder` - (Optional,`set`) `policy_builder` block will provide `learning_mode` options to be used for policy builder.
+See [policy builder](#policy-builder) below for more details.
+
+* `graphql_profiles` - (Optional,`list of set`) `graphql_profiles` takes list of graphql profile options to be used for policy builder.
+See [graphql profiles](#graphql-profiles) below for more details.
+
+* `file_types` - (Optional,`list of set`) `file_types` takes list of file-types options to be used for policy builder.
+See [file types](#file-types) below for more details.
+
 * `open_api_files` - (Optional,type `list`) This section defines the Link for open api files on the policy.
 
-* `policy_import_json` - (Optional,type `string`) The payload of the WAF Policy to be used for IMPORT on to BIGIP. 
+* `policy_import_json` - (Optional,type `string`) The payload of the WAF Policy to be used for IMPORT on to BIG-IP. 
+
+### policy builder
+The `policy_builder` block supports the following:
+
+* `learning_mode` - (Optional , `string`) learning mode setting for policy-builder, possible options: [`automatic`,`disabled`, `manual`]
+
+### graphql profiles
+The `graphql_profile` block supports the following:
+
+* `name` - (Optional , `string`) name of graphql profile to be used for policy config.
+
+### file types
+The `file_types` block supports the following:
+
+* `name` - (Optional , `string`) Specifies the file type name as appearing in the URL extension.
+
+* `type` - (Optional , `string`) Determines the type of the name attribute. Only when setting the type to `wildcard` will the special wildcard characters in the name be interpreted as such
 
 ## Attributes Reference
 

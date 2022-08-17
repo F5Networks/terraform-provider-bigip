@@ -16,11 +16,11 @@ import (
 )
 
 var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
-var TEST_POOL_NAME = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
+var TestPoolName = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
 
-var TEST_POOL_RESOURCE = `
+var TestPoolResource = `
 /*resource "bigip_ltm_node" "test-node" {
-	name = "` + TEST_NODE_NAME + `"
+	name = "` + TestNodeName + `"
 	address = "10.10.10.10"
 	connection_limit = "0"
 	dynamic_ratio = "1"
@@ -29,7 +29,7 @@ var TEST_POOL_RESOURCE = `
 }*/
 
 resource "bigip_ltm_pool" "test-pool" {
-	name = "` + TEST_POOL_NAME + `"
+	name = "` + TestPoolName + `"
 	monitors = ["/Common/http"]
 	allow_nat = "yes"
 	allow_snat = "yes"
@@ -55,10 +55,10 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POOL_RESOURCE,
+				Config: TestPoolResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "name", TEST_POOL_NAME),
+					testCheckPoolExists(TestPoolName),
+					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "name", TestPoolName),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_nat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "allow_snat", "yes"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "description", "Test-Pool-Sample"),
@@ -66,7 +66,7 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "slow_ramp_time", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "service_down_action", "reset"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool.test-pool", "reselect_tries", "2"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TEST_POOL_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "pool", TestPoolName),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.test-pool_test-node", "node", poolMember1),
 				),
 			},
@@ -83,11 +83,11 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_POOL_RESOURCE,
+				Config: TestPoolResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPoolExists(TEST_POOL_NAME),
+					testCheckPoolExists(TestPoolName),
 				),
-				ResourceName:      TEST_POOL_RESOURCE,
+				ResourceName:      TestPoolResource,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -106,7 +106,7 @@ func testCheckPoolExists(name string) resource.TestCheckFunc {
 			return err
 		}
 		if p == nil {
-			return fmt.Errorf("Pool %s does not exist.", name)
+			return fmt.Errorf("Pool %s does not exist ", name)
 		}
 
 		return nil
@@ -127,7 +127,7 @@ func testCheckPoolsDestroyed(s *terraform.State) error {
 			return err
 		}
 		if pool != nil {
-			return fmt.Errorf("Pool %s not destroyed.", name)
+			return fmt.Errorf("Pool %s not destroyed ", name)
 		}
 	}
 	return nil

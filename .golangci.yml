@@ -27,7 +27,7 @@ linters:
     - unconvert
     - unparam
     - varcheck
-    - vet
+#    - vet
     - vetshadow
 #    - whitespace # Disabled for performance reasons
 

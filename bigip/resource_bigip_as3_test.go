@@ -6,9 +6,10 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -363,9 +364,10 @@ func testCheckAs3Exists(name string, exists bool) resource.TestCheckFunc {
 				log.Printf("[DEBUG] Could not close the request to %s", url)
 			}
 		}()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		bodyString := string(body)
+		var body bytes.Buffer
+		_, err = io.Copy(&body, resp.Body)
+		// body, err := ioutil.ReadAll(resp.Body)
+		bodyString := body.String()
 		if (resp.Status == "204 No Content" || err != nil || resp.StatusCode == 404) && exists {
 			return fmt.Errorf("[ERROR] Error while checking as3resource present in bigip :%s  %v", bodyString, err)
 		}

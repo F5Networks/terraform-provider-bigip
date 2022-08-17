@@ -39,7 +39,7 @@ func validateF5Name(value interface{}, field string) (ws []string, errors []erro
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name ", reflect.TypeOf(value)))
 	}
 	re := regexp.MustCompile(`^/[\w_\-.]+/[\w_\-.:]+$`)
 	for _, v := range values {
@@ -63,7 +63,7 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name ", reflect.TypeOf(value)))
 	}
 	re := regexp.MustCompile(`(^/[\w_\-.]+/[\w_\-.:]+/[\w_\-.:]+$)|(^/[\w_\-.]+/[\w_\-.:]+$)`)
 	for _, v := range values {
