@@ -207,68 +207,40 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 		return nil
 	}
 	_ = d.Set("name", name)
-	if _, ok := d.GetOk("partition"); ok {
+	_ = d.Set("defaults_from", pp.DefaultsFrom)
+	_ = d.Set("match_across_pools", pp.MatchAcrossPools)
+	_ = d.Set("match_across_services", pp.MatchAcrossServices)
+	_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	_ = d.Set("mirror", pp.Mirror)
+	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	_ = d.Set("httponly", pp.HTTPOnly)
+	_ = d.Set("expiration", pp.Expiration)
+	_ = d.Set("always_send", pp.AlwaysSend)
+	_ = d.Set("hash_length", pp.HashLength)
+	_ = d.Set("hash_offset", pp.HashOffset)
+	_ = d.Set("method", pp.Method)
+	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
+		d.Set("timeout", timeout)
+	}
+
+	if _, ok := d.GetOk("app_service"); ok {
 		if err := d.Set("app_service", pp.AppService); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
 		}
 	}
-	if _, ok := d.GetOk("partition"); ok {
-		if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("match_across_pools", pp.MatchAcrossPools)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("match_across_services", pp.MatchAcrossServices)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		if err := d.Set("mirror", pp.Mirror); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("method", pp.Method)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("timeout", pp.Timeout)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
-	}
 	// Specific to CookiePersistenceProfile
-	if _, ok := d.GetOk("partition"); ok {
-
-		_ = d.Set("always_send", pp.AlwaysSend)
-	}
-	if _, ok := d.GetOk("partition"); ok {
+	if _, ok := d.GetOk("cookie_encryption"); ok {
 		if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
 		}
 	}
-	if _, ok := d.GetOk("partition"); ok {
+	if _, ok := d.GetOk("cookie_encryption_passphrase"); ok {
 		if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
 		}
 	}
-	if _, ok := d.GetOk("partition"); ok {
+	if _, ok := d.GetOk("cookie_name"); ok {
 		_ = d.Set("cookie_name", pp.CookieName)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("expiration", pp.Expiration)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("hash_length", pp.HashLength)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("hash_offset", pp.HashOffset)
-	}
-	if _, ok := d.GetOk("partition"); ok {
-		_ = d.Set("httponly", pp.HTTPOnly)
 	}
 
 	return nil

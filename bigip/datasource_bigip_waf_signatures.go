@@ -95,7 +95,7 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	if p.Level == "none" {
-		return fmt.Errorf("[ERROR] ASM Module is not rovisioned, it is set to : (%s) ", p.Level)
+		return fmt.Errorf("[ERROR] ASM Module is not provisioned, it is set to : (%s) ", p.Level)
 	}
 
 	signatures, err := client.GetWafSignature(sid)

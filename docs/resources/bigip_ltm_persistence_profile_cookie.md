@@ -71,3 +71,10 @@ If this is configured specify `ignore_changes` under the `lifecycle` block to ig
 `hash_offset` (Optional) (Integer) Number of characters to skip in the cookie for the hash
 
 `httponly` (Optional) (enabled or disabled) Sending only over http
+
+## Importing
+An cookie persistence profile can be imported into this resource by supplying the Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_persistence_profile_cookie.test_ppcookie "/Common/terraform_cookie"
+```

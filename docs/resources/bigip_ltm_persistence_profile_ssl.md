@@ -42,3 +42,10 @@ resource "bigip_ltm_persistence_profile_ssl" "ppssl" {
 `timeout` (Optional) (enabled or disabled) Timeout for persistence of the session in seconds
 
 `override_conn_limit` (Optional) (enabled or disabled) Enable or dissable pool member connection limits are overridden for persisted clients. Per-virtual connection limits remain hard limits and are not overridden.
+
+## Importing
+An ssl persistence profile can be imported into this resource by supplying the Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_persistence_profile_ssl.ppssl "/Common/terraform_ssl"
+```

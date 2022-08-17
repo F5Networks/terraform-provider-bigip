@@ -163,37 +163,22 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 		return nil
 	}
 	_ = d.Set("name", name)
+	_ = d.Set("defaults_from", pp.DefaultsFrom)
+	_ = d.Set("match_across_pools", pp.MatchAcrossPools)
+	_ = d.Set("match_across_services", pp.MatchAcrossServices)
+	_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
+	_ = d.Set("mirror", pp.Mirror)
+	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
+	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
+		d.Set("timeout", timeout)
+	}
+
 	if _, ok := d.GetOk("app_service"); ok {
 		if err := d.Set("app_service", pp.AppService); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
 		}
 	}
 
-	if _, ok := d.GetOk("defaults_from"); ok {
-		if err := d.Set("defaults_from", pp.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("match_across_pools"); ok {
-		_ = d.Set("match_across_pools", pp.MatchAcrossPools)
-	}
-	if _, ok := d.GetOk("match_across_services"); ok {
-		_ = d.Set("match_across_services", pp.MatchAcrossServices)
-	}
-	if _, ok := d.GetOk("match_across_virtuals"); ok {
-		_ = d.Set("match_across_virtuals", pp.MatchAcrossVirtuals)
-	}
-	if _, ok := d.GetOk("mirror"); ok {
-		if err := d.Set("mirror", pp.Mirror); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Mirror to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-		}
-	}
-	if _, ok := d.GetOk("timeout"); ok {
-		_ = d.Set("timeout", pp.Timeout)
-	}
-	if _, ok := d.GetOk("override_conn_limit"); ok {
-		_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
-	}
 	// Specific to SourceAddrPersistenceProfile
 	if _, ok := d.GetOk("hash_algorithm"); ok {
 		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
