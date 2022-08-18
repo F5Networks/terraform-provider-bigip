@@ -211,7 +211,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 				break forLoop
 			case taskResp.StatusCode == 202:
 				var respBody bytes.Buffer
-				_, err = io.Copy(&body, taskResp.Body)
+				_, err = io.Copy(&respBody, taskResp.Body)
 				// respBody, err := ioutil.ReadAll(taskResp.Body)
 				if err != nil {
 					d.SetId("")
