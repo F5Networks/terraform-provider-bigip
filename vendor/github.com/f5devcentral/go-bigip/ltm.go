@@ -978,6 +978,7 @@ type PolicyRuleCondition struct {
 	RegionName            bool     `json:"regionName,omitempty"`
 	Remote                bool     `json:"remote,omitempty"`
 	Request               bool     `json:"request,omitempty"`
+	ClientAccepted        bool     `json:"clientAccepted,omitempty"`
 	Response              bool     `json:"response,omitempty"`
 	RouteDomain           bool     `json:"routeDomain,omitempty"`
 	Rtt                   bool     `json:"rtt,omitempty"`
@@ -2521,7 +2522,7 @@ func (b *BigIP) VirtualServerProfiles(vs string) (*Profiles, error) {
 	return &p, nil
 }
 
-//Get the names of policies associated with a particular virtual server
+// Get the names of policies associated with a particular virtual server
 func (b *BigIP) VirtualServerPolicyNames(vs string) ([]string, error) {
 	var policies VirtualServerPolicies
 	err, _ := b.getForEntity(&policies, uriLtm, uriVirtual, vs, "policies")
@@ -2599,9 +2600,9 @@ func (b *BigIP) Monitors() ([]Monitor, error) {
 
 // CreateMonitor adds a new monitor to the BIG-IP system. <parent> must be one of "http", "https",
 // "icmp", "gateway icmp", or "tcp".
-//func (b *BigIP) CreateMonitor(config *Monitor) error
-//This Function expects Monitor struct type as input,posts the config on to BIGIP to configure LTM Monitor Objects
-//Returns Nil If Post is Success,err in case Failure
+// func (b *BigIP) CreateMonitor(config *Monitor) error
+// This Function expects Monitor struct type as input,posts the config on to BIGIP to configure LTM Monitor Objects
+// Returns Nil If Post is Success,err in case Failure
 func (b *BigIP) CreateMonitor(config *Monitor, parent string) error {
 	//config := &Monitor{
 	//	Name:           name,
@@ -2711,7 +2712,7 @@ func (b *BigIP) Policies() (*Policies, error) {
 	return &p, nil
 }
 
-//Load a fully policy definition. Policies seem to be best dealt with as one big entity.
+// Load a fully policy definition. Policies seem to be best dealt with as one big entity.
 func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	var p Policy
 	values := []string{}
@@ -2719,7 +2720,7 @@ func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	values = append(values, name)
 	// Join three strings into one.
 	//result := strings.Join(values, "")
-	policy_name := "~" + partition + "~" + name
+	policy_name := partition + "~" + name
 	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, policy_name)
 	if err != nil {
 		return nil, err
@@ -2767,9 +2768,10 @@ func normalizePolicy(p *Policy) {
 	}
 }
 
-//Create a new policy. It is not necessary to set the Ordinal fields on subcollections.
+// Create a new policy. It is not necessary to set the Ordinal fields on subcollections.
 func (b *BigIP) CreatePolicy(p *Policy) error {
 	normalizePolicy(p)
+
 	return b.post(p, uriLtm, uriPolicy)
 }
 
@@ -2789,11 +2791,10 @@ func (b *BigIP) PublishPolicy(name, publish string) error {
 	return b.post(config, uriLtm, uriPolicy)
 }
 
-//Update an existing policy.
+// Update an existing policy.
 func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	normalizePolicy(p)
 	values := []string{}
-	values = append(values, "~")
 	values = append(values, partition)
 	values = append(values, "~Drafts~")
 	values = append(values, name)
@@ -2802,7 +2803,7 @@ func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	return b.put(p, uriLtm, uriPolicy, result)
 }
 
-//Delete a policy by name.
+// Delete a policy by name.
 func (b *BigIP) DeletePolicy(name string, partition string) error {
 	values := []string{}
 	values = append(values, "Drafts/")
@@ -2813,10 +2814,10 @@ func (b *BigIP) DeletePolicy(name string, partition string) error {
 	return b.delete(uriLtm, uriPolicy, policy_name)
 }
 
-//Create a draft from an existing policy
+// Create a draft from an existing policy
 func (b *BigIP) CreatePolicyDraft(name string, partition string) error {
 	var s struct{}
-	policy_name := "~" + partition + "~" + name
+	policy_name := partition + "~" + name
 	values := []string{}
 	values = append(values, policy_name)
 	values = append(values, uriCreateDraft)
@@ -2855,7 +2856,7 @@ func (b *BigIP) ModifyOneconnect(name string, oneconnect *Oneconnect) error {
 
 // Create TCP profile for WAN or LAN
 
-//func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
+// func (b *BigIP) CreateTcp(name, partition, defaultsFrom string, idleTimeout, closeWaitTimeout, finWait_2Timeout, finWaitTimeout, keepAliveInterval int, deferredAccept, fastOpen string) error {
 func (b *BigIP) CreateTcp(tcp *Tcp) error {
 	//	tcp := &Tcp{
 	//		Name:              name,
@@ -3042,7 +3043,7 @@ func (b *BigIP) GetHttpcompress(name string) (*Httpcompress, error) {
 	return &httpcompress, nil
 }
 
-//func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
+// func (b *BigIP) CreateHttp2(name, defaultsFrom string, concurrentStreamsPerConnection, connectionIdleTimeout, headerTableSize int, activationModes []string) error {
 func (b *BigIP) CreateHttp2(http2 *Http2) error {
 	//	http2 := &Http2{
 	//		Name:                           name,
@@ -3138,21 +3139,23 @@ func (b *BigIP) AddRecords(name, rname, data string) error {
 	return &snats, nil
 }*/
 
-/*func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool, mirror string, vlansDisabled bool, origins []string) error {
-	snat := &Snat{
-		Name:          name,
-		Partition:     partition,
-		AutoLasthop:   autoLastHop,
-		SourcePort:    sourcePort,
-		Translation:   translation,
-		Snatpool:      snatpool,
-		Mirror:        mirror,
-		VlansDisabled: vlansDisabled,
-		Origins:       origins,
+/*
+	func (b *BigIP) CreateSnat(name, partition, autoLastHop, sourcePort, translation, snatpool, mirror string, vlansDisabled bool, origins []string) error {
+		snat := &Snat{
+			Name:          name,
+			Partition:     partition,
+			AutoLasthop:   autoLastHop,
+			SourcePort:    sourcePort,
+			Translation:   translation,
+			Snatpool:      snatpool,
+			Mirror:        mirror,
+			VlansDisabled: vlansDisabled,
+			Origins:       origins,
+		}
+		log.Println("[INFO] Creating snat  ", snat)
+		return b.post(snat, uriLtm, uriSnat)
 	}
-	log.Println("[INFO] Creating snat  ", snat)
-	return b.post(snat, uriLtm, uriSnat)
-} */
+*/
 func (b *BigIP) CreateSnat(p *Snat) error {
 	return b.post(p, uriLtm, uriSnat)
 }

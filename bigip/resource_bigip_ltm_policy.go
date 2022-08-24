@@ -7,20 +7,19 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"fmt"
 	"log"
 	"os"
-
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-
-	"fmt"
 	"reflect"
 	"regexp"
 	"sort"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adaptation", "server-ssl"})
@@ -64,9 +63,16 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Optional: true,
 			},
 			"strategy": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/first-match",
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "/Common/first-match",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					oldSlice := strings.Split(old, "/")
+					newSlice := strings.Split(new, "/")
+					return oldSlice[len(oldSlice)-1] == newSlice[len(newSlice)-1]
+				},
+				ValidateFunc: validation.StringInSlice([]string{"/Common/first-match", "/Common/all-match",
+					"/Common/best-match", "first-match", "all-match", "best-match"}, false),
 				Description: "Policy Strategy (i.e. /Common/first-match)",
 			},
 			"rule": {
@@ -965,6 +971,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
+									"client_accepted": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+									},
 									"response": {
 										Type:     schema.TypeBool,
 										Optional: true,
@@ -1084,15 +1095,16 @@ func resourceBigipLtmPolicy() *schema.Resource {
 func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
+	polStr := strings.Split(name, "/")
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name ")
 	}
-	partition := match[1]
-	policyName := match[2]
+	partition := strings.Join(polStr[:len(polStr)-1], "/")
+	policyName := polStr[len(polStr)-1]
 
-	log.Println("[INFO] Creating Policy " + policyName)
+	log.Printf("[INFO] Creating Policy : %+v in partion : %+v", policyName, partition)
 
 	p := dataToPolicy(name, d)
 
@@ -1103,9 +1115,9 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 	publishedCopy := d.Get("published_copy").(string)
 	if publishedCopy == "" {
-		publishedCopy = "/" + partition + "/Drafts/" + policyName
+		publishedCopy = partition + "/Drafts/" + policyName
 	} else {
-		publishedCopy = "/" + partition + "/" + publishedCopy
+		publishedCopy = partition + "/" + publishedCopy
 	}
 	t := client.PublishPolicy(policyName, publishedCopy)
 	if t != nil {
@@ -1137,14 +1149,14 @@ func resourceBigipLtmPolicyCreate(d *schema.ResourceData, meta interface{}) erro
 func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-
+	polStr := strings.Split(name, "/")
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
 	}
-	partition := match[1]
-	policyName := match[2]
+	partition := strings.Join(polStr[:len(polStr)-1], "~")
+	policyName := polStr[len(polStr)-1]
 
 	log.Println("[INFO] Fetching policy " + policyName)
 	p, err := client.GetPolicy(policyName, partition)
@@ -1167,14 +1179,15 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	polStr := strings.Split(name, "/")
 
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return false, fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
 	}
-	partition := match[1]
-	policyName := match[2]
+	partition := strings.Join(polStr[:len(polStr)-1], "/")
+	policyName := polStr[len(polStr)-1]
 
 	log.Println("[INFO] Fetching policy " + policyName)
 	p, err := client.GetPolicy(policyName, partition)
@@ -1194,33 +1207,34 @@ func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (boo
 func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-
+	polStr := strings.Split(name, "/")
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
 	}
-	partition := match[1]
-	policyName := match[2]
+	partition := strings.Join(polStr[:len(polStr)-1], "/")
+	partition2 := strings.Join(polStr[:len(polStr)-1], "~")
+	policyName := polStr[len(polStr)-1]
 
 	log.Println("[INFO] Updating  Policy " + policyName)
 
 	p := dataToPolicy(name, d)
-	err := client.CreatePolicyDraft(policyName, partition)
+	err := client.CreatePolicyDraft(policyName, partition2)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Draft Policy   (%s) (%v) ", policyName, err)
 		return err
 	}
-	err = client.UpdatePolicy(policyName, partition, &p)
+	err = client.UpdatePolicy(policyName, partition2, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Draft Policy   (%s) (%v) ", policyName, err)
 		return err
 	}
 	publishedCopy := d.Get("published_copy").(string)
 	if publishedCopy == "" {
-		publishedCopy = "/" + partition + "/Drafts/" + policyName
+		publishedCopy = partition + "/Drafts/" + policyName
 	} else {
-		publishedCopy = "/" + partition + "/" + publishedCopy
+		publishedCopy = partition + "/" + publishedCopy
 	}
 	err = client.PublishPolicy(policyName, publishedCopy)
 	if err != nil {
@@ -1233,14 +1247,15 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 func resourceBigipLtmPolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
+	polStr := strings.Split(name, "/")
 
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
 		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
 	}
-	partition := match[1]
-	policyName := match[2]
+	partition := strings.Join(polStr[:len(polStr)-1], "/")
+	policyName := polStr[len(polStr)-1]
 
 	err := client.DeletePolicy(policyName, partition)
 	if err != nil {
@@ -1255,15 +1270,19 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	var p bigip.Policy
 	values := []string{}
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
-	match := re.FindStringSubmatch(name)
-	partition := match[1]
-	policyName := match[2]
+	polStr := strings.Split(name, "/")
+	var partition string
+	if len(polStr[:len(polStr)-1]) > 1 {
+		partition = strings.Join(polStr[:len(polStr)-1], "/")
+	} else {
+		partition = polStr[:len(polStr)-1][0]
+	}
+	policyName := polStr[len(polStr)-1]
 
-	if partition == "Common" {
+	if partition == "/Common" {
 		values = append(values, "Drafts/")
 	} else {
-		par := "/" + partition + "/Drafts/"
+		par := partition + "/Drafts/"
 		values = append(values, par)
 	}
 	values = append(values, policyName)
