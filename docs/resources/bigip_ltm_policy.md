@@ -61,8 +61,8 @@ resource "bigip_ltm_policy" "test-policy" {
 
 
 ## Importing
-An existing monitor can be imported into this resource by supplying monitor Name in `full path` as `id`.
+An existing policy can be imported into this resource by supplying policy Name in `full path` as `id`.
 An example is below:
 ```sh
-$ terraform import bigip_ltm_monitor.monitor /Common/terraform_monitor
+$ terraform import bigip_ltm_policy.policy-import-test /Common/policy2
 ```

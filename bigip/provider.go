@@ -236,7 +236,9 @@ func mapEntity(d map[string]interface{}, obj interface{}) {
 				incoming := d[field].([]interface{})
 				s := reflect.MakeSlice(f.Type(), len(incoming), len(incoming))
 				for i := 0; i < len(incoming); i++ {
-					s.Index(i).Set(reflect.ValueOf(incoming[i]))
+					if incoming[i] != nil {
+						s.Index(i).Set(reflect.ValueOf(incoming[i]))
+					}
 				}
 				f.Set(s)
 			} else {

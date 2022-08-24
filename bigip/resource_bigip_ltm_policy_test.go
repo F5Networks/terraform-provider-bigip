@@ -9,7 +9,7 @@ package bigip
 import (
 	"fmt"
 	"log"
-	"regexp"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -32,12 +32,10 @@ resource "bigip_ltm_policy" "test-policy" {
 	name = "` + TestPolicyName + `"
 	strategy = "first-match"
 	requires = ["http"]
-#	published_copy = "Drafts/` + TestPolicyName + `"
 	controls = ["forwarding"]
 	rule  {
 	      name = "rule6"
 		      action {
-//			      tm_name    = "20"
 			      forward    = true
 				  connection = false
 			      pool       = "/Common/test-pool"
@@ -48,12 +46,10 @@ resource "bigip_ltm_policy" "test-policy-again" {
   name = "/Common/test-policy-again"
   strategy = "first-match"
   requires = ["http"]
- # published_copy = "Drafts/http_to_https_redirect"
   controls = ["forwarding"]
   rule  {
     name = "testrule"
     action {
-  //    tm_name = "http_to_https_redirect"
       redirect   = true
 	  connection = false
       location   = "tcl:https://[HTTP::host][HTTP::uri]"
@@ -271,6 +267,197 @@ func TestAccBigipLtmPolicy_create_update(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmPolicy_Issue132(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/test-policy-issue132"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue132")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmPoolicyIssu132and133(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue132_a(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/test-policy-issue132-a"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue132-a")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissu132A(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "all-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue132_b(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/test-policy-issue132-b"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue132-b")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissu132B(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "best-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue132_c(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/TEST/test-policy-issue132-c"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue132-c")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissu132C(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "best-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue591(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/policy-issue-591"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "policy-issue-591")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissue591(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue634(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/TEST/A1/test-policy-issue634"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue634")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissue634(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPolicy_Issue634_a(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/TEST/test-policy-issue634-a"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue634-a")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissue634a(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmPolicy_Issue648(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/testpolicy-issue-648"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "testpolicy-issue-648")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissue648(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -334,14 +521,11 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 func testCheckPolicyExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-
-		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
-		match := re.FindStringSubmatch(name)
-		if match == nil {
-			return fmt.Errorf("Failed to match regex in :%v ", name)
-		}
-		partition := match[1]
-		policyName := match[2]
+		polStr := strings.Split(name, "/")
+		partition := strings.Join(polStr[:len(polStr)-1], "/")
+		policyName := polStr[len(polStr)-1]
+		// partition := match[1]
+		// policyName := match[2]
 		policy, err := client.GetPolicy(policyName, partition)
 		if err != nil {
 			return fmt.Errorf("Error while fetching policy: %v ", err)
@@ -363,13 +547,9 @@ func testCheckPolicysDestroyed(s *terraform.State) error {
 			continue
 		}
 		name := rs.Primary.ID
-		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,_-]+)")
-		match := re.FindStringSubmatch(name)
-		if match == nil {
-			return fmt.Errorf("Failed to match regex :%v ", name)
-		}
-		partition := match[1]
-		policyName := match[2]
+		polStr := strings.Split(name, "/")
+		partition := strings.Join(polStr[:len(polStr)-1], "/")
+		policyName := polStr[len(polStr)-1]
 		policy, err := client.GetPolicy(policyName, partition)
 		if err != nil {
 			return nil
@@ -379,4 +559,181 @@ func testCheckPolicysDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testaccbigipltmPoolicyIssu132and133() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue132" {
+		  name     = "/Common/test-policy-issue132"
+		}`
+	return tfConfig
+}
+func testaccbigipltmpoolicyissu132A() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue132-a" {
+		  name     = "/Common/test-policy-issue132-a"
+          strategy = "/Common/all-match"
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissu132B() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue132-b" {
+		  name     = "/Common/test-policy-issue132-b"
+		  strategy = "/Common/best-match"
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissu132C() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue132-c" {
+		  name     = "/TEST/test-policy-issue132-c"
+		  strategy = "/Common/best-match"
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissue591() string {
+	tfConfig := `
+		resource "bigip_ltm_pool" "k8s_prod" {
+  			name = "/Common/k8prod_Pool"
+		}
+		resource "bigip_ltm_policy" "policy-issue-591" {
+		  name     = "/Common/policy-issue-591"
+		  strategy = "first-match"
+		  requires = ["http"]
+		  controls = ["forwarding"]
+		  rule {
+			name = "rule-issue591"
+			condition {
+			  index     = 0
+			  http_host = true
+			  contains  = true
+			  values = [
+				"domain1.net",
+				"domain2.nl"
+			  ]
+			  request = true
+			}
+			condition {
+			  http_uri    = true
+			  path        = true
+			  not         = true
+			  starts_with = true
+			  values      = ["/role-service"]
+			  request     = true
+			}
+			action {
+			  forward  = false
+			  replace  = true
+			  connection = false
+			  http_uri = true
+			  path     = "tcl:[string map {/role-service/ /} [HTTP::uri]]"
+			  request  = true
+			}
+			action {
+			  forward    = true
+			  connection = false
+			  pool       = bigip_ltm_pool.k8s_prod.name
+			}
+		  }
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissue634() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue634" {
+		  name     = "/TEST/A1/test-policy-issue634"
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissue634a() string {
+	tfConfig := `
+		resource "bigip_ltm_policy" "test-policy-issue634-a" {
+		  name     = "/TEST/test-policy-issue634-a"
+		}`
+	return tfConfig
+}
+func testaccbigipltmpoolicyissue648() string {
+	tfConfig := `
+		resource "bigip_ltm_pool" "k8s_prod" {
+  			name = "/Common/k8prod_Pool"
+		}
+		resource "bigip_ltm_policy" "testpolicy-issue-648" {
+		  name     = "/Common/testpolicy-issue-648"
+		  strategy = "first-match"
+		  requires = ["tcp", "client-ssl"]
+		  controls = ["forwarding"]
+		  rule {
+			name = "Rule-01"
+			condition {
+			  ssl_extension    = true
+			  ssl_client_hello = true
+			  server_name      = true
+			  ends_with        = true
+			  values = [
+				"domain1.net",
+				"domain2.nl"
+			  ]
+			}
+			condition {
+			  tcp             = true
+			  matches         = true
+			  address         = true
+			  client_accepted = true
+			  values = [
+				"10.0.0.0/8",
+				"20.0.0.0/8",
+			  ]
+			}
+			action {
+			  forward          = true
+			  connection       = false
+			  pool             = bigip_ltm_pool.k8s_prod.name
+			  ssl_client_hello = true
+			}
+		  }
+		
+		  rule {
+			name = "Rule-02"
+			condition {
+			  ssl_extension    = true
+			  ssl_client_hello = true
+			  server_name      = true
+			  ends_with        = true
+			  values = [
+				"domain3.net",
+				"domain4.nl"
+			  ]
+			}
+			condition {
+			  tcp             = true
+			  matches         = true
+			  address         = true
+			  client_accepted = true
+			  values = [
+				"30.0.0.0/8",
+				"40.0.0.0/8",
+			  ]
+			}
+			action {
+			  forward          = true
+			  connection       = false
+			  pool             = bigip_ltm_pool.k8s_prod.name
+			  ssl_client_hello = true
+			}
+		  }
+		  rule {
+			name = "lastrule-deny"
+			action {
+			  shutdown         = true
+			  ssl_client_hello = true
+			}
+		  }
+		}`
+	return tfConfig
 }
