@@ -21,8 +21,8 @@ var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
 var TEST_VA_NAME_CHANGED = fmt.Sprintf("/%s/test-va-changed", TEST_PARTITION)
 var TEST_VA_CONFIG = `
 resource "bigip_ltm_virtual_address" "test-va" {
-	name = "%s"
-
+	name          = "%s"
+	traffic_group = "/Common/none"
 }
 `
 var TEST_VA_RESOURCE = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME)
