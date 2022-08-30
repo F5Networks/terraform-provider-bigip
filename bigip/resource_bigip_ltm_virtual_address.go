@@ -139,7 +139,11 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	if err := d.Set("advertize_route", va.RouteAdvertisement); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving RouteAdvertisement to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
-	if err := d.Set("traffic_group", va.TrafficGroup); err != nil {
+	traffic_group := va.TrafficGroup
+	if traffic_group == "none" {
+		traffic_group = fmt.Sprintf("/Common/%s", traffic_group)
+	}
+	if err := d.Set("traffic_group", traffic_group); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TrafficGroup to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
 
