@@ -58,6 +58,19 @@ func Provider() terraform.ResourceProvider {
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
 			},
+			"validate_certs_disable": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Enables TLS certificate check on BIG-IP",
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_VERIFY_CERT_SKIP", nil),
+			},
+			"trusted_cert_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Valid Trusted Certificate path",
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TRUSTED_CERT_PATH", nil),
+			},
 			"teem_disable": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -160,14 +173,21 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 	config := Config{
-		Address:  d.Get("address").(string),
-		Port:     d.Get("port").(string),
-		Username: d.Get("username").(string),
-		Password: d.Get("password").(string),
-		Token:    d.Get("token_value").(string),
+		Address:           d.Get("address").(string),
+		Port:              d.Get("port").(string),
+		Username:          d.Get("username").(string),
+		Password:          d.Get("password").(string),
+		Token:             d.Get("token_value").(string),
+		CertVerifyDisable: d.Get("validate_certs_disable").(bool),
 	}
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)
+	}
+	if !d.Get("validate_certs_disable").(bool) {
+		if d.Get("trusted_cert_path").(string) == "" {
+			return nil, fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path")
+		}
+		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}
 	cfg, err := config.Client()
 	if err != nil {
@@ -177,6 +197,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
 		cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
 		cfg.Teem = d.Get("teem_disable").(bool)
+		// cfg.Transport.TLSClientConfig.InsecureSkipVerify = d.Get("validate_certs_disable").(bool)
 	}
 	return cfg, err
 }
