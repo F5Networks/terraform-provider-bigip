@@ -63,7 +63,7 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				Default:     true,
 				Description: "Enables TLS certificate check on BIG-IP",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIP_VERIFY_CERT_SKIP", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_VERIFY_CERT_DISABLE", nil),
 			},
 			"trusted_cert_path": {
 				Type:        schema.TypeString,

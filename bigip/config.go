@@ -9,9 +9,10 @@ package bigip
 import (
 	"crypto/x509"
 	"fmt"
-	bigip "github.com/f5devcentral/go-bigip"
 	"log"
 	"os"
+
+	bigip "github.com/f5devcentral/go-bigip"
 )
 
 type Config struct {
@@ -62,10 +63,10 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 				// log.Printf("[DEBUG]read cert PEM/crt file error:%+v", err)
 			}
 			// TODO: Make sure appMgr sets certificates in bigipInfo
-			certs := []byte(certPEM)
+			// certs := certPEM)
 
 			// Append our certs to the system pool
-			if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+			if ok := rootCAs.AppendCertsFromPEM(certPEM); !ok {
 				log.Println("[DEBUG] No certs appended, using only system certs")
 			}
 			client.Transport.TLSClientConfig.RootCAs = rootCAs
