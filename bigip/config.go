@@ -7,19 +7,24 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"crypto/x509"
+	"fmt"
 	"log"
+	"os"
 
 	bigip "github.com/f5devcentral/go-bigip"
 )
 
 type Config struct {
-	Address        string
-	Port           string
-	Username       string
-	Password       string
-	Token          string
-	LoginReference string `json:"loginProviderName"`
-	ConfigOptions  *bigip.ConfigOptions
+	Address            string
+	Port               string
+	Username           string
+	Password           string
+	Token              string
+	CertVerifyDisable  bool
+	TrustedCertificate string
+	LoginReference     string `json:"loginProviderName"`
+	ConfigOptions      *bigip.ConfigOptions
 }
 
 func (c *Config) Client() (*bigip.BigIP, error) {
@@ -46,6 +51,26 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 		}
 	}
 	if c.Address != "" && c.Username != "" && c.Password != "" {
+		client.Transport.TLSClientConfig.InsecureSkipVerify = c.CertVerifyDisable
+		if !c.CertVerifyDisable {
+			rootCAs, _ := x509.SystemCertPool()
+			if rootCAs == nil {
+				rootCAs = x509.NewCertPool()
+			}
+			certPEM, err := os.ReadFile(c.TrustedCertificate)
+			if err != nil {
+				return nil, fmt.Errorf("provide Valid Trusted certificate path :%+v", err)
+				// log.Printf("[DEBUG]read cert PEM/crt file error:%+v", err)
+			}
+			// TODO: Make sure appMgr sets certificates in bigipInfo
+			// certs := certPEM)
+
+			// Append our certs to the system pool
+			if ok := rootCAs.AppendCertsFromPEM(certPEM); !ok {
+				log.Println("[DEBUG] No certs appended, using only system certs")
+			}
+			client.Transport.TLSClientConfig.RootCAs = rootCAs
+		}
 		err = c.validateConnection(client)
 		if err == nil {
 			return client, nil

@@ -101,7 +101,7 @@ func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *
 		Password: passwd,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: false,
 			},
 		},
 		ConfigOptions: configOptions,
@@ -229,7 +229,7 @@ func (b *BigIP) iControlPath(parts []string) string {
 	return buffer.String()
 }
 
-//Generic delete
+// Generic delete
 func (b *BigIP) delete(path ...string) error {
 	req := &APIRequest{
 		Method: "delete",
@@ -240,7 +240,7 @@ func (b *BigIP) delete(path ...string) error {
 	return callErr
 }
 
-//Generic delete
+// Generic delete
 func (b *BigIP) deleteReq(path ...string) ([]byte, error) {
 	req := &APIRequest{
 		Method: "delete",
@@ -438,9 +438,9 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 	}
 }
 
-//Get a url and populate an entity. If the entity does not exist (404) then the
-//passed entity will be untouched and false will be returned as the second parameter.
-//You can use this to distinguish between a missing entity or an actual error.
+// Get a url and populate an entity. If the entity does not exist (404) then the
+// passed entity will be untouched and false will be returned as the second parameter.
+// You can use this to distinguish between a missing entity or an actual error.
 func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 	req := &APIRequest{
 		Method:      "get",
