@@ -28,6 +28,8 @@ The supported declarative policy structure includes three logical sections:
  
 When an attribute is defined in both the adjustments and modifications sections, the policy is deployed with the value as it appears in the modifications section. When an attribute appears in the modifications section multiple times, the policy is deployed with the value as it appears in the latest definition in the modifications section.
  
+Example Usage:
+
 
 
 Prerequisites
@@ -111,27 +113,40 @@ Quickstart Guide
 
 Additional lab guides
 ---------------------
+
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :glob:
+
+   /userguide/awaf-integration/awaf-create.rst
+   /userguide/awaf-integration/awaf-import.rst
+   /userguide/awaf-integration/awaf-migrate.rst
+   /userguide/awaf-integration/awaf-multiple.rst
+   /userguide/awaf-integration/awaf-policybuildersingle.rst
+   /userguide/awaf-integration/awaf-policybuildermultiple.rst
  
-Scenario #1: Creating a WAF Policy
+**`Scenario #1: Creating a WAF Policy <https://github.com/fchmainy/awaf_tf_docs/tree/main/1.create>`_**
  
 The goal of this lab is to create a new A.WAF Policy from scratch and manage some entities additions.
  
-Scenario #2: Managing with terraform an existing WAF Policy
+**`Scenario #2: Managing with terraform an existing WAF Policy <https://github.com/fchmainy/awaf_tf_docs/tree/main/2.import>`_**
  
 The goal of this lab is to take an existing A.WAF Policy -- that have been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5’s BIG-IP terraform provider.
  
-Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP
+**`Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP <https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate>`_**
  
 This lab is a variant of the previous one. It takes a manually managed A.WAF Policy from an existing BIG-IP and migrate it to a different BIG-IP through Terraform resources.
  
-Scenario #4: Managing an A.WAF Policy on different devices
+**`Scenario #4: Managing an A.WAF Policy on different devices <https://github.com/fchmainy/awaf_tf_docs/tree/main/4.multiple>`_**
  
 The goal of this lab is to manage an A.WAF Policy on multiple devices.
  
-Scenario #5: Managing an A.WAF Policy with Policy Builder on a single device
+**`Scenario #5: Managing an A.WAF Policy with Policy Builder on a single device <https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle>`_**
  
 The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy on a single device or cluster.
  
-Scenario #6: Managing an A.WAF Policy with Policy Builder on multiple device
+**`Scenario #6: Managing an A.WAF Policy with Policy Builder on multiple device <https://github.com/fchmainy/awaf_tf_docs/tree/main/6.policyBuilderMultiple>`_**
  
 The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy from on multiple devices or clusters.

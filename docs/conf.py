@@ -67,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'F5 Resources for Terraform'
-copyright = u'2019 F5 Networks Inc'
+copyright = u'2022 F5 Networks Inc'
 author = u'F5 Networks'
 
 # The version info for the project you're documenting, acts as replacement for
