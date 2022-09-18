@@ -15,7 +15,7 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Date
 
       * - 1.7
-        - Updated the documentation with the following changes: |br| • Updated version charts. |br| • Added section :ref:`bigip-modules-gcp`. 
+        - Updated the documentation with the following changes: |br| • Updated version charts. |br| • Added sections for :ref:`awaf-integration` and :ref:`fast-integration`. 
         - 09-18-22
 
       * - 1.6

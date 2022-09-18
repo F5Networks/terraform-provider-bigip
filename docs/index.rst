@@ -18,7 +18,8 @@ User Guide Index
    /userguide/configuring
    /userguide/bigip-modules/index
    /userguide/as3-integration
-   /userguide/awaf-integration
+   /userguide/awaf-integration/index
+   /userguide/fast-integration/index
    /userguide/do-integration
    /userguide/bigiq-licensing
    /userguide/support

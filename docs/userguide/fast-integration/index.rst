@@ -1,7 +1,7 @@
 .. _fast-integration:
 
 FAST Integration with Terraform
--------------------------------
+===============================
 
 Introduction
 The objective of this templates is to demonstrate how FAST can be used to manage, deploy, and log changes in applications using Terraform as a resource manager through their API.
@@ -16,24 +16,29 @@ https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/
 https://github.com/F5Networks/f5-appsvcs-templates
 
 Example Usage
-resource "bigip_fast_http_app" "myapp" {
-  tenant = "Mytenant"
-  application = "myapp"
-  virtual_server {
-    ip = "10.1.1.1"
-    port = "80"
-  }
-  fast_create_snat_pool_address = [ "10.2.2.2" ]
-  fast_create_pool_members {
-    addresses = [ "10.2.2.100" ]
-    port = "80"
-  }
-  load_balancing_mode = "least-connections-member"
-  fast_create_monitor {
-    send_string = "GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n"
-    response = "200 OK"
-  }
-}
+
+.. code-block:: json
+   :caption: 
+   :linenos:
+
+   resource "bigip_fast_http_app" "myapp" {
+     tenant = "Mytenant"
+     application = "myapp"
+     virtual_server {
+       ip = "10.1.1.1"
+       port = "80"
+     }
+     fast_create_snat_pool_address = [ "10.2.2.2" ]
+     fast_create_pool_members {
+       addresses = [ "10.2.2.100" ]
+       port = "80"
+     }
+     load_balancing_mode = "least-connections-member"
+     fast_create_monitor {
+       send_string = "GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n"
+       response = "200 OK"
+     }
+   }
 
 Terraform integration resouces/data source
              Here will have list with hyperlink to registry link FAST resource:
