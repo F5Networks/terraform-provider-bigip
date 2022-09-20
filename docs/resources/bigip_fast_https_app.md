@@ -38,16 +38,26 @@ See [virtual server](#virtual-server) below for more details.
 
 * `existing_snat_pool` - (Optional,`string`) Name of an existing BIG-IP SNAT pool.
 
-* `fast_create_snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
+* `snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
 
-* `tls_server_profile_name` - (Optional,`string`) Name of an existing TLS server profile.
+* `existing_tls_server_profile` - (Optional,`string`) Name of an existing TLS server profile.
 
-* `create_tls_server_profile` - (Optional,`set`) `create_tls_server_profile` block takes input for FAST-Generated TLS Server Profile.
+* `tls_server_profile` - (Optional,`set`) `tls_server_profile` block takes input for FAST-Generated TLS Server Profile.
 See [TLS Server Profile](#tls-server-profile) below for more details.
 
-* `exist_pool_name` - (Optional,`string`) Name of an existing BIG-IP pool.
+* `existing_tls_client_profile` - (Optional,`string`) Name of an existing TLS client profile.
 
-* `fast_create_pool_members` - (Optional,`set`) `fast_create_pool_members` block takes input for FAST-Generated Pool.
+* `tls_client_profile` - (Optional,`set`) `tls_client_profile` block takes input for FAST-Generated TLS client Profile.
+See [TLS Client Profile](#tls-client-profile) below for more details.
+
+* `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
+
+* `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
+See [WAF Security Policy](#waf-security-policy) below for more details.
+
+* `existing_pool` - (Optional,`string`) Name of an existing BIG-IP pool.
+
+* `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.
 See [Pool Members](#pool-members) below for more details.
       
 * `load_balancing_mode` - (Optional,`string`) A `load balancing method` is an algorithm that the BIG-IP system uses to select a pool member for processing a request. F5 recommends the Least Connections load balancing method
@@ -56,7 +66,7 @@ See [Pool Members](#pool-members) below for more details.
                                             
 * `existing_monitor` - (Optional,`string`) Name of an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server.
 
-* `fast_create_monitor` - (Optional,`set`) `fast_create_monitor` block takes input for FAST-Generated Pool Monitor.
+* `monitor` - (Optional,`set`) `monitor` block takes input for FAST-Generated Pool Monitor.
 See [Pool Monitor](#pool-monitor) below for more details.
 
 ### virtual server
@@ -72,17 +82,33 @@ The `virtual_server` block supports the following:
 ### TLS Server Profile
 Using this block will `enable` for FAST-Generated TLS Server Profile.
 
-The `create_tls_server_profile` block supports the following:
+The `tls_server_profile` block supports the following:
 
 * `tls_cert_name` - (Optional , `string`) Name of existing BIG-IP SSL certificate to be used for FAST-Generated TLS Server Profile.
 
 * `tls_key_name` - (Optional , `string`) Name of existing BIG-IP SSL Key to be used for FAST-Generated TLS Server Profile.
 
+### TLS Client Profile
+Using this block will `enable` for FAST-Generated TLS Client Profile.
+
+The `tls_client_profile` block supports the following:
+
+* `tls_cert_name` - (Optional , `string`) Name of existing BIG-IP SSL certificate to be used for FAST-Generated TLS Server Profile.
+
+* `tls_key_name` - (Optional , `string`) Name of existing BIG-IP SSL Key to be used for FAST-Generated TLS Server Profile.
+
+### WAF Security policy
+Using this block will `enable` for FAST-Generated WAF Security Policy
+
+The `waf_security_policy` block supports the following:
+
+* `enable` - (Optional , `bool`) Setting `true` will enable FAST to create WAF Security Policy.
+
 ### Pool Members
 
 Using this block will `enable` for FAST-Generated Pool.
 
-The `fast_create_pool_members` block supports the following:
+The `pool_members` block supports the following:
 
 * `addresses` - (Optional , `list`) List of server address to be used for FAST-Generated Pool.
 
@@ -99,7 +125,7 @@ The `fast_create_pool_members` block supports the following:
 
 Using this block will `enable` for FAST-Generated Pool Monitor.
 
-The `fast_create_monitor` block supports the following:
+The `monitor` block supports the following:
 
 * `monitor_auth` - (Optional , `bool`) set `true` if the servers require login credentials for web access on FAST-Generated Pool Monitor. default is `false`.
 

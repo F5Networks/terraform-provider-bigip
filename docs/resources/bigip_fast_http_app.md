@@ -38,11 +38,11 @@ See [virtual server](#virtual-server) below for more details.
 
 * `existing_snat_pool` - (Optional,`string`) Name of an existing BIG-IP SNAT pool.
 
-* `fast_create_snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
+* `snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
 
 * `exist_pool_name` - (Optional,`string`) Name of an existing BIG-IP pool.
 
-* `fast_create_pool_members` - (Optional,`set`) `fast_create_pool_members` block takes input for FAST-Generated Pool.
+* `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.
 See [Pool Members](#pool-members) below for more details.
       
 * `load_balancing_mode` - (Optional,`string`) A `load balancing method` is an algorithm that the BIG-IP system uses to select a pool member for processing a request. F5 recommends the Least Connections load balancing method
@@ -51,7 +51,7 @@ See [Pool Members](#pool-members) below for more details.
                                             
 * `existing_monitor` - (Optional,`string`) Name of an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server.
 
-* `fast_create_monitor` - (Optional,`set`) `fast_create_monitor` block takes input for FAST-Generated Pool Monitor.
+* `monitor` - (Optional,`set`) `monitor` block takes input for FAST-Generated Pool Monitor.
 See [Pool Monitor](#pool-monitor) below for more details.
 
 ### virtual server
@@ -67,7 +67,7 @@ The `virtual_server` block supports the following:
 
 Using this block will `enable` for FAST-Generated Pool.
 
-The `fast_create_pool_members` block supports the following:
+The `pool_members` block supports the following:
 
 * `addresses` - (Optional , `list`) List of server address to be used for FAST-Generated Pool.
 
@@ -84,7 +84,7 @@ The `fast_create_pool_members` block supports the following:
 
 Using this block will `enable` for FAST-Generated Pool Monitor.
 
-The `fast_create_monitor` block supports the following:
+The `monitor` block supports the following:
 
 * `monitor_auth` - (Optional , `bool`) set `true` if the servers require login credentials for web access on FAST-Generated Pool Monitor. default is `false`.
 
