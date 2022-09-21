@@ -30,7 +30,7 @@ func dataSourceBigipLtmMonitor() *schema.Resource {
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway-icmp.",
+				Description: "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway-icmp or /Common/tcp-half-open.",
 			},
 			"interval": {
 				Type:     schema.TypeInt,

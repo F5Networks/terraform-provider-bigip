@@ -26,7 +26,7 @@ var parentMonitors = map[string]bool{
 	"/Common/icmp":          true,
 	"/Common/gateway_icmp":  true,
 	"/Common/tcp":           true,
-	"/Common/tcp-half-open": true,
+	"/Common/tcp_half_open": true,
 	"/Common/ftp":           true,
 	"/Common/ldap":          true,
 }
@@ -55,7 +55,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateParent,
 				ForceNew:     true,
-				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp or /Common/gateway_icmp.",
+				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp or /Common/tcp_half_open.",
 			},
 			"interval": {
 				Type:        schema.TypeInt,
@@ -207,6 +207,9 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 	if strings.Contains(parent, "gateway") {
 		parent = "gateway-icmp"
 	}
+	if strings.Contains(parent, "tcp_half_open") {
+		parent = "tcp-half-open"
+	}
 
 	err := client.CreateMonitor(config, parent)
 
@@ -319,6 +322,9 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 	if strings.Contains(parent, "gateway") {
 		parent = "gateway-icmp"
 	}
+	if strings.Contains(parent, "tcp_half_open") {
+		parent = "tcp-half-open"
+	}
 
 	err := client.ModifyMonitor(name, parent, config)
 	if err != nil {
@@ -338,6 +344,9 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	if strings.Contains(parent, "gateway") {
 		parent = "gateway-icmp"
 	}
+	if strings.Contains(parent, "tcp_half_open") {
+		parent = "tcp-half-open"
+	}
 
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
@@ -354,7 +363,7 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/mysql,/Common/mssql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp-half-open, /Common/tcp, /Common/ftp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/mysql,/Common/mssql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp_half_open, /Common/tcp, /Common/ftp")}
 }
 
 func monitorParent(s string) string {
