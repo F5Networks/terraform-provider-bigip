@@ -135,8 +135,8 @@ resource "bigip_fast_https_app" "fast_https_app" {
     port = 443
   }
   tls_server_profile {
-	tls_cert_name = "/Common/default.crt"
-	tls_key_name = "/Common/default.key"
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
   }
 }
 `, httpsTenantName, httpsAppName)
@@ -152,8 +152,8 @@ resource "bigip_fast_https_app" "fast_https_app" {
     port = 443
   }
   tls_client_profile {
-	tls_cert_name = "/Common/default.crt"
-	tls_key_name = "/Common/default.key"
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
   }
 }
 `, httpsTenantName, httpsAppName)
@@ -169,15 +169,15 @@ resource "bigip_fast_https_app" "fast_https_app" {
     port = 443
   }
   tls_server_profile {
-	tls_cert_name = "/Common/default.crt"
-	tls_key_name = "/Common/default.key"
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
   }
   tls_client_profile {
-	tls_cert_name = "/Common/default.crt"
-	tls_key_name = "/Common/default.key"
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
   }
   waf_security_policy {
-	enable = true
+    enable = true
   }
 }
 `, httpsTenantName, httpsAppName)
