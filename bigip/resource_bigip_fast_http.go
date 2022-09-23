@@ -68,21 +68,21 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "name of an existing BIG-IP SNAT pool",
-				ConflictsWith: []string{"fast_create_snat_pool_address"},
+				ConflictsWith: []string{"snat_pool_address"},
 			},
-			"fast_create_snat_pool_address": {
+			"snat_pool_address": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
-			"exist_pool_name": {
+			"existing_pool": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP Pool",
-				ConflictsWith: []string{"fast_create_pool_members"},
+				ConflictsWith: []string{"pool_members"},
 			},
-			"fast_create_pool_members": {
+			"pool_members": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -116,7 +116,7 @@ func resourceBigipHttpFastApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"exist_pool_name"},
+				ConflictsWith: []string{"existing_pool"},
 			},
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
@@ -152,9 +152,9 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server",
-				ConflictsWith: []string{"exist_pool_name", "fast_create_monitor"},
+				ConflictsWith: []string{"existing_pool", "monitor"},
 			},
-			"fast_create_monitor": {
+			"monitor": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "foo",
@@ -197,7 +197,7 @@ func resourceBigipHttpFastApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"existing_monitor", "exist_pool_name"},
+				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
 		},
 	}
@@ -351,12 +351,12 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
-	_ = d.Set("fast_create_monitor.0.monitor_auth", data.MonitorAuth)
-	_ = d.Set("fast_create_monitor.0.username", data.MonitorUsername)
-	_ = d.Set("fast_create_monitor.0.password", data.MonitorPassword)
-	_ = d.Set("fast_create_monitor.0.interval", data.MonitorInterval)
-	_ = d.Set("fast_create_monitor.0.send_string", data.MonitorSendString)
-	_ = d.Set("fast_create_monitor.0.response", data.MonitorResponse)
+	_ = d.Set("monitor.0.monitor_auth", data.MonitorAuth)
+	_ = d.Set("monitor.0.username", data.MonitorUsername)
+	_ = d.Set("monitor.0.password", data.MonitorPassword)
+	_ = d.Set("monitor.0.interval", data.MonitorInterval)
+	_ = d.Set("monitor.0.send_string", data.MonitorSendString)
+	_ = d.Set("monitor.0.response", data.MonitorResponse)
 	return nil
 }
 
@@ -418,12 +418,12 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 
 	httpJson.PoolEnable = false
-	if v, ok := d.GetOk("exist_pool_name"); ok {
+	if v, ok := d.GetOk("existing_pool"); ok {
 		httpJson.PoolEnable = true
 		httpJson.PoolName = v.(string)
 		httpJson.MakePool = false
 	}
-	if p, ok := d.GetOk("fast_create_pool_members"); ok {
+	if p, ok := d.GetOk("pool_members"); ok {
 		httpJson.PoolEnable = true
 		httpJson.MakePool = true
 		log.Printf("[DEBUG] Adding Pool Members:%+v", p)
@@ -459,7 +459,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 		httpJson.SnatAutomap = false
 		httpJson.MakeSnatPool = false
 	}
-	if s, ok := d.GetOk("fast_create_snat_pool_address"); ok {
+	if s, ok := d.GetOk("snat_pool_address"); ok {
 		httpJson.SnatEnable = true
 		httpJson.SnatAutomap = false
 		httpJson.MakeSnatPool = true
@@ -476,8 +476,8 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 		httpJson.MonitorEnable = true
 		httpJson.MakeMonitor = false
 	}
-	if s, ok := d.GetOk("fast_create_monitor"); ok {
-		log.Printf("[DEBUG] fast_create_monitor:%+v", s)
+	if s, ok := d.GetOk("monitor"); ok {
+		log.Printf("[DEBUG] monitor:%+v", s)
 		httpJson.MonitorEnable = true
 		httpJson.MakeMonitor = true
 		sL := s.([]interface{})

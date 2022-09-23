@@ -82,7 +82,9 @@ type FastHttpJson struct {
 	TlsServerEnable        bool           `json:"enable_tls_server"`
 	TlsClientEnable        bool           `json:"enable_tls_client"`
 	TlsServerProfileCreate bool           `json:"make_tls_server_profile"`
+	TlsClientProfileCreate bool           `json:"make_tls_client_profile"`
 	TlsServerProfileName   string         `json:"tls_server_profile_name,omitempty"`
+	TlsClientProfileName   string         `json:"tls_client_profile_name,omitempty"`
 	TlsCertName            string         `json:"tls_cert_name,omitempty"`
 	TlsKeyName             string         `json:"tls_key_name,omitempty"`
 	PoolName               string         `json:"pool_name,omitempty"`
@@ -99,6 +101,10 @@ type FastHttpJson struct {
 	MonitorInterval        int            `json:"monitor_interval,omitempty"`
 	MonitorSendString      string         `json:"monitor_send_string,omitempty"`
 	MonitorResponse        string         `json:"monitor_expected_response,omitempty"`
+	WafPolicyEnable        bool           `json:"enable_waf_policy"`
+	MakeWafpolicy          bool           `json:"make_waf_policy"`
+	WafPolicyName          string         `json:"asm_waf_policy,omitempty"`
+	AsmLoggingEnable       bool           `json:"enable_asm_logging"`
 }
 
 type FastHttpPool struct {

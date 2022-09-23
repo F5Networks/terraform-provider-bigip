@@ -40,6 +40,78 @@ func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 	})
 }
 
+func TestAccFastHTTPSAppSSLProfileTC1(t *testing.T) {
+	httpsAppName = "fast_https_apptc1"
+	httpsTenantName = "fast_https_tenanttc1"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPSAppSSLConfig(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_apptc1"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenanttc1"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.40.44"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccFastHTTPSAppSSLProfileTC2(t *testing.T) {
+	httpsAppName = "fast_https_apptc2"
+	httpsTenantName = "fast_https_tenanttc2"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPSAppSSLConfigTC2(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_apptc2"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenanttc2"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.40.44"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccFastHTTPSAppProfileTC3(t *testing.T) {
+	httpsAppName = "fast_https_apptc3"
+	httpsTenantName = "fast_https_tenanttc3"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPSAppConfigTC3(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_apptc3"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenanttc3"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.40.45"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
+				),
+			},
+		},
+	})
+}
+
 func getFastHTTPSAppConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_https_app" "fast_https_app" {
@@ -48,6 +120,64 @@ resource "bigip_fast_https_app" "fast_https_app" {
   virtual_server {
     ip   = "10.30.40.44"
     port = 443
+  }
+}
+`, httpsTenantName, httpsAppName)
+}
+
+func getFastHTTPSAppSSLConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.30.40.44"
+    port = 443
+  }
+  tls_server_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+}
+`, httpsTenantName, httpsAppName)
+}
+
+func getFastHTTPSAppSSLConfigTC2() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.30.40.44"
+    port = 443
+  }
+  tls_client_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+}
+`, httpsTenantName, httpsAppName)
+}
+
+func getFastHTTPSAppConfigTC3() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.30.40.45"
+    port = 443
+  }
+  tls_server_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+  tls_client_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+  waf_security_policy {
+    enable = true
   }
 }
 `, httpsTenantName, httpsAppName)

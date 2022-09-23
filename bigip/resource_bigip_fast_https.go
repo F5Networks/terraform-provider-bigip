@@ -66,22 +66,21 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "name of an existing BIG-IP SNAT pool",
-				ConflictsWith: []string{"fast_create_snat_pool_address"},
+				ConflictsWith: []string{"snat_pool_address"},
 			},
-			"fast_create_snat_pool_address": {
+			"snat_pool_address": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
-			"tls_server_profile_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:"/Common/clientssl",
+			"existing_tls_server_profile": {
+				Type:          schema.TypeString,
+				Optional:      true,
 				Description:   "Select an existing TLS server profile",
-				ConflictsWith: []string{"create_tls_server_profile"},
+				ConflictsWith: []string{"tls_server_profile"},
 			},
-			"create_tls_server_profile": {
+			"tls_server_profile": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
@@ -99,15 +98,41 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"tls_server_profile_name"},
+				ConflictsWith: []string{"existing_tls_server_profile"},
 			},
-			"exist_pool_name": {
+			"existing_tls_client_profile": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Description:   "Select an existing TLS client profile",
+				ConflictsWith: []string{"tls_client_profile"},
+			},
+			"tls_client_profile": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"tls_cert_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Select an existing BIG-IP SSL certificate",
+						},
+						"tls_key_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Select an existing BIG-IP SSL key",
+						},
+					},
+				},
+				ConflictsWith: []string{"existing_tls_client_profile"},
+			},
+			"existing_pool": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP Pool",
-				ConflictsWith: []string{"fast_create_pool_members", "existing_monitor", "fast_create_monitor"},
+				ConflictsWith: []string{"pool_members", "existing_monitor", "monitor"},
 			},
-			"fast_create_pool_members": {
+			"pool_members": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -141,7 +166,7 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"exist_pool_name"},
+				ConflictsWith: []string{"existing_pool"},
 			},
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
@@ -174,13 +199,33 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				Optional:    true,
 				Description: "none",
 			},
+			"existing_waf_security_policy": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"waf_security_policy"},
+			},
+			"waf_security_policy": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enable": {
+							Type:        schema.TypeBool,
+							Required:    true,
+							Description: "Enables Fast to WAF security policy",
+						},
+					},
+				},
+				ConflictsWith: []string{"existing_waf_security_policy"},
+			},
 			"existing_monitor": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server",
-				ConflictsWith: []string{"exist_pool_name", "fast_create_monitor"},
+				ConflictsWith: []string{"existing_pool", "monitor"},
 			},
-			"fast_create_monitor": {
+			"monitor": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "foo",
@@ -222,7 +267,7 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"existing_monitor", "exist_pool_name"},
+				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
 		},
 	}
@@ -370,23 +415,32 @@ func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 		return fmt.Errorf("error setting virtual_server: %w", err)
 	}
 	_ = d.Set("existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("fast_create_snat_pool_address", data.SnatAddresses)
-	_ = d.Set("exist_pool_name", data.PoolName)
-	_ = d.Set("tls_server_profile_name", data.TlsServerProfileName)
-	if _, ok := d.GetOk("create_tls_server_profile"); ok {
-		if err := d.Set("create_tls_server_profile", []interface{}{flattenFastTlsServerProfile(data)}); err != nil {
-			return fmt.Errorf("error setting create_tls_server_profile: %w", err)
+	_ = d.Set("snat_pool_address", data.SnatAddresses)
+	_ = d.Set("existing_pool", data.PoolName)
+	_ = d.Set("existing_tls_server_profile", data.TlsServerProfileName)
+	if _, ok := d.GetOk("tls_server_profile"); ok {
+		if err := d.Set("tls_server_profile", []interface{}{flattenFastTlsServerProfile(data)}); err != nil {
+			return fmt.Errorf("error setting tls_server_profile: %w", err)
 		}
+	}
+	_ = d.Set("existing_tls_client_profile", data.TlsClientProfileName)
+	if _, ok := d.GetOk("tls_client_profile"); ok {
+		if err := d.Set("tls_client_profile", []interface{}{flattenFastTlsServerProfile(data)}); err != nil {
+			return fmt.Errorf("error setting tls_client_profile: %w", err)
+		}
+	}
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
 	}
 	members := flattenFastPoolMembers(data.PoolMembers)
 	log.Printf("[DEBUG]: Pool Members :%+v", members)
-	_ = d.Set("fast_create_pool_members", members)
+	_ = d.Set("pool_members", members)
 	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
-	if _, ok := d.GetOk("fast_create_monitor"); ok {
-		if err := d.Set("fast_create_monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
-			return fmt.Errorf("error setting fast_create_monitor: %w", err)
+	if _, ok := d.GetOk("monitor"); ok {
+		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
 		}
 	}
 	return nil
@@ -405,6 +459,9 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 		Application: d.Get("application").(string),
 	}
 	httpJson.TlsServerEnable = true
+	httpJson.TlsClientEnable = false
+	httpJson.WafPolicyEnable = false
+	httpJson.AsmLoggingEnable = false
 	httpJson.TlsServerProfileCreate = false
 
 	if v, ok := d.GetOk("virtual_server"); ok {
@@ -414,10 +471,10 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 			httpJson.VirtualPort = v.(map[string]interface{})["port"]
 		}
 	}
-	if v, ok := d.GetOk("tls_server_profile_name"); ok {
+	if v, ok := d.GetOk("existing_tls_server_profile"); ok {
 		httpJson.TlsServerProfileName = v.(string)
 	}
-	if v, ok := d.GetOk("create_tls_server_profile"); ok {
+	if v, ok := d.GetOk("tls_server_profile"); ok {
 		httpJson.TlsServerProfileCreate = true
 		httpJson.TlsServerProfileName = ""
 		tlsSer := v.([]interface{})
@@ -426,13 +483,43 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 			httpJson.TlsKeyName = v.(map[string]interface{})["tls_key_name"].(string)
 		}
 	}
+	if v, ok := d.GetOk("existing_tls_client_profile"); ok {
+		httpJson.TlsClientEnable = true
+		httpJson.TlsClientProfileName = v.(string)
+
+	}
+	if v, ok := d.GetOk("tls_client_profile"); ok {
+		httpJson.TlsClientEnable = true
+		httpJson.TlsClientProfileCreate = true
+		httpJson.TlsClientProfileName = ""
+		tlsClient := v.([]interface{})
+		for _, v := range tlsClient {
+			httpJson.TlsCertName = v.(map[string]interface{})["tls_cert_name"].(string)
+			httpJson.TlsKeyName = v.(map[string]interface{})["tls_key_name"].(string)
+		}
+	}
+	if v, ok := d.GetOk("existing_waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.WafPolicyName = v.(string)
+		httpJson.AsmLoggingEnable = true
+	}
+	if v, ok := d.GetOk("waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.MakeWafpolicy = true
+		httpJson.AsmLoggingEnable = true
+		// httpJson.WafPolicyName = ""
+		wafPol := v.([]interface{})
+		for _, vv := range wafPol {
+			log.Printf("[DEBUG] waf_secu policy:%+v", vv)
+		}
+	}
 	httpJson.PoolEnable = false
-	if v, ok := d.GetOk("exist_pool_name"); ok {
+	if v, ok := d.GetOk("existing_pool"); ok {
 		httpJson.PoolEnable = true
 		httpJson.PoolName = v.(string)
 		httpJson.MakePool = false
 	}
-	if p, ok := d.GetOk("fast_create_pool_members"); ok {
+	if p, ok := d.GetOk("pool_members"); ok {
 		httpJson.PoolEnable = true
 		httpJson.MakePool = true
 		var members []bigip.FastHttpPool
@@ -466,7 +553,7 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 		httpJson.SnatAutomap = false
 		httpJson.MakeSnatPool = false
 	}
-	if s, ok := d.GetOk("fast_create_snat_pool_address"); ok {
+	if s, ok := d.GetOk("snat_pool_address"); ok {
 		httpJson.SnatEnable = true
 		httpJson.SnatAutomap = false
 		httpJson.MakeSnatPool = true
@@ -483,8 +570,8 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 		httpJson.MonitorEnable = true
 		httpJson.MakeMonitor = false
 	}
-	if s, ok := d.GetOk("fast_create_monitor"); ok {
-		log.Printf("[DEBUG] fast_create_monitor:%+v", s)
+	if s, ok := d.GetOk("monitor"); ok {
+		log.Printf("[DEBUG] monitor:%+v", s)
 		httpJson.MonitorEnable = true
 		httpJson.MakeMonitor = true
 		sL := s.([]interface{})
