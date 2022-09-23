@@ -197,7 +197,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
 		cfg.UserAgent += fmt.Sprintf("/terraform-provider-bigip/%s", getVersion())
 		cfg.Teem = d.Get("teem_disable").(bool)
-		// cfg.Transport.TLSClientConfig.InsecureSkipVerify = d.Get("validate_certs_disable").(bool)
+		cfg.Transport.TLSClientConfig.InsecureSkipVerify = d.Get("validate_certs_disable").(bool)
 	}
 	return cfg, err
 }

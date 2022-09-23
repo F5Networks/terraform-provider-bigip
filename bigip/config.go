@@ -76,7 +76,7 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 			return client, nil
 		}
 	}
-	return nil, err
+	return client, err
 
 }
 

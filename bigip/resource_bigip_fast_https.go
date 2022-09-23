@@ -75,9 +75,8 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
 			"existing_tls_server_profile": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:"/Common/clientssl",
+				Type:          schema.TypeString,
+				Optional:      true,
 				Description:   "Select an existing TLS server profile",
 				ConflictsWith: []string{"tls_server_profile"},
 			},
@@ -102,9 +101,8 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				ConflictsWith: []string{"existing_tls_server_profile"},
 			},
 			"existing_tls_client_profile": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Default:"/Common/clientssl",
+				Type:          schema.TypeString,
+				Optional:      true,
 				Description:   "Select an existing TLS client profile",
 				ConflictsWith: []string{"tls_client_profile"},
 			},
@@ -509,7 +507,7 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 		httpJson.WafPolicyEnable = true
 		httpJson.MakeWafpolicy = true
 		httpJson.AsmLoggingEnable = true
-		//httpJson.WafPolicyName = ""
+		// httpJson.WafPolicyName = ""
 		wafPol := v.([]interface{})
 		for _, vv := range wafPol {
 			log.Printf("[DEBUG] waf_secu policy:%+v", vv)

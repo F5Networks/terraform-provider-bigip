@@ -128,22 +128,22 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("virtual address %s not found", name)
 	}
 	log.Printf("[DEBUG] virtual address configured on bigip is :%v", vas)
-	d.Set("name", name)
+	_ = d.Set("name", name)
 	if err := d.Set("arp", va.ARP); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ARP to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
-	d.Set("auto_delete", va.AutoDelete)
-	d.Set("conn_limit", va.ConnectionLimit)
-	d.Set("enabled", va.Enabled)
-	d.Set("icmp_echo", va.ICMPEcho)
+	_ = d.Set("auto_delete", va.AutoDelete)
+	_ = d.Set("conn_limit", va.ConnectionLimit)
+	_ = d.Set("enabled", va.Enabled)
+	_ = d.Set("icmp_echo", va.ICMPEcho)
 	if err := d.Set("advertize_route", va.RouteAdvertisement); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving RouteAdvertisement to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
-	traffic_group := va.TrafficGroup
-	if traffic_group == "none" {
-		traffic_group = fmt.Sprintf("/Common/%s", traffic_group)
+	trafficGroup := va.TrafficGroup
+	if trafficGroup == "none" {
+		trafficGroup = fmt.Sprintf("/Common/%s", trafficGroup)
 	}
-	if err := d.Set("traffic_group", traffic_group); err != nil {
+	if err := d.Set("traffic_group", trafficGroup); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving TrafficGroup to state for Virtual Address  (%s): %s", d.Id(), err)
 	}
 

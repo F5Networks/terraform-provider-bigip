@@ -45,10 +45,14 @@ See [virtual server](#virtual-server) below for more details.
 * `tls_server_profile` - (Optional,`set`) `tls_server_profile` block takes input for FAST-Generated TLS Server Profile.
 See [TLS Server Profile](#tls-server-profile) below for more details.
 
+~> **NOTE** Profile provided by `existing_tls_server_profile` or `tls_server_profile` used for decrypt client-side connections.
+
 * `existing_tls_client_profile` - (Optional,`string`) Name of an existing TLS client profile.
 
 * `tls_client_profile` - (Optional,`set`) `tls_client_profile` block takes input for FAST-Generated TLS client Profile.
 See [TLS Client Profile](#tls-client-profile) below for more details.
+
+~> **NOTE** Profile provided by `existing_tls_client_profile` or `tls_client_profile` used for encrypt server-side connections.
 
 * `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
 
