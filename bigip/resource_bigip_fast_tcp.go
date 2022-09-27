@@ -65,21 +65,21 @@ func resourceBigipFastTcpApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Name of an existing BIG-IP SNAT pool.",
-				ConflictsWith: []string{"fast_create_snat_pool_address"},
+				ConflictsWith: []string{"snat_pool_address"},
 			},
-			"fast_create_snat_pool_address": {
+			"snat_pool_address": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
-			"exist_pool_name": {
+			"existing_pool": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP Pool.",
-				ConflictsWith: []string{"fast_create_pool_members"},
+				ConflictsWith: []string{"pool_members"},
 			},
-			"fast_create_pool_members": {
+			"pool_members": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -108,7 +108,7 @@ func resourceBigipFastTcpApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"exist_pool_name"},
+				ConflictsWith: []string{"existing_pool"},
 			},
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
@@ -144,9 +144,9 @@ func resourceBigipFastTcpApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server",
-				ConflictsWith: []string{"exist_pool_name", "fast_create_monitor"},
+				ConflictsWith: []string{"existing_pool", "monitor"},
 			},
-			"fast_create_monitor": {
+			"monitor": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "Use a FAST generated pool monitor.",
@@ -160,7 +160,7 @@ func resourceBigipFastTcpApp() *schema.Resource {
 						},
 					},
 				},
-				ConflictsWith: []string{"existing_monitor", "exist_pool_name"},
+				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
 			"fast_tcp_json": {
 				Type:        schema.TypeString,
@@ -240,7 +240,7 @@ func resourceBigipFastTcpAppRead(d *schema.ResourceData, meta interface{}) error
 		d.SetId("")
 		return nil
 	}
-	_ = d.Set("fast_tcp_json", fastJson)
+	_ = d.Set("fast_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastTcp)
 	if err != nil {
 		return err
@@ -325,7 +325,7 @@ func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.TCPMonitor)
-	_ = d.Set("fast_create_monitor.0.interval", data.MonitorInterval)
+	_ = d.Set("monitor.0.interval", data.MonitorInterval)
 
 	return nil
 }
@@ -353,7 +353,7 @@ func getParamsConfigMap(d *schema.ResourceData) (string, error) {
 		tcpJson.SnatAutomap = false
 		tcpJson.MakeSnatPool = false
 	}
-	if s, ok := d.GetOk("fast_create_snat_pool_address"); ok {
+	if s, ok := d.GetOk("snat_pool_address"); ok {
 		tcpJson.SnatAutomap = false
 		tcpJson.MakeSnatPool = true
 		var snatAdd []string
@@ -364,12 +364,12 @@ func getParamsConfigMap(d *schema.ResourceData) (string, error) {
 	}
 
 	tcpJson.PoolEnable = false
-	if v, ok := d.GetOk("exist_pool_name"); ok {
+	if v, ok := d.GetOk("existing_pool"); ok {
 		tcpJson.PoolEnable = true
 		tcpJson.PoolName = v.(string)
 		tcpJson.MakePool = false
 	}
-	if p, ok := d.GetOk("fast_create_pool_members"); ok {
+	if p, ok := d.GetOk("pool_members"); ok {
 		tcpJson.PoolEnable = true
 		tcpJson.MakePool = true
 		log.Printf("[DEBUG] Adding Pool Members:%+v", p)
@@ -403,7 +403,7 @@ func getParamsConfigMap(d *schema.ResourceData) (string, error) {
 		tcpJson.MonitorEnable = true
 		tcpJson.TCPMonitor = v.(string)
 	}
-	if s, ok := d.GetOk("fast_create_monitor"); ok {
+	if s, ok := d.GetOk("monitor"); ok {
 		tcpJson.MonitorEnable = true
 		tcpJson.MakeMonitor = true
 		v := s.([]interface{})[0].(map[string]interface{})
