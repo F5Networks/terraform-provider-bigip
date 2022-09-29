@@ -264,8 +264,8 @@ type Vxlan struct {
 	Port              int    `json:"port,omitempty"`
 }
 
-//TrafficSelector is the structure used for Creating IPSec Traffic selectors
-//https://clouddocs.f5.com/api/icontrol-rest/APIRef_tm_net_ipsec_traffic-selector.html
+// TrafficSelector is the structure used for Creating IPSec Traffic selectors
+// https://clouddocs.f5.com/api/icontrol-rest/APIRef_tm_net_ipsec_traffic-selector.html
 type TrafficSelector struct {
 	Name                 string `json:"name,omitempty"`
 	FullPath             string `json:"fullPath,omitempty"`

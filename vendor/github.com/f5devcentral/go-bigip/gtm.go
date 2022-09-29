@@ -213,12 +213,12 @@ func (b *BigIP) CreateGtmserver(p *Server) error {
 	return b.post(p, uriGtm, uriServer)
 }
 
-//Update an existing policy.
+// Update an existing policy.
 func (b *BigIP) UpdateGtmserver(name string, p *Server) error {
 	return b.put(p, uriGtm, uriServer, name)
 }
 
-//Delete a policy by name.
+// Delete a policy by name.
 func (b *BigIP) DeleteGtmserver(name string) error {
 	return b.delete(uriGtm, uriServer, name)
 }

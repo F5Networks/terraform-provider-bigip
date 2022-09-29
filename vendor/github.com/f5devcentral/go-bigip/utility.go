@@ -12,7 +12,7 @@ package bigip
 
 import "encoding/json"
 
-//  LIC contains device license for BIG-IP system.
+// LIC contains device license for BIG-IP system.
 type ULICs struct {
 	LIC []LIC `json:"items"`
 }
