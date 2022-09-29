@@ -88,7 +88,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				Optional: true,
-				Computed: true,
+				//Computed: true,
 			},
 
 			"client_profiles": {
