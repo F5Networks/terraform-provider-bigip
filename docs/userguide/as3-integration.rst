@@ -43,11 +43,11 @@ Argument Reference
 ------------------
 
 
-- `as3_json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_json>`_ - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ``file`` function
+- `as3_json <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_as3#as3_json>`_ - (Required) Path/Filename of Declarative AS3 JSON which is a json file used with builtin ``file`` function
 
-- `tenant_filter <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#tenant_filter>`_ - (Optional) If there are muntiple tenants in a json this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified
+- `tenant_filter <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_as3#tenant_filter>`_ - (Optional) If there are muntiple tenants in a json this attribute helps the user to set a particular tenant to which he want to reflect the changes. Other tenants will neither be created nor be modified
 
-- `as3_example1.json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_example1-json>`_ - Example AS3 Declarative JSON file with single tenant
+- `as3_example1.json <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_as3#as3_example1.json>`_ - Example AS3 Declarative JSON file with single tenant
 
 
 .. code-block:: json
@@ -96,7 +96,7 @@ Argument Reference
         }
     }
 
-- `as3_example2.json <https://www.terraform.io/docs/providers/bigip/r/bigip_as3.html#as3_example2-json>`_ - Example AS3 Declarative JSON file with multiple tenants
+- `as3_example2.json <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_as3#as3_example2.json>`_ - Example AS3 Declarative JSON file with multiple tenants
 
 .. code-block:: json
    :linenos:

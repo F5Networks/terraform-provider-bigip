@@ -7,11 +7,11 @@
 
 # Bug Fixes:
 
-1. F5 LTM default custom profile values should calculated rather than hardcoded in code [https://github.com/terraform-providers/terraform-provider-bigip/issues/298]
+1. F5 LTM default custom profile values should calculated rather than hardcoded in code (Issue 298)
 2. Handling Common/Shared tenant created via AS3
 3. DO declaration fails with CRASH error
 4. Terraform crashes when the structure of response from bigip changes
-5. Error: produced an unexpected new value for was present, but new absent.#305 [https://github.com/terraform-providers/terraform-provider-bigip/issues/305] 
+5. Error: produced an unexpected new value for was present, but new absent. (Issue 305)
 
 ## 1.2.1 (June 11, 2020)
 
@@ -40,7 +40,7 @@
 
 # Bug Fixes:
 1. big_ltm_virtual_server does not work with IPv6 address [https://github.com/F5Networks/terraform-provider-bigip/issues/62, #278]
-2. declaring virtual addresses in /Common/Shared via AS3 fails [ https://github.com/F5Networks/terraform-provider-bigip/issues/48]
+2. declaring virtual addresses in /Common/Shared via AS3 fails [https://github.com/F5Networks/terraform-provider-bigip/issues/48]
 3. BIG-IQ Licensing  [https://github.com/F5Networks/terraform-provider-bigip/issues/44]
 4. DO Error on Terraform destroy [https://github.com/F5Networks/terraform-provider-bigip/issues/43]
 5. The provider provider.bigip does not support resource type "bigip_command".[https://github.com/F5Networks/terraform-provider-bigip/issues/63]
@@ -55,15 +55,15 @@
 
 # Bug Fixes
 
-- Missing "database" entry for PostgreSQL monitor #224 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/224 )
-- `bigip_as3` resource should validate JSON #227 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/227 )
-- bigip_as3 - doesn't delete resource #38 ( https://github.com/F5Networks/terraform-provider-bigip/issues/38 )
-- examples for bigip resources in repo are not compatible with terraform 0.12 #40.(https://github.com                    /F5Networks/terraform-provider-bigip/issues/40 )
-- Looks like provisioner resource in sys.go is not complete #244 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/244 )
+- Missing "database" entry for PostgreSQL monitor (Issue #224)
+- `bigip_as3` resource should validate JSON (Issue #227)
 - bigip_as3 - doesn't delete resource #38 (https://github.com/F5Networks/terraform-provider-bigip/issues/38)
-- `bigip_as3` resource `resourceBigipAs3Read` action does not store actual value in state #254  ( https://github.com/terraform-providers/terraform-provider-bigip/issues/254 )
-- Unable to modify/update data group #248 ( https://github.com/terraform-providers/terraform-provider-bigip/issues/248 )
-- Terraform crash when creating SSL certificate resources on F5 BIG-IP #255 (https://github.com/terraform-providers/terraform-provider-bigip/issues/255 )
+- examples for bigip resources in repo are not compatible with terraform 0.12 #40.(https://github.com/F5Networks/terraform-provider-bigip/issues/40)
+- Looks like provisioner resource in sys.go is not complete (Issue #224)
+- bigip_as3 - doesn't delete resource #38 (https://github.com/F5Networks/terraform-provider-bigip/issues/38)
+- `bigip_as3` resource `resourceBigipAs3Read` action does not store actual value in state (Issue #254)
+- Unable to modify/update data group (Issue #248)
+- Terraform crash when creating SSL certificate resources on F5 BIG-IP (Issue #255)
 
 # Other Notes:
 

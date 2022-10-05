@@ -42,13 +42,13 @@ Example Usage
 Argument Reference
 ------------------
 
-- `do_json <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#do_json>`_ - (Required) Name of the of the Declarative DO JSON file
+- `do_json <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#do_json>`_ - (Required) Name of the of the Declarative DO JSON file
 
-- `timeout(minutes <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#timeout-minutes->`_ - (Optional) timeout to keep polling DO endpoint until the BIG-IP is provisioned by DO. The default timeout is 20 minutes
+- `timeout(minutes) <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#timeout(minutes)>`_ - (Optional) timeout to keep polling DO endpoint until the BIG-IP is provisioned by DO. The default timeout is 20 minutes
 
   .. NOTE:: Delete method is not supported by DO, so terraform destroy won't delete configuration in BIG-IP but we will set the terrform state to empty and won't throw an error.
 
-- `example.json <https://www.terraform.io/docs/providers/bigip/r/bigip_do.html#example-json>`_ - Example of DO Declarative JSON
+- `example.json <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#example.json>`_ - Example of DO Declarative JSON
 
 
 .. code-block:: json
