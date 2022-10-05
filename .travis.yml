@@ -3,7 +3,7 @@ sudo: required
 services:
 - docker
 before_install:
-- docker pull artifactory.f5net.com/f5-content-apps-docker/containthedocs:latest
+- docker pull f5devcentral/containthedocs:latest
 - chmod +x ./scripts/docker-docs.sh ./scripts/test-docs.sh
 install: 
 - pip install awscli --upgrade
