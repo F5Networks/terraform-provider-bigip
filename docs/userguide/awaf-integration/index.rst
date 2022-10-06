@@ -8,7 +8,9 @@ Introduction
 .. seealso::
    :class: sidebar
 
-   Read `Getting Started with Declarative Policies <https://techdocs.f5.com/en-us/bigip-15-1-0/big-ip-declarative-security-policy/declarative-policy-getting-started.html#concept-1626>`_.
+   - `Getting Started with Declarative Policies <https://techdocs.f5.com/en-us/bigip-15-1-0/big-ip-declarative-security-policy/declarative-policy-getting-started.html#concept-1626>`_.
+   - `Manage F5 BIG-IP Advanced WAF Policies with Terraform <https://community.f5.com/t5/technical-articles/manage-f5-big-ip-advanced-waf-policies-with-terraform-intro/ta-p/300828>`_
+
 
 The Advanced Web Application Firewall (Advanced WAF) or Application Security Manager (ASM) security policies can be deployed using the declarative JSON format, facilitating easy integration into a CI/CD pipeline. The declarative policies are extracted from a source control system, for example Git, and imported into the BIG-IP.
 Using the provided declarative policy templates, you can modify the necessary parameters, save the JSON file, and import the updated security policy into your BIG-IP devices. The declarative policy copies the content of the template and adds the adjustments and modifications on to it. The templates therefore allow you to concentrate only on the specific settings that need to be adapted for the specific application that the policy protects.

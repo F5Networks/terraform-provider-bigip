@@ -8,13 +8,13 @@ This page shows you how to create a new A.WAF Policy from scratch and manage som
 Pre-requisites
 --------------
 
-- version 16.1 minimal
-- credentials with REST API access
+- BIG-IP version 16.1 or newer
+- Credentials with REST API access
 
 on Terraform:
 
-- use of F5 bigip provider version 1.15.0 minimal
-- use of Hashicorp version followinf Link
+- use of F5 BIG-IP provider version 1.15.0 or newer
+- use of Hashicorp version following
 
 
 Creating a Policy
@@ -28,16 +28,13 @@ Create 3 files:
 
 .. code-block:: json
    :caption: variables.tf
-   :linenos:
 
    variable bigip {}
    variable username {}
    variable password {}
 
-
 .. code-block:: json
    :caption: inputs.auto.tfvars
-   :linenos:
 
    bigip = "10.1.1.9:443"
    username = "admin"
@@ -45,7 +42,6 @@ Create 3 files:
 
 .. code-block:: json
    :caption: main.tf
-   :linenos:
 
    terraform {
      required_providers {
@@ -73,7 +69,8 @@ Create 3 files:
 
 Now that you have your terraform project all set up, you can run it:
 
-.. code-block:: json
+
+.. code-block:: 
    :caption: 
    :linenos:
 
@@ -149,19 +146,19 @@ Now that you have your terraform project all set up, you can run it:
    Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 
-Now, your WAF Policy might evolve over time. You may want to add entities, manage attack signature exceptions...
+Now, your WAF Policy might evolve over time. You may want to add entities, manage attack signature exceptions, etc.
 
 Policy Lifecycle Management
 ---------------------------
 
 Server Technologies
 ```````````````````
-You want now to add a **MongoDB** server technology into your WAF Policy. The allowed values for server technologies are listed in the `Declarative WAF API documentation<https://clouddocs.f5.com/products/waf-declarative-policy/declarative_policy_v16_1.html#server-technologies>`_.
+You now want to add a **MongoDB** server technology into your WAF Policy. The allowed values for server technologies are listed in the `Declarative WAF API documentation <https://clouddocs.f5.com/products/waf-declarative-policy/declarative_policy_v16_1.html#server-technologies>`_.
 
-edit the main.tf file:
+Edit the main.tf file:
 
 .. code-block:: json
-   :caption: 
+   :caption: main.tf
    :linenos:
 
    resource "bigip_waf_policy" "this" {
@@ -173,9 +170,10 @@ edit the main.tf file:
      server_technologies  = ["Apache Tomcat", "MySQL", "Unix/Linux", "MongoDB"]
    }
 
+|
+
 Parameters management
 `````````````````````
-
 Create a parameters.tf file:
 
 .. code-block:: json
@@ -205,12 +203,13 @@ Create a parameters.tf file:
      sensitive_parameter = true
      perform_staging = true
    }
-   
+
+|
 
 And add references to these parameters in the "bigip_waf_policy" TF resource in the main.tf file:
 
 .. code-block:: json
-   :caption: 
+   :caption: main.tf
    :linenos:
    
    resource "bigip_waf_policy" "this" {
@@ -223,11 +222,11 @@ And add references to these parameters in the "bigip_waf_policy" TF resource in 
      parameters           = [data.bigip_waf_entity_parameter.P1.json, data.bigip_waf_entity_parameter.P2.json, data.bigip_waf_entity_parameter.P3.json]
    }
 
+|
 
-run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
+.. code-block::
    :linenos:
 
    foo@bar:~$ terraform plan -out scenario1
