@@ -148,6 +148,26 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Optional:    true,
 				Description: "none",
 			},
+			"existing_waf_security_policy": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"waf_security_policy"},
+			},
+			"waf_security_policy": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enable": {
+							Type:        schema.TypeBool,
+							Required:    true,
+							Description: "Enables Fast to WAF security policy",
+						},
+					},
+				},
+				ConflictsWith: []string{"existing_waf_security_policy"},
+			},
 			"existing_monitor": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -345,18 +365,20 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
 	_ = d.Set("pool.enable", data.PoolEnable)
 	_ = d.Set("pool.existing_pool", data.PoolName)
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
+	}
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool.pool_members", members)
 	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
-	_ = d.Set("monitor.0.monitor_auth", data.MonitorAuth)
-	_ = d.Set("monitor.0.username", data.MonitorUsername)
-	_ = d.Set("monitor.0.password", data.MonitorPassword)
-	_ = d.Set("monitor.0.interval", data.MonitorInterval)
-	_ = d.Set("monitor.0.send_string", data.MonitorSendString)
-	_ = d.Set("monitor.0.response", data.MonitorResponse)
+	if _, ok := d.GetOk("monitor"); ok {
+		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -452,6 +474,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	httpJson.SnatEnable = true
 	httpJson.SnatAutomap = true
+	httpJson.WafPolicyEnable = false
 	httpJson.MakeSnatPool = false
 	if v, ok := d.GetOk("existing_snat_pool"); ok {
 		httpJson.SnatPoolName = v.(string)
@@ -468,6 +491,21 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			snatAdd = append(snatAdd, addr.(string))
 		}
 		httpJson.SnatAddresses = snatAdd
+	}
+	if v, ok := d.GetOk("existing_waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.WafPolicyName = v.(string)
+		httpJson.AsmLoggingEnable = true
+	}
+	if v, ok := d.GetOk("waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.MakeWafpolicy = true
+		httpJson.AsmLoggingEnable = true
+		// httpJson.WafPolicyName = ""
+		wafPol := v.([]interface{})
+		for _, vv := range wafPol {
+			log.Printf("[DEBUG] waf_secu policy:%+v", vv)
+		}
 	}
 	httpJson.MonitorEnable = false
 	httpJson.MakeMonitor = false

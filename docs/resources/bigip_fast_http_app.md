@@ -54,6 +54,11 @@ See [Pool Members](#pool-members) below for more details.
 * `monitor` - (Optional,`set`) `monitor` block takes input for FAST-Generated Pool Monitor.
 See [Pool Monitor](#pool-monitor) below for more details.
 
+* `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
+
+* `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
+See [WAF Security Policy](#waf-security-policy) below for more details.
+
 ### virtual server
 This IP address, combined with the port you specify below, becomes the BIG-IP virtual server address and port, which clients use to access the application
 
@@ -97,3 +102,10 @@ The `monitor` block supports the following:
 * `send_string` - (Optional , `string`) Specify data to be sent during each health check for FAST-Generated Pool Monitor.
 
 * `response` - (Optional , `string`) The presence of this string anywhere in the HTTP response implies availability.
+
+### WAF Security policy
+Using this block will `enable` for FAST-Generated WAF Security Policy
+
+The `waf_security_policy` block supports the following:
+
+* `enable` - (Optional , `bool`) Setting `true` will enable FAST to create WAF Security Policy.
