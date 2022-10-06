@@ -10,5 +10,5 @@ make html
 echo "Checking grammar and style"
 vale --glob='*.rst' .
 
-echo "Checking links"
-make linkcheck
+# echo "Checking links"
+# make linkcheck
