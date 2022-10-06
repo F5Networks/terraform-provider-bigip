@@ -1,7 +1,5 @@
 .. _awaf-integration:
 
-Scenario #4
-===========
 **`Scenario #4: Managing an A.WAF Policy on different devices <https://github.com/fchmainy/awaf_tf_docs/tree/main/4.multiple>`_**
  
 The goal of this lab is to manage an A.WAF Policy on multiple devices.

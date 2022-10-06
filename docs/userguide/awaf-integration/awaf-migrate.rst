@@ -1,7 +1,5 @@
 .. _awaf-integration:
 
-Scenario #3
-===========
 **`Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP <https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate>`_**
  
 This lab is a variant of the previous one. It takes a manually managed A.WAF Policy from an existing BIG-IP and migrate it to a different BIG-IP through Terraform resources.
