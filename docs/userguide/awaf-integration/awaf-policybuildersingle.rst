@@ -1,5 +1,7 @@
 .. _awaf-integration:
 
+Scenario #5
+===========
 **`Scenario #5: Managing an A.WAF Policy with Policy Builder on a single device <https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle>`_**
  
 The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy on a single device or cluster.
