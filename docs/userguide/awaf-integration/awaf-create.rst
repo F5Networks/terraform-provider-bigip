@@ -33,12 +33,16 @@ Create 3 files:
    variable username {}
    variable password {}
 
+|
+
 .. code-block:: json
    :caption: inputs.auto.tfvars
 
    bigip = "10.1.1.9:443"
    username = "admin"
    password = "yYyYyYy"
+
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -70,10 +74,7 @@ Create 3 files:
 Now that you have your terraform project all set up, you can run it:
 
 
-.. code-block:: 
-   :caption: 
-   :linenos:
-
+:: 
 
    foo@bar:~$ terraform init
 
@@ -146,7 +147,7 @@ Now that you have your terraform project all set up, you can run it:
    Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 
-Now, your WAF Policy might evolve over time. You may want to add entities, manage attack signature exceptions, etc.
+Your WAF Policy might evolve over time, so you may want to add entities, manage attack signature exceptions, etc.
 
 Policy Lifecycle Management
 ---------------------------
@@ -226,8 +227,7 @@ And add references to these parameters in the "bigip_waf_policy" TF resource in 
 
 Run it:
 
-.. code-block::
-   :linenos:
+::
 
    foo@bar:~$ terraform plan -out scenario1
    [...]
@@ -251,7 +251,7 @@ Run it:
 
 Signatures Management
 `````````````````````
-We are creating a separate signature definition file with 3 signatures:
+Create a separate signature definition file with 3 signatures:
 
 - S1 enables and perform staging on the 200010293 attack signature.
 - S2 disables the 200009024 attack signature.
@@ -282,12 +282,11 @@ Create a signatures.tf file:
      perform_staging  = false
    }
 
+|
 
-And add references to these attack signatures in the "bigip_waf_policy" TF resource in the main.tf file:
+Add references to these attack signatures in the "bigip_waf_policy" TF resource in the main.tf file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    resource "bigip_waf_policy" "this" {
      partition            = "Common"
@@ -301,11 +300,9 @@ And add references to these attack signatures in the "bigip_waf_policy" TF resou
    }
 
 
-run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    foo@bar:~$ terraform plan -out scenario1
    [...]
@@ -357,15 +354,11 @@ run it:
       
 At any time you can check the details on a specific Attack signature:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    $ terraform show -json | jq '.values.root_module.resources[] | select(.name == "S3")'
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    {
      "address": "data.bigip_waf_signatures.S3",
@@ -392,9 +385,9 @@ At any time you can check the details on a specific Attack signature:
    }
 
 
-Note: if you have multiple entities to manage, the entity lists in the bigip_waf_policy can be difficult to use. In that case, we recommend the use of terraform hcl maps as presented in the lab 4
+.. NOTE:: If you have multiple entities to manage, the entity lists in the bigip_waf_policy can be difficult to use. In that case, F5 recommends using Terraform HCL maps as presented in `lab 4 <https://github.com/fchmainy/awaf_tf_docs/blob/main/4.multiple/README.md#enforcing-attack-signatures-on-the-qa-environment>`_.
 
-bigip terraform provider official documentation.
+.. seealso:: `F5 BIG-IP Terraform Provider official documentation <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs>`_
 
 Creating a Policy via OpenAPI file
 ----------------------------------
@@ -413,6 +406,8 @@ Create 3 files:
    variable username {}
    variable password {}
 
+|
+
 .. code-block:: json
    :caption: inputs.auto.tfvars
    :linenos:
@@ -420,6 +415,8 @@ Create 3 files:
    bigip = "10.1.1.9:443"
    username = "admin"
    password = "yYyYyYy"
+
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -451,13 +448,11 @@ Create 3 files:
      signatures                = [data.bigip_waf_signatures.S1.json, data.bigip_waf_signatures.S2.json]
 
 
-How to create an OpenAPI security policy using a Swagger file.
+.. seealso:: `How to create an OpenAPI security policy using a Swagger file <https://support.f5.com/csp/article/K07241201>`_
 
-run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    foo@bar:~$ terraform plan -out scenario1.swagger
    [...]
