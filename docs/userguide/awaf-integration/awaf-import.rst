@@ -3,31 +3,30 @@
 Scenario #2: Managing with Terraform an existing WAF policy
 ===========================================================
  
-The goal of this lab is to take an existing A.WAF Policy -- that has been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5 BIG-IP terraform provider.
+The goal of this lab is to take an existing A.WAF Policy -- that has been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5 BIG-IP Terraform Provider.
 
-Goals
-You may already have multiple WAF policies protecting your applications and these WAF policies have evolved over the past months or years. It may be very complicated to do an extensive inventory of each policy, each entity and every attribute. So the goal here is to import the current policy, which will be our current baseline. Every new change, addition of a Server Technology, parameter, attack signature... will be done through Terraform in addition or correction of this new baseline.
+You may already have multiple WAF policies protecting your applications and these WAF policies have evolved over the past months or years. It may be very complicated to do an extensive inventory of each policy, each entity, and every attribute. So the goal here is to import the current policy, which will be our current baseline. Every new change, addition of a Server Technology, parameter, or attack signature will be done through Terraform in addition or correction of this new baseline.
 
 Pre-requisites
 --------------
 On the BIG-IP:
 
-- version 16.1 minimal
-- credentials with REST API access
+- Version 16.1 or newer
+- Credentials with REST API access
 - /Common/scenario2 WAF policy (Rapid deployment template) created
 
 On Terraform:
 
-- use of F5 BIG-IP provider version 1.15.0 minimal
-- use of Hashicorp version followinf Link
+- Using F5 BIG-IP provider version 1.15.0 or newer
+- Using Hashicorp versions following :ref:`versions`
 
 Policy Import
 -------------
 Create 3 files:
 
-- main.tf
 - variables.tf
 - inputs.tfvars
+- main.tf
 
 .. code-block:: json
    :caption: variables.tf
@@ -37,6 +36,7 @@ Create 3 files:
    variable username {}
    variable password {}
 
+|
 
 .. code-block:: json
    :caption: inputs.tfvars
@@ -46,6 +46,7 @@ Create 3 files:
    username = "admin"
    password = "whatIsYourBigIPPassword?"
 
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -71,6 +72,8 @@ Create 3 files:
      template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
    }
 
+|
+
 .. code-block:: json
    :caption: outputs.tf
    :linenos:
@@ -86,17 +89,36 @@ Create 3 files:
 
 As you can see, we only define the two required attributes of the "bigip_waf_policy" terraform resource: name and template_name. It is required to provide them in order to be able to manage the resource.
 
-Just before we go. We need the Policy ID. There are multiple ways we can get it:
+Before we move on, we need the Policy ID. There are multiple ways to get it:
 
-- check on the iControl REST API Endpoint: /mgmt/tm/asm/policies?$filter=name+eq+scenario2&$select=id
-- get a script example in the lab/scripts/ folder
-- using a Go code
+- Check on the iControl REST API Endpoint: ``/mgmt/tm/asm/policies?$filter=name+eq+scenario2&$select=id``
+- Get a script example in the ``lab/scripts/`` folder
+- Using a Go code
 
-Here we are using the Online Go Playground as it is easy and quick to use:
+In this example we are using the Online Go Playground as it is easy and quick to use:
 
-- a/ copy the following piece of code in the Go PlayGround
-- b/ update the value of the following variables located in the main function: var partition string = "Common" var policyName string = "scenario2"
-- c/ Run and get the policy ID.
+1. Copy the following piece of code in the `Go PlayGround <https://go.dev/play/>`_.
+
+   .. code-block:: json
+      :caption: 
+      :linenos:
+
+      // You can edit this code!
+      // Click here and start typing.
+      package main
+
+      import "fmt"
+
+      func main() {
+      	fmt.Println("Hello, 世界")
+      }
+
+2. Update the value of the following variables located in the main function: 
+
+   ``var partition string = "Common"`` 
+   ``var policyName string = "scenario2"``
+
+3. Run and get the policy ID.
 
 .. code-block:: json
    :caption: 
@@ -130,16 +152,16 @@ Here we are using the Online Go Playground as it is easy and quick to use:
        fmt.Println("Policy Id: ", r.Replace(policyId))
    }
 
+|
+
 Now, run the following commands, so we can:
 
-1. Initialize the terraform project
-2. Import the current WAF policy into our state
-3. Set the JSON WAF Policy as our new baseline
-4. Configure the lifecycle of our WAF Policy
+1. Initialize the Terraform Project.
+2. Import the current WAF policy into our state.
+3. Set the JSON WAF Policy as our new baseline.
+4. Configure the lifecycle of our WAF Policy.
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform init
    Initializing the backend...
@@ -160,12 +182,11 @@ Now, run the following commands, so we can:
    The resources that were imported are shown above. These resources are now in
    your Terraform state and will henceforth be managed by Terraform.
 
+|
 
 Now update your terraform main.tf file with the ouputs of the following two commands:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform show -json | jq '.values.root_module.resources[].values.policy_export_json | fromjson' > importedWAFPolicy.json
 
@@ -186,11 +207,11 @@ Now update your terraform main.tf file with the ouputs of the following two comm
        type                 = "security"
    }
 
-using the collected data from the terraform import, we are now updating our main.tf file:
+|
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+Using the collected data from the Terraform import, you can now update your **main.tf** file:
+
+::
 
    resource "bigip_waf_policy" "this" {
        application_language = "utf-8"
@@ -202,13 +223,13 @@ using the collected data from the terraform import, we are now updating our main
        policy_import_json   = file("${path.module}/importedWAFPolicy.json")
    }
 
-You can note that we replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
+|
 
-Finally, we can plan & apply our new project.
+Note that we replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+Finally, you can plan and apply your new project.
+
+:: 
 
    foo@bar:~$ terraform plan -out scenario2
    bigip_waf_policy.this: Refreshing state... [id=EdchwjSqo9cFtYP-iWUJmw]
@@ -235,18 +256,20 @@ Finally, we can plan & apply our new project.
    policyId = "EdchwjSqo9cFtYP-iWUJmw"
    policyJSON = "{[...]}"
 
+|
+
 Policy lifecycle management
 ---------------------------
-Now you can manage your WAF Policy as we did in the previous lab
+Now you can manage your WAF Policy as we did in the previous lab.
 
 You can check your WAF Policy on your BIG-IP after each terraform apply.
 
 Defining parameters
+```````````````````
+
 Create a parameters.tf file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    data "bigip_waf_entity_parameter" "P1" {
      name            = "Parameter1"
@@ -256,7 +279,9 @@ Create a parameters.tf file:
      signature_overrides_disable = [200001494, 200001472]
    }
 
-And add references to these parameters in the "bigip_waf_policy" TF resource in the main.tf file:
+|
+
+Add references to these parameters in the "bigip_waf_policy" TF resource in the **main.tf** file:
 
 .. code-block:: json
    :caption: 
@@ -272,7 +297,7 @@ And add references to these parameters in the "bigip_waf_policy" TF resource in 
 
 Defining URLs
 `````````````
-Create a urls.tf file:
+Create a **urls.tf** file:
 
 .. code-block:: json
    :caption: 
@@ -310,7 +335,7 @@ And add references to this URL in the "bigip_waf_policy" TF resource in the main
      urls                 = [data.bigip_waf_entity_url.U1.json, data.bigip_waf_entity_url.U2.json]
    }
 
-and run it:
+Run it:
 
 .. code-block:: json
    :caption: 

@@ -11,10 +11,10 @@ Pre-requisites
 - BIG-IP version 16.1 or newer
 - Credentials with REST API access
 
-on Terraform:
+On Terraform:
 
-- use of F5 BIG-IP provider version 1.15.0 or newer
-- use of Hashicorp version following
+- Using F5 BIG-IP provider version 1.15.0 or newer
+- Using Hashicorp versions following :ref:`versions`
 
 
 Creating a Policy
@@ -28,6 +28,7 @@ Create 3 files:
 
 .. code-block:: json
    :caption: variables.tf
+   :linenos:
 
    variable bigip {}
    variable username {}
@@ -37,6 +38,7 @@ Create 3 files:
 
 .. code-block:: json
    :caption: inputs.auto.tfvars
+   :linenos:
 
    bigip = "10.1.1.9:443"
    username = "admin"
@@ -46,7 +48,8 @@ Create 3 files:
 
 .. code-block:: json
    :caption: main.tf
-
+   :linenos:
+   
    terraform {
      required_providers {
        bigip = {
