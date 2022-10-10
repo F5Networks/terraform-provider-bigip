@@ -148,6 +148,26 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Optional:    true,
 				Description: "none",
 			},
+			"existing_waf_security_policy": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"waf_security_policy"},
+			},
+			"waf_security_policy": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enable": {
+							Type:        schema.TypeBool,
+							Required:    true,
+							Description: "Enables Fast to WAF security policy",
+						},
+					},
+				},
+				ConflictsWith: []string{"existing_waf_security_policy"},
+			},
 			"existing_monitor": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -199,6 +219,11 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				},
 				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
+			"security_log_profiles": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -221,6 +246,14 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	_ = d.Set("application", app)
 	log.Printf("[DEBUG] ID for resource :%+v", app)
 	d.SetId(d.Get("application").(string))
+	var wafEnabled bool
+	wafEnabled = false
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		wafEnabled = true
+	}
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		wafEnabled = true
+	}
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -233,8 +266,10 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Terraform Version": client.UserAgent,
+			"application type":  "HTTP",
 			"tenant":            tenant,
 			"application":       app,
+			"waf Enabled":       wafEnabled,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
 		err = teemDevice.Report(f, "bigip_fast_http_app", tsVer[3])
@@ -343,20 +378,23 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("snat.automap", data.SnatAutomap)
 	_ = d.Set("snat.existing_snat_pool", data.SnatPoolName)
 	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
+	_ = d.Set("security_log_profiles", data.LogProfileNames)
 	_ = d.Set("pool.enable", data.PoolEnable)
 	_ = d.Set("pool.existing_pool", data.PoolName)
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
+	}
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool.pool_members", members)
 	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
-	_ = d.Set("monitor.0.monitor_auth", data.MonitorAuth)
-	_ = d.Set("monitor.0.username", data.MonitorUsername)
-	_ = d.Set("monitor.0.password", data.MonitorPassword)
-	_ = d.Set("monitor.0.interval", data.MonitorInterval)
-	_ = d.Set("monitor.0.send_string", data.MonitorSendString)
-	_ = d.Set("monitor.0.response", data.MonitorResponse)
+	if _, ok := d.GetOk("monitor"); ok {
+		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -452,6 +490,7 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	httpJson.SnatEnable = true
 	httpJson.SnatAutomap = true
+	httpJson.WafPolicyEnable = false
 	httpJson.MakeSnatPool = false
 	if v, ok := d.GetOk("existing_snat_pool"); ok {
 		httpJson.SnatPoolName = v.(string)
@@ -468,6 +507,21 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			snatAdd = append(snatAdd, addr.(string))
 		}
 		httpJson.SnatAddresses = snatAdd
+	}
+	if v, ok := d.GetOk("existing_waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.WafPolicyName = v.(string)
+		httpJson.AsmLoggingEnable = true
+	}
+	if v, ok := d.GetOk("waf_security_policy"); ok {
+		httpJson.WafPolicyEnable = true
+		httpJson.MakeWafpolicy = true
+		httpJson.AsmLoggingEnable = true
+		// httpJson.WafPolicyName = ""
+		wafPol := v.([]interface{})
+		for _, vv := range wafPol {
+			log.Printf("[DEBUG] waf_secu policy:%+v", vv)
+		}
 	}
 	httpJson.MonitorEnable = false
 	httpJson.MakeMonitor = false
@@ -514,6 +568,14 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	if p, ok := d.GetOk("slow_ramp_time"); ok {
 		httpJson.SlowRampTime = p.(int)
+	}
+	if s, ok := d.GetOk("security_log_profiles"); ok {
+		httpJson.AsmLoggingEnable = true
+		var logProfiles []string
+		for _, logProfile := range s.([]interface{}) {
+			logProfiles = append(logProfiles, logProfile.(string))
+		}
+		httpJson.LogProfileNames = logProfiles
 	}
 	data, err := json.Marshal(httpJson)
 	if err != nil {

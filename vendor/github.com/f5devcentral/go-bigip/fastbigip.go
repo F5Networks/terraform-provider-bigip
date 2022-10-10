@@ -105,6 +105,7 @@ type FastHttpJson struct {
 	MakeWafpolicy          bool           `json:"make_waf_policy"`
 	WafPolicyName          string         `json:"asm_waf_policy,omitempty"`
 	AsmLoggingEnable       bool           `json:"enable_asm_logging"`
+	LogProfileNames        []string       `json:"log_profile_names,omitempty"`
 }
 
 type FastHttpPool struct {
