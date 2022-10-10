@@ -59,6 +59,8 @@ See [Pool Monitor](#pool-monitor) below for more details.
 * `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
 See [WAF Security Policy](#waf-security-policy) below for more details.
 
+* `security_log_profiles` - (Optional,`list`) List of security log profiles to be used for FAST application
+
 ### virtual server
 This IP address, combined with the port you specify below, becomes the BIG-IP virtual server address and port, which clients use to access the application
 

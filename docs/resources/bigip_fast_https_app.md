@@ -73,6 +73,8 @@ See [Pool Members](#pool-members) below for more details.
 * `monitor` - (Optional,`set`) `monitor` block takes input for FAST-Generated Pool Monitor.
 See [Pool Monitor](#pool-monitor) below for more details.
 
+* `security_log_profiles` - (Optional,`list`) List of security log profiles to be used for FAST application
+
 ### virtual server
 This IP address, combined with the port you specify below, becomes the BIG-IP virtual server address and port, which clients use to access the application
 

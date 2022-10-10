@@ -188,8 +188,8 @@ func resourceBigipFastTcpAppCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-	d.Set("application", app)
-	d.Set("tenant", tenant)
+	_ = d.Set("application", app)
+	_ = d.Set("tenant", tenant)
 	log.Printf("[DEBUG] ID for resource :%+v", app)
 	d.SetId(app)
 
@@ -205,6 +205,9 @@ func resourceBigipFastTcpAppCreate(d *schema.ResourceData, meta interface{}) err
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Terraform Version": client.UserAgent,
+			"application type":  "TCP",
+			"tenant":            tenant,
+			"application":       app,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
 		err = teemDevice.Report(f, "bigip_fast_application", tsVer[3])

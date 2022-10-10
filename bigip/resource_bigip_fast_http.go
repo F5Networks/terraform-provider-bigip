@@ -219,6 +219,11 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				},
 				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
+			"security_log_profiles": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -241,6 +246,14 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	_ = d.Set("application", app)
 	log.Printf("[DEBUG] ID for resource :%+v", app)
 	d.SetId(d.Get("application").(string))
+	var wafEnabled bool
+	wafEnabled = false
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		wafEnabled = true
+	}
+	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+		wafEnabled = true
+	}
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -253,8 +266,10 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
 		f := map[string]interface{}{
 			"Terraform Version": client.UserAgent,
+			"application type":  "HTTP",
 			"tenant":            tenant,
 			"application":       app,
+			"waf Enabled":       wafEnabled,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
 		err = teemDevice.Report(f, "bigip_fast_http_app", tsVer[3])
@@ -363,6 +378,7 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("snat.automap", data.SnatAutomap)
 	_ = d.Set("snat.existing_snat_pool", data.SnatPoolName)
 	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
+	_ = d.Set("security_log_profiles", data.LogProfileNames)
 	_ = d.Set("pool.enable", data.PoolEnable)
 	_ = d.Set("pool.existing_pool", data.PoolName)
 	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
@@ -552,6 +568,14 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	if p, ok := d.GetOk("slow_ramp_time"); ok {
 		httpJson.SlowRampTime = p.(int)
+	}
+	if s, ok := d.GetOk("security_log_profiles"); ok {
+		httpJson.AsmLoggingEnable = true
+		var logProfiles []string
+		for _, logProfile := range s.([]interface{}) {
+			logProfiles = append(logProfiles, logProfile.(string))
+		}
+		httpJson.LogProfileNames = logProfiles
 	}
 	data, err := json.Marshal(httpJson)
 	if err != nil {
