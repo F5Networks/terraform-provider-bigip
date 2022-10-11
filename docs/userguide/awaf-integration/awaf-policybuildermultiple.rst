@@ -1,16 +1,16 @@
 .. _awaf-policybuildermultiple:
 
-Scenario #6: Managing an A.WAF Policy with Policy Builder on multiple devices
-=============================================================================
+Scenario #6: Managing an Advanced WAF Policy with Policy Builder on multiple devices
+====================================================================================
  
-The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy from on multiple devices or clusters.
+The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy from on multiple devices or clusters.
 
 Goals
-The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy from on multiple devices or clusters. Several use cases are covered here:
+The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy from on multiple devices or clusters. Several use cases are covered here:
 
 Multiple devices serving and protecting the same application (multiple datacenters, application spanned across multiple clouds... By nature, each standalone device or clusters can see different traffic patterns so the suggestions can be somehow differents. The goal here is to consolidate the suggestions before enforcing them.
 Production BIG-IPs protecting the application therefore seeing the real life traffic flow for seeding the Policy Builder but all changes need to be first validated in the qualification environment before enforcing into production.
-Note: The two uses cases aforementioned are not mutually exclusive and can be managed within a single workflow
+.. Note:: The two uses cases aforementioned are not mutually exclusive and can be managed within a single workflow
 
 
 Pre-requisites
@@ -19,9 +19,9 @@ Pre-requisites
 on the BIG-IPs:
 
  version 16.1 minimal
- A.WAF Provisioned
+ Advanced WAF Provisioned
  credentials with REST API access
- an A.WAF Policy with Policy Builder enabled and Manual traffic Learning
+ an Advanced WAF Policy with Policy Builder enabled and Manual traffic Learning
 on Terraform:
 
  use of F5 bigip provider version 1.16.0 minimal
@@ -136,7 +136,7 @@ We will create and associate the same WAF Policy to these Virtual Servers.
 Runing traffic on Production devices. We will make sure we are not running the same requests on both Production devices so we get distinct suggestions.
 Test the suggestions from Prod1 and Prod2 devices on the QA device and check that the application is not broken.
 Enforce suggestions on the Production devices.
-*Notes: There are some changes that may be specific to the QA env, such as setting Trusted IP addresses. So we will make the specific tuning first. *
+.. Note:: There are some changes that may be specific to the QA env, such as setting Trusted IP addresses. So we will make the specific tuning first. *
 
 1. Policy creation and association
 Plan and apply your new Terraform project.
@@ -195,7 +195,7 @@ resource "bigip_waf_policy" "QAS6" {
     policy_import_json   = data.http.scenario6.body
     modifications        = [data.bigip_waf_pb_suggestions.S6_22AUG20221800_P1.json, data.bigip_waf_pb_suggestions.S6_22AUG20221800_P2.json]
 }
-Notes: There are obviously some redundant learning suggestions on both data sources but the Declarative WAF API automatically removes them.
+.. Note:: There are obviously some redundant learning suggestions on both data sources but the Declarative WAF API automatically removes them.
 
 Now you can test your application through the QA device.
 

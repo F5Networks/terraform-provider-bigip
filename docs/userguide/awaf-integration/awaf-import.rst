@@ -89,19 +89,17 @@ Create 3 files:
 
 As you can see, we only define the two required attributes of the "bigip_waf_policy" terraform resource: name and template_name. It is required to provide them in order to be able to manage the resource.
 
-Before we move on, we need the Policy ID. There are multiple ways to get it:
+Now you need the Policy ID. There are multiple ways to get it:
 
 - Check on the iControl REST API Endpoint: ``/mgmt/tm/asm/policies?$filter=name+eq+scenario2&$select=id``
 - Get a script example in the ``lab/scripts/`` folder
-- Using a Go code
+- Use a Go code
 
 In this example we are using the Online Go Playground as it is easy and quick to use:
 
 1. Copy the following piece of code in the `Go PlayGround <https://go.dev/play/>`_.
 
-   .. code-block:: json
-      :caption: 
-      :linenos:
+   :: 
 
       // You can edit this code!
       // Click here and start typing.
@@ -115,51 +113,49 @@ In this example we are using the Online Go Playground as it is easy and quick to
 
 2. Update the value of the following variables located in the main function: 
 
-   ``var partition string = "Common"`` 
+   ``var partition string = "Common"`` |br|
    ``var policyName string = "scenario2"``
 
 3. Run and get the policy ID.
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+   ::
 
-   package main
+      package main
 
-   import (
-       "crypto/md5"
-       b64 "encoding/base64"
-       "fmt"
-       "strings"
-   )
+      import (
+          "crypto/md5"
+          b64 "encoding/base64"
+          "fmt"
+          "strings"
+      )
    
-   func Hasher(policyName string) string {
-       hasher := md5.New()
-       hasher.Write([]byte(policyName))
-       encodedString := b64.StdEncoding.EncodeToString(hasher.Sum(nil))
+      func Hasher(policyName string) string {
+          hasher := md5.New()
+          hasher.Write([]byte(policyName))
+          encodedString := b64.StdEncoding.EncodeToString(hasher.Sum(nil))
    
-       return strings.TrimRight(encodedString, "=")
-   }
+          return strings.TrimRight(encodedString, "=")
+      }
    
-   func main() {
-       var partition string = "Common"
-       var policyName string = "scenario2"
+      func main() {
+          var partition string = "Common"
+          var policyName string = "scenario2"
    
-       fullName := "/" + partition + "/" + policyName
-       policyId := Hasher(fullName)
+          fullName := "/" + partition + "/" + policyName
+          policyId := Hasher(fullName)
    
-       r := strings.NewReplacer("/", "_", "-", "_", "+", "-")
-       fmt.Println("Policy Id: ", r.Replace(policyId))
-   }
+          r := strings.NewReplacer("/", "_", "-", "_", "+", "-")
+          fmt.Println("Policy Id: ", r.Replace(policyId))
+      }
 
 |
 
-Now, run the following commands, so we can:
+Run the following commands to:
 
 1. Initialize the Terraform Project.
 2. Import the current WAF policy into our state.
-3. Set the JSON WAF Policy as our new baseline.
-4. Configure the lifecycle of our WAF Policy.
+3. Set the JSON WAF Policy as your new baseline.
+4. Configure the lifecycle of your WAF Policy.
 
 :: 
 
@@ -184,7 +180,7 @@ Now, run the following commands, so we can:
 
 |
 
-Now update your terraform main.tf file with the ouputs of the following two commands:
+Update your Terraform main.tf file with the ouputs of the following two commands:
 
 :: 
 
@@ -260,14 +256,14 @@ Finally, you can plan and apply your new project.
 
 Policy lifecycle management
 ---------------------------
-Now you can manage your WAF Policy as we did in the previous lab.
+Now you can manage your WAF Policy as we did in :ref:`awaf-create`.
 
-You can check your WAF Policy on your BIG-IP after each terraform apply.
+You can check your WAF Policy on your BIG-IP after each Terraform apply.
 
 Defining parameters
 ```````````````````
 
-Create a parameters.tf file:
+Create a **parameters.tf** file:
 
 :: 
 
@@ -283,9 +279,7 @@ Create a parameters.tf file:
 
 Add references to these parameters in the "bigip_waf_policy" TF resource in the **main.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    resource "bigip_waf_policy" "this" {
      [...]
@@ -295,13 +289,13 @@ Add references to these parameters in the "bigip_waf_policy" TF resource in the 
    foo@bar:~$ terraform plan -out scenario2
    foo@bar:~$ terraform apply "scenario2"
 
+|
+
 Defining URLs
 `````````````
 Create a **urls.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    data "bigip_waf_entity_url" "U1" {
      name		              = "/URL1"
@@ -324,34 +318,33 @@ Create a **urls.tf** file:
      name                        = "/URL2"
    }
 
-And add references to this URL in the "bigip_waf_policy" TF resource in the main.tf file:
+|
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+Add references to this URL in the "bigip_waf_policy" TF resource in the **main.tf** file:
+
+::
 
    resource "bigip_waf_policy" "this" {
      [...]
      urls                 = [data.bigip_waf_entity_url.U1.json, data.bigip_waf_entity_url.U2.json]
    }
 
+|
+
 Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform plan -out scenario2
    foo@bar:~$ terraform apply "scenario2"
 
+|
 
 Defining Attack Signatures
 ``````````````````````````
-Create a signatures.tf file:
+Create a **signatures.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    data "bigip_waf_signatures" "S1" {
      signature_id     = 200104004
@@ -365,22 +358,25 @@ Create a signatures.tf file:
      enabled          = false
    }
 
-And add references to this URL in the "bigip_waf_policy" TF resource in the main.tf file:
+|
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+And add references to this URL in the "bigip_waf_policy" TF resource in the **main.tf** file:
+
+::
 
    resource "bigip_waf_policy" "this" {
      [...]
      signatures       = [data.bigip_waf_signatures.S1.json, data.bigip_waf_signatures.S2.json]
    }
 
-and run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform plan -out scenario2
    foo@bar:~$ terraform apply "scenario2"
+
+
+.. |br| raw:: html
+ 
+   <br />

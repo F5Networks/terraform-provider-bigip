@@ -72,7 +72,8 @@ Create 3 files:
      enforcement_mode     = "blocking"
      server_technologies  = ["Apache Tomcat", "MySQL", "Unix/Linux"]
    }
-   
+
+|   
 
 Now that you have your terraform project all set up, you can run it:
 
@@ -256,9 +257,9 @@ Signatures Management
 `````````````````````
 Create a separate signature definition file with 3 signatures:
 
-- S1 enables and perform staging on the 200010293 attack signature.
-- S2 disables the 200009024 attack signature.
-- S3 enables and enforce the 200014009 attack signature.
+- S1 enables and perform staging on the **200010293** attack signature.
+- S2 disables the **200009024** attack signature.
+- S3 enables and enforce the **200014009** attack signature.
 
 Create a signatures.tf file:
 
@@ -354,8 +355,9 @@ Run it:
    
    Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
    
-      
-At any time you can check the details on a specific Attack signature:
+|
+
+Use the following command to check the details on a specific Attack signature:
 
 :: 
 

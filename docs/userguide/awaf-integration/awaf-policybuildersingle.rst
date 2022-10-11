@@ -80,7 +80,8 @@ resource "bigip_waf_policy" "this" {
     type                 = "security"
     policy_import_json   = data.http.scenario5.body
 }
-Note: the template name can be set to anything. When it is imported, we will overwrite the value
+
+.. Note:: the template name can be set to anything. When it is imported, we will overwrite the value
 
 outputs.tf
 
@@ -100,7 +101,7 @@ foo@bar:~$ terraform plan -out scenario5
 foo@bar:~$ terraform apply "scenario5"
 Now you can go on your BIG-IP UI and associate the A.WAF Policy scenario5 to the Virtual Server scenario5.vs.
 
-Note: remember, the Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
+.. Note:: remember, the Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
 
 
 
@@ -125,7 +126,7 @@ Here is a typical workflow in a real life:
 
 the security engineer (yourself) regularly checks the sugestions directly on the BIG-IP WebUI and clean the irrelevant suggestions.
 once the cleaning is done, the terraform engineer (can either be the same person or different) creates a unique bigip_waf_pb_suggestions data source before issuing a terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5 to 100% - 100% having the highest confidence level).
-Note: Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
+.. Note:: Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
 
 
 1. Go to your BIG-IP WebUI and clean the irrelevant suggestions
