@@ -7,15 +7,15 @@ Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP
 
 This lab is a variant of the previous one. It takes a manually managed Advanced WAF Policy from an existing BIG-IP and migrates it to a different BIG-IP through Terraform resources.
 
-Goals
 You can meet this scenario in multiple use-cases:
 
-migrating from a BIG-IP to another (platform refresh)
-Re-Hosting (aka Lift&Shift) in a Cloud migration project
-Back-and-Forth importing / exporting WAF Policies between environments (dev / test / QA / Production)
+- Migrating from a BIG-IP to another (platform refresh).
+- Re-Hosting (aka Lift&Shift) in a Cloud migration project.
+- Back-and-Forth importing/exporting WAF Policies between environments (dev/test/QA/Production)
+
 The goal is to leverage the previous import scenario in order to carry and ingest the WAF Policy from one BIG-IP to another while keeping its state through Terraform.
 
-The WAF Policy and its children objects (parameters, urls, attack signatures, exceptions...) can be tightly coupled to a BIG-IP AND / OR can be shared across multiple policies depending on the use case.
+The WAF Policy and its children objects (parameters, urls, attack signatures, exceptions, etc.) can be tightly coupled to a BIG-IP and/or can be shared across multiple policies depending on the use case.
 
 Pre-requisites
 --------------
@@ -94,7 +94,7 @@ Create 4 files:
      template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
    }
 
-.. Note:: The template name can be set to anything. When it is imported, we will overwrite the value
+.. Note:: The template name can be set to anything. When it is imported, the value is overwritten.
 
 |
 
@@ -110,19 +110,18 @@ Create 4 files:
            value   = bigip_waf_policy.current.policy_export_json
    }
 
+|
 
-Here we defined two Big-IPs: "old" and "new". The "old" BIG-IP has the existing Advanced WAF Policies, the "new" is our target.
+Here we defined two BIG-IPs: "old" and "new". The "old" BIG-IP has the existing Advanced WAF Policies, the "new" is our target.
 
-Same as scenario #2 we need the Advanced WAF Policy ID to make the initial import:
+Similar to :ref:`awaf-import`, you need the Advanced WAF Policy ID to make the initial import:
 
-- check on the iControl REST API Endpoint: /mgmt/tm/asm/policies?$filter=name+eq+scenario3&$select=id
-- get a script example in the lab/scripts/ folder
-- run the following piece of code in the Go PlayGround
+- Check on the iControl REST API Endpoint: ``/mgmt/tm/asm/policies?$filter=name+eq+scenario3&$select=id``
+- Get a script example in the ``lab/scripts/`` folder
+- Run the following piece of code in the Go PlayGround
 
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    package main
 
@@ -153,16 +152,14 @@ Same as scenario #2 we need the Advanced WAF Policy ID to make the initial impor
    }
 
 
-Now, run the following commands, so we can:
+Run the following commands to:
 
-1. Initialize the terraform project
-2. Import the current WAF policy from the "old" BIG-IP into our state
-3. Create the Advanced WAF Policy resource for the "BIG-IP" pointing to the imported state
-4. Configure the lifecycle of our WAF Policy
+1. Initialize the Terraform Project.
+2. Import the current WAF policy from the "old" BIG-IP into your state.
+3. Create the Advanced WAF Policy resource for the "BIG-IP" pointing to the imported state.
+4. Configure the lifecycle of our WAF Policy.
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform init
    Initializing the backend...
@@ -183,11 +180,9 @@ Now, run the following commands, so we can:
    your Terraform state and will henceforth be managed by Terraform.
 
 
-Now update your terraform main.tf file with the ouputs of the following two commands:
+Update your **terraform main.tf** file with the ouputs of the following two commands:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    foo@bar:~$ terraform show -json | jq '.values.root_module.resources[].values.policy_export_json | fromjson' > currentWAFPolicy.json
 
@@ -208,11 +203,9 @@ Now update your terraform main.tf file with the ouputs of the following two comm
    }
 
 
-This a migration use case so we don't need anymore the current WAF Policy from the existing BIG-IP. So, using the collected data from the terraform import, we are now updating our main.tf file: If you want to keep the policy on both BIG-IPs, [please get there](UPDATE LINK!!!!)
+This a migration use case so you do not need the current WAF Policy from the existing BIG-IP. Using the collected data from the Terraform import, you can now update your **main.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    resource "bigip_waf_policy" "migrated" {
        provider	           = bigip.new
@@ -227,13 +220,11 @@ This a migration use case so we don't need anymore the current WAF Policy from t
 
 
 
-Note: You can note that we replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
+Note that we replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
 
-Finally, we can plan & apply our new project.
+Finally, you can plan and apply your new project.
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform plan -out scenario3
    bigip_waf_policy.migrated: Refreshing state... [id=YiEQ4l1Fw1U9UnB2-mTKWA]
@@ -260,7 +251,7 @@ Finally, we can plan & apply our new project.
    policyId = "EdchwjSqo9cFtYP-iWUJmw"
    policyJSON = "{[...]}"
 
-
+|
 
 Policy lifecycle management
 ---------------------------
@@ -270,11 +261,9 @@ You can check your WAF Policy on your BIG-IP after each terraform apply.
 
 Defining parameters
 ```````````````````
-Create a parameters.tf file:
+Create a **parameters.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    data "bigip_waf_entity_parameter" "P1" {
      name            = "Parameter1"
@@ -285,11 +274,9 @@ Create a parameters.tf file:
    }
 
 
-And add references to these parameters in the "bigip_waf_policy" TF resource in the main.tf file:
+Add references to these parameters in the ``bigip_waf_policy`` TF resource in the **main.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    resource "bigip_waf_policy" "migrated" {
      [...]
@@ -298,14 +285,13 @@ And add references to these parameters in the "bigip_waf_policy" TF resource in 
    foo@bar:~$ terraform plan -out scenario3
    foo@bar:~$ terraform apply "scenario3"
 
+|
 
 Defining URLs
 `````````````
-Create a urls.tf file:
+Create a **urls.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    data "bigip_waf_entity_url" "U1" {
      name		              = "/URL1"
@@ -330,11 +316,9 @@ Create a urls.tf file:
 
 
 
-And add references to this URL in the "bigip_waf_policy" TF resource in the main.tf file:
+Add references to this URL in the ``bigip_waf_policy`` TF resource in the **main.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    resource "bigip_waf_policy" "migrated" {
      [...]
@@ -342,23 +326,20 @@ And add references to this URL in the "bigip_waf_policy" TF resource in the main
    }
 
 
-and run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform plan -out scenario3
    foo@bar:~$ terraform apply "scenario3"
 
+|
 
 Defining Attack Signatures
 ``````````````````````````
-Create a signatures.tf file:
+Create a **signatures.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    data "bigip_waf_signatures" "S1" {
      provider         = bigip.new
@@ -374,22 +355,18 @@ Create a signatures.tf file:
      enabled          = false
    }
 
-And add references to this URL in the "bigip_waf_policy" TF resource in the main.tf file:
+Add references to this URL in the ``bigip_waf_policy`` TF resource in the **main.tf** file:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    resource "bigip_waf_policy" "migrated" {
      [...]
      signatures       = [data.bigip_waf_signatures.S1.json, data.bigip_waf_signatures.S2.json]
    }
 
-and run it:
+Run it:
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+:: 
 
    foo@bar:~$ terraform plan -out scenario3
    foo@bar:~$ terraform apply "scenario3"

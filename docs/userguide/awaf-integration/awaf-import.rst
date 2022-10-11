@@ -5,7 +5,7 @@ Scenario #2: Managing with Terraform an existing WAF policy
  
 The goal of this lab is to take an existing Advanced WAF Policy -- that has been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5 BIG-IP Terraform Provider.
 
-You may already have multiple WAF policies protecting your applications and these WAF policies have evolved over the past months or years. It may be very complicated to do an extensive inventory of each policy, each entity, and every attribute. So the goal here is to import the current policy, which will be our current baseline. Every new change, addition of a Server Technology, parameter, or attack signature will be done through Terraform in addition or correction of this new baseline.
+You may already have multiple WAF policies protecting your applications and these WAF policies have evolved over the past months or years. It may be very complicated to do an extensive inventory of each policy, each entity, and every attribute. The goal here is to import the current policy, which will be your current baseline. Every new change, addition of a Server Technology, parameter, or attack signature will be done through Terraform in addition or correction of this new baseline.
 
 Pre-requisites
 --------------
@@ -153,7 +153,7 @@ In this example we are using the Online Go Playground as it is easy and quick to
 Run the following commands to:
 
 1. Initialize the Terraform Project.
-2. Import the current WAF policy into our state.
+2. Import the current WAF policy into your state.
 3. Set the JSON WAF Policy as your new baseline.
 4. Configure the lifecycle of your WAF Policy.
 
@@ -180,7 +180,7 @@ Run the following commands to:
 
 |
 
-Update your Terraform main.tf file with the ouputs of the following two commands:
+Update your Terraform **main.tf** file with the ouputs of the following two commands:
 
 :: 
 
@@ -286,6 +286,8 @@ Add references to these parameters in the "bigip_waf_policy" TF resource in the 
      parameters           = [data.bigip_waf_entity_parameter.P1.json]
    }
 
+:: 
+
    foo@bar:~$ terraform plan -out scenario2
    foo@bar:~$ terraform apply "scenario2"
 
@@ -360,7 +362,7 @@ Create a **signatures.tf** file:
 
 |
 
-And add references to this URL in the "bigip_waf_policy" TF resource in the **main.tf** file:
+Add references to this URL in the "bigip_waf_policy" TF resource in the **main.tf** file:
 
 ::
 
