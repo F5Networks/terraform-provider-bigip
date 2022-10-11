@@ -1,7 +1,7 @@
 .. _awaf-migrate:
 
-Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP
-===================================================================
+Scenario #3: Migrating a WAF Policy from one BIG-IP to another BIG-IP
+=====================================================================
 
 .. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate
 
@@ -15,7 +15,7 @@ You can meet this scenario in multiple use-cases:
 
 The goal is to leverage the previous import scenario in order to carry and ingest the WAF Policy from one BIG-IP to another while keeping its state through Terraform.
 
-The WAF Policy and its children objects (parameters, urls, attack signatures, exceptions, etc.) can be tightly coupled to a BIG-IP and/or can be shared across multiple policies depending on the use case.
+The WAF Policy and its children objects (parameters, URLs, attack signatures, exceptions, etc.) can be tightly coupled to a BIG-IP and/or can be shared across multiple policies, depending on the use case.
 
 Pre-requisites
 --------------
@@ -220,7 +220,7 @@ This a migration use case so you do not need the current WAF Policy from the exi
 
 
 
-Note that we replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
+Note that F5 replaced the "policy_export_json" argument with "policy_import_json" pointing to the imported WAF Policy JSON file.
 
 Finally, you can plan and apply your new project.
 
@@ -255,9 +255,7 @@ Finally, you can plan and apply your new project.
 
 Policy lifecycle management
 ---------------------------
-Now you can manage your WAF Policy as we did in the previous lab
-
-You can check your WAF Policy on your BIG-IP after each terraform apply.
+You can manage your WAF Policy as shown in the previous lab. You can check your WAF Policy on your BIG-IP after each terraform apply.
 
 Defining parameters
 ```````````````````
@@ -282,6 +280,9 @@ Add references to these parameters in the ``bigip_waf_policy`` TF resource in th
      [...]
      parameters           = [data.bigip_waf_entity_parameter.P1.json]
    }
+
+:: 
+
    foo@bar:~$ terraform plan -out scenario3
    foo@bar:~$ terraform apply "scenario3"
 
