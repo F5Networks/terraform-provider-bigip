@@ -9,7 +9,7 @@ The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Pol
 
 - The security engineer regularly checks the sugestions directly on the BIG-IP WebUI and cleans the irrelevant suggestions.
 - Once the cleaning is done, the Terraform engineer (who can also be the security engineer) issues a Terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5% to 100%, with 100% being the highest confidence level).
--Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
+- Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
 
 
 Pre-requisites
@@ -29,9 +29,15 @@ On Terraform:
 
 Policy Creation
 ---------------
-F5 has already exported a WAF Policy called scenario5.json available `here <https://raw.githubusercontent.com/fchmainy/awaf_tf_docs/main/0.Appendix/scenario5_wLearningSuggestions.json>`_` including several Policy Builder Suggestions so you won't have to generate traffic.
+F5 has already exported a WAF Policy called scenario5.json available `here <https://raw.githubusercontent.com/fchmainy/awaf_tf_docs/main/0.Appendix/scenario5_wLearningSuggestions.json>`_ including several Policy Builder Suggestions so you won't have to generate traffic.
 
 Create 4 files:
+
+- variables.tf
+- inputs.auto.tfvars
+- main.tf
+- outputs.tf
+
 
 .. code-block:: json
    :caption: variables.tf
@@ -120,12 +126,12 @@ Initialize, plan, and apply your new Terraform project:
 
 |
 
-You can go on your BIG-IP UI and associate the Advanced WAF Policy **scenario5** to the Virtual Server **scenario5.vs**.
+Log on to your BIG-IP UI and associate the Advanced WAF Policy **scenario5** to the Virtual Server **scenario5.vs**.
 
 .. Note:: The Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
 
 
-
+:guilabel:`Security > Application Security : Policy Building : Learning and Blocking Settings`
 
 Simulate a WAF Policy workflow
 ------------------------------
@@ -134,109 +140,132 @@ Change the Policy Builder process (For testing and demo purpose only):
 ``````````````````````````````````````````````````````````````````````
 
 1. Go to the DVWA WAF Policy on your BIG-IP TMUI (if you are using UDF, the WAF policy is called scenario5 and is located under the Common partition.
-2. In the Learning and blocking Settings (Security ›› Application Security : Policy Building : Learning and Blocking Settings), at the very bottom of the page, go on the Loosen Policy settings in the Advanced view of the Policy Building Process.
-3. Change the different sources, spread out over a time period of at least value from 10 to 1 so the policy builder generates learning suggestions more rapidely.
+2. In the Learning and blocking Settings (:guilabel:`Security > Application Security : Policy Building : Learning and Blocking Settings`), at the very bottom of the page, go on the :guilabel:`Loosen Policy` settings in the Advanced view of the :guilabel:`Policy Building Process`.
+3. Change the :guilabel:`different sources, spread out over a time period of at least` value from :guilabel:`10` to :guilabel:`1` so the policy builder generates learning suggestions more rapidly.
 
 Browse the Vulnerable Application
 `````````````````````````````````
-Now browse the DVWA web application through the AWAF Virtual Server. The credentials to log in to DVWA is admin/password.
+Now browse the DVWA web application through the Advanced WAF Virtual Server. The credentials to log in to DVWA is admin/password.
 
-1. Go on the DVWA Security menu and change the level to Low then Submit
+1. Go on the :guilabel:`DVWA Security` menu and change the level to :guilabel:`Low` then :guilabel:`Submit`.
 2. Browse the DVWA website by clicking into any menus.
-3. Then generate some attacks:
+3. Generate some attacks:
 
-   - SQL Injection: %' or 1='1 ' and 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users #
-   - XSS Reflected: <script>alert('hello')</script>
+   - ``SQL Injection: %' or 1='1 ' and 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users #``
+   - ``XSS Reflected: <script>alert('hello')</script>``
 
 
 Check Learning Suggestions
 ``````````````````````````
 If you go to the WAF Policy learning suggestions, you will find multiple suggestions with a high score of 100% (because we have not been picky in the learning process settings).
 
-Here is a typical workflow in a real life:
+Here is a typical workflow in real life:
 
-the security engineer (yourself) regularly checks the sugestions directly on the BIG-IP WebUI and clean the irrelevant suggestions.
-once the cleaning is done, the terraform engineer (can either be the same person or different) creates a unique bigip_waf_pb_suggestions data source before issuing a terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5 to 100% - 100% having the highest confidence level).
+- The security engineer regularly checks the sugestions directly on the BIG-IP WebUI and cleans the irrelevant suggestions.
+- Once the cleaning is done, the Terraform engineer (can either be the same person or different) creates a unique bigip_waf_pb_suggestions data source before issuing a Terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5% to 100% with 100% having the highest confidence level).
+
 .. Note:: Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
 
+|
 
-1. Go to your BIG-IP WebUI and clean the irrelevant suggestions
-⚠️ IMPORTANT you can ignore suggestions but you should never accept them on the WebUI, otherwise you will then have to reconciliate the changes between the WAF Policy on the BIG-IP and the latest known WAF Policy in your terraform state.
+1. Go to your BIG-IP WebUI and clean the irrelevant suggestions.
 
-For example, remove all the suggestions with a scoring = 1%
+   For example, remove all the suggestions with a scoring = 1%
+
+   .. Important:: You can ignore suggestions but you should never accept them on the WebUI, otherwise you will then have to reconciliate the changes between the WAF Policy on the BIG-IP and the latest known WAF Policy in your Terraform state.
 
 
-2. Use Terraform to enforce the policy builder suggestions
-Create a suggestions.tf file:
+2. Use Terraform to enforce the policy builder suggestions.
 
-the name of the bigip_waf_pb_suggestions data source should be unique so we can track what modifications have been enforced and when it was.
+   a. Create a **suggestions.tf** file. The name of the bigip_waf_pb_suggestions data source should be unique so we can track what modifications have been enforced and when.
 
-data "bigip_waf_pb_suggestions" "AUG3rd20221715" {
-  provider	           = bigip.prod 
-  policy_name            = "scenario5"
-  partition              = "Common"
-  minimum_learning_score = 100
-}
+      ::
 
-output "AUG3rd20221715" {
-	value	= data.bigip_waf_pb_suggestions.AUG3rd20221715.json
-}
-You can check here the suggestions before they are applied to the BIG-IP:
+         data "bigip_waf_pb_suggestions" "AUG3rd20221715" {
+           provider	           = bigip.prod 
+           policy_name            = "scenario5"
+           partition              = "Common"
+           minimum_learning_score = 100
+         }
+      
+         output "AUG3rd20221715" {
+         	value	= data.bigip_waf_pb_suggestions.AUG3rd20221715.json
+         }
 
-foo@bar:~$ terraform plan -out scenario5
+      |
 
-foo@bar:~$ terraform apply "scenario5"
+      You can check the suggestions before they are applied to the BIG-IP:
 
-foo@bar:~$ terraform output AUG3rd20221715 | jq '. | fromjson'
-You will get the JSON list of suggestions that have a learning score of 100%.
+      ::
+   
+         foo@bar:~$ terraform plan -out scenario5
+   
+         foo@bar:~$ terraform apply "scenario5"
+   
+         foo@bar:~$ terraform output AUG3rd20221715 | jq '. | fromjson'
 
-{
-    "suggestions": [
-      {
-        "action": "update-append",
-        "description": "Add/Update Parameter. Disable the matched signature on the matched Parameter",
-        "entity": {
-          "level": "global",
-          "name": "id"
-        },
-        "entityChanges": {
-          "signatureOverrides": [
-            {
-              "enabled": false,
-              "name": "SQL-INJ ' UNION SELECT (Parameter)",
-              "signatureId": 200002736
-            }
-          ],
-          "type": "explicit"
-        },
-        "entityType": "parameter"
-      },
-[...],      
-      {
-        "action": "add-or-update",
-        "description": "Add Policy Server Technology",
-        "entity": {
-          "serverTechnologyName": "Unix/Linux"
-        },
-        "entityType": "server-technology"
-      }
-    ]
-  }
-update the main.tf file:
+      |
 
-resource "bigip_waf_policy" "this" {
-    provider             = bigip.prod
-    application_language = "utf-8"
-    partition            = "Common"
-    name                 = "scenario5"
-    template_name        = "POLICY_TEMPLATE_FUNDAMENTAL"
-    type                 = "security"
-    policy_import_json   = data.http.scenario5.body
-    modifications        = [data.bigip_waf_pb_suggestions.AUG3rd20221715.json]
-}
-now, plan & apply!:
+      You will get the JSON list of suggestions that have a learning score of 100%.
 
-foo@bar:~$ terraform plan -out scenario5
+      ::
+   
+         {
+             "suggestions": [
+               {
+                 "action": "update-append",
+                 "description": "Add/Update Parameter. Disable the matched signature on the matched Parameter",
+                 "entity": {
+                   "level": "global",
+                   "name": "id"
+                 },
+                 "entityChanges": {
+                   "signatureOverrides": [
+                     {
+                       "enabled": false,
+                       "name": "SQL-INJ ' UNION SELECT (Parameter)",
+                       "signatureId": 200002736
+                     }
+                   ],
+                   "type": "explicit"
+                 },
+                 "entityType": "parameter"
+               },
+         [...],      
+               {
+                 "action": "add-or-update",
+                 "description": "Add Policy Server Technology",
+                 "entity": {
+                   "serverTechnologyName": "Unix/Linux"
+                 },
+                 "entityType": "server-technology"
+               }
+             ]
+           }
 
-foo@bar:~$ terraform apply "scenario5"
-You can check on your BIGIP UI that the server technologies and other suggestions have been succesfully enforced to your WAF Policy.
+
+   b. Update the **main.tf** file:
+
+      ::
+
+         resource "bigip_waf_policy" "this" {
+             provider             = bigip.prod
+             application_language = "utf-8"
+             partition            = "Common"
+             name                 = "scenario5"
+             template_name        = "POLICY_TEMPLATE_FUNDAMENTAL"
+             type                 = "security"
+             policy_import_json   = data.http.scenario5.body
+             modifications        = [data.bigip_waf_pb_suggestions.AUG3rd20221715.json]
+         }
+
+   c. Plan and apply:
+
+      ::
+
+         foo@bar:~$ terraform plan -out scenario5
+
+         foo@bar:~$ terraform apply "scenario5"
+
+
+   Check on the BIG-IP UI that the server technologies and other suggestions have been succesfully enforced to your WAF Policy.
