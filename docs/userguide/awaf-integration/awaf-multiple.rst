@@ -1,11 +1,13 @@
-.. _awaf-integration:
+.. _awaf-multiple:
 
-**`Scenario #4: Managing an A.WAF Policy on different devices <https://github.com/fchmainy/awaf_tf_docs/tree/main/4.multiple>`_**
- 
-The goal of this lab is to manage an A.WAF Policy on multiple devices.
+Scenario #4: Managing an Advanced WAF Policy on different devices
+=================================================================
 
-Goals
-The goal of this lab) is to manage an A.WAF Policy on multiple devices. It can be:
+.. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/4.multiple
+
+The goal of this lab is to manage an Advanced WAF Policy on multiple devices.
+
+It can be:
 
 different standalone devices serving the same applications
 different devices serving different purposes, for example changes tested first on a QA/Test BIG-IP before applying into production.
@@ -13,7 +15,7 @@ Pre-requisites
 on the BIG-IP:
 
  version 16.1 minimal
- A.WAF Provisioned
+ Advanced WAF Provisioned
  credentials with REST API access
 on Terraform:
 
@@ -200,9 +202,9 @@ now, plan & apply!:
 foo@bar:~$ terraform plan -out scenario4 > output_scenario4.2
 foo@bar:~$ more output_scenario4.2
 foo@bar:~$ terraform apply "scenario4"
-We can verify that the 5 attack signatures have been enabled and enforced on the scenario4 WAF Policy on the QA BIG-IP (first 5 lines in the attack signatures list of the A.WAF Policy).
+We can verify that the 5 attack signatures have been enabled and enforced on the scenario4 WAF Policy on the QA BIG-IP (first 5 lines in the attack signatures list of the Advanced WAF Policy).
 
-Now, the applicatiopn owner identified that these last changes on the QA device have introduced some FP. Using the log events on the A.WAF GUI, we identified that :
+Now, the applicatiopn owner identified that these last changes on the QA device have introduced some FP. Using the log events on the Advanced WAF GUI, we identified that :
 
 the attack signature "200101558" should be disabled globally
 the attack signature "200003068" should be disabled for the "/U1" URL

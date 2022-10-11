@@ -1,25 +1,29 @@
-.. _awaf-integration:
+.. _awaf-policybuildersingle:
 
-**`Scenario #5: Managing an A.WAF Policy with Policy Builder on a single device <https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle>`_**
- 
-The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy on a single device or cluster.
+Scenario #5: Managing an Advanced WAF Policy with Policy Builder on a single device
+===================================================================================
+
+.. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle
+
+The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster.
 
 Goals
-The goal of this lab is to manage Policy Builder Suggestions an A.WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows what can be the management workflow:
+The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows what can be the management workflow:
 
 the security engineer regularly checks the sugestions directly on the BIG-IP WebUI and clean the irrelevant suggestions.
 once the cleaning is done, the terraform engineer (who can also be the security engineer btw) issue a terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5 to 100% - 100% having the highest confidence level).
 Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
 
 
-
 Pre-requisites
+--------------
+
 on the BIG-IP:
 
  version 16.1 minimal
- A.WAF Provisioned
+ Advanced WAF Provisioned
  credentials with REST API access
- an A.WAF Policy with Policy Builder enabled and Manual traffic Learning
+ an Advanced WAF Policy with Policy Builder enabled and Manual traffic Learning
 on Terraform:
 
  use of F5 bigip provider version 1.15.0 minimal

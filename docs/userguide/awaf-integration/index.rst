@@ -1,7 +1,7 @@
 .. _awaf-integration:
 
-AWAF Integration with Terraform
-===============================
+F5 BIG-IP Advanced WAF Integration with Terraform
+=================================================
 
 Introduction
 ------------
@@ -12,13 +12,13 @@ Introduction
    - `Manage F5 BIG-IP Advanced WAF Policies with Terraform <https://community.f5.com/t5/technical-articles/manage-f5-big-ip-advanced-waf-policies-with-terraform-intro/ta-p/300828>`_
 
 
-The Advanced Web Application Firewall (Advanced WAF) or Application Security Manager (ASM) security policies can be deployed using the declarative JSON format, facilitating easy integration into a CI/CD pipeline. The declarative policies are extracted from a source control system, for example Git, and imported into the BIG-IP.
+The F5 BIG-IP Advanced Web Application Firewall (Advanced WAF) or Application Security Manager (ASM) security policies can be deployed using the declarative JSON format, facilitating easy integration into a CI/CD pipeline. The declarative policies are extracted from a source control system, for example Git, and imported into the BIG-IP.
 Using the provided declarative policy templates, you can modify the necessary parameters, save the JSON file, and import the updated security policy into your BIG-IP devices. The declarative policy copies the content of the template and adds the adjustments and modifications on to it. The templates therefore allow you to concentrate only on the specific settings that need to be adapted for the specific application that the policy protects.
 
-Terraform can be used to manage AWAF policy resource with its adjustments and modifications on a BIG-IP. It outputs an up-to-date WAF Policy in a JSON format so you can store it in a registry and/or push it to your BIG-IP.
+Terraform can be used to manage Advanced WAF policy resource with its adjustments and modifications on a BIG-IP. It outputs an up-to-date WAF Policy in a JSON format so you can store it in a registry and/or push it to your BIG-IP.
  
-AWAF Policy structure
-`````````````````````
+Advanced WAF Policy structure
+`````````````````````````````
  
 The supported declarative policy structure includes three logical sections: 
  
@@ -30,9 +30,6 @@ The supported declarative policy structure includes three logical sections:
  
 When an attribute is defined in both the adjustments and modifications sections, the policy is deployed with the value as it appears in the modifications section. When an attribute appears in the modifications section multiple times, the policy is deployed with the value as it appears in the latest definition in the modifications section.
  
-Example Usage:
-
-
 
 Prerequisites
 -------------
@@ -42,7 +39,7 @@ To read, modify, or import declarative policies, you must have:
 
 - BIG-IP devices running version 15.1.x or later
 - BIG-IP Administrator role permissions
-- An active ASM or Advanced WAF license on the BIG-IP devices
+- An active Advanced WAF license on the BIG-IP devices
 - Terraform provider BIG-IP v1.15.0 and above
 
 Example Usage
@@ -96,11 +93,11 @@ Example Usage
 Terraform Integration Resources and Data Sources
 ------------------------------------------------
 
-AWAF Resources:
+Advanced WAF Resources:
 
 - `bigip_waf_policy <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_waf_policy>`_
 
-AWAF Data Sources:
+Advanced WAF Data Sources:
 
 - `bigip_waf_entity_parameters <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_parameters>`_
 - `bigip_waf_entity_url <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_url>`_ 
@@ -112,13 +109,18 @@ AWAF Data Sources:
 Quickstart Guide
 ----------------
 
+Prerequisites
+It requires F5 BIG-IP TMOS minimum version v16.1 because we use the F5 BIG-IP Advanced WAF declarative API.
+Terraform version +0.11 (see minimal requirements)
+
+https://github.com/f5devcentral/awaf-terraform 
 
 Additional lab guides
 ---------------------
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :includehidden:
    :glob:
 

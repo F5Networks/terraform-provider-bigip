@@ -1,8 +1,11 @@
-.. _awaf-integration:
+.. _awaf-migrate:
 
-**`Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP <https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate>`_**
- 
-This lab is a variant of the previous one. It takes a manually managed A.WAF Policy from an existing BIG-IP and migrate it to a different BIG-IP through Terraform resources.
+Scenario #3: Migrating a WAF Policy from a BIG-IP to another BIG-IP
+===================================================================
+
+.. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate
+
+This lab is a variant of the previous one. It takes a manually managed Advanced WAF Policy from an existing BIG-IP and migrates it to a different BIG-IP through Terraform resources.
 
 Goals
 You can meet this scenario in multiple use-cases:
@@ -16,26 +19,25 @@ The WAF Policy and its children objects (parameters, urls, attack signatures, ex
 
 Pre-requisites
 --------------
-on the BIG-IP:
+On the BIG-IP:
 
- version 16.1 minimal
- A.WAF Provisioned
- credentials with REST API access
+- BIG-IP version 16.1 or newer
+- Advanced WAF Provisioned
+- Credentials with REST API access
 
-on Terraform:
+On Terraform:
 
- use of F5 BIG-IP provider version 1.15.0 minimal
- use of Hashicorp version followinf Link
+- Using F5 BIG-IP provider version 1.15.0 or newer
+- Using Hashicorp versions following :ref:`versions`
 
-
-Policy Migration
-----------------
+Migrating a Policy
+------------------
 Create 4 files:
 
-main.tf
-variables.tf
-inputs.auto.tfvars
-outputs.tf
+- variables.tf
+- inputs.auto.tfvars
+- main.tf
+- outputs.tf
 
 .. code-block:: json
    :caption: variables.tf
@@ -46,6 +48,7 @@ outputs.tf
    variable username {}
    variable password {}
 
+|
 
 .. code-block:: json
    :caption: inputs.auto.tfvars
@@ -55,6 +58,8 @@ outputs.tf
    new_bigip = "10.1.1.9:443"
    username = "admin"
    password = "whatIsYourBigIPPassword?"
+
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -89,7 +94,9 @@ outputs.tf
      template_name        = "POLICY_TEMPLATE_RAPID_DEPLOYMENT"
    }
 
-Note: the template name can be set to anything. When it is imported, we will overwrite the value
+.. Note:: The template name can be set to anything. When it is imported, we will overwrite the value
+
+|
 
 .. code-block:: json
    :caption: outputs.tf
@@ -104,9 +111,9 @@ Note: the template name can be set to anything. When it is imported, we will ove
    }
 
 
-Here we defined two Big-IPs: "old" and "new". The "old" BIG-IP has the existing A.WAF Policies, the "new" is our target.
+Here we defined two Big-IPs: "old" and "new". The "old" BIG-IP has the existing Advanced WAF Policies, the "new" is our target.
 
-Same as scenario #2 we need the A.WAF Policy ID to make the initial import:
+Same as scenario #2 we need the Advanced WAF Policy ID to make the initial import:
 
 - check on the iControl REST API Endpoint: /mgmt/tm/asm/policies?$filter=name+eq+scenario3&$select=id
 - get a script example in the lab/scripts/ folder
@@ -150,7 +157,7 @@ Now, run the following commands, so we can:
 
 1. Initialize the terraform project
 2. Import the current WAF policy from the "old" BIG-IP into our state
-3. Create the A.WAF Policy resource for the "BIG-IP" pointing to the imported state
+3. Create the Advanced WAF Policy resource for the "BIG-IP" pointing to the imported state
 4. Configure the lifecycle of our WAF Policy
 
 .. code-block:: json

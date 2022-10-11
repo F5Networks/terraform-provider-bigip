@@ -3,7 +3,7 @@
 Scenario #1: Creating a WAF Policy
 ==================================
 
-This page shows you how to create a new A.WAF Policy from scratch and manage some entities additions.
+This page shows you how to create a new Advanced WAF Policy from scratch and manage some entities additions.
 
 Pre-requisites
 --------------
@@ -49,7 +49,7 @@ Create 3 files:
 .. code-block:: json
    :caption: main.tf
    :linenos:
-   
+
    terraform {
      required_providers {
        bigip = {

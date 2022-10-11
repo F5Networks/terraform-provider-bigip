@@ -3,7 +3,7 @@
 Scenario #2: Managing with Terraform an existing WAF policy
 ===========================================================
  
-The goal of this lab is to take an existing A.WAF Policy -- that has been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5 BIG-IP Terraform Provider.
+The goal of this lab is to take an existing Advanced WAF Policy -- that has been created and managed on a BIG-IP outside of Terraform -- and to import and manage its lifecycle using the F5 BIG-IP Terraform Provider.
 
 You may already have multiple WAF policies protecting your applications and these WAF policies have evolved over the past months or years. It may be very complicated to do an extensive inventory of each policy, each entity, and every attribute. So the goal here is to import the current policy, which will be our current baseline. Every new change, addition of a Server Technology, parameter, or attack signature will be done through Terraform in addition or correction of this new baseline.
 
