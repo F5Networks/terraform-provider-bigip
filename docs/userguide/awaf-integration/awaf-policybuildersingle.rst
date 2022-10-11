@@ -5,122 +5,153 @@ Scenario #5: Managing an Advanced WAF Policy with Policy Builder on a single dev
 
 .. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle
 
-The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster.
+The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows the potential management workflow:
 
-Goals
-The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows what can be the management workflow:
-
-the security engineer regularly checks the sugestions directly on the BIG-IP WebUI and clean the irrelevant suggestions.
-once the cleaning is done, the terraform engineer (who can also be the security engineer btw) issue a terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5 to 100% - 100% having the highest confidence level).
-Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
+- The security engineer regularly checks the sugestions directly on the BIG-IP WebUI and cleans the irrelevant suggestions.
+- Once the cleaning is done, the Terraform engineer (who can also be the security engineer) issues a Terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5% to 100%, with 100% being the highest confidence level).
+-Every suggestions application can be tracked on Terraform and can easily be roll-backed if needed.
 
 
 Pre-requisites
 --------------
+On the BIG-IP:
 
-on the BIG-IP:
+- BIG-IP version 16.1 or newer
+- Advanced WAF Provisioned
+- Credentials with REST API access
+- An Advanced WAF Policy with Policy Builder enabled and Manual traffic Learning
 
- version 16.1 minimal
- Advanced WAF Provisioned
- credentials with REST API access
- an Advanced WAF Policy with Policy Builder enabled and Manual traffic Learning
-on Terraform:
+On Terraform:
 
- use of F5 bigip provider version 1.15.0 minimal
- use of Hashicorp version followinf Link
-
+- Using F5 BIG-IP provider version 1.15.0 or newer
+- Using Hashicorp versions following :ref:`versions`
 
 
 Policy Creation
-We already have exported a WAF Policy called scenario5.json available here including several Policy Builder Suggestions so you won't have to generate traffic.
+---------------
+F5 has already exported a WAF Policy called scenario5.json available `here <https://raw.githubusercontent.com/fchmainy/awaf_tf_docs/main/0.Appendix/scenario5_wLearningSuggestions.json>`_` including several Policy Builder Suggestions so you won't have to generate traffic.
 
-So you have to create 4 files:
+Create 4 files:
 
-variables.tf
+.. code-block:: json
+   :caption: variables.tf
+   :linenos:
 
-variable prod_bigip {}
-variable username {}
-variable password {}
-inputs.auto.tfvars
+   variable prod_bigip {}
+   variable username {}
+   variable password {}
 
-prod_bigip = "10.1.1.8:443"
-username = "admin"
-password = "whatIsYourBigIPPassword?"
-main.tf
+|
 
-terraform {
-  required_providers {
-    bigip = {
-      source = "F5Networks/bigip"
-      version = "1.15"
-    }
-  }
-}
+.. code-block:: json
+   :caption: inputs.auto.tfvars
+   :linenos:
 
-provider "bigip" {
-  alias    = "prod"
-  address  = var.prod_bigip
-  username = var.username
-  password = var.password
-}
+   prod_bigip = "10.1.1.8:443"
+   username = "admin"
+   password = "whatIsYourBigIPPassword?"
 
-data "http" "scenario5" {
-  url = "https://raw.githubusercontent.com/fchmainy/awaf_tf_docs/main/0.Appendix/Common_scenario5__2022-8-12_15-49-28__prod1.f5demo.com.json"
-  request_headers = {
-  	Accept = "application/json"
-  }
-}
+|
 
-resource "bigip_waf_policy" "this" {
-    provider	           = bigip.prod
-    application_language = "utf-8"
-    partition            = "Common"
-    name                 = "scenario5"
-    template_name        = "POLICY_TEMPLATE_FUNDAMENTAL"
-    type                 = "security"
-    policy_import_json   = data.http.scenario5.body
-}
+.. code-block:: json
+   :caption: main.tf
+   :linenos:
 
-.. Note:: the template name can be set to anything. When it is imported, we will overwrite the value
+   terraform {
+     required_providers {
+       bigip = {
+         source = "F5Networks/bigip"
+         version = "1.15"
+       }
+     }
+   }
+   
+   provider "bigip" {
+     alias    = "prod"
+     address  = var.prod_bigip
+     username = var.username
+     password = var.password
+   }
+   
+   data "http" "scenario5" {
+     url = "https://raw.githubusercontent.com/fchmainy/awaf_tf_docs/main/0.Appendix/Common_scenario5__2022-8-12_15-49-28__prod1.f5demo.com.json"
+     request_headers = {
+     	Accept = "application/json"
+     }
+   }
 
-outputs.tf
+   resource "bigip_waf_policy" "this" {
+       provider	           = bigip.prod
+       application_language = "utf-8"
+       partition            = "Common"
+       name                 = "scenario5"
+       template_name        = "POLICY_TEMPLATE_FUNDAMENTAL"
+       type                 = "security"
+       policy_import_json   = data.http.scenario5.body
+   }
 
-output "policyId" {
-	value	= bigip_waf_policy.this.policy_id
-}
+.. Note:: The template name can be set to anything. When it is imported, the value is overwritten.
 
-output "policyJSON" {
-        value   = bigip_waf_policy.this.policy_export_json
-}
-Now initialize, plan and apply your new Terraform project.
+|
 
-foo@bar:~$ terraform init
+.. code-block:: json
+   :caption: outputs.tf
+   :linenos:
 
-foo@bar:~$ terraform plan -out scenario5
+   output "policyId" {
+   	value	= bigip_waf_policy.this.policy_id
+   }
+   
+   output "policyJSON" {
+           value   = bigip_waf_policy.this.policy_export_json
+   }
 
-foo@bar:~$ terraform apply "scenario5"
-Now you can go on your BIG-IP UI and associate the A.WAF Policy scenario5 to the Virtual Server scenario5.vs.
+|
 
-.. Note:: remember, the Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
+Initialize, plan, and apply your new Terraform project:
+
+::
+
+    foo@bar:~$ terraform init
+
+    foo@bar:~$ terraform plan -out scenario5
+
+    foo@bar:~$ terraform apply "scenario5"
+
+|
+
+You can go on your BIG-IP UI and associate the Advanced WAF Policy **scenario5** to the Virtual Server **scenario5.vs**.
+
+.. Note:: The Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
 
 
 
 
 Simulate a WAF Policy workflow
-Change the Policy Builder process (For testing and demoing purpose only):
-First, go to the DVWA WAF Policy on your BIG-IP TMUI (if you are using UDF, the WAF policy is called scenario5 and is located under the Common partition.
-In the Learning and blocking Settings (Security ›› Application Security : Policy Building : Learning and Blocking Settings), at the very bottom of the page, go on the Loosen Policy settings in the Advanced view of the Policy Building Process.
-Change the different sources, spread out over a time period of at least value from 10 to 1 so the policy builder generates learning suggestions more rapidely.
+------------------------------
+
+Change the Policy Builder process (For testing and demo purpose only):
+``````````````````````````````````````````````````````````````````````
+
+1. Go to the DVWA WAF Policy on your BIG-IP TMUI (if you are using UDF, the WAF policy is called scenario5 and is located under the Common partition.
+2. In the Learning and blocking Settings (Security ›› Application Security : Policy Building : Learning and Blocking Settings), at the very bottom of the page, go on the Loosen Policy settings in the Advanced view of the Policy Building Process.
+3. Change the different sources, spread out over a time period of at least value from 10 to 1 so the policy builder generates learning suggestions more rapidely.
+
 Browse the Vulnerable Application
+`````````````````````````````````
 Now browse the DVWA web application through the AWAF Virtual Server. The credentials to log in to DVWA is admin/password.
 
-Go on the *DVWA Security menu and change the level to Low then Submit
-Browse the DVWA website by clicking into any menus.
-Then generate some attacks:
-SQL Injection: %' or 1='1 ' and 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users #
-XSS Reflected: <script>alert('hello')</script>
+1. Go on the DVWA Security menu and change the level to Low then Submit
+2. Browse the DVWA website by clicking into any menus.
+3. Then generate some attacks:
+
+   - SQL Injection: %' or 1='1 ' and 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users #
+   - XSS Reflected: <script>alert('hello')</script>
+
+
 Check Learning Suggestions
-Now, if you go to the WAF Policy learning suggestions, you will find multiple suggestions with a high score of 100% (because we have not been picky in the learning process settings).
+``````````````````````````
+If you go to the WAF Policy learning suggestions, you will find multiple suggestions with a high score of 100% (because we have not been picky in the learning process settings).
 
 Here is a typical workflow in a real life:
 

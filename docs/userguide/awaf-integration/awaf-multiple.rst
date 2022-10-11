@@ -37,6 +37,8 @@ Create 4 files:
    variable username {}
    variable password {}
 
+|
+
 .. code-block:: json
    :caption: inputs.auto.tfvars
    :linenos:
@@ -45,6 +47,8 @@ Create 4 files:
    prod_bigip = "10.1.1.8:443"
    username = "admin"
    password = "whatIsYourBigIPPassword?"
+
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -98,11 +102,11 @@ Create 4 files:
        policy_import_json   = data.http.scenario4.body
    }
 
-..Note:: The template name can be set to anything. When it is imported, the value is overwritten.
+.. Note:: The template name can be set to anything. When it is imported, the value is overwritten.
 
 Here, we are referencing an existing policy from a GitHub repository but it can also be created from zero on both BIG-IPs.
 
-Now initialize, plan, and apply your new Terraform project.
+Initialize, plan, and apply your new Terraform project.
 
 :: 
 
@@ -124,9 +128,9 @@ Simulate a WAF Policy workflow
 ------------------------------
 Here is a common workflow:
 
-enforcing attack signatures on the QA environment
-checking if these changes does not break the application and identify potential False Positives
-applying the changes on QA before applying them on Production
+1. Enforce attack signatures on the QA environment.
+2. Check if these changes do not break the application and identify potential False Positives.
+3. Apply the changes on QA before applying them on Production.
 
 Enforcing attack signatures on the QA environment
 `````````````````````````````````````````````````
@@ -172,6 +176,7 @@ In order to track attack signature changes, use a Terraform HCL map. Add this si
 Create a **signatures.tf** file with a map to all the attack signatures defied previously:
 
 ::
+
     variable "signatures" {
       type = map(object({
             signature_id    = number
@@ -321,7 +326,7 @@ Proceed to the final changes before enforcing into production:
 Update the **main.tf** file:
 
 .. code-block:: json
-   :caption: urls.tf
+   :caption: main.tf
    :linenos:
 
    resource "bigip_waf_policy" "s4_qa" {
@@ -355,6 +360,7 @@ Update the **main.tf** file:
 Play and apply:
 
 ::
+    
     foo@bar:~$ terraform plan -out scenario4 > output_scenario4.3
     foo@bar:~$ more output_scenario4.3
     foo@bar:~$ terraform apply "scenario4"
