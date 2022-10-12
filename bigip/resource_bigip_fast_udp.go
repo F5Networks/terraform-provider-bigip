@@ -383,7 +383,7 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
 	_ = d.Set("virtual_server.0.port", data.VirtualPort)
 	_ = d.Set("enable_fastl4", data.Fastl4Enable)
-	if data.Fastl4Enable == true {
+	if data.Fastl4Enable {
 		_ = d.Set("existing_profile", data.Fastl4ProfileName)
 		_ = d.Set("persistence_profile", data.Fastl4PersistenceProfile)
 		_ = d.Set("persistence_type", data.Fastl4PersistenceType)
@@ -404,12 +404,11 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 	_ = d.Set("monitor.0.send_string", data.MonitorSendString)
 	_ = d.Set("monitor.0.expected_response", data.MonitorExpectedResponse)
 	_ = d.Set("irules", data.IruleNames)
-	_ = d.Set("fallback_persistence.enable", data.EnableFallbackPersistence)
-	_ = d.Set("fallback_persistence.type", data.EnableFallbackPersistence)
-	if data.VlansAllow == true && data.VlansEnable == true {
+	_ = d.Set("fallback_persistence", data.FallbackPersistenceType)
+	if data.VlansAllow && data.VlansEnable {
 		_ = d.Set("vlans_allowed", data.Vlans)
 	}
-	if data.VlansAllow == false && data.VlansEnable == true {
+	if !data.VlansAllow && data.VlansEnable {
 		_ = d.Set("vlans_rejected", data.Vlans)
 	}
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
@@ -433,7 +432,7 @@ func getParamsConfigMapUdp(d *schema.ResourceData) (string, error) {
 	udpJson.Fastl4Enable = false
 	udpJson.MakeFastl4Profile = false
 	if v, ok := d.GetOk("enable_fastl4"); ok {
-		if v.(bool) == true {
+		if v.(bool) {
 			udpJson.Fastl4Enable = v.(bool)
 			if v2, ok2 := d.GetOk("existing_profile"); ok2 {
 				udpJson.Fastl4ProfileName = v2.(string)
@@ -470,7 +469,7 @@ func getParamsConfigMapUdp(d *schema.ResourceData) (string, error) {
 	if v, ok := d.GetOk("persistence_profile"); ok {
 		udpJson.EnablePersistence = true
 		udpJson.UseExistingPersistence = true
-		if udpJson.Fastl4Enable == true {
+		if udpJson.Fastl4Enable {
 			udpJson.Fastl4PersistenceProfile = v.(string)
 		} else {
 			udpJson.UdpPersistenceProfile = v.(string)
@@ -478,7 +477,7 @@ func getParamsConfigMapUdp(d *schema.ResourceData) (string, error) {
 	}
 	if v, ok := d.GetOk("persistence_type"); ok {
 		udpJson.EnablePersistence = true
-		if udpJson.Fastl4Enable == true {
+		if udpJson.Fastl4Enable {
 			udpJson.Fastl4PersistenceType = v.(string)
 		} else {
 			udpJson.UdpPersistenceType = v.(string)
