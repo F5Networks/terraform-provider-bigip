@@ -145,6 +145,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_fast_http_app":                   resourceBigipHttpFastApp(),
 			"bigip_fast_https_app":                  resourceBigipFastHTTPSApp(),
 			"bigip_fast_tcp_app":                    resourceBigipFastTcpApp(),
+			"bigip_fast_udp_app":                    resourceBigipFastUdpApp(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 			"bigip_command":                         resourceBigipCommand(),
