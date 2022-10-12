@@ -18,6 +18,32 @@ import (
 var appName = "fast_tcp_app"
 var tenantName = "fast_tcp_tenant"
 
+var cfg1 = fmt.Sprintf(`
+resource "bigip_fast_tcp_app" "fast_tcp_app" {
+  application = "%v"
+  tenant      = "%v"
+  virtual_server {
+    ip   = "10.99.11.88"
+    port = 80
+  }
+  existing_monitor = "/Common/tcp"
+}
+`, appName, tenantName)
+
+var cfg2 = fmt.Sprintf(`
+resource "bigip_fast_tcp_app" "fast_tcp_app" {
+  application = "%v"
+  tenant      = "%v"
+  virtual_server {
+    ip   = "10.99.11.88"
+    port = 80
+  }
+  monitor {
+	interval = 40
+  }
+}
+`, appName, tenantName)
+
 func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -27,30 +53,29 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 		CheckDestroy: testCheckFastTCPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: getFastTCPAppConfig(),
+				Config: cfg1,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(appName, tenantName, true),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "application", "fast_tcp_app"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "tenant", "fast_tcp_tenant"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.ip", "10.99.11.88"),
 					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.port", "80"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "existing_monitor", "/Common/tcp"),
+				),
+			},
+			{
+				Config: cfg2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(appName, tenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "application", "fast_tcp_app"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "tenant", "fast_tcp_tenant"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.ip", "10.99.11.88"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "virtual_server.0.port", "80"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast_tcp_app", "monitor.0.interval", "40"),
 				),
 			},
 		},
 	})
-}
-
-func getFastTCPAppConfig() string {
-	return fmt.Sprintf(`
-resource "bigip_fast_tcp_app" "fast_tcp_app" {
-  application = "%v"
-  tenant      = "%v"
-  virtual_server {
-    ip   = "10.99.11.88"
-    port = 80
-  }
-}
-`, appName, tenantName)
 }
 
 func testCheckFastTCPAppDestroyed(s *terraform.State) error {

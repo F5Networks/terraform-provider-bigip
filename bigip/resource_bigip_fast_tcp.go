@@ -260,18 +260,19 @@ func resourceBigipFastTcpAppUpdate(d *schema.ResourceData, meta interface{}) err
 	m.Lock()
 	defer m.Unlock()
 
-	name := d.Get("application").(string)
-	tenant := d.Get("tenant").(string)
 	cfg, err := getParamsConfigMap(d)
 	log.Printf("[INFO] Updating FastApp Config :%v", cfg)
 	if err != nil {
-		return nil
+		return err
 	}
-	err = client.ModifyFastAppBigip(cfg, tenant, name)
+	const templateName string = "bigip-fast-templates/tcp"
+	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, templateName)
+	_, _, err = client.PostFastAppBigip(cfg, templateName, userAgent)
 
 	if err != nil {
 		return err
 	}
+
 	return resourceBigipFastTcpAppRead(d, meta)
 }
 
