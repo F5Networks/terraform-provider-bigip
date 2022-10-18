@@ -74,6 +74,7 @@ func TestAccBigipLtmProfileTcpTC1(t *testing.T) {
 				Config: getProfileTCPConfig(profileTcpName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTcpExists(profileTcpName, true),
+					testCheckTcpExists(TestTcpName, false),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test_tcp_profile", "name", profileTcpName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test_tcp_profile", "initial_congestion_windowsize", "20"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test_tcp_profile", "congestion_control", "cdg"),
