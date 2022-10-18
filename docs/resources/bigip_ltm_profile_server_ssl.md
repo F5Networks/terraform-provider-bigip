@@ -103,3 +103,11 @@ There can be only one SSL profile with this setting enabled.
       or in place of the identity in the subject field of the certificate.
 
 * `c3d-cert-lifespan` Specifies the lifespan of the certificate generated using the SSL client certificate constrained delegation. The default value is 24.
+
+## Importing
+An existing server-ssl profile can be imported into this resource by supplying server-ssl profile Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_profile_server_ssl.test-ServerSsl-import /Common/test-ServerSsl
+
+```

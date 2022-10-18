@@ -1151,6 +1151,17 @@ type tcpDTO struct {
 	FinWaitTimeout    int    `json:"finWaitTimeout,omitempty"`
 	KeepAliveInterval int    `json:"keepAliveInterval,omitempty"`
 	DeferredAccept    string `json:"deferredAccept,omitempty"`
+	CongestionControl string `json:"congestionControl,omitempty"`
+	DelayedAcks       string `json:"delayedAcks,omitempty"`
+	Nagle             string `json:"nagle,omitempty"`
+	EarlyRetransmit   string `json:"earlyRetransmit,omitempty"`
+	TailLossProbe     string `json:"tailLossProbe,omitempty"`
+	TimeWaitRecycle   string `json:"timeWaitRecycle,omitempty"`
+	ProxyBufferHigh   int    `json:"proxyBufferHigh,omitempty"`
+	ReceiveWindowSize int    `json:"receiveWindowSize,omitempty"`
+	SendBufferSize    int    `json:"sendBufferSize,omitempty"`
+	ZeroWindowTimeout int    `json:"zeroWindowTimeout,omitempty"`
+	InitCwnd          int    `json:"initCwnd,omitempty"`
 	FastOpen          string `json:"fastOpen,omitempty"`
 }
 
@@ -1168,6 +1179,17 @@ type Tcp struct {
 	FinWaitTimeout    int
 	KeepAliveInterval int
 	DeferredAccept    string
+	CongestionControl string
+	DelayedAcks       string
+	Nagle             string
+	EarlyRetransmit   string
+	TailLossProbe     string
+	ProxyBufferHigh   int
+	ReceiveWindowSize int
+	SendBufferSize    int
+	TimeWaitRecycle   string
+	ZeroWindowTimeout int
+	InitCwnd          int
 	FastOpen          string
 }
 
