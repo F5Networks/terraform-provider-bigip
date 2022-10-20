@@ -78,3 +78,11 @@ There can be only one SSL profile with this setting enabled.
 * `c3d_drop_unknown_ocsp_status` (Optional) Specifies the BIG-IP action when the OCSP responder returns unknown status. The default value is drop, which causes the onnection to be dropped. Conversely, you can specify ignore, which causes the connection to ignore the unknown status and continue.
 
 * `c3d_ocsp` (Optional) Specifies the SSL client certificate constrained delegation OCSP object that the BIG-IP SSL should use to connect to the OCSP responder and check the client certificate status.
+
+
+## Importing
+An existing client-ssl profile can be imported into this resource by supplying client-ssl profile Name in `full path` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_ltm_profile_client_ssl.test-ClientSsl-import /Common/test-ClientSsl
+```

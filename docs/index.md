@@ -14,6 +14,8 @@ configurations in Terraform. Using BIG-IP Provider you can manage LTM(Local Traf
 
 This provider uses the iControlREST API. All the resources are validated with BigIP v12.1.1 and above.
 
+~> **NOTE** For AWAF resources, F5 BIG-IP version should be > v16.x , and ASM need to be provisioned.
+
 ## Example Usage
 ```hcl
 variable hostname {}
