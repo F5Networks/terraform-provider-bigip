@@ -3,7 +3,7 @@
 AS3 Integration with Terraform
 ==============================
 
-You can use Terraform with AS3 for managing application-specific configurations on a BIG-IP system. AS3 uses a declarative model, meaning you provide a JSON declaration rather than a set of imperative commands. The declaration represents the configuration which AS3 is responsible for creating on a BIG-IP system. Terraform provides resources to configure AS3 declarative JSON on BIG-IP.
+You can use Terraform with AS3 for managing application-specific configurations on an F5 BIG-IP system. AS3 uses a declarative model, meaning you provide a JSON declaration rather than a set of imperative commands. The declaration represents the configuration which AS3 is responsible for creating on an F5 BIG-IP system. Terraform provides resources to configure AS3 declarative JSON on BIG-IP.
 
 Prerequisites
 -------------
