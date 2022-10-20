@@ -9,7 +9,7 @@ BIG-IP Licensing Using Terraform through BIG-IQ
    - `Terraform documentation <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_common_license_manage_bigiq>`_.
    - `BIG-IQ License Management <https://clouddocs.f5.com/products/big-iq/mgmt-api/v7.1.0/ApiReferences/bigiq_public_api_ref/r_license_assign_revoke.html>`_.
 
-With this Terraform Resource, you can assign the regkey/utility licenses to a BIG-IP/provider. You can also revoke licenses from BIG-IP/provider for MANAGED, UNMANAGED, or UNREACHABLE devices using BIG-IQ. 
+With this Terraform Resource, you can assign the regkey/utility licenses to an F5 BIG-IP/provider. You can also revoke licenses from BIG-IP/provider for MANAGED, UNMANAGED, or UNREACHABLE devices using BIG-IQ. 
 
 In this section you can see examples of the ``bigip_common_license_manage_bigiq`` resource module. This resource is used for BIG-IP provider license management from BIG-IQ using Terraform.
 

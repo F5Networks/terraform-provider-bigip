@@ -3,12 +3,12 @@
 Scenario #1: Creating a WAF Policy
 ==================================
 
-This page shows you how to create a new Advanced WAF Policy from scratch and manage some entities additions.
+This page shows you how to create a new F5 BIG-IP Advanced WAF Policy from scratch and manage some entities additions.
 
 Pre-requisites
 --------------
 
-- BIG-IP version 16.1 or newer
+- F5 BIG-IP version 16.1 or newer
 - Credentials with REST API access
 
 On Terraform:

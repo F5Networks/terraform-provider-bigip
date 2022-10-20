@@ -1,11 +1,11 @@
 .. _awaf-multiple:
 
-Scenario #4: Managing an Advanced WAF Policy on different devices
-=================================================================
+Scenario #4: Managing an F5 BIG-IP Advanced WAF Policy on different devices
+===========================================================================
 
 .. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/4.multiple
 
-The goal of this lab is to manage an Advanced WAF Policy on multiple devices, including:
+The goal of this lab is to manage an F5 BIG-IP Advanced WAF Policy on multiple devices, including:
 
 - Different standalone devices serving the same applications
 - Different devices serving different purposes: for example, changes tested first on a QA/Test BIG-IP before applying into production.
@@ -247,7 +247,7 @@ Plan and apply:
 
 You can verify that the 5 attack signatures have been enabled and enforced on the scenario4 WAF Policy on the QA BIG-IP (first 5 lines in the attack signatures list of the Advanced WAF Policy).
 
-The applicatiopn owner identified that these last changes on the QA device have introduced some FP. Using the log events on the Advanced WAF GUI, we identified that :
+The applicatiopn owner identified that these last changes on the QA device have introduced some FP. Using the log events on the F5 BIG-IP Advanced WAF GUI, we identified that :
 
 - The attack signature **"200101558"** should be disabled globally
 - The attack signature **"200003068"** should be disabled for the **"/U1"** URL

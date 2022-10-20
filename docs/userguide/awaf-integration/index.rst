@@ -17,8 +17,8 @@ Using the provided declarative policy templates, you can modify the necessary pa
 
 Terraform can be used to manage Advanced WAF policy resource with its adjustments and modifications on a BIG-IP. It outputs an up-to-date WAF Policy in a JSON format so you can store it in a registry and/or push it to your BIG-IP.
  
-Advanced WAF Policy structure
-`````````````````````````````
+F5 BIG-IP Advanced WAF Policy structure
+```````````````````````````````````````
  
 The supported declarative policy structure includes three logical sections: 
  
@@ -93,11 +93,11 @@ Example Usage
 Terraform Integration Resources and Data Sources
 ------------------------------------------------
 
-Advanced WAF Resources:
+F5 BIG-IP Advanced WAF Resources:
 
 - `bigip_waf_policy <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_waf_policy>`_
 
-Advanced WAF Data Sources:
+F5 BIG-IP Advanced WAF Data Sources:
 
 - `bigip_waf_entity_parameters <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_parameters>`_
 - `bigip_waf_entity_url <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/data-sources/bigip_waf_entity_url>`_ 

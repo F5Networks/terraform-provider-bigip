@@ -1,11 +1,11 @@
 .. _awaf-policybuildersingle:
 
-Scenario #5: Managing an Advanced WAF Policy with Policy Builder on a single device
-===================================================================================
+Scenario #5: Managing an F5 BIG-IP Advanced WAF Policy with Policy Builder on a single device
+=============================================================================================
 
 .. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/5.policyBuilderSingle
 
-The goal of this lab is to manage Policy Builder Suggestions an Advanced WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows the potential management workflow:
+The goal of this lab is to manage Policy Builder Suggestions an F5 BIG-IP Advanced WAF Policy on a single device or cluster. As the traffic flows through the BIG-IP, it is easy to manage suggestions from the Policy Builder and enforce them on the WAF Policy. It also shows the potential management workflow:
 
 - The security engineer regularly checks the sugestions directly on the BIG-IP WebUI and cleans the irrelevant suggestions.
 - Once the cleaning is done, the Terraform engineer (who can also be the security engineer) issues a Terraform apply for the current suggestions. You can filter the suggestions on their scoring level (from 5% to 100%, with 100% being the highest confidence level).
@@ -126,26 +126,25 @@ Initialize, plan, and apply your new Terraform project:
 
 |
 
-Log on to your BIG-IP UI and associate the Advanced WAF Policy **scenario5** to the Virtual Server **scenario5.vs**.
+Log on to your F5 BIG-IP UI and associate the Advanced WAF Policy **scenario5** to the Virtual Server **scenario5.vs**.
 
 .. Note:: The Virtual Server and the whole application service can be automated using the BIG-IP provider with the AS3 or FAST resources.
 
 
-:guilabel:`Security > Application Security : Policy Building : Learning and Blocking Settings`
 
 Simulate a WAF Policy workflow
 ------------------------------
 
-Change the Policy Builder process (For testing and demo purpose only):
+Change the Policy Builder process (for testing and demo purpose only):
 ``````````````````````````````````````````````````````````````````````
 
 1. Go to the DVWA WAF Policy on your BIG-IP TMUI (if you are using UDF, the WAF policy is called scenario5 and is located under the Common partition.
-2. In the Learning and blocking Settings (:guilabel:`Security > Application Security : Policy Building : Learning and Blocking Settings`), at the very bottom of the page, go on the :guilabel:`Loosen Policy` settings in the Advanced view of the :guilabel:`Policy Building Process`.
+2. In the :guilabel:`Learning and blocking Settings` (:guilabel:`Security > Application Security : Policy Building : Learning and Blocking Settings`), at the very bottom of the page, go on the :guilabel:`Loosen Policy` settings in the Advanced view of the :guilabel:`Policy Building Process`.
 3. Change the :guilabel:`different sources, spread out over a time period of at least` value from :guilabel:`10` to :guilabel:`1` so the policy builder generates learning suggestions more rapidly.
 
 Browse the Vulnerable Application
 `````````````````````````````````
-Now browse the DVWA web application through the Advanced WAF Virtual Server. The credentials to log in to DVWA is admin/password.
+Now browse the DVWA web application through the F5 BIG-IP Advanced WAF Virtual Server. The credentials to log in to DVWA are admin/password.
 
 1. Go on the :guilabel:`DVWA Security` menu and change the level to :guilabel:`Low` then :guilabel:`Submit`.
 2. Browse the DVWA website by clicking into any menus.

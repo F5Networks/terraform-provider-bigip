@@ -5,7 +5,7 @@ Scenario #3: Migrating a WAF Policy from one BIG-IP to another BIG-IP
 
 .. seealso:: https://github.com/fchmainy/awaf_tf_docs/tree/main/3.migrate
 
-This lab is a variant of the previous one. It takes a manually managed Advanced WAF Policy from an existing BIG-IP and migrates it to a different BIG-IP through Terraform resources.
+This lab is a variant of the previous one. It takes a manually managed F5 BIG-IP Advanced WAF Policy from an existing F5 BIG-IP and migrates it to a different BIG-IP through Terraform resources.
 
 You can meet this scenario in multiple use-cases:
 

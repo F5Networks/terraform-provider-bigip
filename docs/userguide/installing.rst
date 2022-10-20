@@ -36,4 +36,4 @@ After installing Terraform, verify the installation worked by opening a new term
 
 If you get an error that ``terraform`` could not be found, your ``PATH`` environment variable was not set up properly. Please go back and ensure that your ``PATH`` variable contains the directory where Terraform was installed.
 
-Now you should be able to build infrastructure on the BIG-IP system (for example: policy configuration) using terraform resources.
+Now you should be able to build infrastructure on the F5 BIG-IP system (for example: policy configuration) using terraform resources.
