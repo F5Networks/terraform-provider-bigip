@@ -3,7 +3,7 @@
 Support
 =======
 
-F5 provides support for the F5 Modules for Terraform. For more information, see |support_policies|.
+F5 provides support for the F5 BIG-IP Modules for Terraform. For more information, see |support_policies|.
 
 .. |support_policies| raw:: html
 
@@ -26,13 +26,13 @@ When communicating with F5 on the Issues page, use the GitHub user interface, ra
 Get community support on Slack
 ------------------------------
 
-We encourage you to use |slackterraform| for discussion and assistance on the F5 Modules for Terraform.
+We encourage you to use |slackterraform| for discussion and assistance on the F5 BIG-IP Modules for Terraform.
 
 F5 employees are members of this community and typically monitor the channel Monday-Friday 9-5 PST. They will offer best-effort assistance.
 
 .. |slackterraform| raw:: html
 
-   <a href="https://f5cloudsolutions.herokuapp.com/" target="_blank">the F5 Terraform channel on Slack</a>
+   <a href="https://f5cloudsolutions.herokuapp.com/" target="_blank">the F5 BIG-IP Terraform channel on Slack</a>
 
 This slack channel community support should not be considered a substitute for F5 Technical Support. See the `Slack Channel Statement <https://github.com/F5Networks/terraform-provider-bigip/blob/master/slack-channel-statement.md>`_ for guidelines on using this channel.
 
