@@ -40,6 +40,31 @@ func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 	})
 }
 
+func TestAccFastHTTPAppCreateTC02(t *testing.T) {
+	var httpApp1Name = "fast_http_app"
+	var httpTenant1Name = "fast_http_tenant"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPAppConfigTC02(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpApp1Name, httpTenant1Name, true),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "application", httpApp1Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "tenant", httpTenant1Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.0.ip", "10.200.21.2"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.0.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
+				),
+			},
+		},
+	})
+}
+
 func getFastHTTPAppConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_http_app" "fast_http_app" {
@@ -49,6 +74,25 @@ resource "bigip_fast_http_app" "fast_http_app" {
     ip   = "10.30.30.44"
     port = 443
   }
+}
+`, httpTenantName, httpAppName)
+}
+
+func getFastHTTPAppConfigTC02() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_http_app" "fast_http_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.200.21.2"
+    port = 443
+  }
+  pool_members {
+    addresses = ["10.1.20.120", "10.1.10.121", "10.1.10.122"]
+    port      = 80
+  }
+  load_balancing_mode = "least-connections-member"
+  endpoint_ltm_policy = ["/Common/testpolicy1"]
 }
 `, httpTenantName, httpAppName)
 }

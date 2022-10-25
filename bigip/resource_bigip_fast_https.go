@@ -138,31 +138,26 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"addresses": {
-							Type:        schema.TypeList,
-							Required:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
-							Description: "foo",
+							Type:     schema.TypeList,
+							Required: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 						"port": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Default:     80,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  80,
 						},
 						"connection_limit": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 						"priority_group": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 						"share_nodes": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeBool,
+							Optional: true,
 						},
 					},
 				},
@@ -219,6 +214,11 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				},
 				ConflictsWith: []string{"existing_waf_security_policy"},
 			},
+			"endpoint_ltm_policy": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"existing_monitor": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -233,21 +233,18 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"monitor_auth": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Default:     false,
-							Description: "foo",
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
 						},
 						"username": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 						"password": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Sensitive:   true,
-							Description: "foo",
+							Type:      schema.TypeString,
+							Optional:  true,
+							Sensitive: true,
 						},
 						"interval": {
 							Type:        schema.TypeInt,
@@ -258,12 +255,11 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							//Default:"GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n",
-							Description: "foo",
+							Description: "Optional data to be sent during each health check.",
 						},
 						"response": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 					},
 				},
@@ -273,6 +269,11 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"fast_https_json": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Json payload for FAST HTTPS application.",
 			},
 		},
 	}
@@ -334,10 +335,10 @@ func resourceBigipFastHTTPSAppCreate(d *schema.ResourceData, meta interface{}) e
 func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	var fastHttp bigip.FastHttpJson
-	log.Printf("[INFO] Reading FastApp config")
+	log.Printf("[INFO] Reading FastApp HTTPS config")
 	name := d.Id()
 	tenant := d.Get("tenant").(string)
-	log.Printf("[DEBUG] FAST HTTP application get call : %s", name)
+	log.Printf("[DEBUG] FAST HTTPS application get call : %s", name)
 	fastJson, err := client.GetFastApp(tenant, name)
 	log.Printf("[DEBUG] FAST json retreived from the GET call in Read function : %s", fastJson)
 	if err != nil {
@@ -354,7 +355,7 @@ func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) err
 		d.SetId("")
 		return nil
 	}
-	_ = d.Set("fast_json", fastJson)
+	_ = d.Set("fast_https_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastHttp)
 	if err != nil {
 		return err
@@ -433,6 +434,9 @@ func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("snat_pool_address", data.SnatAddresses)
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
 	_ = d.Set("existing_pool", data.PoolName)
+	members := flattenFastPoolMembers(data.PoolMembers)
+	log.Printf("[DEBUG]: Pool Members :%+v", members)
+	_ = d.Set("pool_members", members)
 	_ = d.Set("existing_tls_server_profile", data.TlsServerProfileName)
 	if _, ok := d.GetOk("tls_server_profile"); ok {
 		if err := d.Set("tls_server_profile", []interface{}{flattenFastTlsServerProfile(data)}); err != nil {
@@ -448,11 +452,13 @@ func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
 		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
 	}
-	members := flattenFastPoolMembers(data.PoolMembers)
-	log.Printf("[DEBUG]: Pool Members :%+v", members)
-	_ = d.Set("pool_members", members)
+	if _, ok := d.GetOk("endpoint_ltm_policy"); ok {
+		_ = d.Set("endpoint_ltm_policy", data.WafPolicyName)
+	}
 	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
-	_ = d.Set("slow_ramp_time", data.SlowRampTime)
+	if _, ok := d.GetOk("slow_ramp_time"); ok {
+		_ = d.Set("slow_ramp_time", data.SlowRampTime)
+	}
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
 	if _, ok := d.GetOk("monitor"); ok {
 		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
@@ -502,7 +508,6 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 	if v, ok := d.GetOk("existing_tls_client_profile"); ok {
 		httpJson.TlsClientEnable = true
 		httpJson.TlsClientProfileName = v.(string)
-
 	}
 	if v, ok := d.GetOk("tls_client_profile"); ok {
 		httpJson.TlsClientEnable = true
@@ -513,6 +518,13 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 			httpJson.TlsCertName = v.(map[string]interface{})["tls_cert_name"].(string)
 			httpJson.TlsKeyName = v.(map[string]interface{})["tls_key_name"].(string)
 		}
+	}
+	if s, ok := d.GetOk("endpoint_ltm_policy"); ok {
+		var endptPolicy []string
+		for _, policy := range s.([]interface{}) {
+			endptPolicy = append(endptPolicy, policy.(string))
+		}
+		httpJson.EndpointPolicyNames = endptPolicy
 	}
 	if v, ok := d.GetOk("existing_waf_security_policy"); ok {
 		httpJson.WafPolicyEnable = true

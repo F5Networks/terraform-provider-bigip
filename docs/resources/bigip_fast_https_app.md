@@ -54,6 +54,8 @@ See [TLS Client Profile](#tls-client-profile) below for more details.
 
 ~> **NOTE** Profile provided by `existing_tls_client_profile` or `tls_client_profile` used for encrypt server-side connections.
 
+* `endpoint_ltm_policy` - (Optional,`list`) List of LTM Policies to be applied FAST HTTPS Application.
+
 * `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
 
 * `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
