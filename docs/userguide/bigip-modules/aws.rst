@@ -260,7 +260,7 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| f5_ami_search_name	      | String  | Optional | ``F5 Networks``       | BIG-IP AMI name to search for.          |
+| f5_ami_search_name	        | String  | Optional | ``F5 Networks``       | BIG-IP AMI name to search for.          |
 |                             |         |          | ``BIGIP-14.* PAYG``   |                                         |
 |                             |         |          | ``- Best 200Mbps*``   |                                         |
 |                             |         |          |                       |                                         |
@@ -331,7 +331,7 @@ Required variables must be set in the module block when using this module. Optio
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |
 +-----------------------------+---------+----------+-----------------------+-----------------------------------------+
-| onboard_log	              | String  | Optional | /var/log/startup      | Directory on the BIG-IP to store the    |
+| onboard_log	                | String  | Optional | /var/log/startup      | Directory on the BIG-IP to store the    |
 |                             |         |          | -script.log           | cloud-init logs.                        |
 |                             |         |          |                       |                                         |
 |                             |         |          |                       |                                         |

@@ -4,11 +4,10 @@ FAST Integration with Terraform
 ===============================
 
 Introduction
+------------
 The objective of this templates is to demonstrate how FAST can be used to manage, deploy, and log changes in applications using Terraform as a resource manager through their API.
 
-
-F5 Application Services Templates
-F5 Application Services Templates (FAST) are an easy and effective way to deploy applications on the BIG-IP system using AS3.
+F5 BIG-IP Application Services Templates (FAST) are an easy and effective way to deploy applications on the BIG-IP system using AS3.
 The FAST Extension provides a toolset for templating and managing AS3 Applications on BIG-IP.
 
 For more information about FAST, including installation and usage information, see the FAST Documentation

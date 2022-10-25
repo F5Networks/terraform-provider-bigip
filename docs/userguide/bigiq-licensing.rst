@@ -1,7 +1,7 @@
 .. _bigiq-licensing:
 
-BIG-IP Licensing Using Terraform through BIG-IQ
-===============================================
+F5 BIG-IP Licensing Using Terraform through BIG-IQ
+==================================================
 
 .. seealso::
    :class: sidebar

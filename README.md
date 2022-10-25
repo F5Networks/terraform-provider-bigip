@@ -5,7 +5,7 @@
 
 # Overview
 
-A [Terraform](terraform.io) provider for F5 BigIP LTM.
+A [Terraform](terraform.io) provider for F5 BIG-IP LTM.
 
 [![Build Status](https://travis-ci.org/f5networks/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5networks/terraform-provider-bigip)
 [![Go Report Card](https://goreportcard.com/badge/github.com/f5networks/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5networks/terraform-provider-bigip)
@@ -18,11 +18,11 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 -	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x / 0.13.x / 0.14.x
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
-# F5 BigIP LTM requirements
+# F5 BIG-IP LTM requirements
 
-- This provider uses the iControlREST API, make sure that it is installed and enabled on your F5 device before proceeding.
+- This provider uses the iControlREST API, make sure that it is installed and enabled on your F5 BIG-IP device before proceeding.
 
-These BIG-IP versions are supported in these Terraform versions.
+These F5 BIG-IP versions are supported in these Terraform versions.
 
 | BIG-IP version    | Terraform 0.14 | Terraform 0.13 | Terraform 0.12 | Terraform 0.11 |
 |-------------------|----------------|----------------|----------------|----------------|
@@ -72,7 +72,7 @@ $ $GOPATH/bin/terraform-provider-bigip
 ```
 # Testing
 
-Running the acceptance test suite requires an F5 to test against. Set `BIGIP_HOST`, `BIGIP_USER`
+Running the acceptance test suite requires an F5 BIG-IP to test against. Set `BIGIP_HOST`, `BIGIP_USER`
 and `BIGIP_PASSWORD` to a device to run the tests against. By default tests will use the `Common`
 partition for creating objects. You can change the partition by setting `BIGIP_TEST_PARTITION`.
 

@@ -1,7 +1,7 @@
-F5 Resources for Terraform Overview
-===================================
+F5 BIG-IP Resources for Terraform Overview
+==========================================
 
-Welcome to the F5 Resources for Terraform User Guide. Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
+Welcome to the F5 BIG-IP Resources for Terraform User Guide. Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
 
 Use these resources to create, edit, update, and delete configuration objects on BIG-IP 12.1.1 and later.
 

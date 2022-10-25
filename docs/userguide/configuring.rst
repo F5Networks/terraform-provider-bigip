@@ -10,8 +10,8 @@ Below is an example of the entire configuration. Each section is described below
    Verify that there are no other ``*.tf`` files in your directory, since Terraform loads all of them.
 
 
-Sample Terraform resource to create a policy on the BIG-IP system
------------------------------------------------------------------
+Sample Terraform resource to create a policy on the F5 BIG-IP system
+--------------------------------------------------------------------
 
 .. code-block:: javascript
 

@@ -5,14 +5,14 @@ Declarative Onboarding Integration with Terraform
 
 We can use terraform with Declarative Onboarding (DO) to automate network (L1-L3) onboarding for the F5 BIG-IP system, making it available and ready to accept application services configurations.
 
-F5 Declarative Onboarding uses a declarative model to initially configure a BIG-IP device with all of the required settings to get up and running. This includes system settings such as licensing and provisioning, network settings such as VLANs and Self IPs, and clustering settings if you are using more than one BIG-IP system.
+F5 BIG-IP Declarative Onboarding uses a declarative model to initially configure a BIG-IP device with all of the required settings to get up and running. This includes system settings such as licensing and provisioning, network settings such as VLANs and Self IPs, and clustering settings if you are using more than one BIG-IP system.
 
 Prerequisites
 -------------
 
 To use DO Extensions with Terraform, ensure you meet the following requirements:
 
-- The BIG-IP must be running version 13.1.0 or higher. Due to changes in TMOS v13.1.1.5, the Declarative Onboarding (DO) Extension is not compatible with this specific TMOS version. Versions before and after 13.1.1.5 are compatible.
+- The F5 BIG-IP must be running version 13.1.0 or higher. Due to changes in TMOS v13.1.1.5, the Declarative Onboarding (DO) Extension is not compatible with this specific TMOS version. Versions before and after 13.1.1.5 are compatible.
 - Domain name resolution is used anywhere the declaration accepts a hostname. DO makes sure that any hostnames are resolvable and fails if they are not. The exception is deviceGroup.members, which do not require hostname resolution as they have been added to the trust.
 - You must have an existing BIG-IP device with a management IP address
 - You must have an existing user account with the Administrator role. If you are using 13.1.x, the BIG-IP contains an admin user by default. If you are using 14.x, you must reset the admin password before installing Declarative Onboarding. See `the documentation <https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/installation.html#if-using-big-ip-14-0-or-later>`_ for instructions.
