@@ -133,9 +133,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 			"source_address_translation": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:    true,
 				Description: "none, automap, snat",
 			},
 			"snatpool": {
