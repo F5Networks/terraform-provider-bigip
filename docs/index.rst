@@ -1,7 +1,7 @@
-F5 Resources for Terraform
-==========================
+F5 BIG-IP Resources for Terraform
+=================================
 
-Welcome to the F5 Resources for Terraform User Guide. 
+Welcome to the F5 BIG-IP Resources for Terraform User Guide. 
 
 Use the following links, the navigation on the left, and/or the Next and Previous buttons to explore the documentation.
 
