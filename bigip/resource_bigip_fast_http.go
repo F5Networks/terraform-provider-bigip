@@ -88,31 +88,26 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"addresses": {
-							Type:        schema.TypeList,
-							Required:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
-							Description: "foo",
+							Type:     schema.TypeList,
+							Required: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 						"port": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Default:     80,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  80,
 						},
 						"connection_limit": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 						"priority_group": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 						"share_nodes": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeBool,
+							Optional: true,
 						},
 					},
 				},
@@ -168,36 +163,38 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				},
 				ConflictsWith: []string{"existing_waf_security_policy"},
 			},
+			"endpoint_ltm_policy": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"existing_monitor": {
 				Type:          schema.TypeString,
 				Optional:      true,
+				Default:       "/Common/http",
 				Description:   "Select an existing BIG-IP HTTPS pool monitor. Monitors are used to determine the health of the application on each server",
 				ConflictsWith: []string{"existing_pool", "monitor"},
 			},
 			"monitor": {
 				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "foo",
+				Description: "Use a FAST generated pool monitor.",
 				MaxItems:    1,
-
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"monitor_auth": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Default:     false,
-							Description: "foo",
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
 						},
 						"username": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 						"password": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Sensitive:   true,
-							Description: "foo",
+							Type:      schema.TypeString,
+							Optional:  true,
+							Sensitive: true,
 						},
 						"interval": {
 							Type:        schema.TypeInt,
@@ -208,21 +205,26 @@ func resourceBigipHttpFastApp() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							//Default:"GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n",
-							Description: "foo",
+							Description: "Optional data to be sent during each health check.",
 						},
 						"response": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "foo",
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 					},
 				},
 				ConflictsWith: []string{"existing_monitor", "existing_pool"},
 			},
 			"security_log_profiles": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Existing security log profiles to enable.",
+			},
+			"fast_http_json": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Json payload for FAST HTTP application.",
 			},
 		},
 	}
@@ -251,9 +253,9 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
 		wafEnabled = true
 	}
-	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
-		wafEnabled = true
-	}
+	// if _, ok := d.GetOk("existing_waf_security_policy"); ok {
+	//  	wafEnabled = true
+	// }
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -283,7 +285,7 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	var fastHttp bigip.FastHttpJson
-	log.Printf("[INFO] Reading FastApp config")
+	log.Printf("[INFO] Reading FastApp HTTP config")
 	name := d.Id()
 	tenant := d.Get("tenant").(string)
 	log.Printf("[DEBUG] FAST HTTP application get call : %s", name)
@@ -303,7 +305,7 @@ func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) erro
 		d.SetId("")
 		return nil
 	}
-	_ = d.Set("fast_json", fastJson)
+	_ = d.Set("fast_http_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastHttp)
 	if err != nil {
 		return err
@@ -371,25 +373,28 @@ func resourceBigipFastHttpAppExists(d *schema.ResourceData, meta interface{}) (b
 }
 
 func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
-
+	log.Printf("My HTTP DATA:%+v", data)
+	_ = d.Set("tenant", data.Tenant)
+	_ = d.Set("application", data.Application)
 	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
 	_ = d.Set("virtual_server.0.port", data.VirtualPort)
-	_ = d.Set("snat.enable", data.SnatEnable)
-	_ = d.Set("snat.automap", data.SnatAutomap)
-	_ = d.Set("snat.existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
+	_ = d.Set("existing_snat_pool", data.SnatPoolName)
+	_ = d.Set("snat_pool_addresses", data.SnatAddresses)
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
-	_ = d.Set("pool.enable", data.PoolEnable)
-	_ = d.Set("pool.existing_pool", data.PoolName)
+	_ = d.Set("existing_pool", data.PoolName)
+	members := flattenFastPoolMembers(data.PoolMembers)
+	_ = d.Set("pool_members", members)
+	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
+	if _, ok := d.GetOk("slow_ramp_time"); ok {
+		_ = d.Set("slow_ramp_time", data.SlowRampTime)
+	}
+	_ = d.Set("existing_monitor", data.HTTPMonitor)
 	if _, ok := d.GetOk("existing_waf_security_policy"); ok {
 		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
 	}
-	members := flattenFastPoolMembers(data.PoolMembers)
-	_ = d.Set("pool.pool_members", members)
-	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
-	_ = d.Set("slow_ramp_time", data.SlowRampTime)
-	_ = d.Set("monitor.enable", data.MonitorEnable)
-	_ = d.Set("existing_monitor", data.HTTPMonitor)
+	if _, ok := d.GetOk("endpoint_ltm_policy"); ok {
+		_ = d.Set("endpoint_ltm_policy", data.WafPolicyName)
+	}
 	if _, ok := d.GetOk("monitor"); ok {
 		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
 			return fmt.Errorf("error setting monitor: %w", err)
@@ -507,6 +512,13 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			snatAdd = append(snatAdd, addr.(string))
 		}
 		httpJson.SnatAddresses = snatAdd
+	}
+	if s, ok := d.GetOk("endpoint_ltm_policy"); ok {
+		var endptPolicy []string
+		for _, policy := range s.([]interface{}) {
+			endptPolicy = append(endptPolicy, policy.(string))
+		}
+		httpJson.EndpointPolicyNames = endptPolicy
 	}
 	if v, ok := d.GetOk("existing_waf_security_policy"); ok {
 		httpJson.WafPolicyEnable = true

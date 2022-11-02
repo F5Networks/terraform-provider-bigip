@@ -56,6 +56,8 @@ See [Pool Monitor](#pool-monitor) below for more details.
 
 * `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
 
+* `endpoint_ltm_policy` - (Optional,`list`) List of LTM Policies to be applied FAST HTTP Application.
+
 * `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
 See [WAF Security Policy](#waf-security-policy) below for more details.
 

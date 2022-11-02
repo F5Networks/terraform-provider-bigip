@@ -290,10 +290,10 @@ func resourceBigipFastUdpAppRead(d *schema.ResourceData, meta interface{}) error
 	var fastUdp bigip.FastUDPJson
 	log.Printf("[INFO] Reading FastApp config")
 	tenant := d.Get("tenant").(string)
-	app_name := d.Id()
+	appName := d.Id()
 
 	log.Printf("[INFO] Reading FAST UDP Application config")
-	fastJson, err := client.GetFastApp(tenant, app_name)
+	fastJson, err := client.GetFastApp(tenant, appName)
 	log.Printf("[DEBUG] FAST json retreived from the GET call in Read function : %s", fastJson)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
@@ -358,10 +358,10 @@ func resourceBigipFastUdpAppDelete(d *schema.ResourceData, meta interface{}) err
 func resourceBigipFastUdpAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*bigip.BigIP)
 	tenant := d.Get("tenant").(string)
-	app_name := d.Get("application").(string)
+	appName := d.Get("application").(string)
 
 	log.Printf("[INFO] Reading FAST UDP Application config")
-	resp, err := client.GetFastApp(tenant, app_name)
+	resp, err := client.GetFastApp(tenant, appName)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
 		if err.Error() == "unexpected end of JSON input" {

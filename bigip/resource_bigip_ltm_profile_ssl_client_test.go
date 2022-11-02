@@ -226,6 +226,7 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 }
 
 // This TC is added baseddded based on ref: https://github.com/F5Networks/terraform-provider-bigip/issues/449
+// cert_key_chain field is going to be deprecated in near future.
 func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ClientSsl-CertkeyChain"
@@ -245,10 +246,9 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "chain"), "/Common/ca-bundle.crt"),
+					resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, "chain", "/Common/ca-bundle.crt"),
 				),
 			},
 			{
@@ -258,10 +258,9 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "cert"), "/Common/default.crt"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "key"), "/Common/default.key"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "name"), "default"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("cert_key_chain.0.%s", "chain"), "/Common/ca-bundle.crt"),
+					resource.TestCheckResourceAttr(resFullName, "cert", "/Common/default.crt"),
+					resource.TestCheckResourceAttr(resFullName, "key", "/Common/default.key"),
+					resource.TestCheckResourceAttr(resFullName, "chain", "/Common/ca-bundle.crt"),
 				),
 			},
 		},

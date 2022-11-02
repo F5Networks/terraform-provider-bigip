@@ -366,6 +366,37 @@ func TestAccBigipLtmVS_Vlan_EnabledDisabled(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmVS_TCIssue712(t *testing.T) {
+	vsTCIssue712Name1 := fmt.Sprintf("/%s/%s", "Common", "vs_issue_712_a")
+	vsTCIssue712Name2 := fmt.Sprintf("/%s/%s", "Common", "vs_issue_712_b")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckVSsDestroyed,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: getVSTCIssue712Config(vsTCIssue712Name1, vsTCIssue712Name2),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists(vsTCIssue712Name1),
+					testCheckVSExists(vsTCIssue712Name2),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server1", "name", vsTCIssue712Name1),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server1", "destination", "192.168.1.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server1", "ip_protocol", "tcp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server1", "port", "8080"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server2", "name", vsTCIssue712Name2),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server2", "destination", "192.168.1.1"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server2", "ip_protocol", "udp"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.server2", "port", "8080"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmVS_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -408,7 +439,7 @@ func testCheckVSExists(name string) resource.TestCheckFunc {
 			return err
 		}
 		if vs == nil {
-			return fmt.Errorf("Virtual server %s does not exist.", name)
+			return fmt.Errorf("Virtual server %s does not exist. ", name)
 		}
 
 		return nil
@@ -667,4 +698,20 @@ func testCheckVSsDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func getVSTCIssue712Config(profileName1, profileName2 string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_virtual_server" "server1" {
+  name        = "%v"
+  destination = "192.168.1.1"
+  port        = 8080
+  ip_protocol = "tcp"
+}
+resource "bigip_ltm_virtual_server" "server2" {
+  name        = "%v"
+  destination = "192.168.1.1"
+  port        = 8080
+  ip_protocol = "udp"
+}`, profileName1, profileName2)
 }

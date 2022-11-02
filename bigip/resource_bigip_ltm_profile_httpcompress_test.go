@@ -16,9 +16,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_HTTPCOMPRESS_NAME = fmt.Sprintf("/%s/test-httpcompress", TEST_PARTITION)
+var TestHttpcompressName = fmt.Sprintf("/%s/test-httpcompress", TEST_PARTITION)
 
-var TEST_HTTPCOMPRESS_RESOURCE = `
+var TestHttpcompressResource = `
 resource "bigip_ltm_profile_httpcompress" "test-httpcompress" {
             name = "/Common/test-httpcompress"
 	    defaults_from = "/Common/httpcompression"
@@ -38,9 +38,9 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_HTTPCOMPRESS_RESOURCE,
+				Config: TestHttpcompressResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckHttpcompressExists(TEST_HTTPCOMPRESS_NAME, true),
+					testCheckHttpcompressExists(TestHttpcompressName, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "name", "/Common/test-httpcompress"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "defaults_from", "/Common/httpcompression"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
@@ -61,6 +61,75 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileHttpcompressTC1(t *testing.T) {
+	profileHttpComprsName := fmt.Sprintf("/%s/%s", "Common", "test_httpcompress_profiletc1")
+	httpsTenantName = "fast_https_tenanttc1"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getProfileHttpComprsConfig(profileHttpComprsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckHttpcompressExists(profileHttpComprsName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "compression_buffersize", "4090"),
+				),
+			},
+			{
+				Config: getProfileHttpComprsConfig(profileHttpComprsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckHttpcompressExists(profileHttpComprsName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "compression_buffersize", "4090"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileHttpcompressTC2(t *testing.T) {
+	profileHttpComprsName := fmt.Sprintf("/%s/%s", "Common", "test_httpcompress_profiletc2")
+	httpsTenantName = "fast_https_tenanttc1"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getProfileHttpComprsTC2Config(profileHttpComprsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckHttpcompressExists(profileHttpComprsName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_compression_level", "2"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_memory_level", "32768"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_window_size", "32768"),
+				),
+			},
+			{
+				Config: getProfileHttpComprsTC2Config(profileHttpComprsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckHttpcompressExists(profileHttpComprsName, true),
+					testCheckHttpcompressExists("/Common/testhjj", false),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_compression_level", "2"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_memory_level", "32768"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_window_size", "32768"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileHttpcompress_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -70,11 +139,11 @@ func TestAccBigipLtmProfileHttpcompress_import(t *testing.T) {
 		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_HTTPCOMPRESS_RESOURCE,
+				Config: TestHttpcompressResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckHttpcompressExists(TEST_HTTPCOMPRESS_NAME, true),
+					testCheckHttpcompressExists(TestHttpcompressName, true),
 				),
-				ResourceName:      TEST_HTTPCOMPRESS_NAME,
+				ResourceName:      TestHttpcompressName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -90,10 +159,10 @@ func testCheckHttpcompressExists(name string, exists bool) resource.TestCheckFun
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("httpcompress %s was not created.", name)
+			return fmt.Errorf("httpcompress %s was not created. ", name)
 		}
 		if !exists && p == nil {
-			return fmt.Errorf("httpcompress %s still exists.", name)
+			return fmt.Errorf("httpcompress %s still exists. ", name)
 		}
 		return nil
 	}
@@ -113,8 +182,26 @@ func testCheckHttpcompresssDestroyed(s *terraform.State) error {
 			return err
 		}
 		if httpcompress != nil {
-			return fmt.Errorf("httpcompress %s not destroyed.", name)
+			return fmt.Errorf("httpcompress %s not destroyed. ", name)
 		}
 	}
 	return nil
+}
+
+func getProfileHttpComprsConfig(profileName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_httpcompress" "test_httpcomprs_profile" {
+  name                   = "%v"
+  compression_buffersize = 4090
+}`, profileName)
+}
+
+func getProfileHttpComprsTC2Config(profileName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_httpcompress" "test_httpcomprs_profile" {
+  name                   = "%v"
+  gzip_compression_level = 2
+  gzip_memory_level      = 32768
+  gzip_window_size       = 32768
+}`, profileName)
 }

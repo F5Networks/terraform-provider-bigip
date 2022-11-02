@@ -36,6 +36,12 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description:  "Name of the Ssl Profile",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
+			"defaults_from": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "/Common/serverssl",
+				Description: "Profile name that this profile defaults from.",
+			},
 
 			"partition": {
 				Type:        schema.TypeString,
@@ -152,19 +158,33 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Computed:    true,
 				Description: "Cache time out",
 			},
-
 			"cert": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Name of the server certificate.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "/Common/default.crt",
+				ValidateFunc: validateF5NameWithDirectory,
+				Description:  "Name of the server certificate.",
 			},
-
+			"key": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "/Common/default.key",
+				ValidateFunc: validateF5NameWithDirectory,
+				Description:  "Name of the Server SSL profile key",
+			},
 			"chain": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "none",
+				//ValidateFunc: validateF5NameWithDirectory,
+				Description: "Server certificate chain name.",
+			},
+			"passphrase": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Client certificate chain name.",
+				Sensitive:   true,
+				Description: "Client Certificate Constrained Delegation CA passphrase",
 			},
 
 			"ciphers": {
@@ -172,13 +192,6 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "BigIP Cipher string.",
-			},
-
-			"defaults_from": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "/Common/serverssl",
-				Description: "Profile name that this profile defaults from.",
 			},
 
 			"expire_cert_response_control": {
@@ -202,13 +215,6 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description: "Handshake time out (seconds)",
 			},
 
-			"key": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Name of the Serer SSL profile key",
-			},
-
 			"mod_ssl_methods": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -229,13 +235,6 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Set:      schema.HashString,
 				Computed: true,
 				Optional: true,
-			},
-
-			"passphrase": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Client Certificate Constrained Delegation CA passphrase",
 			},
 
 			"proxy_ca_cert": {
@@ -746,17 +745,17 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.CacheSize = d.Get("cache_size").(int)
 	config.CacheTimeout = d.Get("cache_timeout").(int)
 	config.Cert = d.Get("cert").(string)
+	config.Key = d.Get("key").(string)
 	config.Chain = d.Get("chain").(string)
+	config.Passphrase = d.Get("passphrase").(string)
 	config.Ciphers = d.Get("ciphers").(string)
 	config.ExpireCertResponseControl = d.Get("expire_cert_response_control").(string)
 	config.GenericAlert = d.Get("generic_alert").(string)
 	config.HandshakeTimeout = d.Get("handshake_timeout").(string)
-	config.Key = d.Get("key").(string)
 	config.ModSslMethods = d.Get("mod_ssl_methods").(string)
 	config.Mode = d.Get("mode").(string)
 	config.ProxyCaCert = proxyCaCert
 	config.ProxyCaKey = proxyCaKey
-	config.Passphrase = d.Get("passphrase").(string)
 	config.PeerCertMode = d.Get("peer_cert_mode").(string)
 	config.ProxySsl = d.Get("proxy_ssl").(string)
 	config.RenegotiatePeriod = d.Get("renegotiate_period").(string)
