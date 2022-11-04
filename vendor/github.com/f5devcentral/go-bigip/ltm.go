@@ -925,6 +925,7 @@ type PolicyRuleCondition struct {
 	CountryCode           bool     `json:"countryCode,omitempty"`
 	CountryName           bool     `json:"countryName,omitempty"`
 	CpuUsage              bool     `json:"cpuUsage,omitempty"`
+	Datagroup             string   `json:"datagroup,omitempty"`
 	DeviceMake            bool     `json:"deviceMake,omitempty"`
 	DeviceModel           bool     `json:"deviceModel,omitempty"`
 	Domain                bool     `json:"domain,omitempty"`

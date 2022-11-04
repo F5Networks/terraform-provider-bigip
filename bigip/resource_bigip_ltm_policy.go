@@ -706,6 +706,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 										Optional: true,
 										Computed: true,
 									},
+									"datagroup": {
+										Type:     schema.TypeString,
+										Optional: true,
+										//Computed: true,
+									},
 									"device_make": {
 										Type:     schema.TypeBool,
 										Optional: true,
