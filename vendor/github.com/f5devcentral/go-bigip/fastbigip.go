@@ -68,45 +68,45 @@ type FastTCPJson struct {
 }
 
 type FastUDPJson struct {
-	Tenant           			string      	`json:"tenant_name,omitempty"`
-	Application       			string      	`json:"app_name,omitempty"`
-	VirtualAddress    			string      	`json:"virtual_address,omitempty"`
-	VirtualPort       			interface{} 	`json:"virtual_port,omitempty"`
-	Fastl4Enable	  			bool			`json:"fastl4"`
-	MakeFastl4Profile 			bool			`json:"make_fastl4_profile,omitempty"`
-	Fastl4ProfileName 			string			`json:"fastl4_profile_name,omitempty"`
-	UdpProfileName 			    string			`json:"udp_profile_name,omitempty"`
-	SnatEnable        			bool        	`json:"enable_snat"`
-	SnatAutomap       			bool        	`json:"snat_automap"`
-	MakeSnatPool      			bool        	`json:"make_snatpool"`
-	SnatPoolName           		string      	`json:"snatpool_name,omitempty"`
-	SnatAddresses     	   		[]string 		`json:"snat_addresses,omitempty"`
-	EnablePersistence 	   		bool	 		`json:"enable_persistence"`
-	UseExistingPersistence 		bool	 		`json:"use_existing_persistence_profile,omitempty"`
-	Fastl4PersistenceProfile 	string	 		`json:"fastl4_persistence_profile,omitempty"`
-	Fastl4PersistenceType		string			`json:"fastl4_persistence_type,omitempty"`
-	UdpPersistenceProfile 		string   		`json:"persistence_profile,omitempty"`
-	UdpPersistenceType			string			`json:"persistence_type,omitempty"`
-	EnableFallbackPersistence 	bool			`json:"enable_fallback_persistence"`
-	FallbackPersistenceType 	string			`json:"fallback_persistence_type,omitempty"`
-	PoolEnable        			bool            `json:"enable_pool"`
-	MakePool          			bool            `json:"make_pool"`
-	PoolName          			string          `json:"pool_name,omitempty"`
-	PoolMembers       			[]FastHttpPool  `json:"pool_members,omitempty"`
-	LoadBalancingMode 			string          `json:"load_balancing_mode,omitempty"`
-	SlowRampTime      			int             `json:"slow_ramp_time,omitempty"`
-	MonitorEnable     			bool            `json:"enable_monitor,omitempty"`
-	MakeMonitor       			bool            `json:"make_monitor"`
-	MonitorInterval   			int             `json:"monitor_interval,omitempty"`
-	MonitorSendString 			string		 	`json:"monitor_send_string,omitempty"`
-	MonitorExpectedResponse 	string	 		`json:"monitor_expected_response,omitempty"`
-	UdpMonitor        			string          `json:"monitor_name,omitempty"`
-	IruleNames 					[]string		`json:"irule_names,omitempty"`
-	VlansEnable					bool            `json:"vlans_enable"`
-	VlansAllow					bool            `json:"vlans_allow"`
-	Vlans						[]string        `json:"vlan_names,omitempty"`
-	EnableAsmLogging			bool            `json:"enable_asm_logging"`
-	LogProfileNames 			[]string		`json:"log_profile_names,omitempty"`
+	Tenant                    string         `json:"tenant_name,omitempty"`
+	Application               string         `json:"app_name,omitempty"`
+	VirtualAddress            string         `json:"virtual_address,omitempty"`
+	VirtualPort               interface{}    `json:"virtual_port,omitempty"`
+	Fastl4Enable              bool           `json:"fastl4"`
+	MakeFastl4Profile         bool           `json:"make_fastl4_profile,omitempty"`
+	Fastl4ProfileName         string         `json:"fastl4_profile_name,omitempty"`
+	UdpProfileName            string         `json:"udp_profile_name,omitempty"`
+	SnatEnable                bool           `json:"enable_snat"`
+	SnatAutomap               bool           `json:"snat_automap"`
+	MakeSnatPool              bool           `json:"make_snatpool"`
+	SnatPoolName              string         `json:"snatpool_name,omitempty"`
+	SnatAddresses             []string       `json:"snat_addresses,omitempty"`
+	EnablePersistence         bool           `json:"enable_persistence"`
+	UseExistingPersistence    bool           `json:"use_existing_persistence_profile,omitempty"`
+	Fastl4PersistenceProfile  string         `json:"fastl4_persistence_profile,omitempty"`
+	Fastl4PersistenceType     string         `json:"fastl4_persistence_type,omitempty"`
+	UdpPersistenceProfile     string         `json:"persistence_profile,omitempty"`
+	UdpPersistenceType        string         `json:"persistence_type,omitempty"`
+	EnableFallbackPersistence bool           `json:"enable_fallback_persistence"`
+	FallbackPersistenceType   string         `json:"fallback_persistence_type,omitempty"`
+	PoolEnable                bool           `json:"enable_pool"`
+	MakePool                  bool           `json:"make_pool"`
+	PoolName                  string         `json:"pool_name,omitempty"`
+	PoolMembers               []FastHttpPool `json:"pool_members,omitempty"`
+	LoadBalancingMode         string         `json:"load_balancing_mode,omitempty"`
+	SlowRampTime              int            `json:"slow_ramp_time,omitempty"`
+	MonitorEnable             bool           `json:"enable_monitor,omitempty"`
+	MakeMonitor               bool           `json:"make_monitor"`
+	MonitorInterval           int            `json:"monitor_interval,omitempty"`
+	MonitorSendString         string         `json:"monitor_send_string,omitempty"`
+	MonitorExpectedResponse   string         `json:"monitor_expected_response,omitempty"`
+	UdpMonitor                string         `json:"monitor_name,omitempty"`
+	IruleNames                []string       `json:"irule_names,omitempty"`
+	VlansEnable               bool           `json:"vlans_enable"`
+	VlansAllow                bool           `json:"vlans_allow"`
+	Vlans                     []string       `json:"vlan_names,omitempty"`
+	EnableAsmLogging          bool           `json:"enable_asm_logging"`
+	LogProfileNames           []string       `json:"log_profile_names,omitempty"`
 }
 
 type FastHttpJson struct {
@@ -146,7 +146,7 @@ type FastHttpJson struct {
 	WafPolicyEnable        bool           `json:"enable_waf_policy"`
 	MakeWafpolicy          bool           `json:"make_waf_policy"`
 	WafPolicyName          string         `json:"asm_waf_policy,omitempty"`
-	EndpointPolicyNames     []string      `json:"endpoint_policy_names,omitempty"`
+	EndpointPolicyNames    []string       `json:"endpoint_policy_names,omitempty"`
 	AsmLoggingEnable       bool           `json:"enable_asm_logging"`
 	LogProfileNames        []string       `json:"log_profile_names,omitempty"`
 }
