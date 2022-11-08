@@ -54,16 +54,14 @@ func Provider() terraform.ResourceProvider {
 			"token_auth": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", false),
 			},
 			"validate_certs_disable": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     true,
-				Description: "Enables TLS certificate check on BIG-IP",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIP_VERIFY_CERT_DISABLE", nil),
+				Description: "If set to true, Disables TLS certificate check on BIG-IP. Default : True",
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_VERIFY_CERT_DISABLE", true),
 			},
 			"trusted_cert_path": {
 				Type:        schema.TypeString,
@@ -80,9 +78,8 @@ func Provider() terraform.ResourceProvider {
 			"login_ref": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "tmos",
 				Description: "Login reference for token authentication (see BIG-IP REST docs for details)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", nil),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", "tmos"),
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
