@@ -23,27 +23,23 @@ func resourceBigipSysNtp() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"description": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the ntp Servers",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "User defined description.",
+				//ValidateFunc: validateF5Name,
 			},
-
 			"servers": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
+				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Optional:    true,
-				Description: "Servers Address",
+				Required:    true,
+				Description: "Specifies the time servers that the system uses to update the system time",
 			},
-
 			"timezone": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Servers timezone",
+				Description: "Specifies the time zone that you want to use for the system time",
 			},
 		},
 	}
@@ -54,19 +50,17 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
-	servers := setToStringSlice(d.Get("servers").(*schema.Set))
-	timezone := d.Get("timezone").(string)
 
-	log.Println("[INFO] Configuring Ntp ")
+	log.Println("[INFO] Configuring NTP Servers ")
 
-	err := client.CreateNTP(
-		description,
-		servers,
-		timezone,
-	)
+	configSysNTP := &bigip.NTP{
+		Description: description,
+	}
+	sysNTPConfig := getSysNTPConfig(d, configSysNTP)
+	err := client.ModifyNTP(sysNTPConfig)
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Configure  NTP   (%s) ", err)
+		log.Printf("[ERROR] Unable to Configure  NTP Servers  (%s) ", err)
 		return err
 	}
 	d.SetId(description)
@@ -78,17 +72,15 @@ func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	description := d.Id()
 
-	log.Println("[INFO] Updating NTP " + description)
+	log.Println("[INFO] Updating NTP Servers" + description)
 
-	r := &bigip.NTP{
+	configSysNTP := &bigip.NTP{
 		Description: description,
-		Servers:     setToStringSlice(d.Get("servers").(*schema.Set)),
-		Timezone:    d.Get("timezone").(string),
 	}
-
-	err := client.ModifyNTP(r)
+	sysNTPConfig := getSysNTPConfig(d, configSysNTP)
+	err := client.ModifyNTP(sysNTPConfig)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Modify  NTP  (%v) ", err)
+		log.Printf("[ERROR] Unable to Modify  NTP Servers (%v) ", err)
 		return err
 	}
 	return resourceBigipSysNtpRead(d, meta)
@@ -99,15 +91,15 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 
 	description := d.Id()
 
-	log.Println("[INFO] Reading NTP " + description)
+	log.Println("[INFO] Reading NTP Config" + description)
 
 	ntp, err := client.NTPs()
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve NTP   (%s) ", err)
+		log.Printf("[ERROR] Unable to Retrieve NTP Config (%s) ", err)
 		return err
 	}
 	if ntp == nil {
-		log.Printf("[WARN] NTP (%s) not found, removing from state", d.Id())
+		log.Printf("[WARN] NTP Config (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -126,6 +118,25 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
-	/* This function is not supported on BIG-IP, you cannot DELETE NTP API is not supported */
+	client := meta.(*bigip.BigIP)
+	description := d.Id()
+	log.Println("[INFO] Deleting System NTP Config:" + description)
+	configSysNTP := &bigip.NTP{
+		Description: description,
+		Servers:     []string{},
+		Timezone:    "America/Los_Angeles",
+	}
+	err := client.ModifyNTP(configSysNTP)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Delete NTP Config (%s) (%v) ", description, err)
+		return err
+	}
+	d.SetId("")
 	return nil
+}
+
+func getSysNTPConfig(d *schema.ResourceData, config *bigip.NTP) *bigip.NTP {
+	config.Servers = listToStringSlice(d.Get("servers").([]interface{}))
+	config.Timezone = d.Get("timezone").(string)
+	return config
 }

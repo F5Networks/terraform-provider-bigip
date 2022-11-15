@@ -126,6 +126,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 		m.Allowed = d.Get(prefix + ".allow").(bool)
 		m.Method = d.Get(prefix + ".method").(string)
 		urlJson.MethodOverrides = append(urlJson.MethodOverrides, m)
+		urlJson.MethodsOverrideOnUrlCheck = true
 	}
 
 	jsonString, err := json.Marshal(urlJson)

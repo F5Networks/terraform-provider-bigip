@@ -143,10 +143,17 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 				Description: "If enabled, ADC will defer allocating resources to a connection until some payload data has arrived from the client (default false). This may help minimize the impact of certain DoS attacks but adds undesirable latency under normal conditions. Note: ‘deferredAccept’ is incompatible with server-speaks-first application protocols,Default : disabled",
 			},
 			"fast_open": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "If enabled (default), the system can use the TCP Fast Open protocol extension to reduce latency by sending payload data with initial SYN",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
+				Description:  "If enabled (default), the system can use the TCP Fast Open protocol extension to reduce latency by sending payload data with initial SYN",
+			},
+			"verified_accept": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specifies, when checked (enabled), that the system can actually communicate with the server before establishing a client connection. To determine this, the system sends the server a SYN packet before responding to the client's SYN with a SYN-ACK. When unchecked, the system accepts the client connection before selecting a server to talk to. By default, this setting is disabled",
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
 			},
 		},
 	}
@@ -280,6 +287,11 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 			return fmt.Errorf("[DEBUG] Error saving timewait_recycle to state for tcp profile  (%s): %s", d.Id(), err)
 		}
 	}
+	if _, ok := d.GetOk("verified_accept"); ok {
+		if err := d.Set("verified_accept", obj.VerifiedAccept); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving verified_accept to state for tcp profile  (%s): %s", d.Id(), err)
+		}
+	}
 	if _, ok := d.GetOk("keepalive_interval"); ok {
 		_ = d.Set("keepalive_interval", obj.KeepAliveInterval)
 	}
@@ -328,6 +340,7 @@ func getTCPProfileConfig(d *schema.ResourceData, config *bigip.Tcp) *bigip.Tcp {
 	config.EarlyRetransmit = d.Get("early_retransmit").(string)
 	config.TailLossProbe = d.Get("tailloss_probe").(string)
 	config.TimeWaitRecycle = d.Get("timewait_recycle").(string)
+	config.VerifiedAccept = d.Get("verified_accept").(string)
 	config.DeferredAccept = d.Get("deferred_accept").(string)
 	config.FastOpen = d.Get("fast_open").(string)
 	return config

@@ -46,8 +46,8 @@ type NTPs struct {
 }
 
 type NTP struct {
-	Description string   `json:"description,omitempty"`
-	Servers     []string `json:"servers,omitempty"`
+	Description string   `json:"description"`
+	Servers     []string `json:"servers"`
 	Timezone    string   `json:"timezone,omitempty"`
 }
 
@@ -69,10 +69,10 @@ type DNSs struct {
 }
 
 type DNS struct {
-	Description  string   `json:"description,omitempty"`
-	NameServers  []string `json:"nameServers,omitempty"`
+	Description  string   `json:"description"`
+	NameServers  []string `json:"nameServers,"`
 	NumberOfDots int      `json:"numberOfDots,omitempty"`
-	Search       []string `json:"search,omitempty"`
+	Search       []string `json:"search"`
 }
 
 type Provisions struct {
@@ -554,7 +554,7 @@ func (b *BigIP) CreateNTP(description string, servers []string, timezone string)
 }
 
 func (b *BigIP) ModifyNTP(config *NTP) error {
-	return b.put(config, uriSys, uriNtp)
+	return b.patch(config, uriSys, uriNtp)
 }
 
 func (b *BigIP) NTPs() (*NTP, error) {
@@ -598,7 +598,7 @@ func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots
 }
 
 func (b *BigIP) ModifyDNS(config *DNS) error {
-	return b.put(config, uriSys, uriDNS)
+	return b.patch(config, uriSys, uriDNS)
 }
 
 // DNS & NTP resource does not support Delete API

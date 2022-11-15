@@ -543,7 +543,7 @@ func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
-	bigipConfig := Config{
+	bigipConfig := bigip.Config{
 		Address:  d.Get("bigip_address").(string),
 		Port:     d.Get("bigip_port").(string),
 		Username: d.Get("bigip_user").(string),
@@ -554,5 +554,5 @@ func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
 		bigipConfig.LoginReference = d.Get("bigiq_login_ref").(string)
 	}
 
-	return bigipConfig.Client()
+	return Client(&bigipConfig)
 }

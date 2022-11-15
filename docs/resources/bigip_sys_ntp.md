@@ -8,34 +8,22 @@ description: |-
 
 # bigip\_sys\_ntp
 
-`bigip_sys_ntp` provides details about a specific bigip
+`bigip_sys_ntp` resource is helpful when configuring NTP server on the BIG-IP.
 
-This resource is helpful when configuring NTP server on the BIG-IP.
 ## Example Usage
 
-
 ```hcl
-provider "bigip" {
-  address  = "xxx.xxx.xxx.xxx"
-  username = "xxxxx"
-  password = "xxxxx"
-}
 resource "bigip_sys_ntp" "ntp1" {
   description = "/Common/NTP1"
   servers     = ["time.facebook.com"]
   timezone    = "America/Los_Angeles"
 }
-
 ```      
 
 ## Argument Reference
 
-* `bigip_sys_ntp` - Is the resource is used to configure ntp server on the BIG-IP.
+* `description` - (Required,type `string`) User defined description.
 
-* `/Common/NTP1` - Is the description of the NTP server in the main or common partition of BIG-IP.
+* `servers` - (Required,type `list`) Specifies the time servers that the system uses to update the system time.
 
-* `time.facebook.com` - Is the  NTP server configured on the BIG-IP.
-
-* `servers` - (Optional) Adds NTP servers to or deletes NTP servers from the BIG-IP system.
-
-* `timezone` - (Optional) Specifies the time zone that you want to use for the system time.
+* `timezone` - (Optional,type `string`) Specifies the time zone that you want to use for the system time.

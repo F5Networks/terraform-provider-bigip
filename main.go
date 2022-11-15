@@ -9,9 +9,11 @@ package main
 import (
 	"github.com/F5Networks/terraform-provider-bigip/bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
+	"log"
 )
 
 func main() {
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: bigip.Provider})
 }

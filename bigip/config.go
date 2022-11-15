@@ -15,19 +15,7 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 )
 
-type Config struct {
-	Address            string
-	Port               string
-	Username           string
-	Password           string
-	Token              string
-	CertVerifyDisable  bool
-	TrustedCertificate string
-	LoginReference     string `json:"loginProviderName"`
-	ConfigOptions      *bigip.ConfigOptions
-}
-
-func (c *Config) Client() (*bigip.BigIP, error) {
+func Client(config *bigip.Config) (*bigip.BigIP, error) {
 
 	log.Println("[INFO] Initializing BigIP connection")
 	var client *bigip.BigIP
@@ -36,28 +24,29 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 	// Token Session. The user has already authenticated with the BigIP
 	// outside of the provider, so even if the BigIP is using Token Auth,
 	// we don't want to do that here. We want to use bigip.NewSession
-	if c.LoginReference != "" && c.Token == "" {
-		client, err = bigip.NewTokenSession(c.Address, c.Port, c.Username, c.Password, c.LoginReference, c.ConfigOptions)
+	if config.LoginReference != "" && config.Token == "" && config.Address != "" {
+		client, err = bigip.NewTokenSession(config)
+		// client, err = bigip.NewTokenSession(c)
 		if err != nil {
 			log.Printf("[ERROR] Error creating New Token Session %s ", err)
 			return nil, err
 		}
 
 	} else {
-		client = bigip.NewSession(c.Address, c.Port, c.Username, c.Password, c.ConfigOptions)
+		client = bigip.NewSession(config)
 		// The provider will use the Token value instead of the password
-		if c.Token != "" {
-			client.Token = c.Token
+		if config.Token != "" {
+			client.Token = config.Token
 		}
 	}
-	if c.Address != "" && c.Username != "" && c.Password != "" {
-		client.Transport.TLSClientConfig.InsecureSkipVerify = c.CertVerifyDisable
-		if !c.CertVerifyDisable {
+	if config.Address != "" && config.Username != "" && config.Password != "" {
+		client.Transport.TLSClientConfig.InsecureSkipVerify = config.CertVerifyDisable
+		if !config.CertVerifyDisable {
 			rootCAs, _ := x509.SystemCertPool()
 			if rootCAs == nil {
 				rootCAs = x509.NewCertPool()
 			}
-			certPEM, err := os.ReadFile(c.TrustedCertificate)
+			certPEM, err := os.ReadFile(config.TrustedCertificate)
 			if err != nil {
 				return nil, fmt.Errorf("provide Valid Trusted certificate path :%+v", err)
 				// log.Printf("[DEBUG]read cert PEM/crt file error:%+v", err)
@@ -71,25 +60,11 @@ func (c *Config) Client() (*bigip.BigIP, error) {
 			}
 			client.Transport.TLSClientConfig.RootCAs = rootCAs
 		}
-		err = c.validateConnection(client)
+		err = client.ValidateConnection()
 		if err == nil {
 			return client, nil
 		}
 	}
 	return client, err
 
-}
-
-func (c *Config) validateConnection(client *bigip.BigIP) error {
-	t, err := client.SelfIPs()
-	if err != nil {
-		log.Printf("[ERROR] Connection to BigIP device could not have been validated: %v ", err)
-		return err
-	}
-
-	if t == nil {
-		log.Printf("[WARN] Could not validate connection to BigIP")
-		return nil
-	}
-	return nil
 }
