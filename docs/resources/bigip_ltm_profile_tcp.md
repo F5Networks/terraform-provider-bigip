@@ -52,3 +52,5 @@ resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile" {
 * `fast_open` - (Optional) When enabled, permits TCP Fast Open, allowing properly equipped TCP clients to send data with the SYN packet.
 
 * `deferred_accept` - (Optional) Specifies, when enabled, that the system defers allocation of the connection chain context until the client response is received. This option is useful for dealing with 3-way handshake DOS attacks. The default value is disabled.
+
+* `verified_accept` - (Optional) When enabled, the system verifies that the pool member is available to accept the connection by sending the server a SYN before responding to the client's SYN with a SYN-ACK.

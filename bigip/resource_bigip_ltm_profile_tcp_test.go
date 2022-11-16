@@ -29,6 +29,23 @@ resource "bigip_ltm_profile_tcp" "test-tcp" {
             keepalive_interval = 1700
             deferred_accept = "enabled"
             fast_open = "enabled"
+				verified_accept = "disabled"
+        }
+`
+
+var TEST_TCP_RESOURCE_VERIFIED_ACCEPT = `
+resource "bigip_ltm_profile_tcp" "test-tcp" {
+            name = "/Common/sanjose-tcp-wan-profile"
+            defaults_from = "/Common/tcp-wan-optimized"
+						partition = "Common"
+            idle_timeout = 300
+            close_wait_timeout = 5
+            finwait_2timeout = 5
+            finwait_timeout = 300
+            keepalive_interval = 1700
+            deferred_accept = "enabled"
+            fast_open = "disabled"
+            verified_accept = "enabled"
         }
 `
 
@@ -54,6 +71,36 @@ func TestAccBigipLtmProfileTcp_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "keepalive_interval", "1700"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "deferred_accept", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "fast_open", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "verified_accept", "disabled"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileTcp_create_verified_accept(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_TCP_RESOURCE_VERIFIED_ACCEPT,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckTcpExists(TEST_TCP_NAME, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "name", "/Common/sanjose-tcp-wan-profile"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "defaults_from", "/Common/tcp-wan-optimized"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "idle_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "close_wait_timeout", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_2timeout", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "finwait_timeout", "300"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "keepalive_interval", "1700"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "deferred_accept", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "fast_open", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_tcp.test-tcp", "verified_accept", "enabled"),
 				),
 			},
 		},

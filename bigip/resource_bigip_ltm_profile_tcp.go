@@ -85,6 +85,12 @@ func resourceBigipLtmProfileTcp() *schema.Resource {
 				Computed:    true,
 				Description: "If enabled (default), the system can use the TCP Fast Open protocol extension to reduce latency by sending payload data with initial SYN",
 			},
+			"verified_accept": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "If enabled, the system verifies that the pool member is available to accept the connection by sending the server a SYN before responding to the client's SYN with a SYN-ACK.",
+			},
 		},
 	}
 }
@@ -103,6 +109,7 @@ func resourceBigipLtmProfileTcpCreate(d *schema.ResourceData, meta interface{}) 
 		KeepAliveInterval: d.Get("keepalive_interval").(int),
 		DeferredAccept:    d.Get("deferred_accept").(string),
 		FastOpen:          d.Get("fast_open").(string),
+		VerifiedAccept:    d.Get("verified_accept").(string),
 	}
 	log.Println("[INFO] Creating TCP profile")
 	err := client.CreateTcp(tcpProfileConfig)
@@ -129,6 +136,7 @@ func resourceBigipLtmProfileTcpUpdate(d *schema.ResourceData, meta interface{}) 
 		KeepAliveInterval: d.Get("keepalive_interval").(int),
 		DeferredAccept:    d.Get("deferred_accept").(string),
 		FastOpen:          d.Get("fast_open").(string),
+		VerifiedAccept:    d.Get("verified_accept").(string),
 	}
 	err := client.ModifyTcp(name, tcpProfileConfig)
 	if err != nil {
@@ -186,6 +194,9 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	}
 	if _, ok := d.GetOk("fast_open"); ok {
 		_ = d.Set("fast_open", obj.FastOpen)
+	}
+	if _, ok := d.GetOk("verified_accept"); ok {
+		_ = d.Set("verified_accept", obj.VerifiedAccept)
 	}
 	return nil
 }

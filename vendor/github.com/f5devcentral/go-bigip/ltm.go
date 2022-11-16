@@ -1152,6 +1152,7 @@ type tcpDTO struct {
 	KeepAliveInterval int    `json:"keepAliveInterval,omitempty"`
 	DeferredAccept    string `json:"deferredAccept,omitempty"`
 	FastOpen          string `json:"fastOpen,omitempty"`
+	VerifiedAccept    string `json:"verifiedAccept,omitempty"`
 }
 
 type Tcps struct {
@@ -1169,6 +1170,7 @@ type Tcp struct {
 	KeepAliveInterval int
 	DeferredAccept    string
 	FastOpen          string
+	VerifiedAccept    string
 }
 
 type Ftp struct {
