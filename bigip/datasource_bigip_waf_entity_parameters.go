@@ -2,9 +2,11 @@ package bigip
 
 import (
 	"encoding/json"
+	"fmt"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func dataSourceBigipWafEntityParameter() *schema.Resource {
@@ -82,9 +84,10 @@ func dataSourceBigipWafEntityParameter() *schema.Resource {
 				Description: "Determines whether a parameter is located in headers as one of the headers.",
 			},
 			"level": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies whether the parameter is associated with a URL, a flow, or neither.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"global", "url", "flow"}, false),
+				Description:  "Specifies whether the parameter is associated with a URL, a flow, or neither.",
 			},
 			"mandatory": {
 				Type:        schema.TypeBool,
@@ -117,6 +120,31 @@ func dataSourceBigipWafEntityParameter() *schema.Resource {
 				Optional:    true,
 				Description: "List of Attack Signature Ids which are disabled for this particular parameter.",
 			},
+			"url": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"method": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"protocol": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 			"json": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -132,14 +160,18 @@ func dataSourceBigipWafEntityParameterRead(d *schema.ResourceData, meta interfac
 	entityParameter := &bigip.Parameter{
 		Name: parameterName,
 	}
-
+	if d.Get("level").(string) == "url" {
+		if _, OK := d.GetOk("url"); !OK {
+			return fmt.Errorf("if level set to 'url',url object must be specificed")
+		}
+	}
 	getEPConfig(entityParameter, d)
 
-	parameter_json, err := json.Marshal(entityParameter)
+	parameterJson, err := json.Marshal(entityParameter)
 	if err != nil {
 		return err
 	}
-	_ = d.Set("json", string(parameter_json))
+	_ = d.Set("json", string(parameterJson))
 	d.SetId(parameterName)
 	return nil
 }
@@ -213,5 +245,13 @@ func getEPConfig(ep *bigip.Parameter, d *schema.ResourceData) {
 			sigs = append(sigs, s1)
 		}
 		ep.SignatureOverrides = sigs
+	}
+	if urlVal, OK := d.GetOk("url"); OK {
+		for _, v := range urlVal.([]interface{}) {
+			ep.URL.Name = v.(map[string]interface{})["name"].(string)
+			ep.URL.Method = v.(map[string]interface{})["method"].(string)
+			ep.URL.Type = v.(map[string]interface{})["type"].(string)
+			ep.URL.Protocol = v.(map[string]interface{})["protocol"].(string)
+		}
 	}
 }

@@ -119,6 +119,7 @@ func TestAccBigipSysDNSCreateTC4(t *testing.T) {
 				Config: getsysDNSConfigTC4(TestDnsName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckdnsExists(TestDnsName, true),
+					testCheckdnsExists("test-dns-tc4", false),
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.1", "2.2.2.2"),

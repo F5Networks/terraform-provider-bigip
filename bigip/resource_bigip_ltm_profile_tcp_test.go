@@ -221,9 +221,10 @@ func testCheckTcpsDestroyed(s *terraform.State) error {
 func getProfileTCPConfigDefault(profileName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
-  name                          = "%v"
+  name = "%v"
 }`, profileName)
 }
+
 func getProfileTCPConfig(profileName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
