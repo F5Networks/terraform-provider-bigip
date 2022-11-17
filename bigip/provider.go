@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"golang.org/x/text/cases"
@@ -55,7 +56,7 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
-				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", false),
+				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", true),
 			},
 			"validate_certs_disable": {
 				Type:        schema.TypeBool,
@@ -170,7 +171,7 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
-	config := Config{
+	config := &bigip.Config{
 		Address:           d.Get("address").(string),
 		Port:              d.Get("port").(string),
 		Username:          d.Get("username").(string),
@@ -187,7 +188,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		}
 		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}
-	cfg, err := config.Client()
+	cfg, err := Client(config)
 	if err != nil {
 		return cfg, err
 	}

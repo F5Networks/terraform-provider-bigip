@@ -26,54 +26,44 @@ func resourceBigipSysDns() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"description": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the Dns Servers",
-				ValidateFunc: validateF5Name,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "User defined description",
+				//ValidateFunc: validateF5Name,
 			},
-
 			"name_servers": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
+				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Optional:    true,
-				Description: "Servers Address",
+				Required:    true,
+				Description: "Specifies the name servers that the system uses to validate DNS lookups, and resolve host names",
 			},
-
 			"number_of_dots": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "how many DNS Servers",
 			},
-
 			"search": {
-				Type:        schema.TypeSet,
-				Set:         schema.HashString,
+				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Description: "Servers search domain",
+				Description: "Specifies the domains that the system searches for local domain lookups, to resolve local host names",
 			},
 		},
 	}
-
 }
 
 func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
-	nameservers := setToStringSlice(d.Get("name_servers").(*schema.Set))
-	numberofdots := d.Get("number_of_dots").(int)
-	search := setToStringSlice(d.Get("search").(*schema.Set))
+	log.Println("[INFO] Configuring System DNS Server: " + description)
+	configSysDns := &bigip.DNS{
+		Description: description,
+	}
+	sysDNSConfig := getSysDNSConfig(d, configSysDns)
 
-	log.Println("[INFO] Creating Dns ")
-
-	err := client.CreateDNS(
-		description,
-		nameservers,
-		numberofdots,
-		search,
-	)
+	err := client.ModifyDNS(sysDNSConfig)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create DNS (%s) (%v) ", description, err)
@@ -89,16 +79,14 @@ func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	description := d.Id()
 
-	log.Println("[INFO] Updating DNS " + description)
+	log.Println("[INFO] Updating System DNS Server:" + description)
 
-	r := &bigip.DNS{
-		Description:  description,
-		NameServers:  setToStringSlice(d.Get("name_servers").(*schema.Set)),
-		NumberOfDots: d.Get("number_of_dots").(int),
-		Search:       setToStringSlice(d.Get("search").(*schema.Set)),
+	configSysDns := &bigip.DNS{
+		Description: description,
 	}
+	sysDNSConfig := getSysDNSConfig(d, configSysDns)
 
-	err := client.ModifyDNS(r)
+	err := client.ModifyDNS(sysDNSConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify DNS (%s) (%v) ", description, err)
 		return err
@@ -123,14 +111,12 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	d.Set("description", dns.Description)
+	_ = d.Set("description", dns.Description)
 
 	if err := d.Set("name_servers", dns.NameServers); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for DNS (%s): %s", d.Id(), err)
 	}
-
-	d.Set("number_of_dots", dns.NumberOfDots)
-
+	_ = d.Set("number_of_dots", dns.NumberOfDots)
 	if err := d.Set("search", dns.Search); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving Search  to state for DNS (%s): %s", d.Id(), err)
 	}
@@ -140,6 +126,27 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
 	// There is no Delete API for this operation
-
+	client := meta.(*bigip.BigIP)
+	description := d.Id()
+	log.Println("[INFO] Deleting System DNS Server:" + description)
+	configSysDns := &bigip.DNS{
+		Description:  description,
+		NameServers:  []string{},
+		Search:       []string{},
+		NumberOfDots: 0,
+	}
+	err := client.ModifyDNS(configSysDns)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Delete DNS (%s) (%v) ", description, err)
+		return err
+	}
+	d.SetId("")
 	return nil
+}
+
+func getSysDNSConfig(d *schema.ResourceData, config *bigip.DNS) *bigip.DNS {
+	config.NameServers = listToStringSlice(d.Get("name_servers").([]interface{}))
+	config.NumberOfDots = d.Get("number_of_dots").(int)
+	config.Search = listToStringSlice(d.Get("search").([]interface{}))
+	return config
 }

@@ -68,7 +68,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `mask` - (Optional) Mask can either be in CIDR notation or decimal, i.e.: 24 or 255.255.255.0. A CIDR mask of 0 is the same as 0.0.0.0
 
-* `source_address_translation` - (Optional) Can be either omitted for none or the values automap or snat
+* `source_address_translation` - (Optional) Can be either omitted for `none` or the values `automap` options : [`snat`,`automap`,`none`].
 
 * `translate_address` - Enables or disables address translation for the virtual server. Turn address translation off for a virtual server if you want to use the virtual server to load balance connections to any address. This option is useful when the system is load balancing devices that have the same IP address.
 
@@ -86,7 +86,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `irules` - (Optional) The iRules list you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
 
-* `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs. DEPRECATED - see Virtual Server Property Groups source-address-translation
+* `snatpool` - (Optional) Specifies the name of an existing SNAT pool that you want the virtual server to use to implement selective and intelligent SNATs.
 
 * `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs,enable/disabled will be desided by attribute `vlan_enabled`
 

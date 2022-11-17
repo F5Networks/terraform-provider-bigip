@@ -35,7 +35,12 @@ func resourceBigipSslKey() *schema.Resource {
 				//ForceNew:    true,
 				Description: "Content of SSL certificate key present on local Disk",
 			},
-
+			"passphrase": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: "Passphrase on key.",
+			},
 			"partition": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -59,14 +64,26 @@ func resourceBigipSslKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Certificate Key Name " + name)
 	certpath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
+	passPhrase := d.Get("passphrase").(string)
 	/*if !strings.HasSuffix(name, ".key") {
 		name = name + ".key"
 	}*/
-	err := client.UploadKey(name, certpath, partition)
-	if err != nil {
-		return fmt.Errorf("Error in Importing certificate key (%s): %s ", name, err)
-	}
 
+	sourcePath, err := client.UploadKey(name, certpath)
+	if err != nil {
+		return fmt.Errorf("Error in Uploading certificate key (%s): %s ", name, err)
+	}
+	certkey := bigip.Key{
+		Name:       name,
+		SourcePath: sourcePath,
+		Partition:  partition,
+		Passphrase: passPhrase,
+	}
+	log.Printf("[DEBUG] certkey: %+v\n", certkey)
+	err = client.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
 	d.SetId(name)
 	return resourceBigipSslKeyRead(d, meta)
 }
@@ -141,11 +158,23 @@ func resourceBigipSslKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 		name = name + ".key"
 	}*/
 	partition := d.Get("partition").(string)
-	err := client.UpdateKey(name, certpath, partition)
-	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
-	}
+	passPhrase := d.Get("passphrase").(string)
 
+	sourcePath, err := client.UploadKey(name, certpath)
+	if err != nil {
+		return fmt.Errorf("Error in Uploading certificate key (%s): %s ", name, err)
+	}
+	certkey := bigip.Key{
+		Name:       name,
+		SourcePath: sourcePath,
+		Partition:  partition,
+		Passphrase: passPhrase,
+	}
+	keyName := fmt.Sprintf("/%s/%s", partition, name)
+	err = client.ModifyKey(keyName, &certkey)
+	if err != nil {
+		return err
+	}
 	return resourceBigipSslKeyRead(d, meta)
 }
 

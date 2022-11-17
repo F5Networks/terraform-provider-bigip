@@ -14,12 +14,14 @@ package bigip
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -31,6 +33,18 @@ var defaultConfigOptions = &ConfigOptions{
 
 type ConfigOptions struct {
 	APICallTimeout time.Duration
+}
+
+type Config struct {
+	Address            string
+	Port               string
+	Username           string
+	Password           string
+	Token              string
+	CertVerifyDisable  bool
+	TrustedCertificate string
+	LoginReference     string `json:"loginProviderName"`
+	ConfigOptions      *ConfigOptions
 }
 
 // BigIP is a container for our session state.
@@ -82,29 +96,30 @@ func (r *RequestError) Error() error {
 }
 
 // NewSession sets up our connection to the BIG-IP system.
-func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *BigIP {
+// func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *BigIP {
+func NewSession(bigipConfig *Config) *BigIP {
 	var url string
-	if !strings.HasPrefix(host, "http") {
-		url = fmt.Sprintf("https://%s", host)
+	if !strings.HasPrefix(bigipConfig.Address, "http") {
+		url = fmt.Sprintf("https://%s", bigipConfig.Address)
 	} else {
-		url = host
+		url = bigipConfig.Address
 	}
-	if port != "" {
-		url = url + ":" + port
+	if bigipConfig.Port != "" {
+		url = url + ":" + bigipConfig.Port
 	}
-	if configOptions == nil {
-		configOptions = defaultConfigOptions
+	if bigipConfig.ConfigOptions == nil {
+		bigipConfig.ConfigOptions = defaultConfigOptions
 	}
 	return &BigIP{
 		Host:     url,
-		User:     user,
-		Password: passwd,
+		User:     bigipConfig.Username,
+		Password: bigipConfig.Password,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: false,
+				InsecureSkipVerify: bigipConfig.CertVerifyDisable,
 			},
 		},
-		ConfigOptions: configOptions,
+		ConfigOptions: bigipConfig.ConfigOptions,
 	}
 }
 
@@ -113,7 +128,7 @@ func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *
 // Auth. This is required when using an external authentication
 // provider, such as Radius or Active Directory. loginProviderName is
 // probably "tmos" but your environment may vary.
-func NewTokenSession(host, port, user, passwd, loginProviderName string, configOptions *ConfigOptions) (b *BigIP, err error) {
+func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 	type authReq struct {
 		Username          string `json:"username"`
 		Password          string `json:"password"`
@@ -126,9 +141,9 @@ func NewTokenSession(host, port, user, passwd, loginProviderName string, configO
 	}
 
 	auth := authReq{
-		user,
-		passwd,
-		loginProviderName,
+		bigipConfig.Username,
+		bigipConfig.Password,
+		bigipConfig.LoginReference,
 	}
 
 	marshalJSON, err := json.Marshal(auth)
@@ -143,7 +158,26 @@ func NewTokenSession(host, port, user, passwd, loginProviderName string, configO
 		ContentType: "application/json",
 	}
 
-	b = NewSession(host, port, user, passwd, configOptions)
+	b = NewSession(bigipConfig)
+	if !bigipConfig.CertVerifyDisable {
+		rootCAs, _ := x509.SystemCertPool()
+		if rootCAs == nil {
+			rootCAs = x509.NewCertPool()
+		}
+		certPEM, err := os.ReadFile(bigipConfig.TrustedCertificate)
+		if err != nil {
+			return b, fmt.Errorf("provide Valid Trusted certificate path :%+v", err)
+			// log.Printf("[DEBUG]read cert PEM/crt file error:%+v", err)
+		}
+		// TODO: Make sure appMgr sets certificates in bigipInfo
+		// certs := certPEM)
+
+		// Append our certs to the system pool
+		if ok := rootCAs.AppendCertsFromPEM(certPEM); !ok {
+			fmt.Println("[DEBUG] No certs appended, using only system certs")
+		}
+		b.Transport.TLSClientConfig.RootCAs = rootCAs
+	}
 	resp, err := b.APICall(req)
 	if err != nil {
 		return
@@ -168,6 +202,18 @@ func NewTokenSession(host, port, user, passwd, loginProviderName string, configO
 	b.Token = aresp.Token.Token
 
 	return
+}
+
+// APICall is used to Validate BIG-IP with SelfIPs list
+func (client *BigIP) ValidateConnection() error {
+	t, err := client.SelfIPs()
+	if err != nil {
+		return err
+	}
+	if t == nil {
+		return nil
+	}
+	return nil
 }
 
 // APICall is used to query the BIG-IP web API.

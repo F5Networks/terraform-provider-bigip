@@ -65,7 +65,9 @@ resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile" {
 
 * `timewait_recycle` - (Optional,type `string`) Using this setting enabled, the system can recycle a wait-state connection immediately upon receipt of a new connection request instead of having to wait until the connection times out of the wait state. By default, this setting is enabled.
 
-* `fast_open` - (Optional,type `string`) When enabled, permits TCP Fast Open, allowing properly equipped TCP clients to send data with the SYN packet.
+* `fast_open` - (Optional,type `string`) When enabled, permits TCP Fast Open, allowing properly equipped TCP clients to send data with the SYN packet. Default is `enabled`. If `fast_open` set to `enabled`, argument `verified_accept` can't be set to `enabled`.
+
+* `verified_accept` - (Optional,type `string`) Specifies, when checked (enabled), that the system can actually communicate with the server before establishing a client connection. To determine this, the system sends the server a SYN packet before responding to the client's SYN with a SYN-ACK. When unchecked, the system accepts the client connection before selecting a server to talk to. By default, this setting is `disabled`.
 
 * `deferred_accept` - (Optional,type `string`) Specifies, when enabled, that the system defers allocation of the connection chain context until the client response is received. This option is useful for dealing with 3-way handshake DOS attacks. The default value is disabled.
 

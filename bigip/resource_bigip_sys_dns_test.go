@@ -12,23 +12,20 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_DNS_NAME = fmt.Sprintf("/%s/test-dns", TEST_PARTITION)
+var TestDnsName = fmt.Sprintf("/%s/test-dns", TEST_PARTITION)
 
-var TEST_DNS_RESOURCE = `
+var TestDnsResource = `
 resource "bigip_sys_dns" "test-dns" {
-   description = "` + TEST_DNS_NAME + `"
+   description = "` + TestDnsName + `"
    name_servers = ["1.1.1.1"]
-   number_of_dots = 2
    search = ["f5.com"]
 }
-
 `
 
-func TestAccBigipSysdns_create(t *testing.T) {
+func TestAccBigipSysDNSCreateTC1(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -36,24 +33,20 @@ func TestAccBigipSysdns_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DNS_RESOURCE,
+				Config: TestDnsResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckdnsExists(TEST_DNS_NAME, true),
-					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "description", TEST_DNS_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "number_of_dots", "2"),
-					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns",
-						fmt.Sprintf("name_servers.%d", schema.HashString("1.1.1.1")),
-						"1.1.1.1"),
-					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns",
-						fmt.Sprintf("search.%d", schema.HashString("f5.com")),
-						"f5.com"),
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "description", TestDnsName),
+					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr("bigip_sys_dns.test-dns", "search.0", "f5.com"),
 				),
 			},
 		},
 	})
 }
 
-func TestAccBigipSysdns_import(t *testing.T) {
+func TestAccBigipSysDNSCreateTC2(t *testing.T) {
+	var TestDnsName = "test-dns-tc2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -61,11 +54,101 @@ func TestAccBigipSysdns_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_DNS_RESOURCE,
+				Config: getsysDNSConfigTC2(TestDnsName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckdnsExists(TEST_DNS_NAME, true),
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "search.0", "f5.com"),
 				),
-				ResourceName:      TEST_DNS_NAME,
+			},
+			{
+				Config: getsysDNSConfigTC2(TestDnsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "search.0", "f5.com"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSysDNSCreateTC3(t *testing.T) {
+	var TestDnsName = "test-dns-tc3"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: getsysDNSConfigTC3(TestDnsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "search.0", "f5.com"),
+				),
+			},
+			{
+				Config: getsysDNSConfigTC3a(TestDnsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.1", "2.2.2.2"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "search.0", "f5.com"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "search.1", "f5.net"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSysDNSCreateTC4(t *testing.T) {
+	var TestDnsName = "test-dns-tc4"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: getsysDNSConfigTC4(TestDnsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+					testCheckdnsExists("test-dns-tc4", false),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.1", "2.2.2.2"),
+				),
+			},
+			{
+				Config: getsysDNSConfigTC4(TestDnsName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
+					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipSysDNSImport(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: TestDnsResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckdnsExists(TestDnsName, true),
+				),
+				ResourceName:      TestDnsName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -82,13 +165,46 @@ func testCheckdnsExists(description string, exists bool) resource.TestCheckFunc 
 			return err
 		}
 		if exists && dns == nil {
-			return fmt.Errorf("dns %s was not created.", description)
-
+			return fmt.Errorf("dns %s was not created ", description)
 		}
 		if !exists && dns != nil {
-			return fmt.Errorf("dns %s still exists.", description)
-
+			return fmt.Errorf("dns %s still exists ", description)
 		}
 		return nil
 	}
+}
+
+func getsysDNSConfigTC2(sysDNSName string) string {
+	return fmt.Sprintf(`
+resource "bigip_sys_dns" "test-dns-tc2" {
+  description  = "%v"
+  name_servers = ["1.1.1.1"]
+  search       = ["f5.com"]
+}`, sysDNSName)
+}
+
+func getsysDNSConfigTC3(sysDNSName string) string {
+	return fmt.Sprintf(`
+resource "bigip_sys_dns" "test-dns-tc3" {
+  description  = "%v"
+  name_servers = ["1.1.1.1"]
+  search       = ["f5.com"]
+}`, sysDNSName)
+}
+
+func getsysDNSConfigTC3a(sysDNSName string) string {
+	return fmt.Sprintf(`
+resource "bigip_sys_dns" "test-dns-tc3" {
+  description  = "%v"
+  name_servers = ["1.1.1.1", "2.2.2.2"]
+  search       = ["f5.com", "f5.net"]
+}`, sysDNSName)
+}
+
+func getsysDNSConfigTC4(sysDNSName string) string {
+	return fmt.Sprintf(`
+resource "bigip_sys_dns" "test-dns-tc4" {
+  description  = "%v"
+  name_servers = ["1.1.1.1", "2.2.2.2"]
+}`, sysDNSName)
 }
