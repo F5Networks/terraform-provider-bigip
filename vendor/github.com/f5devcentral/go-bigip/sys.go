@@ -459,25 +459,15 @@ func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
 }
 
 // UploadKey copies a certificate key from local disk to BIGIP
-func (b *BigIP) UploadKey(keyname, keypath, partition string) error {
+func (b *BigIP) UploadKey(keyname, keypath string) (string, error) {
 	keybyte := []byte(keypath)
 	_, err := b.UploadBytes(keybyte, keyname)
 	if err != nil {
-		return err
+		return "", err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
-	log.Println("string:", sourcepath)
-	certkey := Key{
-		Name:       keyname,
-		SourcePath: sourcepath,
-		Partition:  partition,
-	}
-	log.Printf("certkey: %+v\n", certkey)
-	err = b.AddKey(&certkey)
-	if err != nil {
-		return err
-	}
-	return nil
+	log.Println("[DEBUG] string:", sourcepath)
+	return sourcepath, nil
 }
 
 // UpdateKey copies a certificate key from local disk to BIGIP
@@ -488,14 +478,14 @@ func (b *BigIP) UpdateKey(keyname, keypath, partition string) error {
 		return err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
-	log.Println("string:", sourcepath)
+	log.Println("[DEBUG]string:", sourcepath)
 	certkey := Key{
 		Name:       keyname,
 		SourcePath: sourcepath,
 		Partition:  partition,
 	}
 	keyName := fmt.Sprintf("/%s/%s", partition, keyname)
-	log.Printf("keyName: %+v\n", keyName)
+	log.Printf("[DEBUG]keyName: %+v\n", keyName)
 	err = b.ModifyKey(keyName, &certkey)
 	if err != nil {
 		return err
