@@ -92,7 +92,7 @@ func resourceBigipDo() *schema.Resource {
 func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	clientBigip := meta.(*bigip.BigIP)
 
-	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" || d.Get("bigip_port").(string) != "" {
 		clientBigip2, err := connectBigIP(d)
 		if err != nil {
 			log.Printf("Connection to BIGIP Failed with :%v", err)
@@ -273,7 +273,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	clientBigip := meta.(*bigip.BigIP)
-	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" || d.Get("bigip_port").(string) != "" {
 		clientBigip2, err := connectBigIP(d)
 		if err != nil {
 			log.Printf("Connection to BIGIP Failed with :%v", err)
@@ -329,7 +329,7 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 	clientBigip := meta.(*bigip.BigIP)
-	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" || d.Get("bigip_port").(string) != "" {
 		clientBigip2, err := connectBigIP(d)
 		if err != nil {
 			log.Printf("Connection to BIGIP Failed with :%v", err)
@@ -376,7 +376,7 @@ func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, erro
 
 func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	clientBigip := meta.(*bigip.BigIP)
-	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" && d.Get("bigip_port").(string) != "" {
+	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" || d.Get("bigip_port").(string) != "" {
 		clientBigip2, err := connectBigIP(d)
 		if err != nil {
 			log.Printf("Connection to BIGIP Failed with :%v", err)
@@ -546,9 +546,15 @@ func resourceBigipDoDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
+	var portVal string
+	if _, ok := d.GetOk("bigip_port"); ok {
+		portVal = d.Get("bigip_port").(string)
+	} else {
+		portVal = "443"
+	}
 	bigipConfig := bigip.Config{
 		Address:           d.Get("bigip_address").(string),
-		Port:              d.Get("bigip_port").(string),
+		Port:              portVal,
 		Username:          d.Get("bigip_user").(string),
 		Password:          d.Get("bigip_password").(string),
 		CertVerifyDisable: true,
