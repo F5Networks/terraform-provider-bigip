@@ -11,8 +11,8 @@ import (
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceBigipWafEntityUrl() *schema.Resource {
@@ -95,7 +95,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 
 	name := d.Get("name").(string)
 	d.SetId(name)
-	log.Println("[INFO] Creating URL " + name)
+	log.Println("[INFO] Creating URL :" + name)
 
 	urlJson := &bigip.WafUrlJson{
 		Name:                      name,

@@ -7,19 +7,36 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
+	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"reflect"
 	"regexp"
 	"strings"
-
-	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
-func Provider() terraform.ResourceProvider {
+func init() {
+	// Set descriptions to support markdown syntax, this will be used in document generation
+	// and the language server.
+	schema.DescriptionKind = schema.StringMarkdown
+
+	// Customize the content of descriptions when output. For example you can add defaults on
+	// to the exported descriptions if present.
+	// schema.SchemaDescriptionBuilder = func(s *schema.Schema) string {
+	// 	desc := s.Description
+	// 	if s.Default != nil {
+	// 		desc += fmt.Sprintf(" Defaults to `%v`.", s.Default)
+	// 	}
+	// 	return strings.TrimSpace(desc)
+	// }
+}
+
+func Provider() *schema.Provider {
 	p := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"address": {
@@ -158,19 +175,19 @@ func Provider() terraform.ResourceProvider {
 			"bigip_waf_policy":                      resourceBigipAwafPolicy(),
 		},
 	}
-	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+		tflog.Debug(ctx, "ConfigureContextFunc")
+
 		terraformVersion := p.TerraformVersion
 		if terraformVersion == "" {
-			// Terraform 0.12 introduced this field to the protocol
-			// We can therefore assume that if it's missing it's 0.10 or 0.11
 			terraformVersion = "0.11+compatible"
 		}
-		return providerConfigure(d, terraformVersion)
+		return providerConfigure(ctx, d, terraformVersion)
 	}
 	return p
 }
 
-func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
+func providerConfigure(ctx context.Context, d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
 	config := &bigip.Config{
 		Address:           d.Get("address").(string),
 		Port:              d.Get("port").(string),
@@ -182,15 +199,17 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)
 	}
+	// Warning or errors can be collected in a slice type
+	var diags diag.Diagnostics
 	if !d.Get("validate_certs_disable").(bool) {
 		if d.Get("trusted_cert_path").(string) == "" {
-			return nil, fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path")
+			return nil, diag.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path")
 		}
 		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}
 	cfg, err := Client(config)
 	if err != nil {
-		return cfg, err
+		return cfg, diag.FromErr(err)
 	}
 	if cfg != nil {
 		cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
@@ -198,7 +217,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		cfg.Teem = d.Get("teem_disable").(bool)
 		cfg.Transport.TLSClientConfig.InsecureSkipVerify = d.Get("validate_certs_disable").(bool)
 	}
-	return cfg, err
+	return cfg, diags
 }
 
 // Convert slice of strings to schema.TypeSet

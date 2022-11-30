@@ -292,12 +292,6 @@ type Parameter struct {
 	PerformStaging                 bool                     `json:"performStaging,omitempty"`
 	SensitiveParameter             bool                     `json:"sensitiveParameter,omitempty"`
 	SignatureOverrides             []map[string]interface{} `json:"signatureOverrides,omitempty"`
-	URL                            struct {
-		Method   string `json:"method,omitempty"`
-		Name     string `json:"name,omitempty"`
-		Protocol string `json:"protocol,omitempty"`
-		Type     string `json:"type,omitempty"`
-	} `json:"url,omitempty"`
 }
 
 func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {

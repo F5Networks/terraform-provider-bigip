@@ -1158,7 +1158,6 @@ type tcpDTO struct {
 	EarlyRetransmit   string `json:"earlyRetransmit,omitempty"`
 	TailLossProbe     string `json:"tailLossProbe,omitempty"`
 	TimeWaitRecycle   string `json:"timeWaitRecycle,omitempty"`
-	VerifiedAccept    string `json:"verifiedAccept,omitempty"`
 	ProxyBufferHigh   int    `json:"proxyBufferHigh,omitempty"`
 	ReceiveWindowSize int    `json:"receiveWindowSize,omitempty"`
 	SendBufferSize    int    `json:"sendBufferSize,omitempty"`
@@ -1190,7 +1189,6 @@ type Tcp struct {
 	ReceiveWindowSize int
 	SendBufferSize    int
 	TimeWaitRecycle   string
-	VerifiedAccept    string
 	ZeroWindowTimeout int
 	InitCwnd          int
 	FastOpen          string

@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccBigipLtmDataGroup_basic(t *testing.T) {
@@ -34,7 +34,8 @@ func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 			{
 				ResourceName:      resName,
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateId:     fmt.Sprintf("%s:internal", dataGroupFullName),
+				ImportStateVerify: false,
 			},
 		},
 	})

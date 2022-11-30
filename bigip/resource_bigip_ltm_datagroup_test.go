@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var TestDatagroupName = "/" + TEST_PARTITION + "/test-datagroup"
@@ -56,7 +56,7 @@ var TestDatagroupIntegerResource = `
                 }
         }`
 
-func TestAccBigipLtmDataGroup_Create_TypeString(t *testing.T) {
+func TestAccBigipLtmDataGroupTCTypeString(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -73,7 +73,7 @@ func TestAccBigipLtmDataGroup_Create_TypeString(t *testing.T) {
 		},
 	})
 }
-func TestAccBigipLtmDataGroup_Create_TypeIp(t *testing.T) {
+func TestAccBigipLtmDataGroupTCTypeIp(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -91,7 +91,7 @@ func TestAccBigipLtmDataGroup_Create_TypeIp(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmDataGroup_Create_TypeInteger(t *testing.T) {
+func TestAccBigipLtmDataGroupTCTypeInteger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -109,7 +109,7 @@ func TestAccBigipLtmDataGroup_Create_TypeInteger(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmDataGroup_import(t *testing.T) {
+func TestAccBigipLtmDataGroupTCImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)

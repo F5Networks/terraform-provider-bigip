@@ -46,8 +46,8 @@ type NTPs struct {
 }
 
 type NTP struct {
-	Description string   `json:"description"`
-	Servers     []string `json:"servers"`
+	Description string   `json:"description,omitempty"`
+	Servers     []string `json:"servers,omitempty"`
 	Timezone    string   `json:"timezone,omitempty"`
 }
 
@@ -69,10 +69,10 @@ type DNSs struct {
 }
 
 type DNS struct {
-	Description  string   `json:"description"`
-	NameServers  []string `json:"nameServers,"`
+	Description  string   `json:"description,omitempty"`
+	NameServers  []string `json:"nameServers,omitempty"`
 	NumberOfDots int      `json:"numberOfDots,omitempty"`
-	Search       []string `json:"search"`
+	Search       []string `json:"search,omitempty"`
 }
 
 type Provisions struct {
@@ -459,15 +459,25 @@ func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
 }
 
 // UploadKey copies a certificate key from local disk to BIGIP
-func (b *BigIP) UploadKey(keyname, keypath string) (string, error) {
+func (b *BigIP) UploadKey(keyname, keypath, partition string) error {
 	keybyte := []byte(keypath)
 	_, err := b.UploadBytes(keybyte, keyname)
 	if err != nil {
-		return "", err
+		return err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
-	log.Println("[DEBUG] string:", sourcepath)
-	return sourcepath, nil
+	log.Println("string:", sourcepath)
+	certkey := Key{
+		Name:       keyname,
+		SourcePath: sourcepath,
+		Partition:  partition,
+	}
+	log.Printf("certkey: %+v\n", certkey)
+	err = b.AddKey(&certkey)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateKey copies a certificate key from local disk to BIGIP
@@ -478,14 +488,14 @@ func (b *BigIP) UpdateKey(keyname, keypath, partition string) error {
 		return err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + keyname
-	log.Println("[DEBUG]string:", sourcepath)
+	log.Println("string:", sourcepath)
 	certkey := Key{
 		Name:       keyname,
 		SourcePath: sourcepath,
 		Partition:  partition,
 	}
 	keyName := fmt.Sprintf("/%s/%s", partition, keyname)
-	log.Printf("[DEBUG]keyName: %+v\n", keyName)
+	log.Printf("keyName: %+v\n", keyName)
 	err = b.ModifyKey(keyName, &certkey)
 	if err != nil {
 		return err
@@ -544,7 +554,7 @@ func (b *BigIP) CreateNTP(description string, servers []string, timezone string)
 }
 
 func (b *BigIP) ModifyNTP(config *NTP) error {
-	return b.patch(config, uriSys, uriNtp)
+	return b.put(config, uriSys, uriNtp)
 }
 
 func (b *BigIP) NTPs() (*NTP, error) {
@@ -588,7 +598,7 @@ func (b *BigIP) CreateDNS(description string, nameservers []string, numberofdots
 }
 
 func (b *BigIP) ModifyDNS(config *DNS) error {
-	return b.patch(config, uriSys, uriDNS)
+	return b.put(config, uriSys, uriDNS)
 }
 
 // DNS & NTP resource does not support Delete API
