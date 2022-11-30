@@ -128,7 +128,7 @@ func resourceBigiqAs3() *schema.Resource {
 					}
 					return true
 				},
-				ValidateFunc: validation.ValidateJsonString,
+				ValidateFunc: validation.StringIsJSON,
 			},
 			"ignore_metadata": {
 				Type:        schema.TypeBool,
