@@ -7,23 +7,28 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
+	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"log"
 	"os"
 	"regexp"
 	"strings"
-
-	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
+// Warning or errors can be collected in a slice type
+var diags diag.Diagnostics
 
 func resourceBigipLtmDataGroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmDataGroupCreate,
-		Read:   resourceBigipLtmDataGroupRead,
-		Update: resourceBigipLtmDataGroupUpdate,
-		Delete: resourceBigipLtmDataGroupDelete,
-		//Exists: resourceBigipLtmDataGroupExists,
+		Description:   "Manages internal (in-line)/external datagroup configuration",
+		CreateContext: resourceBigipLtmDataGroupCreate,
+		ReadContext:   resourceBigipLtmDataGroupRead,
+		UpdateContext: resourceBigipLtmDataGroupUpdate,
+		DeleteContext: resourceBigipLtmDataGroupDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -74,7 +79,7 @@ func resourceBigipLtmDataGroup() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmDataGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var name string
 	dgtype := d.Get("type").(string)
@@ -82,7 +87,8 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 	tmplPath := d.Get("records_src").(string)
 	name = d.Get("name").(string)
 
-	log.Printf("[INFO] Creating Data Group List %+v", name)
+	tflog.Info(ctx, fmt.Sprintf("Creating Data Group List:%+v", name))
+	var diags diag.Diagnostics
 	if d.Get("internal").(bool) {
 		var records []bigip.DataGroupRecord
 		if rs.Len() > 0 {
@@ -100,25 +106,26 @@ func resourceBigipLtmDataGroupCreate(d *schema.ResourceData, meta interface{}) e
 		}
 		err := client.AddInternalDataGroup(dg)
 		if err != nil {
-			return fmt.Errorf("Error creating Data Group List %s: %v ", name, err)
+			return diag.Errorf("Error creating Data Group List %s: %v ", name, err)
 		}
 	} else {
 		res := strings.Split(name, "/")
 		file, fail := os.OpenFile(tmplPath, os.O_RDWR, 0644)
 		if fail != nil {
-			return fmt.Errorf("error in reading file: %s", fail)
+			return diag.Errorf("error in reading file: %s", fail)
 		}
 		err := client.UploadDatagroup(file, res[2], res[1], dgtype, true)
 		defer file.Close()
 		if err != nil {
-			return fmt.Errorf("error in creating External Datagroup (%s): %s", name, err)
+			return diag.Errorf("error in creating External Datagroup (%s): %s", name, err)
 		}
 	}
 	d.SetId(name)
-	return resourceBigipLtmDataGroupRead(d, meta)
+	resourceBigipLtmDataGroupRead(ctx, d, meta)
+	return diags
 }
 
-func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var records []map[string]interface{}
 
@@ -128,12 +135,12 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 	if d.Get("internal").(bool) {
 		datagroup, err := client.GetInternalDataGroup(name[0])
 		if err != nil {
-			return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
+			return diag.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 		}
 		if datagroup == nil {
 			log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 			d.SetId("")
-			return nil
+			return diags
 		}
 		_ = d.Set("name", datagroup.FullPath)
 		_ = d.Set("type", datagroup.Type)
@@ -145,55 +152,55 @@ func resourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) err
 			records = append(records, dgRecord)
 		}
 		if err := d.Set("record", records); err != nil {
-			return fmt.Errorf("Error updating records in state for Data Group List %s: %v ", name, err)
+			return diag.Errorf("Error updating records in state for Data Group List %s: %v ", name, err)
 		}
 	} else {
 		if len(name) > 1 && name[1] == "external" {
 			datagroup, err := client.GetExternalDataGroup(name[0])
 			if err != nil {
-				return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
+				return diag.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 			}
 			if datagroup == nil {
 				log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 				d.SetId("")
-				return nil
+				return diags
 			}
 			_ = d.Set("name", datagroup.FullPath)
 			_ = d.Set("type", datagroup.Type)
 		} else if len(name) > 1 && name[1] == "internal" {
 			datagroup, err := client.GetInternalDataGroup(name[0])
 			if err != nil {
-				return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
+				return diag.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 			}
 			if datagroup == nil {
 				log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 				d.SetId("")
-				return nil
+				return diags
 			}
 			_ = d.Set("name", datagroup.FullPath)
 			_ = d.Set("type", datagroup.Type)
 		} else {
 			datagroup, err := client.GetExternalDataGroup(name[0])
 			if err != nil {
-				return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
+				return diag.Errorf("Error retrieving Data Group List %s: %v ", name, err)
 			}
 			if datagroup == nil {
 				log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 				d.SetId("")
-				return nil
+				return diags
 			}
 			_ = d.Set("name", datagroup.FullPath)
 			_ = d.Set("type", datagroup.Type)
 		}
 	}
-	return nil
+	return diags
 }
 
-func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmDataGroupUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[DEBUG] Modifying Data Group List %s", name)
+	log.Printf("[INFO] Modifying Data Group List %s", name)
 
 	rs := d.Get("record").(*schema.Set)
 	dgtype := d.Get("type").(string)
@@ -222,7 +229,7 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 
 		ver, err := client.BigipVersion()
 		if err != nil {
-			return fmt.Errorf("Could not get BigipVersion: %v ", err)
+			return diag.Errorf("Could not get BigipVersion: %v ", err)
 		}
 
 		bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
@@ -232,12 +239,12 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		if matchresult {
 			log.Printf("[DEBUG] Bigip version is : %s", regversion)
 			if err := client.ModifyInternalDataGroupRecords(dgver1213); err != nil {
-				return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
+				return diag.Errorf("Error modifying Data Group List %s: %v ", name, err)
 			}
 		} else {
 			log.Printf("[DEBUG] Bigip version is : %s", regversion)
 			if err := client.ModifyInternalDataGroupRecords(dgver); err != nil {
-				return fmt.Errorf("Error modifying Data Group List %s: %v ", name, err)
+				return diag.Errorf("Error modifying Data Group List %s: %v ", name, err)
 			}
 		}
 	} else {
@@ -245,38 +252,38 @@ func resourceBigipLtmDataGroupUpdate(d *schema.ResourceData, meta interface{}) e
 		res := strings.Split(name, "/")
 		file, fail := os.OpenFile(tmplPath, os.O_RDWR, 0644)
 		if fail != nil {
-			return fmt.Errorf("error in reading file: %s", fail)
+			return diag.Errorf("error in reading file: %s", fail)
 		}
 		err := client.UploadDatagroup(file, res[2], res[1], dgtype, true)
 		defer file.Close()
 		if err != nil {
-			return fmt.Errorf("error in creating External Datagroup (%s): %s", name, err)
+			return diag.Errorf("error in creating External Datagroup (%s): %s", name, err)
 		}
 	}
-	return resourceBigipLtmDataGroupRead(d, meta)
+	return resourceBigipLtmDataGroupRead(ctx, d, meta)
 }
 
-func resourceBigipLtmDataGroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmDataGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Printf("[DEBUG] Deleting Data Group List %s", name)
+	log.Printf("[INFO] Deleting Data Group List %s", name)
 	if d.Get("internal").(bool) {
 		err := client.DeleteInternalDataGroup(name)
 		if err != nil {
-			return fmt.Errorf("Error deleting Data Group List %s: %v ", name, err)
+			return diag.Errorf("Error deleting Data Group List %s: %v ", name, err)
 		}
 	} else {
 		err := client.DeleteExternalDataGroup(name)
 		if err != nil {
-			return fmt.Errorf("Error deleting Data Group List %s: %v ", name, err)
+			return diag.Errorf("Error deleting Data Group List %s: %v ", name, err)
 		}
 		err = client.DeleteExternalDatagroupfile(name)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Delete External Datagroup file   (%s) (%v) ", name, err)
-			return err
+			return diag.FromErr(err)
 		}
 	}
 	d.SetId("")
-	return nil
+	return diags
 }
