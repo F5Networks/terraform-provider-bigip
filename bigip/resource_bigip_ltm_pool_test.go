@@ -46,7 +46,7 @@ resource "bigip_ltm_pool_attachment" "test-pool_test-node" {
 }
 `
 
-func TestAccBigipLtmPool_create(t *testing.T) {
+func TestAccBigipLtmPoolTCCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -74,7 +74,7 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmPool_import(t *testing.T) {
+func TestAccBigipLtmPoolTCModify(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -87,8 +87,28 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TestPoolName),
 				),
-				ResourceName:      TestPoolResource,
-				ImportState:       false,
+			},
+		},
+	})
+}
+func TestAccBigipLtmPoolTCImport(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestPoolResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolExists(TestPoolName),
+				),
+			},
+			{
+				ResourceName:      "bigip_ltm_pool.test-pool-import",
+				ImportStateId:     "/Common/test-pool",
+				ImportState:       true,
 				ImportStateVerify: true,
 			},
 		},

@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
@@ -21,7 +20,6 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 		Read:   resourceBigipLtmPersistenceProfileCookieRead,
 		Update: resourceBigipLtmPersistenceProfileCookieUpdate,
 		Delete: resourceBigipLtmPersistenceProfileCookieDelete,
-		Exists: resourceBigipLtmPersistenceProfileCookieExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -161,14 +159,11 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 	name := d.Get("name").(string)
 	parent := d.Get("defaults_from").(string)
 
-	/*err := client.CreateCookiePersistenceProfile(
-		name,
-		parent,
-	)*/
 	config := &bigip.PersistenceProfile{
 		Name:         name,
 		DefaultsFrom: parent,
 	}
+	log.Println("[INFO] Creating Cookie Persistence Profile " + name)
 	err := client.CreateCookiePersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Cookie Persistence Profile %s %v :", name, err)
@@ -199,6 +194,7 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	pp, err := client.GetCookiePersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Cookie Persistence Profile %s  %v : ", name, err)
+		d.SetId("")
 		return err
 	}
 	if pp == nil {
@@ -220,24 +216,17 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	_ = d.Set("hash_offset", pp.HashOffset)
 	_ = d.Set("method", pp.Method)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
-
 	if _, ok := d.GetOk("app_service"); ok {
-		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("app_service", pp.AppService)
 	}
 	// Specific to CookiePersistenceProfile
 	if _, ok := d.GetOk("cookie_encryption"); ok {
-		if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("cookie_encryption", pp.CookieEncryption)
 	}
 	if _, ok := d.GetOk("cookie_encryption_passphrase"); ok {
-		if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase)
 	}
 	if _, ok := d.GetOk("cookie_name"); ok {
 		_ = d.Set("cookie_name", pp.CookieName)
@@ -296,24 +285,4 @@ func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Cookie Persistence Profile " + name)
-
-	pp, err := client.GetCookiePersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Cookie Persistence Profile %s  %v : ", name, err)
-		return false, err
-	}
-	if pp == nil {
-		log.Printf("[WARN] persistence profile cookie (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-
-	return pp != nil, nil
 }

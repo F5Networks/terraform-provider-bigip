@@ -21,7 +21,6 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 		Read:   resourceBigipLtmPersistenceProfileDstAddrRead,
 		Update: resourceBigipLtmPersistenceProfileDstAddrUpdate,
 		Delete: resourceBigipLtmPersistenceProfileDstAddrDelete,
-		Exists: resourceBigipLtmPersistenceProfileDstAddrExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -117,6 +116,7 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 		Name:         name,
 		DefaultsFrom: parent,
 	}
+	log.Println("[INFO] Creating Destination Address Persistence Profile " + name)
 	err := client.CreateDestAddrPersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to create Dst Address Persistence profile %s  %v : ", name, err)
@@ -131,9 +131,7 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 		}
 		return err
 	}
-
 	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
-
 }
 
 func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta interface{}) error {
@@ -146,6 +144,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve DestAdd Persistence Profile %s %v :", name, err)
+		d.SetId("")
 		return err
 	}
 	if pp == nil {
@@ -162,22 +161,19 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
-		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("app_service", pp.AppService)
 	}
 	// Specific to DestAddrPersistenceProfile
 	if _, ok := d.GetOk("hash_algorithm"); ok {
-		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("hash_algorithm", pp.HashAlgorithm)
+
 	}
 	if _, ok := d.GetOk("mask"); ok {
-		d.Set("mask", pp.Mask)
+		_ = d.Set("mask", pp.Mask)
 	}
 	return nil
 }
@@ -187,53 +183,31 @@ func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, met
 
 	name := d.Id()
 	timeout := d.Get("timeout").(int)
-	if timeout != 0 {
-		pp := &bigip.DestAddrPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-				Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
-			},
+	pp := &bigip.DestAddrPersistenceProfile{
+		PersistenceProfile: bigip.PersistenceProfile{
+			AppService:              d.Get("app_service").(string),
+			DefaultsFrom:            d.Get("defaults_from").(string),
+			MatchAcrossPools:        d.Get("match_across_pools").(string),
+			MatchAcrossServices:     d.Get("match_across_services").(string),
+			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+			Mirror:                  d.Get("mirror").(string),
+			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+			Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
+		},
 
-			// Specific to DestAddrPersistenceProfile
-			HashAlgorithm: d.Get("hash_algorithm").(string),
-			Mask:          d.Get("mask").(string),
-		}
-
-		err := client.ModifyDestAddrPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile %s %v :", name, err)
-			return err
-		}
-	} else {
-		pp := &bigip.DestAddrPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			},
-
-			// Specific to DestAddrPersistenceProfile
-			HashAlgorithm: d.Get("hash_algorithm").(string),
-			Mask:          d.Get("mask").(string),
-		}
-
-		err := client.ModifyDestAddrPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile %s %v :", name, err)
-			return err
-		}
+		// Specific to DestAddrPersistenceProfile
+		HashAlgorithm: d.Get("hash_algorithm").(string),
+		Mask:          d.Get("mask").(string),
 	}
 
+	if timeout != 0 {
+		pp.Timeout = strconv.Itoa(d.Get("timeout").(int))
+	}
+	err := client.ModifyDestAddrPersistenceProfile(name, pp)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile %s %v :", name, err)
+		return err
+	}
 	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
 }
 
@@ -249,25 +223,4 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Destination Address Persistence Profile " + name)
-
-	pp, err := client.GetDestAddrPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve Destination Address Persistence Profile  (%s) ", err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-
-	return pp != nil, nil
 }

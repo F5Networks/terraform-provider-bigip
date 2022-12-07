@@ -268,6 +268,7 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	log.Println("[INFO] Updating node " + name)
 	address := d.Get("address").(string)
 	r := regexp.MustCompile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 

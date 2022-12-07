@@ -24,7 +24,6 @@ func resourceBigipLtmPool() *schema.Resource {
 		Read:   resourceBigipLtmPoolRead,
 		Update: resourceBigipLtmPoolUpdate,
 		Delete: resourceBigipLtmPoolDelete,
-		Exists: resourceBigipLtmPoolExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -101,14 +100,13 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Get("name").(string)
 	d.SetId(name)
 	log.Println("[INFO] Creating pool " + name)
-	err := client.CreatePool(name)
-	if err != nil {
-		return fmt.Errorf("Error retrieving pool (%s): %s ", name, err)
+	poolSt := &bigip.Pool{
+		Name: name,
 	}
-	err = resourceBigipLtmPoolUpdate(d, meta)
+	config := getLtmPoolConfig(d, poolSt)
+	err := client.AddPool(config)
 	if err != nil {
-		_ = client.DeletePool(name)
-		return err
+		return fmt.Errorf("Error in creating pool (%s): %s ", name, err)
 	}
 	if !client.Teem {
 		id := uuid.New()
@@ -146,72 +144,26 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	if err := d.Set("allow_nat", pool.AllowNAT); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowNAT to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("allow_snat", pool.AllowSNAT); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowSNAT to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("load_balancing_mode", pool.LoadBalancingMode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving LoadBalancingMode to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("minimum_active_members", pool.MinActiveMembers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
-		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("allow_nat", pool.AllowNAT)
+	_ = d.Set("allow_snat", pool.AllowSNAT)
+	_ = d.Set("load_balancing_mode", pool.LoadBalancingMode)
+	_ = d.Set("slow_ramp_time", pool.SlowRampTime)
+	_ = d.Set("minimum_active_members", pool.MinActiveMembers)
+	_ = d.Set("service_down_action", pool.ServiceDownAction)
+	_ = d.Set("reselect_tries", pool.ReselectTries)
 	_ = d.Set("description", pool.Description)
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
-	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Monitors to state for Pool  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("monitors", makeStringSet(&monitors))
 	return nil
 }
-
-func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking pool " + name + " exists.")
-	pool, err := client.GetPool(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
-		return false, err
-	}
-	if pool == nil {
-		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-	return pool != nil, nil
-}
-
 func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	var monitors []string
-	if m, ok := d.GetOk("monitors"); ok {
-		for _, monitor := range m.(*schema.Set).List() {
-			monitors = append(monitors, monitor.(string))
-		}
+	poolSt := &bigip.Pool{
+		Name: name,
 	}
-	pool := &bigip.Pool{
-		AllowNAT:          d.Get("allow_nat").(string),
-		AllowSNAT:         d.Get("allow_snat").(string),
-		LoadBalancingMode: d.Get("load_balancing_mode").(string),
-		Description:       d.Get("description").(string),
-		MinActiveMembers:  d.Get("minimum_active_members").(int),
-		SlowRampTime:      d.Get("slow_ramp_time").(int),
-		ServiceDownAction: d.Get("service_down_action").(string),
-		ReselectTries:     d.Get("reselect_tries").(int),
-		Monitor:           strings.Join(monitors, " and "),
-	}
-	err := client.ModifyPool(name, pool)
+	config := getLtmPoolConfig(d, poolSt)
+	err := client.ModifyPool(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Pool   (%s) (%v) ", name, err)
 		return err
@@ -229,4 +181,22 @@ func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error 
 	}
 	d.SetId("")
 	return nil
+}
+func getLtmPoolConfig(d *schema.ResourceData, config *bigip.Pool) *bigip.Pool {
+	var monitors []string
+	if m, ok := d.GetOk("monitors"); ok {
+		for _, monitor := range m.(*schema.Set).List() {
+			monitors = append(monitors, monitor.(string))
+		}
+	}
+	config.AllowNAT = d.Get("allow_nat").(string)
+	config.AllowSNAT = d.Get("allow_snat").(string)
+	config.LoadBalancingMode = d.Get("load_balancing_mode").(string)
+	config.Description = d.Get("description").(string)
+	config.MinActiveMembers = d.Get("minimum_active_members").(int)
+	config.SlowRampTime = d.Get("slow_ramp_time").(int)
+	config.ServiceDownAction = d.Get("service_down_action").(string)
+	config.ReselectTries = d.Get("reselect_tries").(int)
+	config.Monitor = strings.Join(monitors, " and ")
+	return config
 }

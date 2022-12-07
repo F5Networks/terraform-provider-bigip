@@ -248,7 +248,8 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve HTTP Profile  (%s) ", err)
+		log.Printf("[ERROR]Unable to retrieve HTTP Profile: %s", err)
+		d.SetId("")
 		return err
 	}
 	if pp == nil {
@@ -259,6 +260,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	_ = d.Set("name", name)
 	_ = d.Set("defaults_from", pp.DefaultsFrom)
 	_ = d.Set("proxy_type", pp.ProxyType)
+	_ = d.Set("description", pp.Description)
 
 	if _, ok := d.GetOk("accept_xff"); ok {
 		_ = d.Set("accept_xff", pp.AcceptXff)
@@ -266,9 +268,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("basic_auth_realm"); ok {
 		_ = d.Set("basic_auth_realm", pp.BasicAuthRealm)
 	}
-	if _, ok := d.GetOk("description"); ok {
-		_ = d.Set("description", pp.Description)
-	}
+
 	if _, ok := d.GetOk("encrypt_cookie_secret"); ok {
 		_ = d.Set("encrypt_cookie_secret", pp.EncryptCookieSecret)
 	}

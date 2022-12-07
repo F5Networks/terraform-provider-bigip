@@ -42,7 +42,6 @@ func resourceBigipCommand() *schema.Resource {
 			},
 			"command_result": {
 				Type:     schema.TypeList,
-				Optional: true,
 				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -65,7 +64,6 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
 		var resultList []string
 		for _, str := range commandList {
-			log.Printf("[INFO] Command to run:%v", str)
 			commandConfig := &bigip.BigipCommand{
 				Command:     "run",
 				UtilCmdArgs: str,

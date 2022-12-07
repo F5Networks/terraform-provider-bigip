@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
@@ -21,7 +20,6 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 		Read:   resourceBigipLtmPersistenceProfileSrcAddrRead,
 		Update: resourceBigipLtmPersistenceProfileSrcAddrUpdate,
 		Delete: resourceBigipLtmPersistenceProfileSrcAddrDelete,
-		Exists: resourceBigipLtmPersistenceProfileSrcAddrExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -155,6 +153,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	pp, err := client.GetSourceAddrPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s)(%v) ", name, err)
+		d.SetId("")
 		return err
 	}
 	if pp == nil {
@@ -170,20 +169,15 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
-
 	if _, ok := d.GetOk("app_service"); ok {
-		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("app_service", pp.AppService)
 	}
 
 	// Specific to SourceAddrPersistenceProfile
 	if _, ok := d.GetOk("hash_algorithm"); ok {
-		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("hash_algorithm", pp.HashAlgorithm)
 	}
 	if _, ok := d.GetOk("map_proxies"); ok {
 		_ = d.Set("map_proxies", pp.MapProxies)
@@ -200,51 +194,28 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 
 	name := d.Id()
 	timeout := d.Get("timeout").(int)
+	pp := &bigip.SourceAddrPersistenceProfile{
+		PersistenceProfile: bigip.PersistenceProfile{
+			AppService:              d.Get("app_service").(string),
+			DefaultsFrom:            d.Get("defaults_from").(string),
+			MatchAcrossPools:        d.Get("match_across_pools").(string),
+			MatchAcrossServices:     d.Get("match_across_services").(string),
+			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+			Mirror:                  d.Get("mirror").(string),
+			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+		},
+		// Specific to SourceAddrPersistenceProfile
+		HashAlgorithm: d.Get("hash_algorithm").(string),
+		MapProxies:    d.Get("map_proxies").(string),
+		Mask:          d.Get("mask").(string),
+	}
 	if timeout != 0 {
-		pp := &bigip.SourceAddrPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-				Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
-			},
-
-			// Specific to SourceAddrPersistenceProfile
-			HashAlgorithm: d.Get("hash_algorithm").(string),
-			MapProxies:    d.Get("map_proxies").(string),
-			Mask:          d.Get("mask").(string),
-		}
-		err := client.ModifySourceAddrPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
-			return err
-		}
-	} else {
-		pp := &bigip.SourceAddrPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			},
-
-			// Specific to SourceAddrPersistenceProfile
-			HashAlgorithm: d.Get("hash_algorithm").(string),
-			MapProxies:    d.Get("map_proxies").(string),
-			Mask:          d.Get("mask").(string),
-		}
-		err := client.ModifySourceAddrPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
-			return err
-		}
+		pp.Timeout = strconv.Itoa(d.Get("timeout").(int))
+	}
+	err := client.ModifySourceAddrPersistenceProfile(name, pp)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
+		return err
 	}
 
 	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
@@ -262,24 +233,4 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Source Address Persistence Profile " + name)
-
-	pp, err := client.GetSourceAddrPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s) (%v)", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] persistence profile src_addr  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }

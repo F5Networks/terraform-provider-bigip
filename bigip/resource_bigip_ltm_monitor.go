@@ -37,7 +37,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 		Read:   resourceBigipLtmMonitorRead,
 		Update: resourceBigipLtmMonitorUpdate,
 		Delete: resourceBigipLtmMonitorDelete,
-		Exists: resourceBigipLtmMonitorExists,
+		//Exists: resourceBigipLtmMonitorExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -211,7 +211,7 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 		parent = "tcp-half-open"
 	}
 
-	err := client.CreateMonitor(config, parent)
+	err := client.AddMonitor(config, parent)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
