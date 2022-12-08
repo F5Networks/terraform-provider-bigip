@@ -14,9 +14,7 @@ https://github.com/F5Networks/f5-appsvcs-templates
 
 Example Usage
 
-.. code-block:: json
-   :caption: 
-   :linenos:
+::
 
    resource “bigip_fast_http_app” “app1” {
        application = “myApp3”
