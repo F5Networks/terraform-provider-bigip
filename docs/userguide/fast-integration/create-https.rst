@@ -14,7 +14,7 @@ On Terraform:
 
 - Using F5 BIG-IP provider version 1.16.0 or newer
 - Using Hashicorp versions following :ref:`versions`
-- Certificate and key files should be available under ~/terraform/scenario4:
+- Certificate and key files should be available under ``~/terraform/scenario4``:
 
   - app4.crt
   - app4.key
@@ -125,9 +125,9 @@ Create 5 files:
 
 |
 
-Now, run the following commands, so you can:
+Run the following commands so you can:
 
-1. Initialize the terraform project
+1. Initialize the Terraform project
 2. Plan the changes
 3. Apply the changes
 

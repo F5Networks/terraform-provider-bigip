@@ -19,7 +19,7 @@ On Terraform:
 
 Create HTTP application
 -----------------------
-Create 5 files in folder cd ~/terraform/scenario3/app1:
+Create 5 files in folder ``cd ~/terraform/scenario3/app1``:
 
 - main.tf
 - variables.tf
@@ -98,9 +98,9 @@ Create 5 files in folder cd ~/terraform/scenario3/app1:
 
 |
 
-Now, run the following commands, so you can:
+Run the following commands, so you can:
 
-1. Initialize the terraform project
+1. Initialize the Terraform project
 2. Plan the changes
 3. Apply the changes
 
@@ -198,7 +198,7 @@ Now, run the following commands, so you can:
 
 |
 
-Now you want to add a custom HTTP monitor and a snat pool. Update your terraform main.tf file with the following:
+Now you want to add a custom HTTP monitor and a snat pool. Update your Terraform main.tf file with the following:
 
 .. code-block:: json
    :caption: main.tf
@@ -225,7 +225,7 @@ Now you want to add a custom HTTP monitor and a snat pool. Update your terraform
 
 |
 
-Now, run the following commands, so we can:
+Run the following commands so you can:
 
 1. Plan the changes
 2. Apply the changes
@@ -363,9 +363,9 @@ Now, run the following commands, so we can:
 
 |
 
-Now you want to add a second virtual server or application in the same tenant. Create a second main.tf file in app2 folder with the following:
+Now you want to add a second virtual server or application in the same tenant. Create a second main.tf file in the app2 folder with the following:
 
-Create 5 files in folder cd ~/terraform/scenario3/app2:
+Create 5 files in folder ``cd ~/terraform/scenario3/app2``:
 
 - main.tf
 - variables.tf
@@ -449,7 +449,7 @@ Create 5 files in folder cd ~/terraform/scenario3/app2:
       
 |
 
-Now, run the following commands, so you can:
+Run the following commands so you can:
 
 1. Plan the changes
 2. Apply the changes
@@ -688,4 +688,4 @@ Now, run the following commands, so you can:
     }
 
 
-.. Note:: Note that you created two different application definitions sharing the same tenant in two different terraform projects. The FAST plugin makes the AS3 declarations reconciliation on the BIG-IP so you do not have to manage the stacking of them for a single tenant.
+.. Note:: Note that you created two different application definitions sharing the same tenant in two different Terraform projects. The FAST plugin makes the AS3 declarations reconcile on the BIG-IP so you do not have to manage the stacking of them for a single tenant.

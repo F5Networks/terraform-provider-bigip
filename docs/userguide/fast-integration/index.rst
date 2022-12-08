@@ -19,24 +19,28 @@ Example Usage
 .. code-block:: json
    :caption: 
    :linenos:
-   resource "bigip_fast_http_app" "myapp" {
-     tenant = "Mytenant"
-     application = "myapp"
-     virtual_server {
-       ip = "10.1.1.1"
-       port = "80"
-     }
-     fast_create_snat_pool_address = [ "10.2.2.2" ]
-     fast_create_pool_members {
-       addresses = [ "10.2.2.100" ]
-       port = "80"
-     }
-     load_balancing_mode = "least-connections-member"
-     fast_create_monitor {
-       send_string = "GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n"
-       response = "200 OK"
+
+   resource “bigip_fast_http_app” “app1” {
+       application = “myApp3”
+       tenant = “scenario3”
+       virtual_server {
+         ip = “10.1.10.223”
+         port = 80
+       }
+     pool_members {
+       addresses = [“10.1.10.120”, “10.1.10.121”, “10.1.10.122”]
+       port = 80
+       }
+     snat_pool_address = [“10.1.10.50”, “10.1.10.51”, “10.1.10.52”]
+     load_balancing_mode = “least-connections-member”
+     monitor {
+       send_string = “GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n” response = “200 OK”
      }
    }
+
+
+
+
 Terraform integration resouces/data source
              Here will have list with hyperlink to registry link FAST resource:
                                https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app

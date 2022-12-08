@@ -47,6 +47,8 @@ Create 4 files:
    username = "admin"
    password = "whatIsYourBigIPPassword?"
 
+|
+
 .. code-block:: json
    :caption: providers.tf
    :linenos:
@@ -64,6 +66,8 @@ Create 4 files:
      username = var.username
      password = var.password
    }
+
+|
 
 .. code-block:: json
    :caption: main.tf
@@ -85,10 +89,11 @@ Create 4 files:
      enable_fastl4		    = true
    }
 
+|
 
-Now, run the following commands, so we can:
+Run the following commands so you can:
 
-1. Initialize the terraform project
+1. Initialize the Terraform project
 2. Plan the changes
 3. Apply the changes
 

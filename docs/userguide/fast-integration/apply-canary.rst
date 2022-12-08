@@ -7,6 +7,8 @@ The goal of this template is to deploy a new HTTPS application using canary depl
 
 
 Pre-requisites
+--------------
+
 on the BIG-IP:
 
  version 16.1 minimal
@@ -15,13 +17,21 @@ on Terraform:
 
  use of F5 bigip provider version 1.16.0 minimal
  use of Hashicorp version following Link
+
+
 Create HTTPS application
+------------------------
 Create 4 files:
 
-main.tf
-variables.tf
-inputs.auto.tfvars
-providers.tf
+- main.tf
+- variables.tf
+- inputs.auto.tfvars
+- providers.tf
+
+.. code-block:: json
+   :caption: 
+   :linenos:
+
 variables.tf
 
 variable "bigip" {}
@@ -36,6 +46,13 @@ variable "partition" {
   type    = string
   default = "Common"
 }
+
+|
+
+.. code-block:: json
+   :caption: 
+   :linenos:
+
 inputs.tfvars
 
 bigip      = "10.1.1.9:443"
@@ -43,6 +60,13 @@ username   = "admin"
 password   = "A7U+=$vJ"
 partition  = "Common"
 policyname = "myApp7_ltm_policy"
+
+|
+
+.. code-block:: json
+   :caption: 
+   :linenos:
+
 providers.tf
 
 terraform {
@@ -58,6 +82,13 @@ provider "bigip" {
   username = var.username
   password = var.password
 }
+
+|
+
+.. code-block:: json
+   :caption: 
+   :linenos:
+
 main.tf
 
 resource "bigip_waf_policy" "app1_waf_v1" {
@@ -117,11 +148,18 @@ resource "bigip_fast_https_app" "this" {
   depends_on            = [bigip_waf_policy.app1_waf_v1, bigip_waf_policy.app1_waf_v2, module.canary_app1.lt
 mPolicyName]
 }
-Now, run the following commands, so we can:
 
-Initialize the terraform project
-Plan the changes
-Apply the changes
+
+
+Run the following commands so you can:
+
+1. Initialize the terraform project
+2. Plan the changes
+3. Apply the changes
+
+::
+
+  
 $ terraform init -upgrade
 Upgrading modules...
 Downloading git::https://github.com/fchmainy/waf_modules.git?ref=v1.0.8 for canary_app1...

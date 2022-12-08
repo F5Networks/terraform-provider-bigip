@@ -100,7 +100,7 @@ Create 5 files:
 
 |
 
-Now, run the following commands, so you can:
+Run the following commands so you can:
 
 1. Initialize the terraform project
 2. Plan the changes
@@ -345,12 +345,13 @@ Now, run the following commands, so you can:
 |
 
 
-The Terraform CLI output is designed to be parsed by humans. To get machine-readable format for automation, use the -json flag for JSON-formatted output.
+The Terraform CLI output is designed to be parsed by humans. To get a machine-readable format for automation, use the -json flag for JSON-formatted output.
 
-Checking the virtual server and pool status you discover both down. Now update your terraform main.tf file with the following: main.tf
+Checking the virtual server and pool status, you discover both are down. Update your terraform main.tf file with the following:
 
-
-::
+.. code-block:: json
+   :caption: main.tf
+   :linenos:
 
     resource "bigip_fast_tcp_app" "this" {
       application               = "myApp2"
@@ -370,7 +371,7 @@ Checking the virtual server and pool status you discover both down. Now update y
 
 |
 
-Now, run the following commands, so you can:
+Run the following commands so you can:
 
 1. Plan the changes
 2. Apply the changes
