@@ -3,8 +3,6 @@
 FAST Integration with Terraform
 ===============================
 
-Introduction
-------------
 The objective of this template is to demonstrate how FAST can be used to manage, deploy, and log changes in applications using Terraform as a resource manager through their API.
 
 F5 BIG-IP Application Services Templates (FAST) are an easy and effective way to deploy applications on the BIG-IP system using AS3.
@@ -15,7 +13,6 @@ https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/
 https://github.com/F5Networks/f5-appsvcs-templates
 
 Example Usage
-`````````````
 
 .. code-block:: json
    :caption: 
@@ -40,17 +37,14 @@ Example Usage
    }
 
 
-
-
 Terraform integration resouces/data source
 ``````````````````````````````````````````
-https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app
-https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_https_app
-https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_tcp_app
+- https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app
+- https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_https_app
+- https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_tcp_app
 
 
-Quick start Guide
-Additional lab guides
+**Additional lab guides**
 
 .. toctree::
    :maxdepth: 2
@@ -64,7 +58,3 @@ Additional lab guides
    /userguide/fast-integration/create-http-existing-pool.rst
    /userguide/fast-integration/create-awaf.rst
    /userguide/fast-integration/apply-canary.rst
-
-
-
-
