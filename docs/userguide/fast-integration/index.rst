@@ -15,6 +15,7 @@ https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/
 https://github.com/F5Networks/f5-appsvcs-templates
 
 Example Usage
+`````````````
 
 .. code-block:: json
    :caption: 
@@ -42,10 +43,10 @@ Example Usage
 
 
 Terraform integration resouces/data source
-             Here will have list with hyperlink to registry link FAST resource:
-                               https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app
-                               https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_https_app
-                               https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_tcp_app
+``````````````````````````````````````````
+https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app
+https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_https_app
+https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_tcp_app
 
 
 Quick start Guide
