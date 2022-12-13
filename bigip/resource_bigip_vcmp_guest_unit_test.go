@@ -7,12 +7,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAccBigipVcmpGuestUnitInvalid(t *testing.T) {
@@ -161,7 +161,7 @@ func TestAccBigipVcmpGuestUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(testguest##\\) is invalid"),
+				ExpectError: regexp.MustCompile(`HTTP 400 :: The requested object name (testguest##) is invalid`),
 			},
 		},
 	})
@@ -194,7 +194,7 @@ func TestAccBigipVcmpGuestUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested vCMP Guest \\(test-vcmp\\) was not found"),
+				ExpectError: regexp.MustCompile(`HTTP 404 :: The requested vCMP Guest (test-vcmp) was not found`),
 			},
 		},
 	})

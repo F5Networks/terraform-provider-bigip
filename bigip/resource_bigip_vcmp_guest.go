@@ -8,12 +8,12 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipVcmpGuest() *schema.Resource {
@@ -251,7 +251,7 @@ func resourceBigipVcmpGuestDelete(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 	disk, ok := d.GetOk("virtual_disk")
-	if d.Get("delete_virtual_disk").(bool) == true && ok {
+	if d.Get("delete_virtual_disk").(bool) && ok {
 		err := deleteVirtualDisk(d, meta)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Delete vCMP virtual disk  (%s) (%v) ", disk, err)
