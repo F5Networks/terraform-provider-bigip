@@ -16,11 +16,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_SNATPOOL_NAME = fmt.Sprintf("/%s/test-snatpool", TEST_PARTITION)
+var TestSnatpoolName = fmt.Sprintf("/%s/test-snatpool", TEST_PARTITION)
 
-var TEST_SNATPOOL_RESOURCE = `
+var TestSnatpoolResource = `
 resource "bigip_ltm_snatpool" "test-snatpool" {
-  name = "` + TEST_SNATPOOL_NAME + `"
+  name = "` + TestSnatpoolName + `"
   members = ["/Common/191.1.1.1","/Common/194.2.2.2"]
 }
 
@@ -35,10 +35,10 @@ func TestAccBigipLtmsnatpool_create(t *testing.T) {
 		CheckDestroy: testChecksnatpoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNATPOOL_RESOURCE,
+				Config: TestSnatpoolResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool", "name", TEST_SNATPOOL_NAME),
+					testChecksnatpoolExists(TestSnatpoolName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool", "name", TestSnatpoolName),
 					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
 						fmt.Sprintf("members.%d", schema.HashString("/Common/191.1.1.1")),
 						"/Common/191.1.1.1"),
@@ -60,11 +60,11 @@ func TestAccBigipLtmsnatpool_import(t *testing.T) {
 		CheckDestroy: testChecksnatpoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNATPOOL_RESOURCE,
+				Config: TestSnatpoolResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
+					testChecksnatpoolExists(TestSnatpoolName, true),
 				),
-				ResourceName:      TEST_SNATPOOL_NAME,
+				ResourceName:      TestSnatpoolName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

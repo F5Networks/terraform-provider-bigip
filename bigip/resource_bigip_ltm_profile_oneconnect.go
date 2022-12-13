@@ -154,6 +154,7 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	log.Printf("[INFO] Reading OneConnect Profile :%+v", name)
 	obj, err := client.GetOneconnect(name)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 	if obj == nil {
@@ -166,24 +167,16 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 		_ = d.Set("partition", obj.Partition)
 	}
 	if _, ok := d.GetOk("defaults_from"); ok {
-		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("defaults_from", obj.DefaultsFrom)
 	}
 	if _, ok := d.GetOk("share_pools"); ok {
-		if err := d.Set("share_pools", obj.SharePools); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving SharePools to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("share_pools", obj.SharePools)
 	}
 	if _, ok := d.GetOk("source_mask"); ok {
-		if err := d.Set("source_mask", obj.SourceMask); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving SourceMask to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("source_mask", obj.SourceMask)
 	}
 	if _, ok := d.GetOk("max_age"); ok {
-		if err := d.Set("max_age", obj.MaxAge); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MaxAge to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("max_age", obj.MaxAge)
 	}
 	if _, ok := d.GetOk("max_size"); ok {
 		_ = d.Set("max_size", obj.MaxSize)

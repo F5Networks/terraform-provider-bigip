@@ -122,9 +122,7 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-
 	log.Printf("[INFO] Creating HTTP2 Profile:%+v ", name)
-
 	pss := &bigip.Http2{
 		Name: name,
 	}
@@ -160,7 +158,6 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-
 	log.Printf("[INFO] Updating HTTP2 Profile Profile:%+v ", name)
 	pss := &bigip.Http2{
 		Name: name,
@@ -181,7 +178,7 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	obj, err := client.GetHttp2(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve http2  (%s) (%v) ", name, err)
-
+		d.SetId("")
 		return err
 	}
 	if obj == nil {
@@ -192,9 +189,7 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	_ = d.Set("name", name)
 	_ = d.Set("defaults_from", obj.DefaultsFrom)
 	if _, ok := d.GetOk("concurrent_streams_per_connection"); ok {
-		if err := d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConcurrentStreamsPerConnection to state for Http2 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
 	}
 	if _, ok := d.GetOk("connection_idle_timeout"); ok {
 		_ = d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
@@ -221,9 +216,7 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 		_ = d.Set("insert_header_name", obj.InsertHeaderName)
 	}
 	if _, ok := d.GetOk("connection_idle_timeout"); ok {
-		if err := d.Set("activation_modes", obj.ActivationModes); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ActivationModes to state for Http2 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("activation_modes", obj.ActivationModes)
 	}
 	return nil
 }

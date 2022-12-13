@@ -178,6 +178,7 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	obj, err := client.GetFastl4(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve FastL4  (%s) (%v) ", name, err)
+		d.SetId("")
 		return err
 	}
 	if obj == nil {
@@ -189,14 +190,10 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	_ = d.Set("defaults_from", obj.DefaultsFrom)
 
 	if _, ok := d.GetOk("client_timeout"); ok {
-		if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("client_timeout", obj.ClientTimeout)
 	}
 	if _, ok := d.GetOk("explicitflow_migration"); ok {
-		if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
 	}
 	if _, ok := d.GetOk("iptos_toclient"); ok {
 		_ = d.Set("iptos_toclient", obj.IpTosToClient)
@@ -228,7 +225,6 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	if _, ok := d.GetOk("receive_windowsize"); ok {
 		_ = d.Set("receive_windowsize", obj.ReceiveWindowSize)
 	}
-
 	return nil
 }
 

@@ -130,6 +130,7 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	p, err := client.GetSnat(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat  (%s) (%v) ", name, err)
+		d.SetId("")
 		return err
 	}
 	if p == nil {
@@ -138,19 +139,11 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	_ = d.Set("name", p.FullPath)
-	if err := d.Set("autolasthop", p.AutoLasthop); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AutoLasthop to state for Snat  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("autolasthop", p.AutoLasthop)
 	_ = d.Set("mirror", p.Mirror)
-	if err := d.Set("sourceport", p.SourcePort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SourcePort to state for Snat  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("translation", p.Translation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Translation to state for Snat  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("snatpool", p.Snatpool); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Snat  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("sourceport", p.SourcePort)
+	_ = d.Set("translation", p.Translation)
+	_ = d.Set("snatpool", p.Snatpool)
 	return SnatToData(p, d)
 }
 
@@ -219,9 +212,7 @@ func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
 	if p.VlansEnabled {
 		_ = d.Set("vlansdisabled", false)
 	}
-	if err := d.Set("vlans", p.Vlans); err != nil {
-		return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
-	}
+	_ = d.Set("vlans", p.Vlans)
 	for i, r := range p.Origins {
 		origins := fmt.Sprintf("origins.%d", i)
 		_ = d.Set(fmt.Sprintf("%s.name", origins), r.Name)

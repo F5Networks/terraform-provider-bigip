@@ -198,9 +198,9 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	obj, err := client.GetTcp(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve tcp Profile  (%s) (%v)", name, err)
+		d.SetId("")
 		return err
 	}
-	log.Printf("[INFO] Reading TCP Object:%+v ", obj)
 	if obj == nil {
 		log.Printf("[WARN] tcp  Profile (%s) not found, removing from state", d.Id())
 		d.SetId("")
@@ -208,97 +208,61 @@ func resourceBigipLtmProfileTcpRead(d *schema.ResourceData, meta interface{}) er
 	}
 	_ = d.Set("name", name)
 	if _, ok := d.GetOk("defaults_from"); ok {
-		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("defaults_from", obj.DefaultsFrom)
 	}
 	if _, ok := d.GetOk("idle_timeout"); ok {
-		if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("idle_timeout", obj.IdleTimeout)
 	}
 	if _, ok := d.GetOk("close_wait_timeout"); ok {
-		if err := d.Set("close_wait_timeout", obj.CloseWaitTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving CloseWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("close_wait_timeout", obj.CloseWaitTimeout)
 	}
 	if _, ok := d.GetOk("finwait_2timeout"); ok {
-		if err := d.Set("finwait_2timeout", obj.FinWait_2Timeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving FinWait_2Timeout to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("finwait_2timeout", obj.FinWait_2Timeout)
 	}
 	if _, ok := d.GetOk("finwait_timeout"); ok {
-		if err := d.Set("finwait_timeout", obj.FinWaitTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving FinWaitTimeout to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("finwait_timeout", obj.FinWaitTimeout)
 	}
 	if _, ok := d.GetOk("congestion_control"); ok {
-		if err := d.Set("congestion_control", obj.CongestionControl); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving congestion_control to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("congestion_control", obj.CongestionControl)
 	}
 	if _, ok := d.GetOk("delayed_acks"); ok {
-		if err := d.Set("delayed_acks", obj.DelayedAcks); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving delayed_acks to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("delayed_acks", obj.DelayedAcks)
 	}
 	if _, ok := d.GetOk("nagle"); ok {
-		if err := d.Set("nagle", obj.Nagle); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving nagle to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("nagle", obj.Nagle)
 	}
 	if _, ok := d.GetOk("early_retransmit"); ok {
-		if err := d.Set("early_retransmit", obj.EarlyRetransmit); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving early_retransmit to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("early_retransmit", obj.EarlyRetransmit)
 	}
 	if _, ok := d.GetOk("tailloss_probe"); ok {
-		if err := d.Set("tailloss_probe", obj.TailLossProbe); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving tailloss_probe to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("tailloss_probe", obj.TailLossProbe)
 	}
 	if _, ok := d.GetOk("initial_congestion_windowsize"); ok {
-		if err := d.Set("initial_congestion_windowsize", obj.InitCwnd); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving initial_congestion_windowsize to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("initial_congestion_windowsize", obj.InitCwnd)
 	}
 	if _, ok := d.GetOk("zerowindow_timeout"); ok {
-		if err := d.Set("zerowindow_timeout", obj.ZeroWindowTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving zeroWindowTimeout to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("zerowindow_timeout", obj.ZeroWindowTimeout)
 	}
 	if _, ok := d.GetOk("send_buffersize"); ok {
-		if err := d.Set("send_buffersize", obj.SendBufferSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving send_buffersize to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("send_buffersize", obj.SendBufferSize)
 	}
 	if _, ok := d.GetOk("receive_windowsize"); ok {
-		if err := d.Set("receive_windowsize", obj.ReceiveWindowSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving receive_windowsize to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("receive_windowsize", obj.ReceiveWindowSize)
 	}
 	if _, ok := d.GetOk("proxybuffer_high"); ok {
-		if err := d.Set("proxybuffer_high", obj.ProxyBufferHigh); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving proxybuffer_high to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("proxybuffer_high", obj.ProxyBufferHigh)
 	}
 	if _, ok := d.GetOk("timewait_recycle"); ok {
-		if err := d.Set("timewait_recycle", obj.TimeWaitRecycle); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving timewait_recycle to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("timewait_recycle", obj.TimeWaitRecycle)
 	}
 	if _, ok := d.GetOk("verified_accept"); ok {
-		if err := d.Set("verified_accept", obj.VerifiedAccept); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving verified_accept to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("verified_accept", obj.VerifiedAccept)
 	}
 	if _, ok := d.GetOk("keepalive_interval"); ok {
 		_ = d.Set("keepalive_interval", obj.KeepAliveInterval)
 	}
 	if _, ok := d.GetOk("deferred_accept"); ok {
-		if err := d.Set("deferred_accept", obj.DeferredAccept); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DeferredAccept to state for tcp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("deferred_accept", obj.DeferredAccept)
 	}
 	if _, ok := d.GetOk("fast_open"); ok {
 		_ = d.Set("fast_open", obj.FastOpen)

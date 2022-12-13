@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmVirtualServerUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-virtual-server"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,7 @@ func TestAccBigipLtmVirtualServerUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmVirtualServerUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-virtual-server"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +41,24 @@ func TestAccBigipLtmVirtualServerUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","description":"VirtualServer-test","destination":"/Common/10.255.255.254:9999","mask": "255.255.255.255","enabled":true,"fallbackPersistence":"/Common/dest_addr","ipProtocol":"tcp","pool":"","source":"0.0.0.0/0","sourceAddressTranslation":{"type":"automap"},"translateAddress":"enabled","translatePort":"enabled","vlansDisabled":true,"persist": [{"name": "hash","partition": "Common","tmDefault": "yes"}],"profiles":[{"name":"/Common/http","context":"all"},{"name":"/Common/tcp","context":"clientside"},{"name":"/Common/tcp-lan-optimized","context":"serverside"}],"policies":null}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/virtual/~Common~test-virtual-server", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","description":"VirtualServer-test","destination":"/Common/10.255.255.254:9999","mask": "255.255.255.255","enabled":true,"fallbackPersistence":"/Common/dest_addr","ipProtocol":"tcp","pool":"","source":"0.0.0.0/0","sourceAddressTranslation":{"type":"automap"},"translateAddress":"enabled","translatePort":"enabled","vlansDisabled":true,"persist": [{"name": "hash","partition": "Common","tmDefault": "yes"}],"profiles":[{"name":"/Common/http","context":"all"},{"name":"/Common/tcp","context":"clientside"},{"name":"/Common/tcp-lan-optimized","context":"serverside"}],"policies":null}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
+	mux.HandleFunc("/mgmt/tm/ltm/virtual/~Common~test-virtual-server/profiles", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"items": [{"name": "f5-tcp-progressive","partition": "Common","fullPath": "/Common/f5-tcp-progressive","context": "all"},{"name": "http","partition": "Common","fullPath": "/Common/http","context": "all"}]}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/virtual/~Common~test-virtual-server/policies", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"items": []}`)
+	})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual/~Common~test-virtual-server", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","description":"VirtualServer-test","destination":"/Common/10.255.254.254:9999","mask": "255.255.255.255","enabled":true,"fallbackPersistence":"/Common/dest_addr","ipProtocol":"tcp","pool":"","source":"0.0.0.0/0","sourceAddressTranslation":{"type":"automap"},"translateAddress":"enabled","translatePort":"enabled","vlansDisabled":true,"persist": [{"name": "hash","partition": "Common","tmDefault": "yes"}],"profiles":[{"name":"/Common/http","context":"all"},{"name":"/Common/tcp","context":"clientside"},{"name":"/Common/tcp-lan-optimized","context":"serverside"}],"policies":null}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +76,8 @@ func TestAccBigipLtmVirtualServerUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmVirtualServerUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmVirtualServerUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-virtual-server"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,13 +88,9 @@ func TestAccBigipLtmVirtualServerUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested object name (/Common/testvirtual##) is invalid", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -113,15 +100,13 @@ func TestAccBigipLtmVirtualServerUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmVirtualServerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testvirtual##\\) is invalid"),
 			},
 		},
 	})
 }
-
-func TestAccBigipLtmVirtualServerUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmVirtualServerUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-virtual-server"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +117,13 @@ func TestAccBigipLtmVirtualServerUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","description":"VirtualServer-test","destination":"/Common/10.255.255.254:9999","mask": "255.255.255.255","enabled":true,"fallbackPersistence":"/Common/dest_addr","ipProtocol":"tcp","pool":"","source":"0.0.0.0/0","sourceAddressTranslation":{"type":"automap"},"translateAddress":"enabled","translatePort":"enabled","vlansDisabled":true,"persist": [{"name": "hash","partition": "Common","tmDefault": "yes"}],"profiles":[{"name":"/Common/http","context":"all"},{"name":"/Common/tcp","context":"clientside"},{"name":"/Common/tcp-lan-optimized","context":"serverside"}],"policies":null}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual/~Common~test-virtual-server", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested Virtual server (/Common/test-virtual-server) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +133,7 @@ func TestAccBigipLtmVirtualServerUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmVirtualServerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Virtual server \\(/Common/test-virtual-server\\) was not found"),
 			},
 		},
 	})
@@ -157,7 +141,7 @@ func TestAccBigipLtmVirtualServerUnitCreateError(t *testing.T) {
 
 func testBigipLtmVirtualServerInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_server" "test-vs" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +154,19 @@ provider "bigip" {
 
 func testBigipLtmVirtualServerCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_server" "test-vs" {
   name    = "%s"
-  basic_auth_realm = "none"
+  destination = "10.255.255.254"
+  description = "VirtualServer-test"
+  port = 9999
+  mask = "255.255.255.255"
+  source_address_translation = "automap"
+  ip_protocol = "tcp"
+  profiles = ["/Common/f5-tcp-progressive","/Common/http"]
+  client_profiles = ["/Common/tcp"]
+  server_profiles = ["/Common/tcp-lan-optimized"]
+  default_persistence_profile = "/Common/hash"
+  fallback_persistence_profile = "/Common/dest_addr"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +178,19 @@ provider "bigip" {
 
 func testBigipLtmVirtualServerModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_server" "test-vs" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  destination = "10.255.254.254"
+  description = "VirtualServer-test"
+  port = 9999
+  mask = "255.255.255.255"
+  source_address_translation = "automap"
+  ip_protocol = "tcp"
+  profiles = ["/Common/f5-tcp-progressive","/Common/http"]
+  client_profiles = ["/Common/tcp"]
+  server_profiles = ["/Common/tcp-lan-optimized"]
+  default_persistence_profile = "/Common/hash"
+  fallback_persistence_profile = "/Common/dest_addr"
 }
 provider "bigip" {
   address  = "%s"

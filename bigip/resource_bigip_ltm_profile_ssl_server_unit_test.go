@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmProfileSslServerUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-profile-server-ssl"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,8 @@ func TestAccBigipLtmProfileSslServerUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmProfileSslServerUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-profile-server-ssl"
+	serversslDefault := "/Common/serverssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +42,201 @@ func TestAccBigipLtmProfileSslServerUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","alertTimeout": "indefinite","allowExpiredCrl": "disabled",
+"appService": "none",
+"authenticate": "once",
+"authenticateDepth": 9,
+"authenticateName": "none",
+"bypassOnClientCertFail": "disabled",
+"bypassOnHandshakeAlert": "disabled",
+"c3dCaCert": "none",
+"c3dCaKey": "none",
+"c3dCertExtensionCustomOids": [],
+"c3dCertExtensionIncludes": [
+"basic-constraints",
+"extended-key-usage",
+"key-usage",
+"subject-alternative-name"
+],
+"c3dCertLifespan": 24,
+"caFile": "none",
+"cacheSize": 262144,
+"cacheTimeout": 3600,
+"cert": "/Common/default.crt",
+"key": "/Common/default.key",
+"chain": "none",
+"cipherGroup": "none",
+"ciphers": "DEFAULT",
+"crl": "none",
+"crlFile": "none",
+"data_0rtt": "disabled",
+"description": "none",
+"expireCertResponseControl": "drop",
+"genericAlert": "enabled",
+"handshakeTimeout": "10",
+"key": "/Common/default.key",
+"logPublisher": "/Common/sys-ssl-publisher",
+"maxActiveHandshakes": "indefinite",
+"modSslMethods": "disabled",
+"mode": "enabled",
+"ocsp": "none",
+"tmOptions": "{ dont-insert-empty-fragments no-tlsv1.3 no-dtlsv1.2 }",
+"peerCertMode": "ignore",
+"proxySsl": "disabled",
+"proxySslPassthrough": "disabled",
+"renegotiatePeriod": "indefinite",
+"renegotiateSize": "indefinite",
+"renegotiation": "enabled",
+"retainCertificate": "true",
+"revokedCertStatusResponseControl": "drop",
+"secureRenegotiation": "require-strict",
+"serverName": "none",
+"sessionMirroring": "disabled",
+"sessionTicket": "disabled",
+"sniDefault": "false",
+"sniRequire": "false",
+"sslC3d": "disabled",
+"sslForwardProxy": "disabled",
+"sslForwardProxyBypass": "disabled",
+"sslForwardProxyVerifiedHandshake": "disabled",
+"sslSignHash": "any",
+"strictResume": "disabled",
+"uncleanShutdown": "enabled",
+"unknownCertStatusResponseControl": "ignore",
+"untrustedCertResponseControl": "drop"}`, resourceName, serversslDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl/~Common~test-profile-server-ssl", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","alertTimeout": "indefinite",
+"allowExpiredCrl": "disabled",
+"appService": "none",
+"authenticate": "once",
+"authenticateDepth": 9,
+"authenticateName": "none",
+"bypassOnClientCertFail": "disabled",
+"bypassOnHandshakeAlert": "disabled",
+"c3dCaCert": "none",
+"c3dCaKey": "none",
+"c3dCertExtensionCustomOids": [],
+"c3dCertExtensionIncludes": [
+"basic-constraints",
+"extended-key-usage",
+"key-usage",
+"subject-alternative-name"
+],
+"c3dCertLifespan": 24,
+"caFile": "none",
+"cacheSize": 262144,
+"cacheTimeout": 3600,
+"cert": "/Common/default.crt",
+"key": "/Common/default.key",
+"chain": "none",
+"cipherGroup": "none",
+"ciphers": "DEFAULT",
+"crl": "none",
+"crlFile": "none",
+"data_0rtt": "disabled",
+"description": "none",
+"expireCertResponseControl": "drop",
+"genericAlert": "enabled",
+"handshakeTimeout": "10",
+"logPublisher": "/Common/sys-ssl-publisher",
+"maxActiveHandshakes": "indefinite",
+"modSslMethods": "disabled",
+"mode": "enabled",
+"ocsp": "none",
+"tmOptions": "{ dont-insert-empty-fragments no-tlsv1.3 no-dtlsv1.2 }",
+"peerCertMode": "ignore",
+"proxySsl": "disabled",
+"proxySslPassthrough": "disabled",
+"renegotiatePeriod": "indefinite",
+"renegotiateSize": "indefinite",
+"renegotiation": "enabled",
+"retainCertificate": "true",
+"revokedCertStatusResponseControl": "drop",
+"secureRenegotiation": "require-strict",
+"serverName": "none",
+"sessionMirroring": "disabled",
+"sessionTicket": "disabled",
+"sniDefault": "false",
+"sniRequire": "false",
+"sslC3d": "disabled",
+"sslForwardProxy": "disabled",
+"sslForwardProxyBypass": "disabled",
+"sslForwardProxyVerifiedHandshake": "disabled",
+"sslSignHash": "any",
+"strictResume": "disabled",
+"uncleanShutdown": "enabled",
+"unknownCertStatusResponseControl": "ignore",
+"untrustedCertResponseControl": "drop"}`, resourceName, serversslDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl/~Common~test-profile-server-ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","alertTimeout": "indefinite",
+"allowExpiredCrl": "disabled",
+"appService": "none",
+"authenticate": "always",
+"authenticateDepth": 9,
+"authenticateName": "none",
+"bypassOnClientCertFail": "disabled",
+"bypassOnHandshakeAlert": "disabled",
+"c3dCaCert": "none",
+"c3dCaKey": "none",
+"c3dCertExtensionCustomOids": [],
+"c3dCertExtensionIncludes": [
+"basic-constraints",
+"extended-key-usage",
+"key-usage",
+"subject-alternative-name"
+],
+"c3dCertLifespan": 24,
+"caFile": "none",
+"cacheSize": 262144,
+"cacheTimeout": 3600,
+"cert": "/Common/default.crt",
+"key": "/Common/default.key",
+"chain": "none",
+"cipherGroup": "none",
+"ciphers": "DEFAULT",
+"crl": "none",
+"crlFile": "none",
+"data_0rtt": "disabled",
+"description": "none",
+"expireCertResponseControl": "drop",
+"genericAlert": "enabled",
+"handshakeTimeout": "10",
+"logPublisher": "/Common/sys-ssl-publisher",
+"maxActiveHandshakes": "indefinite",
+"modSslMethods": "disabled",
+"mode": "enabled",
+"ocsp": "none",
+"tmOptions": "{ dont-insert-empty-fragments no-tlsv1.3 no-dtlsv1.2 }",
+"peerCertMode": "ignore",
+"proxySsl": "disabled",
+"proxySslPassthrough": "disabled",
+"renegotiatePeriod": "indefinite",
+"renegotiateSize": "indefinite",
+"renegotiation": "enabled",
+"retainCertificate": "true",
+"revokedCertStatusResponseControl": "drop",
+"secureRenegotiation": "require-strict",
+"serverName": "none",
+"sessionMirroring": "disabled",
+"sessionTicket": "disabled",
+"sniDefault": "false",
+"sniRequire": "false",
+"sslC3d": "disabled",
+"sslForwardProxy": "disabled",
+"sslForwardProxyBypass": "disabled",
+"sslForwardProxyVerifiedHandshake": "disabled",
+"sslSignHash": "any",
+"strictResume": "disabled",
+"uncleanShutdown": "enabled",
+"unknownCertStatusResponseControl": "ignore",
+"untrustedCertResponseControl": "drop"}`, resourceName, serversslDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +254,8 @@ func TestAccBigipLtmProfileSslServerUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmProfileSslServerUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileSslServerUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-profile-server-ssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,15 +266,10 @@ func TestAccBigipLtmProfileSslServerUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		http.Error(w, "The requested object name (/Common/testserverssl##) is invalid", http.StatusBadRequest)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -113,15 +277,15 @@ func TestAccBigipLtmProfileSslServerUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileSslServerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testserverssl##\\) is invalid"),
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmProfileSslServerUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileSslServerUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-profile-server-ssl"
+	serversslDefault := "/Common/serverssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +296,13 @@ func TestAccBigipLtmProfileSslServerUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, serversslDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/server-ssl/~Common~test-profile-server-ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested Server-SSL Profile (/Common/test-profile-server-ssl) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +312,7 @@ func TestAccBigipLtmProfileSslServerUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileSslServerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Server-SSL Profile \\(/Common/test-profile-server-ssl\\) was not found"),
 			},
 		},
 	})
@@ -157,7 +320,7 @@ func TestAccBigipLtmProfileSslServerUnitCreateError(t *testing.T) {
 
 func testBigipLtmProfileSslServerInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_server_ssl" "test-profile-server-ssl" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +333,11 @@ provider "bigip" {
 
 func testBigipLtmProfileSslServerCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_server_ssl" "test-profile-server-ssl" {
   name    = "%s"
-  basic_auth_realm = "none"
+  defaults_from = "/Common/serverssl"
+  authenticate  = "once"
+  ciphers       = "DEFAULT"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +349,11 @@ provider "bigip" {
 
 func testBigipLtmProfileSslServerModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_server_ssl" "test-profile-server-ssl" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  defaults_from = "/Common/serverssl"
+  authenticate  = "always"
+  ciphers       = "DEFAULT"
 }
 provider "bigip" {
   address  = "%s"

@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmProfileFtpUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-profile-ftp"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,8 @@ func TestAccBigipLtmProfileFtpUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmProfileFtpUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-profile-ftp"
+	ftpDefault := "/Common/ftp"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +42,23 @@ func TestAccBigipLtmProfileFtpUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/cli/version", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/profile/ftp", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","allowFtps":"disabled","inheritParentProfile":"disabled","inheritVlanList":"disabled","port":20,"ftpsMode":"disallow","enforceTlsSessionReuse":"disabled","allowActiveMode":"enabled","translateExtended":"enabled"}`, resourceName, ftpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/profile/ftp/~Common~test-profile-ftp", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","allowFtps":"disabled","inheritParentProfile":"disabled","inheritVlanList":"disabled","port":20,"ftpsMode":"disallow","enforceTlsSessionReuse":"disabled","allowActiveMode":"enabled","translateExtended":"enabled"}`, resourceName, ftpDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-ftp", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","translateExtended":"disabled"",}`, resourceName, ftpDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +76,9 @@ func TestAccBigipLtmProfileFtpUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmProfileFtpUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileFtpUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-profile-ftp"
+	//ftpDefault := "/Common/ftp"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,13 +89,14 @@ func TestAccBigipLtmProfileFtpUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/cli/version", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/profile/ftp", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		http.Error(w, "The requested object name (/Common/testftpravi##) is invalid", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -113,15 +106,15 @@ func TestAccBigipLtmProfileFtpUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileFtpCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testftpravi##\\) is invalid"),
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmProfileFtpUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileFtpUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-profile-ftp"
+	ftpDefault := "/Common/ftp"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +125,20 @@ func TestAccBigipLtmProfileFtpUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/cli/version", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/profile/ftp", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","allowFtps":"disabled","inheritParentProfile":"disabled","inheritVlanList":"disabled","port":20,"ftpsMode":"disallow","enforceTlsSessionReuse":"disabled","allowActiveMode":"enabled","translateExtended":"enabled"}`, resourceName, ftpDefault)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/profile/ftp/~Common~test-profile-ftp", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "PATCH" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s","allowFtps":"disabled","inheritParentProfile":"disabled","inheritVlanList":"disabled","port":20,"ftpsMode":"disallow","enforceTlsSessionReuse":"disabled","allowActiveMode":"enabled","translateExtended":"enabled"}`, resourceName, ftpDefault)
+		}
+		http.Error(w, "The requested FTP Profile (/Common/test-profile-ftp) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +148,7 @@ func TestAccBigipLtmProfileFtpUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileFtpCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested FTP Profile \\(/Common/test-profile-ftp\\) was not found"),
 			},
 		},
 	})
@@ -157,7 +156,7 @@ func TestAccBigipLtmProfileFtpUnitCreateError(t *testing.T) {
 
 func testBigipLtmProfileFtpInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_ftp" "test-ftp" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +169,9 @@ provider "bigip" {
 
 func testBigipLtmProfileFtpCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_ftp" "test-ftp" {
   name    = "%s"
-  basic_auth_realm = "none"
+  defaults_from = "/Common/ftp"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +183,10 @@ provider "bigip" {
 
 func testBigipLtmProfileFtpModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_profile_ftp" "test-ftp" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  defaults_from = "/Common/ftp"
+  translate_extended = "disabled"
 }
 provider "bigip" {
   address  = "%s"

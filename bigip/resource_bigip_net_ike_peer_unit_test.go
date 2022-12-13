@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipNetIkepeerUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-ike-peer"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,7 @@ func TestAccBigipNetIkepeerUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipNetIkepeerUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-ike-peer"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +41,18 @@ func TestAccBigipNetIkepeerUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","dpdDelay":30,"lifetime":1440,"generatePolicy":"off","mode":"main","myCertFile":"/Common/default.crt","myCertKeyFile":"/Common/default.key","myIdType":"address","natTraversal":"off","passive":"false","peersCertType":"none","peersIdType":"address","phase1AuthMethod":"rsa-signature","phase1EncryptAlgorithm":"3des","phase1HashAlgorithm":"sha256","phase1PerfectForwardSecrecy":"modp1024","prf":"sha256","proxySupport":"enabled","remoteAddress":"1.5.3.4","replayWindowSize":64,"state":"enabled","verifyCert":"false"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer/~Common~test-ike-peer", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","dpdDelay":30,"lifetime":1440,"generatePolicy":"off","mode":"main","myCertFile":"/Common/default.crt","myCertKeyFile":"/Common/default.key","myIdType":"address","natTraversal":"off","passive":"false","peersCertType":"none","peersIdType":"address","phase1AuthMethod":"rsa-signature","phase1EncryptAlgorithm":"3des","phase1HashAlgorithm":"sha256","phase1PerfectForwardSecrecy":"modp1024","prf":"sha256","proxySupport":"enabled","remoteAddress":"1.5.3.4","replayWindowSize":64,"state":"enabled","verifyCert":"false"}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer/~Common~test-ike-peer", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","dpdDelay":32,"lifetime":1440,"generatePolicy":"off","mode":"main","myCertFile":"/Common/default.crt","myCertKeyFile":"/Common/default.key","myIdType":"address","natTraversal":"off","passive":"false","peersCertType":"none","peersIdType":"address","phase1AuthMethod":"rsa-signature","phase1EncryptAlgorithm":"3des","phase1HashAlgorithm":"sha256","phase1PerfectForwardSecrecy":"modp1024","prf":"sha256","proxySupport":"enabled","remoteAddress":"1.5.3.4","replayWindowSize":64,"state":"enabled","verifyCert":"false"}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +70,8 @@ func TestAccBigipNetIkepeerUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipNetIkepeerUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipNetIkepeerUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-ike-peer"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,15 +82,10 @@ func TestAccBigipNetIkepeerUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		http.Error(w, "The requested object name (/Common/testikepeer##) is invalid", http.StatusBadRequest)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -113,15 +93,13 @@ func TestAccBigipNetIkepeerUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipNetIkepeerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testikepeer##\\) is invalid"),
 			},
 		},
 	})
 }
-
-func TestAccBigipNetIkepeerUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipNetIkepeerUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-ike-peer"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +110,13 @@ func TestAccBigipNetIkepeerUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","dpdDelay":30,"lifetime":1440,"generatePolicy":"off","mode":"main","myCertFile":"/Common/default.crt","myCertKeyFile":"/Common/default.key","myIdType":"address","natTraversal":"off","passive":"false","peersCertType":"none","peersIdType":"address","phase1AuthMethod":"rsa-signature","phase1EncryptAlgorithm":"3des","phase1HashAlgorithm":"sha256","phase1PerfectForwardSecrecy":"modp1024","prf":"sha256","proxySupport":"enabled","remoteAddress":"1.5.3.4","replayWindowSize":64,"state":"enabled","verifyCert":"false"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ike-peer/~Common~test-ike-peer", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested IKE Peer (/Common/test-ike-peer) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +126,7 @@ func TestAccBigipNetIkepeerUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipNetIkepeerCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested IKE Peer \\(/Common/test-ike-peer\\) was not found"),
 			},
 		},
 	})
@@ -157,8 +134,9 @@ func TestAccBigipNetIkepeerUnitCreateError(t *testing.T) {
 
 func testBigipNetIkepeerInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_net_ike_peer"  "test_ike_peer" {
   name       = "%s"
+  remote_address                 = "1.5.3.4"
   invalidkey = "foo"
 }
 provider "bigip" {
@@ -170,9 +148,29 @@ provider "bigip" {
 
 func testBigipNetIkepeerCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_net_ike_peer"  "test_ike_peer" {
   name    = "%s"
-  basic_auth_realm = "none"
+  dpd_delay                      = 30
+  generate_policy                = "off"
+  lifetime                       = 1440
+  mode                           = "main"
+  my_cert_file                   = "/Common/default.crt"
+  my_cert_key_file               = "/Common/default.key"
+  my_id_type                     = "address"
+  nat_traversal                  = "off"
+  passive                        = "false"
+  peers_cert_type                = "none"
+  peers_id_type                  = "address"
+  phase1_auth_method             = "rsa-signature"
+  phase1_encrypt_algorithm       = "3des"
+  phase1_hash_algorithm          = "sha256"
+  phase1_perfect_forward_secrecy = "modp1024"
+  prf                            = "sha256"
+  proxy_support                  = "enabled"
+  remote_address                 = "1.5.3.4"
+  replay_window_size             = 64
+  state                          = "enabled"
+  verify_cert                    = "false"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +182,29 @@ provider "bigip" {
 
 func testBigipNetIkepeerModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_net_ike_peer"  "test_ike_peer" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  dpd_delay                      = 32
+  generate_policy                = "off"
+  lifetime                       = 1440
+  mode                           = "main"
+  my_cert_file                   = "/Common/default.crt"
+  my_cert_key_file               = "/Common/default.key"
+  my_id_type                     = "address"
+  nat_traversal                  = "off"
+  passive                        = "false"
+  peers_cert_type                = "none"
+  peers_id_type                  = "address"
+  phase1_auth_method             = "rsa-signature"
+  phase1_encrypt_algorithm       = "3des"
+  phase1_hash_algorithm          = "sha256"
+  phase1_perfect_forward_secrecy = "modp1024"
+  prf                            = "sha256"
+  proxy_support                  = "enabled"
+  remote_address                 = "1.5.3.4"
+  replay_window_size             = 64
+  state                          = "enabled"
+  verify_cert                    = "false"
 }
 provider "bigip" {
   address  = "%s"

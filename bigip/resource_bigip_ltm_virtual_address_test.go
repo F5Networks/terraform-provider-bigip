@@ -17,16 +17,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
-var TEST_VA_NAME_CHANGED = fmt.Sprintf("/%s/test-va-changed", TEST_PARTITION)
-var TEST_VA_CONFIG = `
+var TestVaName = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
+var TestVaNameChanged = fmt.Sprintf("/%s/test-va-changed", TEST_PARTITION)
+var TestVaConfig = `
 resource "bigip_ltm_virtual_address" "test-va" {
 	name          = "%s"
 	traffic_group = "/Common/none"
 }
 `
-var TEST_VA_RESOURCE = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME)
-var TEST_VA_RESOURCE_NAME_CHANGED = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME_CHANGED)
+var TestVaResource = fmt.Sprintf(TestVaConfig, TestVaName)
+var TestVaResourceNameChanged = fmt.Sprintf(TestVaConfig, TestVaNameChanged)
 
 func TestAccBigipLtmVA_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -37,17 +37,17 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VA_RESOURCE,
+				Config: TestVaResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVAExists(TEST_VA_NAME, true),
+					testCheckVAExists(TestVaName, true),
 				),
 			},
 			{
-				Config:    TEST_VA_RESOURCE_NAME_CHANGED,
-				PreConfig: func() { testCheckVAExists(TEST_VA_NAME, true) },
+				Config:    TestVaResourceNameChanged,
+				PreConfig: func() { testCheckVAExists(TestVaName, true) },
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVAExists(TEST_VA_NAME, false),
-					testCheckVAExists(TEST_VA_NAME_CHANGED, true),
+					testCheckVAExists(TestVaName, false),
+					testCheckVAExists(TestVaNameChanged, true),
 				),
 			},
 		},
@@ -63,11 +63,11 @@ func TestAccBigipLtmVA_import(t *testing.T) {
 		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VA_RESOURCE,
+				Config: TestVaResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVAExists(TEST_VA_NAME, true),
+					testCheckVAExists(TestVaName, true),
 				),
-				ResourceName:      TEST_VA_NAME,
+				ResourceName:      TestVaName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -87,13 +87,13 @@ func testCheckVAExists(name string, exists bool) resource.TestCheckFunc {
 		for _, va := range vas.VirtualAddresses {
 			if va.FullPath == name {
 				if !exists {
-					return fmt.Errorf("Virtual address %s exists.", name)
+					return fmt.Errorf("Virtual address %s exists ", name)
 				}
 				return nil
 			}
 		}
 		if exists {
-			return fmt.Errorf("Virtual address %s does not exist.", name)
+			return fmt.Errorf("Virtual address %s does not exist ", name)
 		}
 
 		return nil
@@ -115,7 +115,7 @@ func testCheckVAsDestroyed(s *terraform.State) error {
 		}
 		for _, va := range vas.VirtualAddresses {
 			if va.FullPath == name {
-				return fmt.Errorf("Virtual address %s not destroyed.", name)
+				return fmt.Errorf("Virtual address %s not destroyed ", name)
 			}
 		}
 	}

@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmProfileSslUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-ppssl"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,8 @@ func TestAccBigipLtmProfileSslUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmProfileSslUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-ppssl"
+	httpDefault := "/Common/ssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,32 +42,18 @@ func TestAccBigipLtmProfileSslUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl/~Common~test-ppssl", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s"}`, resourceName, httpDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl/~Common~test-ppssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -84,9 +70,8 @@ func TestAccBigipLtmProfileSslUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmProfileSslUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileSslUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-ppssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,13 +82,9 @@ func TestAccBigipLtmProfileSslUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested object name (/Common/testppssl##) is invalid", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -113,15 +94,14 @@ func TestAccBigipLtmProfileSslUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileSslCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testppssl##\\) is invalid"),
 			},
 		},
 	})
 }
-
-func TestAccBigipLtmProfileSslUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmProfileSslUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-ppssl"
+	httpDefault := "/Common/ssl"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +112,16 @@ func TestAccBigipLtmProfileSslUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/ltm/persistence/ssl/~Common~test-ppssl", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "PATCH" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s"}`, resourceName, httpDefault)
+		}
+		http.Error(w, "The requested Persist SSL Profile (/Common/testppssl) was not found", http.StatusNotFound)
+
 	})
 
 	defer teardown()
@@ -149,7 +131,7 @@ func TestAccBigipLtmProfileSslUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmProfileSslCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Persist SSL Profile \\(/Common/testppssl\\) was not found"),
 			},
 		},
 	})
@@ -157,22 +139,27 @@ func TestAccBigipLtmProfileSslUnitCreateError(t *testing.T) {
 
 func testBigipLtmProfileSslInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
   name       = "%s"
+  defaults_from = "/Common/ssl"
   invalidkey = "foo"
 }
 provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
   username = "xxx"
   password = "xxx"
+  login_ref = ""
 }`, resourceName)
 }
 
 func testBigipLtmProfileSslCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
   name    = "%s"
-  basic_auth_realm = "none"
+  defaults_from = "/Common/ssl"
+  match_across_pools = ""
+  match_across_services = ""
+  match_across_virtuals = ""
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +171,12 @@ provider "bigip" {
 
 func testBigipLtmProfileSslModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  defaults_from = "/Common/ssl"
+  match_across_pools = "enabled"
+  match_across_services = "enabled"
+  match_across_virtuals = "enabled"
 }
 provider "bigip" {
   address  = "%s"

@@ -14,11 +14,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_IKE_PEER_NAME = "/Common/testpeer"
+var TestIkePeerName = "/Common/testpeer"
 
-var TEST_IKE_PEER_RESOURCE = `
+var TestIkePeerResource = `
 resource "bigip_net_ike_peer"  "test_ike_peer" {
-    name = "` + TEST_IKE_PEER_NAME + `"
+    name = "` + TestIkePeerName + `"
     dpd_delay                      = 30
     generate_policy                = "off"
     lifetime                       = 1440
@@ -52,10 +52,10 @@ func TestAccBigipNetIkePeerCreate(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetIkePeerDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IKE_PEER_RESOURCE,
+				Config: TestIkePeerResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipNetIkePeerExists(TEST_IKE_PEER_NAME, true),
-					resource.TestCheckResourceAttr("bigip_net_ike_peer.test_ike_peer", "name", TEST_IKE_PEER_NAME),
+					testBigipNetIkePeerExists(TestIkePeerName, true),
+					resource.TestCheckResourceAttr("bigip_net_ike_peer.test_ike_peer", "name", TestIkePeerName),
 					resource.TestCheckResourceAttr("bigip_net_ike_peer.test_ike_peer", "dpd_delay", "30"),
 					resource.TestCheckResourceAttr("bigip_net_ike_peer.test_ike_peer", "generate_policy", "off"),
 					resource.TestCheckResourceAttr("bigip_net_ike_peer.test_ike_peer", "lifetime", "1440"),
@@ -92,11 +92,11 @@ func TestAccBigipNetIkePeerImport(t *testing.T) {
 		CheckDestroy: testCheckBigipNetIkePeerDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IKE_PEER_RESOURCE,
+				Config: TestIkePeerResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipNetIkePeerExists(TEST_IKE_PEER_NAME, true),
+					testBigipNetIkePeerExists(TestIkePeerName, true),
 				),
-				ResourceName:      TEST_IKE_PEER_NAME,
+				ResourceName:      TestIkePeerName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

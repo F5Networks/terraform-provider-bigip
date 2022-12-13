@@ -15,11 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_FASTHTTP_NAME = fmt.Sprintf("/%s/test-fasthttp", TEST_PARTITION)
+var TestFasthttpName = fmt.Sprintf("/%s/test-fasthttp", TEST_PARTITION)
 
-var TEST_FASTHTTP_RESOURCE = `
+var TestFasthttpResource = `
 resource "bigip_ltm_profile_fasthttp" "test-fasthttp" {
-	name = "` + TEST_FASTHTTP_NAME + `"
+	name = "` + TestFasthttpName + `"
 	defaults_from = "/Common/fasthttp"
             idle_timeout = 0
             connpoolidle_timeoutoverride	= 0
@@ -41,10 +41,10 @@ func TestAccBigipLtmfasthttp_create(t *testing.T) {
 		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FASTHTTP_RESOURCE,
+				Config: TestFasthttpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckfasthttpProfileExists(TEST_FASTHTTP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "name", TEST_FASTHTTP_NAME),
+					testCheckfasthttpProfileExists(TestFasthttpName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "name", TestFasthttpName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "defaults_from", "/Common/fasthttp"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "idle_timeout", "0"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fasthttp.test-fasthttp", "connpoolidle_timeoutoverride", "0"),
@@ -69,11 +69,11 @@ func TestAccBigipLtmProfilefasthttp_import(t *testing.T) {
 		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_FASTHTTP_RESOURCE,
+				Config: TestFasthttpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckfasthttpProfileExists(TEST_FASTHTTP_NAME, true),
+					testCheckfasthttpProfileExists(TestFasthttpName, true),
 				),
-				ResourceName:      TEST_FASTHTTP_NAME,
+				ResourceName:      TestFasthttpName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -106,7 +106,6 @@ func testCheckfasthttpsDestroyed(s *terraform.State) error {
 		if rs.Type != "bigip_ltm_profile_fasthttp" {
 			continue
 		}
-
 		name := rs.Primary.ID
 		fasthttp, err := client.GetFasthttp(name)
 		if err != nil {

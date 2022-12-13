@@ -53,20 +53,6 @@ func TestAccBigipLtmPoolUnitCreate(t *testing.T) {
 	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"%s","monitor":"/Common/icmp"}`, resourceName, lbmode)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	assert.Equal(t, "PUT", r.Method, "Expected method 'POST', got %s", r.Method)
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -79,6 +65,73 @@ func TestAccBigipLtmPoolUnitCreate(t *testing.T) {
 			{
 				Config:             testBigipLtmPoolModify(resourceName, server.URL),
 				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-pool"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		http.Error(w, "The requested object name (/Common/testpool##) is invalid", http.StatusBadRequest)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testBigipLtmPoolCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testpool##\\) is invalid"),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-pool"
+	lbmode := "round-robin"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"%s"}`, resourceName, lbmode)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "PATCH" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"%s","monitor":"/Common/icmp"}`, resourceName, lbmode)
+		}
+		http.Error(w, "The requested pool (/Common/test-pool) was not found", http.StatusNotFound)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testBigipLtmPoolCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested pool \\(/Common/test-pool\\) was not found"),
 			},
 		},
 	})

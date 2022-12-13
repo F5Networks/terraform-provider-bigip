@@ -15,11 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
+var TestSnatName = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
 
-var TEST_SNAT_RESOURCE = `
+var TestSnatResource = `
 resource "bigip_ltm_snat" "test-snat" {
- name = "` + TEST_SNAT_NAME + `"
+ name = "` + TestSnatName + `"
  translation = "/Common/136.1.1.1"
  origins { name = "2.2.2.2" }
  origins { name = "3.3.3.3" }
@@ -39,10 +39,10 @@ func TestAccBigipLtmsnat_create(t *testing.T) {
 		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNAT_RESOURCE,
+				Config: TestSnatResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSnatExists(TEST_SNAT_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "name", TEST_SNAT_NAME),
+					testCheckSnatExists(TestSnatName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "name", TestSnatName),
 					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "translation", "/Common/136.1.1.1"),
 					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "origins.0.name", "2.2.2.2"),
 					resource.TestCheckResourceAttr("bigip_ltm_snat.test-snat", "origins.1.name", "3.3.3.3"),
@@ -66,11 +66,11 @@ func TestAccBigipLtmsnat_import(t *testing.T) {
 		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNAT_RESOURCE,
+				Config: TestSnatResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSnatExists(TEST_SNAT_NAME, true),
+					testCheckSnatExists(TestSnatName, true),
 				),
-				ResourceName:      TEST_SNAT_NAME,
+				ResourceName:      TestSnatName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -86,10 +86,10 @@ func testCheckSnatExists(name string, exists bool) resource.TestCheckFunc {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("Snat %s was not created.", name)
+			return fmt.Errorf("Snat %s was not created ", name)
 		}
 		if !exists && p != nil {
-			return fmt.Errorf("Snat %s still exists.", name)
+			return fmt.Errorf("Snat %s still exists ", name)
 		}
 		return nil
 	}
@@ -102,14 +102,13 @@ func testChecksnatsDestroyed(s *terraform.State) error {
 		if rs.Type != "bigip_ltm_snat" {
 			continue
 		}
-
 		name := rs.Primary.ID
 		snat, err := client.GetSnat(name)
 		if err != nil {
 			return err
 		}
 		if snat != nil {
-			return fmt.Errorf("Snat %s not destroyed.", name)
+			return fmt.Errorf("Snat %s not destroyed ", name)
 		}
 	}
 	return nil

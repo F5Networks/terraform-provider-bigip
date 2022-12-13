@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmVirtualAddressUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/10.1.2.13"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,7 @@ func TestAccBigipLtmVirtualAddressUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmVirtualAddressUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/10.1.2.13"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +41,21 @@ func TestAccBigipLtmVirtualAddressUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath": "/Common/10.1.2.13","arp": "enabled","autoDelete": "true","connectionLimit": 0,"enabled": "yes","floating": "enabled","icmpEcho": "enabled","inheritedTrafficGroup": "true","mask": "255.255.255.255","routeAdvertisement": "disabled","serverScope": "any","spanning": "disabled","trafficGroup": "/Common/traffic-group-1"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address/~Common~10.1.2.13", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath": "/Common/10.1.2.13","arp": "enabled","autoDelete": "true","connectionLimit": 0,"enabled": "yes","floating": "enabled","icmpEcho": "enabled","inheritedTrafficGroup": "true","mask": "255.255.255.255","routeAdvertisement": "disabled","serverScope": "any","spanning": "disabled","trafficGroup": "/Common/traffic-group-1"}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address/~Common~10.1.2.13", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		//if r.Method == "GET" {
+		//	_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath": "/Common/10.1.2.13","arp": "enabled","autoDelete": "true","connectionLimit": 0,"enabled": "yes","floating": "enabled","icmpEcho": "enabled","inheritedTrafficGroup": "true","mask": "255.255.255.255","routeAdvertisement": "disabled","serverScope": "any","spanning": "disabled","trafficGroup": "/Common/traffic-group-1"}`, resourceName)
+		//}
+		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath": "/Common/10.1.2.13","arp": "enabled","autoDelete": "true","connectionLimit": 1,"enabled": "yes","floating": "enabled","icmpEcho": "enabled","inheritedTrafficGroup": "true","mask": "255.255.255.255","routeAdvertisement": "disabled","serverScope": "any","spanning": "disabled","trafficGroup": "/Common/traffic-group-1"}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +73,8 @@ func TestAccBigipLtmVirtualAddressUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmVirtualAddressUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmVirtualAddressUnitCreateError(t *testing.T) {
+	resourceName := "/Common/10.1.2.13"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,13 +85,9 @@ func TestAccBigipLtmVirtualAddressUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested object name (/Common/testvirtualaddress##) is invalid", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -113,15 +97,14 @@ func TestAccBigipLtmVirtualAddressUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmVirtualAddressCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testvirtualaddress##\\) is invalid"),
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmVirtualAddressUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmVirtualAddressUnitReadError(t *testing.T) {
+	resourceName := "/Common/10.1.2.13"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +115,13 @@ func TestAccBigipLtmVirtualAddressUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath": "/Common/10.1.2.13","arp": "enabled","autoDelete": "true","connectionLimit": 0,"enabled": "yes","floating": "enabled","icmpEcho": "enabled","inheritedTrafficGroup": "true","mask": "255.255.255.255","routeAdvertisement": "disabled","serverScope": "any","spanning": "disabled","trafficGroup": "/Common/traffic-group-1"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/virtual-address/~Common~10.1.2.13", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested Virtual-Address (/Common/10.1.2.13) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +131,7 @@ func TestAccBigipLtmVirtualAddressUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmVirtualAddressCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Virtual-Address \\(/Common/10.1.2.13\\) was not found"),
 			},
 		},
 	})
@@ -157,7 +139,7 @@ func TestAccBigipLtmVirtualAddressUnitCreateError(t *testing.T) {
 
 func testBigipLtmVirtualAddressInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_address" "test-va" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +152,14 @@ provider "bigip" {
 
 func testBigipLtmVirtualAddressCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_address" "test-va" {
   name    = "%s"
-  basic_auth_realm = "none"
+  arp  = true
+  conn_limit  = 0
+  icmp_echo  = "enabled"
+  advertize_route  = "disabled"
+  traffic_group= "/Common/traffic-group-1"
+  auto_delete = true
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +171,14 @@ provider "bigip" {
 
 func testBigipLtmVirtualAddressModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_virtual_address" "test-va" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  arp  = true
+  conn_limit  = 1
+  icmp_echo  = "enabled"
+  advertize_route  = "disabled"
+  traffic_group= "/Common/traffic-group-1"
+  auto_delete = true
 }
 provider "bigip" {
   address  = "%s"

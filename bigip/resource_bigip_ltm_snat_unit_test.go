@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmSnatUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-snat"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,7 @@ func TestAccBigipLtmSnatUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmSnatUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "/Common/test-snat"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +41,21 @@ func TestAccBigipLtmSnatUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/snat", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","autoLasthop": "default","fullPath": "/Common/test-snat","description": "testsnat","mirror": "disabled","sourcePort": "preserve",
+"translation": "/Common/1.1.1.1","vlansDisabled": true,"origins": [{"name": "0.0.0.0/0","listenerSyncookie": "enabled"}]}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/snat/~Common~test-snat", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","autoLasthop": "default","fullPath": "/Common/test-snat","description": "testsnat","mirror": "disabled","sourcePort": "preserve",
+"translation": "/Common/1.1.1.1","vlansDisabled": true,"origins": [{"name": "2.2.2.2/32","listenerSyncookie": "enabled"},{"name": "3.3.3.3/32","listenerSyncookie": "enabled"}]}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
 	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/snat/~Common~test-snat", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","autoLasthop": "default","fullPath": "/Common/test-snat","description": "testsnat","mirror": "disabled","sourcePort": "preserve",
+"translation": "/Common/1.1.2.1","vlansDisabled": true,"origins": [{"name": "0.0.0.0/0","listenerSyncookie": "enabled"}]}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -84,9 +73,8 @@ func TestAccBigipLtmSnatUnitCreate(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmSnatUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmSnatUnitCreateError(t *testing.T) {
+	resourceName := "/Common/test-snat"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,15 +85,10 @@ func TestAccBigipLtmSnatUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/snat", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		http.Error(w, "The requested object name (/Common/testsnat##) is invalid", http.StatusBadRequest)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -113,15 +96,14 @@ func TestAccBigipLtmSnatUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmSnatCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testsnat##\\) is invalid"),
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmSnatUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+func TestAccBigipLtmSnatUnitReadError(t *testing.T) {
+	resourceName := "/Common/test-snat"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +114,14 @@ func TestAccBigipLtmSnatUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/snat", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","autoLasthop": "default","description": "testsnat","mirror": "disabled","sourcePort": "preserve",
+"translation": "/Common/1.1.1.1","vlansDisabled": true,"origins": [{"name": "0.0.0.0/0","listenerSyncookie": "enabled"}]}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/ltm/snat/~Common~test-snat", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "The requested Snat object (/Common/test-snat) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -149,7 +131,7 @@ func TestAccBigipLtmSnatUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmSnatCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Snat object \\(/Common/test-snat\\) was not found"),
 			},
 		},
 	})
@@ -157,7 +139,7 @@ func TestAccBigipLtmSnatUnitCreateError(t *testing.T) {
 
 func testBigipLtmSnatInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_snat" "test-snat" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +152,14 @@ provider "bigip" {
 
 func testBigipLtmSnatCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_snat" "test-snat" {
   name    = "%s"
-  basic_auth_realm = "none"
+  translation = "/Common/1.1.1.1"
+  origins { name = "2.2.2.2" }
+  origins { name = "3.3.3.3" }
+  vlansdisabled = true
+  autolasthop = "default"
+  mirror = "disabled"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +171,14 @@ provider "bigip" {
 
 func testBigipLtmSnatModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_snat" "test-snat" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  translation = "/Common/1.1.2.1"
+  origins { name = "2.2.2.2" }
+  origins { name = "3.3.3.3" }
+  vlansdisabled = true
+  autolasthop = "default"
+  mirror = "disabled"
 }
 provider "bigip" {
   address  = "%s"

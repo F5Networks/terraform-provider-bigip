@@ -15,17 +15,18 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-func validateStringValue(values []string) schema.SchemaValidateFunc {
-	return func(value interface{}, field string) (ws []string, errors []error) {
-		for _, v := range values {
-			if v == value.(string) {
-				return
-			}
-		}
-		errors = append(errors, fmt.Errorf("%q must be one of %v", field, values))
-		return
-	}
-}
+//
+//func validateStringValue(values []string) schema.SchemaValidateFunc {
+//	return func(value interface{}, field string) (ws []string, errors []error) {
+//		for _, v := range values {
+//			if v == value.(string) {
+//				return
+//			}
+//		}
+//		errors = append(errors, fmt.Errorf("%q must be one of %v", field, values))
+//		return
+//	}
+//}
 
 func validateF5Name(value interface{}, field string) (ws []string, errors []error) {
 	var values []string
@@ -87,9 +88,9 @@ func validateVirtualAddressName(value interface{}, field string) (ws []string, e
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateVirtualAddressName ", reflect.TypeOf(value)))
 	}
-	re := regexp.MustCompile(`^/[\w_\-.]+/[\w_\-.:]+[\%\d_]*$`)
+	re := regexp.MustCompile(`^/[\w_\-.]+/[\w_\-.:]+[%\d_]*$`)
 	for _, v := range values {
 		match := re.MatchString(v)
 		if !match {
@@ -111,9 +112,9 @@ func validatePartitionName(value interface{}, field string) (ws []string, errors
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePartitionName ", reflect.TypeOf(value)))
 	}
-	re := regexp.MustCompile(`^[^/][^\s]+$`)
+	re := regexp.MustCompile(`^[^/][^\s/]+$`)
 	for _, v := range values {
 		match := re.MatchString(v)
 		if !match {
@@ -140,7 +141,7 @@ func validateEnabledDisabled(value interface{}, field string) (ws []string, erro
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateEnabledDisabled", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateEnabledDisabled ", reflect.TypeOf(value)))
 	}
 
 	re := regexp.MustCompile("^enabled$|^disabled$")
@@ -165,7 +166,7 @@ func validateDataGroupType(value interface{}, field string) (ws []string, errors
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validateDataGroupType", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validateDataGroupType ", reflect.TypeOf(value)))
 	}
 
 	re := regexp.MustCompile("^string$|^ip$|^integer$")
@@ -190,7 +191,7 @@ func validateAssignmentType(value interface{}, field string) (ws []string, error
 	case string:
 		values = []string{val}
 	default:
-		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType", reflect.TypeOf(value)))
+		errors = append(errors, fmt.Errorf("Unknown type %v in validatePoolLicenseType ", reflect.TypeOf(value)))
 	}
 	re := regexp.MustCompile("(?mi)^MANAGED$|^UNMANAGED$|^UNREACHABLE$")
 	for _, v := range values {
@@ -203,7 +204,7 @@ func validateAssignmentType(value interface{}, field string) (ws []string, error
 }
 
 func getDeviceUri(str string) []string {
-	re := regexp.MustCompile(`^(?:(?:(https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?`)
+	re := regexp.MustCompile(`^(?:(?:(https?|s?ftp):)//)([^:/\s]+)(?::(\d*))?`)
 	if len(re.FindStringSubmatch(str)) > 0 {
 		return re.FindStringSubmatch(str)
 	}

@@ -1158,7 +1158,7 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
-		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
+		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name ")
 	}
 	partition := strings.Join(polStr[:len(polStr)-1], "~")
 	policyName := polStr[len(polStr)-1]

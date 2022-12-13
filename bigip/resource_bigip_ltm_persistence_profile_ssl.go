@@ -20,7 +20,7 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 		Read:   resourceBigipLtmPersistenceProfileSSLRead,
 		Update: resourceBigipLtmPersistenceProfileSSLUpdate,
 		Delete: resourceBigipLtmPersistenceProfileSSLDelete,
-		Exists: resourceBigipLtmPersistenceProfileSSLExists,
+		//Exists: resourceBigipLtmPersistenceProfileSSLExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -129,6 +129,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile  (%s) ", err)
+		d.SetId("")
 		return err
 	}
 	if pp == nil {
@@ -144,7 +145,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 	return nil
 }
@@ -154,44 +155,24 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 
 	name := d.Id()
 	timeout := d.Get("timeout").(int)
+	pp := &bigip.SSLPersistenceProfile{
+		PersistenceProfile: bigip.PersistenceProfile{
+			AppService:              d.Get("app_service").(string),
+			DefaultsFrom:            d.Get("defaults_from").(string),
+			MatchAcrossPools:        d.Get("match_across_pools").(string),
+			MatchAcrossServices:     d.Get("match_across_services").(string),
+			MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
+			Mirror:                  d.Get("mirror").(string),
+			OverrideConnectionLimit: d.Get("override_conn_limit").(string),
+		},
+	}
 	if timeout != 0 {
-		pp := &bigip.SSLPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-				Timeout:                 strconv.Itoa(d.Get("timeout").(int)),
-			},
-		}
-
-		err := client.ModifySSLPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
-			return err
-		}
-	} else {
-		pp := &bigip.SSLPersistenceProfile{
-			PersistenceProfile: bigip.PersistenceProfile{
-				AppService:              d.Get("app_service").(string),
-				DefaultsFrom:            d.Get("defaults_from").(string),
-				MatchAcrossPools:        d.Get("match_across_pools").(string),
-				MatchAcrossServices:     d.Get("match_across_services").(string),
-				MatchAcrossVirtuals:     d.Get("match_across_virtuals").(string),
-				Mirror:                  d.Get("mirror").(string),
-				OverrideConnectionLimit: d.Get("override_conn_limit").(string),
-			},
-		}
-
-		err := client.ModifySSLPersistenceProfile(name, pp)
-		if err != nil {
-			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
-			return err
-		}
-
+		pp.Timeout = strconv.Itoa(d.Get("timeout").(int))
+	}
+	err := client.ModifySSLPersistenceProfile(name, pp)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
+		return err
 	}
 
 	return resourceBigipLtmPersistenceProfileSSLRead(d, meta)
@@ -209,24 +190,4 @@ func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta in
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching SSL Persistence Profile " + name)
-
-	pp, err := client.GetSSLPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] persistence profile SSL  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }

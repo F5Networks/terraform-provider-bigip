@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -95,6 +94,7 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	snatpool, err := client.GetSnatPool(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat Pool  (%s) (%v) ", name, err)
+		d.SetId("")
 		return err
 	}
 	if snatpool == nil {
@@ -102,10 +102,8 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("members", snatpool.Members); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Members to state for SNAT Pool (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("name", name)
+	_ = d.Set("members", snatpool.Members)
 
 	return nil
 

@@ -19,7 +19,7 @@ func resourceBigipSslCertificate() *schema.Resource {
 		Read:   resourceBigipSslCertificateRead,
 		Update: resourceBigipSslCertificateUpdate,
 		Delete: resourceBigipSslCertificateDelete,
-		Exists: resourceBigipSslCertificateExists,
+		//Exists: resourceBigipSslCertificateExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -59,13 +59,13 @@ func resourceBigipSslCertificate() *schema.Resource {
 func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	log.Println("[INFO] Certificate Name " + name)
+	log.Println("[INFO][Create] Certificate Name " + name)
 
 	certPath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
 	err := client.UploadCertificate(name, certPath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
+		return fmt.Errorf("Error in Importing/Creating certificate (%s): %s ", name, err)
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -109,9 +109,10 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 
 	certificate, err := client.GetCertificate(name)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
-	log.Printf("[INFO] Certificate content:%+v", certificate)
+	log.Printf("[DEBUG] Certificate content:%+v", certificate)
 	_ = d.Set("name", certificate.Name)
 	_ = d.Set("partition", certificate.Partition)
 	_ = d.Set("full_path", certificate.FullPath)
@@ -119,40 +120,40 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking certificate " + name + " exists.")
-	partition := d.Get("partition").(string)
-
-	if partition == "" {
-		if !strings.HasPrefix(name, "/") {
-			err := errors.New("the name must be in full_path format when partition is not specified")
-			fmt.Print(err)
-		}
-	} else {
-		if !strings.HasPrefix(name, "/") {
-			name = "/" + partition + "/" + name
-		}
-	}
-	certificate, err := client.GetCertificate(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve certificate   (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if certificate == nil {
-		log.Printf("[WARN] certificate (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return certificate != nil, nil
-}
+//func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+//	client := meta.(*bigip.BigIP)
+//	name := d.Id()
+//	log.Println("[INFO] Checking certificate " + name + " exists.")
+//	partition := d.Get("partition").(string)
+//
+//	if partition == "" {
+//		if !strings.HasPrefix(name, "/") {
+//			err := errors.New("the name must be in full_path format when partition is not specified")
+//			fmt.Print(err)
+//		}
+//	} else {
+//		if !strings.HasPrefix(name, "/") {
+//			name = "/" + partition + "/" + name
+//		}
+//	}
+//	certificate, err := client.GetCertificate(name)
+//	if err != nil {
+//		log.Printf("[ERROR] Unable to Retrieve certificate   (%s) (%v) ", name, err)
+//		return false, err
+//	}
+//
+//	if certificate == nil {
+//		log.Printf("[WARN] certificate (%s) not found, removing from state", d.Id())
+//		d.SetId("")
+//	}
+//
+//	return certificate != nil, nil
+//}
 
 func resourceBigipSslCertificateUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Println("[INFO] Certificate Name " + name)
+	log.Println("[INFO] [Update] Certificate Name " + name)
 	certpath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
 	/*if !strings.HasSuffix(name, ".crt") {

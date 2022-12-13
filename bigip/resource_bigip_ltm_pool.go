@@ -98,7 +98,6 @@ func resourceBigipLtmPool() *schema.Resource {
 func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	d.SetId(name)
 	log.Println("[INFO] Creating pool " + name)
 	poolSt := &bigip.Pool{
 		Name: name,
@@ -108,6 +107,7 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return fmt.Errorf("Error in creating pool (%s): %s ", name, err)
 	}
+	d.SetId(name)
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -137,6 +137,7 @@ func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
 	log.Println("[INFO] Reading pool " + name)
 	pool, err := client.GetPool(name)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 	if pool == nil {
