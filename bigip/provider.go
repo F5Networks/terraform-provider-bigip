@@ -156,6 +156,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_net_ike_peer":                    resourceBigipNetIkePeer(),
 			"bigip_ipsec_profile":                   resourceBigipIpsecProfile(),
 			"bigip_waf_policy":                      resourceBigipAwafPolicy(),
+			"bigip_vcmp_guest":                      resourceBigipVcmpGuest(),
 		},
 	}
 	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
@@ -224,6 +225,15 @@ func listToStringSlice(s []interface{}) []string {
 	list := make([]string, len(s))
 	for i, v := range s {
 		list[i] = v.(string)
+	}
+	return list
+}
+
+// Convert schema.TypeList to a slice of strings
+func listToIntSlice(s []interface{}) []int {
+	list := make([]int, len(s))
+	for i, v := range s {
+		list[i] = v.(int)
 	}
 	return list
 }
