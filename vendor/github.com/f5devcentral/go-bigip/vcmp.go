@@ -11,33 +11,32 @@ See the License for the specific language governing permissions and limitations 
 
 package bigip
 
-
 type VcmpGuest struct {
-	Name                string `json:"name,omitempty"`
-	FullPath            string `json:"fullPath,omitempty"`
-	AllowedSlots		[]int  `json:"allowedSlots,omitempty"`
-	AssignedSlots		[]int  `json:"assignedSlots,omitempty"`
-	CoresPerSlot		int	   `json:"coresPerSlot,omitempty"`
-	Hostname			string `json:"hostname,omitempty"`
-	InitialImage		string `json:"initialImage,omitempty"`
-	InitialHotfix		string `json:"initialHotfix,omitempty"`
-	Slots				int    `json:"slots,omitempty"`
-	MinSlots			int    `json:"minSlots,omitempty"`
-	ManagementNetwork	string `json:"managementNetwork,omitempty"`
-	ManagementIp		string `json:"managementIp,omitempty"`
-	ManagementGw		string `json:"managementGw,omitempty"`
-	VirtualDisk			string `json:"virtualDisk,omitempty"`
-	Vlans				[]string `json:"vlans,omitempty"`
-	State				string `json:"state,omitempty"`
-	SslMode				string `json:"sslMode,omitempty"`
+	Name              string   `json:"name,omitempty"`
+	FullPath          string   `json:"fullPath,omitempty"`
+	AllowedSlots      []int    `json:"allowedSlots,omitempty"`
+	AssignedSlots     []int    `json:"assignedSlots,omitempty"`
+	CoresPerSlot      int      `json:"coresPerSlot,omitempty"`
+	Hostname          string   `json:"hostname,omitempty"`
+	InitialImage      string   `json:"initialImage,omitempty"`
+	InitialHotfix     string   `json:"initialHotfix,omitempty"`
+	Slots             int      `json:"slots,omitempty"`
+	MinSlots          int      `json:"minSlots,omitempty"`
+	ManagementNetwork string   `json:"managementNetwork,omitempty"`
+	ManagementIp      string   `json:"managementIp,omitempty"`
+	ManagementGw      string   `json:"managementGw,omitempty"`
+	VirtualDisk       string   `json:"virtualDisk,omitempty"`
+	Vlans             []string `json:"vlans,omitempty"`
+	State             string   `json:"state,omitempty"`
+	SslMode           string   `json:"sslMode,omitempty"`
 }
 
 type VcmpDisks struct {
 	Disks []VcmpDisk `json:"items,omitempty"`
 }
 type VcmpDisk struct {
-	Name		string `json:"name,omitempty"`
-	FullPath	string `json:"fullPath,omitempty"`
+	Name     string `json:"name,omitempty"`
+	FullPath string `json:"fullPath,omitempty"`
 }
 
 type VcmpGuestStat struct {
@@ -49,23 +48,22 @@ type VcmpGuestStat struct {
 			VmStatus struct {
 				Descrption string `json:"description,omitempty"`
 			} `json:"vmStatus,omitempty"`
-		}`json:"entries,omitempty"`
-	}`json:"nestedStats,omitempty"`
+		} `json:"entries,omitempty"`
+	} `json:"nestedStats,omitempty"`
 }
 type VcmpGuestStats struct {
-	Kind     string 	`json:"kind,omitempty"`
-	SelfLink string 	`json:"selfLink,omitempty"`
-	Entries  DynStat	`json:"entries,omitempty"`
+	Kind     string  `json:"kind,omitempty"`
+	SelfLink string  `json:"selfLink,omitempty"`
+	Entries  DynStat `json:"entries,omitempty"`
 }
 
-type DynStat map[string] VcmpGuestStat
-
+type DynStat map[string]VcmpGuestStat
 
 const (
-	uriVcmp			= "vcmp"
-	uriGuest		= "guest"
-	uriDisk			= "virtual-disk"
-	uriStats		= "stats"
+	uriVcmp  = "vcmp"
+	uriGuest = "guest"
+	uriDisk  = "virtual-disk"
+	uriStats = "stats"
 )
 
 func (b *BigIP) GetVcmpGuestStats(name string) (*VcmpGuestStats, error) {
@@ -81,7 +79,6 @@ func (b *BigIP) GetVcmpGuestStats(name string) (*VcmpGuestStats, error) {
 
 	return &stats, nil
 }
-
 
 func (b *BigIP) GetVcmpGuest(name string) (*VcmpGuest, error) {
 	var guest VcmpGuest
@@ -110,7 +107,6 @@ func (b *BigIP) GetVcmpDisks() (*VcmpDisks, error) {
 func (b *BigIP) DeleteVcmpDisk(name string) error {
 	return b.delete(uriVcmp, uriDisk, name)
 }
-
 
 func (b *BigIP) CreateVcmpGuest(config *VcmpGuest) error {
 	return b.post(config, uriVcmp, uriGuest)

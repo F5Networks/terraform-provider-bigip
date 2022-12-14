@@ -210,7 +210,8 @@ provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
   username = "xxx"
   password = "xxx"
-}`, resourceName)
+}
+`, resourceName)
 }
 
 func testBigipVcmpGuestCreate(resourceName, url string) string {
@@ -232,7 +233,8 @@ provider "bigip" {
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}
+`, resourceName, url)
 }
 
 func testBigipVcmpGuestModify(resourceName, url string) string {
@@ -246,5 +248,6 @@ provider "bigip" {
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}
+`, resourceName, url)
 }
