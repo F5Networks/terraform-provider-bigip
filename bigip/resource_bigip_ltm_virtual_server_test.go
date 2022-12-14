@@ -584,9 +584,9 @@ resource "bigip_ltm_policy" "test-policy" {
   rule {
     name = "rule6"
     action {
-      forward = true
+      forward    = true
       connection = false
-      pool    = bigip_ltm_pool.mypool.name
+      pool       = bigip_ltm_pool.mypool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]
@@ -632,9 +632,9 @@ resource "bigip_ltm_policy" "%[2]s" {
   rule {
     name = "rule6"
     action {
-      forward = true
+      forward    = true
       connection = false
-      pool    = bigip_ltm_pool.%[1]s.name
+      pool       = bigip_ltm_pool.%[1]s.name
     }
   }
   depends_on = [bigip_ltm_pool.%[1]s]
@@ -680,9 +680,9 @@ resource "bigip_ltm_policy" "%[2]s" {
   rule {
     name = "rule6"
     action {
-      forward = true
+      forward    = true
       connection = false
-      pool    = bigip_ltm_pool.%[1]s.name
+      pool       = bigip_ltm_pool.%[1]s.name
     }
   }
   depends_on = [bigip_ltm_pool.%[1]s]
@@ -761,12 +761,12 @@ resource "bigip_ltm_virtual_server" "test_virtual_server_policyattch_detach" {
 func testVSCreatevlanEnabled(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_net_vlan" "test-vlan" {
-	name = "/Common/test-vlan-vsenable"
-	tag = 1010
-	interfaces {
-		vlanport = 1.1
-		tagged = true
-	}
+  name = "/Common/test-vlan-vsenable"
+  tag  = 1010
+  interfaces {
+    vlanport = 1.1
+    tagged   = true
+  }
 }
 resource "bigip_ltm_virtual_server" "%s" {
   name          = "/Common/%s"
