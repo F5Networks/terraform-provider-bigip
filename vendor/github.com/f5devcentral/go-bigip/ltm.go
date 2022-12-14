@@ -570,11 +570,13 @@ type VirtualServer struct {
 		Pool string `json:"pool,omitempty"`
 	} `json:"sourceAddressTranslation,omitempty"`
 	SourcePort                 string    `json:"sourcePort,omitempty"`
+	FwEnforcedPolicy           string    `json:"fwEnforcedPolicy,omitempty"`
 	SYNCookieStatus            string    `json:"synCookieStatus,omitempty"`
 	TranslateAddress           string    `json:"translateAddress,omitempty"`
 	TranslatePort              string    `json:"translatePort,omitempty"`
 	VlansEnabled               bool      `json:"vlansEnabled,omitempty"`
 	VlansDisabled              bool      `json:"vlansDisabled,omitempty"`
+	TrafficMatchingCriteria    string    `json:"trafficMatchingCriteria,omitempty"`
 	VSIndex                    int       `json:"vsIndex,omitempty"`
 	Vlans                      []string  `json:"vlans,omitempty"`
 	Rules                      []string  `json:"rules,omitempty"`

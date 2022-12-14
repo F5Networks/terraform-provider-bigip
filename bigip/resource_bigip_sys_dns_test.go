@@ -180,7 +180,8 @@ resource "bigip_sys_dns" "test-dns-tc2" {
   description  = "%v"
   name_servers = ["1.1.1.1"]
   search       = ["f5.com"]
-}`, sysDNSName)
+}
+`, sysDNSName)
 }
 
 func getsysDNSConfigTC3(sysDNSName string) string {
@@ -189,7 +190,8 @@ resource "bigip_sys_dns" "test-dns-tc3" {
   description  = "%v"
   name_servers = ["1.1.1.1"]
   search       = ["f5.com"]
-}`, sysDNSName)
+}
+`, sysDNSName)
 }
 
 func getsysDNSConfigTC3a(sysDNSName string) string {
@@ -198,7 +200,8 @@ resource "bigip_sys_dns" "test-dns-tc3" {
   description  = "%v"
   name_servers = ["1.1.1.1", "2.2.2.2"]
   search       = ["f5.com", "f5.net"]
-}`, sysDNSName)
+}
+`, sysDNSName)
 }
 
 func getsysDNSConfigTC4(sysDNSName string) string {
@@ -206,5 +209,6 @@ func getsysDNSConfigTC4(sysDNSName string) string {
 resource "bigip_sys_dns" "test-dns-tc4" {
   description  = "%v"
   name_servers = ["1.1.1.1", "2.2.2.2"]
-}`, sysDNSName)
+}
+`, sysDNSName)
 }

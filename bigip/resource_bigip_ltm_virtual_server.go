@@ -14,184 +14,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
-
-func resourceBigipLtmVirtualServer() *schema.Resource {
-	return &schema.Resource{
-		Create: resourceBigipLtmVirtualServerCreate,
-		Read:   resourceBigipLtmVirtualServerRead,
-		Update: resourceBigipLtmVirtualServerUpdate,
-		Delete: resourceBigipLtmVirtualServerDelete,
-		Exists: resourceBigipLtmVirtualServerExists,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
-
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Name of the virtual server",
-				ForceNew:     true,
-				ValidateFunc: validateF5NameWithDirectory,
-			},
-			"port": {
-				Type:        schema.TypeInt,
-				Required:    true,
-				Description: "Listen port for the virtual server",
-			},
-			"source": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Source IP and mask for the virtual server",
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"state": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "enabled",
-				ValidateFunc: validateEnabledDisabled,
-				Description:  "Specifies whether the virtual server and its resources are available for load balancing. The default is Enabled",
-			},
-			"destination": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"pool": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Description:  "Default pool for this virtual server",
-				ValidateFunc: validateF5NameWithDirectory,
-			},
-			"mask": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "subnet mask",
-			},
-			"profiles": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-				Computed: true,
-			},
-			"client_profiles": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-				//Computed: true,
-			},
-			"server_profiles": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-				//Computed: true,
-			},
-			"persistence_profiles": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-				//Computed: true,
-			},
-			"default_persistence_profile": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"fallback_persistence_profile": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Fallback persistence profile",
-			},
-			"irules": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Optional: true,
-			},
-			"security_log_profiles": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Optional: true,
-			},
-			"per_flow_request_access_policy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-			"source_address_translation": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Computed:    true,
-				Description: "none, automap, snat",
-			},
-			"snatpool": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Name of the snatpool to use. Requires source_address_translation to be set to 'snat'.",
-			},
-			"ip_protocol": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "tcp",
-				//Computed:    true,
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	if (old == "any" && new == "") || (old == "" && new == "any") {
-				//		return true
-				//	}
-				//	return false
-				// },
-				Description: "Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is TCP. The Protocol setting is not available when you select Performance (HTTP) as the Type.",
-			},
-			"policies": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-			},
-			"vlans": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
-			},
-			"translate_address": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "enabled",
-				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
-				Description:  "Specifies, when checked (enabled), that the system translates the address of the virtual server. When cleared (disabled), specifies that the system uses the address without translation. This option is useful when the system is load balancing devices that have the same IP address. The default is enabled",
-			},
-			"translate_port": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "enabled",
-				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
-				Description:  "Specifies, when checked (enabled), that the system translates the port of the virtual server. When cleared (disabled), specifies that the system uses the port without translation. Turning off port translation for a virtual server is useful if you want to use the virtual server to load balance connections to any service. The default is enabled.",
-			},
-			"vlans_enabled": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-				Description: "Enables the virtual server on the VLANs specified by the VLANs option. By default it is set to false",
-			},
-		},
-	}
-}
 
 var cidr = map[string]string{
 	"0":  "0.0.0.0",
@@ -229,6 +57,199 @@ var cidr = map[string]string{
 	"32": "255.255.255.255",
 }
 
+func resourceBigipLtmVirtualServer() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceBigipLtmVirtualServerCreate,
+		Read:   resourceBigipLtmVirtualServerRead,
+		Update: resourceBigipLtmVirtualServerUpdate,
+		Delete: resourceBigipLtmVirtualServerDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
+		Schema: map[string]*schema.Schema{
+			"name": {
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the virtual server",
+				ForceNew:     true,
+				ValidateFunc: validateF5NameWithDirectory,
+			},
+			"port": {
+				Type:          schema.TypeInt,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"trafficmatching_criteria"},
+				Description:   "Listen port for the virtual server",
+			},
+			"source": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Source IP and mask for the virtual server",
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"state": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validateEnabledDisabled,
+				Description:  "Specifies whether the virtual server and its resources are available for load balancing. The default is Enabled",
+			},
+			"destination": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Description:   "Specifies destination IP address information to which the virtual server sends traffic",
+				ConflictsWith: []string{"trafficmatching_criteria"},
+			},
+			"trafficmatching_criteria": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				Description:   "Specifies destination traffic matching information to which the virtual server sends traffic",
+				ConflictsWith: []string{"destination", "port"},
+			},
+			"pool": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Default pool for this virtual server",
+				ValidateFunc: validateF5NameWithDirectory,
+			},
+			"mask": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				StateFunc: func(val interface{}) string {
+					if strings.Contains(val.(string), ".") {
+						return val.(string)
+					} else {
+						return cidr[val.(string)]
+					}
+				},
+				Description: "subnet mask",
+			},
+			"profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				Computed: true,
+			},
+			"client_profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				//Computed: true,
+			},
+			"server_profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				//Computed: true,
+			},
+			"persistence_profiles": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+				//Computed: true,
+			},
+			"default_persistence_profile": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"fallback_persistence_profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Fallback persistence profile",
+			},
+			"irules": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+			},
+			"security_log_profiles": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+			},
+			"per_flow_request_access_policy": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"source_port": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"source_address_translation": {
+				Type:     schema.TypeString,
+				Optional: true,
+				//Computed:    true,
+				Description: "none, automap, snat",
+			},
+			"snatpool": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Name of the snatpool to use. Requires source_address_translation to be set to 'snat'.",
+			},
+			"ip_protocol": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "tcp",
+				Description: "Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is TCP. The Protocol setting is not available when you select Performance (HTTP) as the Type.",
+			},
+			"policies": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+			},
+			"vlans": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+				Optional: true,
+			},
+			"translate_address": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
+				Description:  "Specifies, when checked (enabled), that the system translates the address of the virtual server. When cleared (disabled), specifies that the system uses the address without translation. This option is useful when the system is load balancing devices that have the same IP address. The default is enabled",
+			},
+			"translate_port": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled"}, false),
+				Description:  "Specifies, when checked (enabled), that the system translates the port of the virtual server. When cleared (disabled), specifies that the system uses the port without translation. Turning off port translation for a virtual server is useful if you want to use the virtual server to load balance connections to any service. The default is enabled.",
+			},
+			"vlans_enabled": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Enables the virtual server on the VLANs specified by the VLANs option. By default it is set to false",
+			},
+			"firewall_enforced_policy": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Applies the specified AFM policy to the virtual in an enforcing way,when creating a new virtual, if this parameter is not specified, the enforced is disabled.this should be in full path ex: `/Common/afm-test-policy`",
+			},
+		},
+	}
+}
+
 func ltmVirtualServerAttrDefaults(d *schema.ResourceData) {
 	_, hasMask := d.GetOk("mask")
 	_, hasSource := d.GetOk("source")
@@ -245,7 +266,7 @@ func ltmVirtualServerAttrDefaults(d *schema.ResourceData) {
 	// set default source if nil
 	if !hasSource {
 		// looks like IPv6, lets set to ::/0
-		if strings.Contains(d.Get("source").(string), ":") {
+		if strings.Contains(d.Get("destination").(string), ":") {
 			_ = d.Set("source", "::/0")
 		} else { // 0.0.0.0/0
 			_ = d.Set("source", "0.0.0.0/0")
@@ -298,6 +319,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	vs, err := client.GetVirtualServer(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
+		d.SetId("")
 		return err
 	}
 	if vs == nil {
@@ -305,41 +327,31 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		d.SetId("")
 		return nil
 	}
-
 	vsDest := vs.Destination
-	if strings.Count(vsDest, ":") >= 2 {
-		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+	if vsDest != ":0" && strings.Count(vsDest, ":") >= 2 {
+		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
 			return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
 		}
-		if err := d.Set("destination", destination[2]); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("destination", destination[2])
 	}
-	if strings.Count(vsDest, ":") < 2 {
-		regex := regexp.MustCompile(`(\/.+\/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(\%\d+)?(\:\d+)`)
+	if vsDest != ":0" && strings.Count(vsDest, ":") < 2 {
+		regex := regexp.MustCompile(`(/.+/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(%\d+)?(:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]
 		if len(destination) < 3 {
 			return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
 		}
-		if err := d.Set("destination", parsedDestination); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Destination to state for Virtual Server  (%s): %s", d.Id(), err)
-		}
-	}
-	if err := d.Set("source", vs.Source); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Source to state for Virtual Server  (%s): %s", d.Id(), err)
+		_ = d.Set("destination", parsedDestination)
 	}
 
+	_ = d.Set("trafficmatching_criteria", vs.TrafficMatchingCriteria)
+	_ = d.Set("source", vs.Source)
 	_ = d.Set("protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
-	if err := d.Set("pool", vs.Pool); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Pool to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mask", vs.Mask); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mask to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("pool", vs.Pool)
+	_ = d.Set("mask", vs.Mask)
 
 	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
 	//	   so we need to extract it
@@ -352,16 +364,16 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	//	parsedPort, _ := strconv.Atoi(port[1])
 
 	if strings.Count(vsDest, ":") < 2 {
-		regex := regexp.MustCompile(`\:(\d+)`)
+		regex := regexp.MustCompile(`:(\d+)`)
 		port := regex.FindStringSubmatch(vs.Destination)
 		if len(port) < 2 {
-			return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+			return fmt.Errorf("Unable to extract service port from virtual server destination: %s ", vs.Destination)
 		}
 		parsedPort, _ := strconv.Atoi(port[1])
 		_ = d.Set("port", parsedPort)
 	}
 	if strings.Count(vsDest, ":") >= 2 {
-		regex := regexp.MustCompile(`^(\/.+\/)(.*:[^%]*)(?:\%\d+)?(?:\.(\d+))$`)
+		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedPort, _ := strconv.Atoi(destination[3])
 		_ = d.Set("port", parsedPort)
@@ -376,37 +388,34 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	} else {
 		_ = d.Set("state", "disabled")
 	}
-	_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
-	if err := d.Set("snatpool", vs.SourceAddressTranslation.Pool); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Virtual Server  (%s): %s", d.Id(), err)
+	if _, ok := d.GetOk("source_address_translation"); ok {
+		_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
 	}
-	if err := d.Set("policies", vs.Policies); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Policies to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("snatpool", vs.SourceAddressTranslation.Pool)
+	_ = d.Set("policies", vs.Policies)
 	_ = d.Set("vlans", vs.Vlans)
-	if err := d.Set("translate_address", vs.TranslateAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TranslateAddress to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("translate_port", vs.TranslatePort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TranslatePort to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("translate_address", vs.TranslateAddress)
+	_ = d.Set("translate_port", vs.TranslatePort)
+	_ = d.Set("firewall_enforced_policy", vs.FwEnforcedPolicy)
+
 	profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
 	for _, profile := range vs.PersistenceProfiles {
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
 		profileNames.Add(FullProfileName)
 	}
 	if profileNames.Len() > 0 {
-		_ = d.Set("persistence_profiles", profileNames)
+		if _, ok := d.GetOk("persistence_profiles"); ok {
+			_ = d.Set("persistence_profiles", profileNames)
+			_ = d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile)
+		}
 	}
-	if err := d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving FallbackPersistenceProfile to state for Virtual Server  (%s): %s", d.Id(), err)
-	}
+
+	_ = d.Set("source_port", vs.SourcePort)
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
 		return err
 	}
-
 	if profiles != nil && len(profiles.Profiles) > 0 {
 		profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
 		clientProfileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
@@ -434,25 +443,6 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceBigipLtmVirtualServerExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching virtual server " + name)
-
-	vs, err := client.GetVirtualServer(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
-		return false, err
-	}
-
-	if vs == nil {
-		d.SetId("")
-	}
-
-	return vs != nil, nil
-}
-
 func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
@@ -460,6 +450,7 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	pss := &bigip.VirtualServer{
 		Name: name,
 	}
+	log.Println("[INFO] Updating virtual server " + name)
 	config := getVirtualServerConfig(d, pss)
 	err := client.ModifyVirtualServer(name, config)
 	if err != nil {
@@ -493,21 +484,23 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	config.Pool = d.Get("pool").(string)
 	config.TranslatePort = d.Get("translate_port").(string)
 	config.TranslateAddress = d.Get("translate_address").(string)
+	config.SourcePort = d.Get("source_port").(string)
+	config.FwEnforcedPolicy = d.Get("firewall_enforced_policy").(string)
 	config.Source = d.Get("source").(string)
 	if strings.Contains(destination, ":") {
 		subnetMask := mask
 		config.Destination = fmt.Sprintf("%s.%d", destination, port)
 		config.Mask = subnetMask
 	} else {
-		subnetMask := cidr[mask]
+		var subnetMask string
+		if strings.Contains(mask, ".") {
+			subnetMask = mask
+		} else {
+			subnetMask = cidr[mask]
+		}
 		config.Destination = fmt.Sprintf("%s:%d", destination, port)
 		config.Mask = subnetMask
 	}
-	// destPort := fmt.Sprintf("%s:%d", d.Get("destination").(string), d.Get("port").(int))
-	// if strings.Contains(d.Get("destination").(string), ":") {
-	// 	destPort = fmt.Sprintf("%s.%d", d.Get("destination").(string), d.Get("port").(int))
-	// }
-	// config.Destination = destPort
 
 	var profiles []bigip.Profile
 	if p, ok := d.GetOk("profiles"); ok {
@@ -534,6 +527,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 				persistenceProfiles = append(persistenceProfiles, bigip.Profile{Name: profile.(string)})
 			}
 		}
+		config.FallbackPersistenceProfile = d.Get("fallback_persistence_profile").(string)
 	}
 	var policies []string
 	if p, ok := d.GetOk("policies"); ok {
@@ -552,7 +546,6 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	if cfgLogProfiles, ok := d.GetOk("security_log_profiles"); ok {
 		securityLogProfiles = listToStringSlice(cfgLogProfiles.([]interface{}))
 	}
-	config.FallbackPersistenceProfile = d.Get("fallback_persistence_profile").(string)
 
 	config.SecurityLogProfiles = securityLogProfiles
 	config.PerFlowRequestAccessPolicy = d.Get("per_flow_request_access_policy").(string)
@@ -563,6 +556,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	config.Policies = policies
 	config.Vlans = vlans
 	config.IPProtocol = d.Get("ip_protocol").(string)
+	config.TrafficMatchingCriteria = d.Get("trafficmatching_criteria").(string)
 	srcAddrsTrans := struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`

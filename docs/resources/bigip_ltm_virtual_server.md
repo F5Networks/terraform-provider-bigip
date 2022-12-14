@@ -99,6 +99,10 @@ By default it is `false` i.e vlanDisabled on specified vlans, if we want enable 
 
 * `security_log_profiles` - (Optional) Specifies the log profile applied to the virtual server.
 
+* `source_port` - (Optional,type `string`) Specifies whether the system preserves the source port of the connection. The default is `preserve`.
+
+* `firewall_enforced_policy` - (Optional,type `string`) Applies the specified AFM policy to the virtual in an enforcing way,when creating a new virtual, if this parameter is not specified, the enforced is disabled.This should be in full path ex: `/Common/afm-test-policy`.
+
 ## Importing
 An existing virtual-server can be imported into this resource by supplying virtual-server Name in `full path` as `id`.
 An example is below:
