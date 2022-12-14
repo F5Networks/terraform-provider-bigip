@@ -222,7 +222,8 @@ func getProfileTCPConfigDefault(profileName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
   name = "%v"
-}`, profileName)
+}
+`, profileName)
 }
 
 func getProfileTCPConfig(profileName string) string {
@@ -231,7 +232,8 @@ resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
   name                          = "%v"
   congestion_control            = "cdg"
   initial_congestion_windowsize = 20
-}`, profileName)
+}
+`, profileName)
 }
 
 func getProfileTCPConfig2(profileName string) string {
@@ -240,7 +242,8 @@ resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
   name                          = "%v"
   congestion_control            = "bbr"
   initial_congestion_windowsize = 30
-}`, profileName)
+}
+`, profileName)
 }
 
 func getProfileTCPConfigTC2(profileName string) string {
@@ -252,7 +255,8 @@ resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
   early_retransmit = "disabled"
   tailloss_probe   = "disabled"
   timewait_recycle = "disabled"
-}`, profileName)
+}
+`, profileName)
 }
 func getProfileTCPConfigTC2Modify(profileName string) string {
 	return fmt.Sprintf(`
@@ -263,5 +267,6 @@ resource "bigip_ltm_profile_tcp" "test_tcp_profile" {
   early_retransmit = "enabled"
   tailloss_probe   = "enabled"
   timewait_recycle = "enabled"
-}`, profileName)
+}
+`, profileName)
 }

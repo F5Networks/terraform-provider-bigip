@@ -18,14 +18,14 @@ Resource does not wait for vCMP guest to reach the desired state, it only ensure
 
 ```hcl
 resource "bigip_vcmp_guest" "vcmp-test" {
-  name = "tf_guest"
-  initial_image = "12.1.2.iso"
-  mgmt_network = "bridged"
-  mgmt_address = "10.1.1.1/24"
-  mgmt_route = "none"
-  state = "provisioned"
-  cores_per_slot = 2
-  number_of_slots = 1
+  name                = "tf_guest"
+  initial_image       = "12.1.2.iso"
+  mgmt_network        = "bridged"
+  mgmt_address        = "10.1.1.1/24"
+  mgmt_route          = "none"
+  state               = "provisioned"
+  cores_per_slot      = 2
+  number_of_slots     = 1
   min_number_of_slots = 1
 }
 

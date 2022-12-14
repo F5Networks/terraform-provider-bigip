@@ -210,41 +210,44 @@ provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
   username = "xxx"
   password = "xxx"
-}`, resourceName)
+}
+`, resourceName)
 }
 
 func testBigipVcmpGuestCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_vcmp_guest" "test-vcmp" {
-  name    = "%s"
-  initial_image = "12.1.2.iso"
-  mgmt_network = "bridged"
-  mgmt_address = "10.1.1.1/24"
-  mgmt_route = "none"
-  state = "provisioned"
-  cores_per_slot = 2
-  number_of_slots = 1
+  name                = "%s"
+  initial_image       = "12.1.2.iso"
+  mgmt_network        = "bridged"
+  mgmt_address        = "10.1.1.1/24"
+  mgmt_route          = "none"
+  state               = "provisioned"
+  cores_per_slot      = 2
+  number_of_slots     = 1
   min_number_of_slots = 1
-  vlans = ["/Common/testvlan"]
+  vlans               = ["/Common/testvlan"]
 }
 provider "bigip" {
-  address  = "%s"
-  username = ""
-  password = ""
+  address   = "%s"
+  username  = ""
+  password  = ""
   login_ref = ""
-}`, resourceName, url)
+}
+`, resourceName, url)
 }
 
 func testBigipVcmpGuestModify(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_vcmp_guest" "test-vcmp" {
-  name    = "%s"
+  name  = "%s"
   state = "configured"
 }
 provider "bigip" {
-  address  = "%s"
-  username = ""
-  password = ""
+  address   = "%s"
+  username  = ""
+  password  = ""
   login_ref = ""
-}`, resourceName, url)
+}
+`, resourceName, url)
 }
