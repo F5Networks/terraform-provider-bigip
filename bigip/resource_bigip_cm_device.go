@@ -94,7 +94,7 @@ func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.ModifyDevice(r)
 	if err != nil {
-		log.Printf("[ERROR] Unable to Modidy Device (%s) (%v) ", name, err)
+		log.Printf("[ERROR] Unable to Modify Device (%s) (%v) ", name, err)
 		return err
 	}
 	return resourceBigipCmDeviceRead(d, meta)

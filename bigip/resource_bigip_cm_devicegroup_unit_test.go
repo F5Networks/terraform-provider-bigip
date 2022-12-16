@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testBigipCmDeviceGroupUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-devicegroup"
+func TestBigipCmDeviceGroupUnitInvalid(t *testing.T) {
+	resourceName := "test-devicegroup"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -29,44 +29,38 @@ func testBigipCmDeviceGroupUnitInvalid(t *testing.T) {
 	})
 }
 
-func testBigipCmDeviceGroupUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-devicegroup"
-	httpDefault := "/Common/http"
+func TestBigipCmDeviceGroupUnitCreate(t *testing.T) {
+	resourceName := "test-devicegroup"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+
+	mux.HandleFunc("/mgmt/tm/cm/device-group/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" && r.Method != "POST" && r.Method != "DELETE" {
+			assert.Fail(t, `request method is supposed to be "GET", "POST" or "DELETE", got %s`, r.Method)
+		}
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
+
+	mux.HandleFunc(fmt.Sprintf("/mgmt/tm/cm/device-group/~Common~%s", resourceName),
+		func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, `{
+				"name":"/Common/%[1]s",
+				"fullPath":"/Common/%[1]s",
+				"type": "sync-only",
+				"autoSync": "disabled",
+				"description": "test description",
+				"devicesReference": {
+					"items": [
+						{
+							"name": "bigip15.com"
+						}
+					]
+				}
+			}`, resourceName)
+		},
+	)
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -79,77 +73,6 @@ func testBigipCmDeviceGroupUnitCreate(t *testing.T) {
 			{
 				Config:             testBigipCmDeviceGroupModify(resourceName, server.URL),
 				ExpectNonEmptyPlan: true,
-			},
-		},
-	})
-}
-
-func testBigipCmDeviceGroupUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-devicegroup"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipCmDeviceGroupCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
-		},
-	})
-}
-
-func testBigipCmDeviceGroupUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-devicegroup"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipCmDeviceGroupCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
 			},
 		},
 	})
@@ -171,8 +94,11 @@ provider "bigip" {
 func testBigipCmDeviceGroupCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_cm_devicegroup" "test-devicegroup" {
-  name    = "%s"
-  basic_auth_realm = "none"
+  name        = "/Common/%s"
+  description = "test description"
+  device {
+	name = "bigip15.com"
+  }
 }
 provider "bigip" {
   address  = "%s"
@@ -185,9 +111,13 @@ provider "bigip" {
 func testBigipCmDeviceGroupModify(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_cm_devicegroup" "test-devicegroup" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  name               = "/Common/%s"
+  description        = "test description 2"
+  full_load_on_sync  = "false"
+  incremental_config = 1444
+  device {
+	name = "bigip16.com"
+  }
 }
 provider "bigip" {
   address  = "%s"

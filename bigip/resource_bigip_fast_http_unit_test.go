@@ -16,57 +16,207 @@ import (
 )
 
 func TestAccBigipFastHttpUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "fasthttpapp"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipFastHttpInvalid(resourceName),
-				ExpectError: regexp.MustCompile(" Unsupported argument: An argument named \"invalidkey\" is not expected here"),
+				ExpectError: regexp.MustCompile(`config is invalid: Unsupported argument: An argument named "invalid_key" is not expected here.`),
 			},
 		},
 	})
 }
 
 func TestAccBigipFastHttpUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "fasthttpapp"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+
+	mux.HandleFunc("/mgmt/shared/fast/applications/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `
+		{
+			"code": 202,
+			"requestId": 171,
+			"message": [
+				{
+					"id": "create_id",
+					"name": "bigip-fast-templates/http",
+					"parameters": {
+						"app_name": "%s",
+						"enable_asm_logging": false,
+						"enable_monitor": true,
+						"enable_pool": false,
+						"enable_snat": true,
+						"enable_tls_client": false,
+						"enable_tls_server": false,
+						"enable_waf_policy": false,
+						"make_monitor": false,
+						"make_pool": false,
+						"make_snatpool": false,
+						"make_tls_client_profile": false,
+						"make_tls_server_profile": false,
+						"make_waf_policy": false,
+						"monitor_credentials": false,
+						"monitor_name_http": "/Common/http",
+						"snat_automap": true,
+						"tenant_name": "fasthttptenant",
+						"virtual_address": "10.30.30.44",
+						"virtual_port": 443
+					}
+				}
+			]
+		}
+		`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/shared/fast/tasks/create_id", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `
+		{
+			"id": "create_id",
+			"code": 200,
+			"message": "success",
+			"name": "bigip-fast-templates/http",
+			"parameters": {
+				"app_name": "%s",
+				"enable_asm_logging": false,
+				"enable_monitor": true,
+				"enable_pool": false,
+				"enable_snat": true,
+				"enable_tls_client": false,
+				"enable_tls_server": false,
+				"enable_waf_policy": false,
+				"make_monitor": false,
+				"make_pool": false,
+				"make_snatpool": false,
+				"make_tls_client_profile": false,
+				"make_tls_server_profile": false,
+				"make_waf_policy": false,
+				"monitor_credentials": false,
+				"monitor_name_http": "/Common/http",
+				"snat_automap": true,
+				"tenant_name": "fasthttptenant",
+				"virtual_address": "10.30.30.44",
+				"virtual_port": 443
+			},
+			"tenant": "fasthttptenant",
+			"application": "fasthttpapp",
+			"operation": "create",
+			"timestamp": "2022-12-14T13:59:36.656Z",
+			"host": "localhost",
+			"_links": {
+				"self": "/mgmt/shared/fast/tasks/create_id"
+			}
+		}
+		`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/shared/fast/tasks/delete_id", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{
+			"id": "delete_id",
+    		"code": 200,
+    		"message": "success"
+		}`)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/shared/fast/tasks/update_id", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{
+			"id": "update_id",
+			"code": 200,
+			"message": "success",
+			"name": "bigip-fast-templates/http",
+			"tenant": "fasthttptenant",
+			"application": "%s",
+			"operation": "update"
+		}
+		`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
+
+	mux.HandleFunc("/mgmt/shared/fast/applications/fasthttptenant/fasthttpapp", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			fmt.Fprintf(w, `
+			{
+				"constants": {
+					"class": "Constants",
+					"fast": {
+						"template": "bigip-fast-templates/http",
+						"setHash": "2d88c05f2b7ce83e595c42c780d51b1216c0cafcc027762f6f01990d2d43105a",
+						"view": {
+							"app_name": "%s",
+							"enable_asm_logging": false,
+							"enable_monitor": true,
+							"enable_pool": false,
+							"enable_snat": true,
+							"enable_tls_client": false,
+							"enable_tls_server": false,
+							"enable_waf_policy": false,
+							"make_monitor": true,
+							"make_pool": false,
+							"make_snatpool": false,
+							"make_tls_client_profile": false,
+							"make_tls_server_profile": false,
+							"make_waf_policy": false,
+							"monitor_credentials": true,
+							"monitor_interval": 2,
+							"monitor_name_http": "/Common/http",
+							"monitor_passphrase": "x5$ie02",
+							"monitor_username": "abc",
+							"snat_automap": true,
+							"tenant_name": "fasthttptenant",
+							"virtual_address": "10.30.30.44",
+							"virtual_port": 443
+						}
+					}
+				}
+			}
+			`, resourceName)
+		}
+		if r.Method == "PATCH" {
+			fmt.Fprintf(w, `
+			{
+				"code": 200,
+				"requestId": 178,
+				"message": [
+					{
+						"id": "update_id",
+						"name": "bigip-fast-templates/http",
+						"parameters": {
+							"app_name": "%s",
+							"enable_asm_logging": false,
+							"enable_monitor": true,
+							"enable_pool": false,
+							"enable_snat": true,
+							"enable_tls_client": false,
+							"enable_tls_server": false,
+							"enable_waf_policy": false,
+							"make_monitor": true,
+							"make_pool": false,
+							"make_snatpool": false,
+							"make_tls_client_profile": false,
+							"make_tls_server_profile": false,
+							"make_waf_policy": false,
+							"monitor_credentials": true,
+							"monitor_name_http": "/Common/http",
+							"snat_automap": true,
+							"tenant_name": "fasthttptenant",
+							"virtual_address": "10.30.30.44",
+							"virtual_port": 443,
+							"monitor_interval": 2,
+							"monitor_passphrase": "x5$ie02",
+							"monitor_username": "abc"
+						}
+					}
+				]
+			}`, resourceName)
+		}
+		if r.Method == "DELETE" {
+			fmt.Fprintf(w, `{"id": "delete_id"}`)
+		}
+	})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -77,79 +227,7 @@ func TestAccBigipFastHttpUnitCreate(t *testing.T) {
 				Config: testBigipFastHttpCreate(resourceName, server.URL),
 			},
 			{
-				Config:             testBigipFastHttpModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
-			},
-		},
-	})
-}
-
-func TestAccBigipFastHttpUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipFastHttpCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
-		},
-	})
-}
-
-func TestAccBigipFastHttpUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipFastHttpCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				Config: testBigipFastHttpModify(resourceName, server.URL),
 			},
 		},
 	})
@@ -157,9 +235,10 @@ func TestAccBigipFastHttpUnitCreateError(t *testing.T) {
 
 func testBigipFastHttpInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name       = "%s"
-  invalidkey = "foo"
+resource "bigip_fast_http_app" "fasthttpapp" {
+  tenant      = "fasthttptenant"
+  application = "%s"
+  invalid_key = "foo"
 }
 provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
@@ -170,9 +249,13 @@ provider "bigip" {
 
 func testBigipFastHttpCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_fast_http_app" "fasthttpapp" {
+  tenant      = "fasthttptenant"
+  application = "%s"
+  virtual_server {
+    ip   = "10.30.30.44"
+	port = 443
+  }
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +267,19 @@ provider "bigip" {
 
 func testBigipFastHttpModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_fast_http_app" "fasthttpapp" {
+  tenant      = "fasthttptenant"
+  application = "%s"
+  virtual_server {
+	ip   = "10.30.30.44"
+	port = 443
+  }
+  monitor {
+	monitor_auth = true
+	username     = "abc"
+	password     = "x5$ie02"
+	interval     = 2
+  }
 }
 provider "bigip" {
   address  = "%s"

@@ -328,7 +328,7 @@ func (b *BigIP) post(body interface{}, path ...string) error {
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
 	}
-	log.Printf("[INFO] Req: %+v",req)
+	log.Printf("[INFO] Req: %+v", req)
 	_, callErr := b.APICall(req)
 	return callErr
 }
@@ -345,10 +345,10 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
 	}
-	log.Printf("[INFO] Req: %+v",req)
+	log.Printf("[INFO] Req: %+v", req)
 
 	resp, callErr := b.APICall(req)
-	log.Printf("[INFO] Resp: %+v",string(resp))
+	log.Printf("[INFO] Resp: %+v", string(resp))
 	return resp, callErr
 }
 
