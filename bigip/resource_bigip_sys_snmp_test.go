@@ -16,9 +16,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TEST_PARTITION)
+var TestSnmpName = fmt.Sprintf("/%s/test-snmp", TEST_PARTITION)
 
-var TEST_SNMP_RESOURCE = `
+var TestSnmpResource = `
 resource "bigip_sys_snmp" "test-snmp" {
   sys_contact = "NetOPsAdmin s.shitole@f5.com"
   sys_location = "SeattleHQ"
@@ -34,9 +34,9 @@ func TestAccBigipSyssnmp_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNMP_RESOURCE,
+				Config: TestSnmpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksnmpExists(TEST_SNMP_NAME, true),
+					testChecksnmpExists(TestSnmpName, true),
 					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp", "sys_contact", "NetOPsAdmin s.shitole@f5.com"),
 					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp", "sys_location", "SeattleHQ"),
 					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp",
@@ -56,11 +56,11 @@ func TestAccBigipSyssnmp_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SNMP_RESOURCE,
+				Config: TestSnmpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksnmpExists(TEST_SNMP_NAME, true),
+					testChecksnmpExists(TestSnmpName, true),
 				),
-				ResourceName:      TEST_SNMP_NAME,
+				ResourceName:      TestSnmpName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

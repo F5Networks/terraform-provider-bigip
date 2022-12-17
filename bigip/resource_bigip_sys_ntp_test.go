@@ -16,11 +16,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_NTP_NAME = fmt.Sprintf("/%s/test-ntp", TEST_PARTITION)
+var TestNtpName = fmt.Sprintf("/%s/test-ntp", TEST_PARTITION)
 
-var TEST_NTP_RESOURCE = `
+var TestNtpResource = `
 resource "bigip_sys_ntp" "test-ntp" {
-	description = "` + TEST_NTP_NAME + `"
+	description = "` + TestNtpName + `"
 	servers = ["10.10.10.10"]
 	timezone = "America/Los_Angeles"
 }
@@ -34,10 +34,10 @@ func TestAccBigipSysNtp_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_NTP_RESOURCE,
+				Config: TestNtpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckntpExists(TEST_NTP_NAME, true),
-					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "description", TEST_NTP_NAME),
+					testCheckntpExists(TestNtpName, true),
+					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "description", TestNtpName),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "timezone", "America/Los_Angeles"),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp",
 						fmt.Sprintf("servers.%d", schema.HashString("10.10.10.10")),
@@ -57,11 +57,11 @@ func TestAccBigipSysNtp_import(t *testing.T) {
 		//	CheckDestroy: testCheckntpsDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_NTP_RESOURCE,
+				Config: TestNtpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckntpExists(TEST_NTP_NAME, true),
+					testCheckntpExists(TestNtpName, true),
 				),
-				ResourceName:      TEST_NTP_NAME,
+				ResourceName:      TestNtpName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -130,6 +129,7 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 	obj, err := client.GetRoute(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
+		d.SetId("")
 		return err
 	}
 	if obj == nil {
@@ -138,19 +138,18 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", obj.FullPath)
+	_ = d.Set("name", obj.FullPath)
 
-	if err := d.Set("network", obj.Network); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Network to state for Route (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("network", obj.Network)
+
 	if obj.Gateway != "" || d.Get("gw").(string) != "" {
-		d.Set("gw", obj.Gateway)
+		_ = d.Set("gw", obj.Gateway)
 	}
 	if obj.TmInterface != "" || d.Get("tunnel_ref").(string) != "" {
-		d.Set("tunnel_ref", obj.TmInterface)
+		_ = d.Set("tunnel_ref", obj.TmInterface)
 	}
 	if obj.Blackhole {
-		d.Set("reject", obj.Blackhole)
+		_ = d.Set("reject", obj.Blackhole)
 	}
 	return nil
 }

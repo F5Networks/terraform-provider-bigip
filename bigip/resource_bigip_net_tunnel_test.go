@@ -14,11 +14,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_TUNNEL_NAME = "test-tunnel"
+var TestTunnelName = "test-tunnel"
 
-var TEST_TUNNEL_RESOURCE = `
+var TestTunnelResource = `
 resource "bigip_net_tunnel" "test_tunnel" {
-    name = "` + TEST_TUNNEL_NAME + `"
+    name = "` + TestTunnelName + `"
     auto_last_hop     = "default"
     idle_timeout      = 300
 //    if_index          = 464
@@ -34,9 +34,9 @@ resource "bigip_net_tunnel" "test_tunnel" {
     use_pmtu          = "enabled"        
 }
 `
-var TEST_TUNNEL_RESOURCE_UPDATE = `
+var TestTunnelResourceUpdate = `
 resource "bigip_net_tunnel" "test_tunnel" {
-    name = "` + TEST_TUNNEL_NAME + `"
+    name = "` + TestTunnelName + `"
     auto_last_hop     = "default"
     idle_timeout      = 300
 //    if_index          = 464
@@ -62,13 +62,12 @@ func TestAccBigipNetTunnelCreate(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_TUNNEL_RESOURCE,
+				Config: TestTunnelResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipNetTunnelExists(TEST_TUNNEL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "name", TEST_TUNNEL_NAME),
+					testBigipNetTunnelExists(TestTunnelName, true),
+					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "name", TestTunnelName),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "auto_last_hop", "default"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "idle_timeout", "300"),
-					//  resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "if_index", "464"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "key", "0"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "local_address", "192.16.81.240"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "mode", "bidirectional"),
@@ -94,14 +93,14 @@ func TestAccBigipNetTunnelUpdate(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_TUNNEL_RESOURCE,
+				Config: TestTunnelResource,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "transparent", "disabled"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "use_pmtu", "enabled"),
 				),
 			},
 			{
-				Config: TEST_TUNNEL_RESOURCE_UPDATE,
+				Config: TestTunnelResourceUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "transparent", "enabled"),
 					resource.TestCheckResourceAttr("bigip_net_tunnel.test_tunnel", "use_pmtu", "disabled"),
@@ -119,11 +118,11 @@ func TestAccBigipNetTunnelImport(t *testing.T) {
 		CheckDestroy: testCheckBigipNetTunnelDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_TUNNEL_RESOURCE,
+				Config: TestTunnelResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipNetTunnelExists(TEST_TUNNEL_NAME, true),
+					testBigipNetTunnelExists(TestTunnelName, true),
 				),
-				ResourceName:      TEST_TUNNEL_NAME,
+				ResourceName:      TestTunnelName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

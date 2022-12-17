@@ -103,6 +103,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 
 	selfIP, err := client.SelfIP(name)
 	if err != nil {
+		d.SetId("")
 		return fmt.Errorf("Error retrieving SelfIP %s: %v ", name, err)
 	}
 	if selfIP == nil {
@@ -116,7 +117,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	_ = d.Set("ip", selfIP.Address)
 
 	// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
-	regex := regexp.MustCompile(`\/Common\/(.+)`)
+	regex := regexp.MustCompile(`/Common/(.+)`)
 	trafficGroup := regex.FindStringSubmatch(selfIP.TrafficGroup)
 	_ = d.Set("traffic_group", trafficGroup[1])
 	if selfIP.AllowService == nil {

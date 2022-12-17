@@ -144,69 +144,52 @@ func resourceBigipNetTunnelRead(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Reading TUNNEL %s", name)
+	log.Printf("[INFO] Reading TUNNEL :%+v", name)
 	tunnel, err := client.GetTunnel(name)
-	log.Printf("[DEBUG] TUNNEL Output :%+v", tunnel)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 	if tunnel == nil {
 		d.SetId("")
 		return fmt.Errorf("[ERROR] Tunnel (%s) not found, removing from state", d.Id())
 	}
-	log.Printf("[DEBUG] Tunnel:%+v", tunnel)
-	if err := d.Set("app_service", tunnel.AppService); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AppService to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("auto_last_hop", tunnel.AutoLasthop); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AutoLasthop to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("description", tunnel.Description); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Description to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("idle_timeout", tunnel.IdleTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for Tunnel (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("app_service", tunnel.AppService)
+
+	_ = d.Set("auto_last_hop", tunnel.AutoLasthop)
+
+	_ = d.Set("description", tunnel.Description)
+
+	_ = d.Set("idle_timeout", tunnel.IdleTimeout)
+
 	/*if err := d.Set("if_index", tunnel.IfIndex); err != nil {
 	        return fmt.Errorf("[DEBUG] Error saving IfIndex to state for Tunnel (%s): %s", d.Id(), err)
 	}*/
-	if err := d.Set("key", tunnel.Key); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Key to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("local_address", tunnel.LocalAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving LocalAddress to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mode", tunnel.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mtu", tunnel.Mtu); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mtu to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("partition", tunnel.Partition); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Partition to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("profile", tunnel.Profile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Profile to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("remote_address", tunnel.RemoteAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RemoteAddress to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("secondary_address", tunnel.SecondaryAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SecondaryAddress to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("tos", tunnel.Tos); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Tos to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("traffic_group", tunnel.TrafficGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TrafficGroup to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("transparent", tunnel.Transparent); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Transparent to state for Tunnel (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("use_pmtu", tunnel.UsePmtu); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UsePmtu to state for Tunnel (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("key", tunnel.Key)
+
+	_ = d.Set("local_address", tunnel.LocalAddress)
+
+	_ = d.Set("mode", tunnel.Mode)
+
+	_ = d.Set("mtu", tunnel.Mtu)
+
+	_ = d.Set("partition", tunnel.Partition)
+
+	_ = d.Set("profile", tunnel.Profile)
+
+	_ = d.Set("remote_address", tunnel.RemoteAddress)
+
+	_ = d.Set("secondary_address", tunnel.SecondaryAddress)
+
+	_ = d.Set("tos", tunnel.Tos)
+
+	_ = d.Set("traffic_group", tunnel.TrafficGroup)
+
+	_ = d.Set("transparent", tunnel.Transparent)
+
+	_ = d.Set("use_pmtu", tunnel.UsePmtu)
 	_ = d.Set("name", name)
+
 	return nil
 }
 

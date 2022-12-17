@@ -16,12 +16,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
-var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TEST_PARTITION)
+var TestSelfipName = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
+var TestFloatSelfipName = fmt.Sprintf("/%s/test-float-selfip", TEST_PARTITION)
 
-var TEST_SELFIP_RESOURCE = `
+var TestSelfipResource = `
 resource "bigip_net_vlan" "test-vlan" {
-  name = "` + TEST_VLAN_NAME + `"
+  name = "` + TestVlanName + `"
   tag = 101
   interfaces {
     vlanport = 1.1
@@ -29,13 +29,13 @@ resource "bigip_net_vlan" "test-vlan" {
   }
 }
 resource "bigip_net_selfip" "test-selfip" {
-  name = "` + TEST_SELFIP_NAME + `"
+  name = "` + TestSelfipName + `"
   ip = "11.1.1.1/24"
   vlan = "/Common/test-vlan"
   depends_on = ["bigip_net_vlan.test-vlan"]
 }
 resource "bigip_net_selfip" "test-float-selfip" {
-  name = "` + TEST_FLOAT_SELFIP_NAME + `"
+  name = "` + TestFloatSelfipName + `"
   ip = "11.1.1.2/24"
   traffic_group = "traffic-group-1"
   vlan = "/Common/test-vlan"
@@ -52,16 +52,16 @@ func TestAccBigipNetselfip_create(t *testing.T) {
 		CheckDestroy: testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SELFIP_RESOURCE,
+				Config: TestSelfipResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
-					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
+					testCheckselfipExists(TestFloatSelfipName),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "ip", "11.1.1.1/24"),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", TEST_VLAN_NAME),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "name", TEST_FLOAT_SELFIP_NAME),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", TestVlanName),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "name", TestFloatSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "ip", "11.1.1.2/24"),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "vlan", TEST_VLAN_NAME),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "vlan", TestVlanName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "traffic_group", "traffic-group-1"),
 				),
 			},
@@ -78,11 +78,11 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 		CheckDestroy: testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SELFIP_RESOURCE,
+				Config: TestSelfipResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 				),
-				ResourceName:      TEST_SELFIP_NAME,
+				ResourceName:      TestSelfipName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -97,11 +97,11 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 		CheckDestroy: testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SELFIP_RESOURCE,
+				Config: TestSelfipResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME),
+					testCheckselfipExists(TestFloatSelfipName),
 				),
-				ResourceName:      TEST_FLOAT_SELFIP_NAME,
+				ResourceName:      TestFloatSelfipName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -120,42 +120,42 @@ func TestAccBigipNetselfipPortlockdown(t *testing.T) {
 			{
 				Config: testaccselfipPortLockdownParam("all"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "all"),
 				),
 			},
 			{
 				Config: testaccselfipPortLockdownParam("protocol"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "egp:0"),
 				),
 			},
 			{
 				Config: testaccselfipPortLockdownParam("tcp"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "tcp:4040"),
 				),
 			},
 			{
 				Config: testaccselfipPortLockdownParam("udp"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "udp:4040"),
 				),
 			},
 			{
 				Config: testaccselfipPortLockdownParam("default"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "default"),
 				),
 			},
 			{
 				Config: testaccselfipPortLockdownParam("custom_default"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "default"),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.1", "tcp:4040"),
 				),
@@ -163,7 +163,7 @@ func TestAccBigipNetselfipPortlockdown(t *testing.T) {
 			{
 				Config: testaccselfipPortLockdownParam("none"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckselfipExists(TEST_SELFIP_NAME),
+					testCheckselfipExists(TestSelfipName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "port_lockdown.0", "none"),
 				),
 			},
@@ -181,21 +181,21 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),
-				Check:  testCheckselfipExists(TEST_SELFIP_NAME),
+				Check:  testCheckselfipExists(TestSelfipName),
 			},
 			{
 				Config:             testaccselfipRouteDomain("10.11.12.13/24"),
-				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
+				Check:              testCheckselfipExists(TestSelfipName),
 				ExpectNonEmptyPlan: true,
 				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
 			},
 			{
 				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),
-				Check:  testCheckselfipExists(TEST_SELFIP_NAME),
+				Check:  testCheckselfipExists(TestSelfipName),
 			},
 			{
 				Config:             testaccselfipRouteDomain("10.11.12.13%0/24"),
-				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
+				Check:              testCheckselfipExists(TestSelfipName),
 				ExpectNonEmptyPlan: true,
 				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
 			},
@@ -206,7 +206,7 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 func testaccselfipRouteDomain(ip string) string {
 	resPrefix := `
 	resource "bigip_net_vlan" "test-vlan" {
-      name = "` + TEST_VLAN_NAME + `"
+      name = "` + TestVlanName + `"
 	  tag = 101
 	  interfaces {
 		vlanport = 1.1
@@ -226,7 +226,7 @@ func testaccselfipRouteDomain(ip string) string {
 func testaccselfipPortLockdownParam(portLockdown string) string {
 	resPrefix := `
 	resource "bigip_net_vlan" "test-vlan" {
-      name = "` + TEST_VLAN_NAME + `"
+      name = "` + TestVlanName + `"
 	  tag = 101
 	  interfaces {
 		vlanport = 1.1

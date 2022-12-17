@@ -3,6 +3,7 @@ package bigip
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -48,6 +49,7 @@ func (b *BigIP) UploadFile(f *os.File) (*Upload, error) {
 
 // Upload a file from a byte slice
 func (b *BigIP) UploadBytes(data []byte, filename string) (*Upload, error) {
+	log.Printf("[INFO] filename:%+v", filename)
 	r := bytes.NewReader(data)
 	size := int64(len(data))
 	return b.Upload(r, size, uriShared, uriFileTransfer, uriUploads, filename)

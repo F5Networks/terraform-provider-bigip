@@ -17,12 +17,12 @@ import (
 )
 
 var folder, _ = os.Getwd()
-var SSLCERTIFICATE_NAME = "servercert.crt"
-var TEST_SSLCERTIFICATE_NAME = fmt.Sprintf("/%s/%s", TEST_PARTITION, SSLCERTIFICATE_NAME)
+var SslcertificateName = "servercert.crt"
+var TestSslcertificateName = fmt.Sprintf("/%s/%s", TEST_PARTITION, SslcertificateName)
 
-var TEST_SSL_CERTIFICATE_RESOURCE = `
+var TestSslCertificateResource = `
 resource "bigip_ssl_certificate" "test-cert" {
-        name = "` + SSLCERTIFICATE_NAME + `"
+        name = "` + SslcertificateName + `"
         content = "${file("` + folder + `/../examples/servercert.crt")}"
         partition = "Common"
 }
@@ -37,10 +37,10 @@ func TestAccSslCertificateImportToBigip(t *testing.T) {
 		CheckDestroy: testChecksslcertificateDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SSL_CERTIFICATE_RESOURCE,
+				Config: TestSslCertificateResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksslcertificateExists(TEST_SSLCERTIFICATE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "name", SSLCERTIFICATE_NAME),
+					testChecksslcertificateExists(TestSslcertificateName, true),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "name", SslcertificateName),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "partition", TEST_PARTITION),
 				),
 			},

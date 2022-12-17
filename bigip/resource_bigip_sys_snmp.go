@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -102,6 +101,7 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	snmp, err := client.SNMPs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve SNMP  (%v) ", err)
+		d.SetId("")
 		return err
 	}
 	if snmp == nil {
@@ -109,15 +109,11 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	if err := d.Set("sys_contact", snmp.SysContact); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving SysContact  to state for SysContact  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("sys_location", snmp.SysLocation); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving SysLocation  to state for SysLocation  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("allowedaddresses", snmp.AllowedAddresses); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving AllowedAddresses  to state for AllowedAddresses  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("sys_contact", snmp.SysContact)
+
+	_ = d.Set("sys_location", snmp.SysLocation)
+
+	_ = d.Set("allowedaddresses", snmp.AllowedAddresses)
 
 	return nil
 }

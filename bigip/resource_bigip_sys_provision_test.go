@@ -7,23 +7,22 @@ package bigip
 
 import (
 	"fmt"
-	"testing"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"testing"
 )
 
-var TEST_PROVISION_NAME = "afm"
-var TEST_ASM_PROVISION_NAME = "asm"
-var TEST_GTM_PROVISION_NAME = "gtm"
-var TEST_APM_PROVISION_NAME = "apm"
-var TEST_AVR_PROVISION_NAME = "avr"
-var TEST_ILX_PROVISION_NAME = "ilx"
+var TestProvisionName = "afm"
+var TestAsmProvisionName = "asm"
+var TestGtmProvisionName = "gtm"
+var TestApmProvisionName = "apm"
+var TestAvrProvisionName = "avr"
+var TestIlxProvisionName = "ilx"
 
-var TEST_PROVISION_RESOURCE = `
+var TestProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_PROVISION_NAME + `"
+ name = "` + TestProvisionName + `"
  full_path  = "afm"
  cpu_ratio = 0
  disk_ratio = 0
@@ -31,9 +30,9 @@ resource "bigip_sys_provision" "test-provision" {
  memory_ratio = 0
 }
 `
-var TEST_ASM_PROVISION_RESOURCE = `
+var TestAsmProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_ASM_PROVISION_NAME + `"
+ name = "` + TestAsmProvisionName + `"
  full_path  = "asm"
  cpu_ratio = 0
  disk_ratio = 0
@@ -41,9 +40,9 @@ resource "bigip_sys_provision" "test-provision" {
  memory_ratio = 0
 }
 `
-var TEST_GTM_PROVISION_RESOURCE = `
+var TestGtmProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_GTM_PROVISION_NAME + `"
+ name = "` + TestGtmProvisionName + `"
  full_path  = "gtm"
  cpu_ratio = 0
  disk_ratio = 0
@@ -51,9 +50,9 @@ resource "bigip_sys_provision" "test-provision" {
  memory_ratio = 0
 }
 `
-var TEST_APM_PROVISION_RESOURCE = `
+var TestApmProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_APM_PROVISION_NAME + `"
+ name = "` + TestApmProvisionName + `"
  full_path  = "apm"
  cpu_ratio = 0
  disk_ratio = 0
@@ -61,9 +60,9 @@ resource "bigip_sys_provision" "test-provision" {
  memory_ratio = 0
 }
 `
-var TEST_AVR_PROVISION_RESOURCE = `
+var TestAvrProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_AVR_PROVISION_NAME + `"
+ name = "` + TestAvrProvisionName + `"
  full_path  = "avr"
  cpu_ratio = 0
  disk_ratio = 0
@@ -71,9 +70,9 @@ resource "bigip_sys_provision" "test-provision" {
  memory_ratio = 0
 }
 `
-var TEST_ILX_PROVISION_RESOURCE = `
+var TestIlxProvisionResource = `
 resource "bigip_sys_provision" "test-provision" {
- name = "` + TEST_ILX_PROVISION_NAME + `"
+ name = "` + TestIlxProvisionName + `"
  full_path  = "ilx"
  cpu_ratio = 0
  disk_ratio = 0
@@ -90,10 +89,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PROVISION_RESOURCE,
+				Config: TestProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_PROVISION_NAME),
+					testCheckprovisionExists(TestProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "afm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -110,10 +109,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ASM_PROVISION_RESOURCE,
+				Config: TestAsmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ASM_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_ASM_PROVISION_NAME),
+					testCheckprovisionExists(TestAsmProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestAsmProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "asm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -130,10 +129,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_GTM_PROVISION_RESOURCE,
+				Config: TestGtmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_GTM_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_GTM_PROVISION_NAME),
+					testCheckprovisionExists(TestGtmProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestGtmProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "gtm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -150,10 +149,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_APM_PROVISION_RESOURCE,
+				Config: TestApmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_APM_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_APM_PROVISION_NAME),
+					testCheckprovisionExists(TestApmProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestApmProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "apm"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -170,10 +169,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_AVR_PROVISION_RESOURCE,
+				Config: TestAvrProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_AVR_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_AVR_PROVISION_NAME),
+					testCheckprovisionExists(TestAvrProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestAvrProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "avr"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -190,10 +189,10 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ILX_PROVISION_RESOURCE,
+				Config: TestIlxProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ILX_PROVISION_NAME),
-					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TEST_ILX_PROVISION_NAME),
+					testCheckprovisionExists(TestIlxProvisionName),
+					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "name", TestIlxProvisionName),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "full_path", "ilx"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "cpu_ratio", "0"),
 					resource.TestCheckResourceAttr("bigip_sys_provision.test-provision", "disk_ratio", "0"),
@@ -213,11 +212,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PROVISION_RESOURCE,
+				Config: TestProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_PROVISION_NAME),
+					testCheckprovisionExists(TestProvisionName),
 				),
-				ResourceName:      TEST_PROVISION_NAME,
+				ResourceName:      TestProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -230,11 +229,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ASM_PROVISION_RESOURCE,
+				Config: TestAsmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ASM_PROVISION_NAME),
+					testCheckprovisionExists(TestAsmProvisionName),
 				),
-				ResourceName:      TEST_ASM_PROVISION_NAME,
+				ResourceName:      TestAsmProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -247,11 +246,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_GTM_PROVISION_RESOURCE,
+				Config: TestGtmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_GTM_PROVISION_NAME),
+					testCheckprovisionExists(TestGtmProvisionName),
 				),
-				ResourceName:      TEST_GTM_PROVISION_NAME,
+				ResourceName:      TestGtmProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -264,11 +263,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_APM_PROVISION_RESOURCE,
+				Config: TestApmProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_APM_PROVISION_NAME),
+					testCheckprovisionExists(TestApmProvisionName),
 				),
-				ResourceName:      TEST_APM_PROVISION_NAME,
+				ResourceName:      TestApmProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -281,11 +280,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_AVR_PROVISION_RESOURCE,
+				Config: TestAvrProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_AVR_PROVISION_NAME),
+					testCheckprovisionExists(TestAvrProvisionName),
 				),
-				ResourceName:      TEST_AVR_PROVISION_NAME,
+				ResourceName:      TestAvrProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -298,11 +297,11 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ILX_PROVISION_RESOURCE,
+				Config: TestIlxProvisionResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckprovisionExists(TEST_ILX_PROVISION_NAME),
+					testCheckprovisionExists(TestIlxProvisionName),
 				),
-				ResourceName:      TEST_ILX_PROVISION_NAME,
+				ResourceName:      TestIlxProvisionName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

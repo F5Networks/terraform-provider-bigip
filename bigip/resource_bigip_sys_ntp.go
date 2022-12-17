@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -96,6 +95,7 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 	ntp, err := client.NTPs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve NTP Config (%s) ", err)
+		d.SetId("")
 		return err
 	}
 	if ntp == nil {
@@ -104,16 +104,9 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	if err := d.Set("description", ntp.Description); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Description to state for NTP  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("servers", ntp.Servers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Servers to state for NTP  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("timezone", ntp.Timezone); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Timezone  state for NTP  (%s): %s", d.Id(), err)
-	}
-
+	_ = d.Set("description", ntp.Description)
+	_ = d.Set("servers", ntp.Servers)
+	_ = d.Set("timezone", ntp.Timezone)
 	return nil
 }
 

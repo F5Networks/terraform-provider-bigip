@@ -15,21 +15,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAccBigipSysNTPUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-ntp"
+func TestAccBigipSysSNMPTrapsUnitInvalid(t *testing.T) {
+	resourceName := "snmptraps"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysNtpInvalid(resourceName),
-				ExpectError: regexp.MustCompile("Unsupported argument: An argument named \"invalidkey\" is not expected here"),
+				Config:      testBigipSysSnmpTrapsInvalid(resourceName),
+				ExpectError: regexp.MustCompile(" Unsupported argument: An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})
 }
-func TestAccBigipSysNTPUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-sys-ntp"
+
+func TestAccBigipSysSNMPTrapsUnitCreate(t *testing.T) {
+	resourceName := "snmptraps"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -40,8 +41,11 @@ func TestAccBigipSysNTPUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/ntp", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"description":"%s","servers":["10.10.10.10"],"timezone":"America/Los_Angeles"}`, resourceName)
+	mux.HandleFunc("/mgmt/tm/sys/snmp/traps", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","community":"f5community","description":"Setup snmp traps","host":"195.10.10.1","port":111}`, resourceName)
+	})
+	mux.HandleFunc("/mgmt/tm/sys/snmp/traps/snmptraps", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","community":"f5community","description":"Setup snmp traps","host":"195.10.10.1","port":111}`, resourceName)
 	})
 
 	defer teardown()
@@ -50,18 +54,18 @@ func TestAccBigipSysNTPUnitCreate(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testBigipSysNTPCreate(resourceName, server.URL),
+				Config: testBigipSysSnmpTrapsCreate(resourceName, server.URL),
 			},
 			{
-				Config:             testBigipSysNTPModify(resourceName, server.URL),
+				Config:             testBigipSysSnmpTrapsModify(resourceName, server.URL),
 				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func TestAccBigipSysNTPUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-sys-ntp"
+func TestAccBigipSysSNMPTrapsUnitReadError(t *testing.T) {
+	resourceName := "snmptraps"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -72,28 +76,27 @@ func TestAccBigipSysNTPUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/ntp", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			http.Error(w, "The requested Sys DNS (/Common/test-sys-ntp) was not found", http.StatusNotFound)
-		}
-		_, _ = fmt.Fprintf(w, `{"description":"%s","servers":["10.10.10.10"],"timezone":"America/Los_Angeles"}`, resourceName)
+	mux.HandleFunc("/mgmt/tm/sys/snmp/traps", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s","community":"f5community","description":"Setup snmp traps","host":"195.10.10.1","port":111}`, resourceName)
 	})
-
+	mux.HandleFunc("/mgmt/tm/sys/snmp/traps/snmptraps", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "The requested SNMP (/Common/test-snmp-trap) was not found", http.StatusNotFound)
+	})
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysNTPCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested Sys DNS \\(/Common/test-sys-ntp\\) was not found"),
+				Config:      testBigipSysSnmpTrapsCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: The requested SNMP \\(/Common/test-snmp-trap\\) was not found"),
 			},
 		},
 	})
 }
 
-func TestAccBigipSysNTPUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-sys-ntp"
+func TestAccBigipSysSNMPTrapsUnitCreateError(t *testing.T) {
+	resourceName := "snmptraps"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -104,8 +107,8 @@ func TestAccBigipSysNTPUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/ntp", func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "The requested object name (/Common/testsysdns##) is invalid", http.StatusBadRequest)
+	mux.HandleFunc("/mgmt/tm/sys/snmp/traps", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "The requested object name (/Common/testsnmp##) is invalid", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -114,34 +117,34 @@ func TestAccBigipSysNTPUnitCreateError(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysNTPCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testsysdns##\\) is invalid"),
+				Config:      testBigipSysSnmpTrapsCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testsnmp##\\) is invalid"),
 			},
 		},
 	})
 }
 
-func testBigipSysNtpInvalid(resourceName string) string {
+func testBigipSysSnmpTrapsInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_ntp" "test-ntp" {
-  description = "%s"
-  servers     = ["10.10.10.10"]
-  timezone    = "America/Los_Angeles"
-  invalidkey  = "foo"
+resource "bigip_sys_snmp_traps" "test-snmp-trap" {
+  name       = "%s"
+  invalidkey = "foo"
 }
 provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
-  username = "xxxxx"
-  password = "xxxxx"
+  username = "xxx"
+  password = "xxx"
+}`, resourceName)
 }
-	`, resourceName)
-}
-func testBigipSysNTPCreate(resourceName, url string) string {
+
+func testBigipSysSnmpTrapsCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_ntp" "test-ntp" {
-  description = "%s"
-  servers     = ["10.10.10.10"]
-  timezone    = "America/Los_Angeles"
+resource "bigip_sys_snmp_traps" "test-snmp-trap" {
+  name = "%s"
+  community   = "f5community"
+  host        = "195.10.10.1"
+  description = "Setup snmp traps"
+  port        = 111
 }
 provider "bigip" {
   address  = "%s"
@@ -151,12 +154,14 @@ provider "bigip" {
 }`, resourceName, url)
 }
 
-func testBigipSysNTPModify(resourceName, url string) string {
+func testBigipSysSnmpTrapsModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_ntp" "test-ntp" {
-  description = "%s"
-  servers     = ["10.10.10.11"]
-  timezone    = "America/Los_Angeles"
+resource "bigip_sys_snmp_traps" "test-snmp-trap" {
+  name = "%s"
+  community   = "f5community"
+  host        = "195.10.11.1"
+  description = "Setup snmp traps"
+  port        = 111
 }
 provider "bigip" {
   address  = "%s"

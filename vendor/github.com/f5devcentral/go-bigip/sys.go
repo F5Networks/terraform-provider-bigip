@@ -398,13 +398,14 @@ func (b *BigIP) ModifyCertificate(certName string, cert *Certificate) error {
 
 // UploadCertificate copies a certificate local disk to BIGIP
 func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
+	log.Printf("[INFO] certname :%+v", certname)
 	certbyte := []byte(certpath)
 	_, err := b.UploadBytes(certbyte, certname)
 	if err != nil {
 		return err
 	}
 	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
-	log.Printf("[DEBUG] sourcepath :%+v", sourcepath)
+	log.Printf("[INFO] sourcepath :%+v", sourcepath)
 	cert := Certificate{
 		Name:       certname,
 		SourcePath: sourcepath,

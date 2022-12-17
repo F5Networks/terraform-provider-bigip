@@ -70,7 +70,7 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 	name := d.Get("name").(string)
 	tag := d.Get("tag").(int)
 
-	log.Printf("[DEBUG] Creating VLAN %s", name)
+	log.Printf("[INFO] Creating VLAN %s", name)
 
 	d.Partial(true)
 
@@ -78,11 +78,9 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 		name,
 		tag,
 	)
-
 	if err != nil {
-		return fmt.Errorf("Error creating VLAN %s: %v", name, err)
+		return fmt.Errorf("Error creating VLAN %s: %v ", name, err)
 	}
-
 	d.SetId(name)
 	d.SetPartial("name")
 	d.SetPartial("tag")
@@ -95,7 +93,7 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 		err = client.AddInterfaceToVlan(name, iface, tagged)
 		if err != nil {
-			return fmt.Errorf("Error adding Interface %s to VLAN %s: %v", iface, name, err)
+			return fmt.Errorf("Error adding Interface %s to VLAN %s: %v ", iface, name, err)
 		}
 	}
 	d.SetPartial("interfaces")
@@ -110,11 +108,12 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Reading VLAN %s", name)
+	log.Printf("[INFO] Reading VLAN %s", name)
 
 	vlan, err := client.Vlan(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving VLAN %s: %v", name, err)
+		d.SetId("")
+		return fmt.Errorf("Error retrieving VLAN %s: %v ", name, err)
 	}
 	if vlan == nil {
 		log.Printf("[DEBUG] VLAN %s not found, removing from state", name)
@@ -122,10 +121,10 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", vlan.FullPath)
-	d.Set("tag", vlan.Tag)
+	_ = d.Set("name", vlan.FullPath)
+	_ = d.Set("tag", vlan.Tag)
 
-	log.Printf("[DEBUG] Reading VLAN %s Interfaces", name)
+	log.Printf("[INFO] Reading VLAN %s Interfaces", name)
 
 	vlanInterfaces, err := client.GetVlanInterfaces(name)
 	if err != nil {
@@ -140,19 +139,14 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		} else {
 			ifaceTagged = false
 		}
-		log.Printf("[DEBUG] Retrieved VLAN Interface %s, tagging is set to %t", iface.Name, ifaceTagged)
-
 		vlanIface := map[string]interface{}{
 			"vlanport": iface.Name,
 			"tagged":   ifaceTagged,
 		}
-
 		interfaces = append(interfaces, vlanIface)
 	}
 
-	if err := d.Set("interfaces", interfaces); err != nil {
-		return fmt.Errorf("Error updating Interfaces in state for VLAN %s: %v", name, err)
-	}
+	_ = d.Set("interfaces", interfaces)
 
 	return nil
 }
@@ -162,7 +156,7 @@ func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Updating VLAN %s", name)
+	log.Printf("[INFO] Updating VLAN %s", name)
 
 	r := &bigip.Vlan{
 		Name: name,
@@ -182,7 +176,7 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Deleting VLAN %s", name)
+	log.Printf("[INFO] Deleting VLAN %s", name)
 
 	err := client.DeleteVlan(name)
 	if err != nil {

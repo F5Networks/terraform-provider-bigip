@@ -19,7 +19,6 @@ func resourceBigipTrafficselector() *schema.Resource {
 		Read:   resourceBigipTrafficselectorRead,
 		Update: resourceBigipTrafficselectorUpdate,
 		Delete: resourceBigipTrafficselectorDelete,
-		Exists: resourceBigipTrafficselectorExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -114,6 +113,7 @@ func resourceBigipTrafficselectorRead(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[INFO] Reading Traffic Selector :%+v", name)
 	ts, err := client.GetTrafficselctor(name)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 	if ts == nil {
@@ -121,49 +121,17 @@ func resourceBigipTrafficselectorRead(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id())
 	}
 	log.Printf("[DEBUG] Traffic Selector:%+v", ts)
-	if err := d.Set("ip_protocol", ts.IPProtocol); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("destination_address", ts.DestinationAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("source_address", ts.SourceAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("ipsec_policy", ts.IpsecPolicy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("order", ts.Order); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("destination_port", ts.DestinationPort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("source_port", ts.SourcePort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("direction", ts.Direction); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("ip_protocol", ts.IPProtocol)
+	_ = d.Set("destination_address", ts.DestinationAddress)
+	_ = d.Set("source_address", ts.SourceAddress)
+	_ = d.Set("ipsec_policy", ts.IpsecPolicy)
+	_ = d.Set("order", ts.Order)
+	_ = d.Set("destination_port", ts.DestinationPort)
+	_ = d.Set("source_port", ts.SourcePort)
+	_ = d.Set("direction", ts.Direction)
 	_ = d.Set("description", ts.Description)
 	_ = d.Set("name", name)
 	return nil
-}
-
-func resourceBigipTrafficselectorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Check existence of Traffic Selector: %+v ", name)
-	ts, err := client.GetTrafficselctor(name)
-	if err != nil {
-		return false, err
-	}
-	if ts == nil {
-		log.Printf("[WARN] Traffic-selctor (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id())
-	}
-	return true, nil
 }
 
 func resourceBigipTrafficselectorUpdate(d *schema.ResourceData, meta interface{}) error {

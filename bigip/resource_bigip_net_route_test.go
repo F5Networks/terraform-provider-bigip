@@ -14,12 +14,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_ROUTE_NAME = fmt.Sprintf("/%s/test-route", TEST_PARTITION)
+var TestRouteName = fmt.Sprintf("/%s/test-route", TEST_PARTITION)
 
-var TEST_ROUTE_RESOURCE = `
+var TestRouteResource = `
 
 resource "bigip_net_vlan" "test-vlan" {
-	name = "` + TEST_VLAN_NAME + `"
+	name = "` + TestVlanName + `"
 	tag = 101
 	interfaces {
 		vlanport = 1.1
@@ -27,22 +27,22 @@ resource "bigip_net_vlan" "test-vlan" {
 	}
 }
 resource "bigip_net_selfip" "test-selfip" {
-	name = "` + TEST_SELFIP_NAME + `"
+	name = "` + TestSelfipName + `"
 	ip = "11.1.1.1/24"
 	vlan = "/Common/test-vlan"
 	depends_on = ["bigip_net_vlan.test-vlan"]
 }
 resource "bigip_net_route" "test-route" {
-	  name = "` + TEST_ROUTE_NAME + `"
+	  name = "` + TestRouteName + `"
 	  network = "10.10.10.0/24"
 	  gw      = "11.1.1.2"
 	  depends_on = ["bigip_net_selfip.test-selfip"]
 }
 `
-var TEST_ROUTE_RESOURCE_UPDATE = `
+var TestRouteResourceUpdate = `
 
 resource "bigip_net_vlan" "test-vlan" {
-        name = "` + TEST_VLAN_NAME + `"
+        name = "` + TestVlanName + `"
         tag = 101
         interfaces {
                 vlanport = 1.1
@@ -50,20 +50,20 @@ resource "bigip_net_vlan" "test-vlan" {
         }
 }
 resource "bigip_net_selfip" "test-selfip" {
-        name = "` + TEST_SELFIP_NAME + `"
+        name = "` + TestSelfipName + `"
         ip = "11.1.1.1/24"
         vlan = "/Common/test-vlan"
         depends_on = ["bigip_net_vlan.test-vlan"]
 }
 resource "bigip_net_route" "test-route" {
-          name = "` + TEST_ROUTE_NAME + `"
+          name = "` + TestRouteName + `"
           network = "10.10.10.0/24"
           gw      = "11.1.1.3"
           depends_on = ["bigip_net_selfip.test-selfip"]
 }
 `
 
-func TestAccBigipNetroute_create(t *testing.T) {
+func TestAccBigipNetroutecreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -72,9 +72,9 @@ func TestAccBigipNetroute_create(t *testing.T) {
 		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ROUTE_RESOURCE,
+				Config: TestRouteResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckrouteExists(TEST_ROUTE_NAME, true),
+					testCheckrouteExists(TestRouteName, true),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "name", "/Common/test-route"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "network", "10.10.10.0/24"),
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.2"),
@@ -83,7 +83,7 @@ func TestAccBigipNetroute_create(t *testing.T) {
 		},
 	})
 }
-func TestAccBigipNetroute_update(t *testing.T) {
+func TestAccBigipNetrouteupdate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -92,13 +92,13 @@ func TestAccBigipNetroute_update(t *testing.T) {
 		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ROUTE_RESOURCE,
+				Config: TestRouteResource,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.2"),
 				),
 			},
 			{
-				Config: TEST_ROUTE_RESOURCE_UPDATE,
+				Config: TestRouteResourceUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("bigip_net_route.test-route", "gw", "11.1.1.3"),
 				),
@@ -106,7 +106,7 @@ func TestAccBigipNetroute_update(t *testing.T) {
 		},
 	})
 }
-func TestAccBigipNetroute_import(t *testing.T) {
+func TestAccBigipNetrouteimport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -115,11 +115,11 @@ func TestAccBigipNetroute_import(t *testing.T) {
 		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_ROUTE_RESOURCE,
+				Config: TestRouteResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckrouteExists(TEST_ROUTE_NAME, true),
+					testCheckrouteExists(TestRouteName, true),
 				),
-				ResourceName:      TEST_ROUTE_NAME,
+				ResourceName:      TestRouteName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

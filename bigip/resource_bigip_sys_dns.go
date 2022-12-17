@@ -7,7 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -104,6 +103,7 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 	dns, err := client.DNSs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve DNS (%s) (%v) ", description, err)
+		d.SetId("")
 		return err
 	}
 	if dns == nil {
@@ -112,14 +112,9 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	_ = d.Set("description", dns.Description)
-
-	if err := d.Set("name_servers", dns.NameServers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for DNS (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("name_servers", dns.NameServers)
 	_ = d.Set("number_of_dots", dns.NumberOfDots)
-	if err := d.Set("search", dns.Search); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Search  to state for DNS (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("search", dns.Search)
 
 	return nil
 }
