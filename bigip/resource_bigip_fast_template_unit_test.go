@@ -30,43 +30,27 @@ func TestAccBigipFastTemplateUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipFastTemplateUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "foo_template"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/~Common~foo_template.zip", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/shared/fast/templatesets", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/shared/fast/templatesets/~Common~foo_template", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{
+			"name": "/Common/foo_template",
+			"hash": "abc73hd720djsh7"
+		}`)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -76,70 +60,24 @@ func TestAccBigipFastTemplateUnitCreate(t *testing.T) {
 			{
 				Config: testBigipFastTemplateCreate(resourceName, server.URL),
 			},
-			{
-				Config:             testBigipFastTemplateModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
-			},
-		},
-	})
-}
-
-func TestAccBigipFastTemplateUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipFastTemplateCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
+			// {
+			// 	Config:             testBigipFastTemplateModify(resourceName, server.URL),
+			// 	ExpectNonEmptyPlan: true,
+			// },
 		},
 	})
 }
 
 func TestAccBigipFastTemplateUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "foo_template"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/~Common~foo_template.zip", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Create Page Not Found", 404)
 	})
 
 	defer teardown()
@@ -149,7 +87,7 @@ func TestAccBigipFastTemplateUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipFastTemplateCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Create Page Not Found"),
 			},
 		},
 	})
@@ -157,7 +95,7 @@ func TestAccBigipFastTemplateUnitCreateError(t *testing.T) {
 
 func testBigipFastTemplateInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_fast_template" "foo_Template" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +108,10 @@ provider "bigip" {
 
 func testBigipFastTemplateCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_fast_template" "foo_template" {
+  name     = "/Common/%s"
+  source   = "`+folder3+`/../examples/fast/foo_template.zip"
+  md5_hash = filemd5("`+folder3+`/../examples/fast/foo_template.zip")
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +123,10 @@ provider "bigip" {
 
 func testBigipFastTemplateModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_fast_template" "foo_template" {
+  name    = "/Common/%s"
+  source   = "`+folder3+`/../examples/fast/foo_template_2.zip"
+  md5_hash = filemd5("`+folder3+`/../examples/fast/foo_template_2.zip")
 }
 provider "bigip" {
   address  = "%s"

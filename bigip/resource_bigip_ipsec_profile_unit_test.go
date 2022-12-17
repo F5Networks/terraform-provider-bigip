@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipIPsecProfileUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "test-ipsec-profile"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,43 +30,20 @@ func TestAccBigipIPsecProfileUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipIPsecProfileUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "test-ipsec-profile"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+
+	mux.HandleFunc("/mgmt/tm/net/tunnels/ipsec", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+
+	mux.HandleFunc("/mgmt/tm/net/tunnels/ipsec/~Common~test-ipsec-profile", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{"name":"%[1]s", "fullPath": "/Common/%[1]s", "defaultsFrom": "/Common/ipsec"}`, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -85,25 +62,11 @@ func TestAccBigipIPsecProfileUnitCreate(t *testing.T) {
 }
 
 func TestAccBigipIPsecProfileUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "test-ipsec-profile"
 	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+
+	mux.HandleFunc("/mgmt/tm/net/tunnels/ipsec/~Common~test-ipsec-profile", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{"message": "The requested IPsec Tunnel Profile (/Common/test-ipsec-profiler) was not found."}`)
 	})
 
 	defer teardown()
@@ -113,34 +76,15 @@ func TestAccBigipIPsecProfileUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipIPsecProfileCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: 404 page not found"),
 			},
 		},
 	})
 }
 
 func TestAccBigipIPsecProfileUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "test-ipsec-profile"
 	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -149,7 +93,7 @@ func TestAccBigipIPsecProfileUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipIPsecProfileCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: 404 page not found"),
 			},
 		},
 	})
@@ -157,8 +101,8 @@ func TestAccBigipIPsecProfileUnitCreateError(t *testing.T) {
 
 func testBigipIPsecProfileInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name       = "%s"
+resource "bigip_ipsec_profile" "test-profile-profile" {
+  name       = "/Common/%s"
   invalidkey = "foo"
 }
 provider "bigip" {
@@ -170,9 +114,8 @@ provider "bigip" {
 
 func testBigipIPsecProfileCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_ipsec_profile" "test-ipsec-profile" {
+  name = "/Common/%s"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +127,9 @@ provider "bigip" {
 
 func testBigipIPsecProfileModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_ipsec_profile" "test-ipsec-profile" {
+  name        = "/Common/%s"
+  description = "mytestipsecprofile"
 }
 provider "bigip" {
   address  = "%s"

@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmIruleUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "test_irule"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,43 +30,20 @@ func TestAccBigipLtmIruleUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmIruleUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	iruleName := "test_irule"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+	mux.HandleFunc("/mgmt/tm/ltm/rule", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		}
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc(fmt.Sprintf("/mgmt/tm/ltm/rule/~Common~%s", iruleName), func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{"name":"/Common/%[1]s", "apiAnonymous":"test_%[1]s", "fullPath":"/Common/%[1]s"}`, iruleName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -74,72 +51,29 @@ func TestAccBigipLtmIruleUnitCreate(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testBigipLtmIruleCreate(resourceName, server.URL),
+				Config: testBigipLtmIruleCreate(iruleName, server.URL),
 			},
 			{
-				Config:             testBigipLtmIruleModify(resourceName, server.URL),
+				Config:             testBigipLtmIruleCreate(iruleName, server.URL),
+				ExpectNonEmptyPlan: false,
+			},
+			{
+				Config:             testBigipLtmIruleModify(iruleName, server.URL),
 				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func TestAccBigipLtmIruleUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipLtmIruleCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
-		},
-	})
-}
-
 func TestAccBigipLtmIruleUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	iruleName := "test_irule"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/ltm/rule", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Create Page Not Found", 404)
 	})
 
 	defer teardown()
@@ -148,8 +82,8 @@ func TestAccBigipLtmIruleUnitCreateError(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipLtmIruleCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				Config:      testBigipLtmIruleCreate(iruleName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Create Page Not Found"),
 			},
 		},
 	})
@@ -157,7 +91,7 @@ func TestAccBigipLtmIruleUnitCreateError(t *testing.T) {
 
 func testBigipLtmIruleInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ltm_irule" "test-rule" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -168,31 +102,30 @@ provider "bigip" {
 }`, resourceName)
 }
 
-func testBigipLtmIruleCreate(resourceName, url string) string {
+func testBigipLtmIruleCreate(iruleName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_ltm_irule" "test-rule" {
+  name    = "/Common/%[1]s"
+  irule = "test_%[1]s"
 }
 provider "bigip" {
-  address  = "%s"
+  address  = "%[2]s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, iruleName, url)
 }
 
-func testBigipLtmIruleModify(resourceName, url string) string {
+func testBigipLtmIruleModify(iruleName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_ltm_irule" "test-rule" {
+  name    = "/Common/%[1]s"
+  irule   = "test2_%[1]s"
 }
 provider "bigip" {
-  address  = "%s"
+  address  = "%[2]s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, iruleName, url)
 }

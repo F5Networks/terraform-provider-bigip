@@ -57,28 +57,10 @@ func TestAccBigipLtmNodeUnitCreate(t *testing.T) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
 	mux.HandleFunc("/mgmt/tm/ltm/node", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s"}`, resourceName, address)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s","monitor":"/Common/icmp"}`, resourceName, address)
-	})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s","monitor":"/Common/icmp"}`, resourceName, address)
-	})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s","monitor":"/Common/icmp","dynamicRatio":2}`, resourceName, address)
-	})
-	mux = http.NewServeMux()
 	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~test-node", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintf(w, `{"name":"%s","address":"%s","monitor":"/Common/icmp"}`, resourceName, address)
 	})
@@ -106,11 +88,6 @@ func TestAccBigipLtmNodeUnitCreateFqdn(t *testing.T) {
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/node", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)

@@ -231,23 +231,3 @@ func dataToDevicegroup(name string, d *schema.ResourceData) bigip.Devicegroup {
 
 	return p
 }
-
-func DevicegroupToData(p *bigip.Devicegroup, d *schema.ResourceData) error {
-	_ = d.Set("name", p.Name)
-	_ = d.Set("partition", p.Partition)
-	_ = d.Set("auto_sync", p.AutoSync)
-	_ = d.Set("description", p.Description)
-	_ = d.Set("type", p.Type)
-	_ = d.Set("full_load_on_sync", p.FullLoadOnSync)
-	_ = d.Set("save_on_auto_sync", p.SaveOnAutoSync)
-	_ = d.Set("network_failover", p.NetworkFailover)
-	_ = d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
-
-	for i, r := range p.Deviceb {
-		device := fmt.Sprintf("device.%d", i)
-		_ = d.Set(fmt.Sprintf("%s.name", device), r.Name)
-		_ = d.Set(fmt.Sprintf("%s.set_sync_leader", device), r.SetSyncLeader)
-
-	}
-	return nil
-}

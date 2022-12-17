@@ -36,17 +36,29 @@ func TestAccBigipFastAppUnitCreate(t *testing.T) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+	mux.HandleFunc("/mgmt/shared/fast/applications/", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{
+			"code":202,
+			"requestId":1,
+			"message":[
+				{
+					"id":"dfa86058-78ca-4384-8cf0-fb5be8229c06",
+					"name":"examples/simple_http",
+					"parameters":{
+						"application_name":"sample_app",
+						"server_addresses":["192.1.1.1","192.1.1.2"],
+						"server_port":12584,
+						"tenant_name":"sample_tenant",
+						"virtual_address":"10.1.1.1",
+						"virtual_port":8081
+					}
+				}
+			],
+			"task":"/mgmt/shared/fast/tasks/dfa86058-78ca-4384-8cf0-fb5be8229c06"
+		}
+	`)
 	})
-	mux.HandleFunc("mgmt/shared/fast/applications", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"code":202,"requestId":1,"message":[{"id":"dfa86058-78ca-4384-8cf0-fb5be8229c06","name":"examples/simple_http","parameters":{"application_name":"sample_app","server_addresses":["192.1.1.1","192.1.1.2"],"server_port":12584,"tenant_name":"sample_tenant","virtual_address":"10.1.1.1","virtual_port":8081}}],"task":"/mgmt/shared/fast/tasks/dfa86058-78ca-4384-8cf0-fb5be8229c06"}}`)
-	})
-	mux.HandleFunc("mgmt/shared/fast/tasks/dfa86058-78ca-4384-8cf0-fb5be8229c06", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+	mux.HandleFunc("/mgmt/shared/fast/tasks/dfa86058-78ca-4384-8cf0-fb5be8229c06", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintf(w, `{
     "id": "dfa86058-78ca-4384-8cf0-fb5be8229c06",
     "code": 200,
@@ -73,6 +85,52 @@ func TestAccBigipFastAppUnitCreate(t *testing.T) {
     }}`)
 	})
 
+	mux.HandleFunc("/mgmt/shared/fast/applications/sample_tenant/sample_app", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			fmt.Fprintf(w, `{
+				"constants": {
+					"fast": {
+						"template": "examples/simple_http",
+						"view": {
+							"tenant_name": "sample_tenant",
+							"application_name": "sample_app",
+							  "virtual_port": 8081,
+							  "virtual_address": "10.1.1.1",
+							  "server_port": 12584,
+							"server_addresses": ["192.1.1.1","192.1.1.2"]
+						}
+					}
+				}
+			}`)
+		}
+		if r.Method == "PATCH" {
+			fmt.Fprintf(w,
+				`{
+					"code":202,
+					"requestId":1,
+					"message":[
+						{
+							"id":"dfa86058-78ca-4384-8cf0-fb5be8229c06",
+							"name":"examples/simple_http",
+							"parameters":{
+								"application_name":"sample_app",
+								"server_addresses":["192.1.1.1","192.1.1.2", "192.1.1.3"],
+								"server_port":12584,
+								"tenant_name":"sample_tenant",
+								"virtual_address":"10.1.1.1",
+								"virtual_port":8081
+							}
+						}
+					],
+					"task":"/mgmt/shared/fast/tasks/dfa86058-78ca-4384-8cf0-fb5be8229c06"
+				}`,
+			)
+		}
+		if r.Method == "DELETE" {
+			fmt.Fprintf(w, `{"id": "dfa86058-78ca-4384-8cf0-fb5be8229c06"}`)
+		}
+	})
+
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -89,74 +147,29 @@ func TestAccBigipFastAppUnitCreate(t *testing.T) {
 	})
 }
 
-//func TestAccBigipFastAppUnitReadError(t *testing.T) {
-//	resourceName := "examples/simple_http"
-//	setup()
-//	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-//		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-//	})
-//	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-//		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-//		_, _ = fmt.Fprintf(w, `{}`)
-//	})
-//	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-//		//_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName)
-//	})
-//	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-//		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-//	})
-//
-//	defer teardown()
-//	resource.Test(t, resource.TestCase{
-//		IsUnitTest: true,
-//		Providers:  testProviders,
-//		Steps: []resource.TestStep{
-//			{
-//				Config:      testBigipFastAppUnitCreate(resourceName, server.URL),
-//				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-//			},
-//		},
-//	})
-//}
-//
-//func TestAccBigipFastAppUnitCreateError(t *testing.T) {
-//	resourceName := "examples/simple_http"
-//	setup()
-//	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-//		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-//	})
-//	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-//		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-//		_, _ = fmt.Fprintf(w, `{}`)
-//	})
-//	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-//		//_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`)
-//		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-//	})
-//	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-//		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-//		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-//	})
-//
-//	defer teardown()
-//	resource.Test(t, resource.TestCase{
-//		IsUnitTest: true,
-//		Providers:  testProviders,
-//		Steps: []resource.TestStep{
-//			{
-//				Config:      testBigipFastAppUnitCreate(resourceName, server.URL),
-//				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-//			},
-//		},
-//	})
-//}
+func TestAccBigipFastAppUnitCreateError(t *testing.T) {
+	resourceName := "examples/simple_http"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/shared/fast/applications/", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Create Page Not Found", 404)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testBigipFastAppUnitCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Create Page Not Found"),
+			},
+		},
+	})
+}
 
 func testBigipFastAppUnitInvalid(resourceName string) string {
 	return fmt.Sprintf(`
@@ -190,7 +203,7 @@ func testBigipFastAppUnitModify(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_fast_application"  "foo-app" {
   template    = "%s"
-  fast_json = "${file("`+folder3+`/../examples/fast/new_fast_app.json")}"
+  fast_json = "${file("`+folder3+`/../examples/fast/new_fast_app_2.json")}"
 }
 provider "bigip" {
   address  = "%s"

@@ -6,17 +6,21 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAccBigipLtmDatagroupUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "test_dg"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,135 +34,128 @@ func TestAccBigipLtmDatagroupUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmDatagroupUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
-	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
+	resourceName := "test_dg"
+	cases := []struct {
+		testHeading string
+		internal    bool
+	}{
+		{"Creating internal Data Group", true},
+		{"Creating external Data Group", false},
+	}
 
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: testBigipLtmDatagroupCreate(resourceName, server.URL),
-			},
-			{
-				Config:             testBigipLtmDatagroupModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
-			},
-		},
-	})
+	for _, tc := range cases {
+		t.Run(tc.testHeading, func(t *testing.T) {
+			setup()
+			defer teardown()
+			registerHandlers(t, resourceName)
+
+			createCfg := testBigipLtmDatagroupCreateExternal(resourceName)
+			modifyCfg := testBigipLtmDatagroupModifyExternal(resourceName)
+			if tc.internal {
+				createCfg = testBigipLtmDatagroupCreateInternal(resourceName)
+				modifyCfg = testBigipLtmDatagroupModifyInternal(resourceName)
+			}
+
+			resource.Test(t, resource.TestCase{
+				IsUnitTest: true,
+				Providers:  testProviders,
+				Steps: []resource.TestStep{
+					{
+						Config: createCfg,
+					},
+					{
+						Config:             modifyCfg,
+						ExpectNonEmptyPlan: tc.internal,
+					},
+				},
+			})
+		})
+	}
 }
 
-func TestAccBigipLtmDatagroupUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+func registerHandlers(t *testing.T, resourceName string) {
+	mux.HandleFunc("/mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
+	mux.HandleFunc("/mgmt/tm/ltm/data-group/internal", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			var dg_json bigip.DataGroup
+			json.NewDecoder(r.Body).Decode(&dg_json)
+			log.Printf("Request body: %+v", dg_json)
+		}
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/data-group/external", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			var dg_json bigip.DataGroup
+			json.NewDecoder(r.Body).Decode(&dg_json)
+			log.Printf("Request body: %+v", dg_json)
+		}
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/cli/version", func(w http.ResponseWriter, r *http.Request) {
+		version := `{"entries":{"https://localhost/mgmt/tm/cli/version/0":{"nestedStats":{"entries":{"active":{"description": "16.1.2.1"}}}}}}`
+		io.WriteString(w, version)
 	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipLtmDatagroupCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
+	mux.HandleFunc(fmt.Sprintf("/mgmt/tm/ltm/data-group/internal/~Common~%s", resourceName),
+		func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w,
+				`{
+					"name":"/Common/%[1]s",
+					"fullPath":"/Common/%[1]s",
+					"type":"string",
+					"records":[{"name":"a","data":"1"},{"name":"b","data":"2"}]
+				}`, resourceName,
+			)
 		},
-	})
-}
-
-func TestAccBigipLtmDatagroupUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
-	setup()
-	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-	})
-	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		_, _ = fmt.Fprintf(w, `{}`)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
-	})
-
-	defer teardown()
-	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
-		Steps: []resource.TestStep{
-			{
-				Config:      testBigipLtmDatagroupCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
-			},
+	)
+	mux.HandleFunc(fmt.Sprintf("/mgmt/shared/file-transfer/uploads/%s", resourceName),
+		func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+			assert.Equal(t, "application/octet-stream", r.Header.Get("Content-Type"))
+			fmt.Fprintf(w, "{}")
 		},
+	)
+	mux.HandleFunc("/mgmt/tm/sys/file/data-group", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 	})
+	mux.HandleFunc(fmt.Sprintf("/mgmt/tm/sys/file/data-group/~Common~%s", resourceName),
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != "DELETE" && r.Method != "POST" {
+				assert.Fail(t, "Expected method 'POST' or 'DELETE', got %s", r.Method)
+			}
+		},
+	)
+	mux.HandleFunc(fmt.Sprintf("/mgmt/tm/ltm/data-group/external/~Common~%s", resourceName),
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "GET" {
+				fmt.Fprintf(w,
+					`{
+					"name":"/Common/%[1]s",
+					"fullPath":"/Common/%[1]s",
+					"type":"string",
+					"externalFileName":"/Common/records.txt"
+				}`, resourceName,
+				)
+			}
+			if r.Method == "PATCH" {
+				fmt.Fprintf(w,
+					`{
+					"name":"/Common/%[1]s",
+					"fullPath":"/Common/%[1]s",
+					"type":"string",
+					"externalFileName":"/Common/records2.txt"
+				}`, resourceName,
+				)
+			}
+		},
+	)
 }
 
 func testBigipLtmDatagroupInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name       = "%s"
+resource "bigip_ltm_datagroup" "test_dg" {
+  name       = "/Common/%s"
+  type       = "string"
   invalidkey = "foo"
 }
 provider "bigip" {
@@ -168,31 +165,80 @@ provider "bigip" {
 }`, resourceName)
 }
 
-func testBigipLtmDatagroupCreate(resourceName, url string) string {
+func testBigipLtmDatagroupCreateInternal(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_ltm_datagroup" "test_dg" {
+  name    = "/Common/%s"
+  type    = "string"
+  internal = true
+  record {
+	name = "a"
+    data = "1"
+  }
+  record {
+	name = "b"
+    data = "2"
+  }
 }
 provider "bigip" {
   address  = "%s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, resourceName, server.URL)
 }
 
-func testBigipLtmDatagroupModify(resourceName, url string) string {
+func testBigipLtmDatagroupModifyInternal(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_ltm_datagroup" "test_dg" {
+  name    = "/Common/%s"
+  type    = "string"
+  internal = true
+  record {
+	name = "a"
+    data = "1"
+  }
+  record {
+	name = "b"
+    data = "3"
+  }
 }
 provider "bigip" {
   address  = "%s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, resourceName, server.URL)
+}
+
+func testBigipLtmDatagroupCreateExternal(resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_datagroup" "test_dg" {
+  name    = "/Common/%s"
+  type    = "string"
+  internal = false
+  records_src = "/tmp/records.txt"
+}
+provider "bigip" {
+  address  = "%s"
+  username = ""
+  password = ""
+  login_ref = ""
+}`, resourceName, server.URL)
+}
+
+func testBigipLtmDatagroupModifyExternal(resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_datagroup" "test_dg" {
+  name    = "/Common/%s"
+  type    = "string"
+  internal = false
+  records_src = "/tmp/records2.txt"
+}
+provider "bigip" {
+  address  = "%s"
+  username = ""
+  password = ""
+  login_ref = ""
+}`, resourceName, server.URL)
 }
