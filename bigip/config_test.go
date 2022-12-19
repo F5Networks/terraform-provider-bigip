@@ -1,23 +1,50 @@
 package bigip
 
 import (
-	"github.com/stretchr/testify/assert"
+	bigip "github.com/f5devcentral/go-bigip"
 	"testing"
 )
 
-func TestConfigClient(t *testing.T) {
+func TestConfigClientUnitTC1(t *testing.T) {
 	// test string => expected error count
-	data := map[string]int{
-		"/Common/foo":                           0,
-		"/My-Partition_name/object-name_string": 0,
-		"Common/foo":                            1,
-		"/Common/foo/":                          1,
-		"foo":                                   1,
-		"//":                                    1,
-		"/":                                     1,
-	}
-	for d, ec := range data {
-		_, errs := validateF5Name(d, "testField")
-		assert.Equal(t, ec, len(errs), "%s did not throw %d errors", d, ec)
-	}
+	testConfig := &bigip.Config{}
+	testConfig.Address = "192.168.1.1"
+	testConfig.Username = "testuser"
+	testConfig.Password = "testpasswd"
+	testConfig.Port = "443"
+	testConfig.CertVerifyDisable = true
+	_, _ = Client(testConfig)
+}
+
+func TestConfigClientUnitTC2(t *testing.T) {
+	// test string => expected error count
+	testConfig := &bigip.Config{}
+	testConfig.Address = "192.168.1.1"
+	testConfig.Username = "testuser"
+	testConfig.Password = "testpasswd"
+	testConfig.Port = "443"
+	testConfig.CertVerifyDisable = false
+	_, _ = Client(testConfig)
+}
+
+func TestConfigClientUnitTC3(t *testing.T) {
+	testConfig := &bigip.Config{}
+	testConfig.Address = "192.168.1.1"
+	testConfig.Username = "testuser"
+	testConfig.Password = "testpasswd"
+	testConfig.Port = "443"
+	testConfig.CertVerifyDisable = false
+	testConfig.TrustedCertificate = folder + "/../examples/servercert.crt"
+	_, _ = Client(testConfig)
+}
+
+func TestConfigClientUnitTC4(t *testing.T) {
+	testConfig := &bigip.Config{}
+	testConfig.Address = "192.168.1.1"
+	testConfig.Username = "testuser"
+	testConfig.Password = "testpasswd"
+	testConfig.Port = "443"
+	testConfig.LoginReference = "tmos"
+	testConfig.CertVerifyDisable = true
+	_, _ = Client(testConfig)
 }
