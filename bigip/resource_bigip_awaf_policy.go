@@ -224,7 +224,6 @@ func resourceBigipAwafPolicy() *schema.Resource {
 			},
 			"policy_export_json": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Computed:    true,
 				Description: "The payload of the WAF Policy to be EXPORTED from BIGIP to OUTPUT",
 			},
@@ -326,7 +325,8 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err)
 	}
-	plJson, err := json.Marshal(policyJson.Policy)
+	// plJson, err := json.Marshal(policyJson.Policy)
+	plJson, err := client.ExportPolicyFull(policyID)
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 		_ = d.Set("description", policyJson.Policy.Description)
 	}
 	_ = d.Set("template_name", policyJson.Policy.Template.Name)
-	_ = d.Set("policy_export_json", string(plJson))
+	_ = d.Set("policy_export_json", plJson)
 
 	return nil
 }
