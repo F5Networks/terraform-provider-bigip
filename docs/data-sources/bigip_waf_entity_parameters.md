@@ -49,6 +49,16 @@ data "bigip_waf_entity_parameter" "EPX" {
 * `perform_staging` - Determines the staging state of a parameter.
 * `sensitive_parameter` - Determines whether a parameter is sensitive and must be not visible in logs nor in the user interface.
 * `signature_overrides_disable` - List of Attack Signature Ids which are disabled for this particular parameter.
+* `url` - `url` block will provide options to be used for binding urls to parameter entity.See [url](#url) below for more details.
+
+### url
+The `url` block supports the following:
+
+* `name` - (Required , `string`) name of url block attribute
+* `method` - (Required , `string`) Unique ID of a URL with a protocol type and name. Select a Method for the URL to create an API endpoint: URL + Method
+* `protocol` - (Required , `string`) Specifies whether the protocol for the URL is HTTP or HTTPS.The available options are : ["http","https"]
+* `type` - (Required , `string`) Determines the type of the name attribute. Only when setting the type to wildcard will the special wildcard characters in the name be interpreted as such. The available types are : ["explicit","wildcard"]
+
 
 
 ## Attributes Reference

@@ -48,6 +48,7 @@ type ServerSSLProfile struct {
 	Cert                         string      `json:"cert,omitempty"`
 	Chain                        string      `json:"chain,omitempty"`
 	Ciphers                      string      `json:"ciphers,omitempty"`
+	CipherGroup                  string      `json:"cipherGroup,omitempty"`
 	DefaultsFrom                 string      `json:"defaultsFrom,omitempty"`
 	ExpireCertResponseControl    string      `json:"expireCertResponseControl,omitempty"`
 	GenericAlert                 string      `json:"genericAlert,omitempty"`
@@ -118,6 +119,7 @@ type ClientSSLProfile struct {
 	CertLookupByIpaddrPort          string      `json:"certLookupByIpaddrPort,omitempty"`
 	Chain                           string      `json:"chain,omitempty"`
 	Ciphers                         string      `json:"ciphers,omitempty"`
+	CipherGroup                     string      `json:"cipherGroup,omitempty"`
 	ClientCertCa                    string      `json:"clientCertCa,omitempty"`
 	CrlFile                         string      `json:"crlFile,omitempty"`
 	DefaultsFrom                    string      `json:"defaultsFrom,omitempty"`
@@ -570,11 +572,13 @@ type VirtualServer struct {
 		Pool string `json:"pool,omitempty"`
 	} `json:"sourceAddressTranslation,omitempty"`
 	SourcePort                 string    `json:"sourcePort,omitempty"`
+	FwEnforcedPolicy           string    `json:"fwEnforcedPolicy,omitempty"`
 	SYNCookieStatus            string    `json:"synCookieStatus,omitempty"`
 	TranslateAddress           string    `json:"translateAddress,omitempty"`
 	TranslatePort              string    `json:"translatePort,omitempty"`
 	VlansEnabled               bool      `json:"vlansEnabled,omitempty"`
 	VlansDisabled              bool      `json:"vlansDisabled,omitempty"`
+	TrafficMatchingCriteria    string    `json:"trafficMatchingCriteria,omitempty"`
 	VSIndex                    int       `json:"vsIndex,omitempty"`
 	Vlans                      []string  `json:"vlans,omitempty"`
 	Rules                      []string  `json:"rules,omitempty"`
@@ -2079,7 +2083,7 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 	if !ok {
 		return nil, nil
 	}
-
+	log.Printf("------------------ssl profile: %+v-----------------", clientSSLProfile)
 	return &clientSSLProfile, nil
 }
 

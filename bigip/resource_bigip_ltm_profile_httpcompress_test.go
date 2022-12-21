@@ -193,7 +193,8 @@ func getProfileHttpComprsConfig(profileName string) string {
 resource "bigip_ltm_profile_httpcompress" "test_httpcomprs_profile" {
   name                   = "%v"
   compression_buffersize = 4090
-}`, profileName)
+}
+`, profileName)
 }
 
 func getProfileHttpComprsTC2Config(profileName string) string {
@@ -203,5 +204,6 @@ resource "bigip_ltm_profile_httpcompress" "test_httpcomprs_profile" {
   gzip_compression_level = 2
   gzip_memory_level      = 32768
   gzip_window_size       = 32768
-}`, profileName)
+}
+`, profileName)
 }

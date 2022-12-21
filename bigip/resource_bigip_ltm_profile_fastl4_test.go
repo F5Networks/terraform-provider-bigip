@@ -247,23 +247,25 @@ resource "bigip_ltm_profile_fastl4" "%[3]s" {
 func getProfileFastl4ConfigTC3(profileName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_fastl4" "test_fastl4_profile_tc3" {
-  name                   = "%v"
+  name          = "%v"
   defaults_from = "/Common/fastL4"
-}`, profileName)
+}
+`, profileName)
 }
 
 func getProfileFastl4ConfigTC4(profileName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_fastl4" "test_fastl4_profile_tc4" {
-  name          = "%v"
-  defaults_from = "/Common/fastL4"
+  name                   = "%v"
+  defaults_from          = "/Common/fastL4"
   idle_timeout           = "200"
   explicitflow_migration = "disabled"
   late_binding           = "enabled"
   loose_close            = "enabled"
   loose_initiation       = "enabled"
-  keepalive_interval    = "150"
-  tcp_handshake_timeout = "100"
-  receive_windowsize    = 100
-}`, profileName)
+  keepalive_interval     = "150"
+  tcp_handshake_timeout  = "100"
+  receive_windowsize     = 100
+}
+`, profileName)
 }
