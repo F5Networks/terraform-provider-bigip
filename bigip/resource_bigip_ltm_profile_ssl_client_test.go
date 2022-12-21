@@ -394,6 +394,43 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileClientSsl_UpdateCipherGroup(t *testing.T) {
+	t.Parallel()
+	var instName = "test-ClientSsl-UpdateCipherGroup"
+	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	resFullName := fmt.Sprintf("%s.%s", resName, instName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr(resFullName, "cipher_group", "none"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cipher_group"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr(resFullName, "cipher_group", "/Common/f5-aes"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 	var instName = "test-ClientSsl"
 	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
@@ -530,6 +567,9 @@ func testaccbigipltmprofileclientsslUpdateparam(instName, updateParam string) st
 	case "ciphers":
 		resPrefix = fmt.Sprintf(`%s
 			  ciphers = "AES"`, resPrefix)
+	case "cipher_group":
+		resPrefix = fmt.Sprintf(`%s
+				cipher_group = "/Common/f5-aes"`, resPrefix)
 	default:
 	}
 	return fmt.Sprintf(`%s
