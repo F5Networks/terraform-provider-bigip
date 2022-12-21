@@ -194,6 +194,14 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Description: "BigIP Cipher string.",
 			},
 
+			"cipher_group": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Default:       "none",
+				Description:   "Cipher group for the ssl server profile",
+				ConflictsWith: []string{"ciphers"},
+			},
+
 			"expire_cert_response_control": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -525,6 +533,10 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("[DEBUG] Error saving Ciphers to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
 
+	if err := d.Set("cipher_group", obj.CipherGroup); err != nil {
+		return fmt.Errorf("[DEBUG] Error saving Cipher Group to state for Ssl profile (%s): %s", d.Id(), err)
+	}
+
 	if err := d.Set("expire_cert_response_control", obj.ExpireCertResponseControl); err != nil {
 		return fmt.Errorf("[DEBUG] Error saving ExpireCertResponseControl to state for Ssl profile  (%s): %s", d.Id(), err)
 	}
@@ -748,7 +760,14 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.Key = d.Get("key").(string)
 	config.Chain = d.Get("chain").(string)
 	config.Passphrase = d.Get("passphrase").(string)
-	config.Ciphers = d.Get("ciphers").(string)
+	if ciphers, ok := d.GetOk("ciphers"); ok {
+		config.Ciphers = ciphers.(string)
+		config.CipherGroup = "none"
+	}
+	if cipher_grp, ok := d.GetOk("cipher_group"); ok && cipher_grp != "none" {
+		config.CipherGroup = cipher_grp.(string)
+		config.Ciphers = "none"
+	}
 	config.ExpireCertResponseControl = d.Get("expire_cert_response_control").(string)
 	config.GenericAlert = d.Get("generic_alert").(string)
 	config.HandshakeTimeout = d.Get("handshake_timeout").(string)

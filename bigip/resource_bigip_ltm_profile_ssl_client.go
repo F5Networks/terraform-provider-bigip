@@ -259,6 +259,14 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "BigIP Cipher string.",
 			},
 
+			"cipher_group": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Default:       "none",
+				Description:   "Cipher group for the ssl client profile",
+				ConflictsWith: []string{"ciphers"},
+			},
+
 			"client_cert_ca": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -674,6 +682,12 @@ func resourceBigipLtmProfileClientSSLRead(d *schema.ResourceData, meta interface
 		}
 	}
 
+	if _, ok := d.GetOk("cipher_group"); ok {
+		if err := d.Set("cipher_group", obj.CipherGroup); err != nil {
+			return fmt.Errorf("[DEBUG] Error saving Cipher Group to state for Ssl profile (%s): %s", d.Id(), err)
+		}
+	}
+
 	if _, ok := d.GetOk("client_cert_ca"); ok {
 		if err := d.Set("client_cert_ca", obj.ClientCertCa); err != nil {
 			return fmt.Errorf("[DEBUG] Error saving ClientCertCa to state for Ssl profile  (%s): %s", d.Id(), err)
@@ -977,7 +991,14 @@ func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) 
 	config.CertExtensionIncludes = CertExtensionIncludes
 	config.CertLifespan = d.Get("cert_life_span").(int)
 	config.CertLookupByIpaddrPort = d.Get("cert_lookup_by_ipaddr_port").(string)
-	config.Ciphers = d.Get("ciphers").(string)
+	if ciphers, ok := d.GetOk("ciphers"); ok {
+		config.Ciphers = ciphers.(string)
+		config.CipherGroup = "none"
+	}
+	if cipher_grp, ok := d.GetOk("cipher_group"); ok && cipher_grp != "none" {
+		config.CipherGroup = cipher_grp.(string)
+		config.Ciphers = "none"
+	}
 	config.ClientCertCa = d.Get("client_cert_ca").(string)
 	config.CrlFile = d.Get("crl_file").(string)
 	config.ForwardProxyBypassDefaultAction = d.Get("forward_proxy_bypass_default_action").(string)
