@@ -349,7 +349,6 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	log.Printf("[INFO] Req: %+v", req)
 
 	resp, callErr := b.APICall(req)
-	log.Printf("[INFO] Resp: %+v", string(resp))
 	return resp, callErr
 }
 
@@ -504,7 +503,6 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 	log.Printf("Req:%+v", req)
 
 	resp, err := b.APICall(req)
-	log.Printf("Resp:%+v", string(resp))
 	if err != nil {
 		var reqError RequestError
 		json.Unmarshal(resp, &reqError)
