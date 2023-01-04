@@ -266,6 +266,7 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	part := strings.Split(partition, "/")[0]
 	time.Sleep(5 * time.Second)
 	wafpolicy, err := client.GetWafPolicyQuery(name, part)
+	log.Printf("[INFO] AWAF WAF policy :%v", wafpolicy)
 	if err != nil {
 		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
 	}

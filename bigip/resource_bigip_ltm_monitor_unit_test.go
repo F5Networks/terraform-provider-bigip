@@ -42,8 +42,8 @@ func TestAccBigipLtmMonitorUnitCreate(t *testing.T) {
 
 	for _, name := range monitors {
 		mux.HandleFunc(fmt.Sprintf("/mgmt/tm/ltm/monitor/%s", name), func(w http.ResponseWriter, r *http.Request) {
-			req_url := r.URL.String()
-			if strings.HasSuffix(req_url, "http") {
+			reqUrl := r.URL.String()
+			if strings.HasSuffix(reqUrl, "http") {
 				fmt.Fprintf(w, `{
 					"items": [
 						{

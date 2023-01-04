@@ -15,22 +15,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAccBigipSysProvisionUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-sys-provision"
+func TestAccBigipsysLicenseUnitInvalid(t *testing.T) {
+	regKey := "testkey.key"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysProvisionInvalid(resourceName),
+				Config:      testBigipSysLicenseInvalid(regKey),
 				ExpectError: regexp.MustCompile(" Unsupported argument: An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})
 }
 
-func TestAccBigipSysProvisionUnitCreate(t *testing.T) {
-	resourceName := "afm"
+func TestAccBigipsysLicenseUnitCreate(t *testing.T) {
+	regKey := "Z6298-13163-33476-87907-5067310"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -41,8 +41,8 @@ func TestAccBigipSysProvisionUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/provision/afm", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath":"afm","level":"none"}`, resourceName)
+	mux.HandleFunc("/mgmt/tm/sys/license", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"command": "install", "options":[ { "registration-key": "%s" } ]}`, regKey)
 	})
 
 	defer teardown()
@@ -51,18 +51,18 @@ func TestAccBigipSysProvisionUnitCreate(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testBigipSysProvisionCreate(resourceName, server.URL),
+				Config: testBigipSysLicenseCreate(regKey, server.URL),
 			},
 			{
-				Config:             testBigipSysProvisionModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
+				Config: testBigipSysLicenseModify(regKey, server.URL),
+				//ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func TestAccBigipSysProvisionUnitReadError(t *testing.T) {
-	resourceName := "afm"
+func TestAccBigipsysLicenseUnitReadError(t *testing.T) {
+	regKey := "Z6298-13163-33476-87907-5067310"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -73,27 +73,28 @@ func TestAccBigipSysProvisionUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/provision/afm", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/sys/license", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
-			http.Error(w, "Status not found", http.StatusNotFound)
+			http.Error(w, "License Not installed", http.StatusNotFound)
 		}
-		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath":"afm","level":"none"}`, resourceName)
+		_, _ = fmt.Fprintf(w, `{"command": "install", "options":[ { "registration-key": "%s" } ]}`, regKey)
 	})
+
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysProvisionCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: Status not found"),
+				Config:      testBigipSysLicenseCreate(regKey, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: License Not installed"),
 			},
 		},
 	})
 }
 
-func TestAccBigipSysProvisionUnitCreateError(t *testing.T) {
-	resourceName := "afm"
+func TestAccBigipsysLicenseUnitCreateError(t *testing.T) {
+	regKey := "Z6298-13163-33476-87907-5067310"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -104,11 +105,8 @@ func TestAccBigipSysProvisionUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/provision/afm", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "PUT" {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-		}
-		_, _ = fmt.Fprintf(w, `{"name":"%s","fullPath":"afm","level":"none"}`, resourceName)
+	mux.HandleFunc("/mgmt/tm/sys/license", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -117,58 +115,53 @@ func TestAccBigipSysProvisionUnitCreateError(t *testing.T) {
 		Providers:  testProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testBigipSysProvisionCreate(resourceName, server.URL),
+				Config:      testBigipSysLicenseCreate(regKey, server.URL),
 				ExpectError: regexp.MustCompile("HTTP 400 :: Bad Request"),
 			},
 		},
 	})
 }
 
-func testBigipSysProvisionInvalid(resourceName string) string {
+func testBigipSysLicenseInvalid(regKey string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_provision" "test-sys-provision" {
-  name       = "%s"
+resource "bigip_sys_bigiplicense" "test-sys-license" {
+  command       = "install"
+  registration_key = "%s"
   invalidkey = "foo"
 }
 provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
   username = "xxx"
   password = "xxx"
-}`, resourceName)
+}`, regKey)
 }
 
-func testBigipSysProvisionCreate(resourceName, url string) string {
+func testBigipSysLicenseCreate(regKey, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_provision" "test-sys-provision" {
-  name    = "%s"
-  full_path  = "afm"
-  cpu_ratio = 0
-  disk_ratio = 0
-  level = "none"
-  memory_ratio = 0
+resource "bigip_sys_bigiplicense" "test-sys-license" {
+  command    = "install"
+  registration_key = "%s"
+  timeout = 3
 }
 provider "bigip" {
   address  = "%s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, regKey, url)
 }
 
-func testBigipSysProvisionModify(resourceName, url string) string {
+func testBigipSysLicenseModify(regKey, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_sys_provision" "test-sys-provision" {
-  name    = "%s"
-  full_path  = "afm"
-  cpu_ratio = 1
-  disk_ratio = 0
-  level = "none"
-  memory_ratio = 0
+resource "bigip_sys_bigiplicense" "test-sys-license" {
+  command    = "install"
+  registration_key = "%s"
+  timeout = 4
 }
 provider "bigip" {
   address  = "%s"
   username = ""
   password = ""
   login_ref = ""
-}`, resourceName, url)
+}`, regKey, url)
 }

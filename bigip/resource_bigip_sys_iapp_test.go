@@ -15,9 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_IAPP_NAME = "/" + TEST_PARTITION + "/test-iapp"
+var TestIappName = "/" + TEST_PARTITION + "/test-iapp"
 
-var TEST_IAPP_RESOURCE = `
+var TestIappResource = `
 	resource "bigip_sys_iapp" "test-iapp" {
 		name = "test-iapp"
 		jsonfile = <<EOF
@@ -156,9 +156,9 @@ func TestAccBigipSysIapp_create(t *testing.T) {
 		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IAPP_RESOURCE,
+				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TEST_IAPP_NAME),
+					testCheckIappExists(TestIappName),
 				),
 			},
 		},
@@ -174,11 +174,11 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IAPP_RESOURCE,
+				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TEST_IAPP_NAME),
+					testCheckIappExists(TestIappName),
 				),
-				ResourceName:      TEST_IAPP_NAME,
+				ResourceName:      TestIappName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
@@ -201,9 +201,9 @@ func testCheckIappExists(name string) resource.TestCheckFunc {
 			return fmt.Errorf("jsonfile  body does not match. Expecting %s got %s.", body, jsonfile.Name)
 		}
 
-		jsonfile_name := fmt.Sprintf("/%s/%s", jsonfile.Partition, jsonfile.Name)
-		if jsonfile_name == name {
-			return fmt.Errorf("Jsonfile name does not match. Expecting %s got %s.", name, jsonfile_name)
+		jsonfileName := fmt.Sprintf("/%s/%s", jsonfile.Partition, jsonfile.Name)
+		if jsonfileName == name {
+			return fmt.Errorf("Jsonfile name does not match. Expecting %s got %s.", name, jsonfileName)
 		}
 		return nil
 	}

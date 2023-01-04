@@ -165,13 +165,13 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			return err
 		}
 	}
-	return resourceBigipLtmPoolAttachmentRead(d, meta)
+	return nil
 }
 
 func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	nodeName := d.Get("node").(string)
-	log.Printf("[DEBUG][UPDATE] node name is :%s", nodeName)
+	log.Printf("[INFO][UPDATE] node name is :%s", nodeName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
@@ -182,10 +182,9 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		}
 		if node1 == nil {
 			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
-			d.SetId("")
+			//d.SetId("")
 			return nil
 		}
-
 		poolMem := strings.Split(nodeName, ":")[0]
 		nodeName1 := strings.Split(poolMem, "/")[2]
 		poolName := d.Get("pool").(string)
@@ -255,7 +254,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	client := meta.(*bigip.BigIP)
 	var poolName string
 	nodeName := d.Get("node").(string)
-	log.Printf("[DEBUG] Reading node name is :%s", nodeName)
+	log.Printf("[INFO] Reading node name is :%s", nodeName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
@@ -266,10 +265,11 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 
 	// only add the instance that was previously defined for this resource
 	expected := d.Get("node").(string)
-
+	log.Printf("[INFO][READ] Pool :%s", nodeName)
 	pool, err := client.GetPool(poolName)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Pool (%s)  (%v) ", poolName, err)
+		//d.SetId("")
 		return err
 	}
 	if pool == nil {
@@ -277,14 +277,17 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		d.SetId("")
 		return nil
 	}
+	log.Printf("[INFO][READ] Pool Member :%s", nodeName)
+	log.Printf("[INFO][READ] Pool Member PoolName :%s", poolName)
 	nodes, err := client.PoolMembers(poolName)
 	if err != nil {
+		d.SetId("")
 		return fmt.Errorf("Error retrieving pool (%s) members: %s ", poolName, err)
 	}
-	if nodes == nil {
+	if len(nodes.PoolMembers) < 1 {
 		log.Printf("[WARN] Pool Members (%s) not found, removing from state", poolName)
 		d.SetId("")
-		return nil
+		return fmt.Errorf("Not able to attached Node :%s to pool %s ", expected, poolName)
 	}
 	// only set the instance Id that this resource manages
 	found := false
@@ -293,6 +296,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		for _, node := range nodes.PoolMembers {
 			if expected == node.FullPath {
 				_ = d.Set("node", expected)
+				_ = d.Set("priority_group", node.PriorityGroup)
 				found = true
 				break
 			}
@@ -302,6 +306,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 		for _, node := range nodes.PoolMembers {
 			if expected == node.Name {
 				_ = d.Set("node", expected)
+				_ = d.Set("priority_group", node.PriorityGroup)
 				found = true
 				break
 			}

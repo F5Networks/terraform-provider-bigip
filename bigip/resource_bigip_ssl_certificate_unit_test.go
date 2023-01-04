@@ -30,7 +30,7 @@ func TestAccBigipSslCertificateUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipSslCertificateUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-certificate"
+	resourceName := "test-certificate.crt"
 	httpDefault := "/Common/http"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
@@ -42,19 +42,43 @@ func TestAccBigipSslCertificateUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/test-certificate.crt", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert/~Common~test-certificate", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","sourcePath":"file:///var/config/rest/downloads/%s"}`, resourceName, resourceName)
 	})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert/~Common~test-certificate", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert/~Common~test-certificate.crt", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{
+    "name": "test-certificate.crt",
+    "partition": "Common",
+    "fullPath": "/Common/test-certificate.crt",
+    "certificateKeyCurveName": "none",
+    "certificateKeySize": 2048,
+    "checksum": "SHA1:1338:47796744f4adf6ef012ffe47063de1f6bb86fb03",
+    "createTime": "2021-07-16T05:46:24Z",
+    "createdBy": "root",
+    "email": "root@localhost.localdomain",
+    "expirationDate": 1941774384,
+    "expirationString": "Jul 14 05:46:24 2031 GMT",
+    "fingerprint": "SHA256/AA:6B:8D:F5:64:5F:9F:D7:5D:73:D3:34:18:19:3C:B6:A8:98:7C:99:A4:49:33:B8:26:30:5D:36:89:13:E5:50",
+    "isBundle": "false",
+    "issuer": "emailAddress=root@localhost.localdomain,CN=localhost.localdomain,OU=IT,O=MyCompany,L=Seattle,ST=WA,C=US",
+    "keyType": "rsa-public",
+    "lastUpdateTime": "2021-07-16T05:46:24Z",
+    "mode": 33188,
+    "revision": 1,
+    "serialNumber": "364081584",
+    "size": 1338,
+    "subject": "emailAddress=root@localhost.localdomain,CN=localhost.localdomain,OU=IT,O=MyCompany,L=Seattle,ST=WA,C=US",
+    "systemPath": "/config/ssl/ssl.crt/default.crt",
+    "updatedBy": "root",
+    "version": 3}`)
 	})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -64,15 +88,14 @@ func TestAccBigipSslCertificateUnitCreate(t *testing.T) {
 				Config: testBigipSslCertificateCreate(resourceName, server.URL),
 			},
 			{
-				Config:             testBigipSslCertificateModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
+				Config: testBigipSslCertificateModify(resourceName, server.URL),
 			},
 		},
 	})
 }
 
 func TestAccBigipSslCertificateUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-certificate"
+	resourceName := "test-certificate.crt"
 	httpDefault := "/Common/http"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
@@ -84,13 +107,19 @@ func TestAccBigipSslCertificateUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/test-certificate.crt", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert/~Common~test-certificate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","sourcePath":"file:///var/config/rest/downloads/%s"}`, resourceName, resourceName)
+	})
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert/~Common~test-certificate.crt", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-certificate) was not found", http.StatusNotFound)
+		http.Error(w, "Requested Cert (/Common/test-certificate.crt) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -100,14 +129,14 @@ func TestAccBigipSslCertificateUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSslCertificateCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-certificate\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Requested Cert \\(/Common/test-certificate.crt\\) was not found"),
 			},
 		},
 	})
 }
 
 func TestAccBigipSslCertificateUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-certificate"
+	resourceName := "test-certificate.crt"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -118,36 +147,16 @@ func TestAccBigipSslCertificateUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	//	certByte := []byte(`-----BEGIN CERTIFICATE-----
-	//MIIDRjCCAi4CCQC6Dx6jDXj7dzANBgkqhkiG9w0BAQsFADBlMQswCQYDVQQGEwJJ
-	//TjELMAkGA1UECAwCVFMxDDAKBgNVBAcMA0hZRDESMBAGA1UECgwJRWNvc3lzdGVt
-	//MRIwEAYDVQQLDAlFY29zeXN0ZW0xEzARBgNVBAMMCnd3dy5mNS5jb20wHhcNMTkx
-	//MTIwMDY0MTI4WhcNMjAxMTE5MDY0MTI4WjBlMQswCQYDVQQGEwJJTjELMAkGA1UE
-	//CAwCVFMxDDAKBgNVBAcMA0hZRDESMBAGA1UECgwJRWNvc3lzdGVtMRIwEAYDVQQL
-	//DAlFY29zeXN0ZW0xEzARBgNVBAMMCnd3dy5mNS5jb20wggEiMA0GCSqGSIb3DQEB
-	//AQUAA4IBDwAwggEKAoIBAQDXSTUmCJBauE3DXb1YmDHFP/aTXzjQVBxbLUXvv9Vf
-	//yxPvteH3l0RuxPJCOzTCpSArYJ5MDlxjH366MrsXJWjBVuucidWSFGDikmlvDEhW
-	//Cb9KemK6300cD3hSwq0O7heY6klJ0VnLGNk1uuQdTwfPUM7ZRZzCP5TRiRls8Hi5
-	//M4S/h1/9Pqf6j8/5pzwH5juoD+UeboWf9hIM5LYUDR+v/7+ymBvaAa6Jl9pUjAtH
-	//yiN1swqWAMjGYYwbBpSrFqPLXaSZE/z8dLUZecI6ZMz+yA0Y9JZ3e4A7EDLsSvwd
-	//y5q4mWBMsXzlhiX6c8wWBmhhwqZu3I4WA6ipUv+wWET5AgMBAAEwDQYJKoZIhvcN
-	//AQELBQADggEBABsim7iVvVhL3RT4oA+sbvSDp1lDhiBS2eKcKqnIT0GSROoNpJIN
-	//s3uUD5XUz9oBxLbD3p6uiDrfqvmKTBpbp7YJWYqGbcsG06J392DLTaC/6KPb4D/x
-	//GSLpiyzYPP+YlbBp6VZXQbfx+GGr9UJx2E/Q0rmHVgUx0zFv3I+6rHGVKGA2E61X
-	//8M2fsrkzCFCk8owrDHPV27vXXgUI6bAQNbcJpYb4BCv5eO3zjJFxI0ljWL9LpHDF
-	//AJcu6l4kx4Jpo5lsExqC8QTctHRu2MIZM1MUdml+YyV1Rjb7W5WfL1vgbOVX7O1C
-	//IN0JSq/C/zyaw90UuKb48HeO7aqrkNlmd/0=
-	//-----END CERTIFICATE-----`)
-	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/~Common~test-certificate", func(w http.ResponseWriter, r *http.Request) {
-		r.Header.Set("Content-Type", "application/octet-stream")
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/test-certificate.crt", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		//_, _ = fmt.Fprintf(w, `{}`)
+		_, _ = fmt.Fprintf(w, `{"name":"%s"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-cert", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		http.Error(w, "The requested object name (/Common/testsslcert##) is invalid", http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 	})
-
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -155,7 +164,7 @@ func TestAccBigipSslCertificateUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSslCertificateCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 400 :: The requested object name \\(/Common/testsslcert##\\) is invalid"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: Bad Request"),
 			},
 		},
 	})
@@ -193,7 +202,7 @@ func testBigipSslCertificateModify(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_ssl_certificate" "test-cert" {
   name    = "%s"
-  content = "${file("`+folder+`/../examples/servercert.crt")}"
+  content = "${file("`+folder+`/../examples/servercert2.crt")}"
   partition = "Common"
 }
 provider "bigip" {

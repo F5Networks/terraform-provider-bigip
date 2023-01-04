@@ -245,7 +245,6 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -274,6 +273,7 @@ func (b *BigIP) iControlPath(parts []string) string {
 			buffer.WriteString("/")
 		}
 	}
+	log.Printf("[INFO]String:%+v", buffer.String())
 	return buffer.String()
 }
 
@@ -283,6 +283,7 @@ func (b *BigIP) delete(path ...string) error {
 		Method: "delete",
 		URL:    b.iControlPath(path),
 	}
+	log.Printf("Req:%+v", req)
 
 	_, callErr := b.APICall(req)
 	return callErr
@@ -464,6 +465,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		req.Header.Add("Content-Type", options.ContentType)
 		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
 		// Try to upload chunk
+		log.Printf("Req:%+v", req)
 		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
@@ -499,8 +501,10 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		URL:         b.iControlPath(path),
 		ContentType: "application/json",
 	}
+	log.Printf("Req:%+v", req)
 
 	resp, err := b.APICall(req)
+	log.Printf("Resp:%+v", string(resp))
 	if err != nil {
 		var reqError RequestError
 		json.Unmarshal(resp, &reqError)

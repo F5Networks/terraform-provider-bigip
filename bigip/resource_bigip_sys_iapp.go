@@ -217,12 +217,11 @@ func resourceBigipSysIapp() *schema.Resource {
 func resourceBigipSysIappCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	description := d.Get("description").(string)
+	//description := d.Get("description").(string)
 
 	log.Println("[INFO] Creating Iapp       " + name)
 	p := dataToIapp(d)
-	d.SetId(name)
-	d.SetId(description)
+
 	err := client.CreateIapp(&p)
 
 	if err != nil {
@@ -265,34 +264,25 @@ func resourceBigipSysIappRead(d *schema.ResourceData, meta interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	d.Set("partition", p.Partition)
-	if err := d.Set("devicegroup", p.DeviceGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving DeviceGroup  to state for Devicegroup  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("execute_action", p.ExecuteAction); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving ExecuteAction  to state for ExecuteAction  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("inherited_devicegroup", p.InheritedDevicegroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving InheritedDevicegroup  to state for InheritedDevicegroup  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("inherited_traffic_group", p.InheritedTrafficGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving InheritedTrafficGroup  to state for inheritedTrafficGroup  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("strict_updates", p.StrictUpdates); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving StrictUpdates  to state for StrictUpdates  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("template_modified", p.TemplateModified); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving TemplateModified  to state for TemplateModified  (%s): %s", d.Id(), err)
-	}
-	d.Set("template_prerequisite_errors", p.TemplatePrerequisiteErrors)
-	if err := d.Set("traffic_group", p.TrafficGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving TrafficGroup to state for Iapp  (%s): %s", d.Id(), err)
-	}
-	d.Set("tables", p.Tables)
-	d.Set("lists", p.Lists)
-	d.Set("variables", p.Variables)
-	d.Set("metadata", p.Metadata)
+	_ = d.Set("name", name)
+	_ = d.Set("partition", p.Partition)
+	_ = d.Set("devicegroup", p.DeviceGroup)
+	_ = d.Set("execute_action", p.ExecuteAction)
+	_ = d.Set("inherited_devicegroup", p.InheritedDevicegroup)
+
+	_ = d.Set("inherited_traffic_group", p.InheritedTrafficGroup)
+
+	_ = d.Set("strict_updates", p.StrictUpdates)
+
+	_ = d.Set("template_modified", p.TemplateModified)
+
+	_ = d.Set("template_prerequisite_errors", p.TemplatePrerequisiteErrors)
+	_ = d.Set("traffic_group", p.TrafficGroup)
+
+	_ = d.Set("tables", p.Tables)
+	_ = d.Set("lists", p.Lists)
+	_ = d.Set("variables", p.Variables)
+	_ = d.Set("metadata", p.Metadata)
 	return nil
 }
 

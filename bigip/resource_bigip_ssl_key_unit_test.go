@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipSslCertKeyUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "testkey.key"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,7 +30,7 @@ func TestAccBigipSslCertKeyUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipSslCertKeyUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "testkey.key"
 	httpDefault := "/Common/http"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
@@ -42,31 +42,35 @@ func TestAccBigipSslCertKeyUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/testkey.key", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-key", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","sourcePath":"file:///var/config/rest/downloads/%s"}`, resourceName, resourceName)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-key/~Common~testkey.key", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{
+    "name": "testkey.key",
+    "partition": "Common",
+    "fullPath": "/Common/testkey.key",
+    "checksum": "SHA1:1704:3daeb88d01b0efbd98a73284941a0a5c6306b6b5",
+    "createTime": "2021-07-16T05:46:24Z",
+    "createdBy": "root",
+    "curveName": "none",
+    "keySize": 2048,
+    "keyType": "rsa-private",
+    "lastUpdateTime": "2021-07-16T05:46:24Z",
+    "mode": 33184,
+    "revision": 1,
+    "securityType": "normal",
+    "size": 1704,
+    "systemPath": "/config/ssl/ssl.key/default.key",
+    "updatedBy": "root"}`)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -77,15 +81,15 @@ func TestAccBigipSslCertKeyUnitCreate(t *testing.T) {
 				Config: testBigipCertKeyCreate(resourceName, server.URL),
 			},
 			{
-				Config:             testBigipCertKeyModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
+				Config: testBigipCertKeyModify(resourceName, server.URL),
+				//ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
 func TestAccBigipSslCertKeyUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "testkey.key"
 	httpDefault := "/Common/http"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
@@ -97,13 +101,19 @@ func TestAccBigipSslCertKeyUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/testkey.key", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-key", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","sourcePath":"file:///var/config/rest/downloads/%s"}`, resourceName, resourceName)
+	})
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-key/~Common~testkey.key", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+		http.Error(w, "Requested Cert Key (testkey.key) was not found", http.StatusNotFound)
 	})
 
 	defer teardown()
@@ -113,15 +123,14 @@ func TestAccBigipSslCertKeyUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipCertKeyCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Requested Cert Key \\(testkey.key\\) was not found"),
 			},
 		},
 	})
 }
 
 func TestAccBigipSslCertKeyUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "testkey.key"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +141,15 @@ func TestAccBigipSslCertKeyUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/mgmt/shared/file-transfer/uploads/testkey.key", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Add("Content-Range", "[0-1195/1196]")
+		r.Header.Add("Content-Type", "[application/octet-stream]")
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
+		_, _ = fmt.Fprintf(w, `{"name":"%s"}`, resourceName)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/sys/file/ssl-key", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 	})
 
 	defer teardown()
@@ -149,7 +159,7 @@ func TestAccBigipSslCertKeyUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipCertKeyCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("HTTP 400 :: Bad Request"),
 			},
 		},
 	})
@@ -157,7 +167,7 @@ func TestAccBigipSslCertKeyUnitCreateError(t *testing.T) {
 
 func testBigipCertKeyInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ssl_key" "test-cert-key" {
   name       = "%s"
   invalidkey = "foo"
 }
@@ -170,9 +180,10 @@ provider "bigip" {
 
 func testBigipCertKeyCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ssl_key" "test-cert-key" {
   name    = "%s"
-  basic_auth_realm = "none"
+  content = "${file("`+folder1+`/../examples/serverkey.key")}"
+  partition = "Common"
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +195,10 @@ provider "bigip" {
 
 func testBigipCertKeyModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
+resource "bigip_ssl_key" "test-cert-key" {
   name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  content = "${file("`+folder1+`/../examples/serverkey2.key")}"
+  partition = "Common"
 }
 provider "bigip" {
   address  = "%s"

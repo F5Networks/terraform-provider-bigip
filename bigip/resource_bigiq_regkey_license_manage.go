@@ -138,6 +138,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	licensePoolName := d.Get("license_poolname").(string)
 	log.Printf("[INFO] BIGIP License Assignment Started on Pool:%v", licensePoolName)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
+	log.Printf("[INFO] Pool Info:%v", poolInfo)
 	if err != nil {
 		return err
 	}
@@ -156,6 +157,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
+	log.Printf("[INFO] Pool ID:%v", poolId)
 	if err != nil {
 		return fmt.Errorf("getting Poolid failed with :%v", err)
 	}
@@ -187,7 +189,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		}
 		taskID, err := bigiqRef.PostLicense(config)
 		if err != nil {
-			return fmt.Errorf("Error is : %v", err)
+			return fmt.Errorf("Error is : %v ", err)
 		}
 		respID = taskID
 	} else {
@@ -269,9 +271,12 @@ func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) er
 	if regKey == "" {
 		taskId := memID
 		licenseStatus, err := bigiqRef.GetLicenseStatus(taskId)
+
 		if err != nil {
 			return fmt.Errorf("getting license status failed with : %v", err)
 		}
+		log.Printf("[INFO]licenseStatus :%v", licenseStatus)
+		log.Printf("[INFO]poolInfo :%v", poolInfo)
 		if licenseStatus["status"] == "FINISHED" && poolInfo.SortName == "Purchased Pool" {
 			d.Set("device_license_status", "LICENSED")
 			return nil
@@ -529,10 +534,11 @@ func waitLicenseRevoke(bigipRef *bigip.BigIP) (map[string]interface{}, error) {
 
 func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 	bigiqConfig := bigip.Config{
-		Address:  d.Get("bigiq_address").(string),
-		Port:     d.Get("bigiq_port").(string),
-		Username: d.Get("bigiq_user").(string),
-		Password: d.Get("bigiq_password").(string),
+		Address:           d.Get("bigiq_address").(string),
+		Port:              d.Get("bigiq_port").(string),
+		Username:          d.Get("bigiq_user").(string),
+		CertVerifyDisable: true,
+		Password:          d.Get("bigiq_password").(string),
 	}
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)

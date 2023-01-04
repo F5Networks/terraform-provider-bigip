@@ -292,9 +292,9 @@ type Pool struct {
 	QueueDepthLimit        int    `json:"queueDepthLimit,omitempty"`
 	QueueOnConnectionLimit string `json:"queueOnConnectionLimit,omitempty"`
 	QueueTimeLimit         int    `json:"queueTimeLimit,omitempty"`
-	ReselectTries          int    `json:"reselectTries"`
+	ReselectTries          int    `json:"reselectTries,omitempty"`
 	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
-	SlowRampTime           int    `json:"slowRampTime"`
+	SlowRampTime           int    `json:"slowRampTime,omitempty"`
 }
 
 // Pool Members contains a list of pool members within a pool on the BIG-IP system.
@@ -2300,6 +2300,7 @@ func (b *BigIP) PoolMembers(name string) (*PoolMembers, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("poolMembers:%+v", poolMembers)
 
 	return &poolMembers, nil
 }
@@ -2393,6 +2394,8 @@ func (b *BigIP) DeletePoolMember(pool string, member string) error {
 	if len(strings.Split(member, "%")) > 1 {
 		return b.delete(uriLtm, uriPool, pool, uriPoolMember, url.PathEscape(member))
 	} else {
+		log.Printf("[INFO] pool:%+v", pool)
+		log.Printf("[INFO] member:%+v", member)
 		return b.delete(uriLtm, uriPool, pool, uriPoolMember, member)
 	}
 }

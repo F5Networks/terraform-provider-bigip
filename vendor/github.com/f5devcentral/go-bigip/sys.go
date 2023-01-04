@@ -803,6 +803,7 @@ func (b *BigIP) DeleteTRAP(name string) error {
 func (b *BigIP) Bigiplicenses() (*Bigiplicense, error) {
 	var bigiplicense Bigiplicense
 	err, _ := b.getForEntity(&bigiplicense, uriSys, uriLicense)
+	log.Printf("Error:%+v", err)
 
 	if err != nil {
 		return nil, err

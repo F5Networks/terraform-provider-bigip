@@ -39,9 +39,9 @@ func TestAccBigipCommandUnitCreate(t *testing.T) {
 
 	mux.HandleFunc("/mgmt/tm/util/bash", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		req_body := make(map[string]interface{})
-		json.NewDecoder(r.Body).Decode(&req_body)
-		if req_body["utilCmdArgs"] == "-c 'tmsh show sys version'" {
+		reqBody := make(map[string]interface{})
+		json.NewDecoder(r.Body).Decode(&reqBody)
+		if reqBody["utilCmdArgs"] == "-c 'tmsh show sys version'" {
 			fmt.Fprintf(w, `
 			{
 				"kind": "tm:util:bash:runstate",
@@ -51,7 +51,7 @@ func TestAccBigipCommandUnitCreate(t *testing.T) {
 			}
 			`, sysVersion)
 		}
-		if req_body["utilCmdArgs"] == "-c 'tmsh list ltm pool test-pool1'" {
+		if reqBody["utilCmdArgs"] == "-c 'tmsh list ltm pool test-pool1'" {
 			fmt.Fprintf(w, `
 			{
 				"kind": "tm:util:bash:runstate",

@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccBigipLtmPoolAttachUnitInvalid(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
+	resourceName := "/Common/test-pool-attach1"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
 		Providers:  testProviders,
@@ -30,8 +30,7 @@ func TestAccBigipLtmPoolAttachUnitInvalid(t *testing.T) {
 }
 
 func TestAccBigipLtmPoolAttachUnitCreate(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "10.10.10.10:443"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -42,31 +41,40 @@ func TestAccBigipLtmPoolAttachUnitCreate(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[{"name": "%s",
+            "partition": "Common",
+            "fullPath": "/Common/%s",
+            "address": "10.10.10.10",
+            "connectionLimit": 0,
+            "dynamicRatio": 1,
+            "ephemeral": "false",
+            "fqdn": {
+                "autopopulate": "disabled"
+            },
+            "inheritProfile": "enabled",
+            "logging": "disabled",
+            "monitor": "default",
+            "priorityGroup": 2,
+            "rateLimit": "disabled",
+            "ratio": 1,
+            "session": "user-enabled",
+            "state": "unchecked"}]}`, resourceName, resourceName)
+		}
+		if r.Method == "POST" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","fqdn":{}}`, resourceName)
+		}
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/~Common~10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"connectionLimit":2,"dynamicRatio":3,"fqdn":{},"priorityGroup":2,"rateLimit":"2","ratio":2}`)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-profile-http1", func(w http.ResponseWriter, r *http.Request) {
-	//	http.Error(w, "The requested HTTP Profile (/Common/test-profile-http1) was not found", http.StatusNotFound)
-	//})
-	mux = http.NewServeMux()
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method, "Expected method 'PUT', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none","acceptXff": "enabled",}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name": "test-pool","partition": "Common","fullPath": "/Common/test-pool"}`)
 	})
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"name":"%s","loadBalancingMode":"least-connections-member"}`, resourceName)
-	//})
-	//
-	//mux = http.NewServeMux()
-	//mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool1", func(w http.ResponseWriter, r *http.Request) {
-	//	_, _ = fmt.Fprintf(w, `{"code": 404,"message": "01020036:3: The requested Pool (/Common/test-pool1) was not found.","errorStack": [],"apiError": 3}`)
-	//})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, ``)
+	})
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
@@ -85,8 +93,7 @@ func TestAccBigipLtmPoolAttachUnitCreate(t *testing.T) {
 }
 
 func TestAccBigipLtmPoolAttachUnitReadError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "10.10.10.10:443"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -97,13 +104,22 @@ func TestAccBigipLtmPoolAttachUnitReadError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name": "test-pool","partition": "Common","fullPath": "/Common/test-pool"}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[]}`)
+		}
+		if r.Method == "POST" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","fqdn":{}}`, resourceName)
+		}
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/~Common~10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"connectionLimit":2,"dynamicRatio":3,"fqdn":{},"priorityGroup":2,"rateLimit":"2","ratio":2}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, ``)
 	})
 
 	defer teardown()
@@ -113,15 +129,14 @@ func TestAccBigipLtmPoolAttachUnitReadError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmPoolAttachCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("Not able to attached Node :10.10.10.10:443 to pool /Common/test-pool"),
 			},
 		},
 	})
 }
 
 func TestAccBigipLtmPoolAttachUnitCreateError(t *testing.T) {
-	resourceName := "/Common/test-profile-http"
-	httpDefault := "/Common/http"
+	resourceName := "10.10.10.10:443"
 	setup()
 	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
@@ -132,14 +147,13 @@ func TestAccBigipLtmPoolAttachUnitCreateError(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		_, _ = fmt.Fprintf(w, `{}`)
 	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
-		_, _ = fmt.Fprintf(w, `{"name":"/Common/testhttp##","defaultsFrom":"%s", "basicAuthRealm": "none"}`, httpDefault)
-		http.Error(w, "The requested object name (/Common/testravi##) is invalid", http.StatusNotFound)
-	})
-	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
-		http.Error(w, "The requested HTTP Profile (/Common/test-profile-http) was not found", http.StatusNotFound)
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[]}`)
+		}
+		if r.Method == "POST" {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		}
 	})
 
 	defer teardown()
@@ -149,7 +163,221 @@ func TestAccBigipLtmPoolAttachUnitCreateError(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmPoolAttachCreate(resourceName, server.URL),
-				ExpectError: regexp.MustCompile("HTTP 404 :: The requested HTTP Profile \\(/Common/test-profile-http\\) was not found"),
+				ExpectError: regexp.MustCompile("Failure adding node 10.10.10.10:443 to pool /Common/test-pool: HTTP 400 :: Bad Request"),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolAttachUnitImport(t *testing.T) {
+	resourceName := "10.10.10.10:443"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[{"name": "%s",
+            "partition": "Common",
+            "fullPath": "/Common/%s",
+            "address": "10.10.10.10",
+            "connectionLimit": 0,
+            "dynamicRatio": 1,
+            "ephemeral": "false",
+            "fqdn": {
+                "autopopulate": "disabled"
+            },
+            "inheritProfile": "enabled",
+            "logging": "disabled",
+            "monitor": "default",
+            "priorityGroup": 2,
+            "rateLimit": "disabled",
+            "ratio": 1,
+            "session": "user-enabled",
+            "state": "unchecked"}]}`, resourceName, resourceName)
+		}
+		if r.Method == "POST" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","fqdn":{}}`, resourceName)
+		}
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/~Common~10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"connectionLimit":2,"dynamicRatio":3,"fqdn":{},"priorityGroup":2,"rateLimit":"2","ratio":2}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name": "test-pool","partition": "Common","fullPath": "/Common/test-pool"}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/10.10.10.10:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, ``)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testBigipLtmPoolAttachCreate(resourceName, server.URL),
+			},
+			{
+				Config:       testBigipLtmPoolAttachImport(server.URL),
+				ResourceName: "bigip_ltm_pool_attachment.test-pool-attach1",
+				ImportState:  true,
+				//ImportStateVerify: true,
+				ImportStateId: `{"pool": "/Common/test-pool", "node": "/Common/10.10.10.10:443"}`,
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolAttachUnitCreateFqdn(t *testing.T) {
+	resourceName := "www.f5.com:443"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[{
+    "name": "%s",
+    "partition": "Common",
+    "fullPath": "/Common/%s",
+    "address": "any6",
+    "connectionLimit": 0,
+    "dynamicRatio": 1,
+    "ephemeral": "false",
+    "fqdn": {
+        "autopopulate": "enabled",
+        "tmName": "www.f5.com"
+    },
+    "inheritProfile": "enabled",
+    "logging": "disabled",
+    "monitor": "default",
+    "priorityGroup": 0,
+    "rateLimit": "disabled",
+    "ratio": 1,
+    "session": "user-enabled",
+    "state": "fqdn-up"
+}]}`, resourceName, resourceName)
+		}
+		if r.Method == "POST" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","fqdn":{"autopopulate": "enabled","tmName": "www.f5.com"}}`, resourceName)
+		}
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/~Common~www.f5.com:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"connectionLimit":2,"dynamicRatio":3,"fqdn":{"autopopulate": "enabled","tmName": "www.f5.com"}},"priorityGroup":2,"rateLimit":"2","ratio":2}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name": "test-pool","partition": "Common","fullPath": "/Common/test-pool"}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/www.f5.com:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, ``)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testBigipLtmPoolAttachCreateFqdn(resourceName, server.URL),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolAttachUnitCreateFqdnTC2(t *testing.T) {
+	resourceName := "/Common/www.f5.com:443"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		_, _ = fmt.Fprintf(w, `{}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/node/~Common~www.f5.com", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{
+    "name": "www.f5.com",
+    "partition": "Common",
+    "fullPath": "/Common/www.f5.com",
+    "address": "any6",
+    "connectionLimit": 0,
+    "dynamicRatio": 1,
+    "ephemeral": "false",
+    "fqdn": {
+        "addressFamily": "all",
+        "autopopulate": "enabled",
+        "downInterval": 5,
+        "interval": "3600",
+        "tmName": "www.f5.com"
+    },
+    "logging": "disabled",
+    "monitor": "default",
+    "rateLimit": "disabled",
+    "ratio": 1,
+    "session": "user-enabled",
+    "state": "fqdn-up"
+}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" && r.URL.String() == "/mgmt/tm/ltm/pool/~Common~test-pool/members" {
+			_, _ = fmt.Fprintf(w, `{"items":[{
+    "name": "%s",
+    "partition": "Common",
+    "fullPath": "%s",
+    "address": "any6",
+    "connectionLimit": 0,
+    "dynamicRatio": 1,
+    "ephemeral": "false",
+    "fqdn": {
+        "autopopulate": "enabled",
+        "tmName": "www.f5.com"
+    },
+    "inheritProfile": "enabled",
+    "logging": "disabled",
+    "monitor": "default",
+    "priorityGroup": 0,
+    "rateLimit": "disabled",
+    "ratio": 1,
+    "session": "user-enabled",
+    "state": "fqdn-up"
+}]}`, resourceName, resourceName)
+		}
+		if r.Method == "POST" {
+			_, _ = fmt.Fprintf(w, `{"name":"%s","partition":"Common","fqdn":{"autopopulate": "enabled","tmName": "www.f5.com"}}`, resourceName)
+		}
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/~Common~www.f5.com:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"connectionLimit":2,"dynamicRatio":3,"fqdn":{"autopopulate": "enabled","tmName": "www.f5.com"}},"priorityGroup":2,"rateLimit":"2","ratio":2}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name": "test-pool","partition": "Common","fullPath": "/Common/test-pool"}`)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/pool/~Common~test-pool/members/www.f5.com:443", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, ``)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testBigipLtmPoolAttachCreateFqdn(resourceName, server.URL),
 			},
 		},
 	})
@@ -157,10 +385,12 @@ func TestAccBigipLtmPoolAttachUnitCreateError(t *testing.T) {
 
 func testBigipLtmPoolAttachInvalid(resourceName string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name       = "%s"
-  invalidkey = "foo"
+resource "bigip_ltm_pool_attachment" "test-pool-attach1" {
+   pool = "/Common/test-pool"
+   node = "%s"
+   invalidkey = "foo"
 }
+
 provider "bigip" {
   address  = "xxx.xxx.xxx.xxx"
   username = "xxx"
@@ -170,9 +400,14 @@ provider "bigip" {
 
 func testBigipLtmPoolAttachCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  basic_auth_realm = "none"
+resource "bigip_ltm_pool_attachment" "test-pool-attach1" {
+   pool = "/Common/test-pool"
+   node = "%s"
+   ratio                 = 2
+   connection_limit      = 2
+   connection_rate_limit = 2
+   priority_group        = 2
+   dynamic_ratio         = 3
 }
 provider "bigip" {
   address  = "%s"
@@ -184,10 +419,44 @@ provider "bigip" {
 
 func testBigipLtmPoolAttachModify(resourceName, url string) string {
 	return fmt.Sprintf(`
-resource "bigip_ltm_profile_http" "test-profile-http" {
-  name    = "%s"
-  accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+resource "bigip_ltm_pool_attachment" "test-pool-attach1" {
+   pool = "/Common/test-pool"
+   node = "%s"
+   ratio                 = 2
+   connection_limit      = 2
+   connection_rate_limit = 2
+   priority_group        = 3
+   dynamic_ratio         = 3
+}
+provider "bigip" {
+  address  = "%s"
+  username = ""
+  password = ""
+  login_ref = ""
+}`, resourceName, url)
+}
+func testBigipLtmPoolAttachImport(url string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool_attachment" "test-pool-attach1" {
+    pool = "/Partition/Name"
+    node = "/Partition/Name"
+}
+provider "bigip" {
+  address  = "%s"
+  username = ""
+  password = ""
+  login_ref = ""
+}`, url)
+}
+func testBigipLtmPoolAttachCreateFqdn(resourceName, url string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_pool_attachment" "test-pool-attach1" {
+   pool = "/Common/test-pool"
+   node = "%s"
+   ratio                 = 1
+   connection_limit      = 0
+   priority_group        = 0
+   dynamic_ratio         = 1
 }
 provider "bigip" {
   address  = "%s"

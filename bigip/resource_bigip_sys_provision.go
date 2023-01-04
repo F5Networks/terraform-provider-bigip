@@ -109,6 +109,7 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	p, err := client.Provisions(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", name, err)
+		d.SetId("")
 		return err
 	}
 	if p == nil {

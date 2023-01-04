@@ -22,9 +22,7 @@ func resourceBigipSysBigiplicense() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
-
 			"command": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -35,40 +33,44 @@ func resourceBigipSysBigiplicense() *schema.Resource {
 				Required:    true,
 				Description: "A unique Key F5 provides for Licensing BIG-IP",
 			},
+			"timeout": {
+				Type:     schema.TypeInt,
+				Default:  300,
+				Optional: true,
+			},
 		},
 	}
-
 }
-
 func resourceBigipSysBigiplicenseCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
 	command := d.Get("command").(string)
-	registration_key := d.Get("registration_key").(string)
-	log.Println("[INFO] Creating BigipLicense ")
+	registrationKey := d.Get("registration_key").(string)
+	log.Println("[INFO] Creating Bigip License ")
 
 	err := client.CreateBigiplicense(
 		command,
-		registration_key,
+		registrationKey,
 	)
-	time.Sleep(300 * time.Second)
+	timeOut := time.Duration(d.Get("timeout").(int)) * time.Second
+	time.Sleep(timeOut)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Apply License to Bigip  (%v) ", err)
 		return err
 	}
-	d.SetId(registration_key)
+	d.SetId(registrationKey)
 	return resourceBigipSysBigiplicenseRead(d, meta)
 }
 
 func resourceBigipSysBigiplicenseUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*bigip.BigIP)
 
-	registration_key := d.Id()
+	registrationKey := d.Id()
 
-	log.Println("[INFO] Updating Bigiplicense " + registration_key)
+	log.Println("[INFO] Updating Bigiplicense " + registrationKey)
 
 	r := &bigip.Bigiplicense{
-		Registration_key: registration_key,
+		Registration_key: registrationKey,
 		Command:          d.Get("command").(string),
 	}
 
@@ -85,6 +87,7 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 	licenses, err := client.Bigiplicenses()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Read License from Bigip  (%v) ", err)
+		d.SetId("")
 		return err
 	}
 	if licenses == nil {

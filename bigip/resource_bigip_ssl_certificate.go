@@ -66,6 +66,7 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return fmt.Errorf("Error in Importing/Creating certificate (%s): %s ", name, err)
 	}
+	log.Println("[INFO][Create] Name " + name)
 	d.SetId(name)
 	if !client.Teem {
 		id := uuid.New()

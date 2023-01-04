@@ -16,7 +16,6 @@ func resourceBigipSslKey() *schema.Resource {
 		Read:   resourceBigipSslKeyRead,
 		Update: resourceBigipSslKeyUpdate,
 		Delete: resourceBigipSslKeyDelete,
-		Exists: resourceBigipSslKeyExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -107,46 +106,15 @@ func resourceBigipSslKeyRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	certkey, err := client.GetKey(name)
+	if err != nil {
+		d.SetId("")
+		return err
+	}
 	log.Printf("[INFO] SSL key content:%+v", certkey)
 	_ = d.Set("name", certkey.Name)
 	_ = d.Set("partition", certkey.Partition)
 	_ = d.Set("full_path", certkey.FullPath)
-	if err != nil {
-		return err
-	}
 	return nil
-}
-
-func resourceBigipSslKeyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking certificate key" + name + " exists.")
-	/*if !strings.HasSuffix(name, ".key") {
-		name = name + ".key"
-	}*/
-	partition := d.Get("partition").(string)
-	if partition == "" {
-		if !strings.HasPrefix(name, "/") {
-			err := errors.New("the name must be in full_path format when partition is not specified")
-			fmt.Print(err)
-		}
-	} else {
-		if !strings.HasPrefix(name, "/") {
-			name = "/" + partition + "/" + name
-		}
-	}
-	certkey, err := client.GetKey(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve certificate key (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if certkey == nil {
-		log.Printf("[WARN] certificate key(%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return certkey != nil, nil
 }
 
 func resourceBigipSslKeyUpdate(d *schema.ResourceData, meta interface{}) error {

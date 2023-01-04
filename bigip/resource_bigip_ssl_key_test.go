@@ -17,12 +17,12 @@ import (
 )
 
 var folder1, _ = os.Getwd()
-var SSLKEY_NAME = "serverkey.key"
-var TEST_SSLKEY_NAME = fmt.Sprintf("/%s/%s", TEST_PARTITION, SSLKEY_NAME)
+var SslkeyName = "serverkey.key"
+var TestSslkeyName = fmt.Sprintf("/%s/%s", TEST_PARTITION, SslkeyName)
 
-var TEST_SSL_KEY_RESOURCE = `
+var TestSslKeyResource = `
 resource "bigip_ssl_key" "test-key" {
-        name = "` + SSLKEY_NAME + `"
+        name = "` + SslkeyName + `"
         content = "${file("` + folder1 + `/../examples/serverkey.key")}"
         partition = "` + TEST_PARTITION + `"
 }
@@ -37,10 +37,10 @@ func TestAccSslKeyImportToBigip(t *testing.T) {
 		CheckDestroy: testChecksslKeyDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SSL_KEY_RESOURCE,
+				Config: TestSslKeyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksslkeyExists(TEST_SSLKEY_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "name", SSLKEY_NAME),
+					testChecksslkeyExists(TestSslkeyName, true),
+					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "name", SslkeyName),
 					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "partition", TEST_PARTITION),
 				),
 			},

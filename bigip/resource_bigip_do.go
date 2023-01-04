@@ -30,7 +30,6 @@ func resourceBigipDo() *schema.Resource {
 		Read:   resourceBigipDoRead,
 		Update: resourceBigipDoUpdate,
 		Delete: resourceBigipDoDelete,
-		Exists: resourceBigipDoExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -136,6 +135,7 @@ func resourceBigipDoCreate(d *schema.ResourceData, meta interface{}) error {
 	req.Header.Set("Content-Type", "application/json")
 
 	log.Printf("[INFO] URL:%s", clientBigip.Host)
+	log.Printf("[INFO] Req:%+v", req)
 
 	resp, err := client.Do(req)
 
@@ -325,53 +325,6 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 
-}
-
-func resourceBigipDoExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	clientBigip := meta.(*bigip.BigIP)
-	if d.Get("bigip_address").(string) != "" && d.Get("bigip_user").(string) != "" && d.Get("bigip_password").(string) != "" || d.Get("bigip_port").(string) != "" {
-		clientBigip2, err := connectBigIP(d)
-		if err != nil {
-			log.Printf("Connection to BIGIP Failed with :%v", err)
-			return false, err
-		}
-		clientBigip = clientBigip2
-	}
-	log.Printf("[INFO] Checking if Do config exists in bigip ")
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
-	url := clientBigip.Host + "/mgmt/shared/declarative-onboarding"
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Printf("[ERROR] Error while creating http request for checking Do config : %v", err)
-		return false, err
-	}
-	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, err
-	}
-
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Printf("[DEBUG] Could not close the request to %s", url)
-		}
-	}()
-	var body bytes.Buffer
-	_, err = io.Copy(&body, resp.Body)
-	// body, err := ioutil.ReadAll(resp.Body)
-	bodyString := body.String()
-	if resp.Status == "204 No Content" || err != nil {
-		log.Printf("[ERROR] Error while checking doresource present in bigip :%s  %v", bodyString, err)
-		return false, err
-	}
-
-	return true, nil
 }
 
 func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
