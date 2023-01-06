@@ -66,6 +66,40 @@ func TestAccBigipIPSecPolicyUnitCreate(t *testing.T) {
 	})
 }
 
+func TestAccBigipIPSecPolicyUnitReadError(t *testing.T) {
+	resourceName := "test-ipsec-policy"
+	setup()
+	mux.HandleFunc("mgmt/shared/authn/login", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+	})
+
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ipsec-policy", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method, "Expected method 'POST', got %s", r.Method)
+	})
+
+	mux.HandleFunc("/mgmt/tm/net/ipsec/traffic-selector/~Common~test-ipsec-policy", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method, "Expected method 'GET', got %s", r.Method)
+		fmt.Fprintf(w, `{}`)
+	})
+
+	mux.HandleFunc("/mgmt/tm/net/ipsec/ipsec-policy/~Common~test-ipsec-policy", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Not found", http.StatusNotFound)
+	})
+
+	defer teardown()
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testBigipIPSecPolicyCreate(resourceName, server.URL),
+				ExpectError: regexp.MustCompile("HTTP 404 :: Not found"),
+			},
+		},
+	})
+}
+
 // func TestAccBigipIPSecPolicyUnitExistsError(t *testing.T) {
 // 	resourceName := "test-ipsec-policy"
 // 	setup()
