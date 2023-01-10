@@ -580,7 +580,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["name"] = policyWaf.Name
 		}
 		log.Printf("[INFO] polJsn1 template:%+v", polJsn1.Policy.(map[string]interface{})["template"])
-		if polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
+		if policyWaf.Template.Name != "" && polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
 
@@ -618,7 +618,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 		polJsn1.Modifications = myModification
 		log.Printf("[DEBUG] Modifications: %+v", polJsn1.Modifications)
-		log.Printf("[INFO] Policy Json: %+v", polJsn1)
+		log.Printf("[INFO][Import] Policy Json: %+v", polJsn1)
 		data, err := json.Marshal(polJsn1)
 		if err != nil {
 			return "", err
