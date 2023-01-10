@@ -215,6 +215,7 @@ type WafPolicy struct {
 	ID          string `json:"id,omitempty"`
 	Template    struct {
 		Name string `json:"name,omitempty"`
+		Link string `json:"link,omitempty"`
 	} `json:"template,omitempty"`
 	HasParent           bool        `json:"hasParent,omitempty"`
 	ApplicationLanguage string      `json:"applicationLanguage,omitempty"`

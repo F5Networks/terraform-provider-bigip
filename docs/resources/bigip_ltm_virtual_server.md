@@ -74,7 +74,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `translate_port` - Enables or disables port translation. Turn port translation off for a virtual server if you want to use the virtual server to load balance connections to any service
 
-* `ip_protocol`- (Optional) Specify the IP protocol to use with the the virtual server (all, tcp, or udp are valid)
+* `ip_protocol`- (Optional) Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is `tcp`. valid options are [`any`,`udp`,`tcp`]
 
 * `profiles` - (Optional) List of profiles associated both client and server contexts on the virtual server. This includes protocol, ssl, http, etc.
 
