@@ -526,14 +526,30 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn.Policy.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
 			polJsn.Policy.Name = policyWaf.Name
 		}
+		if len(policyWaf.Description) > 0 {
+			polJsn.Policy.Description = policyWaf.Description
+		}
 		if polJsn.Policy.Template != policyWaf.Template {
 			polJsn.Policy.Template = policyWaf.Template
 		}
-		polJsn.Policy.Urls = append(polJsn.Policy.Urls, policyWaf.Urls...)
-		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 {
-			polJsn.Policy.Parameters = append(polJsn.Policy.Parameters, policyWaf.Parameters...)
+		if len(policyWaf.Urls) > 0 {
+			polJsn.Policy.Urls = policyWaf.Urls
 		}
-		polJsn.Policy.GraphqlProfiles = append(polJsn.Policy.GraphqlProfiles, policyWaf.GraphqlProfiles...)
+		if len(policyWaf.Parameters) > 0 {
+			polJsn.Policy.Parameters = policyWaf.Parameters
+		}
+		if len(policyWaf.Filetypes) > 0 {
+			polJsn.Policy.Filetypes = policyWaf.Filetypes
+		}
+		if len(policyWaf.GraphqlProfiles) > 0 {
+			polJsn.Policy.GraphqlProfiles = policyWaf.GraphqlProfiles
+		}
+		if len(policyWaf.OpenAPIFiles) > 0 {
+			polJsn.Policy.OpenAPIFiles = policyWaf.OpenAPIFiles
+		}
+		if len(policyWaf.ServerTechnologies) > 0 {
+			polJsn.Policy.ServerTechnologies = policyWaf.ServerTechnologies
+		}
 		policyJson.Policy = polJsn.Policy
 	}
 
