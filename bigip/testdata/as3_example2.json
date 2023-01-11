@@ -1,0 +1,42 @@
+{
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "id": "example-declaration-02",
+        "label": "Sample 2",
+        "remark": "Simple HTTP application with round robin pool",
+        "Sample_02": {
+            "class": "Tenant",
+            "defaultRouteDomain": 0,
+            "Application_2": {
+                "class": "Application",
+                "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "10.0.2.12"
+                    ],
+                    "pool": "web_pool2"
+                },
+                "web_pool2": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 443,
+                            "serverAddresses": [
+                                "193.0.1.151",
+                                "193.0.1.112"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

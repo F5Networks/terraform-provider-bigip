@@ -177,7 +177,7 @@ func resourceBigipAs3Create(d *schema.ResourceData, meta interface{}) error {
 	if tenantFilter != "" {
 		log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
 		if !contains(tenantCount, tenantFilter) {
-			return fmt.Errorf("tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
+			return fmt.Errorf("tenant_filter: (%s) not exist in as3_json provided", tenantFilter)
 		}
 		tenantList = tenantFilter
 	}

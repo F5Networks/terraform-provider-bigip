@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -231,6 +232,96 @@ func TestAccBigipFastHttpUnitCreate(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccBigipFastHttpCfgExistingOptions(t *testing.T) {
+	res := resourceBigipFastHTTPSApp()
+	resSchema := res.Schema
+	tlsServProfName := "test_tls_server_profile"
+	tlsClientProfName := "test_tls_client_profile"
+	wafPolicyName := "test_waf_policy"
+	existingPool := "test_pool"
+	existingSnatPool := "test_snat_pool"
+	resourceDataMap := map[string]interface{}{
+		"tenant":                       "tenant",
+		"application":                  "application",
+		"existing_tls_server_profile":  tlsServProfName,
+		"existing_tls_client_profile":  tlsClientProfName,
+		"existing_waf_security_policy": wafPolicyName,
+		"existing_snat_pool":           existingSnatPool,
+		"existing_pool":                existingPool,
+	}
+	resourceLocalData := schema.TestResourceDataRaw(t, resSchema, resourceDataMap)
+	want := `{"tenant_name":"tenant",` +
+		`"app_name":"application",` +
+		`"enable_snat":true,` +
+		`"snat_automap":false,` +
+		`"make_snatpool":false,` +
+		`"snatpool_name":"test_snat_pool",` +
+		`"enable_pool":true,` +
+		`"make_pool":false,` +
+		`"enable_tls_server":false,` +
+		`"enable_tls_client":false,` +
+		`"make_tls_server_profile":false,` +
+		`"make_tls_client_profile":false,` +
+		`"pool_name":"test_pool",` +
+		`"load_balancing_mode":"least-connections-member",` +
+		`"make_monitor":false,` +
+		`"monitor_credentials":false,` +
+		`"enable_waf_policy":true,` +
+		`"make_waf_policy":false,` +
+		`"asm_waf_policy":"test_waf_policy",` +
+		`"enable_asm_logging":true}`
+	got, _ := getFastHttpConfig(resourceLocalData)
+	assert.Equal(t, want, got, "Expected %s, got %s", want, got)
+}
+
+func TestAccBigipFastHttpCfgMakeOptions(t *testing.T) {
+	res := resourceBigipFastHTTPSApp()
+	resSchema := res.Schema
+	snatAddresses := []interface{}{"10.34.26.78"}
+	wafSecPolicy := map[string]interface{}{"enable": true}
+	secLogProf := []interface{}{"test_log_profile"}
+	endpointPolicy := []interface{}{"ltm_endpoint_policy"}
+	pool_members := map[string]interface{}{
+		"addresses":        []interface{}{"1.2.3.4", "5.6.7.8"},
+		"port":             80,
+		"connection_limit": 4,
+		"priority_group":   4,
+		"share_nodes":      true}
+	resourceDataMap := map[string]interface{}{
+		"tenant":                "tenant",
+		"application":           "application",
+		"pool_members":          []interface{}{pool_members},
+		"waf_security_policy":   []interface{}{wafSecPolicy},
+		"snat_pool_address":     snatAddresses,
+		"security_log_profiles": secLogProf,
+		"endpoint_ltm_policy":   endpointPolicy,
+	}
+	resourceLocalData := schema.TestResourceDataRaw(t, resSchema, resourceDataMap)
+	want := `{"tenant_name":"tenant",` +
+		`"app_name":"application",` +
+		`"enable_snat":true,` +
+		`"snat_automap":false,` +
+		`"make_snatpool":true,` +
+		`"snat_addresses":["10.34.26.78"],` +
+		`"enable_pool":true,` +
+		`"make_pool":true,` +
+		`"enable_tls_server":false,` +
+		`"enable_tls_client":false,` +
+		`"make_tls_server_profile":false,` +
+		`"make_tls_client_profile":false,` +
+		`"pool_members":[{"serverAddresses":["1.2.3.4","5.6.7.8"],"servicePort":80,"connectionLimit":4,"priorityGroup":4,"shareNodes":true}],` +
+		`"load_balancing_mode":"least-connections-member",` +
+		`"make_monitor":false,` +
+		`"monitor_credentials":false,` +
+		`"enable_waf_policy":true,` +
+		`"make_waf_policy":true,` +
+		`"endpoint_policy_names":["ltm_endpoint_policy"],` +
+		`"enable_asm_logging":true,` +
+		`"log_profile_names":["test_log_profile"]}`
+	got, _ := getFastHttpConfig(resourceLocalData)
+	assert.Equal(t, got, want, "Expected %s, got %s", want, got)
 }
 
 func testBigipFastHttpInvalid(resourceName string) string {
