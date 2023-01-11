@@ -24,7 +24,6 @@ func resourceBigipIpsecPolicy() *schema.Resource {
 		Read:   resourceBigipIpsecPolicyRead,
 		Update: resourceBigipIpsecPolicyUpdate,
 		Delete: resourceBigipIpsecPolicyDelete,
-		Exists: resourceBigipIpsecPolicyExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -170,6 +169,7 @@ func resourceBigipIpsecPolicyRead(d *schema.ResourceData, meta interface{}) erro
 	log.Printf("[INFO] Reading IPSec policy :%+v", name)
 	ipsec, err := client.GetIPSecPolicy(name)
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 	if ipsec == nil {
@@ -177,55 +177,19 @@ func resourceBigipIpsecPolicyRead(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("[ERROR] IPSec policy (%s) not found, removing from state", d.Id())
 	}
 	log.Printf("[DEBUG] IPSec Policy:%+v", ipsec)
-	if err := d.Set("protocol", ipsec.Protocol); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Protocol to state for IPSec policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mode", ipsec.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for IPSec policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("tunnel_local_address", ipsec.TunnelLocalAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TunnelLocalAddress to state for IPSec policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("tunnel_remote_address", ipsec.TunnelRemoteAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TunnelRemoteAddress to state for IPSec policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("encrypt_algorithm", ipsec.IkePhase2EncryptAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2EncryptAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("auth_algorithm", ipsec.IkePhase2AuthAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2AuthAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("lifetime", ipsec.IkePhase2Lifetime); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2Lifetime to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("kb_lifetime", ipsec.IkePhase2LifetimeKilobytes); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2LifetimeKilobytes to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("perfect_forward_secrecy", ipsec.IkePhase2PerfectForwardSecrecy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2PerfectForwardSecrecy to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("ipcomp", ipsec.Ipcomp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Ipcomp to state for IPSec Policy (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("protocol", ipsec.Protocol)
+	_ = d.Set("mode", ipsec.Mode)
+	_ = d.Set("tunnel_local_address", ipsec.TunnelLocalAddress)
+	_ = d.Set("tunnel_remote_address", ipsec.TunnelRemoteAddress)
+	_ = d.Set("encrypt_algorithm", ipsec.IkePhase2EncryptAlgorithm)
+	_ = d.Set("auth_algorithm", ipsec.IkePhase2AuthAlgorithm)
+	_ = d.Set("lifetime", ipsec.IkePhase2Lifetime)
+	_ = d.Set("kb_lifetime", ipsec.IkePhase2LifetimeKilobytes)
+	_ = d.Set("perfect_forward_secrecy", ipsec.IkePhase2PerfectForwardSecrecy)
+	_ = d.Set("ipcomp", ipsec.Ipcomp)
 	_ = d.Set("description", ipsec.Description)
 	_ = d.Set("name", name)
 	return nil
-}
-
-func resourceBigipIpsecPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Check existence of IPSec Policy: %+v ", name)
-	ipsec, err := client.GetTrafficselctor(name)
-	if err != nil {
-		return false, err
-	}
-	if ipsec == nil {
-		log.Printf("[WARN] IPSec Policy (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, fmt.Errorf("[ERROR] IPSec Policy (%s) not found, removing from state", d.Id())
-	}
-	return true, nil
 }
 
 func resourceBigipIpsecPolicyUpdate(d *schema.ResourceData, meta interface{}) error {

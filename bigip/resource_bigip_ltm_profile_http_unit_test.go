@@ -47,7 +47,93 @@ func TestAccBigipLtmProfilehttpUnitCreate(t *testing.T) {
 		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
 	})
 	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, `{"name":"%s","defaultsFrom":"%s", "basicAuthRealm": "none"}`, resourceName, httpDefault)
+		_, _ = fmt.Fprintf(w, `{
+    "kind": "tm:ltm:profile:http:httpstate",
+    "name": "test-profile-http",
+    "fullPath": "%s",
+    "generation": 1,
+    "selfLink": "https://localhost/mgmt/tm/ltm/profile/http/test-profile-http?ver=16.1.0",
+    "acceptXff": "enabled",
+    "appService": "none",
+    "basicAuthRealm": "none",
+    "defaultsFrom": "%s",
+    "defaultsFromReference": {
+        "link": "https://localhost/mgmt/tm/ltm/profile/http/~Common~http?ver=16.1.0"
+    },
+    "description": "none",
+    "encryptCookies": [],
+    "enforcement": {
+        "allowWsHeaderName": "disabled",
+        "excessClientHeaders": "reject",
+        "excessServerHeaders": "reject",
+        "knownMethods": [
+            "CONNECT",
+            "DELETE",
+            "GET",
+            "HEAD",
+            "LOCK",
+            "OPTIONS",
+            "POST",
+            "PROPFIND",
+            "PUT",
+            "TRACE",
+            "UNLOCK"
+        ],
+        "maxHeaderCount": 64,
+        "maxHeaderSize": 32768,
+        "maxRequests": 0,
+        "oversizeClientHeaders": "reject",
+        "oversizeServerHeaders": "reject",
+        "pipeline": "allow",
+        "rfcCompliance": "disabled",
+        "truncatedRedirects": "disabled",
+        "unknownMethod": "allow"
+    },
+    "explicitProxy": {
+        "badRequestMessage": "none",
+        "badResponseMessage": "none",
+        "connectErrorMessage": "none",
+        "defaultConnectHandling": "deny",
+        "dnsErrorMessage": "none",
+        "dnsResolver": "none",
+        "hostNames": [],
+        "ipv6": "no",
+        "routeDomain": "none",
+        "tunnelName": "none",
+        "tunnelOnAnyRequest": "no"
+    },
+    "fallbackHost": "none",
+    "fallbackStatusCodes": [],
+    "headerErase": "none",
+    "headerInsert": "none",
+    "hsts": {
+        "includeSubdomains": "enabled",
+        "maximumAge": 16070400,
+        "mode": "disabled",
+        "preload": "disabled"
+    },
+    "insertXforwardedFor": "disabled",
+    "lwsSeparator": "none",
+    "lwsWidth": 80,
+    "oneconnectStatusReuse": "200 206",
+    "oneconnectTransformations": "enabled",
+    "proxyType": "reverse",
+    "redirectRewrite": "none",
+    "requestChunking": "sustain",
+    "responseChunking": "sustain",
+    "responseHeadersPermitted": [],
+    "serverAgentName": "BigIP",
+    "sflow": {
+        "pollInterval": 0,
+        "pollIntervalGlobal": "yes",
+        "samplingRate": 0,
+        "samplingRateGlobal": "yes"
+    },
+    "viaHostName": "none",
+    "viaRequest": "preserve",
+    "viaResponse": "preserve",
+    "xffAlternativeNames": []
+}`, resourceName, httpDefault)
 	})
 	mux = http.NewServeMux()
 	mux.HandleFunc("/mgmt/tm/ltm/profile/http/~Common~test-profile-http", func(w http.ResponseWriter, r *http.Request) {
@@ -64,8 +150,8 @@ func TestAccBigipLtmProfilehttpUnitCreate(t *testing.T) {
 				Config: testBigipLtmProfilehttpCreate(resourceName, server.URL),
 			},
 			{
-				Config:             testBigipLtmProfilehttpModify(resourceName, server.URL),
-				ExpectNonEmptyPlan: true,
+				Config: testBigipLtmProfilehttpModify(resourceName, server.URL),
+				//ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -159,6 +245,21 @@ func testBigipLtmProfilehttpCreate(resourceName, url string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_http" "test-profile-http" {
   name    = "%s"
+  encrypt_cookies = []
+  fallback_host = "none"
+  fallback_status_codes = []
+  head_erase = "none"
+  head_insert = "none"
+  insert_xforwarded_for= "disabled"
+  lws_separator = "none"
+  oneconnect_transformations= "enabled"
+  redirect_rewrite = "none"
+  request_chunking = "sustain"
+  response_chunking = "sustain"
+  server_agent_name = "BigIP"
+  via_host_name = "none"
+  via_request = "preserve"
+  via_response = "preserve"
   basic_auth_realm = "none"
 }
 provider "bigip" {
@@ -174,7 +275,21 @@ func testBigipLtmProfilehttpModify(resourceName, url string) string {
 resource "bigip_ltm_profile_http" "test-profile-http" {
   name    = "%s"
   accept_xff = "enabled"
-  encrypt_cookie_secret = ""
+  encrypt_cookies = []
+  fallback_host = "none"
+  fallback_status_codes = []
+  head_erase = "none"
+  head_insert = "none"
+  insert_xforwarded_for= "disabled"
+  lws_separator = "none"
+  oneconnect_transformations= "enabled"
+  redirect_rewrite = "none"
+  request_chunking = "sustain"
+  response_chunking = "sustain"
+  server_agent_name = "BigIP"
+  via_host_name = "none"
+  via_request = "preserve"
+  via_response = "preserve"
 }
 provider "bigip" {
   address  = "%s"

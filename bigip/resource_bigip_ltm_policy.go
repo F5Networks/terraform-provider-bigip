@@ -1331,34 +1331,22 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) error {
 		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 		match := re.FindStringSubmatch(p.Strategy)
 		if match == nil {
-			return fmt.Errorf("Failed to match regex")
+			return fmt.Errorf("Failed to match regex ")
 		}
 		strategyName := match[2]
 
-		if err := d.Set("strategy", strategyName); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Strategy   state for Policy (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("strategy", strategyName)
 	}
-	if err := d.Set("controls", makeStringSet(&p.Controls)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Controls  state for Policy (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("requires", makeStringSet(&p.Requires)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err)
-	}
-
+	_ = d.Set("controls", makeStringSet(&p.Controls))
+	_ = d.Set("requires", makeStringSet(&p.Requires))
 	_ = d.Set("name", p.FullPath)
 
 	if len(p.Rules) > 0 {
 		sort.Slice(p.Rules, func(i, j int) bool {
 			return p.Rules[i].Ordinal < p.Rules[j].Ordinal
 		})
-
 		rule := flattenPolicyRules(p.Rules)
-
-		err := d.Set("rule", rule)
-		if err != nil {
-			return err
-		}
+		_ = d.Set("rule", rule)
 	}
 
 	return nil

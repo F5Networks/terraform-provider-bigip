@@ -140,6 +140,7 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
+	log.Printf("[INFO] Req :%v", req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

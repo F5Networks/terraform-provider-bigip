@@ -393,12 +393,14 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 	if resp.StatusCode == http.StatusAccepted {
 	forLoop:
 		for i := 0; i <= timeoutSec; i++ {
-			log.Printf("[DEBUG]Value of loop counter :%d", i)
+			log.Printf("[INFO]Value of loop counter :%d", i)
+			log.Printf("[INFO]Resp ID :%+v", respID)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 			req, _ := http.NewRequest("GET", url, nil)
 			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
 			req.Header.Set("Accept", "application/json")
 			req.Header.Set("Content-Type", "application/json")
+			log.Printf("[INFO] Req :%+v", req)
 
 			taskResp, err := client.Do(req)
 
@@ -413,6 +415,7 @@ func resourceBigipDoUpdate(d *schema.ResourceData, meta interface{}) error {
 				time.Sleep(1 * time.Second)
 				continue
 			}
+			log.Printf("[INFO] Resp Code:%+v", taskResp.StatusCode)
 			switch {
 			case taskResp.StatusCode == 200:
 				var respBody bytes.Buffer
