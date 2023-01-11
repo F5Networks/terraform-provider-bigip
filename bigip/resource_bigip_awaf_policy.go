@@ -574,34 +574,34 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn)
 		var polJsn1 bigip.PolicyStructobject
 		_ = json.Unmarshal([]byte(val.(string)), &polJsn1)
-		log.Printf("[INFO] polJsn1 FullPath:%+v", polJsn1.Policy.(map[string]interface{})["fullPath"])
 		if polJsn1.Policy.(map[string]interface{})["fullPath"] != policyWaf.Name {
 			polJsn1.Policy.(map[string]interface{})["fullPath"] = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
 			polJsn1.Policy.(map[string]interface{})["name"] = policyWaf.Name
 		}
-		log.Printf("[INFO] polJsn1 template:%+v", polJsn1.Policy.(map[string]interface{})["template"])
 		if policyWaf.Template.Name != "" && polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
 
-		if polJsn.Policy.FullPath != policyWaf.Name {
-			polJsn.Policy.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
-			polJsn.Policy.Name = policyWaf.Name
+		urlList := make([]interface{}, 0)
+		for i, v := range policyWaf.Urls {
+			urlList[i] = v
 		}
-		if polJsn.Policy.Template != policyWaf.Template {
-			polJsn.Policy.Template = policyWaf.Template
+		urlLL := append(polJsn1.Policy.(map[string]interface{})["urls"].([]interface{}), urlList...)
+		polJsn1.Policy.(map[string]interface{})["urls"] = urlLL
+
+		params := make([]interface{}, 0)
+		for i, v := range policyWaf.Parameters {
+			params[i] = v
 		}
-		urlList := make([]bigip.WafUrlJson, 0)
-		urlList = append(urlList, policyWaf.Urls...)
-		polJsn1.Policy.(map[string]interface{})["urls"] = urlList
-		params := make([]bigip.Parameter, 0)
-		if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 && policyWaf.Parameters[0].Name != "*" {
-			params = append(params, policyWaf.Parameters...)
-			polJsn1.Policy.(map[string]interface{})["parameters"] = params
+		paramsLL := append(polJsn1.Policy.(map[string]interface{})["parameters"].([]interface{}), params...)
+		polJsn1.Policy.(map[string]interface{})["parameters"] = paramsLL
+
+		graphQL := make([]interface{}, 0)
+		for i, v := range policyWaf.GraphqlProfiles {
+			graphQL[i] = v
 		}
-		graphQL := make([]bigip.GraphqlProfile, 0)
-		graphQL = append(graphQL, policyWaf.GraphqlProfiles...)
-		polJsn1.Policy.(map[string]interface{})["graphql-profiles"] = graphQL
+		graphQLL := append(polJsn1.Policy.(map[string]interface{})["graphql-profiles"].([]interface{}), graphQL...)
+		polJsn1.Policy.(map[string]interface{})["graphql-profiles"] = graphQLL
 
 		var myModification []interface{}
 		if val, ok := d.GetOk("modifications"); ok {
@@ -618,13 +618,20 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 		polJsn1.Modifications = myModification
 		log.Printf("[DEBUG] Modifications: %+v", polJsn1.Modifications)
-		log.Printf("[INFO][Import] Policy Json: %+v", polJsn1)
+		// log.Printf("[INFO][Import] Policy Json: %+v", polJsn1)
 		data, err := json.Marshal(polJsn1)
 		if err != nil {
 			return "", err
 		}
 		return string(data), nil
 
+		// if polJsn.Policy.FullPath != policyWaf.Name {
+		//	polJsn.Policy.FullPath = fmt.Sprintf("/%s/%s", policyWaf.Partition, policyWaf.Name)
+		//	polJsn.Policy.Name = policyWaf.Name
+		// }
+		// if policyWaf.Template.Name != "" && polJsn.Policy.Template != policyWaf.Template {
+		//	polJsn.Policy.Template = policyWaf.Template
+		// }
 		// polJsn.Policy.Urls = append(polJsn.Policy.Urls, policyWaf.Urls...)
 		// polJsn.Policy.Parameters = []bigip.Parameter{}
 		// if policyWaf.Parameters != nil && len(policyWaf.Parameters) > 0 && policyWaf.Parameters[0].Name != "*" {
