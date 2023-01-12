@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -261,6 +262,96 @@ func TestAccBigipFastUdpUnitCreate(t *testing.T) {
 			},
 		},
 	})
+}
+
+// func TestAccBigipFastUdpCfgExistingOptions(t *testing.T) {
+// 	res := resourceBigipFastUdpApp()
+// 	resSchema := res.Schema
+// 	tlsServProfName := "test_tls_server_profile"
+// 	tlsClientProfName := "test_tls_client_profile"
+// 	wafPolicyName := "test_waf_policy"
+// 	existingPool := "test_pool"
+// 	existingSnatPool := "test_snat_pool"
+// 	resourceDataMap := map[string]interface{}{
+// 		"tenant":                       "tenant",
+// 		"application":                  "application",
+// 		"existing_tls_server_profile":  tlsServProfName,
+// 		"existing_tls_client_profile":  tlsClientProfName,
+// 		"existing_waf_security_policy": wafPolicyName,
+// 		"existing_snat_pool":           existingSnatPool,
+// 		"existing_pool":                existingPool,
+// 	}
+// 	resourceLocalData := schema.TestResourceDataRaw(t, resSchema, resourceDataMap)
+// 	want := `{"tenant_name":"tenant",` +
+// 		`"app_name":"application",` +
+// 		`"enable_snat":true,` +
+// 		`"snat_automap":false,` +
+// 		`"make_snatpool":false,` +
+// 		`"snatpool_name":"test_snat_pool",` +
+// 		`"enable_pool":true,` +
+// 		`"make_pool":false,` +
+// 		`"enable_tls_server":false,` +
+// 		`"enable_tls_client":false,` +
+// 		`"make_tls_server_profile":false,` +
+// 		`"make_tls_client_profile":false,` +
+// 		`"pool_name":"test_pool",` +
+// 		`"load_balancing_mode":"least-connections-member",` +
+// 		`"make_monitor":false,` +
+// 		`"monitor_credentials":false,` +
+// 		`"enable_waf_policy":true,` +
+// 		`"make_waf_policy":false,` +
+// 		`"asm_waf_policy":"test_waf_policy",` +
+// 		`"enable_asm_logging":true}`
+// 	got, _ := getFastHttpConfig(resourceLocalData)
+// 	assert.Equal(t, want, got, "Expected %s, got %s", want, got)
+// }
+
+func TestAccBigipFastUdpCfgMakeOptions(t *testing.T) {
+	res := resourceBigipFastUdpApp()
+	resSchema := res.Schema
+	snatAddresses := []interface{}{"10.34.26.78"}
+	secLogProf := []interface{}{"test_log_profile"}
+	persistenceType := "source-address"
+	fallbackPersistence := "source-address"
+	enableFastl4 := true
+	irules := []interface{}{"irule1", "irule2"}
+	vlansAllowed := []interface{}{"vlan1", "vlan2"}
+
+	resourceDataMap := map[string]interface{}{
+		"tenant":                "tenant",
+		"application":           "application",
+		"snat_pool_address":     snatAddresses,
+		"security_log_profiles": secLogProf,
+		"persistence_type":      persistenceType,
+		"fallback_persistence":  fallbackPersistence,
+		"irules":                irules,
+		"vlans_allowed":         vlansAllowed,
+		"enable_fastl4":         enableFastl4,
+	}
+	resourceLocalData := schema.TestResourceDataRaw(t, resSchema, resourceDataMap)
+	want := `{"tenant_name":"tenant",` +
+		`"app_name":"application",` +
+		`"fastl4":true,` +
+		`"make_fastl4_profile":true,` +
+		`"enable_snat":true,` +
+		`"snat_automap":false,` +
+		`"make_snatpool":true,` +
+		`"snat_addresses":["10.34.26.78"],` +
+		`"enable_persistence":true,` +
+		`"fastl4_persistence_type":"source-address",` +
+		`"enable_fallback_persistence":true,` +
+		`"fallback_persistence_type":"source-address",` +
+		`"enable_pool":false,` +
+		`"make_pool":false,` +
+		`"make_monitor":false,` +
+		`"irule_names":["irule1","irule2"],` +
+		`"vlans_enable":true,` +
+		`"vlans_allow":true,` +
+		`"vlan_names":["vlan1","vlan2"],` +
+		`"enable_asm_logging":true,` +
+		`"log_profile_names":["test_log_profile"]}`
+	got, _ := getParamsConfigMapUdp(resourceLocalData)
+	assert.Equal(t, want, got, "Expected %s, got %s", want, got)
 }
 
 func testBigipFastUDPInvalid(resourceName string) string {

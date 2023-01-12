@@ -217,7 +217,7 @@ resource "bigip_ltm_datagroup" "test_dg" {
   name    = "/Common/%s"
   type    = "string"
   internal = false
-  records_src = "/tmp/records.txt"
+  records_src = "./testdata/records.txt"
 }
 provider "bigip" {
   address  = "%s"
@@ -233,7 +233,7 @@ resource "bigip_ltm_datagroup" "test_dg" {
   name    = "/Common/%s"
   type    = "string"
   internal = false
-  records_src = "/tmp/records2.txt"
+  records_src = "./testdata/records2.txt"
 }
 provider "bigip" {
   address  = "%s"
