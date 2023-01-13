@@ -325,7 +325,7 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 			"Terraform Version":          client.UserAgent,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
-		err = teemDevice.Report(f, "bigip_as3", tsVer[3])
+		err = teemDevice.Report(f, "bigip_waf_policy", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
@@ -516,6 +516,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 		sts = append(sts, st1)
 	}
+	policyWaf.ServerTechnologies = sts
 
 	var wafUrls []bigip.WafUrlJson
 	urls := d.Get("urls").([]interface{})
@@ -558,12 +559,9 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	for i := 0; i < len(apiLinks); i++ {
 		var apiLink bigip.OpenApiLink
 		apiLink.Link = apiLinks[i].(string)
-		// _ = json.Unmarshal([]byte(apiLinks[i].(string)), &apiLink.Link)
 		openApiLinks = append(openApiLinks, apiLink)
 	}
 	policyWaf.OpenAPIFiles = openApiLinks
-
-	policyWaf.ServerTechnologies = sts
 
 	// policyJson := &bigip.PolicyStruct{}
 	policyJson := &bigip.PolicyStructobject{}
@@ -596,6 +594,38 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		paramsLL := append(polJsn1.Policy.(map[string]interface{})["parameters"].([]interface{}), params...)
 		polJsn1.Policy.(map[string]interface{})["parameters"] = paramsLL
 
+		sigSet := make([]interface{}, 0)
+		for i, v := range policyWaf.SignatureSets {
+			sigSet[i] = v
+		}
+		sigSetsList := append(polJsn1.Policy.(map[string]interface{})["signature-sets"].([]interface{}), sigSet...)
+		polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSetsList
+
+		fileType := make([]interface{}, 0)
+		for i, v := range policyWaf.Filetypes {
+			fileType[i] = v
+		}
+		fileTypeList := append(polJsn1.Policy.(map[string]interface{})["filetypes"].([]interface{}), fileType...)
+		polJsn1.Policy.(map[string]interface{})["filetypes"] = fileTypeList
+
+		if policyWaf.Description != "" {
+			polJsn1.Policy.(map[string]interface{})["description"] = policyWaf.Description
+		}
+
+		serverTech := make([]interface{}, 0)
+		for i, v := range policyWaf.ServerTechnologies {
+			serverTech[i] = v
+		}
+		serverTechList := append(polJsn1.Policy.(map[string]interface{})["server-technologies"].([]interface{}), serverTech...)
+		polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTechList
+
+		openApi := make([]interface{}, 0)
+		for i, v := range policyWaf.OpenAPIFiles {
+			openApi[i] = v
+		}
+		openApiList := append(polJsn1.Policy.(map[string]interface{})["open-api-files"].([]interface{}), openApi...)
+		polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApiList
+
 		graphQL := make([]interface{}, 0)
 		for i, v := range policyWaf.GraphqlProfiles {
 			graphQL[i] = v
@@ -623,6 +653,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		// _ = os.WriteFile("myimport.json", data, 0644)
 		return string(data), nil
 
 		// if polJsn.Policy.FullPath != policyWaf.Name {
