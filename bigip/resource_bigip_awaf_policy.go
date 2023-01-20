@@ -278,6 +278,7 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	polName := fmt.Sprintf("/%s/%s", partition, name)
 	mutex.Lock()
 	log.Printf("[INFO] AWAF Policy Config: %+v ", config)
+	// os.WriteFile("awaf_output.json", []byte(config), 0644)
 	taskId, err := client.ImportAwafJson(polName, config, "")
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
@@ -584,29 +585,49 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v
 		}
-		urlLL := append(polJsn1.Policy.(map[string]interface{})["urls"].([]interface{}), urlList...)
-		polJsn1.Policy.(map[string]interface{})["urls"] = urlLL
+		_, urlsOK := polJsn1.Policy.(map[string]interface{})["urls"]
+		if urlsOK {
+			urlLL := append(polJsn1.Policy.(map[string]interface{})["urls"].([]interface{}), urlList...)
+			polJsn1.Policy.(map[string]interface{})["urls"] = urlLL
+		} else {
+			polJsn1.Policy.(map[string]interface{})["urls"] = urlList
+		}
 
 		params := make([]interface{}, 0)
 		for i, v := range policyWaf.Parameters {
 			params[i] = v
 		}
-		paramsLL := append(polJsn1.Policy.(map[string]interface{})["parameters"].([]interface{}), params...)
-		polJsn1.Policy.(map[string]interface{})["parameters"] = paramsLL
+		_, paramsOK := polJsn1.Policy.(map[string]interface{})["parameters"]
+		if paramsOK {
+			paramsLL := append(polJsn1.Policy.(map[string]interface{})["parameters"].([]interface{}), params...)
+			polJsn1.Policy.(map[string]interface{})["parameters"] = paramsLL
+		} else {
+			polJsn1.Policy.(map[string]interface{})["parameters"] = params
+		}
 
 		sigSet := make([]interface{}, 0)
 		for i, v := range policyWaf.SignatureSets {
 			sigSet[i] = v
 		}
-		sigSetsList := append(polJsn1.Policy.(map[string]interface{})["signature-sets"].([]interface{}), sigSet...)
-		polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSetsList
+		_, sigSetOK := polJsn1.Policy.(map[string]interface{})["signature-sets"]
+		if sigSetOK {
+			sigSetsList := append(polJsn1.Policy.(map[string]interface{})["signature-sets"].([]interface{}), sigSet...)
+			polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSetsList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSet
+		}
 
 		fileType := make([]interface{}, 0)
 		for i, v := range policyWaf.Filetypes {
 			fileType[i] = v
 		}
-		fileTypeList := append(polJsn1.Policy.(map[string]interface{})["filetypes"].([]interface{}), fileType...)
-		polJsn1.Policy.(map[string]interface{})["filetypes"] = fileTypeList
+		_, fileTyOK := polJsn1.Policy.(map[string]interface{})["filetypes"]
+		if fileTyOK {
+			fileTypeList := append(polJsn1.Policy.(map[string]interface{})["filetypes"].([]interface{}), fileType...)
+			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileTypeList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileType
+		}
 
 		if policyWaf.Description != "" {
 			polJsn1.Policy.(map[string]interface{})["description"] = policyWaf.Description
@@ -616,22 +637,37 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		for i, v := range policyWaf.ServerTechnologies {
 			serverTech[i] = v
 		}
-		serverTechList := append(polJsn1.Policy.(map[string]interface{})["server-technologies"].([]interface{}), serverTech...)
-		polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTechList
+		_, srvrTCOK := polJsn1.Policy.(map[string]interface{})["server-technologies"]
+		if srvrTCOK {
+			serverTechList := append(polJsn1.Policy.(map[string]interface{})["server-technologies"].([]interface{}), serverTech...)
+			polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTechList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTech
+		}
 
 		openApi := make([]interface{}, 0)
 		for i, v := range policyWaf.OpenAPIFiles {
 			openApi[i] = v
 		}
-		openApiList := append(polJsn1.Policy.(map[string]interface{})["open-api-files"].([]interface{}), openApi...)
-		polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApiList
+		_, openApiOK := polJsn1.Policy.(map[string]interface{})["open-api-files"]
+		if openApiOK {
+			openApiList := append(polJsn1.Policy.(map[string]interface{})["open-api-files"].([]interface{}), openApi...)
+			polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApiList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApi
+		}
 
 		graphQL := make([]interface{}, 0)
 		for i, v := range policyWaf.GraphqlProfiles {
 			graphQL[i] = v
 		}
-		graphQLL := append(polJsn1.Policy.(map[string]interface{})["graphql-profiles"].([]interface{}), graphQL...)
-		polJsn1.Policy.(map[string]interface{})["graphql-profiles"] = graphQLL
+		_, graphqlOK := polJsn1.Policy.(map[string]interface{})["graphql-profiles"]
+		if graphqlOK {
+			graphQLL := append(polJsn1.Policy.(map[string]interface{})["graphql-profiles"].([]interface{}), graphQL...)
+			polJsn1.Policy.(map[string]interface{})["graphql-profiles"] = graphQLL
+		} else {
+			polJsn1.Policy.(map[string]interface{})["graphql-profiles"] = graphQL
+		}
 
 		var myModification []interface{}
 		if val, ok := d.GetOk("modifications"); ok {
