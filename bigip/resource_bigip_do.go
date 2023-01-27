@@ -41,9 +41,12 @@ func resourceBigipDo() *schema.Resource {
 				Required:    true,
 				Description: "DO json",
 				StateFunc: func(v interface{}) string {
-					json, _ := structure.NormalizeJsonString(v)
-					return json
+					jsonString, _ := structure.NormalizeJsonString(v)
+					return jsonString
 				},
+				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				//	return true
+				//},
 			},
 			"timeout": {
 				Type:        schema.TypeInt,
@@ -316,12 +319,13 @@ func resourceBigipDoRead(d *schema.ResourceData, meta interface{}) error {
 	if resp.Status != "200 OK" {
 		return fmt.Errorf("Error while Sending/fetching http request :%s ", bodyString)
 	}
-
 	respRef1 := make(map[string]interface{})
 	if err := json.Unmarshal(respBody.Bytes(), &respRef1); err != nil {
 		return err
 	}
-	log.Printf("[DEBUG] in read resp_body is :%v", respRef1)
+	log.Printf("[INFO] in read resp_body is :%v", respRef1)
+	byteData, _ := json.Marshal(respRef1["declaration"])
+	_ = d.Set("do_json", string(byteData))
 
 	return nil
 
