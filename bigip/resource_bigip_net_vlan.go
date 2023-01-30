@@ -12,6 +12,7 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceBigipNetVlan() *schema.Resource {
@@ -59,6 +60,13 @@ func resourceBigipNetVlan() *schema.Resource {
 					},
 				},
 			},
+			"cmp_hash": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"default", "src-ip", "dst-ip"}, false),
+				Description:  "Specifies how the traffic on the VLAN will be disaggregated. The value selected determines the traffic disaggregation method",
+			},
 		},
 	}
 
@@ -74,13 +82,16 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 	d.Partial(true)
 
-	err := client.CreateVlan(
-		name,
-		tag,
-	)
+	r := &bigip.Vlan{
+		Name:    name,
+		Tag:     tag,
+		CMPHash: d.Get("cmp_hash").(string),
+	}
+
+	err := client.CreateVlan(r)
 
 	if err != nil {
-		return fmt.Errorf("Error creating VLAN %s: %v", name, err)
+		return fmt.Errorf("Error creating VLAN %s: %v ", name, err)
 	}
 
 	d.SetId(name)
@@ -122,8 +133,9 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", vlan.FullPath)
-	d.Set("tag", vlan.Tag)
+	_ = d.Set("name", vlan.FullPath)
+	_ = d.Set("tag", vlan.Tag)
+	_ = d.Set("cmp_hash", vlan.CMPHash)
 
 	log.Printf("[DEBUG] Reading VLAN %s Interfaces", name)
 
@@ -165,13 +177,14 @@ func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 	log.Printf("[DEBUG] Updating VLAN %s", name)
 
 	r := &bigip.Vlan{
-		Name: name,
-		Tag:  d.Get("tag").(int),
+		Name:    name,
+		Tag:     d.Get("tag").(int),
+		CMPHash: d.Get("cmp_hash").(string),
 	}
 
 	err := client.ModifyVlan(name, r)
 	if err != nil {
-		return fmt.Errorf("Error modifying VLAN %s: %v", name, err)
+		return fmt.Errorf("Error modifying VLAN %s: %v ", name, err)
 	}
 
 	return resourceBigipNetVlanRead(d, meta)
@@ -186,9 +199,8 @@ func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.DeleteVlan(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting Vlan : %s", err)
+		return fmt.Errorf("Error Deleting Vlan : %s ", err)
 	}
-
 	d.SetId("")
 	return nil
 }

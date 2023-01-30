@@ -486,12 +486,17 @@ func (b *BigIP) Vlan(name string) (*Vlan, error) {
 	return &vlan, nil
 }
 
+//// CreateVlan adds a new VLAN to the BIG-IP system.
+//func (b *BigIP) CreateVlan(name string, tag int) error {
+//	config := &Vlan{
+//		Name: name,
+//		Tag:  tag,
+//	}
+//	return b.post(config, uriNet, uriVlan)
+//}
+
 // CreateVlan adds a new VLAN to the BIG-IP system.
-func (b *BigIP) CreateVlan(name string, tag int) error {
-	config := &Vlan{
-		Name: name,
-		Tag:  tag,
-	}
+func (b *BigIP) CreateVlan(config *Vlan) error {
 	return b.post(config, uriNet, uriVlan)
 }
 

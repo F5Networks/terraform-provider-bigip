@@ -19,7 +19,7 @@ var TEST_ROUTE_NAME = fmt.Sprintf("/%s/test-route", TEST_PARTITION)
 var TEST_ROUTE_RESOURCE = `
 
 resource "bigip_net_vlan" "test-vlan" {
-	name = "` + TEST_VLAN_NAME + `"
+	name = "` + TestVlanName + `"
 	tag = 101
 	interfaces {
 		vlanport = 1.1
@@ -42,7 +42,7 @@ resource "bigip_net_route" "test-route" {
 var TEST_ROUTE_RESOURCE_UPDATE = `
 
 resource "bigip_net_vlan" "test-vlan" {
-        name = "` + TEST_VLAN_NAME + `"
+        name = "` + TestVlanName + `"
         tag = 101
         interfaces {
                 vlanport = 1.1

@@ -191,9 +191,9 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed: true,
 			},
 			"source_address_translation": {
-				Type:     schema.TypeString,
-				Optional: true,
-				//Computed:    true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "none, automap, snat",
 			},
 			"snatpool": {
@@ -388,9 +388,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	} else {
 		_ = d.Set("state", "disabled")
 	}
-	if _, ok := d.GetOk("source_address_translation"); ok {
-		_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
-	}
+	_ = d.Set("source_address_translation", vs.SourceAddressTranslation.Type)
+
 	_ = d.Set("snatpool", vs.SourceAddressTranslation.Pool)
 	_ = d.Set("policies", vs.Policies)
 	_ = d.Set("vlans", vs.Vlans)
