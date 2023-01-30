@@ -39,4 +39,6 @@ resource "bigip_net_vlan" "vlan1" {
 
 * `vlanport` - Physical or virtual port used for traffic
 
+* `cmp_hash` - (Optional,type `string`) Specifies how the traffic on the VLAN will be disaggregated. The value selected determines the traffic disaggregation method. possible options: [`default`, `src-ip`, `dst-ip`]
+
 * `tagged` - Specifies a list of tagged interfaces or trunks associated with this VLAN. Note that you can associate tagged interfaces or trunks with any number of VLANs.

@@ -50,7 +50,6 @@ func resourceBigipAs3() *schema.Resource {
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
 					json, _ := structure.NormalizeJsonString(v)
-
 					return json
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
@@ -265,7 +264,8 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 		}
 		if as3Resp == "" {
 			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-			d.SetId("")
+			_ = d.Set("as3_json", "")
+			// d.SetId("")
 			return nil
 		}
 		_ = d.Set("as3_json", as3Resp)

@@ -16,9 +16,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-var TEST_VLAN_NAME = fmt.Sprintf("/%s/test-vlan", TEST_PARTITION)
+var TestVlanName = fmt.Sprintf("/%s/test-vlan", TEST_PARTITION)
 
-var TEST_VLAN_RESOURCE = `
+var TestVlanResource = `
 resource "bigip_net_vlan" "test-vlan" {
 	name = "/Common/test-vlan"
 	tag = 101
@@ -38,9 +38,9 @@ func TestAccBigipNetvlan_create(t *testing.T) {
 		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VLAN_RESOURCE,
+				Config: TestVlanResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckvlanExists(TEST_VLAN_NAME, true),
+					testCheckvlanExists(TestVlanName, true),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "name", "/Common/test-vlan"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "tag", "101"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.vlanport", "1.1"),
@@ -60,11 +60,11 @@ func TestAccBigipNetvlan_import(t *testing.T) {
 		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_VLAN_RESOURCE,
+				Config: TestVlanResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckvlanExists(TEST_VLAN_NAME, true),
+					testCheckvlanExists(TestVlanName, true),
 				),
-				ResourceName:      TEST_VLAN_NAME,
+				ResourceName:      TestVlanName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
