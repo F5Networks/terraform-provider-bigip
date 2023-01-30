@@ -44,9 +44,6 @@ func resourceBigipDo() *schema.Resource {
 					jsonString, _ := structure.NormalizeJsonString(v)
 					return jsonString
 				},
-				//DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				//	return true
-				//},
 			},
 			"timeout": {
 				Type:        schema.TypeInt,

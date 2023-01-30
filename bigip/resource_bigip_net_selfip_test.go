@@ -21,7 +21,7 @@ var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TEST_PARTITION
 
 var TEST_SELFIP_RESOURCE = `
 resource "bigip_net_vlan" "test-vlan" {
-  name = "` + TEST_VLAN_NAME + `"
+  name = "` + TestVlanName + `"
   tag = 101
   interfaces {
     vlanport = 1.1
@@ -58,10 +58,10 @@ func TestAccBigipNetselfip_create(t *testing.T) {
 					testCheckselfipExists(TEST_FLOAT_SELFIP_NAME),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "name", TEST_SELFIP_NAME),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "ip", "11.1.1.1/24"),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", TEST_VLAN_NAME),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-selfip", "vlan", TestVlanName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "name", TEST_FLOAT_SELFIP_NAME),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "ip", "11.1.1.2/24"),
-					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "vlan", TEST_VLAN_NAME),
+					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "vlan", TestVlanName),
 					resource.TestCheckResourceAttr("bigip_net_selfip.test-float-selfip", "traffic_group", "traffic-group-1"),
 				),
 			},
@@ -206,7 +206,7 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 func testaccselfipRouteDomain(ip string) string {
 	resPrefix := `
 	resource "bigip_net_vlan" "test-vlan" {
-      name = "` + TEST_VLAN_NAME + `"
+      name = "` + TestVlanName + `"
 	  tag = 101
 	  interfaces {
 		vlanport = 1.1
@@ -226,7 +226,7 @@ func testaccselfipRouteDomain(ip string) string {
 func testaccselfipPortLockdownParam(portLockdown string) string {
 	resPrefix := `
 	resource "bigip_net_vlan" "test-vlan" {
-      name = "` + TEST_VLAN_NAME + `"
+      name = "` + TestVlanName + `"
 	  tag = 101
 	  interfaces {
 		vlanport = 1.1

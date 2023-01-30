@@ -265,7 +265,7 @@ func resourceBigipAs3Read(d *schema.ResourceData, meta interface{}) error {
 		if as3Resp == "" {
 			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
 			_ = d.Set("as3_json", "")
-			//d.SetId("")
+			// d.SetId("")
 			return nil
 		}
 		_ = d.Set("as3_json", as3Resp)
