@@ -48,6 +48,12 @@ whenever we specify this parameter it gets overwrite provider configuration
 ~> **Note:** Delete method is not supported by DO, so terraform destroy won't delete configuration in bigip but we will set the terrform
    state to empty and won't throw error.
 
+## Importing
+Importing Existing DO declaration onto terraform can be done by using `task id` as `id`.
+An example is below:
+```sh
+$ terraform import bigip_do.do-example2 2543dc37-bd1a-45c1-983f-1155a81489b2
+```
 
 * `example.json` - Example of DO Declarative JSON
 
