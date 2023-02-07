@@ -17,8 +17,8 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	uuid "github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
 )
 
 var x = 0
@@ -49,8 +49,8 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "AS3 json",
 				StateFunc: func(v interface{}) string {
-					json, _ := structure.NormalizeJsonString(v)
-					return json
+					jsonString, _ := structure.NormalizeJsonString(v)
+					return jsonString
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					oldResp := []byte(old)

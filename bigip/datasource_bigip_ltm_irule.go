@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipLtmIrule() *schema.Resource {
@@ -31,7 +31,7 @@ func dataSourceBigipLtmIrule() *schema.Resource {
 
 			"irule": {
 				Type:        schema.TypeString,
-				Computed:    true,
+				Optional:    true,
 				Description: "The iRule body",
 				StateFunc: func(s interface{}) string {
 					return strings.TrimSpace(s.(string))

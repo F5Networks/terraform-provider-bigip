@@ -10,7 +10,7 @@ import (
 	"log"
 
 	"github.com/F5Networks/terraform-provider-bigip/bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/plugin"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 
 func main() {

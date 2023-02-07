@@ -11,8 +11,8 @@ import (
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipNetVlan() *schema.Resource {
@@ -95,8 +95,6 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	d.SetId(name)
-	d.SetPartial("name")
-	d.SetPartial("tag")
 
 	ifaceCount := d.Get("interfaces.#").(int)
 	for i := 0; i < ifaceCount; i++ {
@@ -109,7 +107,6 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 			return fmt.Errorf("Error adding Interface %s to VLAN %s: %v", iface, name, err)
 		}
 	}
-	d.SetPartial("interfaces")
 
 	d.Partial(false)
 
