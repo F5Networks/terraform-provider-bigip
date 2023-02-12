@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPSRCADDR_NAME = fmt.Sprintf("/%s/test-ppsrcaddr", TEST_PARTITION)
+var TEST_PPSRCADDR_NAME = fmt.Sprintf("/%s/test-ppsrcaddr", TestPartition)
 
 var TEST_PPSRCADDR_RESOURCE = `
 resource "bigip_ltm_persistence_profile_srcaddr" "test_ppsrcaddr" {
@@ -40,8 +40,8 @@ func TestAccBigipLtmPersistenceProfileSrcAddrCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSrcAddrDestroyed),
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSrcAddrDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPSRCADDR_RESOURCE,
@@ -70,8 +70,8 @@ func TestAccBigipLtmPersistenceProfileSrcAddrImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckBigipLtmPersistenceProfileSrcAddrDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckBigipLtmPersistenceProfileSrcAddrDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPSRCADDR_RESOURCE,

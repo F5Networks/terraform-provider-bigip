@@ -23,8 +23,8 @@ func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastHTTPAppDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFastHTTPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPAppConfig(),
@@ -47,8 +47,8 @@ func TestAccFastHTTPAppCreateTC02(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastHTTPAppDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFastHTTPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPAppConfigTC02(),

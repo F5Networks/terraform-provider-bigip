@@ -18,15 +18,15 @@ func TestAccBigipNetIPsecPolicy_create(t *testing.T) {
 	t.Parallel()
 	resName = "bigip_ipsec_policy"
 	var instName = "test-ipsec-policy"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resName, instName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIPSecPolicyDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIPSecPolicyDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccNetIpsecPolicyDefaultCreate(instName),

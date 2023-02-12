@@ -20,8 +20,8 @@ func TestAccFastUDPAppCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastUDPAppDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFastUDPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastUDPAppConfig(),

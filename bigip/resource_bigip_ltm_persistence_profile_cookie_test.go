@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPCOOKIE_NAME = fmt.Sprintf("/%s/test-ppcookie", TEST_PARTITION)
+var TEST_PPCOOKIE_NAME = fmt.Sprintf("/%s/test-ppcookie", TestPartition)
 
 var TEST_PPCOOKIE_RESOURCE = `
 resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
@@ -41,8 +41,8 @@ func TestAccBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileCookieDestroyed),
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileCookieDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPCOOKIE_RESOURCE,
@@ -74,8 +74,8 @@ func TestAccBigipLtmPersistenceProfileCookieImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckBigipLtmPersistenceProfileCookieDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckBigipLtmPersistenceProfileCookieDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPCOOKIE_RESOURCE,

@@ -18,8 +18,8 @@ import (
 func TestAccBigipVcmpGuestUnitInvalid(t *testing.T) {
 	resourceName := "/Common/test-profile-tcp"
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestInvalid(resourceName),
@@ -123,8 +123,8 @@ func TestAccBigipVcmpGuestUnitCreate(t *testing.T) {
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testBigipVcmpGuestCreate(resourceName, server.URL),
@@ -156,8 +156,8 @@ func TestAccBigipVcmpGuestUnitCreateError(t *testing.T) {
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),
@@ -189,8 +189,8 @@ func TestAccBigipVcmpGuestUnitReadError(t *testing.T) {
 
 	defer teardown()
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),

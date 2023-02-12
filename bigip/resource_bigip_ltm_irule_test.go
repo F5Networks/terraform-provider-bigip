@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_IRULE_NAME = "/" + TEST_PARTITION + "/test-rule_1"
+var TEST_IRULE_NAME = "/" + TestPartition + "/test-rule_1"
 
 var TEST_IRULE_RESOURCE = `
 	resource "bigip_ltm_irule" "test-rule" {
@@ -32,8 +32,8 @@ func TestAccBigipLtmIRule_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIRulesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIRulesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IRULE_RESOURCE,
@@ -50,8 +50,8 @@ func TestAccBigipLtmIRule_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIRulesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIRulesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IRULE_RESOURCE,

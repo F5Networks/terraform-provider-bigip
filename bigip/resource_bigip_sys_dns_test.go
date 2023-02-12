@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestDnsName = fmt.Sprintf("/%s/test-dns", TEST_PARTITION)
+var TestDnsName = fmt.Sprintf("/%s/test-dns", TestPartition)
 
 var TestDnsResource = `
 resource "bigip_sys_dns" "test-dns" {
@@ -30,7 +30,7 @@ func TestAccBigipSysDNSCreateTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDnsResource,
@@ -51,7 +51,7 @@ func TestAccBigipSysDNSCreateTC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: getsysDNSConfigTC2(TestDnsName),
@@ -81,7 +81,7 @@ func TestAccBigipSysDNSCreateTC3(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: getsysDNSConfigTC3(TestDnsName),
@@ -113,7 +113,7 @@ func TestAccBigipSysDNSCreateTC4(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: getsysDNSConfigTC4(TestDnsName),
@@ -141,7 +141,7 @@ func TestAccBigipSysDNSImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDnsResource,

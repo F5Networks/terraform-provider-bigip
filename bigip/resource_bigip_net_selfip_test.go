@@ -16,8 +16,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
-var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TEST_PARTITION)
+var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TestPartition)
+var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TestPartition)
 
 var TEST_SELFIP_RESOURCE = `
 resource "bigip_net_vlan" "test-vlan" {
@@ -48,8 +48,8 @@ func TestAccBigipNetselfip_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckselfipsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SELFIP_RESOURCE,
@@ -74,8 +74,8 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckselfipsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SELFIP_RESOURCE,
@@ -93,8 +93,8 @@ func TestAccBigipNetselfip_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckselfipsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SELFIP_RESOURCE,
@@ -114,8 +114,8 @@ func TestAccBigipNetselfipPortlockdown(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckselfipsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccselfipPortLockdownParam("all"),
@@ -176,8 +176,8 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckselfipsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckselfipsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),

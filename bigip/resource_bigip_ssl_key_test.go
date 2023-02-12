@@ -18,13 +18,13 @@ import (
 
 var folder1, _ = os.Getwd()
 var SSLKEY_NAME = "serverkey.key"
-var TEST_SSLKEY_NAME = fmt.Sprintf("/%s/%s", TEST_PARTITION, SSLKEY_NAME)
+var TEST_SSLKEY_NAME = fmt.Sprintf("/%s/%s", TestPartition, SSLKEY_NAME)
 
 var TEST_SSL_KEY_RESOURCE = `
 resource "bigip_ssl_key" "test-key" {
         name = "` + SSLKEY_NAME + `"
         content = "${file("` + folder1 + `/../examples/serverkey.key")}"
-        partition = "` + TEST_PARTITION + `"
+        partition = "` + TestPartition + `"
 }
 `
 
@@ -33,15 +33,15 @@ func TestAccSslKeyImportToBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testChecksslKeyDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testChecksslKeyDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SSL_KEY_RESOURCE,
 				Check: resource.ComposeTestCheckFunc(
 					testChecksslkeyExists(TEST_SSLKEY_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "name", SSLKEY_NAME),
-					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "partition", TEST_PARTITION),
+					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "partition", TestPartition),
 				),
 			},
 		},
@@ -72,7 +72,7 @@ func testChecksslKeyDestroyed(s *terraform.State) error {
 			continue
 		}
 		name := rs.Primary.ID
-		var sslCertificatename = fmt.Sprintf("~%s~%s", TEST_PARTITION, name)
+		var sslCertificatename = fmt.Sprintf("~%s~%s", TestPartition, name)
 		certificate, err := client.GetKey(sslCertificatename)
 		if err != nil {
 			return err

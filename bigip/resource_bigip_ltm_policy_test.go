@@ -223,8 +223,8 @@ func TestAccBigipLtmPolicy_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPolicyResource,
@@ -242,8 +242,8 @@ func TestAccBigipLtmPolicy_create_update(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPolicyResource3,
@@ -275,8 +275,8 @@ func TestAccBigipLtmPolicy_Issue132(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmPoolicyIssu132and133(),
@@ -299,8 +299,8 @@ func TestAccBigipLtmPolicy_Issue132_a(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissu132A(),
@@ -323,8 +323,8 @@ func TestAccBigipLtmPolicy_Issue132_b(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissu132B(),
@@ -347,8 +347,8 @@ func TestAccBigipLtmPolicy_Issue132_c(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissu132C(),
@@ -371,8 +371,8 @@ func TestAccBigipLtmPolicy_Issue591(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissue591(),
@@ -395,8 +395,8 @@ func TestAccBigipLtmPolicy_Issue634(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissue634(),
@@ -419,8 +419,8 @@ func TestAccBigipLtmPolicy_Issue634_a(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissue634a(),
@@ -442,8 +442,8 @@ func TestAccBigipLtmPolicy_Issue648(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissue648(),
@@ -463,8 +463,8 @@ func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPolicyResource2,
@@ -481,8 +481,8 @@ func TestAccBigipLtmPolicy_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPolicyResource,
@@ -502,8 +502,8 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPolicysDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPolicysDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPolicyResource2,

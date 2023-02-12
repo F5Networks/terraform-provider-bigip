@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
+var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TestPartition)
 
 var TEST_SNAT_RESOURCE = `
 resource "bigip_ltm_snat" "test-snat" {
@@ -35,8 +35,8 @@ func TestAccBigipLtmsnat_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testChecksnatsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNAT_RESOURCE,
@@ -62,8 +62,8 @@ func TestAccBigipLtmsnat_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testChecksnatsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNAT_RESOURCE,

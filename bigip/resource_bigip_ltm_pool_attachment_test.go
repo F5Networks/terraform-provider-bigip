@@ -17,8 +17,8 @@ import (
 
 var poolMember = fmt.Sprintf("%s:443", "10.10.10.10")
 var poolMemberFqdn = fmt.Sprintf("%s:443", "www.google.com")
-var poolMemberFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMember)
-var poolMemberFqdnFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMemberFqdn)
+var poolMemberFullpath = fmt.Sprintf("/%s/%s", TestPartition, poolMember)
+var poolMemberFqdnFullpath = fmt.Sprintf("/%s/%s", TestPartition, poolMemberFqdn)
 
 var TestPoolResource1 = `
 resource "bigip_ltm_pool" "test-pool" {
@@ -107,8 +107,8 @@ func TestAccBigipLtmPoolAttachment_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource1,
@@ -127,8 +127,8 @@ func TestAccBigipLtmPoolAttachment_createFqdn(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource3,
@@ -153,8 +153,8 @@ func TestAccBigipLtmPoolAttachment_Issue381(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmPoolattachIssu381(),
@@ -181,8 +181,8 @@ func TestAccBigipLtmPoolAttachment_Issue380(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmPoolattachIssu380(),
@@ -204,8 +204,8 @@ func TestAccBigipLtmPoolAttachment_Issue92(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmPoolattachIssu92(),
@@ -228,8 +228,8 @@ func TestAccBigipLtmPoolAttachment_Issue661(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmPoolattachIssu661(),
@@ -248,8 +248,8 @@ func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource1,
@@ -266,8 +266,8 @@ func TestAccBigipLtmPoolAttachment_Modify(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource2,
@@ -289,8 +289,8 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource1,

@@ -20,9 +20,9 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 	var nodeName = "test-node"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAcctPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		PreCheck:          func() { testAcctPreCheck(t) },
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckNodeConfigBasic(nodeName),

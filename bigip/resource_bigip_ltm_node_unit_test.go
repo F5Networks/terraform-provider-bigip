@@ -37,8 +37,8 @@ provider "bigip" {
 func TestAccBigipLtmNodeInvalid(t *testing.T) {
 	resourceName := "/Common/test-node"
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmNodeInvalid(resourceName),
@@ -82,8 +82,8 @@ func TestAccBigipLtmNodeCreate(t *testing.T) {
 	})
 	defer teardown()
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testBigipLtmNodeCreate(resourceName, server.URL, address),

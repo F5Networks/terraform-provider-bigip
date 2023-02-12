@@ -32,8 +32,8 @@ provider "bigip" {
 func TestAccBigipSysNtpInvalid(t *testing.T) {
 	resourceName := "/Common/test-ntp"
 	resource.Test(t, resource.TestCase{
-		IsUnitTest: true,
-		Providers:  testProviders,
+		IsUnitTest:        true,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSysNtpInvalid(resourceName),

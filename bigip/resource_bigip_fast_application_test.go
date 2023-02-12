@@ -33,8 +33,8 @@ func TestAccFastAppCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastAppDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFastAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFastResource,

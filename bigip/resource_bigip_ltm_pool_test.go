@@ -16,7 +16,7 @@ import (
 )
 
 var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
-var TestPoolName = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
+var TestPoolName = fmt.Sprintf("/%s/test-pool", TestPartition)
 
 var TestPoolResource = `
 /*resource "bigip_ltm_node" "test-node" {
@@ -51,8 +51,8 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource,
@@ -79,8 +79,8 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckPoolsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource,

@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPSSL_NAME = fmt.Sprintf("/%s/test-ppssl", TEST_PARTITION)
+var TEST_PPSSL_NAME = fmt.Sprintf("/%s/test-ppssl", TestPartition)
 
 var TEST_PPSSL_RESOURCE = `
 resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
@@ -36,8 +36,8 @@ func TestAccBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSSLDestroyed),
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSSLDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPSSL_RESOURCE,
@@ -63,8 +63,8 @@ func TestAccBigipLtmPersistenceProfileSSLImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckBigipLtmPersistenceProfileSSLDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckBigipLtmPersistenceProfileSSLDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PPSSL_RESOURCE,

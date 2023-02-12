@@ -17,8 +17,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TEST_PARTITION)
-var TEST_VA_NAME_CHANGED = fmt.Sprintf("/%s/test-va-changed", TEST_PARTITION)
+var TEST_VA_NAME = fmt.Sprintf("/%s/test-va", TestPartition)
+var TEST_VA_NAME_CHANGED = fmt.Sprintf("/%s/test-va-changed", TestPartition)
 var TEST_VA_CONFIG = `
 resource "bigip_ltm_virtual_address" "test-va" {
 	name          = "%s"
@@ -33,8 +33,8 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckVAsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VA_RESOURCE,
@@ -59,8 +59,8 @@ func TestAccBigipLtmVA_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckVAsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VA_RESOURCE,

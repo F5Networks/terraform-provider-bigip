@@ -17,12 +17,12 @@ func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 	t.Parallel()
 	resName := "bigip_ltm_datagroup.DGTEST"
 	var dataGroupName = "test-rg"
-	var dataGroupFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, dataGroupName)
+	var dataGroupFullName = fmt.Sprintf("/%s/%s", TestPartition, dataGroupName)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAcctPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckDataGroupDestroyed,
+		PreCheck:          func() { testAcctPreCheck(t) },
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckDatagroupConfigBasic(dataGroupName),

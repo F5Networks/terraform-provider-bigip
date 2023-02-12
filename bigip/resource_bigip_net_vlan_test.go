@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestVlanName = fmt.Sprintf("/%s/test-vlan", TEST_PARTITION)
+var TestVlanName = fmt.Sprintf("/%s/test-vlan", TestPartition)
 
 var TestVlanResource = `
 resource "bigip_net_vlan" "test-vlan" {
@@ -34,8 +34,8 @@ func TestAccBigipNetvlan_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckvlansDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestVlanResource,
@@ -56,8 +56,8 @@ func TestAccBigipNetvlan_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckvlansDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestVlanResource,

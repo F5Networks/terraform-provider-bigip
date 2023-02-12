@@ -20,15 +20,15 @@ var resNameserver = "bigip_ltm_profile_server_ssl"
 func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckServerSslDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -78,14 +78,14 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl-UpdateAuthenticate"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckServerSslDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -115,14 +115,14 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl-UpdateTmoptions"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckServerSslDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -154,14 +154,14 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 func TestAccBigipLtmProfileServerSsl_UpdateCipherGroup(t *testing.T) {
 	t.Parallel()
 	var instName = "test-ServerSsl-UpdateCipherGroup"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNameserver, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckServerSslDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -189,13 +189,13 @@ func TestAccBigipLtmProfileServerSsl_UpdateCipherGroup(t *testing.T) {
 
 func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 	var instName = "test-ServerSsl"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckServerSslDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),

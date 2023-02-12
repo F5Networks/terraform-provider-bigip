@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestFastl4Name = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
+var TestFastl4Name = fmt.Sprintf("/%s/test-fastl4", TestPartition)
 
 var TestFastl4Resource = `
 resource "bigip_ltm_profile_fastl4" "test-fastl4" {
@@ -38,8 +38,8 @@ func TestAccBigipLtmProfileFastl4TC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckfastl4sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFastl4Resource,
@@ -68,11 +68,11 @@ func TestAccBigipLtmProfileFastl4TC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckfastl4sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofilefastl4DefaultConfig(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Config: testaccbigipltmprofilefastl4DefaultConfig(TestPartition, TestFastl4Name, "fastl4profileParent"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TestFastl4Name, true),
 					testCheckfastl4Exists("/Common/tetsfastl44", false),
@@ -81,7 +81,7 @@ func TestAccBigipLtmProfileFastl4TC2(t *testing.T) {
 				),
 			},
 			{
-				Config: testaccbigipltmprofilefastl4UpdateIdletimeoutConfig(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Config: testaccbigipltmprofilefastl4UpdateIdletimeoutConfig(TestPartition, TestFastl4Name, "fastl4profileParent"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TestFastl4Name, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "name", TestFastl4Name),
@@ -99,8 +99,8 @@ func TestAccBigipLtmProfileFastl4TC3(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileFastl4ConfigTC3(profileFastL4Name),
@@ -128,8 +128,8 @@ func TestAccBigipLtmProfileFastl4TC4(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileFastl4ConfigTC4(profileFastL4Name),
@@ -172,8 +172,8 @@ func TestAccBigipLtmProfileFastl4_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckfastl4sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFastl4Resource,

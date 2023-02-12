@@ -49,8 +49,8 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFastTCPAppDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFastTCPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: cfg1,

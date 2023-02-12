@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TEST_PARTITION)
+var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TestPartition)
 
 var TEST_ONECONNECT_RESOURCE = `
 resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {
@@ -36,8 +36,8 @@ func TestAccBigipLtmProfileoneconnect_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckoneconnectsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ONECONNECT_RESOURCE,
@@ -62,8 +62,8 @@ func TestAccBigipLtmProfileoneconnect_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckoneconnectsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ONECONNECT_RESOURCE,

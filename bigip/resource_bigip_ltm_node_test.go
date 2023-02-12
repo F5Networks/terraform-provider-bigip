@@ -15,9 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestNodeName = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-var TestV6NodeName = fmt.Sprintf("/%s/test-v6-node", TEST_PARTITION)
-var TestFqdnNodeName = fmt.Sprintf("/%s/test-fqdn-node", TEST_PARTITION)
+var TestNodeName = fmt.Sprintf("/%s/test-node", TestPartition)
+var TestV6NodeName = fmt.Sprintf("/%s/test-v6-node", TestPartition)
+var TestFqdnNodeName = fmt.Sprintf("/%s/test-fqdn-node", TestPartition)
 
 var resNodeName = "bigip_ltm_node"
 
@@ -70,8 +70,8 @@ func TestAccBigipLtmNode_Create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestNodeResource,
@@ -98,8 +98,8 @@ func TestAccBigipLtmNode_V6create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestV6NodeResource,
@@ -123,8 +123,8 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFqdnNodeResource,
@@ -148,7 +148,7 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 	t.Parallel()
 	var instName = "test-node-monitor"
-	var TestNodeName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestNodeName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNodeName, instName)
 	var moni UpdateParam
 	var moni2 UpdateParam
@@ -160,8 +160,8 @@ func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmNodeUpdateParam(instName, moni),
@@ -188,8 +188,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestNodeResource,
@@ -207,8 +207,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestV6NodeResource,
@@ -226,8 +226,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckNodesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFqdnNodeResource,

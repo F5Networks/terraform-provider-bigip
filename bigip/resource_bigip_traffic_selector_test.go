@@ -18,15 +18,15 @@ func TestAccBigipnetIPsecTrafficselector_Defaultcreate(t *testing.T) {
 	t.Parallel()
 	resName = "bigip_traffic_selector"
 	var instName = "test-selector"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resName, instName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIPSectsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIPSectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccNetIpsecTsDefaultcreate(instName),

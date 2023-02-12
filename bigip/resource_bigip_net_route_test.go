@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_ROUTE_NAME = fmt.Sprintf("/%s/test-route", TEST_PARTITION)
+var TEST_ROUTE_NAME = fmt.Sprintf("/%s/test-route", TestPartition)
 
 var TEST_ROUTE_RESOURCE = `
 
@@ -68,8 +68,8 @@ func TestAccBigipNetroute_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckroutesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,
@@ -88,8 +88,8 @@ func TestAccBigipNetroute_update(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckroutesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,
@@ -111,8 +111,8 @@ func TestAccBigipNetroute_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckroutesDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,

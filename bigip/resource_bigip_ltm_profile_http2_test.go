@@ -22,17 +22,17 @@ var resHttp2Name = "bigip_ltm_profile_http2"
 func TestAccBigipLtmProfileHttp2CreateDefault(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-basic"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofileHttp2DefaultConfig(TEST_PARTITION, TestHttp2Name, instName),
+				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TestHttp2Name),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttp2Name),
@@ -50,17 +50,17 @@ TestAccBigipLtmProfileHttp2ModifyName Testcase added to check Name modification 
 func TestAccBigipLtmProfileHttp2ModifyName(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-old"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofileHttp2DefaultConfig(TEST_PARTITION, TestHttp2Name, instName),
+				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TestHttp2Name),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttp2Name),
@@ -68,11 +68,11 @@ func TestAccBigipLtmProfileHttp2ModifyName(t *testing.T) {
 				),
 			},
 			{
-				Config:             testaccbigipltmprofileHttp2DefaultConfig(TEST_PARTITION, fmt.Sprintf("/%s/%s", TEST_PARTITION, "test-http2-new"), instName),
+				Config:             testaccbigipltmprofileHttp2DefaultConfig(TestPartition, fmt.Sprintf("/%s/%s", TestPartition, "test-http2-new"), instName),
 				ExpectNonEmptyPlan: false,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckHttp2Exists(fmt.Sprintf("/%s/%s", TEST_PARTITION, "test-http2-new")),
-					resource.TestCheckResourceAttr(resFullName, "name", fmt.Sprintf("/%s/%s", TEST_PARTITION, "test-http2-new")),
+					testCheckHttp2Exists(fmt.Sprintf("/%s/%s", TestPartition, "test-http2-new")),
+					resource.TestCheckResourceAttr(resFullName, "name", fmt.Sprintf("/%s/%s", TestPartition, "test-http2-new")),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http2"),
 				),
 			},
@@ -83,14 +83,14 @@ func TestAccBigipLtmProfileHttp2ModifyName(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateConcurrentStreamsPerConnection(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-concurrentStreamsPerConnection"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -116,14 +116,14 @@ func TestAccBigipLtmProfileHttp2UpdateConcurrentStreamsPerConnection(t *testing.
 func TestAccBigipLtmProfileHttp2UpdateConnectionIdleTimeout(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-connection-idle-timeout"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -149,14 +149,14 @@ func TestAccBigipLtmProfileHttp2UpdateConnectionIdleTimeout(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateFrameSize(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-frame-size"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -182,14 +182,14 @@ func TestAccBigipLtmProfileHttp2UpdateFrameSize(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateHeaderTableSize(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-header-table-size"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -215,14 +215,14 @@ func TestAccBigipLtmProfileHttp2UpdateHeaderTableSize(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateReceiveWindow(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-receive-window"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -248,14 +248,14 @@ func TestAccBigipLtmProfileHttp2UpdateReceiveWindow(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateWriteSize(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-write-size"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -281,14 +281,14 @@ func TestAccBigipLtmProfileHttp2UpdateWriteSize(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateInsertHeader(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-insert-header"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -313,14 +313,14 @@ func TestAccBigipLtmProfileHttp2UpdateInsertHeader(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateEnforceTlsRequirements(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-enforce-tls-requirements"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -345,14 +345,14 @@ func TestAccBigipLtmProfileHttp2UpdateEnforceTlsRequirements(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateIncludeContentLength(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-include-content-length"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -377,14 +377,14 @@ func TestAccBigipLtmProfileHttp2UpdateIncludeContentLength(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateInsertHeaderName(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-insert-header-name"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -409,14 +409,14 @@ func TestAccBigipLtmProfileHttp2UpdateInsertHeaderName(t *testing.T) {
 func TestAccBigipLtmProfileHttp2UpdateActivationModes(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-activation-modes"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -442,17 +442,17 @@ func TestAccBigipLtmProfileHttp2UpdateActivationModes(t *testing.T) {
 func TestAccBigipLtmProfileHttp2Import(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http2-import"
-	var TestHttp2Name = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttp2Name = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttp2Name, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttp2sDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofileHttp2DefaultConfig(TEST_PARTITION, TestHttp2Name, instName),
+				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttp2Exists(TestHttp2Name),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttp2Name),

@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestHttpcompressName = fmt.Sprintf("/%s/test-httpcompress", TEST_PARTITION)
+var TestHttpcompressName = fmt.Sprintf("/%s/test-httpcompress", TestPartition)
 
 var TestHttpcompressResource = `
 resource "bigip_ltm_profile_httpcompress" "test-httpcompress" {
@@ -34,8 +34,8 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpcompresssDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpcompressResource,
@@ -68,8 +68,8 @@ func TestAccBigipLtmProfileHttpcompressTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileHttpComprsConfig(profileHttpComprsName),
@@ -100,8 +100,8 @@ func TestAccBigipLtmProfileHttpcompressTC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileHttpComprsTC2Config(profileHttpComprsName),
@@ -135,8 +135,8 @@ func TestAccBigipLtmProfileHttpcompress_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpcompresssDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpcompressResource,

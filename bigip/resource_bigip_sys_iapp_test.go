@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_IAPP_NAME = "/" + TEST_PARTITION + "/test-iapp"
+var TEST_IAPP_NAME = "/" + TestPartition + "/test-iapp"
 
 var TEST_IAPP_RESOURCE = `
 	resource "bigip_sys_iapp" "test-iapp" {
@@ -152,8 +152,8 @@ func TestAccBigipSysIapp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIappDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IAPP_RESOURCE,
@@ -170,8 +170,8 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckIappDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IAPP_RESOURCE,

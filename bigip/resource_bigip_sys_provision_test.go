@@ -87,7 +87,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PROVISION_RESOURCE,
@@ -107,7 +107,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ASM_PROVISION_RESOURCE,
@@ -127,7 +127,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_GTM_PROVISION_RESOURCE,
@@ -147,7 +147,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_APM_PROVISION_RESOURCE,
@@ -167,7 +167,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AVR_PROVISION_RESOURCE,
@@ -187,7 +187,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ILX_PROVISION_RESOURCE,
@@ -210,7 +210,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_PROVISION_RESOURCE,
@@ -227,7 +227,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ASM_PROVISION_RESOURCE,
@@ -244,7 +244,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_GTM_PROVISION_RESOURCE,
@@ -261,7 +261,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_APM_PROVISION_RESOURCE,
@@ -278,7 +278,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_AVR_PROVISION_RESOURCE,
@@ -295,7 +295,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ILX_PROVISION_RESOURCE,

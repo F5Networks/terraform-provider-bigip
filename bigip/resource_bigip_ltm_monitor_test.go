@@ -17,13 +17,13 @@ import (
 
 var resLmName = "bigip_ltm_monitor"
 
-var TestMonitorName = fmt.Sprintf("/%s/test-monitor", TEST_PARTITION)
-var TestHttpsMonitorName = fmt.Sprintf("/%s/test-https-monitor", TEST_PARTITION)
-var TestFtpMonitorName = fmt.Sprintf("/%s/test-ftp-monitor", TEST_PARTITION)
-var TestUdpMonitorName = fmt.Sprintf("/%s/test-udp-monitor", TEST_PARTITION)
-var TestPostgresqlMonitorName = fmt.Sprintf("/%s/test-postgresql-monitor", TEST_PARTITION)
-var TestGatewayIcmpMonitorName = fmt.Sprintf("/%s/test-gateway", TEST_PARTITION)
-var TestTcpHalfOpenMonitorName = fmt.Sprintf("/%s/test-tcp-half-open", TEST_PARTITION)
+var TestMonitorName = fmt.Sprintf("/%s/test-monitor", TestPartition)
+var TestHttpsMonitorName = fmt.Sprintf("/%s/test-https-monitor", TestPartition)
+var TestFtpMonitorName = fmt.Sprintf("/%s/test-ftp-monitor", TestPartition)
+var TestUdpMonitorName = fmt.Sprintf("/%s/test-udp-monitor", TestPartition)
+var TestPostgresqlMonitorName = fmt.Sprintf("/%s/test-postgresql-monitor", TestPartition)
+var TestGatewayIcmpMonitorName = fmt.Sprintf("/%s/test-gateway", TestPartition)
+var TestTcpHalfOpenMonitorName = fmt.Sprintf("/%s/test-tcp-half-open", TestPartition)
 
 var TestMonitorResource = `
 resource "bigip_ltm_monitor" "test-monitor" {
@@ -122,8 +122,8 @@ func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestGatewayIcmpMonitorResource,
@@ -144,8 +144,8 @@ func TestAccBigipLtmMonitor_TcpHalfOpenCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpHalfOpenMonitorResource,
@@ -164,15 +164,15 @@ func TestAccBigipLtmMonitor_TcpHalfOpenCreate(t *testing.T) {
 func TestAccBigipLtmMonitor_HttpCreate(t *testing.T) {
 	t.Parallel()
 	var instName = "test-monitor-http"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resLmName, instName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmmonitorUpdateparam(instName, "http", ""),
@@ -192,8 +192,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestMonitorResource,
@@ -221,8 +221,8 @@ func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpsMonitorResource,
@@ -247,8 +247,8 @@ func TestAccBigipLtmMonitor_FtpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFtpMonitorResource,
@@ -274,8 +274,8 @@ func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestUdpMonitorResource,
@@ -297,8 +297,8 @@ func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPostgresqlMonitorResource,
@@ -320,8 +320,8 @@ func TestAccBigipLtmMonitor_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestMonitorResource,

@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_FASTHTTP_NAME = fmt.Sprintf("/%s/test-fasthttp", TEST_PARTITION)
+var TEST_FASTHTTP_NAME = fmt.Sprintf("/%s/test-fasthttp", TestPartition)
 
 var TEST_FASTHTTP_RESOURCE = `
 resource "bigip_ltm_profile_fasthttp" "test-fasthttp" {
@@ -37,8 +37,8 @@ func TestAccBigipLtmfasthttp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckfasthttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FASTHTTP_RESOURCE,
@@ -65,8 +65,8 @@ func TestAccBigipLtmProfilefasthttp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckfasthttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FASTHTTP_RESOURCE,

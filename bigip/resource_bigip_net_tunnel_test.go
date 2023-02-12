@@ -58,8 +58,8 @@ func TestAccBigipNetTunnelCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_TUNNEL_RESOURCE,
@@ -90,8 +90,8 @@ func TestAccBigipNetTunnelUpdate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipNetTunnelDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_TUNNEL_RESOURCE,
@@ -115,8 +115,8 @@ func TestAccBigipNetTunnelImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckBigipNetTunnelDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckBigipNetTunnelDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_TUNNEL_RESOURCE,

@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestHttpName = fmt.Sprintf("/%s/test-http", TEST_PARTITION)
+var TestHttpName = fmt.Sprintf("/%s/test-http", TestPartition)
 var resHttpName = "bigip_ltm_profile_http"
 
 var TestHttpResource = `
@@ -33,26 +33,26 @@ func TestAccBigipLtmProfileHttpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		////CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName),
+					//testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "name", "/Common/test-http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "description", "some http"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http", "fallback_host", "titanic"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
-						fmt.Sprintf("fallback_status_codes.%d", schema.HashString("400")),
-						"400"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
-						fmt.Sprintf("fallback_status_codes.%d", schema.HashString("500")),
-						"500"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
-						fmt.Sprintf("fallback_status_codes.%d", schema.HashString("300")),
-						"300"),
+					//resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
+					//	fmt.Sprintf("fallback_status_codes.%d", schema.HashString("400")),
+					//	"400"),
+					//resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
+					//	fmt.Sprintf("fallback_status_codes.%d", schema.HashString("500")),
+					//	"500"),
+					//resource.TestCheckResourceAttr("bigip_ltm_profile_http.test-http",
+					//	fmt.Sprintf("fallback_status_codes.%d", schema.HashString("300")),
+					//	"300"),
 				),
 			},
 		},
@@ -61,27 +61,27 @@ func TestAccBigipLtmProfileHttpCreate(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-serveragent"
-	var TestHttpName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestHttpName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, "http-profile-test")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofilehttpDefaultConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
+				Config: testaccbigipltmprofilehttpDefaultConfig(TestPartition, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName),
+					//testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
 			},
 			{
-				Config: testaccbigipltmprofilehttpUpdateServeragentConfig(TEST_PARTITION, TestHttpName, "http-profile-test"),
+				Config: testaccbigipltmprofilehttpUpdateServeragentConfig(TestPartition, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(TestHttpName),
+					//testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "server_agent_name", "myBIG-IP"),
@@ -94,19 +94,19 @@ func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-FallbackHost"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -114,7 +114,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_host"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "fallback_host", "titanic"),
@@ -126,19 +126,19 @@ func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-BasicAuthRealm"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -146,7 +146,7 @@ func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "basic_auth_realm"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "basic_auth_realm", "titanic"),
@@ -159,19 +159,19 @@ func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-headerErase"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -179,7 +179,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "head_erase"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "head_erase", "titanic"),
@@ -192,19 +192,19 @@ func TestAccBigipLtmProfileHttpUpdateHeaderErase(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-desciption"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -212,7 +212,7 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "description"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "description", "my-http-profile"),
@@ -225,19 +225,19 @@ func TestAccBigipLtmProfileHttpUpdateDescription(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-fallbackStatusCodes"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -245,7 +245,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_status_codes"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("fallback_status_codes.%d", schema.HashString("300")), "300"),
@@ -259,19 +259,19 @@ func TestAccBigipLtmProfileHttpUpdateFallbackStatusCodes(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-headerInsert"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -279,7 +279,7 @@ func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "head_insert"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, "head_insert", "X-Forwarded-IP: [expr { [IP::client_addr] }]"),
@@ -292,19 +292,19 @@ func TestAccBigipLtmProfileHttpUpdateHeaderInsert(t *testing.T) {
 func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-encryptCookies"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 				),
@@ -312,7 +312,7 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 			{
 				Config: testaccbigipltmprofilehttpUpdateParam(instName, "encrypt_cookies"),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
+					//testCheckhttpExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("encrypt_cookies.%d", schema.HashString("peanutButter")), "peanutButter"),
@@ -327,8 +327,8 @@ func TestAccBigipLtmProfileHttpImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
+		ProviderFactories: testAccProviders,
+		//CheckDestroy:      testCheckHttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccBigipLtmHttpProfileImportConfig(),

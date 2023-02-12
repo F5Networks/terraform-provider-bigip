@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestTcpName = fmt.Sprintf("/%s/test-tcp", TEST_PARTITION)
+var TestTcpName = fmt.Sprintf("/%s/test-tcp", TestPartition)
 
 var TestTcpResource = `
 resource "bigip_ltm_profile_tcp" "test-tcp" {
@@ -38,8 +38,8 @@ func TestAccBigipLtmProfileTcp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpResource,
@@ -67,8 +67,8 @@ func TestAccBigipLtmProfileTcpTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileTCPConfig(profileTcpName),
@@ -109,8 +109,8 @@ func TestAccBigipLtmProfileTcpTC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileTCPConfigDefault(profileTcpName),
@@ -164,8 +164,8 @@ func TestAccBigipLtmProfileTcp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckTcpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpResource,

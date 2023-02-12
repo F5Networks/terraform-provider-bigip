@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_FTP_NAME = fmt.Sprintf("/%s/test-ftp", TEST_PARTITION)
+var TEST_FTP_NAME = fmt.Sprintf("/%s/test-ftp", TestPartition)
 
 var TEST_FTP_RESOURCE = `
 resource "bigip_ltm_profile_ftp" "test-ftp" {
@@ -34,8 +34,8 @@ func TestAccBigipLtmProfileFtp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFtpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFtpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FTP_RESOURCE,
@@ -59,8 +59,8 @@ func TestAccBigipLtmProfileFtp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckFtpsDestroyed,
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testCheckFtpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FTP_RESOURCE,

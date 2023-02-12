@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TEST_PARTITION)
+var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TestPartition)
 
 var TEST_SNMP_RESOURCE = `
 resource "bigip_sys_snmp" "test-snmp" {
@@ -31,7 +31,7 @@ func TestAccBigipSyssnmp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
@@ -53,7 +53,7 @@ func TestAccBigipSyssnmp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		Providers: testAccProviders,
+		ProviderFactories: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
