@@ -1180,7 +1180,7 @@ func resourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error 
 	return policyToData(p, d)
 }
 
-//func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+// func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
 //	client := meta.(*bigip.BigIP)
 //
 //	name := d.Id()
@@ -1225,15 +1225,15 @@ func resourceBigipLtmPolicyUpdate(d *schema.ResourceData, meta interface{}) erro
 	log.Println("[INFO] Updating  Policy " + policyName)
 
 	p := dataToPolicy(name, d)
-	ok, err := client.CheckDraftPolicy(policyName, partition2)
+	ok, _ := client.CheckDraftPolicy(policyName, partition2)
 	if !ok {
-		err = client.CreatePolicyDraft(policyName, partition2)
+		err := client.CreatePolicyDraft(policyName, partition2)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Create Draft Policy   (%s) (%v) ", policyName, err)
 			return err
 		}
 	}
-	err = client.UpdatePolicy(policyName, partition2, &p)
+	err := client.UpdatePolicy(policyName, partition2, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Draft Policy   (%s) (%v) ", policyName, err)
 		return err
@@ -1309,16 +1309,6 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 			var policyRulesActions []bigip.PolicyRuleAction
 			for _, itemAction := range item.(map[string]interface{})["action"].([]interface{}) {
 				var a bigip.PolicyRuleAction
-				//_, ok := itemAction.(map[string]interface{})["disable"].(bool)
-				//// If the key exists
-				//if ok && itemAction.(map[string]interface{})["disable"].(bool) {
-				//	log.Printf("[INFO] [INSIDE] policyRulesActions:%+v", itemAction.(map[string]interface{})["disable"].(bool))
-				//	a.Disable = true
-				//	a.Policy = ""
-				//	a.Select = false
-				//	a.Forward = false
-				//	a.Pool = ""
-				//}
 				b, _ := json.Marshal(itemAction)
 				_ = json.Unmarshal(b, &a)
 				if a.Disable {
@@ -1328,7 +1318,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 					a.Forward = false
 					a.Pool = ""
 				}
-				//mapEntity(itemAction.(map[string]interface{}), &a)
+				// mapEntity(itemAction.(map[string]interface{}), &a)
 				policyRulesActions = append(policyRulesActions, a)
 			}
 			var policyRuleConditions []bigip.PolicyRuleCondition
@@ -1346,9 +1336,9 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	}
 	p.Rules = policyRules
 
-	//ruleCount := d.Get("rule.#").(int)
-	//p.Rules = make([]bigip.PolicyRule, 0, ruleCount)
-	//for i := 0; i < ruleCount; i++ {
+	// ruleCount := d.Get("rule.#").(int)
+	// p.Rules = make([]bigip.PolicyRule, 0, ruleCount)
+	// for i := 0; i < ruleCount; i++ {
 	//	var r bigip.PolicyRule
 	//	prefix := fmt.Sprintf("rule.%d", i)
 	//	r.Name = d.Get(prefix + ".name").(string)
@@ -1378,7 +1368,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	//		r.Conditions[x] = c
 	//	}
 	//	p.Rules = append(p.Rules, r)
-	//}
+	// }
 
 	return p
 }
@@ -1432,17 +1422,11 @@ func flattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
 		}
 
 		if len(v.Actions) > 0 {
-			//sort.Slice(v.Actions, func(i, j int) bool {
-			//	return v.Actions[i].Name < v.Actions[j].Name
-			//})
 			r := flattenPolicyRuleActions(v.Actions)
 			obj["action"] = r
 		}
 
 		if len(v.Conditions) > 0 {
-			//sort.Slice(v.Conditions, func(i, j int) bool {
-			//	return v.Conditions[i].Name < v.Conditions[j].Name
-			//})
 			r := flattenPolicyRuleConditions(v.Conditions)
 			obj["condition"] = r
 		}
