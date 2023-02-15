@@ -63,6 +63,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the description of the policy.",
 			},
 			"application_language": {
@@ -484,7 +485,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		var fileType bigip.Filetype
 		for _, item := range val.(*schema.Set).List() {
 			fileType.Name = item.(map[string]interface{})["name"].(string)
-			fileType.Type = item.(map[string]interface{})["name"].(string)
+			fileType.Type = item.(map[string]interface{})["type"].(string)
 			fileTypes = append(fileTypes, fileType)
 		}
 	}
@@ -506,16 +507,12 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	}
 	p := d.Get("server_technologies").([]interface{})
 
-	var sts []struct {
-		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-	}
+	var sts []bigip.ServerTech
+
 	for i := 0; i < len(p); i++ {
-		st1 := struct {
-			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-		}{
-			p[i].(string),
-		}
-		sts = append(sts, st1)
+		var stec bigip.ServerTech
+		stec.ServerTechnologyName = p[i].(string)
+		sts = append(sts, stec)
 	}
 	policyWaf.ServerTechnologies = sts
 
@@ -581,7 +578,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
 
-		urlList := make([]interface{}, 0)
+		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v
 		}
@@ -593,7 +590,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["urls"] = urlList
 		}
 
-		params := make([]interface{}, 0)
+		params := make([]interface{}, len(policyWaf.Parameters))
 		for i, v := range policyWaf.Parameters {
 			params[i] = v
 		}
@@ -605,7 +602,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["parameters"] = params
 		}
 
-		sigSet := make([]interface{}, 0)
+		sigSet := make([]interface{}, len(policyWaf.SignatureSets))
 		for i, v := range policyWaf.SignatureSets {
 			sigSet[i] = v
 		}
@@ -617,7 +614,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSet
 		}
 
-		fileType := make([]interface{}, 0)
+		fileType := make([]interface{}, len(policyWaf.Filetypes))
 		for i, v := range policyWaf.Filetypes {
 			fileType[i] = v
 		}
@@ -628,12 +625,10 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		} else {
 			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileType
 		}
-
 		if policyWaf.Description != "" {
 			polJsn1.Policy.(map[string]interface{})["description"] = policyWaf.Description
 		}
-
-		serverTech := make([]interface{}, 0)
+		serverTech := make([]interface{}, len(policyWaf.ServerTechnologies))
 		for i, v := range policyWaf.ServerTechnologies {
 			serverTech[i] = v
 		}
@@ -644,8 +639,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		} else {
 			polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTech
 		}
-
-		openApi := make([]interface{}, 0)
+		openApi := make([]interface{}, len(policyWaf.OpenAPIFiles))
 		for i, v := range policyWaf.OpenAPIFiles {
 			openApi[i] = v
 		}
@@ -657,7 +651,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApi
 		}
 
-		graphQL := make([]interface{}, 0)
+		graphQL := make([]interface{}, len(policyWaf.GraphqlProfiles))
 		for i, v := range policyWaf.GraphqlProfiles {
 			graphQL[i] = v
 		}

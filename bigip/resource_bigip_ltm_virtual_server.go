@@ -329,6 +329,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	}
 	vsDest := vs.Destination
 	if vsDest != ":0" && strings.Count(vsDest, ":") >= 2 {
+		log.Printf("[INFO] Matched one:%+v", vsDest)
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
@@ -336,7 +337,8 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		}
 		_ = d.Set("destination", destination[2])
 	}
-	if vsDest != ":0" && strings.Count(vsDest, ":") < 2 {
+	if vsDest != ":0" && vsDest != "0" && strings.Count(vsDest, ":") < 2 {
+		log.Printf("[INFO] Matched two:%+v", vsDest)
 		regex := regexp.MustCompile(`(/.+/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(%\d+)?(:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]

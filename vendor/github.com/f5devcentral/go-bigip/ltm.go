@@ -2795,6 +2795,28 @@ func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	return &p, nil
 }
 
+// Load a fully policy definition. Policies seem to be best dealt with as one big entity.
+func (b *BigIP) CheckDraftPolicy(name string, partition string) (bool, error) {
+	var p Policy
+	values := []string{}
+	values = append(values, "Drafts/")
+	values = append(values, name)
+	// Join three strings into one.
+	result := strings.Join(values, "")
+	policy_name := partition + "~" + result
+	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, policy_name)
+	if err != nil {
+		return false, err
+	}
+	if !ok {
+		return false, nil
+	}
+	if p.FullPath == "" {
+		return false, nil
+	}
+	return true , nil
+}
+
 func normalizePolicy(p *Policy) {
 	//f5 doesn't seem to automatically handle setting the ordinal
 	for ri, _ := range p.Rules {
@@ -2840,7 +2862,7 @@ func (b *BigIP) UpdatePolicy(name string, partition string, p *Policy) error {
 	values = append(values, name)
 	// Join three strings into one.
 	result := strings.Join(values, "")
-	return b.put(p, uriLtm, uriPolicy, result)
+	return b.patch(p, uriLtm, uriPolicy, result)
 }
 
 // Delete a policy by name.
