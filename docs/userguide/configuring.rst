@@ -76,9 +76,8 @@ The ``resource`` block defines a resource that exists within the infrastructure.
 +--------------------+----------------------+---------------------------------------------------------------------------------------------------------------------------+
 
 
-
-Initializating
---------------
+Initializing
+------------
 
 The first command to run for a new configuration, or after checking out an existing configuration from version control, is ``terraform init``, which initializes local settings and data that will be used by subsequent commands.
 
