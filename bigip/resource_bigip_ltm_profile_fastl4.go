@@ -10,19 +10,21 @@ import (
 	"fmt"
 	"log"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipLtmProfileFastl4() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipProfileLtmFastl4Create,
-		Update: resourceBigipLtmProfileFastl4Update,
-		Read:   resourceBigipLtmProfileFastl4Read,
-		Delete: resourceBigipLtmProfileFastl4Delete,
+		CreateContext: resourceBigipProfileLtmFastl4Create,
+		UpdateContext: resourceBigipLtmProfileFastl4Update,
+		ReadContext:   resourceBigipLtmProfileFastl4Read,
+		DeleteContext: resourceBigipLtmProfileFastl4Delete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -126,7 +128,7 @@ func resourceBigipLtmProfileFastl4() *schema.Resource {
 	}
 }
 
-func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipProfileLtmFastl4Create(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -136,7 +138,7 @@ func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{
 		Name: name,
 	}
 	if d.Get("explicitflow_migration").(string) == "enabled" && d.Get("late_binding").(string) != "enabled" {
-		return fmt.Errorf("explicitflow_migration can be enabled only if late_binding set to enabled")
+		return diag.FromErr(fmt.Errorf("explicitflow_migration can be enabled only if late_binding set to enabled"))
 	}
 	fastL4ProfileConfig := getFastL4ProfileConfig(d, configFastl4)
 
@@ -144,14 +146,14 @@ func resourceBigipProfileLtmFastl4Create(d *schema.ResourceData, meta interface{
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create FastL4  (%s) (%v) ", name, err)
-		return fmt.Errorf("Error retrieving profile fastl4 (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error retrieving profile fastl4 (%s): %s ", name, err))
 	}
 
 	d.SetId(name)
-	return resourceBigipLtmProfileFastl4Read(d, meta)
+	return resourceBigipLtmProfileFastl4Read(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFastl4Update(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -159,7 +161,7 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 		Name: name,
 	}
 	if d.Get("explicitflow_migration").(string) == "enabled" && d.Get("late_binding").(string) != "enabled" {
-		return fmt.Errorf("explicitflow_migration can be enabled only if late_binding set to enabled")
+		return diag.FromErr(fmt.Errorf("explicitflow_migration can be enabled only if late_binding set to enabled"))
 	}
 	log.Println("[INFO] Updating Fastl4 profile")
 	fastL4ProfileConfig := getFastL4ProfileConfig(d, configFastl4)
@@ -167,18 +169,18 @@ func resourceBigipLtmProfileFastl4Update(d *schema.ResourceData, meta interface{
 	err := client.ModifyFastl4(name, fastL4ProfileConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify FastL4  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmProfileFastl4Read(d, meta)
+	return resourceBigipLtmProfileFastl4Read(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFastl4Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	obj, err := client.GetFastl4(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve FastL4  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Fastl4 profile  (%s) not found, removing from state", d.Id())
@@ -189,14 +191,10 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	_ = d.Set("defaults_from", obj.DefaultsFrom)
 
 	if _, ok := d.GetOk("client_timeout"); ok {
-		if err := d.Set("client_timeout", obj.ClientTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ClientTimeout to state for FastL4 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("client_timeout", obj.ClientTimeout)
 	}
 	if _, ok := d.GetOk("explicitflow_migration"); ok {
-		if err := d.Set("explicitflow_migration", obj.ExplicitFlowMigration); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ExplicitFlowMigration to state for FastL4 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("explicitflow_migration", obj.ExplicitFlowMigration)
 	}
 	if _, ok := d.GetOk("iptos_toclient"); ok {
 		_ = d.Set("iptos_toclient", obj.IpTosToClient)
@@ -228,11 +226,10 @@ func resourceBigipLtmProfileFastl4Read(d *schema.ResourceData, meta interface{})
 	if _, ok := d.GetOk("receive_windowsize"); ok {
 		_ = d.Set("receive_windowsize", obj.ReceiveWindowSize)
 	}
-
 	return nil
 }
 
-func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFastl4Delete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -241,7 +238,7 @@ func resourceBigipLtmProfileFastl4Delete(d *schema.ResourceData, meta interface{
 	err := client.DeleteFastl4(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve node (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

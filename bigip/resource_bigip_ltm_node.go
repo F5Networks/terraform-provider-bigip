@@ -12,19 +12,20 @@ import (
 	"regexp"
 	"strings"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmNode() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmNodeCreate,
-		Read:   resourceBigipLtmNodeRead,
-		Update: resourceBigipLtmNodeUpdate,
-		Delete: resourceBigipLtmNodeDelete,
-		Exists: resourceBigipLtmNodeExists,
+		CreateContext: resourceBigipLtmNodeCreate,
+		ReadContext:   resourceBigipLtmNodeRead,
+		UpdateContext: resourceBigipLtmNodeUpdate,
+		DeleteContext: resourceBigipLtmNodeDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -129,7 +130,7 @@ func resourceBigipLtmNode() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmNodeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -181,13 +182,13 @@ func resourceBigipLtmNodeCreate(d *schema.ResourceData, meta interface{}) error 
 	if !exist {
 		if err := client.AddNode(nodeConfig); err != nil {
 			d.SetId("")
-			return fmt.Errorf("Error modifying node %s: %v ", name, err)
+			return diag.FromErr(fmt.Errorf("error modifying node %s: %v", name, err))
 		}
 	}
-	return resourceBigipLtmNodeRead(d, meta)
+	return resourceBigipLtmNodeRead(ctx, d, meta)
 }
 
-func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -197,7 +198,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	node, err := client.GetNode(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if node == nil {
 		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
@@ -206,7 +207,7 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if node.FQDN.Name != "" {
 		if err := d.Set("address", node.FQDN.Name); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
 		}
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
@@ -215,13 +216,13 @@ func resourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
 		if err := d.Set("address", node.Address); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
 		}
 	}
 	_ = d.Set("name", name)
 
 	if err := d.Set("rate_limit", node.RateLimit); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err))
 	}
 
 	if (node.Session == "monitor-enabled") || (node.Session == "user-enabled") {
@@ -264,7 +265,7 @@ func resourceBigipLtmNodeExists(d *schema.ResourceData, meta interface{}) (bool,
 	return true, nil
 }
 
-func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmNodeUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -287,13 +288,13 @@ func resourceBigipLtmNodeUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	if err := client.ModifyNode(name, nodeConfig); err != nil {
-		return fmt.Errorf("Error modifying node %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("error modifying node %s: %v", name, err))
 	}
 
-	return resourceBigipLtmNodeRead(d, meta)
+	return resourceBigipLtmNodeRead(ctx, d, meta)
 }
 
-func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmNodeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -302,7 +303,7 @@ func resourceBigipLtmNodeDelete(d *schema.ResourceData, meta interface{}) error 
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Node %s  %v : ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

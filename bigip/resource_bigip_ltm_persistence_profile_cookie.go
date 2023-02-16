@@ -11,19 +11,20 @@ import (
 	"log"
 	"strconv"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPersistenceProfileCookieCreate,
-		Read:   resourceBigipLtmPersistenceProfileCookieRead,
-		Update: resourceBigipLtmPersistenceProfileCookieUpdate,
-		Delete: resourceBigipLtmPersistenceProfileCookieDelete,
-		Exists: resourceBigipLtmPersistenceProfileCookieExists,
+		CreateContext: resourceBigipLtmPersistenceProfileCookieCreate,
+		ReadContext:   resourceBigipLtmPersistenceProfileCookieRead,
+		UpdateContext: resourceBigipLtmPersistenceProfileCookieUpdate,
+		DeleteContext: resourceBigipLtmPersistenceProfileCookieDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -155,7 +156,7 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileCookieCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -172,24 +173,15 @@ func resourceBigipLtmPersistenceProfileCookieCreate(d *schema.ResourceData, meta
 	err := client.CreateCookiePersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Cookie Persistence Profile %s %v :", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
 
-	err = resourceBigipLtmPersistenceProfileCookieUpdate(d, meta)
-	if err != nil {
-		if errdel := client.DeleteCookiePersistenceProfile(name); errdel != nil {
-			return errdel
-		}
-		return err
-	}
-
-	return resourceBigipLtmPersistenceProfileCookieRead(d, meta)
-
+	return resourceBigipLtmPersistenceProfileCookieUpdate(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileCookieRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -199,7 +191,7 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	pp, err := client.GetCookiePersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Cookie Persistence Profile %s  %v : ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pp == nil {
 		log.Printf("[WARN] Cookie Persistence Profile (%s) not found, removing from state", d.Id())
@@ -225,18 +217,18 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 
 	if _, ok := d.GetOk("app_service"); ok {
 		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
 		}
 	}
 	// Specific to CookiePersistenceProfile
 	if _, ok := d.GetOk("cookie_encryption"); ok {
 		if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
 		}
 	}
 	if _, ok := d.GetOk("cookie_encryption_passphrase"); ok {
 		if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
 		}
 	}
 	if _, ok := d.GetOk("cookie_name"); ok {
@@ -246,7 +238,7 @@ func resourceBigipLtmPersistenceProfileCookieRead(d *schema.ResourceData, meta i
 	return nil
 }
 
-func resourceBigipLtmPersistenceProfileCookieUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileCookieUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -278,13 +270,15 @@ func resourceBigipLtmPersistenceProfileCookieUpdate(d *schema.ResourceData, meta
 	err := client.ModifyCookiePersistenceProfile(name, pp)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Cookie Persistence Profile %s %v ", name, err)
-		return err
+		if errdel := client.DeleteCookiePersistenceProfile(name); errdel != nil {
+			return diag.FromErr(errdel)
+		}
+		return diag.FromErr(err)
 	}
-
-	return resourceBigipLtmPersistenceProfileCookieRead(d, meta)
+	return resourceBigipLtmPersistenceProfileCookieRead(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileCookieDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -292,7 +286,7 @@ func resourceBigipLtmPersistenceProfileCookieDelete(d *schema.ResourceData, meta
 	err := client.DeleteCookiePersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Cookie Persistence Profile %s  %v : ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

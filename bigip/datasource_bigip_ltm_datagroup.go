@@ -6,16 +6,18 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipLtmDataGroup() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipLtmDataGroupRead,
+		ReadContext: dataSourceBigipLtmDataGroupRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -54,7 +56,7 @@ func dataSourceBigipLtmDataGroup() *schema.Resource {
 	}
 }
 
-func dataSourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	var records []map[string]interface{}
@@ -62,7 +64,7 @@ func dataSourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Retrieving Data Group List %s", name)
 	dataGroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err))
 	}
 	if dataGroup == nil {
 		log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
@@ -80,7 +82,7 @@ func dataSourceBigipLtmDataGroupRead(d *schema.ResourceData, meta interface{}) e
 		records = append(records, dgRecord)
 	}
 	if err := d.Set("record", records); err != nil {
-		return fmt.Errorf("Error updating records in state for Data Group List %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error updating records in state for Data Group List %s: %v ", name, err))
 	}
 	d.SetId(dataGroup.FullPath)
 	return nil

@@ -10,14 +10,16 @@ import (
 	"fmt"
 	"log"
 
+	"context"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceBigipWafEntityUrl() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipWafEntityUrlRead,
+		ReadContext: dataSourceBigipWafEntityUrlRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -90,7 +92,7 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 	}
 }
 
-func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipWafEntityUrlRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	_ = meta // we never call the device, to avoid compiler errors we zero this out here
 
 	name := d.Get("name").(string)
@@ -131,7 +133,7 @@ func dataSourceBigipWafEntityUrlRead(d *schema.ResourceData, meta interface{}) e
 
 	jsonString, err := json.Marshal(urlJson)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] URL Json:%+v", string(jsonString))
 	_ = d.Set("json", string(jsonString))

@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -24,13 +26,12 @@ var fastTmpl = "bigip-fast-templates/http"
 
 func resourceBigipHttpFastApp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipFastHttpAppCreate,
-		Read:   resourceBigipFastHttpAppRead,
-		Update: resourceBigipFastHttpAppUpdate,
-		Delete: resourceBigipFastHttpAppDelete,
-		Exists: resourceBigipFastHttpAppExists,
+		CreateContext: resourceBigipFastHttpAppCreate,
+		ReadContext:   resourceBigipFastHttpAppRead,
+		UpdateContext: resourceBigipFastHttpAppUpdate,
+		DeleteContext: resourceBigipFastHttpAppDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"tenant": {
@@ -230,11 +231,11 @@ func resourceBigipHttpFastApp() *schema.Resource {
 	}
 }
 
-func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHttpAppCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastJson, err := getFastHttpConfig(d)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	m.Lock()
 	defer m.Unlock()
@@ -242,7 +243,7 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, fastTmpl)
 	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl, userAgent)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("tenant", tenant)
 	_ = d.Set("application", app)
@@ -279,10 +280,10 @@ func resourceBigipFastHttpAppCreate(d *schema.ResourceData, meta interface{}) er
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipFastHttpAppRead(d, meta)
+	return resourceBigipFastHttpAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHttpAppRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var fastHttp bigip.FastHttpJson
 	log.Printf("[INFO] Reading FastApp HTTP config")
@@ -298,7 +299,7 @@ func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) erro
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 	if fastJson == "" {
 		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
@@ -308,20 +309,20 @@ func resourceBigipFastHttpAppRead(d *schema.ResourceData, meta interface{}) erro
 	_ = d.Set("fast_http_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastHttp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	err = setFastHttpData(d, fastHttp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }
 
-func resourceBigipFastHttpAppUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHttpAppUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastJson, e := getFastHttpConfig(d)
 	if e != nil {
-		return e
+		return diag.FromErr(e)
 	}
 	m.Lock()
 	defer m.Unlock()
@@ -330,12 +331,12 @@ func resourceBigipFastHttpAppUpdate(d *schema.ResourceData, meta interface{}) er
 	tenant := d.Get("tenant").(string)
 	err := client.ModifyFastAppBigip(fastJson, tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipFastAppRead(d, meta)
+	return resourceBigipFastAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastHttpAppDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHttpAppDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -343,7 +344,7 @@ func resourceBigipFastHttpAppDelete(d *schema.ResourceData, meta interface{}) er
 	tenant := d.Get("tenant").(string)
 	err := client.DeleteFastAppBigip(tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

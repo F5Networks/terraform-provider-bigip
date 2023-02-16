@@ -6,17 +6,19 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipLtmIrule() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipLtmIruleRead,
+		ReadContext: dataSourceBigipLtmIruleRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -41,14 +43,14 @@ func dataSourceBigipLtmIrule() *schema.Resource {
 	}
 }
 
-func dataSourceBigipLtmIruleRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipLtmIruleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	name := fmt.Sprintf("/%s/%s", d.Get("partition").(string), d.Get("name").(string))
 
 	irule, err := client.IRule(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving iRule %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("Error retrieving iRule %s: %v ", name, err))
 	}
 	if irule == nil {
 		log.Printf("[DEBUG] iRule (%s) not found, removing from state", name)

@@ -9,13 +9,15 @@ import (
 	"fmt"
 	"log"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipSslCertificate() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipSslCertificateRead,
+		ReadContext: dataSourceBigipSslCertificateRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -36,7 +38,7 @@ func dataSourceBigipSslCertificate() *schema.Resource {
 		},
 	}
 }
-func dataSourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
@@ -45,10 +47,10 @@ func dataSourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{})
 	log.Println("[INFO] Reading Certificate : " + name)
 	certificate, err := client.GetCertificate(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving certificate %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving certificate %s: %v", name, err))
 	}
 	if certificate == nil {
-		return fmt.Errorf("Certificate (%s) not found", name)
+		return diag.FromErr(fmt.Errorf("certificate (%s) not found", name))
 	}
 
 	d.Set("name", certificate.Name)

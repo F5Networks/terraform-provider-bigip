@@ -12,7 +12,9 @@ import (
 	"regexp"
 	"strings"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -34,13 +36,12 @@ var parentMonitors = map[string]bool{
 
 func resourceBigipLtmMonitor() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmMonitorCreate,
-		Read:   resourceBigipLtmMonitorRead,
-		Update: resourceBigipLtmMonitorUpdate,
-		Delete: resourceBigipLtmMonitorDelete,
-		Exists: resourceBigipLtmMonitorExists,
+		CreateContext: resourceBigipLtmMonitorCreate,
+		ReadContext:   resourceBigipLtmMonitorRead,
+		UpdateContext: resourceBigipLtmMonitorUpdate,
+		DeleteContext: resourceBigipLtmMonitorDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -194,7 +195,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmMonitorCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	parent := monitorParent(d.Get("parent").(string))
@@ -216,14 +217,14 @@ func resourceBigipLtmMonitorCreate(d *schema.ResourceData, meta interface{}) err
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Monitor (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
-	return resourceBigipLtmMonitorRead(d, meta)
+	return resourceBigipLtmMonitorRead(ctx, d, meta)
 }
 
-func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -237,7 +238,7 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 	monitors, err := client.Monitors()
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if monitors == nil {
 		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
@@ -250,10 +251,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			_ = d.Set("up_interval", m.UpInterval)
 			_ = d.Set("timeout", m.Timeout)
 			if err := d.Set("send", m.SendString); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err)
+				return diag.FromErr(fmt.Errorf("[DEBUG] Error saving SendString to state for Monitor (%s): %s", d.Id(), err))
 			}
 			if err := d.Set("receive", m.ReceiveString); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err)
+				return diag.FromErr(fmt.Errorf("[DEBUG] Error saving ReceiveString to state for Monitor (%s): %s", d.Id(), err))
 			}
 			_ = d.Set("receive_disable", m.ReceiveDisable)
 			_ = d.Set("reverse", m.Reverse)
@@ -280,35 +281,10 @@ func resourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 	}
-	return fmt.Errorf("Couldn't find LTM Monitor %s ", name)
+	return diag.FromErr(fmt.Errorf("Couldn't find LTM Monitor %s ", name))
 }
 
-func resourceBigipLtmMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Checking LTM Monitor: %+v Exist", name)
-
-	monitors, err := client.Monitors()
-
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
-		return false, err
-	}
-	if monitors == nil {
-		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-	for _, m := range monitors {
-		if m.FullPath == name {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmMonitorUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -330,13 +306,13 @@ func resourceBigipLtmMonitorUpdate(d *schema.ResourceData, meta interface{}) err
 	err := client.ModifyMonitor(name, parent, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Monitor (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceBigipLtmMonitorRead(d, meta)
+	return resourceBigipLtmMonitorRead(ctx, d, meta)
 }
 
-func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmMonitorDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	parent := monitorParent(d.Get("parent").(string))
@@ -352,7 +328,7 @@ func resourceBigipLtmMonitorDelete(d *schema.ResourceData, meta interface{}) err
 	err := client.DeleteMonitor(name, parent)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Monitor (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

@@ -12,19 +12,21 @@ import (
 	"regexp"
 	"strings"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipNetSelfIP() *schema.Resource {
 
 	return &schema.Resource{
-		Create: resourceBigipNetSelfIPCreate,
-		Read:   resourceBigipNetSelfIPRead,
-		Update: resourceBigipNetSelfIPUpdate,
-		Delete: resourceBigipNetSelfIPDelete,
+		CreateContext: resourceBigipNetSelfIPCreate,
+		ReadContext:   resourceBigipNetSelfIPRead,
+		UpdateContext: resourceBigipNetSelfIPUpdate,
+		DeleteContext: resourceBigipNetSelfIPDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -72,7 +74,7 @@ func resourceBigipNetSelfIP() *schema.Resource {
 	}
 }
 
-func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -87,15 +89,15 @@ func resourceBigipNetSelfIPCreate(d *schema.ResourceData, meta interface{}) erro
 	err := client.CreateSelfIP(config)
 
 	if err != nil {
-		return fmt.Errorf("Error creating SelfIP %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error creating SelfIP %s: %v ", name, err))
 	}
 
 	d.SetId(name)
 
-	return resourceBigipNetSelfIPRead(d, meta)
+	return resourceBigipNetSelfIPRead(ctx, d, meta)
 }
 
-func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -103,7 +105,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 
 	selfIP, err := client.SelfIP(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving SelfIP %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error retrieving SelfIP %s: %v ", name, err))
 	}
 	if selfIP == nil {
 		log.Printf("[DEBUG] SelfIP %s not found, removing from state", name)
@@ -127,7 +129,7 @@ func resourceBigipNetSelfIPRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -141,14 +143,14 @@ func resourceBigipNetSelfIPUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.ModifySelfIP(name, config)
 	if err != nil {
-		return fmt.Errorf("Error modifying SelfIP %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error modifying SelfIP %s: %v ", name, err))
 	}
 
-	return resourceBigipNetSelfIPRead(d, meta)
+	return resourceBigipNetSelfIPRead(ctx, d, meta)
 
 }
 
-func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetSelfIPDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -156,7 +158,7 @@ func resourceBigipNetSelfIPDelete(d *schema.ResourceData, meta interface{}) erro
 
 	err := client.DeleteSelfIP(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting SelfIP %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error deleting SelfIP %s: %v ", name, err))
 	}
 
 	d.SetId("")

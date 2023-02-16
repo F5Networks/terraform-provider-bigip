@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceBigipWafEntityParameter() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipWafEntityParameterRead,
+		ReadContext: dataSourceBigipWafEntityParameterRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -155,21 +157,21 @@ func dataSourceBigipWafEntityParameter() *schema.Resource {
 	}
 }
 
-func dataSourceBigipWafEntityParameterRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipWafEntityParameterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	parameterName := d.Get("name").(string)
 	entityParameter := &bigip.Parameter{
 		Name: parameterName,
 	}
 	if d.Get("level").(string) == "url" {
 		if _, OK := d.GetOk("url"); !OK {
-			return fmt.Errorf("if level set to 'url',url object must be specificed")
+			return diag.FromErr(fmt.Errorf("if level set to 'url',url object must be specificed"))
 		}
 	}
 	getEPConfig(entityParameter, d)
 
 	parameterJson, err := json.Marshal(entityParameter)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("json", string(parameterJson))
 	d.SetId(parameterName)

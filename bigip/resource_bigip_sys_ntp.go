@@ -7,21 +7,22 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
 	"log"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipSysNtp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysNtpCreate,
-		Update: resourceBigipSysNtpUpdate,
-		Read:   resourceBigipSysNtpRead,
-		Delete: resourceBigipSysNtpDelete,
+		CreateContext: resourceBigipSysNtpCreate,
+		UpdateContext: resourceBigipSysNtpUpdate,
+		ReadContext:   resourceBigipSysNtpRead,
+		DeleteContext: resourceBigipSysNtpDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"description": {
@@ -46,7 +47,7 @@ func resourceBigipSysNtp() *schema.Resource {
 
 }
 
-func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
@@ -61,13 +62,13 @@ func resourceBigipSysNtpCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Configure  NTP Servers  (%s) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(description)
-	return resourceBigipSysNtpRead(d, meta)
+	return resourceBigipSysNtpRead(ctx, d, meta)
 }
 
-func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -81,12 +82,12 @@ func resourceBigipSysNtpUpdate(d *schema.ResourceData, meta interface{}) error {
 	err := client.ModifyNTP(sysNTPConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify  NTP Servers (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipSysNtpRead(d, meta)
+	return resourceBigipSysNtpRead(ctx, d, meta)
 }
 
-func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -96,7 +97,7 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 	ntp, err := client.NTPs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve NTP Config (%s) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if ntp == nil {
 		log.Printf("[WARN] NTP Config (%s) not found, removing from state", d.Id())
@@ -104,20 +105,14 @@ func resourceBigipSysNtpRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	if err := d.Set("description", ntp.Description); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Description to state for NTP  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("servers", ntp.Servers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Servers to state for NTP  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("timezone", ntp.Timezone); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Timezone  state for NTP  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("description", ntp.Description)
+	_ = d.Set("servers", ntp.Servers)
+	_ = d.Set("timezone", ntp.Timezone)
 
 	return nil
 }
 
-func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysNtpDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	description := d.Id()
 	log.Println("[INFO] Deleting System NTP Config:" + description)
@@ -129,7 +124,7 @@ func resourceBigipSysNtpDelete(d *schema.ResourceData, meta interface{}) error {
 	err := client.ModifyNTP(configSysNTP)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete NTP Config (%s) (%v) ", description, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

@@ -6,17 +6,19 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"regexp"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipLtmNode() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipLtmNodeRead,
+		ReadContext: dataSourceBigipLtmNodeRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -119,14 +121,14 @@ func dataSourceBigipLtmNode() *schema.Resource {
 		},
 	}
 }
-func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	name := fmt.Sprintf("/%s/%s", d.Get("partition").(string), d.Get("name").(string))
 	log.Println("[DEBUG] Reading Node : " + name)
 	node, err := client.GetNode(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving node %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("Error retrieving node %s: %v", name, err))
 	}
 	if node == nil {
 		log.Printf("[DEBUG] Node %s not found, removing from state", name)
@@ -136,7 +138,7 @@ func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error 
 
 	if node.FQDN.Name != "" {
 		if err := d.Set("address", node.FQDN.Name); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
 		}
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
@@ -145,7 +147,7 @@ func dataSourceBigipLtmNodeRead(d *schema.ResourceData, meta interface{}) error 
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
 		if err := d.Set("address", node.Address); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
 		}
 	}
 

@@ -14,9 +14,11 @@ import (
 	"strconv"
 	"strings"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -59,12 +61,12 @@ var cidr = map[string]string{
 
 func resourceBigipLtmVirtualServer() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmVirtualServerCreate,
-		Read:   resourceBigipLtmVirtualServerRead,
-		Update: resourceBigipLtmVirtualServerUpdate,
-		Delete: resourceBigipLtmVirtualServerDelete,
+		CreateContext: resourceBigipLtmVirtualServerCreate,
+		ReadContext:   resourceBigipLtmVirtualServerRead,
+		UpdateContext: resourceBigipLtmVirtualServerUpdate,
+		DeleteContext: resourceBigipLtmVirtualServerDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -274,7 +276,7 @@ func ltmVirtualServerAttrDefaults(d *schema.ResourceData) {
 	}
 }
 
-func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualServerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -286,7 +288,7 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 	err := client.CreateVirtualServer(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -308,10 +310,10 @@ func resourceBigipLtmVirtualServerCreate(d *schema.ResourceData, meta interface{
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipLtmVirtualServerRead(d, meta)
+	return resourceBigipLtmVirtualServerRead(ctx, d, meta)
 }
 
-func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Fetching virtual server " + name)
@@ -320,7 +322,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
 		d.SetId("")
-		return err
+		return diag.FromErr(err)
 	}
 	if vs == nil {
 		log.Printf("[WARN] VirtualServer (%s) not found, removing from state", d.Id())
@@ -332,7 +334,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
-			return fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination)
+			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination))
 		}
 		_ = d.Set("destination", destination[2])
 	}
@@ -341,7 +343,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]
 		if len(destination) < 3 {
-			return fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination)
+			return diag.FromErr(fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination))
 		}
 		_ = d.Set("destination", parsedDestination)
 	}
@@ -359,7 +361,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	//	regex = regexp.MustCompile(`\:(\d+)`)
 	//	port := regex.FindStringSubmatch(vs.Destination)
 	//	if len(port) < 2 {
-	//		return fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
+	//		return diag.FromErr(fmt.Errorf("Unable to extract service port from virtual server destination: %s", vs.Destination)
 	//	}
 	//	parsedPort, _ := strconv.Atoi(port[1])
 
@@ -367,7 +369,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 		regex := regexp.MustCompile(`:(\d+)`)
 		port := regex.FindStringSubmatch(vs.Destination)
 		if len(port) < 2 {
-			return fmt.Errorf("Unable to extract service port from virtual server destination: %s ", vs.Destination)
+			return diag.FromErr(fmt.Errorf("Unable to extract service port from virtual server destination: %s ", vs.Destination))
 		}
 		parsedPort, _ := strconv.Atoi(port[1])
 		_ = d.Set("port", parsedPort)
@@ -413,7 +415,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	profiles, err := client.VirtualServerProfiles(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if profiles != nil && len(profiles.Profiles) > 0 {
 		profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(profiles.Profiles)))
@@ -442,7 +444,7 @@ func resourceBigipLtmVirtualServerRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualServerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -453,12 +455,12 @@ func resourceBigipLtmVirtualServerUpdate(d *schema.ResourceData, meta interface{
 	config := getVirtualServerConfig(d, pss)
 	err := client.ModifyVirtualServer(name, config)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmVirtualServerRead(d, meta)
+	return resourceBigipLtmVirtualServerRead(ctx, d, meta)
 }
 
-func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualServerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -467,7 +469,7 @@ func resourceBigipLtmVirtualServerDelete(d *schema.ResourceData, meta interface{
 	err := client.DeleteVirtualServer(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Virtual Server  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

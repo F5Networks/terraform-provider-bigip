@@ -6,16 +6,18 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipLtmMonitor() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipLtmMonitorRead,
+		ReadContext: dataSourceBigipLtmMonitorRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -105,7 +107,7 @@ func dataSourceBigipLtmMonitor() *schema.Resource {
 	}
 }
 
-func dataSourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	name := fmt.Sprintf("/%s/%s", d.Get("partition").(string), d.Get("name").(string))
@@ -113,7 +115,7 @@ func dataSourceBigipLtmMonitorRead(d *schema.ResourceData, meta interface{}) err
 	monitors, err := client.Monitors()
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Monitor (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if monitors == nil {
 		log.Printf("[WARN] Monitor (%s) not found, removing from state", d.Id())

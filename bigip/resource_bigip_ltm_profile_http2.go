@@ -16,18 +16,20 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileHttp2() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileHttp2Create,
-		Update: resourceBigipLtmProfileHttp2Update,
-		Read:   resourceBigipLtmProfileHttp2Read,
-		Delete: resourceBigipLtmProfileHttp2Delete,
+		CreateContext: resourceBigipLtmProfileHttp2Create,
+		UpdateContext: resourceBigipLtmProfileHttp2Update,
+		ReadContext:   resourceBigipLtmProfileHttp2Read,
+		DeleteContext: resourceBigipLtmProfileHttp2Delete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -119,7 +121,7 @@ func resourceBigipLtmProfileHttp2() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Create(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 
@@ -132,7 +134,7 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 
 	err := client.CreateHttp2(config)
 	if err != nil {
-		return fmt.Errorf("Error creating profile Http2 (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error creating profile Http2 (%s): %s", name, err))
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -154,10 +156,10 @@ func resourceBigipLtmProfileHttp2Create(d *schema.ResourceData, meta interface{}
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipLtmProfileHttp2Read(d, meta)
+	return resourceBigipLtmProfileHttp2Read(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Update(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -169,12 +171,12 @@ func resourceBigipLtmProfileHttp2Update(d *schema.ResourceData, meta interface{}
 
 	err := client.ModifyHttp2(name, config)
 	if err != nil {
-		return fmt.Errorf("Error modifying profile Http2 (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error modifying profile Http2 (%s): %s ", name, err))
 	}
-	return resourceBigipLtmProfileHttp2Read(d, meta)
+	return resourceBigipLtmProfileHttp2Read(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Reading http2 profile " + name)
@@ -182,7 +184,7 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve http2  (%s) (%v) ", name, err)
 
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Http2 Profile (%s) not found, removing from state", d.Id())
@@ -192,9 +194,7 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 	_ = d.Set("name", name)
 	_ = d.Set("defaults_from", obj.DefaultsFrom)
 	if _, ok := d.GetOk("concurrent_streams_per_connection"); ok {
-		if err := d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConcurrentStreamsPerConnection to state for Http2 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("concurrent_streams_per_connection", obj.ConcurrentStreamsPerConnection)
 	}
 	if _, ok := d.GetOk("connection_idle_timeout"); ok {
 		_ = d.Set("connection_idle_timeout", obj.ConnectionIdleTimeout)
@@ -221,14 +221,12 @@ func resourceBigipLtmProfileHttp2Read(d *schema.ResourceData, meta interface{}) 
 		_ = d.Set("insert_header_name", obj.InsertHeaderName)
 	}
 	if _, ok := d.GetOk("connection_idle_timeout"); ok {
-		if err := d.Set("activation_modes", obj.ActivationModes); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ActivationModes to state for Http2 profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("activation_modes", obj.ActivationModes)
 	}
 	return nil
 }
 
-func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttp2Delete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -236,7 +234,7 @@ func resourceBigipLtmProfileHttp2Delete(d *schema.ResourceData, meta interface{}
 
 	err := client.DeleteHttp2(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting  profile Http2 (%s): %s", name, err)
+		return diag.FromErr(fmt.Errorf("error deleting  profile Http2 (%s): %s", name, err))
 	}
 	d.SetId("")
 	return nil

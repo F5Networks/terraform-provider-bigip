@@ -10,19 +10,20 @@ import (
 	"fmt"
 	"log"
 
+	"context"
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmVirtualAddress() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmVirtualAddressCreate,
-		Read:   resourceBigipLtmVirtualAddressRead,
-		Update: resourceBigipLtmVirtualAddressUpdate,
-		Delete: resourceBigipLtmVirtualAddressDelete,
-		Exists: resourceBigipLtmVirtualAddressExists,
+		CreateContext: resourceBigipLtmVirtualAddressCreate,
+		ReadContext:   resourceBigipLtmVirtualAddressRead,
+		UpdateContext: resourceBigipLtmVirtualAddressUpdate,
+		DeleteContext: resourceBigipLtmVirtualAddressDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -87,21 +88,21 @@ func resourceBigipLtmVirtualAddress() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmVirtualAddressCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualAddressCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating virtual address " + name)
 
 	if err := client.CreateVirtualAddress(name, hydrateVirtualAddress(d)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
-	return resourceBigipLtmVirtualAddressRead(d, meta)
+	return resourceBigipLtmVirtualAddressRead(ctx, d, meta)
 }
 
-func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualAddressRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -112,7 +113,7 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 	vas, err := client.VirtualAddresses()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Address (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if vas == nil {
 		log.Printf("[WARN] VirtualAddress (%s) not found, removing from state", d.Id())
@@ -125,27 +126,21 @@ func resourceBigipLtmVirtualAddressRead(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if va.FullPath != name {
-		return fmt.Errorf("virtual address %s not found", name)
+		return diag.FromErr(fmt.Errorf("virtual address %s not found", name))
 	}
 	log.Printf("[DEBUG] virtual address configured on bigip is :%v", vas)
 	_ = d.Set("name", name)
-	if err := d.Set("arp", va.ARP); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ARP to state for Virtual Address  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("arp", va.ARP)
 	_ = d.Set("auto_delete", va.AutoDelete)
 	_ = d.Set("conn_limit", va.ConnectionLimit)
 	_ = d.Set("enabled", va.Enabled)
 	_ = d.Set("icmp_echo", va.ICMPEcho)
-	if err := d.Set("advertize_route", va.RouteAdvertisement); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RouteAdvertisement to state for Virtual Address  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("advertize_route", va.RouteAdvertisement)
 	trafficGroup := va.TrafficGroup
 	if trafficGroup == "none" {
 		trafficGroup = fmt.Sprintf("/Common/%s", trafficGroup)
 	}
-	if err := d.Set("traffic_group", trafficGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TrafficGroup to state for Virtual Address  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("traffic_group", trafficGroup)
 
 	return nil
 }
@@ -176,7 +171,7 @@ func resourceBigipLtmVirtualAddressExists(d *schema.ResourceData, meta interface
 	return va != nil, nil
 }
 
-func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualAddressUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -186,10 +181,10 @@ func resourceBigipLtmVirtualAddressUpdate(d *schema.ResourceData, meta interface
 	err := client.ModifyVirtualAddress(name, va)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Address  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceBigipLtmVirtualAddressRead(d, meta)
+	return resourceBigipLtmVirtualAddressRead(ctx, d, meta)
 }
 
 func hydrateVirtualAddress(d *schema.ResourceData) *bigip.VirtualAddress {
@@ -205,21 +200,21 @@ func hydrateVirtualAddress(d *schema.ResourceData) *bigip.VirtualAddress {
 	}
 }
 
-func resourceBigipLtmVirtualAddressDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmVirtualAddressDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	log.Printf("[INFO] Deleting virtual address " + name)
 	client := meta.(*bigip.BigIP)
-	vs, err_check := resourceBigipLtmVirtualAddressExists(d, meta)
+	vs, errCheck := resourceBigipLtmVirtualAddressExists(d, meta)
 
 	if !vs {
-		log.Printf("[ERROR] Unable to get Virtual Address  (%v)  (%v) ", vs, err_check)
+		log.Printf("[ERROR] Unable to get Virtual Address  (%v)  (%v) ", vs, errCheck)
 		d.SetId("")
 		return nil
 	}
 	err := client.DeleteVirtualAddress(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Virtual Address  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
