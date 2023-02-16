@@ -3,7 +3,7 @@
 Declarative Onboarding Integration with Terraform
 =================================================
 
-We can use terraform with Declarative Onboarding (DO) to automate network (L1-L3) onboarding for the F5 BIG-IP system, making it available and ready to accept application services configurations.
+Use Terraform with Declarative Onboarding (DO) to automate network (L1-L3) onboarding for the F5 BIG-IP system, making it available and ready to accept application services configurations.
 
 F5 BIG-IP Declarative Onboarding uses a declarative model to initially configure a BIG-IP device with all of the required settings to get up and running. This includes system settings such as licensing and provisioning, network settings such as VLANs and Self IPs, and clustering settings if you are using more than one BIG-IP system.
 
