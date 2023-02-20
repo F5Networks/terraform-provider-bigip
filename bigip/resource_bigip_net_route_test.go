@@ -68,8 +68,8 @@ func TestAccBigipNetroute_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckroutesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,
@@ -88,8 +88,8 @@ func TestAccBigipNetroute_update(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckroutesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,
@@ -111,8 +111,8 @@ func TestAccBigipNetroute_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckroutesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckroutesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ROUTE_RESOURCE,

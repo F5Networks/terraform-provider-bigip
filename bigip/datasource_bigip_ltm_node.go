@@ -128,7 +128,7 @@ func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, met
 	log.Println("[DEBUG] Reading Node : " + name)
 	node, err := client.GetNode(name)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error retrieving node %s: %v", name, err))
+		return diag.FromErr(fmt.Errorf("error retrieving node %s: %v", name, err))
 	}
 	if node == nil {
 		log.Printf("[DEBUG] Node %s not found, removing from state", name)
@@ -137,18 +137,14 @@ func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, met
 	}
 
 	if node.FQDN.Name != "" {
-		if err := d.Set("address", node.FQDN.Name); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("address", node.FQDN.Name)
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
 		// x:x(%x)
 		regex := regexp.MustCompile(`((?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})|(?:.*:[^%]*))(?:\%\d+)?`)
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
-		if err := d.Set("address", node.Address); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("address", node.Address)
 	}
 
 	_ = d.Set("name", node.Name)
@@ -161,9 +157,7 @@ func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, met
 	_ = d.Set("ratio", node.Ratio)
 	_ = d.Set("state", node.State)
 	_ = d.Set("session", node.Session)
-
 	var fqdn []map[string]interface{}
-
 	fqdnelements := map[string]interface{}{
 		"interval":       node.FQDN.Interval,
 		"downinterval":   node.FQDN.DownInterval,
@@ -178,7 +172,5 @@ func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, met
 	//	_ = d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
 	//	_ = d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
 	d.SetId(node.Name)
-
 	return nil
-
 }

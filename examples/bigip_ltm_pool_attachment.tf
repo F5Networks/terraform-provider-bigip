@@ -23,13 +23,13 @@ resource "bigip_ltm_pool" "pool" {
   monitors            = ["/Common/terraform_monitor"]
   allow_snat          = "yes"
   allow_nat           = "yes"
-  depends_on = [bigip_ltm_monitor.monitor]
+  depends_on          = [bigip_ltm_monitor.monitor]
 }
 
 resource "bigip_ltm_node" "node" {
-  name             = "/Common/terraform_node1"
-  address          = "192.168.30.2"
-    }
+  name    = "/Common/terraform_node1"
+  address = "192.168.30.2"
+}
 
 resource "bigip_ltm_pool_attachment" "attach_node" {
   pool       = "/Common/terraform-pool"

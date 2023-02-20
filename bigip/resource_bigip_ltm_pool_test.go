@@ -51,8 +51,8 @@ func TestAccBigipLtmPool_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckPoolsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource,
@@ -79,8 +79,8 @@ func TestAccBigipLtmPool_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckPoolsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPoolResource,

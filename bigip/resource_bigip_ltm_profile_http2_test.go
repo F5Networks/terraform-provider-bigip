@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -28,8 +26,8 @@ func TestAccBigipLtmProfileHttp2CreateDefault(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),
@@ -56,8 +54,8 @@ func TestAccBigipLtmProfileHttp2ModifyName(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),
@@ -89,8 +87,8 @@ func TestAccBigipLtmProfileHttp2UpdateConcurrentStreamsPerConnection(t *testing.
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -122,8 +120,8 @@ func TestAccBigipLtmProfileHttp2UpdateConnectionIdleTimeout(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -155,8 +153,8 @@ func TestAccBigipLtmProfileHttp2UpdateFrameSize(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -188,8 +186,8 @@ func TestAccBigipLtmProfileHttp2UpdateHeaderTableSize(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -221,8 +219,8 @@ func TestAccBigipLtmProfileHttp2UpdateReceiveWindow(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -254,8 +252,8 @@ func TestAccBigipLtmProfileHttp2UpdateWriteSize(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -287,8 +285,8 @@ func TestAccBigipLtmProfileHttp2UpdateInsertHeader(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -319,8 +317,8 @@ func TestAccBigipLtmProfileHttp2UpdateEnforceTlsRequirements(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -351,8 +349,8 @@ func TestAccBigipLtmProfileHttp2UpdateIncludeContentLength(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -383,8 +381,8 @@ func TestAccBigipLtmProfileHttp2UpdateInsertHeaderName(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -415,8 +413,8 @@ func TestAccBigipLtmProfileHttp2UpdateActivationModes(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2UpdateParam(instName, ""),
@@ -432,7 +430,7 @@ func TestAccBigipLtmProfileHttp2UpdateActivationModes(t *testing.T) {
 					testCheckHttp2Exists(TestHttp2Name),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttp2Name),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http2"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("activation_modes.%d", schema.HashString("always")), "always"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "activation_modes.*", "always"),
 				),
 			},
 		},
@@ -448,8 +446,8 @@ func TestAccBigipLtmProfileHttp2Import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttp2sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttp2sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileHttp2DefaultConfig(TestPartition, TestHttp2Name, instName),

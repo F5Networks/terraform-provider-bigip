@@ -23,8 +23,8 @@ func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastHTTPSAppDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPSAppConfig(),
@@ -47,8 +47,8 @@ func TestAccFastHTTPSAppSSLProfileTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastHTTPSAppDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPSAppSSLConfig(),
@@ -71,8 +71,8 @@ func TestAccFastHTTPSAppSSLProfileTC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastHTTPSAppDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPSAppSSLConfigTC2(),
@@ -95,8 +95,8 @@ func TestAccFastHTTPSAppProfileTC3(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastHTTPSAppDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPSAppConfigTC3(),
@@ -119,8 +119,8 @@ func TestAccFastHTTPSAppProfileTC4(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastHTTPSAppDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getFastHTTPSAppConfigTC4(),

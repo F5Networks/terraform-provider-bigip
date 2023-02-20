@@ -31,7 +31,7 @@ func TestAccBigipSysNtp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_NTP_RESOURCE,
@@ -53,7 +53,7 @@ func TestAccBigipSysNtp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		//	CheckDestroy: testCheckntpsDestroyed, ( No Delet API support)
 		Steps: []resource.TestStep{
 			{

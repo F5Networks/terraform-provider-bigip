@@ -152,8 +152,8 @@ func TestAccBigipSysIapp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIappDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IAPP_RESOURCE,
@@ -170,8 +170,8 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIappDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IAPP_RESOURCE,

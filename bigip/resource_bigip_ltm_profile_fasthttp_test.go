@@ -37,8 +37,8 @@ func TestAccBigipLtmfasthttp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckfasthttpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FASTHTTP_RESOURCE,
@@ -65,8 +65,8 @@ func TestAccBigipLtmProfilefasthttp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckfasthttpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfasthttpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FASTHTTP_RESOURCE,

@@ -61,8 +61,8 @@ func TestAccBigipLtmDataGroup_Create_TypeString(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupStringResource,
@@ -78,8 +78,8 @@ func TestAccBigipLtmDataGroup_Create_TypeIp(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupIpResource,
@@ -96,8 +96,8 @@ func TestAccBigipLtmDataGroup_Create_TypeInteger(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupIntegerResource,
@@ -114,8 +114,8 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupStringResource,
@@ -133,8 +133,8 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupIpResource,
@@ -152,8 +152,8 @@ func TestAccBigipLtmDataGroup_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckDataGroupDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestDatagroupIntegerResource,

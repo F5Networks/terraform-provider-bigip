@@ -32,8 +32,8 @@ func TestAccFastTemplateCreateOnBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFastTemplateDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastTemplateDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FAST_TEMPLATE,

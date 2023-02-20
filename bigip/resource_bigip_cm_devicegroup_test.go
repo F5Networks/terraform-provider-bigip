@@ -47,8 +47,8 @@ func TestAccBigipCmDevicegroup_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckCmDevicegroupsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckCmDevicegroupsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DG_RESOURCE,
@@ -75,8 +75,8 @@ func TestAccBigipCmDevicegroup_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckCmDevicegroupsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckCmDevicegroupsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DG_RESOURCE,

@@ -35,8 +35,8 @@ func TestAccBigipLtmsnat_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testChecksnatsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNAT_RESOURCE,
@@ -62,8 +62,8 @@ func TestAccBigipLtmsnat_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testChecksnatsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksnatsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNAT_RESOURCE,

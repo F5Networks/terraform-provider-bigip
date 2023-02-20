@@ -15,11 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPDSTADDR_NAME = fmt.Sprintf("/%s/test-ppdstaddr", TestPartition)
+var TestPpdstaddrName = fmt.Sprintf("/%s/test-ppdstaddr", TestPartition)
 
-var TEST_PPDSTADDR_RESOURCE = `
+var TestPpdstaddrResource = `
 resource "bigip_ltm_persistence_profile_dstaddr" "test_ppdstaddr" {
-	name = "` + TEST_PPDSTADDR_NAME + `"
+	name = "` + TestPpdstaddrName + `"
 	defaults_from = "/Common/dest_addr"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
@@ -39,14 +39,14 @@ func TestAccBigipLtmPersistenceProfileDstAddrCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileDstAddrDestroyed),
+		Providers:    testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileDstAddrDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPDSTADDR_RESOURCE,
+				Config: TestPpdstaddrResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileDstAddrExists(TEST_PPDSTADDR_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "name", TEST_PPDSTADDR_NAME),
+					testBigipLtmPersistenceProfileDstAddrExists(TestPpdstaddrName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "name", TestPpdstaddrName),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "defaults_from", "/Common/dest_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_dstaddr.test_ppdstaddr", "match_across_services", "enabled"),
@@ -68,15 +68,15 @@ func TestAccBigipLtmPersistenceProfileDstAddrImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckBigipLtmPersistenceProfileDstAddrDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckBigipLtmPersistenceProfileDstAddrDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPDSTADDR_RESOURCE,
+				Config: TestPpdstaddrResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileDstAddrExists(TEST_PPDSTADDR_NAME, true),
+					testBigipLtmPersistenceProfileDstAddrExists(TestPpdstaddrName, true),
 				),
-				ResourceName:      TEST_PPDSTADDR_NAME,
+				ResourceName:      TestPpdstaddrName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

@@ -122,8 +122,8 @@ func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestGatewayIcmpMonitorResource,
@@ -144,8 +144,8 @@ func TestAccBigipLtmMonitor_TcpHalfOpenCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpHalfOpenMonitorResource,
@@ -171,8 +171,8 @@ func TestAccBigipLtmMonitor_HttpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmmonitorUpdateparam(instName, "http", ""),
@@ -192,8 +192,8 @@ func TestAccBigipLtmMonitor_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestMonitorResource,
@@ -221,8 +221,8 @@ func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpsMonitorResource,
@@ -247,8 +247,8 @@ func TestAccBigipLtmMonitor_FtpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFtpMonitorResource,
@@ -274,8 +274,8 @@ func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestUdpMonitorResource,
@@ -297,8 +297,8 @@ func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestPostgresqlMonitorResource,
@@ -320,8 +320,8 @@ func TestAccBigipLtmMonitor_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testMonitorsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestMonitorResource,

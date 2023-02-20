@@ -33,8 +33,8 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckVAsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VA_RESOURCE,
@@ -59,8 +59,8 @@ func TestAccBigipLtmVA_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckVAsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVAsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VA_RESOURCE,

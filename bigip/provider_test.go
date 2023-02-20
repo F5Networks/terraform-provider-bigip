@@ -19,12 +19,12 @@ var TestPartition = "Common"
 // The factory function will be invoked for every Terraform CLI command executed
 // to create a provider server to which the CLI can reattach.
 
-var testAccProvider = Provider()
+//var testAccProviders map[string]*schema.Provider{}
+//var testAccProvider *schema.Provider
 
-var testAccProviders = map[string]func() (*schema.Provider, error){
-	"bigip": func() (*schema.Provider, error) {
-		return Provider(), nil
-	},
+var testAccProvider = Provider()
+var testAccProviders = map[string]*schema.Provider{
+	"bigip": testAccProvider,
 }
 
 func TestAccProvider(t *testing.T) {
@@ -49,4 +49,25 @@ func testAcctPreCheck(t *testing.T) {
 			return
 		}
 	}
+}
+
+func testAcctUnitPreCheck(t *testing.T, url string) {
+	_ = os.Setenv("BIGIP_HOST", url)
+	_ = os.Setenv("BIGIP_USER", "xxxx")
+	_ = os.Setenv("BIGIP_PASSWORD", "xxx")
+	_ = os.Setenv("BIGIP_TOKEN_AUTH", "false")
+}
+
+// loadFixtureBytes returns the entire contents of the given file as a byte slice
+func loadFixtureBytes(path string) []byte {
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return contents
+}
+
+// loadFixtureString returns the entire contents of the given file as a string
+func loadFixtureString(path string) string {
+	return string(loadFixtureBytes(path))
 }

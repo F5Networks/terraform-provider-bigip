@@ -12,7 +12,6 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
@@ -34,8 +33,8 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttpcompresssDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpcompressResource,
@@ -43,18 +42,10 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 					testCheckHttpcompressExists(TestHttpcompressName, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "name", "/Common/test-httpcompress"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "defaults_from", "/Common/httpcompression"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
-						fmt.Sprintf("uri_exclude.%d", schema.HashString("f5.com")),
-						"f5.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
-						fmt.Sprintf("uri_include.%d", schema.HashString("cisco.com")),
-						"cisco.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
-						fmt.Sprintf("content_type_include.%d", schema.HashString("nicecontent.com")),
-						"nicecontent.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress",
-						fmt.Sprintf("content_type_exclude.%d", schema.HashString("nicecontentexclude.com")),
-						"nicecontentexclude.com"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "uri_exclude.*", "f5.com"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "uri_include.*", "cisco.com"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "content_type_include.*", "nicecontent.com"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "content_type_exclude.*", "nicecontentexclude.com"),
 				),
 			},
 		},
@@ -68,8 +59,8 @@ func TestAccBigipLtmProfileHttpcompressTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileHttpComprsConfig(profileHttpComprsName),
@@ -95,13 +86,13 @@ func TestAccBigipLtmProfileHttpcompressTC1(t *testing.T) {
 
 func TestAccBigipLtmProfileHttpcompressTC2(t *testing.T) {
 	profileHttpComprsName := fmt.Sprintf("/%s/%s", "Common", "test_httpcompress_profiletc2")
-	httpsTenantName = "fast_https_tenanttc1"
+	httpsTenantName = "fast_https_tenanttc2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileHttpComprsTC2Config(profileHttpComprsName),
@@ -118,7 +109,6 @@ func TestAccBigipLtmProfileHttpcompressTC2(t *testing.T) {
 				Config: getProfileHttpComprsTC2Config(profileHttpComprsName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttpcompressExists(profileHttpComprsName, true),
-					testCheckHttpcompressExists("/Common/testhjj", false),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "gzip_compression_level", "2"),
@@ -135,8 +125,8 @@ func TestAccBigipLtmProfileHttpcompress_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckHttpcompresssDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpcompresssDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestHttpcompressResource,

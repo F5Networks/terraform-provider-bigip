@@ -25,8 +25,8 @@ func TestAccBigipnetIPsecTrafficselector_Defaultcreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIPSectsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIPSectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccNetIpsecTsDefaultcreate(instName),

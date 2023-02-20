@@ -25,8 +25,8 @@ func TestAccBigipNetIPsecProfile_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIPSecProfileDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIPSecProfileDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccNetIpsecProfileDefaultCreate(instName),

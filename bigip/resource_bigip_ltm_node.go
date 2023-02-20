@@ -98,6 +98,7 @@ func resourceBigipLtmNode() *schema.Resource {
 						"address_family": {
 							Type:        schema.TypeString,
 							Optional:    true,
+							Computed:    true,
 							Description: "Specifies the node's address family. The default is 'unspecified', or IP-agnostic",
 						},
 						"name": {
@@ -206,18 +207,14 @@ func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta 
 		return nil
 	}
 	if node.FQDN.Name != "" {
-		if err := d.Set("address", node.FQDN.Name); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("address", node.FQDN.Name)
 	} else {
 		// xxx.xxx.xxx.xxx(%x)
 		// x:x(%x)
 		regex := regexp.MustCompile(`((?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})|(?:.*:[^%]*))(?:\%\d+)?`)
 		address := regex.FindStringSubmatch(node.Address)
 		log.Println("[INFO] Address: " + address[1])
-		if err := d.Set("address", node.Address); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving address to state for Node (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("address", node.Address)
 	}
 	_ = d.Set("name", name)
 
@@ -226,23 +223,26 @@ func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta 
 	}
 
 	if (node.Session == "monitor-enabled") || (node.Session == "user-enabled") {
-		log.Printf("[DEBUG] node session is :%s", node.Session)
 		_ = d.Set("session", "user-enabled")
 	} else {
-		log.Printf("[DEBUG] node session is :%s", node.Session)
 		_ = d.Set("session", "user-disabled")
 	}
-
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("description", node.Description)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)
 	_ = d.Set("monitor", strings.TrimSpace(node.Monitor))
 	_ = d.Set("ratio", node.Ratio)
-	_ = d.Set("fqdn.0.interval", node.FQDN.Interval)
-	_ = d.Set("fqdn.0.downinterval", node.FQDN.DownInterval)
-	_ = d.Set("fqdn.0.autopopulate", node.FQDN.AutoPopulate)
-	_ = d.Set("fqdn.0.address_family", node.FQDN.AddressFamily)
-
+	if _, ok := d.GetOk("fqdn"); ok {
+		var fqdn []map[string]interface{}
+		fqdnelements := map[string]interface{}{
+			"interval":       node.FQDN.Interval,
+			"downinterval":   node.FQDN.DownInterval,
+			"autopopulate":   node.FQDN.AutoPopulate,
+			"address_family": node.FQDN.AddressFamily,
+		}
+		fqdn = append(fqdn, fqdnelements)
+		_ = d.Set("fqdn", fqdn)
+	}
 	return nil
 }
 

@@ -38,8 +38,8 @@ func TestAccBigipLtmProfileFastl4TC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckfastl4sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFastl4Resource,
@@ -68,8 +68,8 @@ func TestAccBigipLtmProfileFastl4TC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckfastl4sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofilefastl4DefaultConfig(TestPartition, TestFastl4Name, "fastl4profileParent"),
@@ -99,8 +99,8 @@ func TestAccBigipLtmProfileFastl4TC3(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileFastl4ConfigTC3(profileFastL4Name),
@@ -128,8 +128,8 @@ func TestAccBigipLtmProfileFastl4TC4(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileFastl4ConfigTC4(profileFastL4Name),
@@ -172,8 +172,8 @@ func TestAccBigipLtmProfileFastl4_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckfastl4sDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFastl4Resource,

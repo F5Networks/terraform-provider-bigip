@@ -33,8 +33,8 @@ func TestAccSslCertificateImportToBigip(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testChecksslcertificateDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksslcertificateDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SSL_CERTIFICATE_RESOURCE,

@@ -89,8 +89,8 @@ func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource,
@@ -107,8 +107,8 @@ func TestAccBigipAs3_create_MultiTenants(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource1,
@@ -124,8 +124,8 @@ func TestAccBigipAs3_create_PartialSuccess(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource2,
@@ -143,8 +143,8 @@ func TestAccBigipAs3_addTenantFilter(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource4,
@@ -163,8 +163,8 @@ func TestAccBigipAs3_update_addTenant(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource1,
@@ -186,8 +186,8 @@ func TestAccBigipAs3_update_deleteTenant(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource3,
@@ -211,8 +211,8 @@ func TestAccBigipAs3_update_config(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource,
@@ -235,8 +235,8 @@ func TestAccBigipAs3Issue592(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resourcegithub592,
@@ -253,8 +253,8 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resourcegithub592,
@@ -277,8 +277,8 @@ func TestAccBigipAs3Issue601(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resourcegithub601a,
@@ -302,8 +302,8 @@ func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource,
@@ -323,8 +323,8 @@ func TestAccBigipAs3_import_MultiTenants(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckAs3Destroy,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: TestAs3Resource1,
@@ -381,8 +381,8 @@ func TestAccBigipAs3_badJSON(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckdevicesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckdevicesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config:      TestAs3ResourceInvalidJson,

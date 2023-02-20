@@ -78,7 +78,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 			testCheckIRulesDestroyed,
@@ -119,7 +119,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 			testCheckIRulesDestroyed,
@@ -166,7 +166,7 @@ func TestAccBigipLtmVirtualServercreate_Defaultstate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -193,7 +193,7 @@ func TestAccBigipLtmVirtualServerModify_stateDisabledtoEnabled(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -239,7 +239,7 @@ func TestAccBigipLtmVirtualServerModify_stateEnabledtoDisabled(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -285,7 +285,7 @@ func TestAccBigipLtmVirtualServerPolicyattach_detach(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -319,7 +319,7 @@ func TestAccBigipLtmVirtualServerPooolattach_detatch(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -347,7 +347,7 @@ func TestAccBigipLtmVirtualServerVlan_EnabledDisabled(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -374,7 +374,7 @@ func TestAccBigipLtmVirtualServerTCIssue712(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -405,7 +405,7 @@ func TestAccBigipLtmVirtualServerTCIssue736(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckVSsDestroyed,
 		),
@@ -453,8 +453,8 @@ func TestAccBigipLtmVirtualServerTCIssue729(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckVSsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVSsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccBigipLtmVSImportIssue729(),
@@ -477,8 +477,8 @@ func TestAccBigipLtmVirtualServerimport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckVSsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVSsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccBigipLtmVSImportConfig(),

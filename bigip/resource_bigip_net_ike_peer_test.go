@@ -48,8 +48,8 @@ func TestAccBigipNetIkePeerCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipNetIkePeerDestroyed),
+		Providers:    testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipNetIkePeerDestroyed),
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IKE_PEER_RESOURCE,
@@ -88,8 +88,8 @@ func TestAccBigipNetIkePeerImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckBigipNetIkePeerDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckBigipNetIkePeerDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IKE_PEER_RESOURCE,

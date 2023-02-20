@@ -27,8 +27,8 @@ func TestAccBigipLtmProfileClientSsl_Default_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -53,8 +53,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateName(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -88,8 +88,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -123,8 +123,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateAuthenticateDepth(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -170,8 +170,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -207,8 +207,8 @@ func TestAccBigipLtmProfileClientSsl_NonDefaultCert_Create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslNondefaultcertconfigbasic("Common", instName),
@@ -236,8 +236,8 @@ func TestAccBigipLtmProfileClientSsl_CertkeyChain(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslCerkeychain(instName),
@@ -277,8 +277,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateCachetimeout(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -312,8 +312,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateCertlifespan(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -358,8 +358,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipher(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -404,8 +404,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipherGroup(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileclientsslDefaultcreate(instName),
@@ -438,8 +438,8 @@ func TestAccBigipLtmProfileClientSsl_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckClientSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckClientSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				//Config: TestClientsslResource,

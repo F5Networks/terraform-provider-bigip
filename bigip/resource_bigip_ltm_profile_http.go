@@ -361,25 +361,6 @@ func resourceBigipLtmProfileHttpDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-//func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//
-//	name := d.Id()
-//	log.Println("[INFO] Fetching HTTPProfile " + name)
-//	pp, err := client.GetHttpProfile(name)
-//	if err != nil {
-//		log.Printf("[ERROR] Unable to retrieve HTTPProfile (%s) (%v) ", name, err)
-//		return false, err
-//	}
-//
-//	if pp == nil {
-//		log.Printf("[WARN] HTTP Profile  (%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//	}
-//
-//	return pp != nil, nil
-//}
-
 func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bigip.HttpProfile {
 	config.AppService = d.Get("app_service").(string)
 	config.DefaultsFrom = d.Get("defaults_from").(string)

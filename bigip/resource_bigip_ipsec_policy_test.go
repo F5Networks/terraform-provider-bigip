@@ -25,8 +25,8 @@ func TestAccBigipNetIPsecPolicy_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIPSecPolicyDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIPSecPolicyDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccNetIpsecPolicyDefaultCreate(instName),

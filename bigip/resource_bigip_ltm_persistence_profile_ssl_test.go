@@ -15,11 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPSSL_NAME = fmt.Sprintf("/%s/test-ppssl", TestPartition)
+var TestPpsslName = fmt.Sprintf("/%s/test-ppssl", TestPartition)
 
-var TEST_PPSSL_RESOURCE = `
+var TestPpsslResource = `
 resource "bigip_ltm_persistence_profile_ssl" "test_ppssl" {
-	name = "` + TEST_PPSSL_NAME + `"
+	name = "` + TestPpsslName + `"
 	defaults_from = "/Common/ssl"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
@@ -36,14 +36,14 @@ func TestAccBigipLtmPersistenceProfileSSLCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSSLDestroyed),
+		Providers:    testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSSLDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPSSL_RESOURCE,
+				Config: TestPpsslResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileSSLExists(TEST_PPSSL_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "name", TEST_PPSSL_NAME),
+					testBigipLtmPersistenceProfileSSLExists(TestPpsslName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "name", TestPpsslName),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "defaults_from", "/Common/ssl"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_ssl.test_ppssl", "match_across_services", "enabled"),
@@ -63,15 +63,15 @@ func TestAccBigipLtmPersistenceProfileSSLImport(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckBigipLtmPersistenceProfileSSLDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckBigipLtmPersistenceProfileSSLDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPSSL_RESOURCE,
+				Config: TestPpsslResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileSSLExists(TEST_PPSSL_NAME, true),
+					testBigipLtmPersistenceProfileSSLExists(TestPpsslName, true),
 				),
-				ResourceName:      TEST_PPSSL_NAME,
+				ResourceName:      TestPpsslName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

@@ -38,8 +38,8 @@ func TestAccBigipLtmProfileTcp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpResource,
@@ -67,8 +67,8 @@ func TestAccBigipLtmProfileTcpTC1(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileTCPConfig(profileTcpName),
@@ -109,8 +109,8 @@ func TestAccBigipLtmProfileTcpTC2(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: getProfileTCPConfigDefault(profileTcpName),
@@ -164,8 +164,8 @@ func TestAccBigipLtmProfileTcp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckTcpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckTcpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestTcpResource,

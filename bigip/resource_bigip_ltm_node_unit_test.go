@@ -25,24 +25,18 @@ resource "bigip_ltm_node" "test-node" {
   name       = "%s"
   address    = "10.10.10.10"
   invalidkey = "foo"
-}
-provider "bigip" {
-  address  = "xxx.xxx.xxx.xxx"
-  username = "xxx"
-  password = "xxx"
-}
-	`, resourceName)
+}`, resourceName)
 }
 
 func TestAccBigipLtmNodeInvalid(t *testing.T) {
 	resourceName := "/Common/test-node"
 	resource.Test(t, resource.TestCase{
-		IsUnitTest:        true,
-		ProviderFactories: testAccProviders,
+		IsUnitTest: true,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipLtmNodeInvalid(resourceName),
-				ExpectError: regexp.MustCompile("Unsupported argument: An argument named \"invalidkey\" is not expected here"),
+				ExpectError: regexp.MustCompile("An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})
@@ -54,12 +48,13 @@ resource "bigip_ltm_node" "test-node" {
   name    = "%s"
   address = "%s"
 }
-provider "bigip" {
-  address  = "%s"
-  username = "xxxx"
-  password = "xxxx"
-}
-	`, resourceName, address, url)
+//provider "bigip" {
+////alias = "unitbigip"
+//address  = "%s"
+//username = "xxxx"
+//password = "xxxx"
+//}
+`, resourceName, address, url)
 }
 
 func TestAccBigipLtmNodeCreate(t *testing.T) {
@@ -82,8 +77,9 @@ func TestAccBigipLtmNodeCreate(t *testing.T) {
 	})
 	defer teardown()
 	resource.Test(t, resource.TestCase{
-		IsUnitTest:        true,
-		ProviderFactories: testAccProviders,
+		IsUnitTest: true,
+		PreCheck:   func() { testAcctUnitPreCheck(t, server.URL) },
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testBigipLtmNodeCreate(resourceName, server.URL, address),

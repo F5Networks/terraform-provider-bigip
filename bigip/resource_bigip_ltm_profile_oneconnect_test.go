@@ -36,8 +36,8 @@ func TestAccBigipLtmProfileoneconnect_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckoneconnectsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ONECONNECT_RESOURCE,
@@ -62,8 +62,8 @@ func TestAccBigipLtmProfileoneconnect_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckoneconnectsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckoneconnectsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_ONECONNECT_RESOURCE,

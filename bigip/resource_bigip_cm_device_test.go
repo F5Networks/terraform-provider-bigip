@@ -30,8 +30,8 @@ func TestAccBigipCmDevice_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckdevicesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckdevicesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DEVICE_RESOURCE,
@@ -52,8 +52,8 @@ func TestAccBigipCmDevice_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckdevicesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckdevicesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_DEVICE_RESOURCE,

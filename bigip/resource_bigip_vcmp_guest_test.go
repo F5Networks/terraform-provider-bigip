@@ -38,8 +38,8 @@ func TestAccBigipVcmpguest_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckvcmpguestDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckvcmpguestDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VCMP_GUEST_RESOURCE,
@@ -67,8 +67,8 @@ func TestAccBigipVcmpguest_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckvcmpguestDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckvcmpguestDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_VCMP_GUEST_RESOURCE,

@@ -27,8 +27,8 @@ func TestAccBigipLtmProfileServerSsl_Default_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckServerSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -84,8 +84,8 @@ func TestAccBigipLtmProfileServerSsl_UpdateAuthenticate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckServerSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -121,8 +121,8 @@ func TestAccBigipLtmProfileServerSsl_UpdateTmoptions(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckServerSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -160,8 +160,8 @@ func TestAccBigipLtmProfileServerSsl_UpdateCipherGroup(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckServerSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),
@@ -194,8 +194,8 @@ func TestAccBigipLtmProfileServerSsl_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckServerSslDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckServerSslDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmprofileserversslDefaultcreate(instName),

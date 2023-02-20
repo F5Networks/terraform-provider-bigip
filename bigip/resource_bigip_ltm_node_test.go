@@ -70,8 +70,8 @@ func TestAccBigipLtmNode_Create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestNodeResource,
@@ -98,8 +98,8 @@ func TestAccBigipLtmNode_V6create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestV6NodeResource,
@@ -123,8 +123,8 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFqdnNodeResource,
@@ -139,6 +139,7 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
+					//resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.*.interval", "3000"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
 				),
 			},
@@ -160,8 +161,8 @@ func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmNodeUpdateParam(instName, moni),
@@ -188,8 +189,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestNodeResource,
@@ -207,8 +208,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestV6NodeResource,
@@ -226,8 +227,8 @@ func TestAccBigipLtmNode_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckNodesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestFqdnNodeResource,
@@ -256,6 +257,27 @@ func testCheckNodeExists(name string) resource.TestCheckFunc {
 
 		return nil
 	}
+}
+func TestAccBigipLtmNodeTestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_node.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists("/Common/test_node_tc1"),
+					testCheckNodeExists("/Common/test_node_tc2"),
+					testCheckNodeExists("/Common/test_node_tc3"),
+					testCheckNodeExists("/Common/test_node_tc4"),
+					testCheckNodeExists("/Common/test_node_tc8"),
+				),
+			},
+		},
+	})
 }
 
 func testCheckNodesDestroyed(s *terraform.State) error {

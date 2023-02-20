@@ -34,8 +34,8 @@ func TestAccBigipLtmProfileFtp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFtpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFtpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FTP_RESOURCE,
@@ -59,8 +59,8 @@ func TestAccBigipLtmProfileFtp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckFtpsDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFtpsDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_FTP_RESOURCE,

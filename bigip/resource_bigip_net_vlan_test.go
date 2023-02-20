@@ -34,8 +34,8 @@ func TestAccBigipNetvlan_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckvlansDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestVlanResource,
@@ -56,8 +56,8 @@ func TestAccBigipNetvlan_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckvlansDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckvlansDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TestVlanResource,

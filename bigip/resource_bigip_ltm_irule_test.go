@@ -32,8 +32,8 @@ func TestAccBigipLtmIRule_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIRulesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIRulesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IRULE_RESOURCE,
@@ -50,8 +50,8 @@ func TestAccBigipLtmIRule_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
-		CheckDestroy:      testCheckIRulesDestroyed,
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckIRulesDestroyed,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_IRULE_RESOURCE,

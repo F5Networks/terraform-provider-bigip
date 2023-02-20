@@ -31,7 +31,7 @@ func TestAccBigipSyssnmp_create(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
@@ -53,7 +53,7 @@ func TestAccBigipSyssnmp_import(t *testing.T) {
 		PreCheck: func() {
 			testAcctPreCheck(t)
 		},
-		ProviderFactories: testAccProviders,
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: TEST_SNMP_RESOURCE,
