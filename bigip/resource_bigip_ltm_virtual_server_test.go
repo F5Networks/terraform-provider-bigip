@@ -12,13 +12,22 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var TestVsName = fmt.Sprintf("/%s/test-vs", TestPartition)
 
-var TestVsResource = TEST_IRULE_RESOURCE + `
+var TestIruleResource = `
+resource "bigip_ltm_irule" "test-rule-vstc1" {
+  name  = "/Common/test-rule-vstc1"
+  irule = <<EOF
+when CLIENT_ACCEPTED {
+     log local0. "test"
+}
+EOF
+}
+`
+var TestVsResource = TestIruleResource + `
 resource "bigip_ltm_policy" "http_to_https_redirect" {
   name = "/Common/http_to_https_redirect"
   strategy = "first-match"
@@ -43,7 +52,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	mask = "255.255.255.255"
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
-	irules = [bigip_ltm_irule.test-rule.name]
+	irules = [bigip_ltm_irule.test-rule-vstc1.name]
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
@@ -55,7 +64,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 `
 var TestVs6Name = fmt.Sprintf("/%s/test-vs6", TestPartition)
 
-var TestVs6Resource = TEST_IRULE_RESOURCE + `
+var TestVs6Resource = TestIruleResource + `
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TestVs6Name + `"
     destination = "fe80::11"
@@ -63,7 +72,8 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	port = 9999
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
-	irules = [bigip_ltm_irule.test-rule.name]
+    irules = [bigip_ltm_irule.test-rule-vstc1.name] 
+	//irules = [bigip_ltm_irule.test-rule.name]
 	profiles = ["/Common/http"]
 	client_profiles = ["/Common/tcp"]
 	server_profiles = ["/Common/tcp-lan-optimized"]
@@ -96,19 +106,11 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source", "0.0.0.0/0"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "irules.0", TEST_IRULE_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("profiles.%d", schema.HashString("/Common/http")),
-						"/Common/http"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("client_profiles.%d", schema.HashString("/Common/tcp")),
-						"/Common/tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
-						"/Common/tcp-lan-optimized"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
-						"/Common/source_addr"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "irules.*", "/Common/test-rule-vstc1"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "profiles.*", "/Common/http"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "client_profiles.*", "/Common/tcp"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "server_profiles.*", "/Common/tcp-lan-optimized"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
@@ -137,23 +139,14 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "description", "VirtualServer-test"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "irules.0", TEST_IRULE_NAME),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "irules.0", "/Common/test-rule-vstc1"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "default_persistence_profile", "/Common/hash"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("profiles.%d", schema.HashString("/Common/http")),
-						"/Common/http"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("client_profiles.%d", schema.HashString("/Common/tcp")),
-						"/Common/tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("server_profiles.%d", schema.HashString("/Common/tcp-lan-optimized")),
-						"/Common/tcp-lan-optimized"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/source_addr")),
-						"/Common/source_addr"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs",
-						fmt.Sprintf("persistence_profiles.%d", schema.HashString("/Common/hash")),
-						"/Common/hash"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "irules.*", "/Common/test-rule-vstc1"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "profiles.*", "/Common/http"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "client_profiles.*", "/Common/tcp"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "server_profiles.*", "/Common/tcp-lan-optimized"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/hash"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
 				),
 			},
@@ -295,7 +288,7 @@ func TestAccBigipLtmVirtualServerPolicyattach_detach(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists("test-vs-sample"),
 					resource.TestCheckResourceAttr(rsName, "name", "/Common/test-vs-sample"),
-					resource.TestCheckResourceAttr(rsName, fmt.Sprintf("policies.%d", schema.HashString("/Common/test-policy-tc8")), "/Common/test-policy-tc8"),
+					resource.TestCheckTypeSetElemAttr(rsName, "policies.*", "/Common/test-policy-tc88"),
 				),
 			},
 			{
@@ -360,7 +353,7 @@ func TestAccBigipLtmVirtualServerVlan_EnabledDisabled(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "destination", "192.168.50.11"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "port", "80"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", "vlans_enabled", "true"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs-vlan", fmt.Sprintf("vlans.%d", schema.HashString("/Common/test-vlan-vsenable")), "/Common/test-vlan-vsenable"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs-vlan", "vlans.*", "/Common/test-vlan-vsenable"),
 				),
 			},
 		},
@@ -472,6 +465,32 @@ func TestAccBigipLtmVirtualServerTCIssue729(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmVirtualServerTestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVSsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_virtual_server.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVSExists("/Common/test_vs_tc1"),
+					testCheckVSExists("/Common/test_vs_tc3"),
+					testCheckVSExists("/Common/test_vs_tc4"),
+					testCheckVSExists("/Common/test_vs_tc5"),
+					testCheckVSExists("/Common/test_vs_tc6"),
+					//resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc9", "pool", "/Common/test_pool_pa_tc9"),
+					//resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "pool", "/Common/test_pool_pa_tc1"),
+					//resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "node", "1.1.12.2:80"),
+					//resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc6", "node", "/Common/test3.com:80"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmVirtualServerimport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -577,7 +596,7 @@ resource "bigip_ltm_pool" "mypool" {
 }
 
 resource "bigip_ltm_policy" "test-policy" {
-  name     = "/Common/test-policy-tc8"
+  name     = "/Common/test-policy-tc88"
   strategy = "first-match"
   requires = ["http"]
   controls = ["forwarding"]
@@ -714,22 +733,23 @@ resource "bigip_ltm_virtual_server" "%[3]s" {
 func testVSCreatePolicyDettach(vsName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_pool" "mypool" {
-  name                = "/Common/test-pool-policydettach"
+  name                = "/Common/test-pool-policyattach"
   allow_nat           = "yes"
   allow_snat          = "yes"
   load_balancing_mode = "round-robin"
 }
 
 resource "bigip_ltm_policy" "test-policy" {
-  name     = "/Common/test-policy-tc9"
+  name     = "/Common/test-policy-tc88"
   strategy = "first-match"
   requires = ["http"]
   controls = ["forwarding"]
   rule {
     name = "rule6"
     action {
-      forward = true
-      pool    = bigip_ltm_pool.mypool.name
+      forward    = true
+      connection = false
+      pool       = bigip_ltm_pool.mypool.name
     }
   }
   depends_on = [bigip_ltm_pool.mypool]

@@ -315,6 +315,28 @@ func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmMonitorTestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_monitor.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists("/Common/test_monitor_tc1"),
+					testCheckMonitorExists("/Common/test_monitor_tc2"),
+					testCheckMonitorExists("/Common/test_monitor_tc3"),
+					testCheckMonitorExists("/Common/test_monitor_tc4"),
+					testCheckMonitorExists("/Common/test_monitor_tc5"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmMonitor_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

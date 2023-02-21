@@ -350,7 +350,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 
 	_ = d.Set("trafficmatching_criteria", vs.TrafficMatchingCriteria)
 	_ = d.Set("source", vs.Source)
-	_ = d.Set("protocol", vs.IPProtocol)
+	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
 	_ = d.Set("pool", vs.Pool)
 	_ = d.Set("mask", vs.Mask)
@@ -383,7 +383,6 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	_ = d.Set("irules", makeStringList(&vs.Rules))
 	_ = d.Set("security_log_profiles", makeStringList(&vs.SecurityLogProfiles))
 	_ = d.Set("per_flow_request_access_policy", vs.PerFlowRequestAccessPolicy)
-	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("description", vs.Description)
 	if vs.Enabled {
 		_ = d.Set("state", "enabled")
