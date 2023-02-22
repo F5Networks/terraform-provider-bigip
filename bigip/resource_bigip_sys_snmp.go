@@ -7,22 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // this module does not have DELETE function as there is no API for Delete.
 func resourceBigipSysSnmp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysSnmpCreate,
-		Update: resourceBigipSysSnmpUpdate,
-		Read:   resourceBigipSysSnmpRead,
-		Delete: resourceBigipSysSnmpDelete,
+		CreateContext: resourceBigipSysSnmpCreate,
+		UpdateContext: resourceBigipSysSnmpUpdate,
+		ReadContext:   resourceBigipSysSnmpRead,
+		DeleteContext: resourceBigipSysSnmpDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -48,7 +49,7 @@ func resourceBigipSysSnmp() *schema.Resource {
 
 }
 
-func resourceBigipSysSnmpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Get("sys_contact").(string)
@@ -65,13 +66,13 @@ func resourceBigipSysSnmpCreate(d *schema.ResourceData, meta interface{}) error 
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Configure SNMP  (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(sysContact)
-	return resourceBigipSysSnmpRead(d, meta)
+	return resourceBigipSysSnmpRead(ctx, d, meta)
 }
 
-func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -87,12 +88,12 @@ func resourceBigipSysSnmpUpdate(d *schema.ResourceData, meta interface{}) error 
 	err := client.ModifySNMP(r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify SNMP (%s) (%v) ", sysContact, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipSysSnmpRead(d, meta)
+	return resourceBigipSysSnmpRead(ctx, d, meta)
 }
 
-func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	sysContact := d.Id()
@@ -102,27 +103,21 @@ func resourceBigipSysSnmpRead(d *schema.ResourceData, meta interface{}) error {
 	snmp, err := client.SNMPs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve SNMP  (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if snmp == nil {
 		log.Printf("[WARN] SNMP (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-	if err := d.Set("sys_contact", snmp.SysContact); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving SysContact  to state for SysContact  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("sys_location", snmp.SysLocation); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving SysLocation  to state for SysLocation  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("allowedaddresses", snmp.AllowedAddresses); err != nil {
-		return fmt.Errorf("[DEBUG] Error Saving AllowedAddresses  to state for AllowedAddresses  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("sys_contact", snmp.SysContact)
+	_ = d.Set("sys_location", snmp.SysLocation)
+	_ = d.Set("allowedaddresses", snmp.AllowedAddresses)
 
 	return nil
 }
 
-func resourceBigipSysSnmpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// No API support for Delete
 	return nil
 }

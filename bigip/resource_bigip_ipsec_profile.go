@@ -6,22 +6,23 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipIpsecProfile() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipIpsecProfileCreate,
-		Read:   resourceBigipIpsecProfileRead,
-		Update: resourceBigipIpsecProfileUpdate,
-		Delete: resourceBigipIpsecProfileDelete,
-		Exists: resourceBigipIpsecProfileExists,
+		CreateContext: resourceBigipIpsecProfileCreate,
+		ReadContext:   resourceBigipIpsecProfileRead,
+		UpdateContext: resourceBigipIpsecProfileUpdate,
+		DeleteContext: resourceBigipIpsecProfileDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -54,7 +55,7 @@ func resourceBigipIpsecProfile() *schema.Resource {
 	}
 }
 
-func resourceBigipIpsecProfileCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecProfileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating IPSec profile " + name)
@@ -67,53 +68,37 @@ func resourceBigipIpsecProfileCreate(d *schema.ResourceData, meta interface{}) e
 	err := client.CreateIPSecProfile(selectorConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create IPsec profile (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipIpsecProfileRead(d, meta)
+	return resourceBigipIpsecProfileRead(ctx, d, meta)
 }
 
-func resourceBigipIpsecProfileRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecProfileRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Reading IPsec profile :%+v", name)
 	ts, err := client.GetIPSecProfile(name)
 	log.Printf("IPsec Profile:%+v", ts)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if ts == nil {
 		d.SetId("")
-		return fmt.Errorf("[ERROR] IPsec profile (%s) not found, removing from state", d.Id())
+		return diag.FromErr(fmt.Errorf("[ERROR] IPsec profile (%s) not found, removing from state", d.Id()))
 	}
 	if err := d.Set("parent_profile", ts.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPsec parent profile (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IPsec parent profile (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("traffic_selector", ts.TrafficSelector); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPsec profile (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IPsec profile (%s): %s", d.Id(), err))
 	}
 	_ = d.Set("description", ts.Description)
 	_ = d.Set("name", name)
 	return nil
 }
 
-func resourceBigipIpsecProfileExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Check existence of IPsec Profile: %+v ", name)
-	ts, err := client.GetIPSecProfile(name)
-	if err != nil {
-		return false, err
-	}
-	if ts == nil {
-		log.Printf("[WARN] IPsec Profile (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, fmt.Errorf("[ERROR] IPsec Profile (%s) not found, removing from state", d.Id())
-	}
-	return true, nil
-}
-
-func resourceBigipIpsecProfileUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecProfileUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating IPsec Profile:%+v ", name)
@@ -125,17 +110,17 @@ func resourceBigipIpsecProfileUpdate(d *schema.ResourceData, meta interface{}) e
 	err := client.ModifyIPSecProfile(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify IPsec Profile   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipIpsecProfileRead(d, meta)
+	return resourceBigipIpsecProfileRead(ctx, d, meta)
 }
-func resourceBigipIpsecProfileDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecProfileDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Deleting IPsec Profile :%+v ", name)
 	err := client.DeleteIPSecProfile(name)
 	if err != nil {
-		return fmt.Errorf("[ERROR] Unable to Delete IPsec Profile (%s) (%v) ", name, err)
+		return diag.FromErr(fmt.Errorf("[ERROR] Unable to Delete IPsec Profile (%s) (%v) ", name, err))
 	}
 	d.SetId("")
 	return nil

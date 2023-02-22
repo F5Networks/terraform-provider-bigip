@@ -7,6 +7,6 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 variable "AWS_ACCESS_KEY" {}
 variable "AWS_SECRET_KEY" {}
 variable "AWS_REGION" {
-default = "us-east-1"
+  default = "us-east-1"
 }
 

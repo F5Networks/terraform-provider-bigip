@@ -7,22 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // this module does not have DELETE function as there is no API for Delete
 func resourceBigipSysSnmpTraps() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysSnmpTrapsCreate,
-		Update: resourceBigipSysSnmpTrapsUpdate,
-		Read:   resourceBigipSysSnmpTrapsRead,
-		Delete: resourceBigipSysSnmpTrapsDelete,
+		CreateContext: resourceBigipSysSnmpTrapsCreate,
+		UpdateContext: resourceBigipSysSnmpTrapsUpdate,
+		ReadContext:   resourceBigipSysSnmpTrapsRead,
+		DeleteContext: resourceBigipSysSnmpTrapsDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -110,7 +111,7 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 
 }
 
-func resourceBigipSysSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpTrapsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -149,13 +150,13 @@ func resourceBigipSysSnmpTrapsCreate(d *schema.ResourceData, meta interface{}) e
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create SNMP trap (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipSysSnmpTrapsRead(d, meta)
+	return resourceBigipSysSnmpTrapsRead(ctx, d, meta)
 }
 
-func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpTrapsUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -182,12 +183,12 @@ func resourceBigipSysSnmpTrapsUpdate(d *schema.ResourceData, meta interface{}) e
 	err := client.ModifyTRAP(r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify SNMP trap (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipSysSnmpTrapsRead(d, meta)
+	return resourceBigipSysSnmpTrapsRead(ctx, d, meta)
 }
 
-func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpTrapsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	host := d.Id()
@@ -197,7 +198,7 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 	traps, err := client.TRAPs(host)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve SNMP trap (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if traps == nil {
 		log.Printf("[WARN] SNMP traps (%s) not found, removing from state", d.Id())
@@ -205,35 +206,25 @@ func resourceBigipSysSnmpTrapsRead(d *schema.ResourceData, meta interface{}) err
 		return nil
 	}
 
-	d.Set("name", traps.Name)
-	if err := d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AuthPasswordEncrypted to state for Snmp Traps  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("auth_protocol", traps.AuthProtocol); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AuthProtocol to state for Snmp Traps (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("community", traps.Community); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Community to state for Snmp Traps  (%s): %s", d.Id(), err)
-	}
-	d.Set("description", traps.Description)
-	d.Set("engine_id", traps.EngineId)
-	if err := d.Set("host", traps.Host); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Host to state for Snmp Traps  (%s): %s", d.Id(), err)
-	}
-	d.Set("port", traps.Port)
-	d.Set("privacy_password", traps.PrivacyPassword)
-	if err := d.Set("privacy_password_encrypted", traps.PrivacyPasswordEncrypted); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PrivacyPasswordEncrypted to state for Snmp Traps (%s): %s", d.Id(), err)
-	}
-	d.Set("privacy_protocol", traps.PrivacyProtocol)
-	d.Set("security_level", traps.SecurityLevel)
-	d.Set("security_name", traps.SecurityName)
-	d.Set("version", traps.Version)
+	_ = d.Set("name", traps.Name)
+	_ = d.Set("auth_passwordencrypted", traps.AuthPasswordEncrypted)
+	_ = d.Set("auth_protocol", traps.AuthProtocol)
+	_ = d.Set("community", traps.Community)
+	_ = d.Set("description", traps.Description)
+	_ = d.Set("engine_id", traps.EngineId)
+	_ = d.Set("host", traps.Host)
+	_ = d.Set("port", traps.Port)
+	_ = d.Set("privacy_password", traps.PrivacyPassword)
+	_ = d.Set("privacy_password_encrypted", traps.PrivacyPasswordEncrypted)
+	_ = d.Set("privacy_protocol", traps.PrivacyProtocol)
+	_ = d.Set("security_level", traps.SecurityLevel)
+	_ = d.Set("security_name", traps.SecurityName)
+	_ = d.Set("version", traps.Version)
 
 	return nil
 }
 
-func resourceBigipSysSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysSnmpTrapsDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -242,7 +233,7 @@ func resourceBigipSysSnmpTrapsDelete(d *schema.ResourceData, meta interface{}) e
 	err := client.DeleteTRAP(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to delete SNMP trap (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

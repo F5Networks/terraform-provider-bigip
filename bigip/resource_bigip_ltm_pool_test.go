@@ -11,12 +11,12 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var poolMember1 = fmt.Sprintf("%s:443", "10.10.10.10")
-var TestPoolName = fmt.Sprintf("/%s/test-pool", TEST_PARTITION)
+var TestPoolName = fmt.Sprintf("/%s/test-pool", TestPartition)
 
 var TestPoolResource = `
 /*resource "bigip_ltm_node" "test-node" {

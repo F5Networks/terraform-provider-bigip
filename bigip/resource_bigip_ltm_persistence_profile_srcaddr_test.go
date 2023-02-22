@@ -11,15 +11,15 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPSRCADDR_NAME = fmt.Sprintf("/%s/test-ppsrcaddr", TEST_PARTITION)
+var TestPpsrcaddrName = fmt.Sprintf("/%s/test-ppsrcaddr", TestPartition)
 
-var TEST_PPSRCADDR_RESOURCE = `
+var TestPpsrcaddrResource = `
 resource "bigip_ltm_persistence_profile_srcaddr" "test_ppsrcaddr" {
-	name = "` + TEST_PPSRCADDR_NAME + `"
+	name = "` + TestPpsrcaddrName + `"
 	defaults_from = "/Common/source_addr"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
@@ -44,10 +44,10 @@ func TestAccBigipLtmPersistenceProfileSrcAddrCreate(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileSrcAddrDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPSRCADDR_RESOURCE,
+				Config: TestPpsrcaddrResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileSrcAddrExists(TEST_PPSRCADDR_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_srcaddr.test_ppsrcaddr", "name", TEST_PPSRCADDR_NAME),
+					testBigipLtmPersistenceProfileSrcAddrExists(TestPpsrcaddrName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_srcaddr.test_ppsrcaddr", "name", TestPpsrcaddrName),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_srcaddr.test_ppsrcaddr", "defaults_from", "/Common/source_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_srcaddr.test_ppsrcaddr", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_srcaddr.test_ppsrcaddr", "match_across_services", "enabled"),
@@ -74,11 +74,11 @@ func TestAccBigipLtmPersistenceProfileSrcAddrImport(t *testing.T) {
 		CheckDestroy: testCheckBigipLtmPersistenceProfileSrcAddrDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPSRCADDR_RESOURCE,
+				Config: TestPpsrcaddrResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileSrcAddrExists(TEST_PPSRCADDR_NAME, true),
+					testBigipLtmPersistenceProfileSrcAddrExists(TestPpsrcaddrName, true),
 				),
-				ResourceName:      TEST_PPSRCADDR_NAME,
+				ResourceName:      TestPpsrcaddrName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

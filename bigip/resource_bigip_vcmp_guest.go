@@ -1,29 +1,30 @@
 /*
-Original work from https://github.com/DealerDotCom/terraform-provider-bigip
-Modifications Copyright 2022 F5 Networks Inc.
+Copyright 2019 F5 Networks Inc.
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-If a copy of the MPL was not distributed with this file,You can obtain one at https://mozilla.org/MPL/2.0/.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipVcmpGuest() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipVcmpGuestCreate,
-		Update: resourceBigipVcmpGuestUpdate,
-		Read:   resourceBigipVcmpGuestRead,
-		Delete: resourceBigipVcmpGuestDelete,
+		CreateContext: resourceBigipVcmpGuestCreate,
+		UpdateContext: resourceBigipVcmpGuestUpdate,
+		ReadContext:   resourceBigipVcmpGuestRead,
+		DeleteContext: resourceBigipVcmpGuestDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -130,7 +131,7 @@ func resourceBigipVcmpGuest() *schema.Resource {
 	}
 }
 
-func resourceBigipVcmpGuestCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipVcmpGuestCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating vCMP Guest: " + name)
@@ -138,16 +139,16 @@ func resourceBigipVcmpGuestCreate(d *schema.ResourceData, meta interface{}) erro
 	mgmt := d.Get("mgmt_network").(string)
 	ip := d.Get("mgmt_address").(string)
 	if mgmt == "bridged" && ip == "" {
-		return fmt.Errorf("the mgmt_address must be provided if mgmt_network is set to bridged")
+		return diag.FromErr(fmt.Errorf("the mgmt_address must be provided if mgmt_network is set to bridged"))
 	}
 	p := dataToVcmp(name, d)
 	err := client.CreateVcmpGuest(&p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create vCMP Guest  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipVcmpGuestRead(d, meta)
+	return resourceBigipVcmpGuestRead(ctx, d, meta)
 }
 
 func dataToVcmp(name string, d *schema.ResourceData) bigip.VcmpGuest {
@@ -168,7 +169,7 @@ func dataToVcmp(name string, d *schema.ResourceData) bigip.VcmpGuest {
 	return p
 }
 
-func resourceBigipVcmpGuestRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipVcmpGuestRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -177,58 +178,34 @@ func resourceBigipVcmpGuestRead(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve vCMP Guest  (%s) (%v) ", name, err)
 		d.SetId("")
-		return err
+		return diag.FromErr(err)
 	}
 	if p == nil {
 		log.Printf("[WARN] vCMP Guest (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-	return vcmpToData(p, d)
+	return vcmpToData(ctx, p, d)
 }
 
-func vcmpToData(p *bigip.VcmpGuest, d *schema.ResourceData) error {
+func vcmpToData(_ context.Context, p *bigip.VcmpGuest, d *schema.ResourceData) diag.Diagnostics {
 	_ = d.Set("name", p.FullPath)
-	if err := d.Set("initial_image", p.InitialImage); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving InitialImage to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("initial_hotfix", p.InitialHotfix); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving InitialHotfix to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("vlans", p.Vlans); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Vlans to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mgmt_network", p.ManagementNetwork); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ManagementNetwork to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mgmt_address", p.ManagementIp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ManagementIp to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mgmt_route", p.ManagementGw); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ManagementGw to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("allowed_slots", p.AllowedSlots); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowedSlots to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("number_of_slots", p.Slots); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Slots to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("min_number_of_slots", p.MinSlots); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MinSlots to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("cores_per_slot", p.CoresPerSlot); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CoresPerSlot to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("state", p.State); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving State to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("virtual_disk", p.VirtualDisk); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving VirtualDisk to state for vCMP Guest  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("initial_image", p.InitialImage)
+	_ = d.Set("initial_hotfix", p.InitialHotfix)
+	_ = d.Set("vlans", p.Vlans)
+	_ = d.Set("mgmt_network", p.ManagementNetwork)
+	_ = d.Set("mgmt_address", p.ManagementIp)
+	_ = d.Set("mgmt_route", p.ManagementGw)
+	_ = d.Set("allowed_slots", p.AllowedSlots)
+	_ = d.Set("number_of_slots", p.Slots)
+	_ = d.Set("min_number_of_slots", p.MinSlots)
+	_ = d.Set("cores_per_slot", p.CoresPerSlot)
+	_ = d.Set("state", p.State)
+	_ = d.Set("virtual_disk", p.VirtualDisk)
 	return nil
 }
 
-func resourceBigipVcmpGuestUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipVcmpGuestUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating vCMP Guest:%+v", name)
@@ -236,29 +213,28 @@ func resourceBigipVcmpGuestUpdate(d *schema.ResourceData, meta interface{}) erro
 	err := client.UpdateVcmpGuest(name, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve vCMP Guest  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipVcmpGuestRead(d, meta)
+	return resourceBigipVcmpGuestRead(ctx, d, meta)
 }
 
-func resourceBigipVcmpGuestDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipVcmpGuestDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Deleting vCMP Guest :%+v", name)
 	err := client.DeleteVcmpGuest(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete vCMP Guest  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	disk, ok := d.GetOk("virtual_disk")
 	if d.Get("delete_virtual_disk").(bool) && ok {
 		err := deleteVirtualDisk(d, meta)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Delete vCMP virtual disk  (%s) (%v) ", disk, err)
-			return err
+			return diag.FromErr(err)
 		}
 	}
-
 	d.SetId("")
 	return nil
 }

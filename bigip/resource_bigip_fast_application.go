@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,19 +17,20 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
 )
 
 func resourceBigipFastApp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipFastAppCreate,
-		Read:   resourceBigipFastAppRead,
-		Update: resourceBigipFastAppUpdate,
-		Delete: resourceBigipFastAppDelete,
-		Exists: resourceBigipFastAppExists,
+		CreateContext: resourceBigipFastAppCreate,
+		ReadContext:   resourceBigipFastAppRead,
+		UpdateContext: resourceBigipFastAppUpdate,
+		DeleteContext: resourceBigipFastAppDelete,
+		Exists:        resourceBigipFastAppExists,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"fast_json": {
@@ -89,7 +91,7 @@ func resourceBigipFastApp() *schema.Resource {
 	}
 }
 
-func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastAppCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastTmpl := d.Get("template").(string)
 	fastJson := d.Get("fast_json").(string)
@@ -99,7 +101,7 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, fastTmpl)
 	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl, userAgent)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("tenant", tenant)
 	_ = d.Set("application", app)
@@ -124,9 +126,9 @@ func resourceBigipFastAppCreate(d *schema.ResourceData, meta interface{}) error 
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipFastAppRead(d, meta)
+	return resourceBigipFastAppRead(ctx, d, meta)
 }
-func resourceBigipFastAppRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastAppRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading FastApp config")
 	name := d.Id()
@@ -141,7 +143,7 @@ func resourceBigipFastAppRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 	if fastJson == "" {
 		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
@@ -175,7 +177,7 @@ func resourceBigipFastAppExists(d *schema.ResourceData, meta interface{}) (bool,
 	return true, nil
 }
 
-func resourceBigipFastAppUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastAppUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastJson := d.Get("fast_json").(string)
 	m.Lock()
@@ -185,12 +187,12 @@ func resourceBigipFastAppUpdate(d *schema.ResourceData, meta interface{}) error 
 	tenant := d.Get("tenant").(string)
 	err := client.ModifyFastAppBigip(fastJson, tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipFastAppRead(d, meta)
+	return resourceBigipFastAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastAppDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastAppDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -198,7 +200,7 @@ func resourceBigipFastAppDelete(d *schema.ResourceData, meta interface{}) error 
 	tenant := d.Get("tenant").(string)
 	err := client.DeleteFastAppBigip(tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

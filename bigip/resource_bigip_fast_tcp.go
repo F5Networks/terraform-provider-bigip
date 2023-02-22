@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,19 +16,19 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipFastTcpApp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipFastTcpAppCreate,
-		Read:   resourceBigipFastTcpAppRead,
-		Update: resourceBigipFastTcpAppUpdate,
-		Delete: resourceBigipFastTcpAppDelete,
-		Exists: resourceBigipFastTcpAppExists,
+		CreateContext: resourceBigipFastTcpAppCreate,
+		ReadContext:   resourceBigipFastTcpAppRead,
+		UpdateContext: resourceBigipFastTcpAppUpdate,
+		DeleteContext: resourceBigipFastTcpAppDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"application": {
@@ -171,7 +172,7 @@ func resourceBigipFastTcpApp() *schema.Resource {
 	}
 }
 
-func resourceBigipFastTcpAppCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastTcpAppCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	const templateName string = "bigip-fast-templates/tcp"
 	m.Lock()
@@ -186,7 +187,7 @@ func resourceBigipFastTcpAppCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	tenant, app, err := client.PostFastAppBigip(cfg, templateName, userAgent)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("application", app)
 	_ = d.Set("tenant", tenant)
@@ -216,10 +217,10 @@ func resourceBigipFastTcpAppCreate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	return resourceBigipFastTcpAppRead(d, meta)
+	return resourceBigipFastTcpAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastTcpAppRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastTcpAppRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var fastTcp bigip.FastTCPJson
 	log.Printf("[INFO] Reading FastApp config")
@@ -236,7 +237,7 @@ func resourceBigipFastTcpAppRead(d *schema.ResourceData, meta interface{}) error
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 	if fastJson == "" {
 		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
@@ -246,16 +247,16 @@ func resourceBigipFastTcpAppRead(d *schema.ResourceData, meta interface{}) error
 	_ = d.Set("fast_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastTcp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	err = setFastTcpData(d, fastTcp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }
 
-func resourceBigipFastTcpAppUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastTcpAppUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -263,20 +264,20 @@ func resourceBigipFastTcpAppUpdate(d *schema.ResourceData, meta interface{}) err
 	cfg, err := getParamsConfigMap(d)
 	log.Printf("[INFO] Updating FastApp Config :%v", cfg)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	const templateName string = "bigip-fast-templates/tcp"
 	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, templateName)
 	_, _, err = client.PostFastAppBigip(cfg, templateName, userAgent)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceBigipFastTcpAppRead(d, meta)
+	return resourceBigipFastTcpAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastTcpAppDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastTcpAppDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -284,34 +285,10 @@ func resourceBigipFastTcpAppDelete(d *schema.ResourceData, meta interface{}) err
 	tenant := d.Get("tenant").(string)
 	err := client.DeleteFastAppBigip(tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
-	return resourceBigipFastTcpAppRead(d, meta)
-}
-
-func resourceBigipFastTcpAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	tenant := d.Get("tenant").(string)
-	app_name := d.Get("application").(string)
-
-	log.Printf("[INFO] Reading FAST TCP Application config")
-	resp, err := client.GetFastApp(tenant, app_name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve json ")
-		if err.Error() == "unexpected end of JSON input" {
-			log.Printf("[ERROR] %v", err)
-			d.SetId("")
-			return false, nil
-		}
-		return false, err
-	}
-	if resp == "" {
-		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-	return true, nil
+	return resourceBigipFastTcpAppRead(ctx, d, meta)
 }
 
 func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
@@ -325,12 +302,14 @@ func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
 	_ = d.Set("pool.existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool.pool_members", members)
-	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("monitor.enable", data.MonitorEnable)
 	_ = d.Set("existing_monitor", data.TCPMonitor)
 	_ = d.Set("monitor.0.interval", data.MonitorInterval)
-
+	err := d.Set("load_balancing_mode", data.LoadBalancingMode)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

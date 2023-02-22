@@ -7,23 +7,24 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPersistenceProfileDstAddrCreate,
-		Read:   resourceBigipLtmPersistenceProfileDstAddrRead,
-		Update: resourceBigipLtmPersistenceProfileDstAddrUpdate,
-		Delete: resourceBigipLtmPersistenceProfileDstAddrDelete,
-		Exists: resourceBigipLtmPersistenceProfileDstAddrExists,
+		CreateContext: resourceBigipLtmPersistenceProfileDstAddrCreate,
+		ReadContext:   resourceBigipLtmPersistenceProfileDstAddrRead,
+		UpdateContext: resourceBigipLtmPersistenceProfileDstAddrUpdate,
+		DeleteContext: resourceBigipLtmPersistenceProfileDstAddrDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -107,7 +108,7 @@ func resourceBigipLtmPersistenceProfileDstAddr() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileDstAddrCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -120,23 +121,15 @@ func resourceBigipLtmPersistenceProfileDstAddrCreate(d *schema.ResourceData, met
 	err := client.CreateDestAddrPersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to create Dst Address Persistence profile %s  %v : ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
 
-	if err := resourceBigipLtmPersistenceProfileDstAddrUpdate(d, meta); err != nil {
-		if errdel := client.DeleteDestAddrPersistenceProfile(name); errdel != nil {
-			return errdel
-		}
-		return err
-	}
-
-	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
-
+	return resourceBigipLtmPersistenceProfileDstAddrUpdate(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileDstAddrRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -146,7 +139,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 	pp, err := client.GetDestAddrPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve DestAdd Persistence Profile %s %v :", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pp == nil {
 		log.Printf("[WARN] Destination Address Persistence Profile (%s) not found, removing from state", d.Id())
@@ -162,27 +155,27 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(d *schema.ResourceData, meta 
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
 		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving AppService to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err))
 		}
 	}
 	// Specific to DestAddrPersistenceProfile
 	if _, ok := d.GetOk("hash_algorithm"); ok {
 		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for resourceBigipLtmPersistenceProfileDstAddr (%s): %s", d.Id(), err))
 		}
 	}
 	if _, ok := d.GetOk("mask"); ok {
-		d.Set("mask", pp.Mask)
+		_ = d.Set("mask", pp.Mask)
 	}
 	return nil
 }
 
-func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileDstAddrUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -208,7 +201,10 @@ func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, met
 		err := client.ModifyDestAddrPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile %s %v :", name, err)
-			return err
+			if errdel := client.DeleteDestAddrPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 	} else {
 		pp := &bigip.DestAddrPersistenceProfile{
@@ -230,14 +226,17 @@ func resourceBigipLtmPersistenceProfileDstAddrUpdate(d *schema.ResourceData, met
 		err := client.ModifyDestAddrPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify DestAdd Persistence Profile %s %v :", name, err)
-			return err
+			if errdel := client.DeleteDestAddrPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceBigipLtmPersistenceProfileDstAddrRead(d, meta)
+	return resourceBigipLtmPersistenceProfileDstAddrRead(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileDstAddrDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -245,29 +244,8 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(d *schema.ResourceData, met
 
 	err := client.DeleteDestAddrPersistenceProfile(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting DestAddPersistence profile  %s: %s", name, err)
+		return diag.FromErr(fmt.Errorf("Error deleting DestAddPersistence profile  %s: %s", name, err))
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Destination Address Persistence Profile " + name)
-
-	pp, err := client.GetDestAddrPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve Destination Address Persistence Profile  (%s) ", err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-
-	return pp != nil, nil
 }

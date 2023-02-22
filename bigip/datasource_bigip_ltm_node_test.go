@@ -10,14 +10,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccBigipLtmNode_basic(t *testing.T) {
 	t.Parallel()
 	resName := "bigip_ltm_node.NODETEST"
 	dataSourceName := "data.bigip_ltm_node.NODETEST"
-	var nodeName = "test-node"
+	var nodeName = "/Common/test-node"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAcctPreCheck(t) },
@@ -44,7 +44,7 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 func testAccCheckNodeConfigBasic(nodeName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_node" "NODETEST" {
-  name    = "/%s/%s"
+  name    = "%s"
   address = "192.168.30.1"
 }
 
@@ -54,5 +54,5 @@ data "bigip_ltm_node" "NODETEST" {
   name      = split("/", bigip_ltm_node.NODETEST.name)[2]
   partition = split("/", bigip_ltm_node.NODETEST.name)[1]
 }
-`, "Common", nodeName)
+`, nodeName)
 }

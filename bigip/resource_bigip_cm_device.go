@@ -7,21 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipCmDevice() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipCmDeviceCreate,
-		Update: resourceBigipCmDeviceUpdate,
-		Read:   resourceBigipCmDeviceRead,
-		Delete: resourceBigipCmDeviceDelete,
+		CreateContext: resourceBigipCmDeviceCreate,
+		UpdateContext: resourceBigipCmDeviceUpdate,
+		ReadContext:   resourceBigipCmDeviceRead,
+		DeleteContext: resourceBigipCmDeviceDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -52,7 +54,7 @@ func resourceBigipCmDevice() *schema.Resource {
 
 }
 
-func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	configsyncIp := d.Get("configsync_ip").(string)
@@ -71,14 +73,14 @@ func resourceBigipCmDeviceCreate(d *schema.ResourceData, meta interface{}) error
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Device %s %v ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipCmDeviceRead(d, meta)
+	return resourceBigipCmDeviceRead(ctx, d, meta)
 
 }
 
-func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -95,12 +97,12 @@ func resourceBigipCmDeviceUpdate(d *schema.ResourceData, meta interface{}) error
 	err := client.ModifyDevice(r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modidy Device (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipCmDeviceRead(d, meta)
+	return resourceBigipCmDeviceRead(ctx, d, meta)
 }
 
-func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -110,7 +112,7 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	members, err := client.Devices(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Device (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if members == nil {
 		log.Printf("[WARN] Device (%s) not found, removing from state", d.Id())
@@ -121,27 +123,27 @@ func resourceBigipCmDeviceRead(d *schema.ResourceData, meta interface{}) error {
 	_ = d.Set("name", members.Name)
 
 	if err := d.Set("mirror_ip", members.MirrorIp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving mirror_ip  to state for Device (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving mirror_ip  to state for Device (%s): %s", d.Id(), err))
 	}
 
 	if err := d.Set("configsync_ip", members.ConfigsyncIp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving configsync_ip  to state for Device (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving configsync_ip  to state for Device (%s): %s", d.Id(), err))
 	}
 
 	if err := d.Set("mirror_secondary_ip", members.MirrorSecondaryIp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving mirror_secondary_ip  to state for Device (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving mirror_secondary_ip  to state for Device (%s): %s", d.Id(), err))
 	}
 
 	return nil
 }
 
-func resourceBigipCmDeviceDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDeviceDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	err := client.DeleteDevice(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Device (%s)  (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

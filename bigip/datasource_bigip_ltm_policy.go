@@ -7,20 +7,20 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
-
-	"github.com/f5devcentral/go-bigip/f5teem"
-	"github.com/google/uuid"
-
-	"fmt"
 	"reflect"
 	"regexp"
 	"sort"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adaptation", "server-ssl"})
@@ -28,7 +28,7 @@ import (
 
 func dataSourceBigipLtmPolicy() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipLtmPolicyRead,
+		ReadContext: dataSourceBigipLtmPolicyRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -1075,7 +1075,7 @@ func dataSourceBigipLtmPolicy() *schema.Resource {
 	}
 }
 
-func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipLtmPolicyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	d.SetId("")
@@ -1085,7 +1085,7 @@ func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) erro
 	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 	match := re.FindStringSubmatch(name)
 	if match == nil {
-		return fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
+		return diag.FromErr(fmt.Errorf("policy name failed to match the regex, and should be of format /partition/policy_name"))
 	}
 	partition := match[1]
 	policyName := match[2]
@@ -1095,7 +1095,7 @@ func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) erro
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", policyName, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if p == nil {
@@ -1126,25 +1126,25 @@ func dataSourceBigipLtmPolicyRead(d *schema.ResourceData, meta interface{}) erro
 	return DatapolicyToData(p, d)
 }
 
-func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) error {
+func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) diag.Diagnostics {
 
 	if p.Strategy != "" {
 		re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
 		match := re.FindStringSubmatch(p.Strategy)
 		if match == nil {
-			return fmt.Errorf("Failed to match regex")
+			return diag.FromErr(fmt.Errorf("failed to match regex"))
 		}
 		strategyName := match[2]
 
 		if err := d.Set("strategy", strategyName); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving Strategy   state for Policy (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Strategy   state for Policy (%s): %s", d.Id(), err))
 		}
 	}
 	if err := d.Set("controls", makeStringSet(&p.Controls)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Controls  state for Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Controls  state for Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("requires", makeStringSet(&p.Requires)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err))
 	}
 
 	_ = d.Set("name", p.FullPath)
@@ -1158,7 +1158,7 @@ func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) error {
 		log.Printf("[DEBUG] rule is :%v", rule)
 		err := d.Set("rule", rule)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 	return nil

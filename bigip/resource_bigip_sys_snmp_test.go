@@ -11,12 +11,12 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TEST_PARTITION)
+var TEST_SNMP_NAME = fmt.Sprintf("/%s/test-snmp", TestPartition)
 
 var TEST_SNMP_RESOURCE = `
 resource "bigip_sys_snmp" "test-snmp" {

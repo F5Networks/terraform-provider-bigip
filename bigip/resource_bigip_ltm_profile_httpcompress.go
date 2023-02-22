@@ -7,22 +7,24 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileHttpcompressCreate,
-		Update: resourceBigipLtmProfileHttpcompressUpdate,
-		Read:   resourceBigipLtmProfileHttpcompressRead,
-		Delete: resourceBigipLtmProfileHttpcompressDelete,
+		CreateContext: resourceBigipLtmProfileHttpcompressCreate,
+		UpdateContext: resourceBigipLtmProfileHttpcompressUpdate,
+		ReadContext:   resourceBigipLtmProfileHttpcompressRead,
+		DeleteContext: resourceBigipLtmProfileHttpcompressDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -121,7 +123,7 @@ func resourceBigipLtmProfileHttpcompress() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -134,18 +136,18 @@ func resourceBigipLtmProfileHttpcompressCreate(d *schema.ResourceData, meta inte
 	obj, _ := client.GetHttpcompress(name)
 	if obj != nil && obj.FullPath == name {
 		d.SetId(name)
-		return resourceBigipLtmProfileHttpcompressRead(d, meta)
+		return resourceBigipLtmProfileHttpcompressRead(ctx, d, meta)
 	}
 	err := client.CreateHttpcompress(htpcompProfileConfig)
 
 	if err != nil {
-		return fmt.Errorf("Error retrieving profile Http compress (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving profile Http compress (%s): %s", name, err))
 	}
 	d.SetId(name)
-	return resourceBigipLtmProfileHttpcompressRead(d, meta)
+	return resourceBigipLtmProfileHttpcompressRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	httpcompressConfig := &bigip.Httpcompress{
@@ -156,18 +158,18 @@ func resourceBigipLtmProfileHttpcompressUpdate(d *schema.ResourceData, meta inte
 
 	err := client.ModifyHttpcompress(name, htpcompProfileConfig)
 	if err != nil {
-		return fmt.Errorf("Error modifying  profile Http compress (%s): %s", name, err)
+		return diag.FromErr(fmt.Errorf("error modifying  profile Http compress (%s): %s", name, err))
 	}
-	return resourceBigipLtmProfileHttpcompressRead(d, meta)
+	return resourceBigipLtmProfileHttpcompressRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	obj, err := client.GetHttpcompress(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Http Compress Profile (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Httpcompress Profile (%s) not found, removing from state", d.Id())
@@ -175,68 +177,45 @@ func resourceBigipLtmProfileHttpcompressRead(d *schema.ResourceData, meta interf
 		return nil
 	}
 	_ = d.Set("name", obj.FullPath)
-	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Http Compress profile  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("defaults_from", obj.DefaultsFrom)
+
 	if _, ok := d.GetOk("uri_include"); ok {
-		if err := d.Set("uri_include", obj.UriInclude); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving UriInclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("uri_include", obj.UriInclude)
 	}
 	if _, ok := d.GetOk("uri_exclude"); ok {
-		if err := d.Set("uri_exclude", obj.UriExclude); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving UriExclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("uri_exclude", obj.UriExclude)
 	}
 	if _, ok := d.GetOk("content_type_include"); ok {
-		if err := d.Set("content_type_include", obj.ContentTypeInclude); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ContentTypeInclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("content_type_include", obj.ContentTypeInclude)
 	}
 	if _, ok := d.GetOk("content_type_exclude"); ok {
-		if err := d.Set("content_type_exclude", obj.ContentTypeExclude); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ContentTypeExclude to state for  Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("content_type_exclude", obj.ContentTypeExclude)
 	}
 	if _, ok := d.GetOk("compression_buffersize"); ok {
-		if err := d.Set("compression_buffersize", obj.BufferSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving compression_buffersize to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("compression_buffersize", obj.BufferSize)
 	}
 	if _, ok := d.GetOk("gzip_compression_level"); ok {
-		if err := d.Set("gzip_compression_level", obj.GzipLevel); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving gzip_compression_level to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("gzip_compression_level", obj.GzipLevel)
 	}
 	if _, ok := d.GetOk("gzip_memory_level"); ok {
-		if err := d.Set("gzip_memory_level", obj.GzipMemoryLevel); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving gzip_memory_level to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("gzip_memory_level", obj.GzipMemoryLevel)
 	}
 	if _, ok := d.GetOk("gzip_window_size"); ok {
-		if err := d.Set("gzip_window_size", obj.GzipWindowSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving gzip_window_size to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("gzip_window_size", obj.GzipWindowSize)
 	}
 	if _, ok := d.GetOk("keep_accept_encoding"); ok {
-		if err := d.Set("keep_accept_encoding", obj.KeepAcceptEncoding); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving keep_accept_encoding to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("keep_accept_encoding", obj.KeepAcceptEncoding)
 	}
 	if _, ok := d.GetOk("vary_header"); ok {
-		if err := d.Set("vary_header", obj.VaryHeader); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving vary_header to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("vary_header", obj.VaryHeader)
 	}
 	if _, ok := d.GetOk("cpu_saver"); ok {
-		if err := d.Set("cpu_saver", obj.CPUSaver); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving cpu_saver to state for Http Compress profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("cpu_saver", obj.CPUSaver)
 	}
 	return nil
 }
 
-func resourceBigipLtmProfileHttpcompressDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpcompressDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -245,7 +224,7 @@ func resourceBigipLtmProfileHttpcompressDelete(d *schema.ResourceData, meta inte
 	err := client.DeleteHttpcompress(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Httpcompress  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

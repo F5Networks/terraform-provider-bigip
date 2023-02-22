@@ -12,12 +12,12 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TEST_PARTITION)
-var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TEST_PARTITION)
+var TEST_SELFIP_NAME = fmt.Sprintf("/%s/test-selfip", TestPartition)
+var TEST_FLOAT_SELFIP_NAME = fmt.Sprintf("/%s/test-float-selfip", TestPartition)
 
 var TEST_SELFIP_RESOURCE = `
 resource "bigip_net_vlan" "test-vlan" {

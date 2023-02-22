@@ -11,13 +11,13 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestNodeName = fmt.Sprintf("/%s/test-node", TEST_PARTITION)
-var TestV6NodeName = fmt.Sprintf("/%s/test-v6-node", TEST_PARTITION)
-var TestFqdnNodeName = fmt.Sprintf("/%s/test-fqdn-node", TEST_PARTITION)
+var TestNodeName = fmt.Sprintf("/%s/test-node", TestPartition)
+var TestV6NodeName = fmt.Sprintf("/%s/test-v6-node", TestPartition)
+var TestFqdnNodeName = fmt.Sprintf("/%s/test-fqdn-node", TestPartition)
 
 var resNodeName = "bigip_ltm_node"
 
@@ -28,40 +28,38 @@ type UpdateParam struct {
 
 var TestNodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TestNodeName + `"
-	address = "192.168.30.1"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "/Common/icmp"
-	rate_limit = "disabled"
-	state = "user-up"
-	ratio = "91"
+  name             = "` + TestNodeName + `"
+  address          = "192.168.30.1"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "/Common/icmp"
+  rate_limit       = "disabled"
+  state            = "user-up"
+  ratio            = "91"
 }
 `
-
 var TestV6NodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TestV6NodeName + `"
-	address = "fe80::10"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-	state = "user-up"
+  name             = "` + TestV6NodeName + `"
+  address          = "fe80::10"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "default"
+  rate_limit       = "disabled"
+  state            = "user-up"
 }
 `
-
 var TestFqdnNodeResource = `
 resource "bigip_ltm_node" "test-fqdn-node" {
-	name = "` + TestFqdnNodeName + `"
-	address = "f5.com"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-	fqdn { interval = "3000"}
-	state = "user-up"
-	ratio = "19"
+  name             = "` + TestFqdnNodeName + `"
+  address          = "f5.com"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "default"
+  rate_limit       = "disabled"
+  fqdn { interval = "3000" }
+  state = "user-up"
+  ratio = "19"
 }
 `
 
@@ -139,6 +137,7 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
+					// resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.*.interval", "3000"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
 				),
 			},
@@ -148,7 +147,7 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 	t.Parallel()
 	var instName = "test-node-monitor"
-	var TestNodeName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var TestNodeName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resNodeName, instName)
 	var moni UpdateParam
 	var moni2 UpdateParam
@@ -256,6 +255,27 @@ func testCheckNodeExists(name string) resource.TestCheckFunc {
 
 		return nil
 	}
+}
+func TestAccBigipLtmNodeTestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_node.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists("/Common/test_node_tc1"),
+					testCheckNodeExists("/Common/test_node_tc2"),
+					testCheckNodeExists("/Common/test_node_tc3"),
+					testCheckNodeExists("/Common/test_node_tc4"),
+					testCheckNodeExists("/Common/test_node_tc8"),
+				),
+			},
+		},
+	})
 }
 
 func testCheckNodesDestroyed(s *terraform.State) error {

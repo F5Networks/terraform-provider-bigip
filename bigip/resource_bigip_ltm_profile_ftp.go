@@ -6,22 +6,24 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"regexp"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileFtp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileFtpCreate,
-		Update: resourceBigipLtmProfileFtpUpdate,
-		Read:   resourceBigipLtmProfileFtpRead,
-		Delete: resourceBigipLtmProfileFtpDelete,
+		CreateContext: resourceBigipLtmProfileFtpCreate,
+		UpdateContext: resourceBigipLtmProfileFtpUpdate,
+		ReadContext:   resourceBigipLtmProfileFtpRead,
+		DeleteContext: resourceBigipLtmProfileFtpDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -125,14 +127,14 @@ func resourceBigipLtmProfileFtp() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileFtpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFtpCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 
 	ver, err := client.BigipVersion()
 	if err != nil {
 		log.Printf("[ERROR] Unable to get bigip version  (%v)", err)
-		return err
+		return diag.FromErr(err)
 	}
 	bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
 	re := regexp.MustCompile(`^(12)|(13).*`)
@@ -163,7 +165,7 @@ func resourceBigipLtmProfileFtpCreate(d *schema.ResourceData, meta interface{}) 
 		err := client.CreateFtp(ftpProfileConfig)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Create ftp Profile  (%s) (%v)", name, err)
-			return err
+			return diag.FromErr(err)
 		}
 	} else {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
@@ -185,21 +187,21 @@ func resourceBigipLtmProfileFtpCreate(d *schema.ResourceData, meta interface{}) 
 		err := client.CreateFtp(ftpProfileConfig)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Create ftp Profile  (%s) (%v)", name, err)
-			return err
+			return diag.FromErr(err)
 		}
 	}
 	d.SetId(name)
-	return resourceBigipLtmProfileFtpRead(d, meta)
+	return resourceBigipLtmProfileFtpRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileFtpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFtpUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
 	ver, err := client.BigipVersion()
 	if err != nil {
 		log.Printf("[ERROR] Unable to get bigip version  (%v)", err)
-		return err
+		return diag.FromErr(err)
 	}
 	bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
 	re := regexp.MustCompile(`^(12)|(13).*`)
@@ -228,7 +230,7 @@ func resourceBigipLtmProfileFtpUpdate(d *schema.ResourceData, meta interface{}) 
 		}
 		err := client.ModifyFtp(name, ftpProfileConfig)
 		if err != nil {
-			return fmt.Errorf("Error create profile ftp (%s): %s ", name, err)
+			return diag.FromErr(fmt.Errorf("error update profile ftp (%s): %s", name, err))
 		}
 	} else {
 		log.Printf("[DEBUG] Bigip version is : %s", regversion)
@@ -249,19 +251,19 @@ func resourceBigipLtmProfileFtpUpdate(d *schema.ResourceData, meta interface{}) 
 		}
 		err := client.ModifyFtp(name, ftpProfileConfig)
 		if err != nil {
-			return fmt.Errorf("Error create profile ftp (%s): %s ", name, err)
+			return diag.FromErr(fmt.Errorf("error update profile ftp (%s): %s ", name, err))
 		}
 	}
-	return resourceBigipLtmProfileFtpRead(d, meta)
+	return resourceBigipLtmProfileFtpRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFtpRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	obj, err := client.GetFtp(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve ftp Profile  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] ftp  Profile (%s) not found, removing from state", d.Id())
@@ -274,7 +276,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	ver, err := client.BigipVersion()
 	if err != nil {
 		log.Printf("[ERROR] Unable to get bigip version  (%v)", err)
-		return err
+		return diag.FromErr(err)
 	}
 	bigipversion := ver.Entries.HTTPSLocalhostMgmtTmCliVersion0.NestedStats.Entries.Active.Description
 	re := regexp.MustCompile(`^(12)|(13).*`)
@@ -340,7 +342,7 @@ func resourceBigipLtmProfileFtpRead(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func resourceBigipLtmProfileFtpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFtpDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -349,7 +351,7 @@ func resourceBigipLtmProfileFtpDelete(d *schema.ResourceData, meta interface{}) 
 	err := client.DeleteFtp(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete ftp Profile (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

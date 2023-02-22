@@ -7,21 +7,22 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipNetRoute() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipNetRouteCreate,
-		Update: resourceBigipNetRouteUpdate,
-		Read:   resourceBigipNetRouteRead,
-		Delete: resourceBigipNetRouteDelete,
+		CreateContext: resourceBigipNetRouteCreate,
+		UpdateContext: resourceBigipNetRouteUpdate,
+		ReadContext:   resourceBigipNetRouteRead,
+		DeleteContext: resourceBigipNetRouteDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -56,7 +57,7 @@ func resourceBigipNetRoute() *schema.Resource {
 	}
 }
 
-func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -84,13 +85,13 @@ func resourceBigipNetRouteCreate(d *schema.ResourceData, meta interface{}) error
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Route  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipNetRouteRead(d, meta)
+	return resourceBigipNetRouteRead(ctx, d, meta)
 }
 
-func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -118,19 +119,19 @@ func resourceBigipNetRouteUpdate(d *schema.ResourceData, meta interface{}) error
 	err := client.ModifyRoute(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipNetRouteRead(d, meta)
+	return resourceBigipNetRouteRead(ctx, d, meta)
 }
 
-func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Printf("[DEBUG] Reading Net Route config :%+v", name)
+	log.Printf("[INFO] Reading Net Route config :%+v", name)
 	obj, err := client.GetRoute(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Route  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Route (%s) not found, removing from state", d.Id())
@@ -138,24 +139,23 @@ func resourceBigipNetRouteRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", obj.FullPath)
+	_ = d.Set("name", obj.FullPath)
 
-	if err := d.Set("network", obj.Network); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Network to state for Route (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("network", obj.Network)
+
 	if obj.Gateway != "" || d.Get("gw").(string) != "" {
-		d.Set("gw", obj.Gateway)
+		_ = d.Set("gw", obj.Gateway)
 	}
 	if obj.TmInterface != "" || d.Get("tunnel_ref").(string) != "" {
-		d.Set("tunnel_ref", obj.TmInterface)
+		_ = d.Set("tunnel_ref", obj.TmInterface)
 	}
 	if obj.Blackhole {
-		d.Set("reject", obj.Blackhole)
+		_ = d.Set("reject", obj.Blackhole)
 	}
 	return nil
 }
 
-func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetRouteDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -164,7 +164,7 @@ func resourceBigipNetRouteDelete(d *schema.ResourceData, meta interface{}) error
 	err := client.DeleteRoute(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Route  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

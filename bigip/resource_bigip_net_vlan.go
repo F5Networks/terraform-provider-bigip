@@ -7,23 +7,25 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipNetVlan() *schema.Resource {
 
 	return &schema.Resource{
-		Create: resourceBigipNetVlanCreate,
-		Read:   resourceBigipNetVlanRead,
-		Update: resourceBigipNetVlanUpdate,
-		Delete: resourceBigipNetVlanDelete,
+		CreateContext: resourceBigipNetVlanCreate,
+		ReadContext:   resourceBigipNetVlanRead,
+		UpdateContext: resourceBigipNetVlanUpdate,
+		DeleteContext: resourceBigipNetVlanDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -72,13 +74,13 @@ func resourceBigipNetVlan() *schema.Resource {
 
 }
 
-func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
 	tag := d.Get("tag").(int)
 
-	log.Printf("[DEBUG] Creating VLAN %s", name)
+	log.Printf("[INFO] Creating VLAN %s", name)
 
 	d.Partial(true)
 
@@ -91,12 +93,10 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 	err := client.CreateVlan(r)
 
 	if err != nil {
-		return fmt.Errorf("Error creating VLAN %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("Error creating VLAN %s: %v ", name, err))
 	}
 
 	d.SetId(name)
-	d.SetPartial("name")
-	d.SetPartial("tag")
 
 	ifaceCount := d.Get("interfaces.#").(int)
 	for i := 0; i < ifaceCount; i++ {
@@ -106,26 +106,25 @@ func resourceBigipNetVlanCreate(d *schema.ResourceData, meta interface{}) error 
 
 		err = client.AddInterfaceToVlan(name, iface, tagged)
 		if err != nil {
-			return fmt.Errorf("Error adding Interface %s to VLAN %s: %v", iface, name, err)
+			return diag.FromErr(fmt.Errorf("error adding Interface %s to VLAN %s: %v", iface, name, err))
 		}
 	}
-	d.SetPartial("interfaces")
 
 	d.Partial(false)
 
-	return resourceBigipNetVlanRead(d, meta)
+	return resourceBigipNetVlanRead(ctx, d, meta)
 }
 
-func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Reading VLAN %s", name)
+	log.Printf("[INFO] Reading VLAN %s", name)
 
 	vlan, err := client.Vlan(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving VLAN %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving VLAN %s: %v", name, err))
 	}
 	if vlan == nil {
 		log.Printf("[DEBUG] VLAN %s not found, removing from state", name)
@@ -141,7 +140,7 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 
 	vlanInterfaces, err := client.GetVlanInterfaces(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving VLAN %s Interfaces: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving VLAN %s Interfaces: %v", name, err))
 	}
 
 	var interfaces []map[string]interface{}
@@ -163,18 +162,18 @@ func resourceBigipNetVlanRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if err := d.Set("interfaces", interfaces); err != nil {
-		return fmt.Errorf("Error updating Interfaces in state for VLAN %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error updating Interfaces in state for VLAN %s: %v", name, err))
 	}
 
 	return nil
 }
 
-func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Updating VLAN %s", name)
+	log.Printf("[INFO] Updating VLAN %s", name)
 
 	r := &bigip.Vlan{
 		Name:    name,
@@ -184,22 +183,22 @@ func resourceBigipNetVlanUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	err := client.ModifyVlan(name, r)
 	if err != nil {
-		return fmt.Errorf("Error modifying VLAN %s: %v ", name, err)
+		return diag.FromErr(fmt.Errorf("error modifying VLAN %s: %v", name, err))
 	}
 
-	return resourceBigipNetVlanRead(d, meta)
+	return resourceBigipNetVlanRead(ctx, d, meta)
 }
 
-func resourceBigipNetVlanDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetVlanDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
 
-	log.Printf("[DEBUG] Deleting VLAN %s", name)
+	log.Printf("[INFO] Deleting VLAN %s", name)
 
 	err := client.DeleteVlan(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting Vlan : %s ", err)
+		return diag.FromErr(fmt.Errorf("error Deleting Vlan : %s", err))
 	}
 	d.SetId("")
 	return nil

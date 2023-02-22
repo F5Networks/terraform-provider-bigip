@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TEST_PARTITION)
+var TEST_ONECONNECT_NAME = fmt.Sprintf("/%s/test-oneconnect", TestPartition)
 
 var TEST_ONECONNECT_RESOURCE = `
 resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {

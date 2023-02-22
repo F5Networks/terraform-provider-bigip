@@ -1,5 +1,5 @@
 data "bigip_ltm_pool" "test" {
-  name = "terraform-pool"
+  name      = "terraform-pool"
   partition = "Common"
 }
 

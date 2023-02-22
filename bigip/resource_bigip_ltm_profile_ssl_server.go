@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -15,17 +16,18 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileServerSsl() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileServerSslCreate,
-		Update: resourceBigipLtmProfileServerSslUpdate,
-		Read:   resourceBigipLtmProfileServerSslRead,
-		Delete: resourceBigipLtmProfileServerSslDelete,
+		CreateContext: resourceBigipLtmProfileServerSslCreate,
+		UpdateContext: resourceBigipLtmProfileServerSslUpdate,
+		ReadContext:   resourceBigipLtmProfileServerSslRead,
+		DeleteContext: resourceBigipLtmProfileServerSslDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -176,7 +178,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "none",
-				//ValidateFunc: validateF5NameWithDirectory,
+				// ValidateFunc: validateF5NameWithDirectory,
 				Description: "Server certificate chain name.",
 			},
 			"passphrase": {
@@ -394,7 +396,7 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileServerSslCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -410,7 +412,7 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Server Ssl Profile (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
@@ -435,10 +437,10 @@ func resourceBigipLtmProfileServerSslCreate(d *schema.ResourceData, meta interfa
 		}
 	}
 
-	return resourceBigipLtmProfileServerSslRead(d, meta)
+	return resourceBigipLtmProfileServerSslRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileServerSslUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -452,12 +454,12 @@ func resourceBigipLtmProfileServerSslUpdate(d *schema.ResourceData, meta interfa
 
 	err := client.ModifyServerSSLProfile(name, config)
 	if err != nil {
-		return fmt.Errorf(" Error create profile Ssl (%s): %s", name, err)
+		return diag.FromErr(fmt.Errorf("error create profile Ssl (%s): %s", name, err))
 	}
-	return resourceBigipLtmProfileServerSslRead(d, meta)
+	return resourceBigipLtmProfileServerSslRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileServerSslRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -466,7 +468,7 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Server SSL Profile   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if obj == nil {
@@ -478,95 +480,29 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 	_ = d.Set("name", name)
 	_ = d.Set("partition", obj.Partition)
 
-	if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("alert_timeout", obj.AlertTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AlertTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("authenticate", obj.Authenticate); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Authenticate to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("authenticate_depth", obj.AuthenticateDepth); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AuthenticateDepth to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_ca_cert", obj.C3dCaCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCaCert to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_ca_key", obj.C3dCaKey); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCaKey to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_ca_passphrase", obj.C3dCaPassphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCaPassphrase to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_cert_extension_custom_oids", obj.C3dCertExtensionCustomOids); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCertExtensionCustomOids to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_cert_extension_includes", obj.C3dCertExtensionIncludes); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCertExtensionIncludes to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("c3d_cert_lifespan", obj.C3dCertLifespan); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving C3dCertLifespan to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ca_file", obj.CaFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CaFile to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("cert", obj.Cert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Cert to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("chain", obj.Chain); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Chain to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ciphers", obj.Ciphers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Ciphers to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("cipher_group", obj.CipherGroup); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Cipher Group to state for Ssl profile (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("expire_cert_response_control", obj.ExpireCertResponseControl); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ExpireCertResponseControl to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("cache_size", obj.CacheSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CacheSize to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("handshake_timeout", obj.HandshakeTimeout); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving HandshakeTimeout to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("key", obj.Key); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Key to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("mod_ssl_methods", obj.ModSslMethods); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ModSslMethods to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("mode", obj.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("proxy_ca_cert", obj.ProxyCaCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("proxy_ca_key", obj.ProxyCaKey); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("defaults_from", obj.DefaultsFrom)
+	_ = d.Set("alert_timeout", obj.AlertTimeout)
+	_ = d.Set("authenticate", obj.Authenticate)
+	_ = d.Set("authenticate_depth", obj.AuthenticateDepth)
+	_ = d.Set("c3d_ca_cert", obj.C3dCaCert)
+	_ = d.Set("c3d_ca_key", obj.C3dCaKey)
+	_ = d.Set("c3d_ca_passphrase", obj.C3dCaPassphrase)
+	_ = d.Set("c3d_cert_extension_custom_oids", obj.C3dCertExtensionCustomOids)
+	_ = d.Set("c3d_cert_extension_includes", obj.C3dCertExtensionIncludes)
+	_ = d.Set("c3d_cert_lifespan", obj.C3dCertLifespan)
+	_ = d.Set("ca_file", obj.CaFile)
+	_ = d.Set("cert", obj.Cert)
+	_ = d.Set("chain", obj.Chain)
+	_ = d.Set("ciphers", obj.Ciphers)
+	_ = d.Set("cipher_group", obj.CipherGroup)
+	_ = d.Set("expire_cert_response_control", obj.ExpireCertResponseControl)
+	_ = d.Set("cache_size", obj.CacheSize)
+	_ = d.Set("handshake_timeout", obj.HandshakeTimeout)
+	_ = d.Set("key", obj.Key)
+	_ = d.Set("mod_ssl_methods", obj.ModSslMethods)
+	_ = d.Set("mode", obj.Mode)
+	_ = d.Set("proxy_ca_cert", obj.ProxyCaCert)
+	_ = d.Set("proxy_ca_key", obj.ProxyCaKey)
 	xt := reflect.TypeOf(obj.TmOptions).Kind()
 	if obj.TmOptions != "none" {
 		if xt == reflect.String {
@@ -576,7 +512,7 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 				tmOptions = tmOptions[:len(tmOptions)-1]
 			}
 			if err := d.Set("tm_options", tmOptions); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
+				return diag.FromErr(fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err))
 			}
 
 		} else {
@@ -584,101 +520,38 @@ func resourceBigipLtmProfileServerSslRead(d *schema.ResourceData, meta interface
 			for _, v := range obj.TmOptions.([]interface{}) {
 				newObj = append(newObj, v.(string))
 			}
-			if err := d.Set("tm_options", newObj); err != nil {
-				return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-			}
+			_ = d.Set("tm_options", newObj)
 		}
 	} else {
 		tmOptions := []string{}
-		if err := d.Set("tm_options", tmOptions); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("tm_options", tmOptions)
 	}
 
-	if err := d.Set("passphrase", obj.Passphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Passphrase to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("proxy_ssl", obj.ProxySsl); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxySsl to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("peer_cert_mode", obj.PeerCertMode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeerCertMode to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("renegotiate_period", obj.RenegotiatePeriod); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RenegotiatePeriod to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("renegotiate_size", obj.RenegotiateSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RenegotiateSize to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("renegotiation", obj.Renegotiation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Renegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("retain_certificate", obj.RetainCertificate); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RetainCertificate to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("secure_renegotiation", obj.SecureRenegotiation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SecureRenegotiation to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("server_name", obj.ServerName); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ServerName to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("session_mirroring", obj.SessionMirroring); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SessionMirroring to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("session_ticket", obj.SessionTicket); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SessionTicket to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("sni_default", obj.SniDefault); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SniDefault to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("sni_require", obj.SniRequire); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SniRequire to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ssl_c3d", obj.SslC3d); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslC3d to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ssl_forward_proxy", obj.SslForwardProxy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslForwardProxy to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ssl_forward_proxy_bypass", obj.SslForwardProxyBypass); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslForwardProxyBypass to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("ssl_sign_hash", obj.SslSignHash); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SslSignHash to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("strict_resume", obj.StrictResume); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving StrictResume to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("unclean_shutdown", obj.UncleanShutdown); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UncleanShutdown to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
-
-	if err := d.Set("untrusted_cert_response_control", obj.UntrustedCertResponseControl); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving UntrustedCertResponseControl to state for Ssl profile  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("passphrase", obj.Passphrase)
+	_ = d.Set("proxy_ssl", obj.ProxySsl)
+	_ = d.Set("peer_cert_mode", obj.PeerCertMode)
+	_ = d.Set("renegotiate_period", obj.RenegotiatePeriod)
+	_ = d.Set("renegotiate_size", obj.RenegotiateSize)
+	_ = d.Set("renegotiation", obj.Renegotiation)
+	_ = d.Set("retain_certificate", obj.RetainCertificate)
+	_ = d.Set("secure_renegotiation", obj.SecureRenegotiation)
+	_ = d.Set("server_name", obj.ServerName)
+	_ = d.Set("session_mirroring", obj.SessionMirroring)
+	_ = d.Set("session_ticket", obj.SessionTicket)
+	_ = d.Set("sni_default", obj.SniDefault)
+	_ = d.Set("sni_require", obj.SniRequire)
+	_ = d.Set("ssl_c3d", obj.SslC3d)
+	_ = d.Set("ssl_forward_proxy", obj.SslForwardProxy)
+	_ = d.Set("ssl_forward_proxy_bypass", obj.SslForwardProxyBypass)
+	_ = d.Set("ssl_sign_hash", obj.SslSignHash)
+	_ = d.Set("strict_resume", obj.StrictResume)
+	_ = d.Set("unclean_shutdown", obj.UncleanShutdown)
+	_ = d.Set("untrusted_cert_response_control", obj.UntrustedCertResponseControl)
 
 	return nil
 }
 
-func resourceBigipLtmProfileServerSslDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileServerSslDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -687,7 +560,7 @@ func resourceBigipLtmProfileServerSslDelete(d *schema.ResourceData, meta interfa
 	err := client.DeleteServerSSLProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Ssl Profile (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

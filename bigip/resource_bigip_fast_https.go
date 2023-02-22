@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,19 +17,19 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipFastHTTPSApp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipFastHTTPSAppCreate,
-		Read:   resourceBigipFastHTTPSAppRead,
-		Update: resourceBigipFastHTTPSAppUpdate,
-		Delete: resourceBigipFastHTTPSAppDelete,
-		Exists: resourceBigipFastHTTPSAppExists,
+		CreateContext: resourceBigipFastHTTPSAppCreate,
+		ReadContext:   resourceBigipFastHTTPSAppRead,
+		UpdateContext: resourceBigipFastHTTPSAppUpdate,
+		DeleteContext: resourceBigipFastHTTPSAppDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"tenant": {
@@ -254,7 +255,7 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 						"send_string": {
 							Type:     schema.TypeString,
 							Optional: true,
-							//Default:"GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n",
+							// Default:"GET / HTTP/1.1\r\nHost: example.com\r\nConnection: Close\r\n\r\n",
 							Description: "Optional data to be sent during each health check.",
 						},
 						"response": {
@@ -279,11 +280,11 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 	}
 }
 
-func resourceBigipFastHTTPSAppCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastJson, err := getFastHTTPSConfig(d)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	m.Lock()
 	defer m.Unlock()
@@ -292,7 +293,7 @@ func resourceBigipFastHTTPSAppCreate(d *schema.ResourceData, meta interface{}) e
 	userAgent := fmt.Sprintf("?userAgent=%s/%s", client.UserAgent, fastTmpl)
 	tenant, app, err := client.PostFastAppBigip(fastJson, fastTmpl, userAgent)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("tenant", tenant)
 	_ = d.Set("application", app)
@@ -329,10 +330,10 @@ func resourceBigipFastHTTPSAppCreate(d *schema.ResourceData, meta interface{}) e
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipFastHttpAppRead(d, meta)
+	return resourceBigipFastHttpAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var fastHttp bigip.FastHttpJson
 	log.Printf("[INFO] Reading FastApp HTTPS config")
@@ -348,7 +349,7 @@ func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 	if fastJson == "" {
 		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
@@ -358,20 +359,20 @@ func resourceBigipFastHTTPSAppRead(d *schema.ResourceData, meta interface{}) err
 	_ = d.Set("fast_https_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastHttp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	err = setFastHTTPSData(d, fastHttp)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }
 
-func resourceBigipFastHTTPSAppUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	fastJson, e := getFastHTTPSConfig(d)
 	if e != nil {
-		return e
+		return diag.FromErr(e)
 	}
 	m.Lock()
 	defer m.Unlock()
@@ -380,12 +381,12 @@ func resourceBigipFastHTTPSAppUpdate(d *schema.ResourceData, meta interface{}) e
 	tenant := d.Get("tenant").(string)
 	err := client.ModifyFastAppBigip(fastJson, tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipFastAppRead(d, meta)
+	return resourceBigipFastAppRead(ctx, d, meta)
 }
 
-func resourceBigipFastHTTPSAppDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipFastHTTPSAppDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
@@ -393,33 +394,10 @@ func resourceBigipFastHTTPSAppDelete(d *schema.ResourceData, meta interface{}) e
 	tenant := d.Get("tenant").(string)
 	err := client.DeleteFastAppBigip(tenant, name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipFastHTTPSAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Checking if FastApp config exists in BIGIP")
-	name := d.Id()
-	tenant := d.Get("tenant").(string)
-	fastJson, err := client.GetFastApp(tenant, name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve json ")
-		if err.Error() == "unexpected end of JSON input" {
-			log.Printf("[ERROR] %v", err)
-			d.SetId("")
-			return false, nil
-		}
-		return false, err
-	}
-	log.Printf("[INFO] FAST response Body:%+v", fastJson)
-	if fastJson == "" {
-		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-		return false, nil
-	}
-	return true, nil
 }
 
 func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {

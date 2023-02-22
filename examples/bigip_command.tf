@@ -5,6 +5,6 @@ provider "bigip" {
 }
 
 resource "bigip_command" "test-command" {
-  name      = "command1"
-  commands   = ["show sys version"]
+  name     = "command1"
+  commands = ["show sys version"]
 }

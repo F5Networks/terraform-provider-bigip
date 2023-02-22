@@ -7,21 +7,22 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileFasthttp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileFasthttpCreate,
-		Update: resourceBigipLtmProfileFasthttpUpdate,
-		Read:   resourceBigipLtmProfileFasthttpRead,
-		Delete: resourceBigipLtmProfileFasthttpDelete,
+		CreateContext: resourceBigipLtmProfileFasthttpCreate,
+		UpdateContext: resourceBigipLtmProfileFasthttpUpdate,
+		ReadContext:   resourceBigipLtmProfileFasthttpRead,
+		DeleteContext: resourceBigipLtmProfileFasthttpDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -110,7 +111,7 @@ func resourceBigipLtmProfileFasthttp() *schema.Resource {
 
 }
 
-func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -122,7 +123,7 @@ func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interfac
 	connpoolMinSize := d.Get("connpool_minsize").(int)
 	connpoolReplenish := d.Get("connpool_replenish").(string)
 	connpoolStep := d.Get("connpool_step").(int)
-	forceHttp_10Response := d.Get("forcehttp_10response").(string)
+	forcehttp10response := d.Get("forcehttp_10response").(string)
 	maxHeaderSize := d.Get("maxheader_size").(int)
 	log.Println("[INFO] Creating Fasthttp profile")
 
@@ -136,21 +137,21 @@ func resourceBigipLtmProfileFasthttpCreate(d *schema.ResourceData, meta interfac
 		ConnpoolMinSize:             connpoolMinSize,
 		ConnpoolReplenish:           connpoolReplenish,
 		ConnpoolStep:                connpoolStep,
-		ForceHttp_10Response:        forceHttp_10Response,
+		ForceHttp_10Response:        forcehttp10response,
 		MaxHeaderSize:               maxHeaderSize,
 	}
 	err := client.CreateFasthttp(r)
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Fasthttp   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
-	return resourceBigipLtmProfileFasthttpRead(d, meta)
+	return resourceBigipLtmProfileFasthttpRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -172,19 +173,19 @@ func resourceBigipLtmProfileFasthttpUpdate(d *schema.ResourceData, meta interfac
 	err := client.ModifyFasthttp(name, r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Fasthttp   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmProfileFasthttpRead(d, meta)
+	return resourceBigipLtmProfileFasthttpRead(ctx, d, meta)
 
 }
 
-func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	obj, err := client.GetFasthttp(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Fasthttp   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Fasthttp profile  (%s) not found, removing from state", d.Id())
@@ -193,60 +194,39 @@ func resourceBigipLtmProfileFasthttpRead(d *schema.ResourceData, meta interface{
 	}
 	_ = d.Set("name", name)
 	if _, ok := d.GetOk("defaults_from"); ok {
-		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("defaults_from", obj.DefaultsFrom)
 	}
 	if _, ok := d.GetOk("idle_timeout"); ok {
-		if err := d.Set("idle_timeout", obj.IdleTimeout); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving IdleTimeout to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("idle_timeout", obj.IdleTimeout)
 	}
 	if _, ok := d.GetOk("connpoolidle_timeoutoverride"); ok {
-		if err := d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolIdleTimeoutOverride to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpoolidle_timeoutoverride", obj.ConnpoolIdleTimeoutOverride)
 	}
 	if _, ok := d.GetOk("connpool_maxreuse"); ok {
-
-		if err := d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxReuse to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpool_maxreuse", obj.ConnpoolMaxReuse)
 	}
 	if _, ok := d.GetOk("connpool_maxsize"); ok {
-		if err := d.Set("connpool_maxsize", obj.ConnpoolMaxSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolMaxSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpool_maxsize", obj.ConnpoolMaxSize)
 	}
 	if _, ok := d.GetOk("connpool_minsize"); ok {
-		if err := d.Set("connpool_minsize", obj.ConnpoolMinSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolMinSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpool_minsize", obj.ConnpoolMinSize)
 	}
 	if _, ok := d.GetOk("connpool_replenish"); ok {
-		if err := d.Set("connpool_replenish", obj.ConnpoolReplenish); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolReplenish to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpool_replenish", obj.ConnpoolReplenish)
 	}
 	if _, ok := d.GetOk("connpool_step"); ok {
-		if err := d.Set("connpool_step", obj.ConnpoolStep); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ConnpoolStep to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("connpool_step", obj.ConnpoolStep)
 	}
 	if _, ok := d.GetOk("forcehttp_10response"); ok {
-		if err := d.Set("forcehttp_10response", obj.ForceHttp_10Response); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving ForceHttp_10Response to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("forcehttp_10response", obj.ForceHttp_10Response)
 	}
 	if _, ok := d.GetOk("maxheader_size"); ok {
-		if err := d.Set("maxheader_size", obj.MaxHeaderSize); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MaxHeaderSize to state for Fasthttp profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("maxheader_size", obj.MaxHeaderSize)
 	}
 	return nil
 }
 
-func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileFasthttpDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -255,7 +235,7 @@ func resourceBigipLtmProfileFasthttpDelete(d *schema.ResourceData, meta interfac
 	err := client.DeleteFasthttp(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Fasthttp   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_IAPP_NAME = "/" + TEST_PARTITION + "/test-iapp"
+var TEST_IAPP_NAME = "/" + TestPartition + "/test-iapp"
 
 var TEST_IAPP_RESOURCE = `
 	resource "bigip_sys_iapp" "test-iapp" {

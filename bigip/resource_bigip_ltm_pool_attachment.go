@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,17 +16,18 @@ import (
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPoolAttachmentCreate,
-		Read:   resourceBigipLtmPoolAttachmentRead,
-		Update: resourceBigipLtmPoolAttachmentUpdate,
-		Delete: resourceBigipLtmPoolAttachmentDelete,
+		CreateContext: resourceBigipLtmPoolAttachmentCreate,
+		ReadContext:   resourceBigipLtmPoolAttachmentRead,
+		UpdateContext: resourceBigipLtmPoolAttachmentUpdate,
+		DeleteContext: resourceBigipLtmPoolAttachmentDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceBigipLtmPoolAttachmentImport,
+			StateContext: resourceBigipLtmPoolAttachmentImport,
 		},
 		Schema: map[string]*schema.Schema{
 			"pool": {
@@ -85,7 +87,7 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolAttachmentCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	poolName := d.Get("pool").(string)
 	nodeName := d.Get("node").(string)
@@ -98,7 +100,7 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		node1, err := client.GetNode(parts[0])
 		if err != nil {
 			log.Printf("[ERROR] Unable to retrieve node %s  %v :", nodeName, err)
-			return err
+			return diag.FromErr(err)
 		}
 		if node1 == nil {
 			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
@@ -116,26 +118,18 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 			config.FQDN.DownInterval = node1.FQDN.DownInterval
 			err = client.AddPoolMemberFQDN(poolName, config)
 			if err != nil {
-				return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
-			}
-			err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
-			if err != nil {
-				return err
+				return diag.FromErr(fmt.Errorf("failure adding node %s to pool %s: %s", nodeName, poolName, err))
 			}
 			d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
-			return nil
+			return resourceBigipLtmPoolAttachmentUpdate(ctx, d, meta)
 		}
 		log.Printf("[INFO][CREATE] Adding node : %+v to pool: %+v", nodeName, poolName)
 		err = client.AddPoolMemberNode(poolName, nodeName)
 		if err != nil {
-			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+			return diag.FromErr(fmt.Errorf("failure adding node %s to pool %s: %s", nodeName, poolName, err))
 		}
 		d.SetId(fmt.Sprintf("%s-%s", poolName, nodeName))
-		err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
-		if err != nil {
-			return err
-		}
-		return nil
+		return resourceBigipLtmPoolAttachmentUpdate(ctx, d, meta)
 	} else {
 		log.Println("[DEBUG] creating node from pool attachment resource")
 		ipNode := strings.Split(parts[0], "%")[0]
@@ -157,18 +151,14 @@ func resourceBigipLtmPoolAttachmentCreate(d *schema.ResourceData, meta interface
 		log.Printf("[INFO] Adding Pool member (%s) to pool (%s)", nodeName, poolName)
 		err := client.AddPoolMember(poolName, config)
 		if err != nil {
-			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+			return diag.FromErr(fmt.Errorf("failure adding node %s to pool %s: %s", nodeName, poolName, err))
 		}
 		d.SetId(poolName)
-		err = resourceBigipLtmPoolAttachmentUpdate(d, meta)
-		if err != nil {
-			return err
-		}
+		return resourceBigipLtmPoolAttachmentUpdate(ctx, d, meta)
 	}
-	return resourceBigipLtmPoolAttachmentRead(d, meta)
 }
 
-func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	nodeName := d.Get("node").(string)
 	log.Printf("[DEBUG][UPDATE] node name is :%s", nodeName)
@@ -178,7 +168,7 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		parts := strings.Split(nodeName, ":")
 		node1, err := client.GetNode(parts[0])
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		if node1 == nil {
 			log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
@@ -212,7 +202,7 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		log.Printf("[DEBUG] [UPDATE] pool config :%+v", config)
 		err = client.ModifyPoolMember(poolName, config)
 		if err != nil {
-			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+			return diag.FromErr(fmt.Errorf("failure adding node %s to pool %s: %s", nodeName, poolName, err))
 		}
 	} else {
 		poolName := d.Id()
@@ -245,13 +235,13 @@ func resourceBigipLtmPoolAttachmentUpdate(d *schema.ResourceData, meta interface
 		log.Printf("[DEBUG] [UPDATE] pool config :%+v", config)
 		err := client.ModifyPoolMember2(poolName, config)
 		if err != nil {
-			return fmt.Errorf("Failure adding node %s to pool %s: %s ", nodeName, poolName, err)
+			return diag.FromErr(fmt.Errorf("failure adding node %s to pool %s: %s", nodeName, poolName, err))
 		}
 	}
-	return resourceBigipLtmPoolAttachmentRead(d, meta)
+	return resourceBigipLtmPoolAttachmentRead(ctx, d, meta)
 }
 
-func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var poolName string
 	nodeName := d.Get("node").(string)
@@ -270,7 +260,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	pool, err := client.GetPool(poolName)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Pool (%s)  (%v) ", poolName, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pool == nil {
 		log.Printf("[WARN] Pool (%s) not found, removing from state", poolName)
@@ -279,7 +269,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	}
 	nodes, err := client.PoolMembers(poolName)
 	if err != nil {
-		return fmt.Errorf("Error retrieving pool (%s) members: %s ", poolName, err)
+		return diag.FromErr(fmt.Errorf("error retrieving pool (%s) members: %s", poolName, err))
 	}
 	if nodes == nil {
 		log.Printf("[WARN] Pool Members (%s) not found, removing from state", poolName)
@@ -315,7 +305,7 @@ func resourceBigipLtmPoolAttachmentRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceBigipLtmPoolAttachmentDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolAttachmentDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	poolName := d.Get("pool").(string)
@@ -326,13 +316,13 @@ func resourceBigipLtmPoolAttachmentDelete(d *schema.ResourceData, meta interface
 	err := client.DeletePoolMember(poolName, nodeName)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete PoolMember (%s)  (%s) ", nodeName, err)
-		return fmt.Errorf("Failure removing node %s from pool %s: %s ", nodeName, poolName, err)
+		return diag.FromErr(fmt.Errorf("failure removing node %s from pool %s: %s ", nodeName, poolName, err))
 	}
 	d.SetId("")
 	return nil
 }
 
-func resourceBigipLtmPoolAttachmentImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceBigipLtmPoolAttachmentImport(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	client := meta.(*bigip.BigIP)
 
 	var data map[string]string

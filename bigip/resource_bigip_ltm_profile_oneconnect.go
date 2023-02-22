@@ -7,21 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileOneconnect() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileOneconnectCreate,
-		Update: resourceBigipLtmProfileOneconnectUpdate,
-		Read:   resourceBigipLtmProfileOneconnectRead,
-		Delete: resourceBigipLtmProfileOneconnectDelete,
+		CreateContext: resourceBigipLtmProfileOneconnectCreate,
+		UpdateContext: resourceBigipLtmProfileOneconnectUpdate,
+		ReadContext:   resourceBigipLtmProfileOneconnectRead,
+		DeleteContext: resourceBigipLtmProfileOneconnectDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -88,7 +90,7 @@ func resourceBigipLtmProfileOneconnect() *schema.Resource {
 		},
 	}
 }
-func resourceBigipLtmProfileOneconnectCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
@@ -118,13 +120,13 @@ func resourceBigipLtmProfileOneconnectCreate(d *schema.ResourceData, meta interf
 	err := client.CreateOneconnect(oneConnectconfig)
 
 	if err != nil {
-		return fmt.Errorf("Error create profile oneConnect (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error create profile oneConnect (%s): %s", name, err))
 	}
 	d.SetId(name)
-	return resourceBigipLtmProfileOneconnectRead(d, meta)
+	return resourceBigipLtmProfileOneconnectRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating OneConnect Profile :%+v", name)
@@ -143,18 +145,18 @@ func resourceBigipLtmProfileOneconnectUpdate(d *schema.ResourceData, meta interf
 	err := client.ModifyOneconnect(name, r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify OneConnect profile   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmProfileOneconnectRead(d, meta)
+	return resourceBigipLtmProfileOneconnectRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Reading OneConnect Profile :%+v", name)
 	obj, err := client.GetOneconnect(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if obj == nil {
 		log.Printf("[WARN] Onceconnect Profile (%s) not found, removing from state", d.Id())
@@ -166,24 +168,16 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 		_ = d.Set("partition", obj.Partition)
 	}
 	if _, ok := d.GetOk("defaults_from"); ok {
-		if err := d.Set("defaults_from", obj.DefaultsFrom); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving DefaultsFrom to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("defaults_from", obj.DefaultsFrom)
 	}
 	if _, ok := d.GetOk("share_pools"); ok {
-		if err := d.Set("share_pools", obj.SharePools); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving SharePools to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("share_pools", obj.SharePools)
 	}
 	if _, ok := d.GetOk("source_mask"); ok {
-		if err := d.Set("source_mask", obj.SourceMask); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving SourceMask to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("source_mask", obj.SourceMask)
 	}
 	if _, ok := d.GetOk("max_age"); ok {
-		if err := d.Set("max_age", obj.MaxAge); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving MaxAge to state for Onceconnect profile  (%s): %s", d.Id(), err)
-		}
+		_ = d.Set("max_age", obj.MaxAge)
 	}
 	if _, ok := d.GetOk("max_size"); ok {
 		_ = d.Set("max_size", obj.MaxSize)
@@ -199,13 +193,13 @@ func resourceBigipLtmProfileOneconnectRead(d *schema.ResourceData, meta interfac
 	}
 	return nil
 }
-func resourceBigipLtmProfileOneconnectDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileOneconnectDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Deleting OneConnect Profile " + name)
 	err := client.DeleteOneconnect(name)
 	if err != nil {
-		return fmt.Errorf("Error Deleting profile oneConnect (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error Deleting profile oneConnect (%s): %s ", name, err))
 	}
 	d.SetId("")
 	return nil

@@ -7,21 +7,22 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipSysDns() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysDnsCreate,
-		Update: resourceBigipSysDnsUpdate,
-		Read:   resourceBigipSysDnsRead,
-		Delete: resourceBigipSysDnsDelete,
+		CreateContext: resourceBigipSysDnsCreate,
+		UpdateContext: resourceBigipSysDnsUpdate,
+		ReadContext:   resourceBigipSysDnsRead,
+		DeleteContext: resourceBigipSysDnsDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -53,7 +54,7 @@ func resourceBigipSysDns() *schema.Resource {
 	}
 }
 
-func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Get("description").(string)
@@ -67,14 +68,14 @@ func resourceBigipSysDnsCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create DNS (%s) (%v) ", description, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(description)
 
-	return resourceBigipSysDnsRead(d, meta)
+	return resourceBigipSysDnsRead(ctx, d, meta)
 }
 
-func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -89,12 +90,12 @@ func resourceBigipSysDnsUpdate(d *schema.ResourceData, meta interface{}) error {
 	err := client.ModifyDNS(sysDNSConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify DNS (%s) (%v) ", description, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipSysDnsRead(d, meta)
+	return resourceBigipSysDnsRead(ctx, d, meta)
 }
 
-func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	description := d.Id()
@@ -104,7 +105,7 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 	dns, err := client.DNSs()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve DNS (%s) (%v) ", description, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if dns == nil {
 		log.Printf("[WARN] DNS (%s) not found, removing from state", d.Id())
@@ -113,18 +114,14 @@ func resourceBigipSysDnsRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	_ = d.Set("description", dns.Description)
 
-	if err := d.Set("name_servers", dns.NameServers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Name Servers to state for DNS (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("name_servers", dns.NameServers)
 	_ = d.Set("number_of_dots", dns.NumberOfDots)
-	if err := d.Set("search", dns.Search); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Search  to state for DNS (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("search", dns.Search)
 
 	return nil
 }
 
-func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysDnsDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// There is no Delete API for this operation
 	client := meta.(*bigip.BigIP)
 	description := d.Id()
@@ -138,7 +135,7 @@ func resourceBigipSysDnsDelete(d *schema.ResourceData, meta interface{}) error {
 	err := client.ModifyDNS(configSysDns)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete DNS (%s) (%v) ", description, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

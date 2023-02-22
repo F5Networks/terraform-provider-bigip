@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
@@ -13,18 +14,18 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmProfileHttp() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmProfileHttpCreate,
-		Read:   resourceBigipLtmProfileHttpRead,
-		Update: resourceBigipLtmProfileHttpUpdate,
-		Delete: resourceBigipLtmProfileHttpDelete,
-		Exists: resourceBigipLtmProfileHttpExists,
+		CreateContext: resourceBigipLtmProfileHttpCreate,
+		ReadContext:   resourceBigipLtmProfileHttpRead,
+		UpdateContext: resourceBigipLtmProfileHttpUpdate,
+		DeleteContext: resourceBigipLtmProfileHttpDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -200,7 +201,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -213,7 +214,7 @@ func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{})
 
 	err := client.AddHttpProfile(config)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
 
@@ -236,10 +237,10 @@ func resourceBigipLtmProfileHttpCreate(d *schema.ResourceData, meta interface{})
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipLtmProfileHttpRead(d, meta)
+	return resourceBigipLtmProfileHttpRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -249,7 +250,7 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	pp, err := client.GetHttpProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve HTTP Profile  (%s) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pp == nil {
 		log.Printf("[WARN] HTTP  Profile (%s) not found, removing from state", name)
@@ -308,7 +309,6 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("response_chunking"); ok {
 		_ = d.Set("response_chunking", pp.ResponseChunking)
 	}
-	log.Printf("[DEBUG] response_headers_permitted:%+v", pp.ResponseHeadersPermitted)
 	_ = d.Set("response_headers_permitted", pp.ResponseHeadersPermitted)
 
 	if _, ok := d.GetOk("server_agent_name"); ok {
@@ -323,13 +323,12 @@ func resourceBigipLtmProfileHttpRead(d *schema.ResourceData, meta interface{}) e
 	if _, ok := d.GetOk("via_response"); ok {
 		_ = d.Set("via_response", pp.ViaResponse)
 	}
-	log.Printf("[DEBUG] xff_alternative_names:%+v", pp.XffAlternativeNames)
 	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
 
 	return nil
 }
 
-func resourceBigipLtmProfileHttpUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating HTTP Profile Profile:%+v ", name)
@@ -342,13 +341,13 @@ func resourceBigipLtmProfileHttpUpdate(d *schema.ResourceData, meta interface{})
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify HTTP Profile  (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceBigipLtmProfileHttpRead(d, meta)
+	return resourceBigipLtmProfileHttpRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileHttpDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmProfileHttpDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -356,29 +355,10 @@ func resourceBigipLtmProfileHttpDelete(d *schema.ResourceData, meta interface{})
 	err := client.DeleteHttpProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete HTTPProfile  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmProfileHttpExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching HTTPProfile " + name)
-	pp, err := client.GetHttpProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve HTTPProfile (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] HTTP Profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }
 
 func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bigip.HttpProfile {
@@ -407,6 +387,5 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 	config.ViaRequest = d.Get("via_request").(string)
 	config.ViaResponse = d.Get("via_response").(string)
 	config.XffAlternativeNames = setToInterfaceSlice(d.Get("xff_alternative_names").(*schema.Set))
-
 	return config
 }

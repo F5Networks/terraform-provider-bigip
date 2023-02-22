@@ -1,19 +1,21 @@
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceBigipWafPb() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipWafPbRead,
+		ReadContext: dataSourceBigipWafPbRead,
 		Schema: map[string]*schema.Schema{
 			"policy_name": {
 				Type:        schema.TypeString,
@@ -52,7 +54,7 @@ type ExportPb struct {
 	Filter          string            `json:"filter,omitempty"`
 }
 
-func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipWafPbRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 
@@ -61,7 +63,7 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 	score := d.Get("minimum_learning_score").(int)
 	policyId, err := client.GetWafPolicyId(policyName, partition)
 	if err != nil {
-		return fmt.Errorf("error retrieving policy %s on partition %s", policyName, partition)
+		return diag.FromErr(fmt.Errorf("error retrieving policy %s on partition %s", policyName, partition))
 	}
 	policyLink := fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyId)
 	payload := ExportPb{
@@ -71,17 +73,17 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	export, err := client.PostPbExport(payload)
 	if err != nil {
-		return fmt.Errorf("error exporting pb suggestions: %v", err)
+		return diag.FromErr(fmt.Errorf("error exporting pb suggestions: %v", err))
 	}
 	task, err := client.GetWafPbExportResult(export.Task_id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG]Initial response export status %v", task.Status)
 	for task.Status != "COMPLETED" && task.Status != "FAILURE" {
 		pbtask, err := client.GetWafPbExportResult(export.Task_id)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		task = pbtask
 		if task.Status == "FAILURE" || task.Status == "COMPLETED" {
@@ -91,12 +93,12 @@ func dataSourceBigipWafPbRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if task.Status == "FAILURE" {
-		return fmt.Errorf("export task failed")
+		return diag.FromErr(fmt.Errorf("export task failed"))
 	}
 	if task.Status == "COMPLETED" {
 		pbJson, err := json.Marshal(task.Result)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		_ = d.Set("policy_id", policyId)
 		_ = d.Set("json", string(pbJson))

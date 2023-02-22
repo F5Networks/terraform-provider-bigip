@@ -6,17 +6,19 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipWafPolicy() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipWafPolicyRead,
+		ReadContext: dataSourceBigipWafPolicyRead,
 		Schema: map[string]*schema.Schema{
 			"policy_id": {
 				Type:        schema.TypeString,
@@ -33,7 +35,7 @@ func dataSourceBigipWafPolicy() *schema.Resource {
 	}
 }
 
-func dataSourceBigipWafPolicyRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipWafPolicyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 
@@ -43,19 +45,19 @@ func dataSourceBigipWafPolicyRead(d *schema.ResourceData, meta interface{}) erro
 
 	wafpolicy, err := client.GetWafPolicy(policyID)
 	if err != nil {
-		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+		return diag.FromErr(fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err))
 	}
 
 	policyJson, err := client.ExportPolicy(policyID)
 	if err != nil {
-		return fmt.Errorf("error Exporting waf policy ID %v with : %+v", policyID, err)
+		return diag.FromErr(fmt.Errorf("error Exporting waf policy ID %v with : %+v", policyID, err))
 	}
 
 	log.Printf("[DEBUG] Policy Json : %+v", policyJson.Policy)
 
 	plJson, err := json.Marshal(policyJson.Policy)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	_ = d.Set("policy_id", wafpolicy.ID)
