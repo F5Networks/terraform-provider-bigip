@@ -10,15 +10,12 @@ import (
 	"log"
 
 	"github.com/F5Networks/terraform-provider-bigip/bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 
 func main() {
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: func() *schema.Provider {
-			return bigip.Provider()
-		},
+		ProviderFunc: bigip.Provider,
 	})
 }

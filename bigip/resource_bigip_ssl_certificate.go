@@ -1,13 +1,13 @@
 package bigip
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
@@ -119,36 +119,6 @@ func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData
 
 	return nil
 }
-
-//func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//	name := d.Id()
-//	log.Println("[INFO] Checking certificate " + name + " exists.")
-//	partition := d.Get("partition").(string)
-//
-//	if partition == "" {
-//		if !strings.HasPrefix(name, "/") {
-//			err := errors.New("the name must be in full_path format when partition is not specified")
-//			fmt.Print(err)
-//		}
-//	} else {
-//		if !strings.HasPrefix(name, "/") {
-//			name = "/" + partition + "/" + name
-//		}
-//	}
-//	certificate, err := client.GetCertificate(name)
-//	if err != nil {
-//		log.Printf("[ERROR] Unable to Retrieve certificate   (%s) (%v) ", name, err)
-//		return false, err
-//	}
-//
-//	if certificate == nil {
-//		log.Printf("[WARN] certificate (%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//	}
-//
-//	return certificate != nil, nil
-//}
 
 func resourceBigipSslCertificateUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)

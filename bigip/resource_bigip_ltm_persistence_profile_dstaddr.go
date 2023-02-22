@@ -7,11 +7,11 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -155,7 +155,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(ctx context.Context, d *schem
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
@@ -170,7 +170,7 @@ func resourceBigipLtmPersistenceProfileDstAddrRead(ctx context.Context, d *schem
 		}
 	}
 	if _, ok := d.GetOk("mask"); ok {
-		d.Set("mask", pp.Mask)
+		_ = d.Set("mask", pp.Mask)
 	}
 	return nil
 }
@@ -248,25 +248,4 @@ func resourceBigipLtmPersistenceProfileDstAddrDelete(ctx context.Context, d *sch
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileDstAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Destination Address Persistence Profile " + name)
-
-	pp, err := client.GetDestAddrPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve Destination Address Persistence Profile  (%s) ", err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] DestAddpersistance profile  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-
-	return pp != nil, nil
 }

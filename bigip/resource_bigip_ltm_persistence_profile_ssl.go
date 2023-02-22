@@ -7,10 +7,10 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"log"
 	"strconv"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -137,7 +137,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(ctx context.Context, d *schema.Re
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 	return nil
 }
@@ -207,24 +207,4 @@ func resourceBigipLtmPersistenceProfileSSLDelete(ctx context.Context, d *schema.
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching SSL Persistence Profile " + name)
-
-	pp, err := client.GetSSLPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] persistence profile SSL  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }

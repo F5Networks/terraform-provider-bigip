@@ -6,13 +6,13 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
@@ -374,7 +374,6 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 	_ = d.Set("existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool_members", members)
-	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("existing_monitor", data.UdpMonitor)
 	_ = d.Set("monitor.0.interval", data.MonitorInterval)
@@ -389,6 +388,10 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 		_ = d.Set("vlans_rejected", data.Vlans)
 	}
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
+	err := d.Set("load_balancing_mode", data.LoadBalancingMode)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

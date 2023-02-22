@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -14,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
@@ -331,6 +331,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	}
 	vsDest := vs.Destination
 	if vsDest != ":0" && strings.Count(vsDest, ":") >= 2 {
+		log.Printf("[INFO] Matched one:%+v", vsDest)
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
@@ -338,7 +339,8 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		}
 		_ = d.Set("destination", destination[2])
 	}
-	if vsDest != ":0" && strings.Count(vsDest, ":") < 2 {
+	if vsDest != ":0" && vsDest != "0" && strings.Count(vsDest, ":") < 2 {
+		log.Printf("[INFO] Matched two:%+v", vsDest)
 		regex := regexp.MustCompile(`(/.+/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(%\d+)?(:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]

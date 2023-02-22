@@ -7,11 +7,11 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -80,8 +80,8 @@ func resourceBigipLtmIRuleRead(ctx context.Context, d *schema.ResourceData, meta
 		return nil
 	}
 
-	d.Set("name", irule.FullPath)
-	d.Set("irule", irule.Rule)
+	_ = d.Set("name", irule.FullPath)
+	_ = d.Set("irule", irule.Rule)
 
 	return nil
 }

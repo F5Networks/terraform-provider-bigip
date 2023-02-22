@@ -1,12 +1,12 @@
 package bigip
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -117,38 +117,6 @@ func resourceBigipSslKeyRead(ctx context.Context, d *schema.ResourceData, meta i
 	}
 	return nil
 }
-
-//func resourceBigipSslKeyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//	name := d.Id()
-//	log.Println("[INFO] Checking certificate key" + name + " exists.")
-//	/*if !strings.HasSuffix(name, ".key") {
-//		name = name + ".key"
-//	}*/
-//	partition := d.Get("partition").(string)
-//	if partition == "" {
-//		if !strings.HasPrefix(name, "/") {
-//			err := errors.New("the name must be in full_path format when partition is not specified")
-//			fmt.Print(err)
-//		}
-//	} else {
-//		if !strings.HasPrefix(name, "/") {
-//			name = "/" + partition + "/" + name
-//		}
-//	}
-//	certkey, err := client.GetKey(name)
-//	if err != nil {
-//		log.Printf("[ERROR] Unable to Retrieve certificate key (%s) (%v) ", name, err)
-//		return false, err
-//	}
-//
-//	if certkey == nil {
-//		log.Printf("[WARN] certificate key(%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//	}
-//
-//	return certkey != nil, nil
-//}
 
 func resourceBigipSslKeyUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)

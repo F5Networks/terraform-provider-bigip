@@ -350,29 +350,6 @@ func resourceBigipFastHttpAppDelete(ctx context.Context, d *schema.ResourceData,
 	return nil
 }
 
-func resourceBigipFastHttpAppExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Checking if FastApp config exists in BIGIP")
-	name := d.Id()
-	tenant := d.Get("tenant").(string)
-	fastJson, err := client.GetFastApp(tenant, name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve json ")
-		if err.Error() == "unexpected end of JSON input" {
-			log.Printf("[ERROR] %v", err)
-			d.SetId("")
-			return false, nil
-		}
-		return false, err
-	}
-	log.Printf("[INFO] FAST response Body:%+v", fastJson)
-	if fastJson == "" {
-		log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-		return false, nil
-	}
-	return true, nil
-}
-
 func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	log.Printf("My HTTP DATA:%+v", data)
 	_ = d.Set("tenant", data.Tenant)

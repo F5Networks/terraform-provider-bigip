@@ -6,10 +6,10 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -53,8 +53,8 @@ func dataSourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(fmt.Errorf("certificate (%s) not found", name))
 	}
 
-	d.Set("name", certificate.Name)
-	d.Set("partition", certificate.Partition)
+	_ = d.Set("name", certificate.Name)
+	_ = d.Set("partition", certificate.Partition)
 
 	d.SetId(certificate.FullPath)
 

@@ -7,12 +7,12 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
@@ -155,21 +155,21 @@ func resourceBigipLtmPoolRead(ctx context.Context, d *schema.ResourceData, meta 
 	return nil
 }
 
-func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking pool " + name + " exists.")
-	pool, err := client.GetPool(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
-		return false, err
-	}
-	if pool == nil {
-		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-	return pool != nil, nil
-}
+// func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+//	client := meta.(*bigip.BigIP)
+//	name := d.Id()
+//	log.Println("[INFO] Checking pool " + name + " exists.")
+//	pool, err := client.GetPool(name)
+//	if err != nil {
+//		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
+//		return false, err
+//	}
+//	if pool == nil {
+//		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
+//		d.SetId("")
+//	}
+//	return pool != nil, nil
+// }
 
 func resourceBigipLtmPoolUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)

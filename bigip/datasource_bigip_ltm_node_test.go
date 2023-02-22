@@ -51,8 +51,8 @@ resource "bigip_ltm_node" "NODETEST" {
 # We can't easily reference the node resource above because name includes the
 # partition. Instead we have to split and pull out the separate pieces.
 data "bigip_ltm_node" "NODETEST" {
- name      = split("/", bigip_ltm_node.NODETEST.name)[2]
- partition = split("/", bigip_ltm_node.NODETEST.name)[1]
+  name      = split("/", bigip_ltm_node.NODETEST.name)[2]
+  partition = split("/", bigip_ltm_node.NODETEST.name)[1]
 }
 `, nodeName)
 }

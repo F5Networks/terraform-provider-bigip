@@ -7,13 +7,13 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -275,7 +275,7 @@ func resourceBigiqLicenseManageRead(ctx context.Context, d *schema.ResourceData,
 			return diag.FromErr(fmt.Errorf("getting license status failed with : %v", err))
 		}
 		if licenseStatus["status"] == "FINISHED" && poolInfo.SortName == "Purchased Pool" {
-			d.Set("device_license_status", "LICENSED")
+			_ = d.Set("device_license_status", "LICENSED")
 			return nil
 		}
 		if licenseStatus["status"] == "FAILED" {
@@ -297,7 +297,7 @@ func resourceBigiqLicenseManageRead(ctx context.Context, d *schema.ResourceData,
 		if !ok && deviceStatus != "LICENSED" {
 			return diag.FromErr(fmt.Errorf("getting license assignment status from bigip failed with :%v", err))
 		}
-		d.Set("device_license_status", deviceStatus)
+		_ = d.Set("device_license_status", deviceStatus)
 	} else {
 		log.Printf("[DEBUG] GetMemberStatus using regKey")
 		if _, err := bigiqRef.GetMemberStatus(poolId, regKey, memID); err != nil {

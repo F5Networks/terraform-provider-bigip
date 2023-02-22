@@ -272,7 +272,7 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 	})
 }
 
-//func TestAccBigipAs3Issue601(t *testing.T) {
+// func TestAccBigipAs3Issue601(t *testing.T) {
 //	resource.Test(t, resource.TestCase{
 //		PreCheck: func() {
 //			testAcctPreCheck(t)
@@ -295,7 +295,7 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 //			},
 //		},
 //	})
-//}
+// }
 
 func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{

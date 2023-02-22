@@ -25,7 +25,8 @@ resource "bigip_ltm_node" "test-node" {
   name       = "%s"
   address    = "10.10.10.10"
   invalidkey = "foo"
-}`, resourceName)
+}
+`, resourceName)
 }
 
 func TestAccBigipLtmNodeInvalid(t *testing.T) {

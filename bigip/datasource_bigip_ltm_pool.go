@@ -8,10 +8,11 @@ package bigip
 import (
 	"context"
 	"fmt"
+	"log"
+
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"log"
 )
 
 func dataSourceBigipLtmPool() *schema.Resource {

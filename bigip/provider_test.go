@@ -19,8 +19,8 @@ var TestPartition = "Common"
 // The factory function will be invoked for every Terraform CLI command executed
 // to create a provider server to which the CLI can reattach.
 
-//var testAccProviders map[string]*schema.Provider{}
-//var testAccProvider *schema.Provider
+// var testAccProviders map[string]*schema.Provider{}
+// var testAccProvider *schema.Provider
 
 var testAccProvider = Provider()
 var testAccProviders = map[string]*schema.Provider{
@@ -51,7 +51,7 @@ func testAcctPreCheck(t *testing.T) {
 	}
 }
 
-func testAcctUnitPreCheck(t *testing.T, url string) {
+func testAcctUnitPreCheck(_ *testing.T, url string) {
 	_ = os.Setenv("BIGIP_HOST", url)
 	_ = os.Setenv("BIGIP_USER", "xxxx")
 	_ = os.Setenv("BIGIP_PASSWORD", "xxx")

@@ -6,10 +6,10 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -134,22 +134,6 @@ func resourceBigipTrafficselectorRead(ctx context.Context, d *schema.ResourceDat
 	_ = d.Set("name", name)
 	return nil
 }
-
-//func resourceBigipTrafficselectorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//	name := d.Id()
-//	log.Printf("[INFO] Check existence of Traffic Selector: %+v ", name)
-//	ts, err := client.GetTrafficselctor(name)
-//	if err != nil {
-//		return false, err
-//	}
-//	if ts == nil {
-//		log.Printf("[WARN] Traffic-selctor (%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//		return false, fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id())
-//	}
-//	return true, nil
-//}
 
 func resourceBigipTrafficselectorUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)

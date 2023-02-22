@@ -7,11 +7,10 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"strconv"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -212,24 +211,18 @@ func resourceBigipLtmPersistenceProfileCookieRead(ctx context.Context, d *schema
 	_ = d.Set("hash_offset", pp.HashOffset)
 	_ = d.Set("method", pp.Method)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
-		if err := d.Set("app_service", pp.AppService); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("app_service", pp.AppService)
 	}
 	// Specific to CookiePersistenceProfile
 	if _, ok := d.GetOk("cookie_encryption"); ok {
-		if err := d.Set("cookie_encryption", pp.CookieEncryption); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving CookieEncryption to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("cookie_encryption", pp.CookieEncryption)
 	}
 	if _, ok := d.GetOk("cookie_encryption_passphrase"); ok {
-		if err := d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase); err != nil {
-			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving CookieEncryptionPassphrase to state for PersistenceProfileCookie (%s): %s", d.Id(), err))
-		}
+		_ = d.Set("cookie_encryption_passphrase", pp.CookieEncryptionPassphrase)
 	}
 	if _, ok := d.GetOk("cookie_name"); ok {
 		_ = d.Set("cookie_name", pp.CookieName)
@@ -290,24 +283,4 @@ func resourceBigipLtmPersistenceProfileCookieDelete(ctx context.Context, d *sche
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileCookieExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Cookie Persistence Profile " + name)
-
-	pp, err := client.GetCookiePersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Cookie Persistence Profile %s  %v : ", name, err)
-		return false, err
-	}
-	if pp == nil {
-		log.Printf("[WARN] persistence profile cookie (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, nil
-	}
-
-	return pp != nil, nil
 }

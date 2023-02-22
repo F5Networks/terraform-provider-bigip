@@ -66,6 +66,7 @@ func TestAccBigipLtmProfileHttpcompressTC1(t *testing.T) {
 				Config: getProfileHttpComprsConfig(profileHttpComprsName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckHttpcompressExists(profileHttpComprsName, true),
+					testCheckHttpcompressExists("/Common/xxx_tets_compre", false),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "name", profileHttpComprsName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "defaults_from", "/Common/httpcompression"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test_httpcomprs_profile", "compression_buffersize", "4090"),
@@ -151,7 +152,7 @@ func testCheckHttpcompressExists(name string, exists bool) resource.TestCheckFun
 		if exists && p == nil {
 			return fmt.Errorf("httpcompress %s was not created. ", name)
 		}
-		if !exists && p == nil {
+		if !exists && p != nil {
 			return fmt.Errorf("httpcompress %s still exists. ", name)
 		}
 		return nil

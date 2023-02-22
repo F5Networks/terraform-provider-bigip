@@ -28,40 +28,38 @@ type UpdateParam struct {
 
 var TestNodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TestNodeName + `"
-	address = "192.168.30.1"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "/Common/icmp"
-	rate_limit = "disabled"
-	state = "user-up"
-	ratio = "91"
+  name             = "` + TestNodeName + `"
+  address          = "192.168.30.1"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "/Common/icmp"
+  rate_limit       = "disabled"
+  state            = "user-up"
+  ratio            = "91"
 }
 `
-
 var TestV6NodeResource = `
 resource "bigip_ltm_node" "test-node" {
-	name = "` + TestV6NodeName + `"
-	address = "fe80::10"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-	state = "user-up"
+  name             = "` + TestV6NodeName + `"
+  address          = "fe80::10"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "default"
+  rate_limit       = "disabled"
+  state            = "user-up"
 }
 `
-
 var TestFqdnNodeResource = `
 resource "bigip_ltm_node" "test-fqdn-node" {
-	name = "` + TestFqdnNodeName + `"
-	address = "f5.com"
-	connection_limit = "0"
-	dynamic_ratio = "1"
-	monitor = "default"
-	rate_limit = "disabled"
-	fqdn { interval = "3000"}
-	state = "user-up"
-	ratio = "19"
+  name             = "` + TestFqdnNodeName + `"
+  address          = "f5.com"
+  connection_limit = "0"
+  dynamic_ratio    = "1"
+  monitor          = "default"
+  rate_limit       = "disabled"
+  fqdn { interval = "3000" }
+  state = "user-up"
+  ratio = "19"
 }
 `
 
@@ -139,7 +137,7 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "rate_limit", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "state", "user-up"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.0.interval", "3000"),
-					//resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.*.interval", "3000"),
+					// resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "fqdn.*.interval", "3000"),
 					resource.TestCheckResourceAttr("bigip_ltm_node.test-fqdn-node", "ratio", "19"),
 				),
 			},

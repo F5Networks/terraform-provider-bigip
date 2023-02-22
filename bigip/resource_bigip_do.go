@@ -7,6 +7,7 @@ package bigip
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -17,7 +18,6 @@ import (
 	"strings"
 	"time"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	uuid "github.com/google/uuid"

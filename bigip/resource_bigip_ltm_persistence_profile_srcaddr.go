@@ -7,11 +7,11 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
-	"context"
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -162,7 +162,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(ctx context.Context, d *schem
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
@@ -261,23 +261,3 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(ctx context.Context, d *sch
 	d.SetId("")
 	return nil
 }
-
-//func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//
-//	name := d.Id()
-//	log.Println("[INFO] Fetching Source Address Persistence Profile " + name)
-//
-//	pp, err := client.GetSourceAddrPersistenceProfile(name)
-//	if err != nil {
-//		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s) (%v)", name, err)
-//		return false, err
-//	}
-//
-//	if pp == nil {
-//		log.Printf("[WARN] persistence profile src_addr  (%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//	}
-//
-//	return pp != nil, nil
-//}
