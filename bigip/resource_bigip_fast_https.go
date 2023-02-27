@@ -487,7 +487,9 @@ func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	}
 	_ = d.Set("existing_monitor", data.HTTPMonitor)
 	if _, ok := d.GetOk("monitor"); ok {
-		_ = d.Set("monitor", []interface{}{flattenFastMonitor(data)})
+		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
 	}
 	return nil
 }

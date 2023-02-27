@@ -58,7 +58,7 @@ func TestAccFastHTTPAppCreateTC02(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "tenant", httpTenant1Name),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "virtual_server.0.ip", "10.200.21.2"),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "virtual_server.0.port", "443"),
-					//resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
+					// resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
 				),
 			},
 		},

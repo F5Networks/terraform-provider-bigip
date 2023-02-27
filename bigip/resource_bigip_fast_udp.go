@@ -383,7 +383,10 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 	monitorData["expected_response"] = data.MonitorExpectedResponse
 	monitorData["interval"] = data.MonitorInterval
 	if _, ok := d.GetOk("monitor"); ok {
-		_ = d.Set("monitor", []interface{}{monitorData})
+		// _ = d.Set("monitor", []interface{}{monitorData})
+		if err := d.Set("monitor", []interface{}{monitorData}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
 	}
 	_ = d.Set("irules", data.IruleNames)
 	_ = d.Set("fallback_persistence", data.FallbackPersistenceType)

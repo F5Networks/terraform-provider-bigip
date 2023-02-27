@@ -312,7 +312,9 @@ func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
 	monitorData["enable"] = data.MonitorEnable
 	monitorData["interval"] = data.MonitorInterval
 	if _, ok := d.GetOk("monitor"); ok {
-		_ = d.Set("monitor", []interface{}{monitorData})
+		if err := d.Set("monitor", []interface{}{monitorData}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
 	}
 	return nil
 }
