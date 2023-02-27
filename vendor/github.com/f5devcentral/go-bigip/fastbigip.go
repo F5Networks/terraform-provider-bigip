@@ -110,45 +110,47 @@ type FastUDPJson struct {
 }
 
 type FastHttpJson struct {
-	Tenant                 string         `json:"tenant_name,omitempty"`
-	Application            string         `json:"app_name,omitempty"`
-	VirtualAddress         string         `json:"virtual_address,omitempty"`
-	VirtualPort            interface{}    `json:"virtual_port,omitempty"`
-	SnatEnable             bool           `json:"enable_snat,omitempty"`
-	SnatAutomap            bool           `json:"snat_automap"`
-	MakeSnatPool           bool           `json:"make_snatpool"`
-	SnatPoolName           string         `json:"snatpool_name,omitempty"`
-	SnatAddresses          []string       `json:"snat_addresses,omitempty"`
-	PoolEnable             bool           `json:"enable_pool"`
-	MakePool               bool           `json:"make_pool"`
-	TlsServerEnable        bool           `json:"enable_tls_server"`
-	TlsClientEnable        bool           `json:"enable_tls_client"`
-	TlsServerProfileCreate bool           `json:"make_tls_server_profile"`
-	TlsClientProfileCreate bool           `json:"make_tls_client_profile"`
-	TlsServerProfileName   string         `json:"tls_server_profile_name,omitempty"`
-	TlsClientProfileName   string         `json:"tls_client_profile_name,omitempty"`
-	TlsCertName            string         `json:"tls_cert_name,omitempty"`
-	TlsKeyName             string         `json:"tls_key_name,omitempty"`
-	PoolName               string         `json:"pool_name,omitempty"`
-	PoolMembers            []FastHttpPool `json:"pool_members,omitempty"`
-	LoadBalancingMode      string         `json:"load_balancing_mode,omitempty"`
-	SlowRampTime           int            `json:"slow_ramp_time,omitempty"`
-	MonitorEnable          bool           `json:"enable_monitor,omitempty"`
-	MakeMonitor            bool           `json:"make_monitor"`
-	HTTPMonitor            string         `json:"monitor_name_http,omitempty"`
-	HTTPSMonitor           string         `json:"monitor_name,omitempty"`
-	MonitorAuth            bool           `json:"monitor_credentials"`
-	MonitorUsername        string         `json:"monitor_username,omitempty"`
-	MonitorPassword        string         `json:"monitor_passphrase,omitempty"`
-	MonitorInterval        int            `json:"monitor_interval,omitempty"`
-	MonitorSendString      string         `json:"monitor_send_string,omitempty"`
-	MonitorResponse        string         `json:"monitor_expected_response,omitempty"`
-	WafPolicyEnable        bool           `json:"enable_waf_policy"`
-	MakeWafpolicy          bool           `json:"make_waf_policy"`
-	WafPolicyName          string         `json:"asm_waf_policy,omitempty"`
-	EndpointPolicyNames    []string       `json:"endpoint_policy_names,omitempty"`
-	AsmLoggingEnable       bool           `json:"enable_asm_logging"`
-	LogProfileNames        []string       `json:"log_profile_names,omitempty"`
+	Tenant                 string               `json:"tenant_name,omitempty"`
+	Application            string               `json:"app_name,omitempty"`
+	VirtualAddress         string               `json:"virtual_address,omitempty"`
+	VirtualPort            interface{}          `json:"virtual_port,omitempty"`
+	SnatEnable             bool                 `json:"enable_snat,omitempty"`
+	SnatAutomap            bool                 `json:"snat_automap"`
+	MakeSnatPool           bool                 `json:"make_snatpool"`
+	SnatPoolName           string               `json:"snatpool_name,omitempty"`
+	SnatAddresses          []string             `json:"snat_addresses,omitempty"`
+	PoolEnable             bool                 `json:"enable_pool"`
+	MakePool               bool                 `json:"make_pool"`
+	TlsServerEnable        bool                 `json:"enable_tls_server"`
+	TlsClientEnable        bool                 `json:"enable_tls_client"`
+	TlsServerProfileCreate bool                 `json:"make_tls_server_profile"`
+	TlsClientProfileCreate bool                 `json:"make_tls_client_profile"`
+	TlsServerProfileName   string               `json:"tls_server_profile_name,omitempty"`
+	TlsClientProfileName   string               `json:"tls_client_profile_name,omitempty"`
+	TlsCertName            string               `json:"tls_cert_name,omitempty"`
+	TlsKeyName             string               `json:"tls_key_name,omitempty"`
+	PoolName               string               `json:"pool_name,omitempty"`
+	PoolMembers            []FastHttpPool       `json:"pool_members,omitempty"`
+	SdEnable               bool                 `json:"use_sd"`
+	ServiceDiscovery       []ServiceDiscoverObj `json:"service_discovery,omitempty"`
+	LoadBalancingMode      string               `json:"load_balancing_mode,omitempty"`
+	SlowRampTime           int                  `json:"slow_ramp_time,omitempty"`
+	MonitorEnable          bool                 `json:"enable_monitor,omitempty"`
+	MakeMonitor            bool                 `json:"make_monitor"`
+	HTTPMonitor            string               `json:"monitor_name_http,omitempty"`
+	HTTPSMonitor           string               `json:"monitor_name,omitempty"`
+	MonitorAuth            bool                 `json:"monitor_credentials"`
+	MonitorUsername        string               `json:"monitor_username,omitempty"`
+	MonitorPassword        string               `json:"monitor_passphrase,omitempty"`
+	MonitorInterval        int                  `json:"monitor_interval,omitempty"`
+	MonitorSendString      string               `json:"monitor_send_string,omitempty"`
+	MonitorResponse        string               `json:"monitor_expected_response,omitempty"`
+	WafPolicyEnable        bool                 `json:"enable_waf_policy"`
+	MakeWafpolicy          bool                 `json:"make_waf_policy"`
+	WafPolicyName          string               `json:"asm_waf_policy,omitempty"`
+	EndpointPolicyNames    []string             `json:"endpoint_policy_names,omitempty"`
+	AsmLoggingEnable       bool                 `json:"enable_asm_logging"`
+	LogProfileNames        []string             `json:"log_profile_names,omitempty"`
 }
 
 type FastHttpPool struct {
@@ -157,6 +159,42 @@ type FastHttpPool struct {
 	ConnectionLimit int      `json:"connectionLimit,omitempty"`
 	PriorityGroup   int      `json:"priorityGroup,omitempty"`
 	ShareNodes      bool     `json:"shareNodes,omitempty"`
+}
+
+type ServiceDiscoverObj struct {
+	SdType               string `json:"sd_type"`
+	SdPort               int    `json:"sd_port"`
+	SdTagKey             string `json:"sd_tag_key,omitempty"`
+	SdTagVal             string `json:"sd_tag_val,omitempty"`
+	SdAccessKeyId        string `json:"sd_accessKeyId,omitempty"`
+	SdSecretAccessKey    string `json:"sd_secretAccessKey,omitempty"`
+	SdAddressRealm       string `json:"sd_addressRealm,omitempty"`
+	SdCredentialUpdate   bool   `json:"sd_credentialUpdate"`
+	SdExternalId         string `json:"sd_externalId,omitempty"`
+	SdRoleARN            string `json:"sd_roleARN,omitempty"`
+	SdMinimumMonitors    string `json:"sd_minimumMonitors,omitempty"`
+	SdAwsRegion          string `json:"sd_aws_region,omitempty"`
+	SdUndetectableAction string `json:"sd_undetectableAction"`
+	SdUpdateInterval     string `json:"sd_updateInterval,omitempty"`
+	SdRg                 string `json:"sd_rg,omitempty"`
+	SdSid                string `json:"sd_sid,omitempty"`
+	SdRid                string `json:"sd_rid,omitempty"`
+	SdRtype              string `json:"sd_rtype,omitempty"`
+	SdDirid              string `json:"sd_dirid,omitempty"`
+	SdAppid              string `json:"sd_appid,omitempty"`
+	SdApikey             string `json:"sd_apikey,omitempty"`
+	SdEnvironment        string `json:"sd_environment,omitempty"`
+	SdAzureTagKey        string `json:"sd_azure_tag_key,omitempty"`
+	SdAzureTagVal        string `json:"sd_azure_tag_val,omitempty"`
+	SdUseManagedIdentity bool   `json:"sd_useManagedIdentity,omitempty"`
+	SdRegion             string `json:"sd_region,omitempty"`
+	SdEncodedCredentials string `json:"sd_encodedCredentials,omitempty"`
+	SdProjectId          string `json:"sd_projectId,omitempty"`
+	SdUri                string `json:"sd_uri,omitempty"`
+	SdEncodedToken       string `json:"sd_encodedToken,omitempty"`
+	SdJmesPathQuery      string `json:"sd_jmesPathQuery,omitempty"`
+	SdRejectUnauthorized bool   `json:"sd_rejectUnauthorized,omitempty"`
+	SdTrustCA            string `json:"sd_trustCA,omitempty"`
 }
 
 // UploadFastTemplate copies a template set from local disk to BIGIP

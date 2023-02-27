@@ -137,6 +137,31 @@ func TestAccFastHTTPSAppProfileTC4(t *testing.T) {
 	})
 }
 
+func TestAccFastHTTPSAppProfileTC5(t *testing.T) {
+	httpsAppName = "fast_https_apptc5"
+	httpsTenantName = "fast_https_tenanttc5"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPSAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPSAppConfigTC5(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_apptc5"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenanttc5"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.30.41.45"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
+				),
+			},
+		},
+	})
+}
+
 func getFastHTTPSAppConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_https_app" "fast_https_app" {
@@ -209,6 +234,31 @@ resource "bigip_fast_https_app" "fast_https_app" {
 }
 
 func getFastHTTPSAppConfigTC4() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.30.41.45"
+    port = 443
+  }
+  tls_server_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+  tls_client_profile {
+    tls_cert_name = "/Common/default.crt"
+    tls_key_name  = "/Common/default.key"
+  }
+  waf_security_policy {
+    enable = true
+  }
+  endpoint_ltm_policy = ["/Common/testpolicy1"]
+}
+`, httpsTenantName, httpsAppName)
+}
+
+func getFastHTTPSAppConfigTC5() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_https_app" "fast_https_app" {
   tenant      = "%v"
