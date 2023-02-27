@@ -81,11 +81,12 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Select an existing BIG-IP Pool",
-				ConflictsWith: []string{"pool_members"},
+				ConflictsWith: []string{"pool_members", "service_discovery", "existing_monitor", "monitor"},
 			},
 			"pool_members": {
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"addresses": {
@@ -100,15 +101,65 @@ func resourceBigipHttpFastApp() *schema.Resource {
 						},
 						"connection_limit": {
 							Type:     schema.TypeInt,
+							Computed: true,
 							Optional: true,
 						},
 						"priority_group": {
 							Type:     schema.TypeInt,
+							Computed: true,
 							Optional: true,
 						},
 						"share_nodes": {
 							Type:     schema.TypeBool,
+							Computed: true,
 							Optional: true,
+						},
+					},
+				},
+				ConflictsWith: []string{"existing_pool"},
+			},
+			"service_discovery": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"sd_type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"sd_port": {
+							Type:     schema.TypeInt,
+							Required: true,
+						},
+						"sd_aws_tag_key": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sd_aws_tag_val": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sd_aws_region": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sd_aws_access_key": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sd_aws_secret_access_key": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sd_address_realm": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "private",
+						},
+						"sd_undetectable_action": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "remove",
 						},
 					},
 				},
@@ -354,10 +405,12 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	log.Printf("My HTTP DATA:%+v", data)
 	_ = d.Set("tenant", data.Tenant)
 	_ = d.Set("application", data.Application)
-	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
-	_ = d.Set("virtual_server.0.port", data.VirtualPort)
+	vsdata := make(map[string]interface{})
+	vsdata["ip"] = data.VirtualAddress
+	vsdata["port"] = data.VirtualPort
+	_ = d.Set("virtual_server", []interface{}{vsdata})
 	_ = d.Set("existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("snat_pool_addresses", data.SnatAddresses)
+	_ = d.Set("snat_pool_address", data.SnatAddresses)
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
 	_ = d.Set("existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
@@ -371,12 +424,16 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 		_ = d.Set("existing_waf_security_policy", data.WafPolicyName)
 	}
 	if _, ok := d.GetOk("endpoint_ltm_policy"); ok {
-		_ = d.Set("endpoint_ltm_policy", data.WafPolicyName)
+		_ = d.Set("endpoint_ltm_policy", data.EndpointPolicyNames)
 	}
 	if _, ok := d.GetOk("monitor"); ok {
 		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
 			return fmt.Errorf("error setting monitor: %w", err)
 		}
+	}
+
+	if _, ok := d.GetOk("service_discovery"); ok {
+		_ = d.Set("service_discovery", data.ServiceDiscovery)
 	}
 	return nil
 }
@@ -408,7 +465,7 @@ func flattenFastPoolMembers(members []bigip.FastHttpPool) []interface{} {
 	for i, v := range members {
 		obj := make(map[string]interface{})
 		if len(v.ServerAddresses) > 0 {
-			obj["adresses"] = v.ServerAddresses
+			obj["addresses"] = v.ServerAddresses
 		}
 		obj["port"] = v.ServicePort
 		if v.ConnectionLimit > 0 {
@@ -471,6 +528,33 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 		}
 		httpJson.PoolMembers = members
 	}
+
+	if p, ok := d.GetOk("service_discovery"); ok {
+		httpJson.SdEnable = true
+		httpJson.PoolEnable = true
+		httpJson.MakePool = true
+		var sdObjs []bigip.ServiceDiscoverObj
+		for _, r := range p.(*schema.Set).List() {
+			sdObj := bigip.ServiceDiscoverObj{}
+			sdObj.SdType = r.(map[string]interface{})["sd_type"].(string)
+			sdObj.SdPort = r.(map[string]interface{})["sd_port"].(int)
+			sdObj.SdAddressRealm = r.(map[string]interface{})["sd_address_realm"].(string)
+			if sdObj.SdType == "aws" {
+				if r.(map[string]interface{})["sd_aws_tag_key"].(string) == "" && r.(map[string]interface{})["sd_aws_tag_val"].(string) == "" {
+					return "", fmt.Errorf("'sd_aws_tag_key' and 'sd_aws_tag_val' must be specified for aws service discovery")
+				}
+				sdObj.SdTagKey = r.(map[string]interface{})["sd_aws_tag_key"].(string)
+				sdObj.SdTagVal = r.(map[string]interface{})["sd_aws_tag_val"].(string)
+				sdObj.SdAwsRegion = r.(map[string]interface{})["sd_aws_region"].(string)
+				sdObj.SdAccessKeyId = r.(map[string]interface{})["sd_aws_access_key"].(string)
+				sdObj.SdSecretAccessKey = r.(map[string]interface{})["sd_aws_secret_access_key"].(string)
+				sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
+			}
+			sdObjs = append(sdObjs, sdObj)
+		}
+		httpJson.ServiceDiscovery = sdObjs
+	}
+
 	httpJson.SnatEnable = true
 	httpJson.SnatAutomap = true
 	httpJson.WafPolicyEnable = false

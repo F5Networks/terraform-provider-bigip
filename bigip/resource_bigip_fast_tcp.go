@@ -225,10 +225,10 @@ func resourceBigipFastTcpAppRead(ctx context.Context, d *schema.ResourceData, me
 	var fastTcp bigip.FastTCPJson
 	log.Printf("[INFO] Reading FastApp config")
 	tenant := d.Get("tenant").(string)
-	app_name := d.Id()
+	appName := d.Id()
 
 	log.Printf("[INFO] Reading FAST TCP Application config")
-	fastJson, err := client.GetFastApp(tenant, app_name)
+	fastJson, err := client.GetFastApp(tenant, appName)
 	log.Printf("[DEBUG] FAST json retreived from the GET call in Read function : %s", fastJson)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
@@ -292,23 +292,29 @@ func resourceBigipFastTcpAppDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
-	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
-	_ = d.Set("virtual_server.0.port", data.VirtualPort)
-	_ = d.Set("snat.enable", data.SnatEnable)
-	_ = d.Set("snat.automap", data.SnatAutomap)
-	_ = d.Set("snat.existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("snat.snat_addresses", data.SnatAddresses)
-	_ = d.Set("pool.enable", data.PoolEnable)
-	_ = d.Set("pool.existing_pool", data.PoolName)
+	_ = d.Set("tenant", data.Tenant)
+	_ = d.Set("application", data.Application)
+	vsdata := make(map[string]interface{})
+	vsdata["ip"] = data.VirtualAddress
+	vsdata["port"] = data.VirtualPort
+	_ = d.Set("virtual_server", []interface{}{vsdata})
+	_ = d.Set("existing_snat_pool", data.SnatPoolName)
+	_ = d.Set("snat_pool_address", data.SnatAddresses)
+	_ = d.Set("existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
-	_ = d.Set("pool.pool_members", members)
-	_ = d.Set("slow_ramp_time", data.SlowRampTime)
-	_ = d.Set("monitor.enable", data.MonitorEnable)
+	_ = d.Set("pool_members", members)
+	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
+	if _, ok := d.GetOk("slow_ramp_time"); ok {
+		_ = d.Set("slow_ramp_time", data.SlowRampTime)
+	}
 	_ = d.Set("existing_monitor", data.TCPMonitor)
-	_ = d.Set("monitor.0.interval", data.MonitorInterval)
-	err := d.Set("load_balancing_mode", data.LoadBalancingMode)
-	if err != nil {
-		return err
+	monitorData := make(map[string]interface{})
+	monitorData["enable"] = data.MonitorEnable
+	monitorData["interval"] = data.MonitorInterval
+	if _, ok := d.GetOk("monitor"); ok {
+		if err := d.Set("monitor", []interface{}{monitorData}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
 	}
 	return nil
 }

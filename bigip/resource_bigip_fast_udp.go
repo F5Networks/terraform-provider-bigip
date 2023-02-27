@@ -357,8 +357,10 @@ func resourceBigipFastUdpAppDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
-	_ = d.Set("virtual_server.0.ip", data.VirtualAddress)
-	_ = d.Set("virtual_server.0.port", data.VirtualPort)
+	vsdata := make(map[string]interface{})
+	vsdata["ip"] = data.VirtualAddress
+	vsdata["port"] = data.VirtualPort
+	_ = d.Set("virtual_server", []interface{}{vsdata})
 	_ = d.Set("enable_fastl4", data.Fastl4Enable)
 	if data.Fastl4Enable {
 		_ = d.Set("existing_profile", data.Fastl4ProfileName)
@@ -370,15 +372,22 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 		_ = d.Set("persistence_type", data.UdpPersistenceType)
 	}
 	_ = d.Set("existing_snat_pool", data.SnatPoolName)
-	_ = d.Set("snat_pool_addresses", data.SnatAddresses)
+	_ = d.Set("snat_pool_address", data.SnatAddresses)
 	_ = d.Set("existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool_members", members)
 	_ = d.Set("slow_ramp_time", data.SlowRampTime)
 	_ = d.Set("existing_monitor", data.UdpMonitor)
-	_ = d.Set("monitor.0.interval", data.MonitorInterval)
-	_ = d.Set("monitor.0.send_string", data.MonitorSendString)
-	_ = d.Set("monitor.0.expected_response", data.MonitorExpectedResponse)
+	monitorData := make(map[string]interface{})
+	monitorData["send_string"] = data.MonitorSendString
+	monitorData["expected_response"] = data.MonitorExpectedResponse
+	monitorData["interval"] = data.MonitorInterval
+	if _, ok := d.GetOk("monitor"); ok {
+		// _ = d.Set("monitor", []interface{}{monitorData})
+		if err := d.Set("monitor", []interface{}{monitorData}); err != nil {
+			return fmt.Errorf("error setting monitor: %w", err)
+		}
+	}
 	_ = d.Set("irules", data.IruleNames)
 	_ = d.Set("fallback_persistence", data.FallbackPersistenceType)
 	if data.VlansAllow && data.VlansEnable {
@@ -388,10 +397,7 @@ func setFastUdpData(d *schema.ResourceData, data bigip.FastUDPJson) error {
 		_ = d.Set("vlans_rejected", data.Vlans)
 	}
 	_ = d.Set("security_log_profiles", data.LogProfileNames)
-	err := d.Set("load_balancing_mode", data.LoadBalancingMode)
-	if err != nil {
-		return err
-	}
+	_ = d.Set("load_balancing_mode", data.LoadBalancingMode)
 	return nil
 }
 

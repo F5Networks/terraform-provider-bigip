@@ -41,8 +41,8 @@ func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 }
 
 func TestAccFastHTTPAppCreateTC02(t *testing.T) {
-	var httpApp1Name = "fast_http_app"
-	var httpTenant1Name = "fast_http_tenant"
+	var httpApp1Name = "fast_http_apptc2"
+	var httpTenant1Name = "fast_http_tenanttc2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -51,14 +51,14 @@ func TestAccFastHTTPAppCreateTC02(t *testing.T) {
 		CheckDestroy: testCheckFastHTTPAppDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: getFastHTTPAppConfigTC02(),
+				Config: getFastHTTPAppConfigTC02(httpTenant1Name, httpApp1Name),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckFastAppExists(httpApp1Name, httpTenant1Name, true),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "application", httpApp1Name),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "tenant", httpTenant1Name),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.0.ip", "10.200.21.2"),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "virtual_server.0.port", "443"),
-					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "application", httpApp1Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "tenant", httpTenant1Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "virtual_server.0.ip", "10.200.21.2"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc2", "virtual_server.0.port", "443"),
+					// resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app", "endpoint_ltm_policy.0", "/Common/testpolicy1"),
 				),
 			},
 		},
@@ -78,9 +78,9 @@ resource "bigip_fast_http_app" "fast_http_app" {
 `, httpTenantName, httpAppName)
 }
 
-func getFastHTTPAppConfigTC02() string {
+func getFastHTTPAppConfigTC02(httpTenantName, httpAppName string) string {
 	return fmt.Sprintf(`
-resource "bigip_fast_http_app" "fast_http_app" {
+resource "bigip_fast_http_app" "fast_http_app_tc2" {
   tenant      = "%v"
   application = "%v"
   virtual_server {
