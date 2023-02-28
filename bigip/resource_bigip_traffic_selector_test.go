@@ -10,15 +10,15 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccBigipnetIPsecTrafficselector_Defaultcreate(t *testing.T) {
 	t.Parallel()
 	resName = "bigip_traffic_selector"
 	var instName = "test-selector"
-	var instFullName = fmt.Sprintf("/%s/%s", TEST_PARTITION, instName)
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
 	resFullName := fmt.Sprintf("%s.%s", resName, instName)
 
 	resource.Test(t, resource.TestCase{

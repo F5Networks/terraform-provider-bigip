@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TEST_PARTITION)
+var TEST_SNAT_NAME = fmt.Sprintf("/%s/test-snat", TestPartition)
 
 var TEST_SNAT_RESOURCE = `
 resource "bigip_ltm_snat" "test-snat" {

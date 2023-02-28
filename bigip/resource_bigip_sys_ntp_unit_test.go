@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func testBigipSysNtpInvalid(resourceName string) string {
@@ -33,7 +33,7 @@ func TestAccBigipSysNtpInvalid(t *testing.T) {
 	resourceName := "/Common/test-ntp"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
-		Providers:  testProviders,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSysNtpInvalid(resourceName),

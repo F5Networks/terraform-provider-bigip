@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -14,19 +15,19 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipIpsecPolicy() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipIpsecPolicyCreate,
-		Read:   resourceBigipIpsecPolicyRead,
-		Update: resourceBigipIpsecPolicyUpdate,
-		Delete: resourceBigipIpsecPolicyDelete,
-		Exists: resourceBigipIpsecPolicyExists,
+		CreateContext: resourceBigipIpsecPolicyCreate,
+		ReadContext:   resourceBigipIpsecPolicyRead,
+		UpdateContext: resourceBigipIpsecPolicyUpdate,
+		DeleteContext: resourceBigipIpsecPolicyDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -116,7 +117,7 @@ func resourceBigipIpsecPolicy() *schema.Resource {
 	}
 }
 
-func resourceBigipIpsecPolicyCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecPolicyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating IPSec Policy " + name)
@@ -139,7 +140,7 @@ func resourceBigipIpsecPolicyCreate(d *schema.ResourceData, meta interface{}) er
 	err := client.CreateIPSecPolicy(selectorConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create IPSec policy (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -161,74 +162,58 @@ func resourceBigipIpsecPolicyCreate(d *schema.ResourceData, meta interface{}) er
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipIpsecPolicyRead(d, meta)
+	return resourceBigipIpsecPolicyRead(ctx, d, meta)
 }
 
-func resourceBigipIpsecPolicyRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecPolicyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Reading IPSec policy :%+v", name)
 	ipsec, err := client.GetIPSecPolicy(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if ipsec == nil {
 		d.SetId("")
-		return fmt.Errorf("[ERROR] IPSec policy (%s) not found, removing from state", d.Id())
+		return diag.FromErr(fmt.Errorf("[ERROR] IPSec policy (%s) not found, removing from state", d.Id()))
 	}
 	log.Printf("[DEBUG] IPSec Policy:%+v", ipsec)
 	if err := d.Set("protocol", ipsec.Protocol); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Protocol to state for IPSec policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Protocol to state for IPSec policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("mode", ipsec.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for IPSec policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Mode to state for IPSec policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("tunnel_local_address", ipsec.TunnelLocalAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TunnelLocalAddress to state for IPSec policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving TunnelLocalAddress to state for IPSec policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("tunnel_remote_address", ipsec.TunnelRemoteAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TunnelRemoteAddress to state for IPSec policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving TunnelRemoteAddress to state for IPSec policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("encrypt_algorithm", ipsec.IkePhase2EncryptAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2EncryptAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IkePhase2EncryptAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("auth_algorithm", ipsec.IkePhase2AuthAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2AuthAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IkePhase2AuthAlgorithm to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("lifetime", ipsec.IkePhase2Lifetime); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2Lifetime to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IkePhase2Lifetime to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("kb_lifetime", ipsec.IkePhase2LifetimeKilobytes); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2LifetimeKilobytes to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IkePhase2LifetimeKilobytes to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("perfect_forward_secrecy", ipsec.IkePhase2PerfectForwardSecrecy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IkePhase2PerfectForwardSecrecy to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IkePhase2PerfectForwardSecrecy to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	if err := d.Set("ipcomp", ipsec.Ipcomp); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Ipcomp to state for IPSec Policy (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Ipcomp to state for IPSec Policy (%s): %s", d.Id(), err))
 	}
 	_ = d.Set("description", ipsec.Description)
 	_ = d.Set("name", name)
 	return nil
 }
 
-func resourceBigipIpsecPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Check existence of IPSec Policy: %+v ", name)
-	ipsec, err := client.GetTrafficselctor(name)
-	if err != nil {
-		return false, err
-	}
-	if ipsec == nil {
-		log.Printf("[WARN] IPSec Policy (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, fmt.Errorf("[ERROR] IPSec Policy (%s) not found, removing from state", d.Id())
-	}
-	return true, nil
-}
-
-func resourceBigipIpsecPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecPolicyUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating IPSec Policy:%+v ", name)
@@ -249,17 +234,17 @@ func resourceBigipIpsecPolicyUpdate(d *schema.ResourceData, meta interface{}) er
 	err := client.ModifyIPSecPolicy(name, ipsec)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify IPSec Policy   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipIpsecPolicyRead(d, meta)
+	return resourceBigipIpsecPolicyRead(ctx, d, meta)
 }
-func resourceBigipIpsecPolicyDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipIpsecPolicyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Deleting IPSec Policy:%+v ", name)
 	err := client.DeleteIPSecPolicy(name)
 	if err != nil {
-		return fmt.Errorf("[ERROR] Unable to Delete IPSec Policy (%s) (%v) ", name, err)
+		return diag.FromErr(fmt.Errorf("[ERROR] Unable to Delete IPSec Policy (%s) (%v) ", name, err))
 	}
 	d.SetId("")
 	return nil

@@ -6,6 +6,6 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 provider "azurerm" {
 }
 resource "azurerm_resource_group" "scs" {
-        name = "SCSResourceGroup"
-        location = "eastus"
+  name     = "SCSResourceGroup"
+  location = "eastus"
 }

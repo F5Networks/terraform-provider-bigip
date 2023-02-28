@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -14,17 +15,18 @@ import (
 	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigiqLicenseManage() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigiqLicenseManageCreate,
-		Read:   resourceBigiqLicenseManageRead,
-		Update: resourceBigiqLicenseManageUpdate,
-		Delete: resourceBigiqLicenseManageDelete,
+		CreateContext: resourceBigiqLicenseManageCreate,
+		ReadContext:   resourceBigiqLicenseManageRead,
+		UpdateContext: resourceBigiqLicenseManageUpdate,
+		DeleteContext: resourceBigiqLicenseManageDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"bigiq_address": {
@@ -120,13 +122,13 @@ func resourceBigiqLicenseManage() *schema.Resource {
 	}
 }
 
-func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigiqLicenseManageCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	bigipRef := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Start License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
-		return err
+		return diag.FromErr(err)
 	}
 	var deviceIP []string
 	var respID string
@@ -139,25 +141,25 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[INFO] BIGIP License Assignment Started on Pool:%v", licensePoolName)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if poolInfo == nil {
-		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
+		return diag.FromErr(fmt.Errorf("there is no pool with specified name:%v", licensePoolName))
 	}
 
 	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
-		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
+		return diag.FromErr(fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName))
 	}
 
 	assignmentType := d.Get("assignment_type").(string)
 	if strings.ToLower(assignmentType) == "unreachable" {
 		if d.Get("mac_address").(string) == "" || d.Get("hypervisor").(string) == "" {
-			return fmt.Errorf("mac_address and hypervisor are required parameter for assignment_type = %s", assignmentType)
+			return diag.FromErr(fmt.Errorf("mac_address and hypervisor are required parameter for assignment_type = %s", assignmentType))
 		}
 	}
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {
-		return fmt.Errorf("getting Poolid failed with :%v", err)
+		return diag.FromErr(fmt.Errorf("getting Poolid failed with :%v", err))
 	}
 	regKey := d.Get("key").(string)
 	if regKey == "" {
@@ -187,7 +189,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		}
 		taskID, err := bigiqRef.PostLicense(config)
 		if err != nil {
-			return fmt.Errorf("Error is : %v", err)
+			return diag.FromErr(fmt.Errorf("Error is : %v", err))
 		}
 		respID = taskID
 	} else {
@@ -195,7 +197,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 		if strings.ToUpper(assignmentType) == "MANAGED" {
 			deviceID, err := bigiqRef.GetDeviceId(deviceIP[2])
 			if (err != nil) && (deviceID == "") {
-				return fmt.Errorf("getting deviceid failed with :%v", err)
+				return diag.FromErr(fmt.Errorf("getting deviceid failed with :%v", err))
 			}
 			deRef := bigip.DeviceRef{
 				Link: deviceID,
@@ -206,7 +208,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
-				return err
+				return diag.FromErr(err)
 			}
 			respID = resp.ID
 		} else if strings.ToUpper(assignmentType) == "UNMANAGED" {
@@ -219,7 +221,7 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
-				return err
+				return diag.FromErr(err)
 			}
 			respID = resp.ID
 		}
@@ -227,91 +229,91 @@ func resourceBigiqLicenseManageCreate(d *schema.ResourceData, meta interface{}) 
 	if strings.ToLower(assignmentType) == "unreachable" {
 		licenseStatus, err := bigiqRef.GetLicenseStatus(respID)
 		if err != nil {
-			return fmt.Errorf("getting license status failed with : %v", err)
+			return diag.FromErr(fmt.Errorf("getting license status failed with : %v", err))
 		}
 		if licenseStatus["status"] == "FAILED" {
 			d.SetId("")
-			return fmt.Errorf("%s", licenseStatus["errorMessage"])
+			return diag.FromErr(fmt.Errorf("%s", licenseStatus["errorMessage"]))
 		}
 		licenseText := licenseStatus["licenseText"].(string)
 		err = bigipRef.InstallLicense(licenseText)
 		if err != nil {
-			return fmt.Errorf("License Assignment to UNREACHBLE Device Failed : %v", err)
+			return diag.FromErr(fmt.Errorf("License Assignment to UNREACHBLE Device Failed : %v ", err))
 		}
 	}
 	d.SetId(respID)
-	return resourceBigiqLicenseManageRead(d, meta)
+	return resourceBigiqLicenseManageRead(ctx, d, meta)
 }
-func resourceBigiqLicenseManageRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigiqLicenseManageRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	bigipRef := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Reading License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
-		return err
+		return diag.FromErr(err)
 	}
 	licensePoolName := d.Get("license_poolname").(string)
 	memID := d.Id()
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if poolInfo == nil {
-		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
+		return diag.FromErr(fmt.Errorf("there is no pool with specified name:%v", licensePoolName))
 	}
 	poolName := d.Get("license_poolname").(string)
 	regKey := d.Get("key").(string)
 	poolId, err := bigiqRef.GetRegkeyPoolId(poolName)
 	if err != nil && poolId == "" {
 		log.Printf("Getting PoolID failed with :%v", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if regKey == "" {
 		taskId := memID
 		licenseStatus, err := bigiqRef.GetLicenseStatus(taskId)
 		if err != nil {
-			return fmt.Errorf("getting license status failed with : %v", err)
+			return diag.FromErr(fmt.Errorf("getting license status failed with : %v", err))
 		}
 		if licenseStatus["status"] == "FINISHED" && poolInfo.SortName == "Purchased Pool" {
-			d.Set("device_license_status", "LICENSED")
+			_ = d.Set("device_license_status", "LICENSED")
 			return nil
 		}
 		if licenseStatus["status"] == "FAILED" {
 			d.SetId("")
-			return fmt.Errorf("%s", licenseStatus["errorMessage"])
+			return diag.FromErr(fmt.Errorf("%s", licenseStatus["errorMessage"]))
 		}
 		licenseAssignmentReference := licenseStatus["licenseAssignmentReference"].(map[string]interface{})["link"].(string)
 		assignmentRef := strings.Split(licenseAssignmentReference, "/")
 		deviceStatus, err := bigiqRef.GetDeviceLicenseStatus(assignmentRef[3:]...)
 		if err != nil {
-			return fmt.Errorf("getting license assignment status from bigip failed with :%v", err)
+			return diag.FromErr(fmt.Errorf("getting license assignment status from bigip failed with :%v", err))
 		}
 
 		bigipLicence, err := bigipRef.GetBigipLiceseStatus()
 		if err != nil {
-			return fmt.Errorf("getting license assignment status from bigip failed with :%v", err)
+			return diag.FromErr(fmt.Errorf("getting license assignment status from bigip failed with :%v", err))
 		}
 		_, ok := bigipLicence["entries"].(map[string]interface{})
 		if !ok && deviceStatus != "LICENSED" {
-			return fmt.Errorf("getting license assignment status from bigip failed with :%v", err)
+			return diag.FromErr(fmt.Errorf("getting license assignment status from bigip failed with :%v", err))
 		}
-		d.Set("device_license_status", deviceStatus)
+		_ = d.Set("device_license_status", deviceStatus)
 	} else {
 		log.Printf("[DEBUG] GetMemberStatus using regKey")
 		if _, err := bigiqRef.GetMemberStatus(poolId, regKey, memID); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 	return nil
 }
 
-func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigiqLicenseManageUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	bigipRef := meta.(*bigip.BigIP)
 	log.Printf("[INFO] Updating License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	var deviceIP []string
@@ -324,20 +326,20 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 	licensePoolName := d.Get("license_poolname").(string)
 	poolInfo, err := bigiqRef.GetPoolType(licensePoolName)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if poolInfo == nil {
-		return fmt.Errorf("there is no pool with specified name:%v", licensePoolName)
+		return diag.FromErr(fmt.Errorf("there is no pool with specified name:%v", licensePoolName))
 	}
 	log.Printf("poolInfo:%+v", poolInfo)
 
 	if poolInfo.SortName == "Utility" && d.Get("unit_of_measure").(string) == "" {
-		return fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName)
+		return diag.FromErr(fmt.Errorf("unit_of_measure is required parameter for %s license type pool :%v", poolInfo.SortName, licensePoolName))
 	}
 
 	poolId, err := bigiqRef.GetRegkeyPoolId(licensePoolName)
 	if err != nil {
-		return fmt.Errorf("getting Poolid failed with :%v", err)
+		return diag.FromErr(fmt.Errorf("getting Poolid failed with :%v", err))
 	}
 	regKey := d.Get("key").(string)
 	if regKey == "" {
@@ -367,7 +369,7 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 		}
 		taskID, err := bigiqRef.PostLicense(config)
 		if err != nil {
-			return fmt.Errorf("Error is : %v", err)
+			return diag.FromErr(fmt.Errorf("Error is : %v ", err))
 		}
 		respID = taskID
 	} else {
@@ -375,7 +377,7 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 		if strings.ToUpper(assignmentType) == "MANAGED" {
 			deviceID, err := bigiqRef.GetDeviceId(deviceIP[2])
 			if (err != nil) && (deviceID == "") {
-				return fmt.Errorf("getting deviceid failed with :%v", err)
+				return diag.FromErr(fmt.Errorf("getting deviceid failed with :%v", err))
 			}
 			deRef := bigip.DeviceRef{
 				Link: deviceID,
@@ -386,7 +388,7 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
-				return err
+				return diag.FromErr(err)
 			}
 			respID = resp.ID
 		} else if strings.ToUpper(assignmentType) == "UNMANAGED" {
@@ -400,23 +402,23 @@ func resourceBigiqLicenseManageUpdate(d *schema.ResourceData, meta interface{}) 
 			resp, err := bigiqRef.RegkeylicenseAssign(config, poolId, regKey)
 			if err != nil {
 				log.Printf("Assigning License failed from regKey Pool:%v", err)
-				return err
+				return diag.FromErr(err)
 			}
 
 			respID = resp.ID
 		}
 	}
 	d.SetId(respID)
-	return resourceBigiqLicenseManageRead(d, meta)
+	return resourceBigiqLicenseManageRead(ctx, d, meta)
 }
 
-func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigiqLicenseManageDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	bigipRef := meta.(*bigip.BigIP)
 	log.Printf("Revoke License assignment for :%+v", bigipRef.Host)
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
-		return err
+		return diag.FromErr(err)
 	}
 	memID := d.Id()
 	var poolId, regKey string
@@ -424,7 +426,7 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		poolId, err = bigiqRef.GetRegkeyPoolId(v.(string))
 		if (err != nil) && (poolId == "") {
 			log.Printf("Getting PoolID failed with :%v", err)
-			return err
+			return diag.FromErr(err)
 		}
 	}
 	if v, ok := d.GetOk("key"); ok {
@@ -470,29 +472,29 @@ func resourceBigiqLicenseManageDelete(d *schema.ResourceData, meta interface{}) 
 		}
 		_, err := bigiqRef.PostLicense(config)
 		if err != nil {
-			return fmt.Errorf("revoking license failed with : %v", err)
+			return diag.FromErr(fmt.Errorf("revoking license failed with : %v", err))
 		}
 		if strings.ToLower(assignmentType) == "unreachable" {
 			err = bigipRef.RevokeLicense()
 			if err != nil {
-				return fmt.Errorf("license revoking to unreachable device failed : %v", err)
+				return diag.FromErr(fmt.Errorf("license revoking to unreachable device failed : %v", err))
 			}
 			time.Sleep(5 * time.Second)
 		}
 		log.Println("[DEBUG] wait for bigip status with license revoking")
 		bigipLicence, err := waitLicenseRevoke(bigipRef)
 		if err != nil {
-			return fmt.Errorf("getting license revoking status from bigip failed with :%v", err)
+			return diag.FromErr(fmt.Errorf("getting license revoking status from bigip failed with :%v", err))
 		}
 		_, ok := bigipLicence["entries"].(map[string]interface{})
 		if ok {
-			return fmt.Errorf("getting license revoking status from bigip failed")
+			return diag.FromErr(fmt.Errorf("getting license revoking status from bigip failed"))
 		}
 		log.Printf("[INFO] License Revoking for Device %+v Success", bigipRef.Host)
 	} else {
 		if strings.ToUpper(assignmentType) == "MANAGED" {
 			if err := bigiqRef.RegkeylicenseRevoke(poolId, regKey, memID); err != nil {
-				return fmt.Errorf("Error in RegkeylicenseRevoke: %v", err)
+				return diag.FromErr(fmt.Errorf("Error in RegkeylicenseRevoke: %v", err))
 			}
 		} else if strings.ToUpper(assignmentType) == "UNMANAGED" {
 			config := &struct {

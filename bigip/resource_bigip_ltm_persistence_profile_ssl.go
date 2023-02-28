@@ -7,22 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"log"
 	"strconv"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPersistenceProfileSSLCreate,
-		Read:   resourceBigipLtmPersistenceProfileSSLRead,
-		Update: resourceBigipLtmPersistenceProfileSSLUpdate,
-		Delete: resourceBigipLtmPersistenceProfileSSLDelete,
-		Exists: resourceBigipLtmPersistenceProfileSSLExists,
+		CreateContext: resourceBigipLtmPersistenceProfileSSLCreate,
+		ReadContext:   resourceBigipLtmPersistenceProfileSSLRead,
+		UpdateContext: resourceBigipLtmPersistenceProfileSSLUpdate,
+		DeleteContext: resourceBigipLtmPersistenceProfileSSLDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -90,7 +91,7 @@ func resourceBigipLtmPersistenceProfileSSL() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSSLCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -103,23 +104,15 @@ func resourceBigipLtmPersistenceProfileSSLCreate(d *schema.ResourceData, meta in
 
 	err := client.CreateSSLPersistenceProfile(config)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
 
-	err = resourceBigipLtmPersistenceProfileSSLUpdate(d, meta)
-	if err != nil {
-		if errdel := client.DeleteSSLPersistenceProfile(name); errdel != nil {
-			return errdel
-		}
-		return err
-	}
-
-	return resourceBigipLtmPersistenceProfileSSLRead(d, meta)
+	return resourceBigipLtmPersistenceProfileSSLUpdate(ctx, d, meta)
 
 }
 
-func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSSLRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -129,7 +122,7 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	pp, err := client.GetSSLPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile  (%s) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pp == nil {
 		log.Printf("[WARN] SSL  Persistence Profile (%s) not found, removing from state", name)
@@ -144,12 +137,12 @@ func resourceBigipLtmPersistenceProfileSSLRead(d *schema.ResourceData, meta inte
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 	return nil
 }
 
-func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSSLUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -171,7 +164,10 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 		err := client.ModifySSLPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
-			return err
+			if errdel := client.DeleteSSLPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 	} else {
 		pp := &bigip.SSLPersistenceProfile{
@@ -189,15 +185,17 @@ func resourceBigipLtmPersistenceProfileSSLUpdate(d *schema.ResourceData, meta in
 		err := client.ModifySSLPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify SSL Persistence Profile  (%s) (%v)", name, err)
-			return err
+			if errdel := client.DeleteSSLPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 
 	}
-
-	return resourceBigipLtmPersistenceProfileSSLRead(d, meta)
+	return resourceBigipLtmPersistenceProfileSSLRead(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSSLDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -205,28 +203,8 @@ func resourceBigipLtmPersistenceProfileSSLDelete(d *schema.ResourceData, meta in
 	err := client.DeleteSSLPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete SSL Persistence Profile  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileSSLExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching SSL Persistence Profile " + name)
-
-	pp, err := client.GetSSLPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve SSL Persistence Profile (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] persistence profile SSL  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }

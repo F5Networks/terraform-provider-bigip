@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,8 +18,9 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 var (
@@ -27,12 +29,12 @@ var (
 
 func resourceBigipAwafPolicy() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipAwafPolicyCreate,
-		Read:   resourceBigipAwafPolicyRead,
-		Update: resourceBigipAwafPolicyUpdate,
-		Delete: resourceBigipAwafPolicyDelete,
+		CreateContext: resourceBigipAwafPolicyCreate,
+		ReadContext:   resourceBigipAwafPolicyRead,
+		UpdateContext: resourceBigipAwafPolicyUpdate,
+		DeleteContext: resourceBigipAwafPolicyDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -63,6 +65,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the description of the policy.",
 			},
 			"application_language": {
@@ -254,7 +257,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 	}
 }
 
-func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipAwafPolicyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	partition := d.Get("partition").(string)
@@ -265,15 +268,15 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	p, err := client.Provisions(provision)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", provision, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if p.Level == "none" {
-		return fmt.Errorf("[ERROR] ASM Module is not provisioned, it is set to : (%s) ", p.Level)
+		return diag.FromErr(fmt.Errorf("[ERROR] ASM Module is not provisioned, it is set to : (%s) ", p.Level))
 	}
 
 	config, err := getpolicyConfig(d)
 	if err != nil {
-		return fmt.Errorf("error in Json encode for waf policy %+v", err)
+		return diag.FromErr(fmt.Errorf("error in Json encode for waf policy %+v", err))
 	}
 	polName := fmt.Sprintf("/%s/%s", partition, name)
 	mutex.Lock()
@@ -282,30 +285,30 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	taskId, err := client.ImportAwafJson(polName, config, "")
 	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
 	}
 	err = client.GetImportStatus(taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
 	}
 	part := strings.Split(partition, "/")[0]
 	time.Sleep(10 * time.Second)
 	wafpolicy, err := client.GetWafPolicyQuery(name, part)
 	if err != nil {
-		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+		return diag.FromErr(fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err))
 	}
 	taskId, err = client.ApplyAwafJson(polName, wafpolicy.ID)
 	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
 	if err != nil {
 		err1 := client.DeleteWafPolicy(wafpolicy.ID)
 		if err1 != nil {
-			return fmt.Errorf(" Error Deleting AWAF Policy : %s", err1)
+			return diag.FromErr(fmt.Errorf(" Error Deleting AWAF Policy : %s", err1))
 		}
-		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
 	}
 	err = client.GetApplyStatus(taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
 	}
 
 	if !client.Teem {
@@ -333,10 +336,10 @@ func resourceBigipAwafPolicyCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	d.SetId(wafpolicy.ID)
 	mutex.Unlock()
-	return resourceBigipAwafPolicyRead(d, meta)
+	return resourceBigipAwafPolicyRead(ctx, d, meta)
 }
 
-func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipAwafPolicyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	policyID := d.Id()
 	name := d.Get("name").(string)
@@ -345,17 +348,17 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 
 	wafpolicy, err := client.GetWafPolicy(policyID)
 	if err != nil {
-		return fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err)
+		return diag.FromErr(fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err))
 	}
 
 	policyJson, err := client.ExportPolicy(policyID)
 	if err != nil {
-		return fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err)
+		return diag.FromErr(fmt.Errorf("error Exporting waf policy `%+v` with : %v", name, err))
 	}
 	// plJson, err := json.Marshal(policyJson.Policy)
 	plJson, err := client.ExportPolicyFull(policyID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	_ = d.Set("name", policyJson.Policy.Name)
 	part := strings.Split(policyJson.Policy.FullPath, "/")
@@ -379,7 +382,7 @@ func resourceBigipAwafPolicyRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipAwafPolicyUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	policyID := d.Id()
 	name := d.Get("name").(string)
@@ -388,7 +391,7 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 
 	config, err := getpolicyConfig(d)
 	if err != nil {
-		return fmt.Errorf("error in Json encode for waf policy %+v", err)
+		return diag.FromErr(fmt.Errorf("error in Json encode for waf policy %+v", err))
 	}
 	log.Printf("[DEBUG] Policy config: %+v", config)
 	polName := fmt.Sprintf("/%s/%s", partition, name)
@@ -396,26 +399,26 @@ func resourceBigipAwafPolicyUpdate(d *schema.ResourceData, meta interface{}) err
 	taskId, err := client.ImportAwafJson(polName, config, policyID)
 	log.Printf("[DEBUG] AWAF Import policy TaskID :%v", taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
 	}
 	err = client.GetImportStatus(taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
 	}
 	taskId, err = client.ApplyAwafJson(polName, policyID)
 	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
 	}
 	err = client.GetApplyStatus(taskId)
 	if err != nil {
-		return fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
 	}
 	mutex.Unlock()
-	return resourceBigipAwafPolicyRead(d, meta)
+	return resourceBigipAwafPolicyRead(ctx, d, meta)
 }
 
-func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipAwafPolicyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	policyID := d.Id()
 	name := d.Get("name").(string)
@@ -423,7 +426,7 @@ func resourceBigipAwafPolicyDelete(d *schema.ResourceData, meta interface{}) err
 
 	err := client.DeleteWafPolicy(policyID)
 	if err != nil {
-		return fmt.Errorf(" Error Deleting AWAF Policy : %s", err)
+		return diag.FromErr(fmt.Errorf(" Error Deleting AWAF Policy : %s", err))
 	}
 	d.SetId("")
 	return nil
@@ -484,7 +487,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		var fileType bigip.Filetype
 		for _, item := range val.(*schema.Set).List() {
 			fileType.Name = item.(map[string]interface{})["name"].(string)
-			fileType.Type = item.(map[string]interface{})["name"].(string)
+			fileType.Type = item.(map[string]interface{})["type"].(string)
 			fileTypes = append(fileTypes, fileType)
 		}
 	}
@@ -506,16 +509,12 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	}
 	p := d.Get("server_technologies").([]interface{})
 
-	var sts []struct {
-		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-	}
+	var sts []bigip.ServerTech
+
 	for i := 0; i < len(p); i++ {
-		st1 := struct {
-			ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-		}{
-			p[i].(string),
-		}
-		sts = append(sts, st1)
+		var stec bigip.ServerTech
+		stec.ServerTechnologyName = p[i].(string)
+		sts = append(sts, stec)
 	}
 	policyWaf.ServerTechnologies = sts
 
@@ -581,7 +580,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
 
-		urlList := make([]interface{}, 0)
+		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v
 		}
@@ -593,7 +592,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["urls"] = urlList
 		}
 
-		params := make([]interface{}, 0)
+		params := make([]interface{}, len(policyWaf.Parameters))
 		for i, v := range policyWaf.Parameters {
 			params[i] = v
 		}
@@ -605,7 +604,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["parameters"] = params
 		}
 
-		sigSet := make([]interface{}, 0)
+		sigSet := make([]interface{}, len(policyWaf.SignatureSets))
 		for i, v := range policyWaf.SignatureSets {
 			sigSet[i] = v
 		}
@@ -617,7 +616,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["signature-sets"] = sigSet
 		}
 
-		fileType := make([]interface{}, 0)
+		fileType := make([]interface{}, len(policyWaf.Filetypes))
 		for i, v := range policyWaf.Filetypes {
 			fileType[i] = v
 		}
@@ -628,12 +627,10 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		} else {
 			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileType
 		}
-
 		if policyWaf.Description != "" {
 			polJsn1.Policy.(map[string]interface{})["description"] = policyWaf.Description
 		}
-
-		serverTech := make([]interface{}, 0)
+		serverTech := make([]interface{}, len(policyWaf.ServerTechnologies))
 		for i, v := range policyWaf.ServerTechnologies {
 			serverTech[i] = v
 		}
@@ -644,8 +641,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		} else {
 			polJsn1.Policy.(map[string]interface{})["server-technologies"] = serverTech
 		}
-
-		openApi := make([]interface{}, 0)
+		openApi := make([]interface{}, len(policyWaf.OpenAPIFiles))
 		for i, v := range policyWaf.OpenAPIFiles {
 			openApi[i] = v
 		}
@@ -657,7 +653,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["open-api-files"] = openApi
 		}
 
-		graphQL := make([]interface{}, 0)
+		graphQL := make([]interface{}, len(policyWaf.GraphqlProfiles))
 		for i, v := range policyWaf.GraphqlProfiles {
 			graphQL[i] = v
 		}

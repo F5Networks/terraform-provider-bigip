@@ -6,25 +6,25 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"log"
 	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipSysBigiplicense() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysBigiplicenseCreate,
-		Update: resourceBigipSysBigiplicenseUpdate,
-		Read:   resourceBigipSysBigiplicenseRead,
-		Delete: resourceBigipSysBigiplicenseDelete,
+		CreateContext: resourceBigipSysBigiplicenseCreate,
+		UpdateContext: resourceBigipSysBigiplicenseUpdate,
+		ReadContext:   resourceBigipSysBigiplicenseRead,
+		DeleteContext: resourceBigipSysBigiplicenseDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
-
 		Schema: map[string]*schema.Schema{
-
 			"command": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -37,45 +37,48 @@ func resourceBigipSysBigiplicense() *schema.Resource {
 			},
 		},
 	}
-
 }
 
-func resourceBigipSysBigiplicenseCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysBigiplicenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	command := d.Get("command").(string)
-	registration_key := d.Get("registration_key").(string)
+	registrationKey := d.Get("registration_key").(string)
 	log.Println("[INFO] Creating BigipLicense ")
 
 	err := client.CreateBigiplicense(
 		command,
-		registration_key,
+		registrationKey,
 	)
 	time.Sleep(300 * time.Second)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Apply License to Bigip  (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
-	d.SetId(registration_key)
-	return resourceBigipSysBigiplicenseRead(d, meta)
+	d.SetId(registrationKey)
+	return resourceBigipSysBigiplicenseRead(ctx, d, meta)
 }
 
-func resourceBigipSysBigiplicenseUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysBigiplicenseUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
-	registration_key := d.Id()
+	registrationKey := d.Id()
 
-	log.Println("[INFO] Updating Bigiplicense " + registration_key)
+	log.Println("[INFO] Updating Bigiplicense " + registrationKey)
 
 	r := &bigip.Bigiplicense{
-		Registration_key: registration_key,
+		Registration_key: registrationKey,
 		Command:          d.Get("command").(string),
 	}
-
-	return client.ModifyBigiplicense(r)
+	err := client.ModifyBigiplicense(r)
+	if err != nil {
+		log.Printf("[ERROR] Unable to Apply License to Bigip  (%v) ", err)
+		return diag.FromErr(err)
+	}
+	return resourceBigipSysBigiplicenseRead(ctx, d, meta)
 }
 
-func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysBigiplicenseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -85,7 +88,7 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 	licenses, err := client.Bigiplicenses()
 	if err != nil {
 		log.Printf("[ERROR] Unable to Read License from Bigip  (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	if licenses == nil {
 		log.Printf("[WARN] License (%s) not found, removing from state", d.Id())
@@ -96,7 +99,7 @@ func resourceBigipSysBigiplicenseRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceBigipSysBigiplicenseDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysBigiplicenseDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// API does not Exists
 	return nil
 }

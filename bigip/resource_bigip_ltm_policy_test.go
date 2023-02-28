@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var TestPolicyName = "/Common/test-policy"
@@ -434,6 +434,7 @@ func TestAccBigipLtmPolicy_Issue634_a(t *testing.T) {
 		},
 	})
 }
+
 func TestAccBigipLtmPolicy_Issue648(t *testing.T) {
 	t.Parallel()
 	TestPolicyName = "/Common/testpolicy-issue-648"
@@ -447,6 +448,29 @@ func TestAccBigipLtmPolicy_Issue648(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testaccbigipltmpoolicyissue648(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists(TestPolicyName),
+					testCheckPolicyExists(TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
+				),
+			},
+		},
+	})
+}
+func TestAccBigipLtmPolicyIssue737(t *testing.T) {
+	t.Parallel()
+	TestPolicyName = "/Common/testpolicy-issue-737"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "testpolicy-issue-737")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmpoolicyissue737(),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPolicyExists(TestPolicyName),
 					testCheckPolicyExists(TestPolicyName),
@@ -735,5 +759,91 @@ func testaccbigipltmpoolicyissue648() string {
 			}
 		  }
 		}`
+	return tfConfig
+}
+
+func testaccbigipltmpoolicyissue737() string {
+	tfConfig := `
+resource "bigip_ltm_policy" "policy" {
+  name     = "/Common/f5-policy"
+  strategy = "first-match"
+  requires = ["http"]
+  controls = ["forwarding", "asm"]
+
+  ### IMPORTANT! Please do not change rules order as it matters!
+  # Cluster rules
+  dynamic "rule" {
+    for_each = { for r in local.rules : r.name => r }
+
+    content {
+      name = "${rule.value.name}-https"
+
+      action {
+        connection = false
+        forward    = true
+        asm        = false
+        disable    = false
+        pool       = "/Common/${rule.value.pool}"
+      }
+      condition {
+        http_host = true
+        host      = true
+        ends_with = true
+        request   = true
+        values    = ["${rule.value.matching}"]
+      }
+      action {
+        asm        = true
+        connection = false
+        enable     = rule.value.enable
+        disable    = rule.value.disable
+        select     = rule.value.select
+        policy     = rule.value.policy
+      }
+    }
+  }
+  rule {
+    name = "default-rule"
+    action {
+      asm        = true
+      connection = false
+      disable    = true
+      request    = true
+    }
+  }
+}
+
+locals {
+  rules = [
+    {
+      name = "rule1"
+      pool = "pool1"
+      matching = "example.com"
+      enable = true
+      select = false
+      disable = false
+      policy = "/Common/f5-waf-profile"
+    },
+    {
+      name = "rule2"
+      pool = "pool2"
+      matching = "example2.com"
+      enable = false
+      disable = true
+      select = false
+      policy = ""
+    },
+    {
+      name = "rule3"
+      pool = "pool3"
+      matching = "example3.com"
+      enable = true
+      disable = false
+      select = false
+      policy = "/Common/f5-waf-profile"
+    }
+  ]
+}
+`
 	return tfConfig
 }

@@ -67,7 +67,7 @@ resource "bigip_waf_policy" "test-awaf" {
   //  parameters           = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json]
   //  signatures = [data.bigip_waf_signatures.WAFSIG1.json]
   //  signatures = [data.bigip_waf_signatures.WAFSIG1.json, data.bigip_waf_signatures.WAFSIG2.json]
-//  parameters = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json]
+  //  parameters = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json]
   parameters = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json, data.bigip_waf_entity_parameter.Param3.json]
   //  urls                 = [data.bigip_waf_entity_url.URL.json, data.bigip_waf_entity_url.URL2.json]
   //  open_api_files = ["https://api.swaggerhub.com/apis/F5EMEASSA/Arcadia-OAS3/2.0.0-oas3"]

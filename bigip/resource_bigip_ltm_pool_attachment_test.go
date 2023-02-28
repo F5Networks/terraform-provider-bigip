@@ -11,14 +11,14 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var poolMember = fmt.Sprintf("%s:443", "10.10.10.10")
 var poolMemberFqdn = fmt.Sprintf("%s:443", "www.google.com")
-var poolMemberFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMember)
-var poolMemberFqdnFullpath = fmt.Sprintf("/%s/%s", TEST_PARTITION, poolMemberFqdn)
+var poolMemberFullpath = fmt.Sprintf("/%s/%s", TestPartition, poolMember)
+var poolMemberFqdnFullpath = fmt.Sprintf("/%s/%s", TestPartition, poolMemberFqdn)
 
 var TestPoolResource1 = `
 resource "bigip_ltm_pool" "test-pool" {
@@ -85,9 +85,30 @@ resource "bigip_ltm_node" "test-node" {
         monitor = "default"
         rate_limit = "disabled"
         fqdn {
-    address_family = "ipv4"
-    interval       = "3000"
-  }
+    		address_family = "ipv4"
+    		interval       = "3000"
+  		}
+}
+resource "bigip_ltm_pool" "test-pool" {
+        name = "` + TestPoolName + `"
+        monitors = ["/Common/http"]
+        allow_nat = "yes"
+        allow_snat = "yes"
+        description = "Test-Pool-Sample"
+        load_balancing_mode = "round-robin"
+        slow_ramp_time = "5"
+        service_down_action = "reset"
+        reselect_tries = "2"
+}
+`
+var TestPoolResource5 = `
+resource "bigip_ltm_node" "test-node" {
+        name = "` + TestNodeName + `"
+        address = "10.10.100.11"
+        connection_limit = "0"
+        dynamic_ratio = "1"
+        monitor = "default"
+        rate_limit = "disabled"
 }
 resource "bigip_ltm_pool" "test-pool" {
         name = "` + TestPoolName + `"
@@ -302,7 +323,7 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 				),
 			},
 			{
-				Config: TestPoolResource4,
+				Config: TestPoolResource5,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckPoolExists(TestPoolName),
 					testCheckPoolAttachment(TestPoolName, poolMemberFullpath, false),
@@ -311,6 +332,31 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 		},
 	})
 }
+
+func TestAccBigipLtmPoolAttachmentTestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_pool_attachment.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/test3.com:80", true),
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/test_node_pa_tc5:80", true),
+					testCheckPoolAttachment("/TEST3/test_pool_pa_tc10", "/TEST3/2.3.2.2%50:8080", true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc9", "pool", "/Common/test_pool_pa_tc9"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "node", "1.1.12.2:80"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc6", "node", "/Common/test3.com:80"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckPoolAttachment(poolName string, expected string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

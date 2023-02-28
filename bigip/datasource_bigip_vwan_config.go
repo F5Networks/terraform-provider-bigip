@@ -9,18 +9,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
-
 	"log"
 	"net/url"
 	"os"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2020-11-01/network"
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 const (
@@ -35,7 +34,7 @@ STORAGE_ACCOUNT_KEY`
 
 func dataSourceBigipVwanconfig() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipVwanconfigRead,
+		ReadContext: dataSourceBigipVwanconfigRead,
 		Schema: map[string]*schema.Schema{
 			"azure_vwan_resourcegroup": {
 				Type:        schema.TypeString,
@@ -87,12 +86,12 @@ func dataSourceBigipVwanconfig() *schema.Resource {
 		},
 	}
 }
-func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipVwanconfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	d.SetId("")
 	log.Println("[INFO] Reading VWAN Config for site:" + d.Get("azure_vwan_vpnsite").(string))
 
 	if os.Getenv("AZURE_SUBSCRIPTION_ID") == "" || os.Getenv("AZURE_CLIENT_ID") == "" || os.Getenv("AZURE_CLIENT_SECRET") == "" || os.Getenv("AZURE_TENANT_ID") == "" || os.Getenv("STORAGE_ACCOUNT_NAME") == "" || os.Getenv("STORAGE_ACCOUNT_KEY") == "" {
-		return fmt.Errorf("%s", azureEnvErr)
+		return diag.FromErr(fmt.Errorf("%s", azureEnvErr))
 	}
 	config := azureConfig{
 		subscriptionID:    os.Getenv("AZURE_SUBSCRIPTION_ID"),
@@ -108,7 +107,7 @@ func dataSourceBigipVwanconfigRead(d *schema.ResourceData, meta interface{}) err
 	res, err := DownloadVwanConfig(config)
 	if err != nil {
 		log.Printf("failed to download vpnClient Config: %+v", err.Error())
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Unmarshed Data : %+v", res)
 	for _, v := range res {

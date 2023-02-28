@@ -12,13 +12,13 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var folder, _ = os.Getwd()
 var SSLCERTIFICATE_NAME = "servercert.crt"
-var TEST_SSLCERTIFICATE_NAME = fmt.Sprintf("/%s/%s", TEST_PARTITION, SSLCERTIFICATE_NAME)
+var TEST_SSLCERTIFICATE_NAME = fmt.Sprintf("/%s/%s", TestPartition, SSLCERTIFICATE_NAME)
 
 var TEST_SSL_CERTIFICATE_RESOURCE = `
 resource "bigip_ssl_certificate" "test-cert" {
@@ -41,7 +41,7 @@ func TestAccSslCertificateImportToBigip(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testChecksslcertificateExists(TEST_SSLCERTIFICATE_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "name", SSLCERTIFICATE_NAME),
-					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "partition", TEST_PARTITION),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "partition", TestPartition),
 				),
 			},
 		},
@@ -72,7 +72,7 @@ func testChecksslcertificateDestroyed(s *terraform.State) error {
 			continue
 		}
 		name := rs.Primary.ID
-		var sslCertificatename = fmt.Sprintf("~%s~%s", TEST_PARTITION, name)
+		var sslCertificatename = fmt.Sprintf("~%s~%s", TestPartition, name)
 		certificate, err := client.GetCertificate(sslCertificatename)
 		if err != nil {
 			return err

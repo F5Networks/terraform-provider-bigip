@@ -7,21 +7,22 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmSnatpool() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmSnatpoolCreate,
-		Update: resourceBigipLtmSnatpoolUpdate,
-		Read:   resourceBigipLtmSnatpoolRead,
-		Delete: resourceBigipLtmSnatpoolDelete,
+		CreateContext: resourceBigipLtmSnatpoolCreate,
+		UpdateContext: resourceBigipLtmSnatpoolUpdate,
+		ReadContext:   resourceBigipLtmSnatpoolRead,
+		DeleteContext: resourceBigipLtmSnatpoolDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -45,7 +46,7 @@ func resourceBigipLtmSnatpool() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmSnatpoolCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatpoolCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -56,15 +57,15 @@ func resourceBigipLtmSnatpoolCreate(d *schema.ResourceData, meta interface{}) er
 	err := client.CreateSnatPool(name, members)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Snat Pool  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
 
-	return resourceBigipLtmSnatpoolRead(d, meta)
+	return resourceBigipLtmSnatpoolRead(ctx, d, meta)
 }
 
-func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatpoolUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -79,13 +80,13 @@ func resourceBigipLtmSnatpoolUpdate(d *schema.ResourceData, meta interface{}) er
 	err := client.ModifySnatPool(name, r)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Snat Pool  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceBigipLtmSnatpoolRead(d, meta)
+	return resourceBigipLtmSnatpoolRead(ctx, d, meta)
 }
 
-func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatpoolRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -95,23 +96,21 @@ func resourceBigipLtmSnatpoolRead(d *schema.ResourceData, meta interface{}) erro
 	snatpool, err := client.GetSnatPool(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat Pool  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if snatpool == nil {
 		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-	d.Set("name", name)
-	if err := d.Set("members", snatpool.Members); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Members to state for SNAT Pool (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("name", name)
+	_ = d.Set("members", snatpool.Members)
 
 	return nil
 
 }
 
-func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatpoolDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -119,7 +118,7 @@ func resourceBigipLtmSnatpoolDelete(d *schema.ResourceData, meta interface{}) er
 	err := client.DeleteSnatPool(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Snat Pool  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

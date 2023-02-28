@@ -7,21 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmSnat() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmSnatCreate,
-		Update: resourceBigipLtmSnatUpdate,
-		Read:   resourceBigipLtmSnatRead,
-		Delete: resourceBigipLtmSnatDelete,
+		CreateContext: resourceBigipLtmSnatCreate,
+		UpdateContext: resourceBigipLtmSnatUpdate,
+		ReadContext:   resourceBigipLtmSnatRead,
+		DeleteContext: resourceBigipLtmSnatDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -107,7 +109,7 @@ func resourceBigipLtmSnat() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmSnatCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating Snat: " + name)
@@ -116,13 +118,13 @@ func resourceBigipLtmSnatCreate(d *schema.ResourceData, meta interface{}) error 
 	err := client.CreateSnat(&p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Snat  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipLtmSnatRead(d, meta)
+	return resourceBigipLtmSnatRead(ctx, d, meta)
 }
 
-func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 
@@ -130,7 +132,7 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 	p, err := client.GetSnat(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if p == nil {
 		log.Printf("[WARN] Snat  (%s) not found, removing from state", d.Id())
@@ -138,23 +140,18 @@ func resourceBigipLtmSnatRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 	_ = d.Set("name", p.FullPath)
-	if err := d.Set("autolasthop", p.AutoLasthop); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AutoLasthop to state for Snat  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("autolasthop", p.AutoLasthop)
 	_ = d.Set("mirror", p.Mirror)
-	if err := d.Set("sourceport", p.SourcePort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SourcePort to state for Snat  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("translation", p.Translation); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Translation to state for Snat  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("snatpool", p.Snatpool); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Snatpool to state for Snat  (%s): %s", d.Id(), err)
-	}
-	return SnatToData(p, d)
+	_ = d.Set("sourceport", p.SourcePort)
+
+	_ = d.Set("translation", p.Translation)
+
+	_ = d.Set("snatpool", p.Snatpool)
+
+	return SnatToData(ctx, p, d)
 }
 
-func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating Ltm Snat:%+v", name)
@@ -162,19 +159,19 @@ func resourceBigipLtmSnatUpdate(d *schema.ResourceData, meta interface{}) error 
 	err := client.UpdateSnat(name, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmSnatRead(d, meta)
+	return resourceBigipLtmSnatRead(ctx, d, meta)
 }
 
-func resourceBigipLtmSnatDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmSnatDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Deleting Ltm Snat:%+v", name)
 	err := client.DeleteSnat(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Snat  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
@@ -207,7 +204,7 @@ func dataToSnat(name string, d *schema.ResourceData) bigip.Snat {
 	return p
 }
 
-func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
+func SnatToData(ctx context.Context, p *bigip.Snat, d *schema.ResourceData) diag.Diagnostics {
 	_ = d.Set("autolasthop", p.AutoLasthop)
 	_ = d.Set("mirror", p.Mirror)
 	_ = d.Set("sourceport", p.SourcePort)
@@ -219,9 +216,7 @@ func SnatToData(p *bigip.Snat, d *schema.ResourceData) error {
 	if p.VlansEnabled {
 		_ = d.Set("vlansdisabled", false)
 	}
-	if err := d.Set("vlans", p.Vlans); err != nil {
-		return fmt.Errorf("error setting Vlans for resource %s: %s", d.Id(), err)
-	}
+	_ = d.Set("vlans", p.Vlans)
 	for i, r := range p.Origins {
 		origins := fmt.Sprintf("origins.%d", i)
 		_ = d.Set(fmt.Sprintf("%s.name", origins), r.Name)

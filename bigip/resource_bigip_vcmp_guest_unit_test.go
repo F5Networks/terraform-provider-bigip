@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestAccBigipVcmpGuestUnitInvalid(t *testing.T) {
 	resourceName := "/Common/test-profile-tcp"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
-		Providers:  testProviders,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestInvalid(resourceName),
@@ -124,7 +124,7 @@ func TestAccBigipVcmpGuestUnitCreate(t *testing.T) {
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
-		Providers:  testProviders,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testBigipVcmpGuestCreate(resourceName, server.URL),
@@ -157,7 +157,7 @@ func TestAccBigipVcmpGuestUnitCreateError(t *testing.T) {
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
-		Providers:  testProviders,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),
@@ -190,7 +190,7 @@ func TestAccBigipVcmpGuestUnitReadError(t *testing.T) {
 	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
-		Providers:  testProviders,
+		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipVcmpGuestCreate(resourceName, server.URL),

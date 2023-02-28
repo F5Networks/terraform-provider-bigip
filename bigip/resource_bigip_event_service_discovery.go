@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -16,17 +17,18 @@ import (
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceServiceDiscovery() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceServiceDiscoveryCreate,
-		Read:   resourceServiceDiscoveryRead,
-		Update: resourceServiceDiscoveryUpdate,
-		Delete: resourceServiceDiscoveryDelete,
+		CreateContext: resourceServiceDiscoveryCreate,
+		ReadContext:   resourceServiceDiscoveryRead,
+		UpdateContext: resourceServiceDiscoveryUpdate,
+		DeleteContext: resourceServiceDiscoveryDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 
@@ -63,7 +65,7 @@ func resourceServiceDiscovery() *schema.Resource {
 	}
 }
 
-func resourceServiceDiscoveryCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceServiceDiscoveryCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	taskid := d.Get("taskid").(string)
 	log.Printf("[INFO]: taskid: %+v", taskid)
@@ -77,36 +79,36 @@ func resourceServiceDiscoveryCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[INFO]: node Value: %+v", nodeList)
 	err := client.AddServiceDiscoveryNodes(taskid, nodeList)
 	if err != nil {
-		return fmt.Errorf("Error modifying node %s: %v ", nodeList, err)
+		return diag.FromErr(fmt.Errorf("error modifying node %s: %v", nodeList, err))
 	}
 	d.SetId(taskid)
-	return resourceServiceDiscoveryRead(d, meta)
+	return resourceServiceDiscoveryRead(ctx, d, meta)
 
 }
 
-func resourceServiceDiscoveryRead(d *schema.ResourceData, meta interface{}) error {
+func resourceServiceDiscoveryRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	taskid := d.Id()
 
 	serviceDiscoveryResp, err := client.GetServiceDiscoveryNodes(taskid)
 	log.Printf("[DEBUG] serviceDiscoveryResp is :%v", serviceDiscoveryResp)
 	if err != nil {
-		return fmt.Errorf("Error Reading node : %v ", err)
+		return diag.FromErr(fmt.Errorf("error Reading node : %v", err))
 	}
 	nodeList1 := serviceDiscoveryResp.(map[string]interface{})["result"].(map[string]interface{})["providerOptions"].(map[string]interface{})["nodeList"]
 	log.Printf("[DEBUG] nodeList1 is :%v", nodeList1)
 
 	if serviceDiscoveryResp == nil {
 		d.SetId("")
-		return fmt.Errorf("[DEBUG]serviceDiscoveryResp is : %s", serviceDiscoveryResp)
+		return diag.FromErr(fmt.Errorf("[DEBUG]serviceDiscoveryResp is : %s", serviceDiscoveryResp))
 	}
 	if err := d.Set("node", nodeList1); err != nil {
-		return fmt.Errorf("Error updating nodelist in state: %v ", err)
+		return diag.FromErr(fmt.Errorf("error updating nodelist in state: %v", err))
 	}
 	return nil
 }
 
-func resourceServiceDiscoveryUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceServiceDiscoveryUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	taskid := d.Id()
 	log.Printf("[INFO]: taskid: %+v", taskid)
@@ -119,12 +121,12 @@ func resourceServiceDiscoveryUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 	err := client.AddServiceDiscoveryNodes(taskid, nodeList)
 	if err != nil {
-		return fmt.Errorf("Error modifying node %s: %v ", nodeList, err)
+		return diag.FromErr(fmt.Errorf("error modifying node %s: %v", nodeList, err))
 	}
-	return resourceServiceDiscoveryRead(d, meta)
+	return resourceServiceDiscoveryRead(ctx, d, meta)
 }
 
-func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceServiceDiscoveryDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	clientBigip := meta.(*bigip.BigIP)
 	taskid := d.Id()
 	url := clientBigip.Host + "/mgmt/shared/service-discovery/task/" + taskid + "/nodes/"
@@ -135,14 +137,14 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("POST", url, payload)
 	if err != nil {
-		return fmt.Errorf("Error while creating http request for Delete operation:%+v ", err)
+		return diag.FromErr(fmt.Errorf("error while creating http request for Delete operation:%+v ", err))
 	}
 	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -154,12 +156,12 @@ func resourceServiceDiscoveryDelete(d *schema.ResourceData, meta interface{}) er
 	_, err = io.Copy(&body, resp.Body)
 	// body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	bodyString := body.String()
 	if resp.Status != "200 OK" {
-		return fmt.Errorf("Error while Sending/Posting http request for Delete operation :%s  %v", bodyString, err)
+		return diag.FromErr(fmt.Errorf("error while Sending/Posting http request for Delete operation :%s  %v", bodyString, err))
 	}
 
 	d.SetId("")

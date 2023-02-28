@@ -6,22 +6,24 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipNetIkePeer() *schema.Resource {
 
 	return &schema.Resource{
-		Create: resourceBigipNetIkePeerCreate,
-		Read:   resourceBigipNetIkePeerRead,
-		Update: resourceBigipNetIkePeerUpdate,
-		Delete: resourceBigipNetIkePeerDelete,
+		CreateContext: resourceBigipNetIkePeerCreate,
+		ReadContext:   resourceBigipNetIkePeerRead,
+		UpdateContext: resourceBigipNetIkePeerUpdate,
+		DeleteContext: resourceBigipNetIkePeerDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -238,7 +240,7 @@ func resourceBigipNetIkePeer() *schema.Resource {
 	}
 
 }
-func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetIkePeerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -251,13 +253,13 @@ func resourceBigipNetIkePeerCreate(d *schema.ResourceData, meta interface{}) err
 	err := client.CreateIkePeer(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create IkePeer %s %v :", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
 
-	return resourceBigipNetIkePeerRead(d, meta)
+	return resourceBigipNetIkePeerRead(ctx, d, meta)
 }
-func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetIkePeerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -265,116 +267,81 @@ func resourceBigipNetIkePeerRead(d *schema.ResourceData, meta interface{}) error
 	log.Printf("[DEBUG] Reading IkePeer %s", name)
 	ikepeer, err := client.GetIkePeer(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if ikepeer == nil {
 		d.SetId("")
-		return fmt.Errorf("[ERROR] IkePeer (%s) not found, removing from state", d.Id())
+		return diag.FromErr(fmt.Errorf("[ERROR] IkePeer (%s) not found, removing from state", d.Id()))
 	}
-	log.Printf("[DEBUG] IkePeer:%+v", ikepeer)
-	if err := d.Set("app_service", ikepeer.AppService); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AppService to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_file", ikepeer.MyCertFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_key_file", ikepeer.MyCertKeyFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertKeyFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_cert_key_passphrase", ikepeer.MyCertKeyPassphrase); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyCertKeyPassphrase to state for IkePeer (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("app_service", ikepeer.AppService)
+
+	_ = d.Set("my_cert_file", ikepeer.MyCertFile)
+
+	_ = d.Set("my_cert_key_file", ikepeer.MyCertKeyFile)
+
+	_ = d.Set("my_cert_key_passphrase", ikepeer.MyCertKeyPassphrase)
+
 	if ikepeer.PresharedKey != "" && d.Get("preshared_key").(string) != "" {
 		_ = d.Set("preshared_key", ikepeer.PresharedKey)
 	}
-	if err := d.Set("preshared_key_encrypted", ikepeer.PresharedKeyEncrypted); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PresharedKeyEncrypted to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("ca_cert_file", ikepeer.CaCertFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CaCertFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("crl_file", ikepeer.CrlFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving  to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("description", ikepeer.Description); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving CrlFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("generate_policy", ikepeer.GeneratePolicy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving GeneratePolicy to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("mode", ikepeer.Mode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Mode to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_id_type", ikepeer.MyIdType); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyIdType to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("my_id_value", ikepeer.MyIdValue); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving MyIdValue to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("nat_traversal", ikepeer.NatTraversal); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving NatTraversal to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("passive", ikepeer.Passive); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Passive to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("peers_cert_file", ikepeer.PeersCertFile); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeersCertFile to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("peers_cert_type", ikepeer.PeersCertType); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeersCertType to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("peers_id_type", ikepeer.PeersIdType); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeersIdType to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("peers_id_value", ikepeer.PeersIdValue); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving PeersIdValue to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("phase1_auth_method", ikepeer.Phase1AuthMethod); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Phase1AuthMethod to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("phase1_encrypt_algorithm", ikepeer.Phase1EncryptAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Phase1EncryptAlgorithm to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("phase1_hash_algorithm", ikepeer.Phase1HashAlgorithm); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Phase1HashAlgorithm to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("phase1_perfect_forward_secrecy", ikepeer.Phase1PerfectForwardSecrecy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Phase1PerfectForwardSecrecy to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("prf", ikepeer.Prf); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Prf to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("proxy_support", ikepeer.ProxySupport); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ProxySupport to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("remote_address", ikepeer.RemoteAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving RemoteAddress to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("state", ikepeer.State); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving State to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("traffic_selector", ikepeer.TrafficSelector); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving TrafficSelector to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("verify_cert", ikepeer.VerifyCert); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving VerifyCert to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("version", ikepeer.Version); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Version to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("dpd_delay", ikepeer.DpdDelay); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving DpdDelay to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("lifetime", ikepeer.Lifetime); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Lifetime to state for IkePeer (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("replay_window_size", ikepeer.ReplayWindowSize); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ReplayWindowSize to state for IkePeer (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("preshared_key_encrypted", ikepeer.PresharedKeyEncrypted)
+
+	_ = d.Set("ca_cert_file", ikepeer.CaCertFile)
+
+	_ = d.Set("crl_file", ikepeer.CrlFile)
+
+	_ = d.Set("description", ikepeer.Description)
+
+	_ = d.Set("generate_policy", ikepeer.GeneratePolicy)
+
+	_ = d.Set("mode", ikepeer.Mode)
+
+	_ = d.Set("my_id_type", ikepeer.MyIdType)
+
+	_ = d.Set("my_id_value", ikepeer.MyIdValue)
+
+	_ = d.Set("nat_traversal", ikepeer.NatTraversal)
+
+	_ = d.Set("passive", ikepeer.Passive)
+
+	_ = d.Set("peers_cert_file", ikepeer.PeersCertFile)
+
+	_ = d.Set("peers_cert_type", ikepeer.PeersCertType)
+
+	_ = d.Set("peers_id_type", ikepeer.PeersIdType)
+
+	_ = d.Set("peers_id_value", ikepeer.PeersIdValue)
+
+	_ = d.Set("phase1_auth_method", ikepeer.Phase1AuthMethod)
+
+	_ = d.Set("phase1_encrypt_algorithm", ikepeer.Phase1EncryptAlgorithm)
+
+	_ = d.Set("phase1_hash_algorithm", ikepeer.Phase1HashAlgorithm)
+
+	_ = d.Set("phase1_perfect_forward_secrecy", ikepeer.Phase1PerfectForwardSecrecy)
+
+	_ = d.Set("prf", ikepeer.Prf)
+
+	_ = d.Set("proxy_support", ikepeer.ProxySupport)
+
+	_ = d.Set("remote_address", ikepeer.RemoteAddress)
+
+	_ = d.Set("state", ikepeer.State)
+
+	_ = d.Set("traffic_selector", ikepeer.TrafficSelector)
+
+	_ = d.Set("verify_cert", ikepeer.VerifyCert)
+
+	_ = d.Set("version", ikepeer.Version)
+
+	_ = d.Set("dpd_delay", ikepeer.DpdDelay)
+
+	_ = d.Set("lifetime", ikepeer.Lifetime)
+	_ = d.Set("replay_window_size", ikepeer.ReplayWindowSize)
 	_ = d.Set("name", name)
 	return nil
 }
-func resourceBigipNetIkePeerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetIkePeerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -388,12 +355,12 @@ func resourceBigipNetIkePeerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	err := client.ModifyIkePeer(name, config)
 	if err != nil {
-		return fmt.Errorf(" Error modifying IkePeer %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf(" Error modifying IkePeer %s: %v", name, err))
 	}
 
-	return resourceBigipNetIkePeerRead(d, meta)
+	return resourceBigipNetIkePeerRead(ctx, d, meta)
 }
-func resourceBigipNetIkePeerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipNetIkePeerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -402,7 +369,7 @@ func resourceBigipNetIkePeerDelete(d *schema.ResourceData, meta interface{}) err
 
 	err := client.DeleteIkePeer(name)
 	if err != nil {
-		return fmt.Errorf(" Error Deleting IkePeer : %s", err)
+		return diag.FromErr(fmt.Errorf(" Error Deleting IkePeer : %s", err))
 	}
 
 	d.SetId("")

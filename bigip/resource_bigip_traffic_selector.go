@@ -6,22 +6,23 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipTrafficselector() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipTrafficselectorCreate,
-		Read:   resourceBigipTrafficselectorRead,
-		Update: resourceBigipTrafficselectorUpdate,
-		Delete: resourceBigipTrafficselectorDelete,
-		Exists: resourceBigipTrafficselectorExists,
+		CreateContext: resourceBigipTrafficselectorCreate,
+		ReadContext:   resourceBigipTrafficselectorRead,
+		UpdateContext: resourceBigipTrafficselectorUpdate,
+		DeleteContext: resourceBigipTrafficselectorDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -89,7 +90,7 @@ func resourceBigipTrafficselector() *schema.Resource {
 	}
 }
 
-func resourceBigipTrafficselectorCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipTrafficselectorCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating IPSec traffic Selector " + name)
@@ -102,71 +103,39 @@ func resourceBigipTrafficselectorCreate(d *schema.ResourceData, meta interface{}
 	err := client.CreateTrafficSelector(selectorConfig)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create IPsec Traffic Selector (%s) (%v)", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipTrafficselectorRead(d, meta)
+	return resourceBigipTrafficselectorRead(ctx, d, meta)
 }
 
-func resourceBigipTrafficselectorRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipTrafficselectorRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Reading Traffic Selector :%+v", name)
 	ts, err := client.GetTrafficselctor(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if ts == nil {
 		d.SetId("")
-		return fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id())
+		return diag.FromErr(fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id()))
 	}
 	log.Printf("[DEBUG] Traffic Selector:%+v", ts)
-	if err := d.Set("ip_protocol", ts.IPProtocol); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("destination_address", ts.DestinationAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("source_address", ts.SourceAddress); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("ipsec_policy", ts.IpsecPolicy); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("order", ts.Order); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("destination_port", ts.DestinationPort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("source_port", ts.SourcePort); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("direction", ts.Direction); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving IPProtocol to state for Traffic selector (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("ip_protocol", ts.IPProtocol)
+	_ = d.Set("destination_address", ts.DestinationAddress)
+	_ = d.Set("source_address", ts.SourceAddress)
+	_ = d.Set("ipsec_policy", ts.IpsecPolicy)
+	_ = d.Set("order", ts.Order)
+	_ = d.Set("destination_port", ts.DestinationPort)
+	_ = d.Set("source_port", ts.SourcePort)
+	_ = d.Set("direction", ts.Direction)
 	_ = d.Set("description", ts.Description)
 	_ = d.Set("name", name)
 	return nil
 }
 
-func resourceBigipTrafficselectorExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Printf("[INFO] Check existence of Traffic Selector: %+v ", name)
-	ts, err := client.GetTrafficselctor(name)
-	if err != nil {
-		return false, err
-	}
-	if ts == nil {
-		log.Printf("[WARN] Traffic-selctor (%s) not found, removing from state", d.Id())
-		d.SetId("")
-		return false, fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id())
-	}
-	return true, nil
-}
-
-func resourceBigipTrafficselectorUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipTrafficselectorUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating Traffic Selector:%+v ", name)
@@ -178,17 +147,17 @@ func resourceBigipTrafficselectorUpdate(d *schema.ResourceData, meta interface{}
 	err := client.ModifyTrafficSelector(name, config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify IPSec Traffic Selector   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipTrafficselectorRead(d, meta)
+	return resourceBigipTrafficselectorRead(ctx, d, meta)
 }
-func resourceBigipTrafficselectorDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipTrafficselectorDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Deleting Traffic Selector :%+v ", name)
 	err := client.DeleteTrafficSelector(name)
 	if err != nil {
-		return fmt.Errorf("[ERROR] Unable to Delete Traffic Selector (%s) (%v) ", name, err)
+		return diag.FromErr(fmt.Errorf("[ERROR] Unable to Delete Traffic Selector (%s) (%v) ", name, err))
 	}
 	d.SetId("")
 	return nil

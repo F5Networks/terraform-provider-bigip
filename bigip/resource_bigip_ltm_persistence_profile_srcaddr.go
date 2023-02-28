@@ -7,23 +7,24 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPersistenceProfileSrcAddrCreate,
-		Read:   resourceBigipLtmPersistenceProfileSrcAddrRead,
-		Update: resourceBigipLtmPersistenceProfileSrcAddrUpdate,
-		Delete: resourceBigipLtmPersistenceProfileSrcAddrDelete,
-		Exists: resourceBigipLtmPersistenceProfileSrcAddrExists,
+		CreateContext: resourceBigipLtmPersistenceProfileSrcAddrCreate,
+		ReadContext:   resourceBigipLtmPersistenceProfileSrcAddrRead,
+		UpdateContext: resourceBigipLtmPersistenceProfileSrcAddrUpdate,
+		DeleteContext: resourceBigipLtmPersistenceProfileSrcAddrDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -114,7 +115,7 @@ func resourceBigipLtmPersistenceProfileSrcAddr() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -128,24 +129,15 @@ func resourceBigipLtmPersistenceProfileSrcAddrCreate(d *schema.ResourceData, met
 	err := client.CreateSourceAddrPersistenceProfile(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Source Address Persistence Profile  (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(name)
 
-	err = resourceBigipLtmPersistenceProfileSrcAddrUpdate(d, meta)
-	if err != nil {
-		if errdel := client.DeleteSourceAddrPersistenceProfile(name); errdel != nil {
-			return errdel
-		}
-		return err
-	}
-
-	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
-
+	return resourceBigipLtmPersistenceProfileSrcAddrUpdate(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -155,7 +147,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	pp, err := client.GetSourceAddrPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s)(%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if pp == nil {
 		log.Printf("[WARN] Source Address Persistence Profile (%s) not found, removing from state", d.Id())
@@ -170,19 +162,19 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	_ = d.Set("mirror", pp.Mirror)
 	_ = d.Set("override_conn_limit", pp.OverrideConnectionLimit)
 	if timeout, err := strconv.Atoi(pp.Timeout); err == nil {
-		d.Set("timeout", timeout)
+		_ = d.Set("timeout", timeout)
 	}
 
 	if _, ok := d.GetOk("app_service"); ok {
 		if err := d.Set("app_service", pp.AppService); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving AppService to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err))
 		}
 	}
 
 	// Specific to SourceAddrPersistenceProfile
 	if _, ok := d.GetOk("hash_algorithm"); ok {
 		if err := d.Set("hash_algorithm", pp.HashAlgorithm); err != nil {
-			return fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err)
+			return diag.FromErr(fmt.Errorf("[DEBUG] Error saving HashAlgorithm to state for PersistenceProfileSrcAddr (%s): %s", d.Id(), err))
 		}
 	}
 	if _, ok := d.GetOk("map_proxies"); ok {
@@ -195,7 +187,7 @@ func resourceBigipLtmPersistenceProfileSrcAddrRead(d *schema.ResourceData, meta 
 	return nil
 }
 
-func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -221,7 +213,10 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 		err := client.ModifySourceAddrPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
-			return err
+			if errdel := client.DeleteSourceAddrPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 	} else {
 		pp := &bigip.SourceAddrPersistenceProfile{
@@ -243,14 +238,17 @@ func resourceBigipLtmPersistenceProfileSrcAddrUpdate(d *schema.ResourceData, met
 		err := client.ModifySourceAddrPersistenceProfile(name, pp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Modify Source Address Persistence Profile  (%s) ", err)
-			return err
+			if errdel := client.DeleteSourceAddrPersistenceProfile(name); errdel != nil {
+				return diag.FromErr(errdel)
+			}
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceBigipLtmPersistenceProfileSrcAddrRead(d, meta)
+	return resourceBigipLtmPersistenceProfileSrcAddrRead(ctx, d, meta)
 }
 
-func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPersistenceProfileSrcAddrDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -258,28 +256,8 @@ func resourceBigipLtmPersistenceProfileSrcAddrDelete(d *schema.ResourceData, met
 	err := client.DeleteSourceAddrPersistenceProfile(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Source Address Persistence Profile (%s)  (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
-}
-
-func resourceBigipLtmPersistenceProfileSrcAddrExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Println("[INFO] Fetching Source Address Persistence Profile " + name)
-
-	pp, err := client.GetSourceAddrPersistenceProfile(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Source Address Persistence Profile  (%s) (%v)", name, err)
-		return false, err
-	}
-
-	if pp == nil {
-		log.Printf("[WARN] persistence profile src_addr  (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return pp != nil, nil
 }

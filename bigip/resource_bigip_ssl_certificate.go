@@ -1,6 +1,7 @@
 package bigip
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -10,18 +11,18 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipSslCertificate() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSslCertificateCreate,
-		Read:   resourceBigipSslCertificateRead,
-		Update: resourceBigipSslCertificateUpdate,
-		Delete: resourceBigipSslCertificateDelete,
-		Exists: resourceBigipSslCertificateExists,
+		CreateContext: resourceBigipSslCertificateCreate,
+		ReadContext:   resourceBigipSslCertificateRead,
+		UpdateContext: resourceBigipSslCertificateUpdate,
+		DeleteContext: resourceBigipSslCertificateDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -56,7 +57,7 @@ func resourceBigipSslCertificate() *schema.Resource {
 	}
 }
 
-func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSslCertificateCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Certificate Name " + name)
@@ -65,7 +66,7 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 	partition := d.Get("partition").(string)
 	err := client.UploadCertificate(name, certPath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error in Importing certificate (%s): %s", name, err))
 	}
 	d.SetId(name)
 	if !client.Teem {
@@ -87,10 +88,10 @@ func resourceBigipSslCertificateCreate(d *schema.ResourceData, meta interface{})
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipSslCertificateRead(d, meta)
+	return resourceBigipSslCertificateRead(ctx, d, meta)
 }
 
-func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Reading Certificate : " + name)
@@ -109,7 +110,7 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 
 	certificate, err := client.GetCertificate(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[INFO] Certificate content:%+v", certificate)
 	_ = d.Set("name", certificate.Name)
@@ -119,37 +120,7 @@ func resourceBigipSslCertificateRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBigipSslCertificateExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking certificate " + name + " exists.")
-	partition := d.Get("partition").(string)
-
-	if partition == "" {
-		if !strings.HasPrefix(name, "/") {
-			err := errors.New("the name must be in full_path format when partition is not specified")
-			fmt.Print(err)
-		}
-	} else {
-		if !strings.HasPrefix(name, "/") {
-			name = "/" + partition + "/" + name
-		}
-	}
-	certificate, err := client.GetCertificate(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve certificate   (%s) (%v) ", name, err)
-		return false, err
-	}
-
-	if certificate == nil {
-		log.Printf("[WARN] certificate (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-
-	return certificate != nil, nil
-}
-
-func resourceBigipSslCertificateUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSslCertificateUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Certificate Name " + name)
@@ -160,13 +131,13 @@ func resourceBigipSslCertificateUpdate(d *schema.ResourceData, meta interface{})
 	}*/
 	err := client.UpdateCertificate(name, certpath, partition)
 	if err != nil {
-		return fmt.Errorf("Error in Importing certificate (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error in Importing certificate (%s): %s", name, err))
 	}
 
-	return resourceBigipSslCertificateRead(d, meta)
+	return resourceBigipSslCertificateRead(ctx, d, meta)
 }
 
-func resourceBigipSslCertificateDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSslCertificateDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Deleting Certificate " + name)
@@ -178,7 +149,7 @@ func resourceBigipSslCertificateDelete(d *schema.ResourceData, meta interface{})
 	err := client.DeleteCertificate(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Pool   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

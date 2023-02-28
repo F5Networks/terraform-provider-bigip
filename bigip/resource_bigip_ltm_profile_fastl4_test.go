@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestFastl4Name = fmt.Sprintf("/%s/test-fastl4", TEST_PARTITION)
+var TestFastl4Name = fmt.Sprintf("/%s/test-fastl4", TestPartition)
 
 var TestFastl4Resource = `
 resource "bigip_ltm_profile_fastl4" "test-fastl4" {
@@ -72,7 +72,7 @@ func TestAccBigipLtmProfileFastl4TC2(t *testing.T) {
 		CheckDestroy: testCheckfastl4sDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: testaccbigipltmprofilefastl4DefaultConfig(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Config: testaccbigipltmprofilefastl4DefaultConfig(TestPartition, TestFastl4Name, "fastl4profileParent"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TestFastl4Name, true),
 					testCheckfastl4Exists("/Common/tetsfastl44", false),
@@ -81,7 +81,7 @@ func TestAccBigipLtmProfileFastl4TC2(t *testing.T) {
 				),
 			},
 			{
-				Config: testaccbigipltmprofilefastl4UpdateIdletimeoutConfig(TEST_PARTITION, TestFastl4Name, "fastl4profileParent"),
+				Config: testaccbigipltmprofilefastl4UpdateIdletimeoutConfig(TestPartition, TestFastl4Name, "fastl4profileParent"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckfastl4Exists(TestFastl4Name, true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_fastl4.fastl4profileParent", "name", TestFastl4Name),

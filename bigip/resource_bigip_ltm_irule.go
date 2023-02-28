@@ -7,23 +7,24 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmIRule() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmIRuleCreate,
-		Read:   resourceBigipLtmIRuleRead,
-		Update: resourceBigipLtmIRuleUpdate,
-		Delete: resourceBigipLtmIRuleDelete,
-		Exists: resourceBigipLtmIRuleExists,
+		CreateContext: resourceBigipLtmIRuleCreate,
+		ReadContext:   resourceBigipLtmIRuleRead,
+		UpdateContext: resourceBigipLtmIRuleUpdate,
+		DeleteContext: resourceBigipLtmIRuleDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -47,7 +48,7 @@ func resourceBigipLtmIRule() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmIRuleCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmIRuleCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
@@ -55,15 +56,15 @@ func resourceBigipLtmIRuleCreate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.CreateIRule(name, d.Get("irule").(string))
 	if err != nil {
-		return fmt.Errorf("Error creating iRule %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error creating iRule %s: %v", name, err))
 	}
 
 	d.SetId(name)
 
-	return resourceBigipLtmIRuleRead(d, meta)
+	return resourceBigipLtmIRuleRead(ctx, d, meta)
 }
 
-func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmIRuleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -71,7 +72,7 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 
 	irule, err := client.IRule(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving iRule %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving iRule %s: %v", name, err))
 	}
 	if irule == nil {
 		log.Printf("[DEBUG] iRule (%s) not found, removing from state", name)
@@ -79,32 +80,13 @@ func resourceBigipLtmIRuleRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	d.Set("name", irule.FullPath)
-	d.Set("irule", irule.Rule)
+	_ = d.Set("name", irule.FullPath)
+	_ = d.Set("irule", irule.Rule)
 
 	return nil
 }
 
-func resourceBigipLtmIRuleExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-
-	name := d.Id()
-	log.Printf("[INFO] Checking if iRule (%s) exists", name)
-
-	irule, err := client.IRule(name)
-	if err != nil {
-		return false, fmt.Errorf("Error retrieving iRule %s: %v", name, err)
-	}
-	if irule == nil {
-		log.Printf("[DEBUG] iRule (%s) not found, removing from state", name)
-		d.SetId("")
-		return false, nil
-	}
-
-	return irule != nil, nil
-}
-
-func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmIRuleUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -116,17 +98,17 @@ func resourceBigipLtmIRuleUpdate(d *schema.ResourceData, meta interface{}) error
 
 	err := client.ModifyIRule(name, r)
 	if err != nil {
-		return fmt.Errorf("Error modifying iRule %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error modifying iRule %s: %v", name, err))
 	}
-	return resourceBigipLtmIRuleRead(d, meta)
+	return resourceBigipLtmIRuleRead(ctx, d, meta)
 }
 
-func resourceBigipLtmIRuleDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmIRuleDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	err := client.DeleteIRule(name)
 	if err != nil {
-		return fmt.Errorf("Error deleting iRule %s: %v", name, err)
+		return diag.FromErr(fmt.Errorf("error deleting iRule %s: %v", name, err))
 	}
 	d.SetId("")
 	return nil

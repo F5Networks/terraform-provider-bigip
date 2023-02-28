@@ -7,21 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipCmDevicegroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipCmDevicegroupCreate,
-		Update: resourceBigipCmDevicegroupUpdate,
-		Read:   resourceBigipCmDevicegroupRead,
-		Delete: resourceBigipCmDevicegroupDelete,
+		CreateContext: resourceBigipCmDevicegroupCreate,
+		UpdateContext: resourceBigipCmDevicegroupUpdate,
+		ReadContext:   resourceBigipCmDevicegroupRead,
+		DeleteContext: resourceBigipCmDevicegroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -104,7 +106,7 @@ func resourceBigipCmDevicegroup() *schema.Resource {
 	}
 }
 
-func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 	log.Println("[INFO] Creating Device Group" + name)
@@ -117,13 +119,13 @@ func resourceBigipCmDevicegroupCreate(d *schema.ResourceData, meta interface{}) 
 
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Devicegroup (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipCmDevicegroupRead(d, meta)
+	return resourceBigipCmDevicegroupRead(ctx, d, meta)
 }
 
-func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Updating Devicegroup " + name)
@@ -131,12 +133,12 @@ func resourceBigipCmDevicegroupUpdate(d *schema.ResourceData, meta interface{}) 
 	err := client.UpdateDevicegroup(name, &p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Devicegroup (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipCmDevicegroupRead(d, meta)
+	return resourceBigipCmDevicegroupRead(ctx, d, meta)
 }
 
-func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
@@ -152,11 +154,10 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 			log.Printf("[ERROR] Unable to retrieve DevicegroupsDevices (%s,%s) (%v) ", name, Rname, err)
 		}
 	}
-
 	p, err := client.Devicegroups(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Devicegroup (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if p == nil {
@@ -167,11 +168,11 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 	_ = d.Set("name", p.Name)
 	_ = d.Set("description", p.Description)
 	if err := d.Set("auto_sync", p.AutoSync); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AutoSync  to state for Devicegroup (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving AutoSync  to state for Devicegroup (%s): %s", d.Id(), err))
 	}
 
 	if err := d.Set("type", p.Type); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err)
+		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err))
 	}
 	_ = d.Set("fullLoadOnSync", p.FullLoadOnSync)
 	_ = d.Set("saveOnAutoSync", p.SaveOnAutoSync)
@@ -181,7 +182,7 @@ func resourceBigipCmDevicegroupRead(d *schema.ResourceData, meta interface{}) er
 
 }
 
-func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCmDevicegroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	deviceCount := d.Get("device.#").(int)
@@ -193,7 +194,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 		err := client.DeleteDevicegroupDevices(name, Rname)
 		if err != nil {
 			log.Printf("[ERROR] Unable to Delete Deviceg (%s)  (%v) ", Rname, err)
-			return err
+			return diag.FromErr(err)
 		}
 
 	}
@@ -201,7 +202,7 @@ func resourceBigipCmDevicegroupDelete(d *schema.ResourceData, meta interface{}) 
 	err := client.DeleteDevicegroup(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Devicegroup (%s)  (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

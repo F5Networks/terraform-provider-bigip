@@ -7,7 +7,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 
 
 provider "bigip" {
-  address = "X.X.X.X"
+  address  = "X.X.X.X"
   username = "xxxx"
   password = "xxxx"
 }
@@ -20,11 +20,11 @@ resource "null_resource" "install_as3" {
   }
 }
 // The below null resource can be used to deploy HTTP script as3_http.sh which uses JSON payload example1.josn 
- resource "null_resource" "deploy_as3_http" {
- provisioner "local-exec" {
+resource "null_resource" "deploy_as3_http" {
+  provisioner "local-exec" {
     command = "sh as3_http.sh"
   }
-depends_on = ["null_resource.install_as3"]
+  depends_on = ["null_resource.install_as3"]
 
 }
 

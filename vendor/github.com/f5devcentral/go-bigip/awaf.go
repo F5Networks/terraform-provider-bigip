@@ -206,6 +206,9 @@ type PolicyStructobject struct {
 	Policy        interface{}   `json:"policy,omitempty"`
 	Modifications []interface{} `json:"modifications,omitempty"`
 }
+type ServerTech struct {
+	ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
+}
 
 type WafPolicy struct {
 	Name        string `json:"name,omitempty"`
@@ -217,19 +220,17 @@ type WafPolicy struct {
 		Name string `json:"name,omitempty"`
 		Link string `json:"link,omitempty"`
 	} `json:"template,omitempty"`
-	HasParent           bool        `json:"hasParent,omitempty"`
-	ApplicationLanguage string      `json:"applicationLanguage,omitempty"`
-	EnablePassiveMode   bool        `json:"enablePassiveMode,omitempty"`
-	ProtocolIndependent bool        `json:"protocolIndependent,omitempty"`
-	CaseInsensitive     bool        `json:"caseInsensitive,omitempty"`
-	EnforcementMode     string      `json:"enforcementMode,omitempty"`
-	Type                string      `json:"type,omitempty"`
-	Parameters          []Parameter `json:"parameters,omitempty"`
-	ServerTechnologies  []struct {
-		ServerTechnologyName string `json:"serverTechnologyName,omitempty"`
-	} `json:"server-technologies,omitempty"`
-	Urls          []WafUrlJson `json:"urls,omitempty"`
-	PolicyBuilder struct {
+	HasParent           bool         `json:"hasParent,omitempty"`
+	ApplicationLanguage string       `json:"applicationLanguage,omitempty"`
+	EnablePassiveMode   bool         `json:"enablePassiveMode,omitempty"`
+	ProtocolIndependent bool         `json:"protocolIndependent,omitempty"`
+	CaseInsensitive     bool         `json:"caseInsensitive,omitempty"`
+	EnforcementMode     string       `json:"enforcementMode,omitempty"`
+	Type                string       `json:"type,omitempty"`
+	Parameters          []Parameter  `json:"parameters,omitempty"`
+	ServerTechnologies  []ServerTech `json:"server-technologies,omitempty"`
+	Urls                []WafUrlJson `json:"urls,omitempty"`
+	PolicyBuilder       struct {
 		LearningMode string `json:"learningMode,omitempty"`
 	} `json:"policy-builder,omitempty"`
 	SignatureSettings struct {

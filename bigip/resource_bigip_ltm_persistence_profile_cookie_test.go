@@ -11,15 +11,15 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_PPCOOKIE_NAME = fmt.Sprintf("/%s/test-ppcookie", TEST_PARTITION)
+var TestPpcookieName = fmt.Sprintf("/%s/test-ppcookie", TestPartition)
 
-var TEST_PPCOOKIE_RESOURCE = `
+var TestPpcookieResource = `
 resource "bigip_ltm_persistence_profile_cookie" "test_ppcookie" {
-	name = "` + TEST_PPCOOKIE_NAME + `"
+	name = "` + TestPpcookieName + `"
 	defaults_from = "/Common/cookie"
 	match_across_pools = "enabled"
 	match_across_services = "enabled"
@@ -45,10 +45,10 @@ func TestAccBigipLtmPersistenceProfileCookieCreate(t *testing.T) {
 		CheckDestroy: resource.ComposeTestCheckFunc(testCheckBigipLtmPersistenceProfileCookieDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPCOOKIE_RESOURCE,
+				Config: TestPpcookieResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileCookieExists(TEST_PPCOOKIE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "name", TEST_PPCOOKIE_NAME),
+					testBigipLtmPersistenceProfileCookieExists(TestPpcookieName, true),
+					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "name", TestPpcookieName),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "defaults_from", "/Common/cookie"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "match_across_pools", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_persistence_profile_cookie.test_ppcookie", "match_across_services", "enabled"),
@@ -78,11 +78,11 @@ func TestAccBigipLtmPersistenceProfileCookieImport(t *testing.T) {
 		CheckDestroy: testCheckBigipLtmPersistenceProfileCookieDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_PPCOOKIE_RESOURCE,
+				Config: TestPpcookieResource,
 				Check: resource.ComposeTestCheckFunc(
-					testBigipLtmPersistenceProfileCookieExists(TEST_PPCOOKIE_NAME, true),
+					testBigipLtmPersistenceProfileCookieExists(TestPpcookieName, true),
 				),
-				ResourceName:      TEST_PPCOOKIE_NAME,
+				ResourceName:      TestPpcookieName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},

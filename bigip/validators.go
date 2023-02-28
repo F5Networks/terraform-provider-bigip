@@ -12,20 +12,8 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
-
-func validateStringValue(values []string) schema.SchemaValidateFunc {
-	return func(value interface{}, field string) (ws []string, errors []error) {
-		for _, v := range values {
-			if v == value.(string) {
-				return
-			}
-		}
-		errors = append(errors, fmt.Errorf("%q must be one of %v", field, values))
-		return
-	}
-}
 
 func validateF5Name(value interface{}, field string) (ws []string, errors []error) {
 	var values []string

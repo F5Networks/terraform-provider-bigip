@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_FTP_NAME = fmt.Sprintf("/%s/test-ftp", TEST_PARTITION)
+var TEST_FTP_NAME = fmt.Sprintf("/%s/test-ftp", TestPartition)
 
 var TEST_FTP_RESOURCE = `
 resource "bigip_ltm_profile_ftp" "test-ftp" {

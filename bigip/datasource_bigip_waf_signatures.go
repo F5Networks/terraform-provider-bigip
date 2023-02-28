@@ -6,18 +6,20 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceBigipWafSignatures() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceBigipWafSignatureRead,
+		ReadContext: dataSourceBigipWafSignatureRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -84,7 +86,7 @@ func dataSourceBigipWafSignatures() *schema.Resource {
 	}
 }
 
-func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceBigipWafSignatureRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	d.SetId("")
 	sid := d.Get("signature_id").(int)
@@ -92,15 +94,15 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 	p, err := client.Provisions(provision)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", provision, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if p.Level == "none" {
-		return fmt.Errorf("[ERROR] ASM Module is not provisioned, it is set to : (%s) ", p.Level)
+		return diag.FromErr(fmt.Errorf("[ERROR] asm Module is not provisioned, it is set to : (%s) ", p.Level))
 	}
 
 	signatures, err := client.GetWafSignature(sid)
 	if err != nil {
-		return fmt.Errorf("error retrieving signature %d: %v", sid, err)
+		return diag.FromErr(fmt.Errorf("error retrieving signature %d: %v", sid, err))
 	}
 
 	// filter query always returns a list if the list is empty it means the signature is not found
@@ -126,7 +128,7 @@ func dataSourceBigipWafSignatureRead(d *schema.ResourceData, meta interface{}) e
 	}
 	jsonString, err := json.Marshal(sigJson)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Signature Json:%+v", string(jsonString))
 	_ = d.Set("json", string(jsonString))

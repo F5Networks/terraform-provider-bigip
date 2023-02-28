@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -15,18 +16,18 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipLtmPool() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipLtmPoolCreate,
-		Read:   resourceBigipLtmPoolRead,
-		Update: resourceBigipLtmPoolUpdate,
-		Delete: resourceBigipLtmPoolDelete,
-		Exists: resourceBigipLtmPoolExists,
+		CreateContext: resourceBigipLtmPoolCreate,
+		ReadContext:   resourceBigipLtmPoolRead,
+		UpdateContext: resourceBigipLtmPoolUpdate,
+		DeleteContext: resourceBigipLtmPoolDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -96,20 +97,15 @@ func resourceBigipLtmPool() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	d.SetId(name)
 	log.Println("[INFO] Creating pool " + name)
 	err := client.CreatePool(name)
 	if err != nil {
-		return fmt.Errorf("Error retrieving pool (%s): %s ", name, err)
+		return diag.FromErr(fmt.Errorf("error retrieving pool (%s): %s", name, err))
 	}
-	err = resourceBigipLtmPoolUpdate(d, meta)
-	if err != nil {
-		_ = client.DeletePool(name)
-		return err
-	}
+	d.SetId(name)
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -129,69 +125,53 @@ func resourceBigipLtmPoolCreate(d *schema.ResourceData, meta interface{}) error 
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	return resourceBigipLtmPoolRead(d, meta)
+	return resourceBigipLtmPoolUpdate(ctx, d, meta)
 }
 
-func resourceBigipLtmPoolRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	_ = d.Set("name", name)
 	log.Println("[INFO] Reading pool " + name)
 	pool, err := client.GetPool(name)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if pool == nil {
 		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-	if err := d.Set("allow_nat", pool.AllowNAT); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowNAT to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("allow_snat", pool.AllowSNAT); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving AllowSNAT to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("load_balancing_mode", pool.LoadBalancingMode); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving LoadBalancingMode to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("slow_ramp_time", pool.SlowRampTime); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("minimum_active_members", pool.MinActiveMembers); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving SlowRampTime to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("service_down_action", pool.ServiceDownAction); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving ServiceDownAction to state for Pool  (%s): %s", d.Id(), err)
-	}
-	if err := d.Set("reselect_tries", pool.ReselectTries); err != nil {
-		return fmt.Errorf("[DEBUG] ERror saving ReselectTries to state for Pool  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("allow_nat", pool.AllowNAT)
+	_ = d.Set("allow_snat", pool.AllowSNAT)
+	_ = d.Set("load_balancing_mode", pool.LoadBalancingMode)
+	_ = d.Set("slow_ramp_time", pool.SlowRampTime)
+	_ = d.Set("minimum_active_members", pool.MinActiveMembers)
+	_ = d.Set("service_down_action", pool.ServiceDownAction)
+	_ = d.Set("reselect_tries", pool.ReselectTries)
 	_ = d.Set("description", pool.Description)
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
-	if err := d.Set("monitors", makeStringSet(&monitors)); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving Monitors to state for Pool  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("monitors", makeStringSet(&monitors))
 	return nil
 }
 
-func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	client := meta.(*bigip.BigIP)
-	name := d.Id()
-	log.Println("[INFO] Checking pool " + name + " exists.")
-	pool, err := client.GetPool(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
-		return false, err
-	}
-	if pool == nil {
-		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
-		d.SetId("")
-	}
-	return pool != nil, nil
-}
+// func resourceBigipLtmPoolExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+//	client := meta.(*bigip.BigIP)
+//	name := d.Id()
+//	log.Println("[INFO] Checking pool " + name + " exists.")
+//	pool, err := client.GetPool(name)
+//	if err != nil {
+//		log.Printf("[ERROR] Unable to Retrieve Pool   (%s) (%v) ", name, err)
+//		return false, err
+//	}
+//	if pool == nil {
+//		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
+//		d.SetId("")
+//	}
+//	return pool != nil, nil
+// }
 
-func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	var monitors []string
@@ -214,18 +194,22 @@ func resourceBigipLtmPoolUpdate(d *schema.ResourceData, meta interface{}) error 
 	err := client.ModifyPool(name, pool)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Pool   (%s) (%v) ", name, err)
-		return err
+		errdel := client.DeletePool(name)
+		if errdel != nil {
+			return diag.FromErr(errdel)
+		}
+		return diag.FromErr(err)
 	}
-	return resourceBigipLtmPoolRead(d, meta)
+	return resourceBigipLtmPoolRead(ctx, d, meta)
 }
-func resourceBigipLtmPoolDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipLtmPoolDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Deleting pool " + name)
 	err := client.DeletePool(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Pool   (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil

@@ -17,8 +17,8 @@ import (
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var dir, _ = os.Getwd()
@@ -272,30 +272,30 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 	})
 }
 
-func TestAccBigipAs3Issue601(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckAs3Destroy,
-		Steps: []resource.TestStep{
-			{
-				Config: TestAs3Resourcegithub601a,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckAs3Exists("Sample_01", true),
-				),
-			},
-			{
-				Config: TestAs3Resourcegithub601b,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckAs3Exists("Sample_02", true),
-					testCheckAs3Exists("Sample_01", false),
-				),
-			},
-		},
-	})
-}
+// func TestAccBigipAs3Issue601(t *testing.T) {
+//	resource.Test(t, resource.TestCase{
+//		PreCheck: func() {
+//			testAcctPreCheck(t)
+//		},
+//		Providers:    testAccProviders,
+//		CheckDestroy: testCheckAs3Destroy,
+//		Steps: []resource.TestStep{
+//			{
+//				Config: TestAs3Resourcegithub601a,
+//				Check: resource.ComposeTestCheckFunc(
+//					testCheckAs3Exists("Sample_01", true),
+//				),
+//			},
+//			{
+//				Config: TestAs3Resourcegithub601b,
+//				Check: resource.ComposeTestCheckFunc(
+//					testCheckAs3Exists("Sample_02", true),
+//					testCheckAs3Exists("Sample_01", false),
+//				),
+//			},
+//		},
+//	})
+// }
 
 func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{

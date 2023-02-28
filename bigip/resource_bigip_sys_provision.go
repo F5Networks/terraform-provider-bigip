@@ -7,22 +7,23 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"fmt"
+	"context"
 	"log"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipSysProvision() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipSysProvisionCreate,
-		Update: resourceBigipSysProvisionUpdate,
-		Read:   resourceBigipSysProvisionRead,
-		Delete: resourceBigipSysProvisionDelete,
+		CreateContext: resourceBigipSysProvisionCreate,
+		UpdateContext: resourceBigipSysProvisionUpdate,
+		ReadContext:   resourceBigipSysProvisionRead,
+		DeleteContext: resourceBigipSysProvisionDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -64,7 +65,7 @@ func resourceBigipSysProvision() *schema.Resource {
 	}
 }
 
-func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
 
@@ -78,13 +79,13 @@ func resourceBigipSysProvisionCreate(d *schema.ResourceData, meta interface{}) e
 	err := client.ProvisionModule(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Provision  (%s) ", err)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipSysProvisionRead(d, meta)
+	return resourceBigipSysProvisionRead(ctx, d, meta)
 }
 
-func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Updating Provisioning for :%v module", name)
@@ -97,28 +98,26 @@ func resourceBigipSysProvisionUpdate(d *schema.ResourceData, meta interface{}) e
 	err := client.ProvisionModule(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Update Provision (%v) ", err)
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceBigipSysProvisionRead(d, meta)
+	return resourceBigipSysProvisionRead(ctx, d, meta)
 }
 
-func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Println("[INFO] Reading Provisions " + name)
 	p, err := client.Provisions(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Provision (%s) (%v) ", name, err)
-		return err
+		return diag.FromErr(err)
 	}
 	if p == nil {
 		log.Printf("[WARN] Provision (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
-	if err := d.Set("full_path", p.FullPath); err != nil {
-		return fmt.Errorf("[DEBUG] Error saving FullPath to state for Provision  (%s): %s", d.Id(), err)
-	}
+	_ = d.Set("full_path", p.FullPath)
 	_ = d.Set("cpu_ratio", p.CpuRatio)
 	_ = d.Set("disk_ratio", p.DiskRatio)
 	_ = d.Set("level", p.Level)
@@ -127,7 +126,7 @@ func resourceBigipSysProvisionRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceBigipSysProvisionDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipSysProvisionDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// API is not supported for Deleting
 	return nil
 }

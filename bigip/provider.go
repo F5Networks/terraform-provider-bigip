@@ -7,19 +7,20 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	p := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"address": {
@@ -159,7 +160,7 @@ func Provider() terraform.ResourceProvider {
 			"bigip_vcmp_guest":                      resourceBigipVcmpGuest(),
 		},
 	}
-	p.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		terraformVersion := p.TerraformVersion
 		if terraformVersion == "" {
 			// Terraform 0.12 introduced this field to the protocol
@@ -171,7 +172,7 @@ func Provider() terraform.ResourceProvider {
 	return p
 }
 
-func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
 	config := &bigip.Config{
 		Address:           d.Get("address").(string),
 		Port:              d.Get("port").(string),
@@ -185,13 +186,13 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	}
 	if !d.Get("validate_certs_disable").(bool) {
 		if d.Get("trusted_cert_path").(string) == "" {
-			return nil, fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path")
+			return nil, diag.FromErr(fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path"))
 		}
 		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}
 	cfg, err := Client(config)
 	if err != nil {
-		return cfg, err
+		return cfg, diag.FromErr(err)
 	}
 	if cfg != nil {
 		cfg.UserAgent = fmt.Sprintf("Terraform/%s", terraformVersion)
@@ -199,7 +200,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		cfg.Teem = d.Get("teem_disable").(bool)
 		cfg.Transport.TLSClientConfig.InsecureSkipVerify = d.Get("validate_certs_disable").(bool)
 	}
-	return cfg, err
+	return cfg, diag.FromErr(err)
 }
 
 // Convert slice of strings to schema.TypeSet

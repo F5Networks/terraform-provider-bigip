@@ -10,38 +10,38 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var TEST_PARTITION = "Common"
+var TestPartition = "Common"
 
-var testAccProviders map[string]terraform.ResourceProvider
-var testAccProvider *schema.Provider
+// providerFactories are used to instantiate a provider during acceptance testing.
+// The factory function will be invoked for every Terraform CLI command executed
+// to create a provider server to which the CLI can reattach.
 
-var testProviders = map[string]terraform.ResourceProvider{
-	"bigip": Provider(),
-}
+// var testAccProviders map[string]*schema.Provider{}
+// var testAccProvider *schema.Provider
 
-func init() {
-	testAccProvider = Provider().(*schema.Provider)
-	testAccProviders = map[string]terraform.ResourceProvider{
-		"bigip": testAccProvider,
-	}
-	if v := os.Getenv("BIGIP_TEST_PARTITION"); v != "" {
-		TEST_PARTITION = v
-	}
+var testAccProvider = Provider()
+var testAccProviders = map[string]*schema.Provider{
+	"bigip": testAccProvider,
 }
 
 func TestAccProvider(t *testing.T) {
-	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
+	if err := Provider().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
 
 func testAcctPreCheck(t *testing.T) {
+	// You can add code here to run prior to any test case execution, for example assertions
+	// about the appropriate environment variables being set are common to see in a pre-check
+	// function.
 	if os.Getenv("BIGIP_TOKEN_VALUE") != "" || (os.Getenv("BIGIP_TOKEN_AUTH") != "" && os.Getenv("BIGIP_LOGIN_REF") != "") {
 		return
+	}
+	if v := os.Getenv("BIGIP_TEST_PARTITION"); v != "" {
+		TestPartition = v
 	}
 	for _, s := range [...]string{"BIGIP_HOST", "BIGIP_USER", "BIGIP_PASSWORD"} {
 		if os.Getenv(s) == "" {
@@ -49,4 +49,25 @@ func testAcctPreCheck(t *testing.T) {
 			return
 		}
 	}
+}
+
+func testAcctUnitPreCheck(_ *testing.T, url string) {
+	_ = os.Setenv("BIGIP_HOST", url)
+	_ = os.Setenv("BIGIP_USER", "xxxx")
+	_ = os.Setenv("BIGIP_PASSWORD", "xxx")
+	_ = os.Setenv("BIGIP_TOKEN_AUTH", "false")
+}
+
+// loadFixtureBytes returns the entire contents of the given file as a byte slice
+func loadFixtureBytes(path string) []byte {
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return contents
+}
+
+// loadFixtureString returns the entire contents of the given file as a string
+func loadFixtureString(path string) string {
+	return string(loadFixtureBytes(path))
 }

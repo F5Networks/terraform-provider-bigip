@@ -6,6 +6,7 @@ If a copy of the MPL was not distributed with this file, You can obtain one at h
 package bigip
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -14,17 +15,18 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceBigipCommand() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBigipCommandCreate,
-		Read:   resourceBigipCommandRead,
-		Update: resourceBigipCommandUpdate,
-		Delete: resourceBigipCommandDelete,
+		CreateContext: resourceBigipCommandCreate,
+		ReadContext:   resourceBigipCommandRead,
+		UpdateContext: resourceBigipCommandUpdate,
+		DeleteContext: resourceBigipCommandDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"when": {
@@ -53,7 +55,7 @@ func resourceBigipCommand() *schema.Resource {
 	}
 }
 
-func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCommandCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var commandList []string
 	if d.Get("when").(string) == "apply" {
@@ -72,7 +74,7 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 			}
 			resultCmd, err := client.RunCommand(commandConfig)
 			if err != nil {
-				return fmt.Errorf("error retrieving Command Result: %v", err)
+				return diag.FromErr(fmt.Errorf("error retrieving Command Result: %v", err))
 			}
 			resultList = append(resultList, resultCmd.CommandResult)
 		}
@@ -101,11 +103,11 @@ func resourceBigipCommandCreate(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipCommandRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCommandRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Println("[INFO]:Read Operation is not supported for this resource")
 	return nil
 }
-func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCommandUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var commandList []string
 	if d.Get("when").(string) == "apply" {
@@ -123,7 +125,7 @@ func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error 
 			}
 			resultCmd, err := client.RunCommand(commandConfig)
 			if err != nil {
-				return fmt.Errorf("error retrieving Command Result: %v", err)
+				return diag.FromErr(fmt.Errorf("error retrieving Command Result: %v", err))
 			}
 			resultList = append(resultList, resultCmd.CommandResult)
 		}
@@ -132,7 +134,7 @@ func resourceBigipCommandUpdate(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceBigipCommandDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	var commandList []string
 	if d.Get("when").(string) == "destroy" {
@@ -152,7 +154,7 @@ func resourceBigipCommandDelete(d *schema.ResourceData, meta interface{}) error 
 			log.Printf("[INFO] Command struct:%+v", commandConfig)
 			resultCmd, err := client.RunCommand(commandConfig)
 			if err != nil {
-				return fmt.Errorf("error retrieving Command Result: %v", err)
+				return diag.FromErr(fmt.Errorf("error retrieving Command Result: %v", err))
 			}
 			log.Printf("[INFO] Result Command struct:%+v", resultCmd)
 
