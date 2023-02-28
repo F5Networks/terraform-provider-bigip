@@ -680,7 +680,7 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 				if r.(map[string]interface{})["sd_azure_tag_key"].(string) != "" && r.(map[string]interface{})["sd_azure_tag_val"].(string) != "" {
 					sdObj.SdAzureTagKey = r.(map[string]interface{})["sd_azure_tag_key"].(string)
 					sdObj.SdAzureTagVal = r.(map[string]interface{})["sd_azure_tag_val"].(string)
-				} else if r.(map[string]interface{})["sd_azure_resource_id"].(string) != "" && r.(map[string]interface{})["sd_azure_directory_id"].(string) != "" {
+				} else if r.(map[string]interface{})["sd_azure_resource_id"].(string) != "" {
 					sdObj.SdRid = r.(map[string]interface{})["sd_azure_resource_id"].(string)
 					// sdObj.SdDirid = r.(map[string]interface{})["sd_azure_directory_id"].(string)
 				}
@@ -697,7 +697,6 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 				sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
 				sdObjs = append(sdObjs, sdObj)
 			}
-			//sdObjs = append(sdObjs, sdObj)
 		}
 		httpJson.ServiceDiscovery = sdObjs
 	}

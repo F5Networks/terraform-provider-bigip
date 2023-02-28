@@ -228,6 +228,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	}
 	createdTenants = d.Get("tenant_list").(string)
 	x++
+	log.Printf("[TRACE] %+v", x)
 	return resourceBigipAs3Read(ctx, d, meta)
 }
 func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
