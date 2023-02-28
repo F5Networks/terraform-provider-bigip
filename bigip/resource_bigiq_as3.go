@@ -170,6 +170,7 @@ func resourceBigiqAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	as3ID := fmt.Sprintf("%s_%s", targetInfo, successfulTenants)
 	d.SetId(as3ID)
 	p++
+	log.Printf("[TRACE] %+v", p)
 	return resourceBigiqAs3Read(ctx, d, meta)
 }
 
