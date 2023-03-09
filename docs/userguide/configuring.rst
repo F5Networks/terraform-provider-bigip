@@ -289,7 +289,7 @@ You can inspect the current state using ``terraform show``:
            "forwarding",
        ]
        id = "test-policy"
-       name = "common/test-policy"
+       name = "/common/test-policy"
        requires = [
            "http",
        ]
