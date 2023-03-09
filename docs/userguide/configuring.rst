@@ -84,7 +84,7 @@ Terraform uses a plugin-based architecture to support available infrastructure a
 
 .. code-block:: javascript
 
-   root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform init
+   $ terraform init
 
     Initializing the backend...
 
@@ -111,7 +111,7 @@ The output below shows the execution plan and describes which actions Terraform 
 
 .. code-block:: javascript
 
-   root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform apply
+   $ terraform apply
 
     An execution plan has been generated and is shown below.
     Resource actions are indicated with the following symbols:
@@ -269,9 +269,6 @@ The output below shows the execution plan and describes which actions Terraform 
     bigip_ltm_policy.test-policy: Creation complete after 0s [id=test-policy]
 
     Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
-    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
-
-
 
 If ``terraform apply`` failed with an error, read the error message and fix the error that occurred. At this stage, it is likely to be a syntax error in the configuration.
 
@@ -285,23 +282,23 @@ You can inspect the current state using ``terraform show``:
 
 .. code-block:: javascript
 
-   root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform show
-    # bigip_ltm_policy.test-policy:
-    resource "bigip_ltm_policy" "test-policy" {
-        controls = [
-            "forwarding",
-        ]
-        id = "test-policy"
-        name = "common/test-policy"
-        requires = [
-            "http",
-        ]
-        strategy = "/Common/first-match"
+   $ terraform show
+   # bigip_ltm_policy.test-policy:
+   resource "bigip_ltm_policy" "test-policy" {
+       controls = [
+           "forwarding",
+       ]
+       id = "test-policy"
+       name = "common/test-policy"
+       requires = [
+           "http",
+       ]
+       strategy = "/Common/first-match"
 
-        rule {
-            name = "rule6"
+       rule {
+           name = "rule6"
 
-            action {
+           action {
                 asm = false
                 avr = false
                 cache = false
@@ -369,25 +366,22 @@ You can inspect the current state using ``terraform show``:
                 write = false
            }
        }
-    }
+   }
 
-    # bigip_ltm_pool.mypool:
-    resource "bigip_ltm_pool" "mypool" {
-        allow_nat = "yes"
-        allow_snat = "yes"
-        id = "/Common/mypool"
-        load_balancing_mode = "round-robin"
-        monitors = [
-            "/Common/http",
-        ]
-        name = "/Common/mypool"
-        reselect_tries = 0
-        service_down_action = "none"
-        slow_ramp_time = 0
-    }
-    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
-
-
+   # bigip_ltm_pool.mypool:
+   resource "bigip_ltm_pool" "mypool" {
+       allow_nat = "yes"
+       allow_snat = "yes"
+       id = "/Common/mypool"
+       load_balancing_mode = "round-robin"
+       monitors = [
+           "/Common/http",
+       ]
+       name = "/Common/mypool"
+       reselect_tries = 0
+       service_down_action = "none"
+       slow_ramp_time = 0
+   }
 
 How to Generate/Build Terraform BIG-IP Provider Binary
 ------------------------------------------------------
