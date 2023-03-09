@@ -15,36 +15,35 @@ Sample Terraform resource to create a policy on the F5 BIG-IP system
 
 .. code-block:: javascript
 
-    provider "bigip" {
-        address = "x.x.x.x"
-        username = "xxxx"
-        password = "xxxx"
-    }
- 
-    resource "bigip_ltm_policy" "test-policy" {
-        name = "my_policy"
-        strategy = "first-match"
-        requires = ["http"]
-        published_copy = "Drafts/my_policy"
-        controls = ["forwarding"]
-        rule {
-            name = "rule6"
-            action = {
-                tm_name = "20"
-                forward = true
-                pool = "/Common/mypool"
-            }
-        }
-        depends_on = ["bigip_ltm_pool.mypool"]
-    }
-    
-    resource "bigip_ltm_pool" "mypool" {
-        name = "/Common/mypool"
-        monitors = ["/Common/http"]
-        allow_nat = "yes"
-        allow_snat = "yes"
-        load_balancing_mode = "round-robin"
-    }
+   provider "bigip" {
+       address = "x.x.x.x"
+       username = "xxxx"
+       password = "xxxx"
+   }
+
+   resource "bigip_ltm_policy" "test-policy" {
+       name = "/Common/test-policy"
+       strategy = "first-match"
+       requires = ["http"]
+       controls = ["forwarding"]
+       rule {
+           name = "rule6"
+           action {
+               tm_name = "20"
+               forward = true
+               pool = "/Common/mypool"
+           }
+       }
+       depends_on = [bigip_ltm_pool.mypool]
+   }
+
+   resource "bigip_ltm_pool" "mypool" {
+       name = "/Common/mypool"
+       monitors = ["/Common/http"]
+       allow_nat = "yes"
+       allow_snat = "yes"
+       load_balancing_mode = "round-robin"
+   }
 
 
 
@@ -120,127 +119,126 @@ The output below shows the execution plan and describes which actions Terraform 
 
     Terraform will perform the following actions:
 
-    # bigip_ltm_policy.test-policy will be created
-    + resource "bigip_ltm_policy" "test-policy" {
-    + controls = [
-    + "forwarding",
-    ]
-    + id = (known after apply)
-    + name = "my_policy"
-    + published_copy = "Drafts/my_policy"
-    + requires = [
-    + "http",
-    ]
-    + strategy = "first-match"
+      # bigip_ltm_policy.test-policy will be created
+      + resource "bigip_ltm_policy" "test-policy" {
+          + controls = [
+              + "forwarding",
+            ]
+          + id = (known after apply)
+          + name = "/Common/test-policy"
+          + requires = [
+              + "http",
+            ]
+          + strategy = "first-match"
 
-    + rule {
-    + name = "rule6"
+          + rule {
+              + name = "rule6"
 
-    + action {
-    + app_service = (known after apply)
-    + application = (known after apply)
-    + asm = (known after apply)
-    + avr = (known after apply)
-    + cache = (known after apply)
-    + carp = (known after apply)
-    + category = (known after apply)
-    + classify = (known after apply)
-    + clone_pool = (known after apply)
-    + code = (known after apply)
-    + compress = (known after apply)
-    + content = (known after apply)
-    + cookie_hash = (known after apply)
-    + cookie_insert = (known after apply)
-    + cookie_passive = (known after apply)
-    + cookie_rewrite = (known after apply)
-    + decompress = (known after apply)
-    + defer = (known after apply)
-    + destination_address = (known after apply)
-    + disable = (known after apply)
-    + domain = (known after apply)
-    + enable = (known after apply)
-    + expiry = (known after apply)
-    + expiry_secs = (known after apply)
-    + expression = (known after apply)
-    + extension = (known after apply)
-    + facility = (known after apply)
-    + forward = true
-    + from_profile = (known after apply)
-    + hash = (known after apply)
-    + host = (known after apply)
-    + http = (known after apply)
-    + http_basic_auth = (known after apply)
-    + http_cookie = (known after apply)
-    + http_header = (known after apply)
-    + http_referer = (known after apply)
-    + http_reply = (known after apply)
-    + http_set_cookie = (known after apply)
-    + http_uri = (known after apply)
-    + ifile = (known after apply)
-    + insert = (known after apply)
-    + internal_virtual = (known after apply)
-    + ip_address = (known after apply)
-    + key = (known after apply)
-    + l7dos = (known after apply)
-    + length = (known after apply)
-    + location = (known after apply)
-    + log = (known after apply)
-    + ltm_policy = (known after apply)
-    + member = (known after apply)
-    + message = (known after apply)
-    + netmask = (known after apply)
-    + nexthop = (known after apply)
-    + node = (known after apply)
-    + offset = (known after apply)
-    + path = (known after apply)
-    + pem = (known after apply)
-    + persist = (known after apply)
-    + pin = (known after apply)
-    + policy = (known after apply)
-    + pool = "/Common/mypool"
-    + port = (known after apply)
-    + priority = (known after apply)
-    + profile = (known after apply)
-    + protocol = (known after apply)
-    + query_string = (known after apply)
-    + rateclass = (known after apply)
-    + redirect = (known after apply)
-    + remove = (known after apply)
-    + replace = (known after apply)
-    + request = (known after apply)
-    + request_adapt = (known after apply)
-    + reset = (known after apply)
-    + response = (known after apply)
-    + response_adapt = (known after apply)
-    + scheme = (known after apply)
-    + script = (known after apply)
-    + select = (known after apply)
-    + server_ssl = (known after apply)
-    + set_variable = (known after apply)
-    + snat = (known after apply)
-    + snatpool = (known after apply)
-    + source_address = (known after apply)
-    + ssl_client_hello = (known after apply)
-    + ssl_server_handshake = (known after apply)
-    + ssl_server_hello = (known after apply)
-    + ssl_session_id = (known after apply)
-    + status = (known after apply)
-    + tcl = (known after apply)
-    + tcp_nagle = (known after apply)
-    + text = (known after apply)
-    + timeout = (known after apply)
-    + tm_name = "20"
-    + uie = (known after apply)
-    + universal = (known after apply)
-    + value = (known after apply)
-    + virtual = (known after apply)
-    + vlan = (known after apply)
-    + vlan_id = (known after apply)
-    + wam = (known after apply)
-    + write = (known after apply)
-    }
-    }
-    }
+              + action {
+                  + app_service = (known after apply)
+                  + application = (known after apply)
+                  + asm = (known after apply)
+                  + avr = (known after apply)
+                  + cache = (known after apply)
+                  + carp = (known after apply)
+                  + category = (known after apply)
+                  + classify = (known after apply)
+                  + clone_pool = (known after apply)
+                  + code = (known after apply)
+                  + compress = (known after apply)
+                  + content = (known after apply)
+                  + cookie_hash = (known after apply)
+                  + cookie_insert = (known after apply)
+                  + cookie_passive = (known after apply)
+                  + cookie_rewrite = (known after apply)
+                  + decompress = (known after apply)
+                  + defer = (known after apply)
+                  + destination_address = (known after apply)
+                  + disable = (known after apply)
+                  + domain = (known after apply)
+                  + enable = (known after apply)
+                  + expiry = (known after apply)
+                  + expiry_secs = (known after apply)
+                  + expression = (known after apply)
+                  + extension = (known after apply)
+                  + facility = (known after apply)
+                  + forward = true
+                  + from_profile = (known after apply)
+                  + hash = (known after apply)
+                  + host = (known after apply)
+                  + http = (known after apply)
+                  + http_basic_auth = (known after apply)
+                  + http_cookie = (known after apply)
+                  + http_header = (known after apply)
+                  + http_referer = (known after apply)
+                  + http_reply = (known after apply)
+                  + http_set_cookie = (known after apply)
+                  + http_uri = (known after apply)
+                  + ifile = (known after apply)
+                  + insert = (known after apply)
+                  + internal_virtual = (known after apply)
+                  + ip_address = (known after apply)
+                  + key = (known after apply)
+                  + l7dos = (known after apply)
+                  + length = (known after apply)
+                  + location = (known after apply)
+                  + log = (known after apply)
+                  + ltm_policy = (known after apply)
+                  + member = (known after apply)
+                  + message = (known after apply)
+                  + netmask = (known after apply)
+                  + nexthop = (known after apply)
+                  + node = (known after apply)
+                  + offset = (known after apply)
+                  + path = (known after apply)
+                  + pem = (known after apply)
+                  + persist = (known after apply)
+                  + pin = (known after apply)
+                  + policy = (known after apply)
+                  + pool = "/Common/mypool"
+                  + port = (known after apply)
+                  + priority = (known after apply)
+                  + profile = (known after apply)
+                  + protocol = (known after apply)
+                  + query_string = (known after apply)
+                  + rateclass = (known after apply)
+                  + redirect = (known after apply)
+                  + remove = (known after apply)
+                  + replace = (known after apply)
+                  + request = (known after apply)
+                  + request_adapt = (known after apply)
+                  + reset = (known after apply)
+                  + response = (known after apply)
+                  + response_adapt = (known after apply)
+                  + scheme = (known after apply)
+                  + script = (known after apply)
+                  + select = (known after apply)
+                  + server_ssl = (known after apply)
+                  + set_variable = (known after apply)
+                  + snat = (known after apply)
+                  + snatpool = (known after apply)
+                  + source_address = (known after apply)
+                  + ssl_client_hello = (known after apply)
+                  + ssl_server_handshake = (known after apply)
+                  + ssl_server_hello = (known after apply)
+                  + ssl_session_id = (known after apply)
+                  + status = (known after apply)
+                  + tcl = (known after apply)
+                  + tcp_nagle = (known after apply)
+                  + text = (known after apply)
+                  + timeout = (known after apply)
+                  + tm_name = "20"
+                  + uie = (known after apply)
+                  + universal = (known after apply)
+                  + value = (known after apply)
+                  + virtual = (known after apply)
+                  + vlan = (known after apply)
+                  + vlan_id = (known after apply)
+                  + wam = (known after apply)
+                  + write = (known after apply)
+             }
+          }
+      }
 
     # bigip_ltm_pool.mypool will be created
     + resource "bigip_ltm_pool" "mypool" {
@@ -260,15 +258,15 @@ The output below shows the execution plan and describes which actions Terraform 
     Plan: 2 to add, 0 to change, 0 to destroy.
 
     Do you want to perform these actions?
-    Terraform will perform the actions described above.
-    Only 'yes' will be accepted to approve.
+      Terraform will perform the actions described above.
+      Only 'yes' will be accepted to approve.
 
-    Enter a value: yes
+      Enter a value: yes
 
     bigip_ltm_pool.mypool: Creating...
     bigip_ltm_pool.mypool: Creation complete after 0s [id=/Common/mypool]
     bigip_ltm_policy.test-policy: Creating...
-    bigip_ltm_policy.test-policy: Creation complete after 0s [id=my_policy]
+    bigip_ltm_policy.test-policy: Creation complete after 0s [id=test-policy]
 
     Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
     root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
@@ -290,103 +288,102 @@ You can inspect the current state using ``terraform show``:
    root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip# terraform show
     # bigip_ltm_policy.test-policy:
     resource "bigip_ltm_policy" "test-policy" {
-    controls = [
-    "forwarding",
-    ]
-    id = "my_policy"
-    name = "my_policy"
-    published_copy = "Drafts/my_policy"
-    requires = [
-    "http",
-    ]
-    strategy = "/Common/first-match"
+        controls = [
+            "forwarding",
+        ]
+        id = "test-policy"
+        name = "common/test-policy"
+        requires = [
+            "http",
+        ]
+        strategy = "/Common/first-match"
 
-    rule {
-    name = "rule6"
+        rule {
+            name = "rule6"
 
-    action {
-    asm = false
-    avr = false
-    cache = false
-    carp = false
-    classify = false
-    code = 0
-    compress = false
-    cookie_hash = false
-    cookie_insert = false
-    cookie_passive = false
-    cookie_rewrite = false
-    decompress = false
-    defer = false
-    destination_address = false
-    disable = false
-    enable = false
-    expiry_secs = 0
-    forward = true
-    hash = false
-    http = false
-    http_basic_auth = false
-    http_cookie = false
-    http_header = false
-    http_host = false
-    http_referer = false
-    http_reply = false
-    http_set_cookie = false
-    http_uri = false
-    insert = false
-    l7dos = false
-    length = 0
-    log = false
-    ltm_policy = false
-    offset = 0
-    pem = false
-    persist = false
-    pin = false
-    pool = "/Common/mypool"
-    port = 0
-    redirect = false
-    remove = false
-    replace = false
-    request = false
-    request_adapt = false
-    reset = false
-    response = false
-    response_adapt = false
-    select = false
-    server_ssl = false
-    set_variable = false
-    source_address = false
-    ssl_client_hello = false
-    ssl_server_handshake = false
-    ssl_server_hello = false
-    ssl_session_id = false
-    status = 0
-    tcl = false
-    tcp_nagle = false
-    timeout = 0
-    tm_name = "20"
-    uie = false
-    universal = false
-    vlan_id = 0
-    wam = false
-    write = false
-    }
-    }
+            action {
+                asm = false
+                avr = false
+                cache = false
+                carp = false
+                classify = false
+                code = 0
+                compress = false
+                cookie_hash = false
+                cookie_insert = false
+                cookie_passive = false
+                cookie_rewrite = false
+                decompress = false
+                defer = false
+                destination_address = false
+                disable = false
+                enable = false
+                expiry_secs = 0
+                forward = true
+                hash = false
+                http = false
+                http_basic_auth = false
+                http_cookie = false
+                http_header = false
+                http_host = false
+                http_referer = false
+                http_reply = false
+                http_set_cookie = false
+                http_uri = false
+                insert = false
+                l7dos = false
+                length = 0
+                log = false
+                ltm_policy = false
+                offset = 0
+                pem = false
+                persist = false
+                pin = false
+                pool = "/Common/mypool"
+                port = 0
+                redirect = false
+                remove = false
+                replace = false
+                request = false
+                request_adapt = false
+                reset = false
+                response = false
+                response_adapt = false
+                select = false
+                server_ssl = false
+                set_variable = false
+                source_address = false
+                ssl_client_hello = false
+                ssl_server_handshake = false
+                ssl_server_hello = false
+                ssl_session_id = false
+                status = 0
+                tcl = false
+                tcp_nagle = false
+                timeout = 0
+                tm_name = "20"
+                uie = false
+                universal = false
+                vlan_id = 0
+                wam = false
+                write = false
+           }
+       }
     }
 
     # bigip_ltm_pool.mypool:
     resource "bigip_ltm_pool" "mypool" {
-    allow_nat = "yes"
-    allow_snat = "yes"
-    id = "/Common/mypool"
-    load_balancing_mode = "round-robin"
-    monitors = [
-    "/Common/http",
-    ]
-    name = "/Common/mypool"
-    reselect_tries = 0
-    service_down_action = "none"
-    slow_ramp_time = 0
+        allow_nat = "yes"
+        allow_snat = "yes"
+        id = "/Common/mypool"
+        load_balancing_mode = "round-robin"
+        monitors = [
+            "/Common/http",
+        ]
+        name = "/Common/mypool"
+        reselect_tries = 0
+        service_down_action = "none"
+        slow_ramp_time = 0
     }
     root@terraforn-ubuntu3:~/go/src/github.com/terraform-providers/terraform-provider-bigip#
 
