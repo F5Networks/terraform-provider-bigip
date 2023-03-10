@@ -14,6 +14,10 @@ This page shows the revision history for this documentation. See `GitHub <https:
         - Description
         - Date
 
+      * - 1.8
+        - Updated the documentation with the following changes: |br| • Updated :doc:`Configuring Terraform <configuring>` with corrected sample code syntax and resource name.
+        - 03-09-23
+
       * - 1.7
         - Updated the documentation with the following changes: |br| • Updated version charts. |br| • Added sections for :ref:`awaf-integration` and :ref:`fast-integration`. 
         - 09-18-22
