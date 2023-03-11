@@ -193,7 +193,6 @@ func resourceBigipLtmDataGroupUpdate(ctx context.Context, d *schema.ResourceData
 			Type:    dgtype,
 			Records: records,
 		}
-
 		dgver1213 := &bigip.DataGroup{
 			Name:    name,
 			Records: records,

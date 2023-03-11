@@ -61,7 +61,7 @@ func dataSourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData
 	d.SetId("")
 	var records []map[string]interface{}
 	name := fmt.Sprintf("/%s/%s", d.Get("partition").(string), d.Get("name").(string))
-	log.Printf("[DEBUG] Retrieving Data Group List %s", name)
+	log.Printf("[INFO] Retrieving Data Group List %s", name)
 	dataGroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err))
