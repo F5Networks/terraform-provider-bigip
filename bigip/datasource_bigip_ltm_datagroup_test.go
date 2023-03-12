@@ -57,8 +57,8 @@ resource "bigip_ltm_datagroup" "DGTEST" {
   }
 }
 data "bigip_ltm_datagroup" "DGTEST" {
-  name      = "%s"
-  partition = "Common"
+  name       = "%s"
+  partition  = "Common"
   depends_on = [bigip_ltm_datagroup.DGTEST]
 }
 `, "Common", dataGroupName, dataGroupName)
