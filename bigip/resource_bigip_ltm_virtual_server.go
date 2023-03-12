@@ -319,6 +319,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	log.Println("[INFO] Fetching virtual server " + name)
 
 	vs, err := client.GetVirtualServer(name)
+	log.Printf("[DEBUG]virtual Server Details:%+v", vs)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
 		d.SetId("")
@@ -330,8 +331,9 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		return nil
 	}
 	vsDest := vs.Destination
+	log.Printf("[DEBUG]vsDest :%+v", vsDest)
 	if vsDest != ":0" && strings.Count(vsDest, ":") >= 2 {
-		log.Printf("[INFO] Matched one:%+v", vsDest)
+		log.Printf("[DEBUG] Matched one:%+v", vsDest)
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
@@ -340,7 +342,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		_ = d.Set("destination", destination[2])
 	}
 	if vsDest != ":0" && vsDest != "0" && strings.Count(vsDest, ":") < 2 {
-		log.Printf("[INFO] Matched two:%+v", vsDest)
+		log.Printf("[DEBUG] Matched two:%+v", vsDest)
 		regex := regexp.MustCompile(`(/.+/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(%\d+)?(:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		parsedDestination := destination[2] + destination[3]
@@ -370,6 +372,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	if strings.Count(vsDest, ":") < 2 {
 		regex := regexp.MustCompile(`:(\d+)`)
 		port := regex.FindStringSubmatch(vs.Destination)
+		log.Printf("[DEBUG] Matched for port-1:%+v", port)
 		if len(port) < 2 {
 			return diag.FromErr(fmt.Errorf("Unable to extract service port from virtual server destination: %s ", vs.Destination))
 		}
@@ -379,6 +382,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	if strings.Count(vsDest, ":") >= 2 {
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
+		log.Printf("[DEBUG] Matched for port-2:%+v", destination)
 		parsedPort, _ := strconv.Atoi(destination[3])
 		_ = d.Set("port", parsedPort)
 	}
