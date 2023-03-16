@@ -133,23 +133,26 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "Cache time out",
 			},
 			"cert": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "/Common/default.crt",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				//Default:      "/Common/default.crt",
 				ValidateFunc: validateF5NameWithDirectory,
 				Description:  "Name of the server certificate.",
 			},
 			"key": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "/Common/default.key",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				//Default:      "/Common/default.key",
 				ValidateFunc: validateF5NameWithDirectory,
 				Description:  "Name of the Server SSL profile key",
 			},
 			"chain": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "none",
+				Computed: true,
+				//Default:  "none",
 				// ValidateFunc: validateF5NameWithDirectory,
 				Description: "Client certificate chain name.",
 			},
@@ -164,7 +167,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Type:       schema.TypeList,
 				Optional:   true,
 				MaxItems:   1,
-				Deprecated: "This Field going to deprecate in future version, please specify with cert,key,chain,passphrase as separate attribute.",
+				Deprecated: "This Field 'cert_key_chain' going to deprecate in future version, please specify with cert,key,chain,passphrase as separate attribute.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {

@@ -11,7 +11,6 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
@@ -179,8 +178,8 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("dont-insert-empty-fragments")), "dont-insert-empty-fragments"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "tm_options.*", "dont-insert-empty-fragments"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "tm_options.*", "no-tlsv1.3"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
 			},
@@ -190,7 +189,7 @@ func TestAccBigipLtmProfileClientSsl_UpdateTmoptions(t *testing.T) {
 					testCheckClientSslExists(instFullName),
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
-					resource.TestCheckResourceAttr(resFullName, fmt.Sprintf("tm_options.%d", schema.HashString("no-tlsv1.3")), "no-tlsv1.3"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "tm_options.*", "no-tlsv1.3"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
 				),
 			},
@@ -512,14 +511,12 @@ func testaccbigipltmprofileclientsslCerkeychain(instName string) string {
 resource "%[1]s" "%[2]s" {
   name         = "/Common/%[2]s"
   authenticate = "always"
-  cert_key_chain {
-    name  = "default"
-    cert  = "/Common/default.crt"
-    key   = "/Common/default.key"
-    chain = "/Common/ca-bundle.crt"
-  }
+  cert         = "/Common/default.crt"
+  key          = "/Common/default.key"
+  chain        = "/Common/ca-bundle.crt"
+  passphrase   = "test123"
 }
-		`, resName, instName)
+`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslCerkeychainissue449(instName string) string {
@@ -527,14 +524,12 @@ func testaccbigipltmprofileclientsslCerkeychainissue449(instName string) string 
 resource "%[1]s" "%[2]s" {
   name         = "/Common/%[2]s"
   authenticate = "once"
-  cert_key_chain {
-    name  = "default"
-    cert  = "/Common/default.crt"
-    key   = "/Common/default.key"
-    chain = "/Common/ca-bundle.crt"
-  }
+  cert         = "/Common/default.crt"
+  key          = "/Common/default.key"
+  chain        = "/Common/ca-bundle.crt"
+  passphrase   = "test123"
 }
-		`, resName, instName)
+`, resName, instName)
 }
 
 func testaccbigipltmprofileclientsslUpdateparam(instName, updateParam string) string {
