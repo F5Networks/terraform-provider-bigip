@@ -44,6 +44,9 @@ See [virtual server](#virtual-server) below for more details.
 
 * `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.
 See [Pool Members](#pool-members) below for more details.
+
+* `service_discovery` - (Optional,`set`) `service_discovery` block to Automatically Discover Pool Members with Service Discovery.
+  See [Service Discovery](#service-discovery) below for more details.
       
 * `load_balancing_mode` - (Optional,`string`) A `load balancing method` is an algorithm that the BIG-IP system uses to select a pool member for processing a request. F5 recommends the Least Connections load balancing method
     
@@ -113,3 +116,45 @@ Using this block will `enable` for FAST-Generated WAF Security Policy
 The `waf_security_policy` block supports the following:
 
 * `enable` - (Optional , `bool`) Setting `true` will enable FAST to create WAF Security Policy.
+
+### Service Discovery
+
+Using this block will `enable` Discover Pool Members with Service Discovery.
+
+The `service_discovery` block supports the following:
+
+* `sd_type` - (Required , `string`) service discovery account type, options [`aws`,`azure`,`gce`] 
+
+* `sd_port` - (Required , `int`) port number of serviceport to be used for FAST-Generated Pool.
+
+* `sd_aws_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool.
+
+* `sd_aws_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.
+
+* `sd_aws_region` - (Optional , `string`) Empty string (default) means region in which ADC is running.
+
+* `sd_aws_access_key` - (Optional , `string`) Information for discovering AWS nodes that are not in the same region as your BIG-IP.
+
+* `sd_aws_secret_access_key` - (Optional , `string`) Will be stored in the declaration as an encrypted string.
+
+* `sd_address_realm` - (Optional , `string`) Specifies whether to look for public or private IP addresses. Default :`private`
+
+* `sd_undetectable_action` - (Optional , `string`) Action to take when node cannot be detected. Default `remove`.
+
+* `sd_azure_resource_group` - (Optional , `string`) Azure Resource Group name.
+
+* `sd_azure_subscription_id` - (Optional , `string`) Azure subscription ID.
+
+* `sd_azure_resource_id` - (Optional , `string`) ID of resource to find nodes by.
+
+* `sd_azure_directory_id` - (Optional , `string`) Azure Active Directory ID (AKA tenant ID).
+
+* `sd_azure_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool.
+
+* `sd_azure_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.
+
+* `sd_gce_region` - (Optional , `string`) Empty string (default) means region in which ADC is running.
+
+* `sd_gce_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool
+
+* `sd_gce_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.

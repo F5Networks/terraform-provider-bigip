@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -16,6 +17,7 @@ import (
 func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 	t.Parallel()
 	resName := "bigip_ltm_datagroup.DGTEST"
+	dsName := "data.bigip_ltm_datagroup.DGTEST"
 	var dataGroupName = "test-rg"
 	var dataGroupFullName = fmt.Sprintf("/%s/%s", TestPartition, dataGroupName)
 
@@ -32,9 +34,10 @@ func TestAccBigipLtmDataGroup_basic(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      resName,
-				ImportState:       true,
-				ImportStateVerify: true,
+				Config: testAccCheckDatagroupConfigBasic(dataGroupName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(dsName, "name", regexp.MustCompile(dataGroupName)),
+				),
 			},
 		},
 	})
@@ -53,5 +56,10 @@ resource "bigip_ltm_datagroup" "DGTEST" {
     name = "test-name2"
   }
 }
-`, "Common", dataGroupName)
+data "bigip_ltm_datagroup" "DGTEST" {
+  name       = "%s"
+  partition  = "Common"
+  depends_on = [bigip_ltm_datagroup.DGTEST]
+}
+`, "Common", dataGroupName, dataGroupName)
 }
