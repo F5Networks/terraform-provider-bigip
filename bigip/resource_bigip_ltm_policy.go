@@ -1320,7 +1320,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 					a.Forward = false
 					a.Pool = ""
 				}
-				// mapEntity(itemAction.(map[string]interface{}), &a)
+				mapEntity(itemAction.(map[string]interface{}), &a)
 				policyRulesActions = append(policyRulesActions, a)
 			}
 			var policyRuleConditions []bigip.PolicyRuleCondition
