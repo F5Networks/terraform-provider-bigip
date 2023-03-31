@@ -339,17 +339,22 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		if destination == nil {
 			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination))
 		}
-		_ = d.Set("destination", destination[2])
+		if len(destination) > 3 {
+			_ = d.Set("destination", destination[2])
+		} else {
+			_ = d.Set("destination", vsDest)
+		}
 	}
 	if vsDest != ":0" && vsDest != "0" && strings.Count(vsDest, ":") < 2 {
 		log.Printf("[DEBUG] Matched two:%+v", vsDest)
 		regex := regexp.MustCompile(`(/.+/)((?:[0-9]{1,3}\.){3}[0-9]{1,3})(%\d+)?(:\d+)`)
 		destination := regex.FindStringSubmatch(vs.Destination)
-		parsedDestination := destination[2] + destination[3]
-		if len(destination) < 3 {
-			return diag.FromErr(fmt.Errorf("Unable to extract destination address from virtual server destination: " + vs.Destination))
+		if len(destination) > 3 {
+			parsedDestination := destination[2] + destination[3]
+			_ = d.Set("destination", parsedDestination)
+		} else {
+			_ = d.Set("destination", vsDest)
 		}
-		_ = d.Set("destination", parsedDestination)
 	}
 
 	_ = d.Set("trafficmatching_criteria", vs.TrafficMatchingCriteria)
@@ -380,11 +385,12 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		_ = d.Set("port", parsedPort)
 	}
 	if strings.Count(vsDest, ":") >= 2 {
-		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
+		regex := regexp.MustCompile(`[:.](\d+)$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
-		log.Printf("[DEBUG] Matched for port-2:%+v", destination)
-		parsedPort, _ := strconv.Atoi(destination[3])
-		_ = d.Set("port", parsedPort)
+		if len(destination) > 1 {
+			parsedPort, _ := strconv.Atoi(destination[1])
+			_ = d.Set("port", parsedPort)
+		}
 	}
 	_ = d.Set("irules", makeStringList(&vs.Rules))
 	_ = d.Set("security_log_profiles", makeStringList(&vs.SecurityLogProfiles))
