@@ -520,48 +520,48 @@ func flattenFastMonitor(data bigip.FastHttpJson) map[string]interface{} {
 	return tfMap
 }
 
-func flattenFastServiceDiscovery(members []interface{}) []string {
-	// att := make([]string, len(members))
-	var att []string
-	for i, v := range members {
-		log.Printf("Members:%+v", i)
-		data, _ := json.Marshal(v)
-		log.Printf("Members data:%+v", string(data))
-		att = append(att, string(data))
-	}
-	//	obj := make(map[string]interface{})
-	//	obj["sd_type"] = v.SdType
-	//	obj["sd_port"] = v.SdPort
-	//	if v.SdType == "aws" {
-	//		obj["sd_aws_tag_key"] = v.SdTagKey
-	//		obj["sd_aws_tag_val"] = v.SdTagVal
-	//		obj["sd_address_realm"] = v.SdAddressRealm
-	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
-	//		att[i] = obj
-	//	}
-	//	if v.SdType == "azure" {
-	//		obj["sd_azure_directory_id"] = v.SdDirid
-	//		obj["sd_azure_resource_group"] = v.SdRg
-	//		obj["sd_azure_resource_id"] = v.SdRid
-	//		obj["sd_azure_subscription_id"] = v.SdSid
-	//		obj["sd_azure_tag_key"] = v.SdAzureTagKey
-	//		obj["sd_azure_tag_val"] = v.SdAzureTagVal
-	//		obj["sd_address_realm"] = v.SdAddressRealm
-	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
-	//		att[i] = obj
-	//	}
-	//	if v.SdType == "gce" {
-	//		obj["sd_gce_tag_key"] = v.SdTagKey
-	//		obj["sd_gce_tag_val"] = v.SdTagVal
-	//		obj["sd_address_realm"] = v.SdAddressRealm
-	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
-	//		att[i] = obj
-	//	}
-	// }
-	// return att
-	log.Printf("Members data:%+v", att)
-	return att
-}
+// func flattenFastServiceDiscovery(members []interface{}) []string {
+//	// att := make([]string, len(members))
+//	var att []string
+//	for i, v := range members {
+//		log.Printf("Members:%+v", i)
+//		data, _ := json.Marshal(v)
+//		log.Printf("Members data:%+v", string(data))
+//		att = append(att, string(data))
+//	}
+//	//	obj := make(map[string]interface{})
+//	//	obj["sd_type"] = v.SdType
+//	//	obj["sd_port"] = v.SdPort
+//	//	if v.SdType == "aws" {
+//	//		obj["sd_aws_tag_key"] = v.SdTagKey
+//	//		obj["sd_aws_tag_val"] = v.SdTagVal
+//	//		obj["sd_address_realm"] = v.SdAddressRealm
+//	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
+//	//		att[i] = obj
+//	//	}
+//	//	if v.SdType == "azure" {
+//	//		obj["sd_azure_directory_id"] = v.SdDirid
+//	//		obj["sd_azure_resource_group"] = v.SdRg
+//	//		obj["sd_azure_resource_id"] = v.SdRid
+//	//		obj["sd_azure_subscription_id"] = v.SdSid
+//	//		obj["sd_azure_tag_key"] = v.SdAzureTagKey
+//	//		obj["sd_azure_tag_val"] = v.SdAzureTagVal
+//	//		obj["sd_address_realm"] = v.SdAddressRealm
+//	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
+//	//		att[i] = obj
+//	//	}
+//	//	if v.SdType == "gce" {
+//	//		obj["sd_gce_tag_key"] = v.SdTagKey
+//	//		obj["sd_gce_tag_val"] = v.SdTagVal
+//	//		obj["sd_address_realm"] = v.SdAddressRealm
+//	//		obj["sd_undetectable_action"] = v.SdUndetectableAction
+//	//		att[i] = obj
+//	//	}
+//	// }
+//	// return att
+//	log.Printf("Members data:%+v", att)
+//	return att
+// }
 
 func flattenFastPoolMembers(members []bigip.FastHttpPool) []interface{} {
 	att := make([]interface{}, len(members))

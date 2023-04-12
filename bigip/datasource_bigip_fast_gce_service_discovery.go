@@ -3,7 +3,8 @@ package bigip
 import (
 	"context"
 	"encoding/json"
-	"github.com/f5devcentral/go-bigip"
+
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -83,7 +84,7 @@ func dataBigipFastGceServiceDiscoveryRead(ctx context.Context, d *schema.Resourc
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	_ = d.Set("gce_sd_json", string(config))
+	_ = d.Set("gce_sd_json", config)
 	d.SetId(hashForState(d.Get("gce_sd_json").(string)))
 	return nil
 }
