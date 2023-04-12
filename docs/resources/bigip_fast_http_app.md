@@ -27,6 +27,37 @@ resource "bigip_fast_http_app" "fast_http_app" {
 
 ```
 
+## Example Usage with service discovery
+
+```hcl
+
+data "bigip_fast_azure_service_discovery" "TC3" {
+  resource_group  = "testazurerg"
+  subscription_id = "testazuresid"
+  tag_key         = "testazuretag"
+  tag_value       = "testazurevalue"
+}
+
+data "bigip_fast_gce_service_discovery" "TC3" {
+  tag_key   = "testgcetag"
+  tag_value = "testgcevalue"
+  region    = "testgceregion"
+}
+resource "bigip_fast_http_app" "fast_https_app" {
+  tenant      = "fasthttptenant"
+  application = "fasthttpapp"
+  virtual_server {
+    ip   = "10.30.40.44"
+    port = 443
+  }
+  pool_members {
+    addresses = ["10.11.40.120", "10.11.30.121", "10.11.30.122"]
+    port      = 80
+  }
+  service_discovery = [data.bigip_fast_gce_service_discovery.TC3.gce_sd_json, data.bigip_fast_azure_service_discovery.TC3.azure_sd_json]
+}
+```
+
 ## Argument Reference
 
 * `tenant` - (Required, `string`) Name of the FAST HTTPS application tenant.
@@ -45,8 +76,7 @@ See [virtual server](#virtual-server) below for more details.
 * `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.
 See [Pool Members](#pool-members) below for more details.
 
-* `service_discovery` - (Optional,`set`) `service_discovery` block to Automatically Discover Pool Members with Service Discovery.
-  See [Service Discovery](#service-discovery) below for more details.
+* `service_discovery` - (Optional,`list`) List of different cloud service discovery config provided as string, provided `service_discovery` block to Automatically Discover Pool Members with Service Discovery on different clouds.
       
 * `load_balancing_mode` - (Optional,`string`) A `load balancing method` is an algorithm that the BIG-IP system uses to select a pool member for processing a request. F5 recommends the Least Connections load balancing method
     
@@ -117,44 +147,64 @@ The `waf_security_policy` block supports the following:
 
 * `enable` - (Optional , `bool`) Setting `true` will enable FAST to create WAF Security Policy.
 
-### Service Discovery
+[//]: # (### Service Discovery)
 
-Using this block will `enable` Discover Pool Members with Service Discovery.
+[//]: # ()
+[//]: # (Using this block will `enable` Discover Pool Members with Service Discovery.)
 
-The `service_discovery` block supports the following:
+[//]: # ()
+[//]: # (The `service_discovery` block supports the following:)
 
-* `sd_type` - (Required , `string`) service discovery account type, options [`aws`,`azure`,`gce`] 
+[//]: # ()
+[//]: # (* `sd_type` - &#40;Required , `string`&#41; service discovery account type, options [`aws`,`azure`,`gce`] )
 
-* `sd_port` - (Required , `int`) port number of serviceport to be used for FAST-Generated Pool.
+[//]: # ()
+[//]: # (* `sd_port` - &#40;Required , `int`&#41; port number of serviceport to be used for FAST-Generated Pool.)
 
-* `sd_aws_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool.
+[//]: # ()
+[//]: # (* `sd_aws_tag_key` - &#40;Optional , `string`&#41; The tag key associated with the node to add to this pool.)
 
-* `sd_aws_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.
+[//]: # ()
+[//]: # (* `sd_aws_tag_val` - &#40;Optional , `string`&#41; The tag value associated with the node to add to this pool.)
 
-* `sd_aws_region` - (Optional , `string`) Empty string (default) means region in which ADC is running.
+[//]: # ()
+[//]: # (* `sd_aws_region` - &#40;Optional , `string`&#41; Empty string &#40;default&#41; means region in which ADC is running.)
 
-* `sd_aws_access_key` - (Optional , `string`) Information for discovering AWS nodes that are not in the same region as your BIG-IP.
+[//]: # ()
+[//]: # (* `sd_aws_access_key` - &#40;Optional , `string`&#41; Information for discovering AWS nodes that are not in the same region as your BIG-IP.)
 
-* `sd_aws_secret_access_key` - (Optional , `string`) Will be stored in the declaration as an encrypted string.
+[//]: # ()
+[//]: # (* `sd_aws_secret_access_key` - &#40;Optional , `string`&#41; Will be stored in the declaration as an encrypted string.)
 
-* `sd_address_realm` - (Optional , `string`) Specifies whether to look for public or private IP addresses. Default :`private`
+[//]: # ()
+[//]: # (* `sd_address_realm` - &#40;Optional , `string`&#41; Specifies whether to look for public or private IP addresses. Default :`private`)
 
-* `sd_undetectable_action` - (Optional , `string`) Action to take when node cannot be detected. Default `remove`.
+[//]: # ()
+[//]: # (* `sd_undetectable_action` - &#40;Optional , `string`&#41; Action to take when node cannot be detected. Default `remove`.)
 
-* `sd_azure_resource_group` - (Optional , `string`) Azure Resource Group name.
+[//]: # ()
+[//]: # (* `sd_azure_resource_group` - &#40;Optional , `string`&#41; Azure Resource Group name.)
 
-* `sd_azure_subscription_id` - (Optional , `string`) Azure subscription ID.
+[//]: # ()
+[//]: # (* `sd_azure_subscription_id` - &#40;Optional , `string`&#41; Azure subscription ID.)
 
-* `sd_azure_resource_id` - (Optional , `string`) ID of resource to find nodes by.
+[//]: # ()
+[//]: # (* `sd_azure_resource_id` - &#40;Optional , `string`&#41; ID of resource to find nodes by.)
 
-* `sd_azure_directory_id` - (Optional , `string`) Azure Active Directory ID (AKA tenant ID).
+[//]: # ()
+[//]: # (* `sd_azure_directory_id` - &#40;Optional , `string`&#41; Azure Active Directory ID &#40;AKA tenant ID&#41;.)
 
-* `sd_azure_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool.
+[//]: # ()
+[//]: # (* `sd_azure_tag_key` - &#40;Optional , `string`&#41; The tag key associated with the node to add to this pool.)
 
-* `sd_azure_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.
+[//]: # ()
+[//]: # (* `sd_azure_tag_val` - &#40;Optional , `string`&#41; The tag value associated with the node to add to this pool.)
 
-* `sd_gce_region` - (Optional , `string`) Empty string (default) means region in which ADC is running.
+[//]: # ()
+[//]: # (* `sd_gce_region` - &#40;Optional , `string`&#41; Empty string &#40;default&#41; means region in which ADC is running.)
 
-* `sd_gce_tag_key` - (Optional , `string`) The tag key associated with the node to add to this pool
+[//]: # ()
+[//]: # (* `sd_gce_tag_key` - &#40;Optional , `string`&#41; The tag key associated with the node to add to this pool)
 
-* `sd_gce_tag_val` - (Optional , `string`) The tag value associated with the node to add to this pool.
+[//]: # ()
+[//]: # (* `sd_gce_tag_val` - &#40;Optional , `string`&#41; The tag value associated with the node to add to this pool.)

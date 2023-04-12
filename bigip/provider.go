@@ -8,6 +8,8 @@ package bigip
 
 import (
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -85,19 +87,23 @@ func Provider() *schema.Provider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"bigip_ltm_datagroup":        dataSourceBigipLtmDataGroup(),
-			"bigip_ltm_monitor":          dataSourceBigipLtmMonitor(),
-			"bigip_ltm_irule":            dataSourceBigipLtmIrule(),
-			"bigip_ssl_certificate":      dataSourceBigipSslCertificate(),
-			"bigip_ltm_pool":             dataSourceBigipLtmPool(),
-			"bigip_ltm_policy":           dataSourceBigipLtmPolicy(),
-			"bigip_ltm_node":             dataSourceBigipLtmNode(),
-			"bigip_vwan_config":          dataSourceBigipVwanconfig(),
-			"bigip_waf_signatures":       dataSourceBigipWafSignatures(),
-			"bigip_waf_policy":           dataSourceBigipWafPolicy(),
-			"bigip_waf_pb_suggestions":   dataSourceBigipWafPb(),
-			"bigip_waf_entity_url":       dataSourceBigipWafEntityUrl(),
-			"bigip_waf_entity_parameter": dataSourceBigipWafEntityParameter(),
+			"bigip_ltm_datagroup":                 dataSourceBigipLtmDataGroup(),
+			"bigip_ltm_monitor":                   dataSourceBigipLtmMonitor(),
+			"bigip_ltm_irule":                     dataSourceBigipLtmIrule(),
+			"bigip_ssl_certificate":               dataSourceBigipSslCertificate(),
+			"bigip_ltm_pool":                      dataSourceBigipLtmPool(),
+			"bigip_ltm_policy":                    dataSourceBigipLtmPolicy(),
+			"bigip_ltm_node":                      dataSourceBigipLtmNode(),
+			"bigip_vwan_config":                   dataSourceBigipVwanconfig(),
+			"bigip_waf_signatures":                dataSourceBigipWafSignatures(),
+			"bigip_waf_policy":                    dataSourceBigipWafPolicy(),
+			"bigip_waf_pb_suggestions":            dataSourceBigipWafPb(),
+			"bigip_waf_entity_url":                dataSourceBigipWafEntityUrl(),
+			"bigip_waf_entity_parameter":          dataSourceBigipWafEntityParameter(),
+			"bigip_fast_consul_service_discovery": dataSourceBigipFastConsulServiceDiscovery(),
+			"bigip_fast_aws_service_discovery":    dataSourceBigipFastAwsServiceDiscovery(),
+			"bigip_fast_azure_service_discovery":  dataSourceBigipFastAzureServiceDiscovery(),
+			"bigip_fast_gce_service_discovery":    dataSourceBigipFastGceServiceDiscovery(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -301,4 +307,14 @@ func toSnakeCase(str string) string {
 
 func getVersion() string {
 	return ProviderVersion
+}
+
+// hashForState computes the hexadecimal representation of the SHA1 checksum of a string.
+// This is used by most resources/data-sources here to compute their Unique Identifier (ID).
+func hashForState(value string) string {
+	if value == "" {
+		return ""
+	}
+	hash := sha1.Sum([]byte(strings.TrimSpace(value)))
+	return hex.EncodeToString(hash[:])
 }
