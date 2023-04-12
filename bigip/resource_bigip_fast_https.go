@@ -169,104 +169,10 @@ func resourceBigipFastHTTPSApp() *schema.Resource {
 				ConflictsWith: []string{"existing_pool"},
 			},
 			"service_discovery": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"sd_type": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-						"sd_port": {
-							Type:     schema.TypeInt,
-							Required: true,
-						},
-						"sd_aws_tag_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_aws_tag_val": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_aws_region": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_aws_access_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_aws_secret_access_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_address_realm": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "private",
-						},
-						"sd_undetectable_action": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "remove",
-						},
-						"sd_azure_resource_group": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"sd_azure_subscription_id": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"sd_azure_resource_id": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-							// ConflictsWith: []string{"service_discovery.sd_azure_tag_key", "service_discovery.sd_azure_tag_val"},
-						},
-						"sd_azure_directory_id": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-							// ConflictsWith: []string{"sd_azure_tag_key", "sd_azure_tag_val"},
-						},
-						"sd_azure_tag_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-							// ConflictsWith: []string{"sd_azure_resource_id", "sd_azure_directory_id"},
-						},
-						"sd_azure_tag_val": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-							// ConflictsWith: []string{"sd_azure_resource_id", "sd_azure_directory_id"},
-						},
-						"sd_gce_tag_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_gce_tag_val": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-						"sd_gce_region": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-						},
-					},
-				},
+				Type:          schema.TypeList,
+				Computed:      true,
+				Optional:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_pool"},
 			},
 			"load_balancing_mode": {
@@ -513,9 +419,9 @@ func setFastHTTPSData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	_ = d.Set("existing_pool", data.PoolName)
 	members := flattenFastPoolMembers(data.PoolMembers)
 	_ = d.Set("pool_members", members)
-	if _, ok := d.GetOk("service_discovery"); ok {
-		_ = d.Set("service_discovery", flattenFastServiceDiscovery(data.ServiceDiscovery))
-	}
+	// if _, ok := d.GetOk("service_discovery"); ok {
+	//	_ = d.Set("service_discovery", flattenFastServiceDiscovery(data.ServiceDiscovery))
+	// }
 	_ = d.Set("existing_tls_server_profile", data.TlsServerProfileName)
 	if _, ok := d.GetOk("tls_server_profile"); ok {
 		_ = d.Set("tls_server_profile", []interface{}{flattenFastTlsServerProfile(data)})
@@ -647,59 +553,73 @@ func getFastHTTPSConfig(d *schema.ResourceData) (string, error) {
 		}
 		httpJson.PoolMembers = members
 	}
+	var serviceDiscovery []interface{}
 	if p, ok := d.GetOk("service_discovery"); ok {
 		httpJson.SdEnable = true
 		httpJson.PoolEnable = true
 		httpJson.MakePool = true
-		var sdObjs []bigip.ServiceDiscoverObj
-		for _, r := range p.(*schema.Set).List() {
-			sdObj := bigip.ServiceDiscoverObj{}
-			sdObj.SdType = r.(map[string]interface{})["sd_type"].(string)
-			sdObj.SdPort = r.(map[string]interface{})["sd_port"].(int)
-			sdObj.SdAddressRealm = r.(map[string]interface{})["sd_address_realm"].(string)
-			if sdObj.SdType == "aws" {
-				if r.(map[string]interface{})["sd_aws_tag_key"].(string) == "" || r.(map[string]interface{})["sd_aws_tag_val"].(string) == "" {
-					return "", fmt.Errorf("'sd_aws_tag_key' and 'sd_aws_tag_val' must be specified for aws service discovery")
-				}
-				sdObj.SdTagKey = r.(map[string]interface{})["sd_aws_tag_key"].(string)
-				sdObj.SdTagVal = r.(map[string]interface{})["sd_aws_tag_val"].(string)
-				sdObj.SdAwsRegion = r.(map[string]interface{})["sd_aws_region"].(string)
-				sdObj.SdAccessKeyId = r.(map[string]interface{})["sd_aws_access_key"].(string)
-				sdObj.SdSecretAccessKey = r.(map[string]interface{})["sd_aws_secret_access_key"].(string)
-				sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-				sdObjs = append(sdObjs, sdObj)
-			}
-			if sdObj.SdType == "azure" {
-				if r.(map[string]interface{})["sd_azure_resource_group"].(string) == "" || r.(map[string]interface{})["sd_azure_subscription_id"].(string) == "" {
-					return "", fmt.Errorf("'sd_azure_resource_group' and 'sd_azure_subscription_id' must be specified for azure service discovery")
-				}
-				sdObj.SdRg = r.(map[string]interface{})["sd_azure_resource_group"].(string)
-				sdObj.SdSid = r.(map[string]interface{})["sd_azure_subscription_id"].(string)
-				sdObj.SdRtype = "tag"
-				sdObj.SdUseManagedIdentity = true
-				if r.(map[string]interface{})["sd_azure_tag_key"].(string) != "" && r.(map[string]interface{})["sd_azure_tag_val"].(string) != "" {
-					sdObj.SdAzureTagKey = r.(map[string]interface{})["sd_azure_tag_key"].(string)
-					sdObj.SdAzureTagVal = r.(map[string]interface{})["sd_azure_tag_val"].(string)
-				} else if r.(map[string]interface{})["sd_azure_resource_id"].(string) != "" {
-					sdObj.SdRid = r.(map[string]interface{})["sd_azure_resource_id"].(string)
-					// sdObj.SdDirid = r.(map[string]interface{})["sd_azure_directory_id"].(string)
-				}
-				sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-				sdObjs = append(sdObjs, sdObj)
-			}
-			if sdObj.SdType == "gce" {
-				if r.(map[string]interface{})["sd_gce_tag_key"].(string) == "" || r.(map[string]interface{})["sd_gce_tag_val"].(string) == "" || r.(map[string]interface{})["sd_gce_region"].(string) == "" {
-					return "", fmt.Errorf("'sd_gce_tag_key' , 'sd_gce_tag_val' and 'sd_gce_region' must be specified for GCE service discovery")
-				}
-				sdObj.SdTagKey = r.(map[string]interface{})["sd_gce_tag_key"].(string)
-				sdObj.SdTagVal = r.(map[string]interface{})["sd_gce_tag_val"].(string)
-				sdObj.SdRegion = r.(map[string]interface{})["sd_gce_region"].(string)
-				sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-				sdObjs = append(sdObjs, sdObj)
-			}
+		for _, item := range p.([]interface{}) {
+			var sdMap map[string]interface{}
+			_ = json.Unmarshal([]byte(item.(string)), &sdMap)
+			serviceDiscovery = append(serviceDiscovery, sdMap)
+			// httpJson.ServiceDiscovery = append(httpJson.ServiceDiscovery, sdMap)
 		}
-		httpJson.ServiceDiscovery = sdObjs
 	}
+	httpJson.ServiceDiscovery = serviceDiscovery
+
+	// if p, ok := d.GetOk("service_discovery"); ok {
+	//	httpJson.SdEnable = true
+	//	httpJson.PoolEnable = true
+	//	httpJson.MakePool = true
+	//	var sdObjs []bigip.ServiceDiscoverObj
+	//	for _, r := range p.(*schema.Set).List() {
+	//		sdObj := bigip.ServiceDiscoverObj{}
+	//		sdObj.SdType = r.(map[string]interface{})["sd_type"].(string)
+	//		sdObj.SdPort = r.(map[string]interface{})["sd_port"].(int)
+	//		sdObj.SdAddressRealm = r.(map[string]interface{})["sd_address_realm"].(string)
+	//		if sdObj.SdType == "aws" {
+	//			if r.(map[string]interface{})["sd_aws_tag_key"].(string) == "" || r.(map[string]interface{})["sd_aws_tag_val"].(string) == "" {
+	//				return "", fmt.Errorf("'sd_aws_tag_key' and 'sd_aws_tag_val' must be specified for aws service discovery")
+	//			}
+	//			sdObj.SdTagKey = r.(map[string]interface{})["sd_aws_tag_key"].(string)
+	//			sdObj.SdTagVal = r.(map[string]interface{})["sd_aws_tag_val"].(string)
+	//			sdObj.SdAwsRegion = r.(map[string]interface{})["sd_aws_region"].(string)
+	//			sdObj.SdAccessKeyId = r.(map[string]interface{})["sd_aws_access_key"].(string)
+	//			sdObj.SdSecretAccessKey = r.(map[string]interface{})["sd_aws_secret_access_key"].(string)
+	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
+	//			sdObjs = append(sdObjs, sdObj)
+	//		}
+	//		if sdObj.SdType == "azure" {
+	//			if r.(map[string]interface{})["sd_azure_resource_group"].(string) == "" || r.(map[string]interface{})["sd_azure_subscription_id"].(string) == "" {
+	//				return "", fmt.Errorf("'sd_azure_resource_group' and 'sd_azure_subscription_id' must be specified for azure service discovery")
+	//			}
+	//			sdObj.SdRg = r.(map[string]interface{})["sd_azure_resource_group"].(string)
+	//			sdObj.SdSid = r.(map[string]interface{})["sd_azure_subscription_id"].(string)
+	//			sdObj.SdRtype = "tag"
+	//			sdObj.SdUseManagedIdentity = true
+	//			if r.(map[string]interface{})["sd_azure_tag_key"].(string) != "" && r.(map[string]interface{})["sd_azure_tag_val"].(string) != "" {
+	//				sdObj.SdAzureTagKey = r.(map[string]interface{})["sd_azure_tag_key"].(string)
+	//				sdObj.SdAzureTagVal = r.(map[string]interface{})["sd_azure_tag_val"].(string)
+	//			} else if r.(map[string]interface{})["sd_azure_resource_id"].(string) != "" {
+	//				sdObj.SdRid = r.(map[string]interface{})["sd_azure_resource_id"].(string)
+	//				// sdObj.SdDirid = r.(map[string]interface{})["sd_azure_directory_id"].(string)
+	//			}
+	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
+	//			sdObjs = append(sdObjs, sdObj)
+	//		}
+	//		if sdObj.SdType == "gce" {
+	//			if r.(map[string]interface{})["sd_gce_tag_key"].(string) == "" || r.(map[string]interface{})["sd_gce_tag_val"].(string) == "" || r.(map[string]interface{})["sd_gce_region"].(string) == "" {
+	//				return "", fmt.Errorf("'sd_gce_tag_key' , 'sd_gce_tag_val' and 'sd_gce_region' must be specified for GCE service discovery")
+	//			}
+	//			sdObj.SdTagKey = r.(map[string]interface{})["sd_gce_tag_key"].(string)
+	//			sdObj.SdTagVal = r.(map[string]interface{})["sd_gce_tag_val"].(string)
+	//			sdObj.SdRegion = r.(map[string]interface{})["sd_gce_region"].(string)
+	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
+	//			sdObjs = append(sdObjs, sdObj)
+	//		}
+	//	}
+	// httpJson.ServiceDiscovery = sdObjs
+	// }
 	httpJson.SnatEnable = true
 	httpJson.SnatAutomap = true
 	httpJson.MakeSnatPool = false
