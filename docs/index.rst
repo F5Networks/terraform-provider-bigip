@@ -6,6 +6,10 @@ Welcome to F5 Resources for Terraform.
 Terraform can manage infrastructure including low-level components like compute instances, storage, and networking,
 as well as high-level components like DNS entries, SaaS features, and more.
 
+:doc:`Get started with F5 Terraform Resources <overview>`.
+
+
+
 .. _revision-history:
 
 Document Revision History
