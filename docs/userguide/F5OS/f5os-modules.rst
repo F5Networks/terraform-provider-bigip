@@ -82,7 +82,7 @@ The following example demonstrates a resource used to manage F5OS tenant image.
 
 **Optional parameters**
 
-- ``local_path`` (string) - The path on the F5OS where the the tenant image is to be uploaded.
+- ``local_path`` (string) - The path on the F5OS where the tenant image is to be uploaded.
 - ``protocol`` (string) - Protocol for image transfer.
 - ``remote_host`` (string) - The hostname or IP address of the remote server on which the tenant image is stored. The server must make the image accessible via the specified protocol.
 - ``remote_password`` (string, sensitive) Password for the user on the remote server on which the tenant image is stored.
