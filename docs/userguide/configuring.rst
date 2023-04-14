@@ -10,8 +10,10 @@ Below is an example of the entire configuration. Each section is described below
    Verify that there are no other ``*.tf`` files in your directory, since Terraform loads all of them.
 
 
-Sample Terraform resource to create a policy on the F5 BIG-IP system
---------------------------------------------------------------------
+Sample Terraform Resource
+--------------------------
+
+The following sample demonstrates creating a policy on the F5 BIG-IP system:
 
 .. code-block:: javascript
 
@@ -383,15 +385,18 @@ You can inspect the current state using ``terraform show``:
        slow_ramp_time = 0
    }
 
-How to Generate/Build Terraform BIG-IP Provider Binary
-------------------------------------------------------
+
+Generating a BIG-IP Provider Binary
+-------------------------------------
+
+Use the following steps to build a Terraform BIG-IP provider binary:
 
 Prerequisites:
 
 - `Go <https://golang.org/doc/install>`_ 1.11
-- Terraform installed 
+- Terraform :doc:`installed </userguide/installing>`
 
-Steps to Build Locally:
+**To build locally**
 
 #. ``git clone https://github.com/F5Networks/terraform-provider-bigip.git``
 
@@ -402,6 +407,14 @@ Steps to Build Locally:
 #. ``go build``
 
 #. Move the binary to the current working directory where Terraform config files are located.
+
+
+
+What’s Next?
+
+- :doc:`Support <support>`
+- :ref:`Revision History <revision-history>`
+
 
 
 

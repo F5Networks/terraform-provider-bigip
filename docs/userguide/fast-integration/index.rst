@@ -56,3 +56,12 @@ Terraform integration resouces/data source
    /userguide/fast-integration/create-http-existing-pool.rst
    /userguide/fast-integration/create-awaf.rst
    /userguide/fast-integration/apply-canary.rst
+
+What's Next?
+
+- :ref:`Release Notes <release-notes>`
+- :ref:`BIG-IP Provider Modules <bigip-modules>`
+- :ref:`AS3 Integration <as3-integration>`
+- :ref:`Advanced WAF Integration <awaf-integration>`
+- :ref:`Declarative Onboarding Integration <do-integration>`
+- :ref:`Licensing with BIG-IQ <bigiq-licensing>`

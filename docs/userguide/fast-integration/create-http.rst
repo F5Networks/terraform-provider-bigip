@@ -688,4 +688,14 @@ Run the following commands so you can:
     }
 
 
-.. Note:: Note that you created two different application definitions sharing the same tenant in two different Terraform projects. The FAST plugin makes the AS3 declarations reconcile on the BIG-IP so you do not have to manage the stacking of them for a single tenant.
+.. Note::
+
+   You created two different application definitions sharing the same tenant in two different Terraform
+   projects. The FAST plugin makes the AS3 declarations reconcile on the BIG-IP so you do not have to manage the stacking of
+   them for a single tenant.
+
+.. The |fast-serviceDiscovery| enables you to discover pool members using account AWS, GCP, and Azure tags.
+
+.. |fast-serviceDiscovery| raw:: html
+
+   <a href="https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_fast_http_app#service-discovery" target="_blank">Service Discovery parameters</a>

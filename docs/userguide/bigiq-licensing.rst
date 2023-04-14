@@ -1,7 +1,7 @@
 .. _bigiq-licensing:
 
-F5 BIG-IP Licensing Using Terraform through BIG-IQ
-==================================================
+Licensing BIG-IP with BIG-IQ
+==============================
 
 .. seealso::
    :class: sidebar
@@ -102,3 +102,12 @@ Argument Reference
 - `tenant <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_common_license_manage_bigiq#tenant>`_ - (Optional) For an unreachable BIG-IP, you can provide an optional description for the assignment in this field.
 
 - `key <https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_common_license_manage_bigiq#key>`_ - Optional) License Assignment is done with specified ``key``, supported only with RegKeypool type License assignement. type ``string``
+
+What's Next?
+
+- :ref:`Release Notes <release-notes>`
+- :ref:`BIG-IP Provider Modules <bigip-modules>`
+- :ref:`AS3 Integration <as3-integration>`
+- :ref:`Advanced WAF Integration <awaf-integration>`
+- :ref:`FAST Integration <fast-integration>`
+- :ref:`Declarative Onboarding Integration <do-integration>`
