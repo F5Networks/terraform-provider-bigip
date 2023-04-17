@@ -5,11 +5,11 @@ In this quick start guide, you will deploy a BIG-IP on VELOS hardware using Terr
 
 You require the following five files:
 
-- **main.tf** - Contains resource definitions. Use the Single Responsibility principle tom minimize the file size.
-- **variables.tf** - Store all input variables, including all applicable default values.
-- **inputs.auto.tfvars** - Define and manage variables values.
-- **providers.tf** - Used only on the top-level directory, declares which providers and version used in the project.
-- **outputs.tf**- Store exported data items.
+- :ref:`Main.tf <f5os_main>` - Contains resource definitions. Use the Single Responsibility principle to minimize the file size.
+- :ref:`Variables.tf <f5os_variables>` - Stores all input variables, including all applicable default values.
+- :ref:`Inputs.auto.tfvars <f5os_inputs>` - Defines and manages variables values.
+- :ref:`Providers.tf <f5os_providers>` - Declares which providers and version to use in the project. Use only on the top-level directory.
+- :ref:`Outputs.tf <f5os_outputs>`- Stores exported data items.
 
 .. _f5os_examples:
 
@@ -256,7 +256,7 @@ Deploying BIG-IP on VELOS
 3. Use ``Terraform Apply`` to execute the changes defined by your Terraform configuration and create, update, or destroy resources.
    To perform exactly the previous example actions, run the following command to apply the plan.
 
-    ``terraform apply "bigip-velos"``
+   ``terraform apply "bigip-velos"``
 
    For example:
 
