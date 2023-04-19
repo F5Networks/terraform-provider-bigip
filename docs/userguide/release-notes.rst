@@ -16,4 +16,4 @@ What's Next?
 
 .. |f5_terraform_github-RNs| raw:: html
 
-   <a href="https://github.com/F5Networks/terraform-provider-bigip/release" target="_blank">GitHub</a>
+   <a href="https://github.com/F5Networks/terraform-provider-bigip/releases" target="_blank">GitHub</a>
