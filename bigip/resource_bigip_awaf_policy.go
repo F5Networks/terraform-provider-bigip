@@ -579,7 +579,9 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		if policyWaf.Template.Name != "" && polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
-
+		if policyWaf.ApplicationLanguage != "" {
+			polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = policyWaf.ApplicationLanguage
+		}
 		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v
