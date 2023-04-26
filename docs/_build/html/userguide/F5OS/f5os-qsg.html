@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<head>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PPZPQ6');</script>
+  <!-- End Google Tag Manager -->
+    <title>F5OS Quick Start Guide</title>
+  
+
+  <meta charset="utf-8">
+  <!-- Twitter Bootstrap viewport setting -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- F5 metadata -->
+  <meta name="title" content="F5OS Quick Start Guide"/>
+  <meta name="product" content="F5 BIG-IP Resources for Terraform"/>
+  <meta name="version" content=""/>
+  <meta name="updated_date"  content="2023-04-26 10:21:57"/>
+  <meta name="archived" content="Archived documents excluded"/>
+  <meta name="doc_type" content="Manual"/>
+  <meta name="lifecycle" content="release"/>
+  <meta name="F5 BIG-IP Resources for Terraform" content=""/>
+
+
+  
+
+  
+  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
+
+</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>F5OS Quick Start Guide &#8212; F5 Modules for Terraform</title>
+    <link rel="stylesheet" href="../../_static/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/table_styling.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/f5.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/f5-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/21fb8a09c3.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="F5OS Tenant Reference" href="f5os-modules.html" />
+
+  
+    
+
+  
+  </head><body>
+  <div id="clouddocs-header"></div>
+
+    <div id="dismiss">
+      <button type="button" class="btn btn-info navbar-btn site-hidden">
+        <i class="fa fa-align-justify"></i>
+      </button>
+    </div>
+    <div id="sidebar" class="section-nav">
+      
+      <!--  version selector ------------------>
+      <div id="version_selector_wrapper">
+      </div>
+      <nav class="nav-sidebartoc">
+
+        
+         <h5>F5 BIG-IP Resources for Terraform  </h5>
+        
+<div id="searchbox" role="search">
+  <form class="search" action="../../search.html" method="get">
+    <input type="text" class="search" name="q" placeholder=" Search..." />
+    <button type="submit" class="btn btn-info navbar-btn"><i class="fa fa-search"></i></button>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        <hr>
+        <span class="nav-sidebartoc">
+            <p class="caption"><span class="caption-text">F5 Terraform Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">F5 Terraform Resources Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installing Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5 BIG-IP Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index-bigip.html">F5 BIG-IP Provider Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">F5 BIG-IP Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigip-modules/index.html">F5 BIG-IP Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../as3-integration.html">AS3 Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../awaf-integration/index.html">Advanced WAF Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fast-integration/index.html">FAST Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../do-integration.html">Declarative Onboarding Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigiq-licensing.html">Licensing BIG-IP with BIG-IQ</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5OS Provider</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index-f5os.html">F5OS Resources for Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">F5OS Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="f5os-modules.html">F5OS Tenant Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">F5OS Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-files">Example files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deploying-big-ip-on-velos">Deploying BIG-IP on VELOS</a></li>
+</ul>
+</li>
+</ul>
+
+        </span><!-- Use this file to add extra links to the bottom of the ToC sidebar -->
+<hr>
+  <span class="nav-sidebartoc">
+ <!-- insert content here -->
+  </span>
+      </nav>
+    </div>
+
+
+    <div id="right-sidebar">
+      <h7 style="font-weight:normal">On this page:</h7>
+      <nav class="nav-sidebartoc">
+        <span class="nav-sidebartoc">
+            <ul>
+<li><a class="reference internal" href="#">F5OS Quick Start Guide</a><ul>
+<li><a class="reference internal" href="#example-files">Example files</a></li>
+<li><a class="reference internal" href="#deploying-big-ip-on-velos">Deploying BIG-IP on VELOS</a></li>
+</ul>
+</li>
+</ul>
+
+         </span>
+      </nav>
+    </div>
+
+
+
+
+
+  
+  <div class="main active" id="content" >
+    <article class="docs-container site-article-inner">
+            <nav class="site-breadcrumb-nav site-nav">
+          <ul class="site-breadcrumb-list">
+            <li class="breadcrumb-item"><button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn site-hidden"><i class="fa fa-align-justify"></i></button>&#x20 <a href="/">CloudDocs Home</a> &gt; <a href="../../index.html">F5 BIG-IP Resources for Terraform </a> &gt; F5OS Quick Start Guide</li>
+          </ul>
+      </nav>
+      
+      
+
+
+    <!--a title="Export PDF" id="export-pdf" class="btn btn btn-link pull-right">View PDF</a-->
+    <button type="button" id="export-pdf" class="btn btn-link right">PDF</button>
+
+
+    
+     
+         <div class="sidebar" id="version-warning" style="display: none;">
+           <p class="first sidebar-title">
+           <span class="icon fa fa-info-circle fa-lg"></span> Version notice:</p>
+           <p class="last" id="currentVersion"></p>
+          </div>
+
+
+     <div role="main">
+        
+  <div class="section" id="f5os-quick-start-guide">
+<h1>F5OS Quick Start Guide<a class="headerlink" href="#f5os-quick-start-guide" title="Permalink to this headline">¶</a></h1>
+<p>In this quick start guide, you will deploy a BIG-IP on VELOS hardware using Terraform F5OS resources.</p>
+<p>You require the following five files:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#f5os-main"><span class="std std-ref">Main.tf</span></a> - Contains resource definitions. Use the Single Responsibility principle to minimize the file size.</li>
+<li><a class="reference internal" href="#f5os-variables"><span class="std std-ref">Variables.tf</span></a> - Stores all input variables, including all applicable default values.</li>
+<li><a class="reference internal" href="#f5os-inputs"><span class="std std-ref">Inputs.auto.tfvars</span></a> - Defines and manages variables values.</li>
+<li><a class="reference internal" href="#f5os-providers"><span class="std std-ref">Providers.tf</span></a> - Declares which providers and version to use in the project. Use only on the top-level directory.</li>
+<li><a class="reference internal" href="#f5os-outputs"><span class="std std-ref">Outputs.tf</span></a>- Stores exported data items.</li>
+</ul>
+<div class="section" id="example-files">
+<span id="f5os-examples"></span><h2>Example files<a class="headerlink" href="#example-files" title="Permalink to this headline">¶</a></h2>
+<p>Use the following file examples to help you automate configurations and interactions for various services
+provided by F5 VELOS platform and F5 rSeries appliances.</p>
+<p id="f5os-variables"><strong>Example variables file</strong></p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">variable</span> <span class="s2">&quot;tenant_name&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the name of the tenant&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;tenant_image_name&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the name of the image that is to be used for the tenant&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;tenant_deployment_file&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the name of deployment file used for deploying the tenant&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;tenant_type&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;type of the tenant&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="s2">&quot;BIG-IP-Next&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;cpu_cores&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the number of vCPUs to be added to the tenant&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;running_state&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the desired state for the tenant, should be either &#39;configured&#39; or &#39;deployed&#39;&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="s2">&quot;deployed&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;mgmt_ip&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;ip address of the tenant&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;mgmt_gateway&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;management gateway for the tenant&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;mgmt_prefix&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;tenant management CIDR prefix&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;timeout&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;the number of seconds to wait for the tenant to have the desired running state&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="mi">360</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;disk_size&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;minimum virtual disk size required for tenant deployment&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">&quot;new_passwd&quot;</span> <span class="p">{</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">&quot;new password for the bigip next tenant&quot;</span>
+  <span class="k">default</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="f5os-inputs"><strong>Example inputs file</strong></p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">cpu_cores</span>                           <span class="o">=</span> <span class="mi">8</span>
+<span class="nx">cryptos</span>                                     <span class="o">=</span> <span class="s2">&quot;disabled&quot;</span>
+<span class="nx">tenant_deployment_file</span>      <span class="o">=</span> <span class="s2">&quot;BIG-IP-Next-0.10.0-4.38.5+0.0.14.yaml&quot;</span>
+<span class="nx">id</span>                                          <span class="o">=</span> <span class="p">(</span><span class="nx">known</span> <span class="nx">after</span> <span class="nx">apply</span><span class="p">)</span>
+<span class="nx">tenant_image_name</span>           <span class="o">=</span> <span class="s2">&quot;BIG-IP-Next-0.10.0-4.38.5+0.0.14&quot;</span>
+<span class="nx">mgmt_gateway</span>                        <span class="o">=</span> <span class="s2">&quot;10.1.10.253&quot;</span>
+<span class="nx">mgmt_ip</span>                             <span class="o">=</span> <span class="s2">&quot;10.1.10.1&quot;</span>
+<span class="nx">mgmt_prefix</span>                         <span class="o">=</span> <span class="mi">24</span>
+<span class="nx">tenant_name</span>                         <span class="o">=</span> <span class="s2">&quot;testnext&quot;</span>
+<span class="nx">running_state</span>                       <span class="o">=</span> <span class="s2">&quot;deployed&quot;</span>
+<span class="nx">timeout</span>                             <span class="o">=</span> <span class="mi">360</span>
+<span class="nx">tenant_type</span>                         <span class="o">=</span> <span class="s2">&quot;BIG-IP-Next&quot;</span>
+<span class="nx">disk_size</span>                           <span class="o">=</span> <span class="mi">15</span>
+</pre></div>
+</div>
+<p id="f5os-outputs"><strong>Example outputs file</strong></p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">output</span> <span class="s2">&quot;tenant_status&quot;</span> <span class="p">{</span>
+  <span class="nx">value</span> <span class="o">=</span> <span class="nx">tenant_status</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="f5os-providers"><strong>Example providers file</strong></p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">terraform</span> <span class="p">{</span>
+  <span class="nx">required_providers</span> <span class="p">{</span>
+    <span class="nx">f5os</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">source</span>  <span class="o">=</span> <span class="s2">&quot;F5Networks/f5os&quot;</span>
+      <span class="nx">version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">provider</span> <span class="s2">&quot;f5os&quot;</span> <span class="p">{</span>
+  <span class="nx">host</span>              <span class="o">=</span> <span class="s2">&quot;10.10.100.100&quot;</span>
+  <span class="nx">username</span>  <span class="o">=</span> <span class="s2">&quot;username&quot;</span>
+  <span class="nx">password</span>  <span class="o">=</span> <span class="s2">&quot;passwd&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="f5os-main"><strong>Example main file</strong></p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">resource</span> <span class="s2">&quot;random_string&quot;</span> <span class="s2">&quot;dynamic_password&quot;</span> <span class="p">{</span>
+  <span class="nx">length</span>      <span class="o">=</span> <span class="mi">16</span>
+  <span class="nx">min_upper</span>   <span class="o">=</span> <span class="mi">1</span>
+  <span class="nx">min_lower</span>   <span class="o">=</span> <span class="mi">1</span>
+  <span class="nx">min_numeric</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="nx">special</span>     <span class="o">=</span> <span class="kc">false</span>
+<span class="p">}</span>
+
+<span class="nx">resource</span> <span class="s2">&quot;f5os_tenant&quot;</span> <span class="s2">&quot;bigip_next_tenant&quot;</span> <span class="p">{</span>
+  <span class="nx">name</span>                              <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">tenant_name</span>
+  <span class="nx">image_name</span>                <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">tenant_image_name</span>
+  <span class="nx">deployment_file</span>   <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">tenant_deployment_file</span>
+  <span class="nx">mgmt_ip</span>                   <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">mgmt_ip</span>
+  <span class="nx">mgmt_prefix</span>               <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">mgmt_prefix</span>
+  <span class="nx">mgmt_gateway</span>              <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">mgmt_gateway</span>
+  <span class="nx">cpu_cores</span>                 <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">cpu_cores</span>
+  <span class="nx">running_state</span>     <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">running_state</span>
+  <span class="nx">type</span>                              <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">tenant_type</span>
+  <span class="nx">virtual_disk_size</span> <span class="o">=</span> <span class="kd">var</span><span class="p">.</span><span class="nx">disk_size</span>
+
+  <span class="nx">provisioner</span> <span class="s2">&quot;local-exec&quot;</span> <span class="p">{</span>
+    <span class="nx">command</span> <span class="o">=</span> <span class="o">&lt;&lt;</span><span class="nx">EOF</span>
+      <span class="k">if</span> <span class="p">[</span> <span class="nx">$</span><span class="p">{</span><span class="kd">var</span><span class="p">.</span><span class="nx">running_state</span><span class="p">}</span> <span class="o">=</span> <span class="s2">&quot;deployed&quot;</span> <span class="p">]</span>
+      <span class="nx">then</span>
+        <span class="nx">num_seconds</span><span class="o">=</span><span class="mi">100</span>
+        <span class="nx">expected_http</span><span class="o">=</span><span class="mi">200</span>
+        <span class="nx">endpoint</span><span class="o">=</span><span class="s2">&quot;https://${var.mgmt_ip}:5443/gui&quot;</span>
+        <span class="k">for</span><span class="p">((</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">$num_seconds</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">));</span> <span class="k">do</span>
+          <span class="nx">http_resp</span><span class="o">=</span><span class="nx">$</span><span class="p">(</span><span class="nx">curl</span> <span class="o">-</span><span class="nx">k</span> <span class="o">-</span><span class="nx">s</span> <span class="o">-</span><span class="nx">o</span> <span class="o">/</span><span class="nx">dev</span><span class="o">/</span><span class="kc">null</span> <span class="o">-</span><span class="nx">w</span> <span class="s2">&quot;%%{http_code}&quot;</span> <span class="nx">$endpoint</span><span class="p">)</span>
+          <span class="k">if</span> <span class="p">[</span> <span class="nx">$http_resp</span> <span class="o">-</span><span class="nx">eq</span> <span class="nx">$expected_http</span> <span class="p">];</span> <span class="nx">then</span>
+            <span class="nx">curl</span> <span class="o">-</span><span class="nx">k</span> <span class="o">-</span><span class="nx">u</span> <span class="nx">admin</span><span class="o">:</span><span class="nx">admin</span> <span class="o">\</span>
+            <span class="o">--</span><span class="nx">header</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> <span class="o">\</span>
+            <span class="o">-</span><span class="nx">X</span> <span class="nx">PUT</span> <span class="nx">https</span><span class="o">:</span><span class="c1">//${var.mgmt_ip}:5443/api/v1/me \</span>
+            <span class="o">--</span><span class="nx">data</span> <span class="s1">&#39;{&quot;newPassword&quot;: &quot;${var.new_passwd != &quot;&quot; ? var.new_passwd : random_string.dynamic_password.result}&quot;, &quot;currentPassword&quot;: &quot;admin&quot;}&#39;</span>
+            <span class="nx">exit</span> <span class="mi">0</span>
+          <span class="nx">fi</span>
+          <span class="nx">sleep</span> <span class="mi">2</span>
+        <span class="nx">done</span>
+        <span class="nx">echo</span> <span class="s2">&quot;Could not change the password, maybe the tenant is not yet in the running state&quot;</span>
+        <span class="nx">exit</span> <span class="mi">1</span>
+      <span class="nx">fi</span>
+    <span class="nx">EOF</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deploying-big-ip-on-velos">
+<span id="f5os-deploy"></span><h2>Deploying BIG-IP on VELOS<a class="headerlink" href="#deploying-big-ip-on-velos" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Use <code class="docutils literal notranslate"><span class="pre">Terraform</span> <span class="pre">Initialize</span></code> to prepare the working directory so Terraform can run the configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> terraform init
+<span class="go">Initializing the backend...</span>
+
+<span class="go">Initializing provider plugins...</span>
+<span class="go">- Finding f5networks/f5os versions matching &quot;1.0.0&quot;...</span>
+
+<span class="go">Terraform has been successfully initialized!</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use <code class="docutils literal notranslate"><span class="pre">Terraform</span> <span class="pre">Plan</span></code> to preview any changes that are required for your infrastructure before applying.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> terraform plan -out bigip-velos
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you change modules or change backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect, and then prompt you to rerun <code class="docutils literal notranslate"><span class="pre">plan</span></code> (if necessary).</p>
+</div>
+<p>Terraform uses the selected providers to generate the following example execution plan. Resource actions are indicated with
+the <code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">create</span></code> symbols.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">#</span> f5os_tenant.bigip_next_tenant will be created
+<span class="go">+ resource &quot;f5os_tenant&quot; &quot;bigip_next_tenant&quot; {</span>
+<span class="go">        + cpu_cores = 8</span>
+<span class="go">        + cryptos = &quot;disabled&quot;</span>
+<span class="go">        + deployment_file = &quot;BIG-IP-Next-0.10.0-4.38.5+0.0.14.yaml&quot;</span>
+<span class="go">        + id = (known after apply)</span>
+<span class="go">        + image_name = &quot;BIG-IP-Next-0.10.0-4.38.5+0.0.14&quot;</span>
+<span class="go">        + mgmt_gateway = &quot;10.1.10.253&quot;</span>
+<span class="go">        + mgmt_ip = &quot;10.1.10.1&quot;</span>
+<span class="go">        + mgmt_prefix = 24</span>
+<span class="go">        + name = &quot;testnext&quot;</span>
+<span class="go">        + running_state = &quot;deployed&quot;</span>
+<span class="go">        + status = (known after apply)</span>
+<span class="go">        + timeout = 360</span>
+<span class="go">        + type = &quot;BIG-IP-Next&quot;</span>
+<span class="go">        + virtual_disk_size = 15</span>
+<span class="go">            }</span>
+<span class="gp">#</span> random_string.dynamic_password will be created
+<span class="go">+ resource &quot;random_string&quot; &quot;dynamic_password&quot; {</span>
+<span class="go">        + id = (known after apply)</span>
+<span class="go">        + length = 16</span>
+<span class="go">        + lower = true</span>
+<span class="go">        + min_lower = 1</span>
+<span class="go">        + min_numeric = 1</span>
+<span class="go">        + min_special = 0</span>
+<span class="go">        + min_upper = 1</span>
+<span class="go">        + number = true</span>
+<span class="go">        + numeric = true</span>
+<span class="go">        + result = (known after apply)</span>
+<span class="go">        + special = false</span>
+<span class="go">        + upper = true</span>
+<span class="go">      }</span>
+
+<span class="go">Plan: 2 to add, 0 to change, 0 to destroy.</span>
+<span class="go">Changes to Outputs: ``+ tenant_status = (known after apply)``</span>
+</pre></div>
+</div>
+<ol class="loweralpha simple">
+<li>Use <code class="docutils literal notranslate"><span class="pre">bigip-velos</span></code> to save your plan.</li>
+</ol>
+</li>
+<li><p class="first">Use <code class="docutils literal notranslate"><span class="pre">Terraform</span> <span class="pre">Apply</span></code> to execute the changes defined by your Terraform configuration and create, update, or destroy resources.
+To perform exactly the previous example actions, run the following command to apply the plan.</p>
+<p><code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">apply</span> <span class="pre">&quot;bigip-velos&quot;</span></code></p>
+<p>For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> terraform apply <span class="s2">&quot;bigip-velos&quot;</span>
+<span class="go">random_string.dynamic_password: Creating...</span>
+<span class="go">random_string.dynamic_password: Creation complete after 0s [id=TlROhi9CjZVUPq6E]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Creating...</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [10s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [20s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [30s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [40s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [50s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m0s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m10s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m20s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Provisioning with &#39;local-exec&#39;...</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec): Executing: [&quot;/bin/sh&quot; &quot;-c&quot; &quot; if [ deployed = \&quot;deployed\&quot; ]\n then\n num_seconds=100\n expected_http=200\n endpoint=\&quot;https://10.1.10.1:5443/gui\&quot;\n for((i=0; i&lt;$num_seconds; i++)); do\n http_resp=$(curl -k -s -o /dev/null -w \&quot;%{http_code}\&quot; $endpoint)\n if [ $http_resp -eq $expected_http ]; then\n curl -k -u admin:admin \\\n --header &#39;Content-Type: application/json&#39; \\\n -X PUT https://10.1.10.1:5443/api/v1/me \\\n --data &#39;{\&quot;newPassword\&quot;: \&quot;F5site02\&quot;, \&quot;currentPassword\&quot;: \&quot;admin\&quot;}&#39;\n exit 0\n fi\n sleep 2\n done\n echo \&quot;Could not change the password, maybe the tenant is not yet in the running state\&quot;\n exit 1\n fi\n&quot;]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m30s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m40s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [1m50s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m0s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m10s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m20s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m30s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m40s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [2m50s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [3m0s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [3m10s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [3m20s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [3m30s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Still creating... [3m40s elapsed]</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec):       % Total        % Received     % Xferd Average Speed   Time    Time    Time    Current</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec):                                                             Dload  Upload   Total   Spent   Left    Speed</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec):   0     0    0     0        0         0     0          0 --:--:-- --:--:-- --:--:--      0</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec):   0     0    0     0        0         0     0          0 --:--:-- --:--:-- --:--:--      0</span>
+<span class="go">f5os_tenant.bigip_next_tenant (local-exec): 100    55    0     0  100    55     0         36  0:00:01  0:00:01 --:--:--     36</span>
+<span class="go">f5os_tenant.bigip_next_tenant: Creation complete after 3m42s [id=testnext]</span>
+
+<span class="go">Apply complete! Resources: 2 added, 0 changed, 0 destroyed.</span>
+
+<span class="go">Outputs:</span>
+
+<span class="go">tenant_status = &quot;Configured&quot;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>What’s Next?</p>
+<ul class="simple">
+<li><a href="https://github.com/F5Networks/terraform-provider-F5OS" target="_blank">GitHub</a></li>
+<li><a class="reference internal" href="../support.html"><span class="doc">Support</span></a></li>
+</ul>
+</div>
+</div>
+
+
+     </div>
+    
+     <div class="row next-prev-btn-row">
+       <div class="col-lg-12">
+       
+        <a href="f5os-modules.html" title="F5OS Tenant Reference" accesskey="p" class="btn btn-primary left"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Previous</a>
+       
+       
+     </div>
+     </div>
+    
+
+    </article>
+  </div>
+
+</div>
+
+
+  <div id="clouddocs-footer"></div>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script src="../../_static/js/index.js"></script>
+  <script src="../../_static/js/bootstrap.min.js"></script>
+  <script src="../../_static/js/clouddocs.js"></script>
+  <script src="../../_static/js/jquery.appear.js"></script>
+  <script src="../../_static/js/printThis.js"></script>
+  </body>
+</html>

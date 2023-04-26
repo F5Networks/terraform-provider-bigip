@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<head>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PPZPQ6');</script>
+  <!-- End Google Tag Manager -->
+    <title>Declarative Onboarding Integration with Terraform</title>
+  
+
+  <meta charset="utf-8">
+  <!-- Twitter Bootstrap viewport setting -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- F5 metadata -->
+  <meta name="title" content="Declarative Onboarding Integration with Terraform"/>
+  <meta name="product" content="F5 BIG-IP Resources for Terraform"/>
+  <meta name="version" content=""/>
+  <meta name="updated_date"  content="2023-04-26 10:21:57"/>
+  <meta name="archived" content="Archived documents excluded"/>
+  <meta name="doc_type" content="Manual"/>
+  <meta name="lifecycle" content="release"/>
+  <meta name="F5 BIG-IP Resources for Terraform" content=""/>
+
+
+  
+
+  
+  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
+
+</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Declarative Onboarding Integration with Terraform &#8212; F5 Modules for Terraform</title>
+    <link rel="stylesheet" href="../_static/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/table_styling.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/21fb8a09c3.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Licensing BIG-IP with BIG-IQ" href="bigiq-licensing.html" />
+    <link rel="prev" title="Scenario #7: Applying Canary deployment strategy for HTTPS application with Web Application Firewall policy" href="fast-integration/apply-canary.html" />
+
+  
+    
+
+  
+  </head><body>
+  <div id="clouddocs-header"></div>
+
+    <div id="dismiss">
+      <button type="button" class="btn btn-info navbar-btn site-hidden">
+        <i class="fa fa-align-justify"></i>
+      </button>
+    </div>
+    <div id="sidebar" class="section-nav">
+      
+      <!--  version selector ------------------>
+      <div id="version_selector_wrapper">
+      </div>
+      <nav class="nav-sidebartoc">
+
+        
+         <h5>F5 BIG-IP Resources for Terraform  </h5>
+        
+<div id="searchbox" role="search">
+  <form class="search" action="../search.html" method="get">
+    <input type="text" class="search" name="q" placeholder=" Search..." />
+    <button type="submit" class="btn btn-info navbar-btn"><i class="fa fa-search"></i></button>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        <hr>
+        <span class="nav-sidebartoc">
+            <p class="caption"><span class="caption-text">F5 Terraform Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">F5 Terraform Resources Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="support.html">Support</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5 BIG-IP Provider</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index-bigip.html">F5 BIG-IP Provider Overview</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index-bigip.html#releases-and-versioning">Releases and Versioning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">F5 BIG-IP Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bigip-modules/index.html">F5 BIG-IP Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="as3-integration.html">AS3 Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="awaf-integration/index.html">Advanced WAF Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fast-integration/index.html">FAST Integration with Terraform</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Declarative Onboarding Integration with Terraform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#argument-reference">Argument Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#do-installation">DO Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bigiq-licensing.html">Licensing BIG-IP with BIG-IQ</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5OS Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/index-f5os.html">F5OS Resources for Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/release-notes.html">F5OS Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/f5os-modules.html">F5OS Tenant Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/f5os-qsg.html">F5OS Quick Start Guide</a></li>
+</ul>
+
+        </span><!-- Use this file to add extra links to the bottom of the ToC sidebar -->
+<hr>
+  <span class="nav-sidebartoc">
+ <!-- insert content here -->
+  </span>
+      </nav>
+    </div>
+
+
+    <div id="right-sidebar">
+      <h7 style="font-weight:normal">On this page:</h7>
+      <nav class="nav-sidebartoc">
+        <span class="nav-sidebartoc">
+            <ul>
+<li><a class="reference internal" href="#">Declarative Onboarding Integration with Terraform</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#argument-reference">Argument Reference</a></li>
+<li><a class="reference internal" href="#do-installation">DO Installation</a></li>
+</ul>
+</li>
+</ul>
+
+         </span>
+      </nav>
+    </div>
+
+
+
+
+
+  
+  <div class="main active" id="content" >
+    <article class="docs-container site-article-inner">
+            <nav class="site-breadcrumb-nav site-nav">
+          <ul class="site-breadcrumb-list">
+            <li class="breadcrumb-item"><button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn site-hidden"><i class="fa fa-align-justify"></i></button>&#x20 <a href="/">CloudDocs Home</a> &gt; <a href="../index.html">F5 BIG-IP Resources for Terraform </a> &gt; Declarative Onboarding Integration with Terraform</li>
+          </ul>
+      </nav>
+      
+      
+
+
+    <!--a title="Export PDF" id="export-pdf" class="btn btn btn-link pull-right">View PDF</a-->
+    <button type="button" id="export-pdf" class="btn btn-link right">PDF</button>
+
+
+    
+     
+         <div class="sidebar" id="version-warning" style="display: none;">
+           <p class="first sidebar-title">
+           <span class="icon fa fa-info-circle fa-lg"></span> Version notice:</p>
+           <p class="last" id="currentVersion"></p>
+          </div>
+
+
+     <div role="main">
+        
+  <div class="section" id="declarative-onboarding-integration-with-terraform">
+<span id="do-integration"></span><h1>Declarative Onboarding Integration with Terraform<a class="headerlink" href="#declarative-onboarding-integration-with-terraform" title="Permalink to this headline">¶</a></h1>
+<p>Terraform is used with Declarative Onboarding (DO) to automate network (L1-L3) onboarding for the F5 BIG-IP system, making
+it available and ready to accept application services configurations.</p>
+<p>F5 BIG-IP Declarative Onboarding uses a declarative model to initially configure a BIG-IP device with all of the required settings to get up and running. This includes system settings such as licensing and provisioning, network settings such as VLANs and Self IPs, and clustering settings if you are using more than one BIG-IP system.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>To use DO Extensions with Terraform, ensure you meet the following requirements:</p>
+<ul class="simple">
+<li>The F5 BIG-IP must be running version 13.1.0 or higher. Due to changes in TMOS v13.1.1.5, the Declarative Onboarding (DO) Extension is not compatible with this specific TMOS version. Versions before and after 13.1.1.5 are compatible.</li>
+<li>Domain name resolution is used anywhere the declaration accepts a hostname. DO makes sure that any hostnames are resolvable and fails if they are not. The exception is deviceGroup.members, which do not require hostname resolution as they have been added to the trust.</li>
+<li>You must have an existing BIG-IP device with a management IP address</li>
+<li>You must have an existing user account with the Administrator role. If you are using 13.1.x, the BIG-IP contains an admin user by default. If you are using 14.x, you must reset the admin password before installing Declarative Onboarding. See <a class="reference external" href="https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/installation.html#if-using-big-ip-14-0-or-later">the documentation</a> for instructions.</li>
+<li>While Declarative Onboarding is supported on F5 vCMP systems, network stitching to vCMP Guests or Hosts is not supported.</li>
+<li>If you are using an F5 BYOL license, you must have a valid F5 Networks License Registration Key to include in your declaration. If you do not have one, contact your F5 sales representative. If you do not use a valid F5 license key, your declaration will fail. This is not a requirement if you are using a BIG-IP with pay-as-you-go licensing.</li>
+<li>If you are using a single NIC BIG-IP system, you must include port 8443 after the IP address of the BIG-IP in your POST and GET requests, for example, <code class="docutils literal notranslate"><span class="pre">https://&lt;BIG-IP&gt;:8443/mgmt/shared/declarative-onboarding</span></code>.</li>
+</ul>
+<p>Limitations:</p>
+<ul class="simple">
+<li>DO does not support <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> operation: <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">destroy</span></code> will raise an error.</li>
+<li>If you POST a declaration that modifies the password for the admin account, even if the declaration returns an error, the password can be changed. Therefore you may need to update the admin password in the client you are using to send the declaration.</li>
+<li>The first time you POST a Declarative Onboarding declaration, the system records the configuration that exists prior to processing the declaration. Declarative Onboarding is meant to initially configure a BIG-IP device. However, if you POST subsequent declarations to the same BIG-IP system, and leave out some of the properties you initially used, the system restores the original properties for those items.</li>
+</ul>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">No matter what you send in a subsequent declaration, Declarative Onboarding will never unlicense a BIG-IP device, it will never delete a user, and it WILL never break the device trust once it has been established.</p>
+</div>
+</div>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>resource &quot;bigip_do&quot; &quot;do-example&quot; {
+    do_json = &quot;${file(&quot;example.json&quot;)}&quot;
+    timeout = 15
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="argument-reference">
+<h2>Argument Reference<a class="headerlink" href="#argument-reference" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><a class="reference external" href="https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#do_json">do_json</a> - (Required) Name of the of the Declarative DO JSON file</p>
+</li>
+<li><p class="first"><a class="reference external" href="https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#timeout(minutes)">timeout(minutes)</a> - (Optional) timeout to keep polling DO endpoint until the BIG-IP is provisioned by DO. The default timeout is 20 minutes</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Delete method is not supported by DO, so terraform destroy won’t delete configuration in BIG-IP but we will set the terrform state to empty and won’t throw an error.</p>
+</div>
+</li>
+<li><p class="first"><a class="reference external" href="https://registry.terraform.io/providers/F5Networks/bigip/latest/docs/resources/bigip_do#example.json">example.json</a> - Example of DO Declarative JSON</p>
+</li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;schemaVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;Device&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;async&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;my BIG-IP declaration for declarative onboarding&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;Common&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;Tenant&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;hostname&quot;</span><span class="p">:</span> <span class="s2">&quot;bigip.example.com&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;myLicense&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;License&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;licenseType&quot;</span><span class="p">:</span> <span class="s2">&quot;regKey&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;regKey&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;admin&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;userType&quot;</span><span class="p">:</span> <span class="s2">&quot;regular&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;shell&quot;</span><span class="p">:</span> <span class="s2">&quot;bash&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;myProvisioning&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;Provision&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;ltm&quot;</span><span class="p">:</span> <span class="s2">&quot;nominal&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;gtm&quot;</span><span class="p">:</span> <span class="s2">&quot;minimum&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;external&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;VLAN&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;tag&quot;</span><span class="p">:</span> <span class="mi">4093</span><span class="p">,</span>
+            <span class="nt">&quot;mtu&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+            <span class="nt">&quot;interfaces&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;tagged&quot;</span><span class="p">:</span> <span class="kc">true</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;cmpHash&quot;</span><span class="p">:</span> <span class="s2">&quot;dst-ip&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;external-self&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;SelfIp&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;x.x.x.x&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;vlan&quot;</span><span class="p">:</span> <span class="s2">&quot;external&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;allowService&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;trafficGroup&quot;</span><span class="p">:</span> <span class="s2">&quot;traffic-group-local-only&quot;</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="do-installation">
+<h2>DO Installation<a class="headerlink" href="#do-installation" title="Permalink to this headline">¶</a></h2>
+<p>Use the following terraform provisioner to download DO RPM from GitHub and install the RPM on BIG-IP.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">resource</span> <span class="s2">&quot;null_resource&quot;</span> <span class="s2">&quot;install_do&quot;</span> <span class="p">{</span>
+
+<span class="n">provisioner</span> <span class="s2">&quot;local-exec&quot;</span> <span class="p">{</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="s2">&quot;./install-do-rpm.sh x.x.x.x xxxx:xxxx&quot;</span>
+
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You will need to pass BIG-IP and its credentials as an argument to the install script. This script is available in the <a class="reference external" href="https://github.com/F5Networks/terraform-provider-bigip/tree/master/examples">examples section</a> of DO in the Terraform repo.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">DO tenants are BIG-IP administrative partitions used to group configurations and also resources shared by applications
+in other tenants.</p>
+</div>
+<p>What’s Next?</p>
+<ul class="simple">
+<li><a class="reference internal" href="release-notes.html#release-notes"><span class="std std-ref">Release Notes</span></a></li>
+<li><a class="reference internal" href="bigip-modules/index.html#bigip-modules"><span class="std std-ref">BIG-IP Provider Modules</span></a></li>
+<li><a class="reference internal" href="as3-integration.html#as3-integration"><span class="std std-ref">AS3 Integration</span></a></li>
+<li><a class="reference internal" href="awaf-integration/index.html#awaf-integration"><span class="std std-ref">Advanced WAF Integration</span></a></li>
+<li><a class="reference internal" href="fast-integration/index.html#fast-integration"><span class="std std-ref">FAST Integration</span></a></li>
+<li><a class="reference internal" href="bigiq-licensing.html#bigiq-licensing"><span class="std std-ref">Licensing with BIG-IQ</span></a></li>
+</ul>
+</div>
+</div>
+
+
+     </div>
+    
+     <div class="row next-prev-btn-row">
+       <div class="col-lg-12">
+       
+        <a href="fast-integration/apply-canary.html" title="Scenario #7: Applying Canary deployment strategy for HTTPS application with Web Application Firewall policy" accesskey="p" class="btn btn-primary left"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Previous</a>
+       
+       
+          <a href="bigiq-licensing.html" title="Licensing BIG-IP with BIG-IQ" accesskey="n" class="btn btn-primary right">Next <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+       
+     </div>
+     </div>
+    
+
+    </article>
+  </div>
+
+</div>
+
+
+  <div id="clouddocs-footer"></div>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script src="../_static/js/index.js"></script>
+  <script src="../_static/js/bootstrap.min.js"></script>
+  <script src="../_static/js/clouddocs.js"></script>
+  <script src="../_static/js/jquery.appear.js"></script>
+  <script src="../_static/js/printThis.js"></script>
+  </body>
+</html>

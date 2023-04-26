@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<head>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PPZPQ6');</script>
+  <!-- End Google Tag Manager -->
+    <title>F5OS Tenant Reference</title>
+  
+
+  <meta charset="utf-8">
+  <!-- Twitter Bootstrap viewport setting -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- F5 metadata -->
+  <meta name="title" content="F5OS Tenant Reference"/>
+  <meta name="product" content="F5 BIG-IP Resources for Terraform"/>
+  <meta name="version" content=""/>
+  <meta name="updated_date"  content="2023-04-26 10:21:57"/>
+  <meta name="archived" content="Archived documents excluded"/>
+  <meta name="doc_type" content="Manual"/>
+  <meta name="lifecycle" content="release"/>
+  <meta name="F5 BIG-IP Resources for Terraform" content=""/>
+
+
+  
+
+  
+  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
+
+</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>F5OS Tenant Reference &#8212; F5 Modules for Terraform</title>
+    <link rel="stylesheet" href="../../_static/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/table_styling.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/f5.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/f5-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/21fb8a09c3.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="F5OS Quick Start Guide" href="f5os-qsg.html" />
+    <link rel="prev" title="F5OS Provider Release Notes" href="release-notes.html" />
+
+  
+    
+
+  
+  </head><body>
+  <div id="clouddocs-header"></div>
+
+    <div id="dismiss">
+      <button type="button" class="btn btn-info navbar-btn site-hidden">
+        <i class="fa fa-align-justify"></i>
+      </button>
+    </div>
+    <div id="sidebar" class="section-nav">
+      
+      <!--  version selector ------------------>
+      <div id="version_selector_wrapper">
+      </div>
+      <nav class="nav-sidebartoc">
+
+        
+         <h5>F5 BIG-IP Resources for Terraform  </h5>
+        
+<div id="searchbox" role="search">
+  <form class="search" action="../../search.html" method="get">
+    <input type="text" class="search" name="q" placeholder=" Search..." />
+    <button type="submit" class="btn btn-info navbar-btn"><i class="fa fa-search"></i></button>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        <hr>
+        <span class="nav-sidebartoc">
+            <p class="caption"><span class="caption-text">F5 Terraform Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">F5 Terraform Resources Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installing Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5 BIG-IP Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index-bigip.html">F5 BIG-IP Provider Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">F5 BIG-IP Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigip-modules/index.html">F5 BIG-IP Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../as3-integration.html">AS3 Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../awaf-integration/index.html">Advanced WAF Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fast-integration/index.html">FAST Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../do-integration.html">Declarative Onboarding Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bigiq-licensing.html">Licensing BIG-IP with BIG-IQ</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5OS Provider</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index-f5os.html">F5OS Resources for Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">F5OS Provider Release Notes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">F5OS Tenant Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#f5os-tenant-example">F5OS tenant example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#f5os-tenant-image-example">F5OS tenant image example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="f5os-qsg.html">F5OS Quick Start Guide</a></li>
+</ul>
+
+        </span><!-- Use this file to add extra links to the bottom of the ToC sidebar -->
+<hr>
+  <span class="nav-sidebartoc">
+ <!-- insert content here -->
+  </span>
+      </nav>
+    </div>
+
+
+    <div id="right-sidebar">
+      <h7 style="font-weight:normal">On this page:</h7>
+      <nav class="nav-sidebartoc">
+        <span class="nav-sidebartoc">
+            <ul>
+<li><a class="reference internal" href="#">F5OS Tenant Reference</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#f5os-tenant-example">F5OS tenant example</a></li>
+<li><a class="reference internal" href="#f5os-tenant-image-example">F5OS tenant image example</a></li>
+</ul>
+</li>
+</ul>
+
+         </span>
+      </nav>
+    </div>
+
+
+
+
+
+  
+  <div class="main active" id="content" >
+    <article class="docs-container site-article-inner">
+            <nav class="site-breadcrumb-nav site-nav">
+          <ul class="site-breadcrumb-list">
+            <li class="breadcrumb-item"><button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn site-hidden"><i class="fa fa-align-justify"></i></button>&#x20 <a href="/">CloudDocs Home</a> &gt; <a href="../../index.html">F5 BIG-IP Resources for Terraform </a> &gt; F5OS Tenant Reference</li>
+          </ul>
+      </nav>
+      
+      
+
+
+    <!--a title="Export PDF" id="export-pdf" class="btn btn btn-link pull-right">View PDF</a-->
+    <button type="button" id="export-pdf" class="btn btn-link right">PDF</button>
+
+
+    
+     
+         <div class="sidebar" id="version-warning" style="display: none;">
+           <p class="first sidebar-title">
+           <span class="icon fa fa-info-circle fa-lg"></span> Version notice:</p>
+           <p class="last" id="currentVersion"></p>
+          </div>
+
+
+     <div role="main">
+        
+  <div class="section" id="f5os-tenant-reference">
+<h1>F5OS Tenant Reference<a class="headerlink" href="#f5os-tenant-reference" title="Permalink to this headline">¶</a></h1>
+<p>This topic describes how to manage the F5OS tenant.</p>
+<div class="section" id="prerequisites">
+<span id="f5os-prereqs"></span><h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a href="https://www.terraform.io/downloads.html" target="_blank">Terraform</a>  v0.13.x or later</li>
+<li><a href="https://golang.org/doc/install" target="_blank">Go</a>  v1.18 or later</li>
+</ul>
+</div>
+<div class="section" id="f5os-tenant-example">
+<span id="f5os-tenantex"></span><h2>F5OS tenant example<a class="headerlink" href="#f5os-tenant-example" title="Permalink to this headline">¶</a></h2>
+<p>The following example demonstrates a resource used to manage F5OS tenant.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">resource &quot;f5os_tenant&quot; &quot;test2&quot; {</span>
+<span class="go">  name              = &quot;testtenant-ecosys2&quot;</span>
+<span class="go">  image_name        = &quot;BIGIP-17.1.0-0.0.16.ALL-F5OS.qcow2.zip.bundle&quot;</span>
+<span class="go">  mgmt_ip           = &quot;10.10.10.26&quot;</span>
+<span class="go">  mgmt_gateway      = &quot;10.10.10.1&quot;</span>
+<span class="go">  mgmt_prefix       = 24</span>
+<span class="go">  type              = &quot;BIG-IP&quot;</span>
+<span class="go">  cpu_cores         = 8</span>
+<span class="go">  running_state     = &quot;configured&quot;</span>
+<span class="go">  virtual_disk_size = 82</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+<p><strong>Required parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">image_name</span></code> (string) - Name of the tenant image used. Required for create operations.</li>
+<li><code class="docutils literal notranslate"><span class="pre">mgmt_gateway</span></code> (string) - Tenant management gateway.</li>
+<li><code class="docutils literal notranslate"><span class="pre">mgmt_ip</span></code> (string) - IP address used to connect to the deployed tenant. Required for create operations.</li>
+<li><code class="docutils literal notranslate"><span class="pre">mgmt_prefix</span></code> (integer) - Tenant management CIDR prefix.</li>
+<li><code class="docutils literal notranslate"><span class="pre">name</span></code> (string) - Name of the tenant. The first character must be a letter. Only lowercase alphanumeric characters
+are allowed. No special or extended characters are allowed except for hyphens. The name cannot exceed 50 characters.</li>
+</ul>
+<p><strong>Optional parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">cpu_cores</span></code> (integer) - The number of vCPUs you want added to the tenant. Required for create operations.</li>
+<li><code class="docutils literal notranslate"><span class="pre">cryptos</span></code> (string) - Whether crypto and compression hardware offload should be enabled on the tenant. We recommend it is enabled, otherwise crypto and compression may be processed in CPU.</li>
+<li><code class="docutils literal notranslate"><span class="pre">deployment_file</span></code> (string) - Deployment file used for BIG-IP-Next . Required for if type is BIG-IP-Next.</li>
+<li><code class="docutils literal notranslate"><span class="pre">nodes</span></code> (integer list) - List of integers. Specifies on which blades nodes the tenants are deployed. Required for create operations. For single blade platforms like rSeries only the value of 1 should be provided.</li>
+<li><code class="docutils literal notranslate"><span class="pre">running_state</span></code> (string) - Desired running_state of the tenant.</li>
+<li><code class="docutils literal notranslate"><span class="pre">timeout</span></code> (integer) - The number of seconds to wait for image import to finish.</li>
+<li><code class="docutils literal notranslate"><span class="pre">type</span></code> (string) - Name of the tenant image to be used. Required for create operations</li>
+<li><code class="docutils literal notranslate"><span class="pre">virtual_disk_size</span></code> (integer) - Minimum virtual disk size required for Tenant deployment</li>
+<li><code class="docutils literal notranslate"><span class="pre">vlans</span></code> (integer list) - The existing VLAN IDs in the chassis partition that should be added to the tenant. The order
+of these VLANs is ignored. This module orders the VLANs automatically, if you deliberately re-order them in subsequent tasks, this module will not register a change. Required for create operations</li>
+</ul>
+<p><strong>Read-only parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">id</span></code> (string) - Tenant identifier</li>
+<li><code class="docutils literal notranslate"><span class="pre">status</span></code> (string) - Tenant status</li>
+</ul>
+</div>
+<div class="section" id="f5os-tenant-image-example">
+<span id="f5os-tenanteximg"></span><h2>F5OS tenant image example<a class="headerlink" href="#f5os-tenant-image-example" title="Permalink to this headline">¶</a></h2>
+<p>The following example demonstrates a resource used to manage F5OS tenant image.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">resource &quot;f5os_tenant_image&quot; &quot;test&quot; {</span>
+<span class="go">  image_name  = &quot;BIGIP-17.1.0-0.0.16.ALL-F5OS.qcow2.zip.bundle&quot;</span>
+<span class="go">  remote_host = &quot;remote-host&quot;</span>
+<span class="go">  remote_path = &quot;remote-path&quot;</span>
+<span class="go">  local_path  = &quot;images&quot;</span>
+<span class="go">  timeout     = 360</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+<p><strong>Required parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">image_name</span></code> (string) - Name of the tenant image.</li>
+</ul>
+<p><strong>Optional parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">local_path</span></code> (string) - The path on the F5OS where the tenant image is to be uploaded.</li>
+<li><code class="docutils literal notranslate"><span class="pre">protocol</span></code> (string) - Protocol for image transfer.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote_host</span></code> (string) - The hostname or IP address of the remote server on which the tenant image is stored. The server must make the image accessible via the specified protocol.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote_password</span></code> (string, sensitive) Password for the user on the remote server on which the tenant image is stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote_path</span></code> (string) - The path to the tenant image on the remote server.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote_port</span></code> (integer) - The port on the remote host to which you want to connect. If the port is not provided, a default port for the selected protocol is used.</li>
+<li><code class="docutils literal notranslate"><span class="pre">remote_user</span></code> (string) - User name for the remote server on which the tenant image is stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">timeout</span></code> (integer) - The number of seconds to wait for image import to finish.</li>
+</ul>
+<p><strong>Read-only parameters</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">id</span></code> (string) - Example identifier.</li>
+<li><code class="docutils literal notranslate"><span class="pre">status</span></code> (string) - Status of imported image</li>
+</ul>
+<p>What’s Next?</p>
+<ul class="simple">
+<li><a class="reference internal" href="f5os-qsg.html"><span class="doc">Quick start guide</span></a></li>
+<li><a class="reference internal" href="../support.html"><span class="doc">Support</span></a></li>
+</ul>
+</div>
+</div>
+
+
+     </div>
+    
+     <div class="row next-prev-btn-row">
+       <div class="col-lg-12">
+       
+        <a href="release-notes.html" title="F5OS Provider Release Notes" accesskey="p" class="btn btn-primary left"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Previous</a>
+       
+       
+          <a href="f5os-qsg.html" title="F5OS Quick Start Guide" accesskey="n" class="btn btn-primary right">Next <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+       
+     </div>
+     </div>
+    
+
+    </article>
+  </div>
+
+</div>
+
+
+  <div id="clouddocs-footer"></div>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script src="../../_static/js/index.js"></script>
+  <script src="../../_static/js/bootstrap.min.js"></script>
+  <script src="../../_static/js/clouddocs.js"></script>
+  <script src="../../_static/js/jquery.appear.js"></script>
+  <script src="../../_static/js/printThis.js"></script>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<head>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PPZPQ6');</script>
+  <!-- End Google Tag Manager -->
+    <title>layout: “bigip” page_title: “BIG-IP: bigip_ltm_profile_tcp” sidebar_current: “docs-bigip-resource-profile_tcp-x” description: |- Provides details about bigip_ltm_profile_tcp resource</title>
+  
+
+  <meta charset="utf-8">
+  <!-- Twitter Bootstrap viewport setting -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- F5 metadata -->
+  <meta name="title" content="layout: “bigip” page_title: “BIG-IP: bigip_ltm_profile_tcp” sidebar_current: “docs-bigip-resource-profile_tcp-x” description: |- Provides details about bigip_ltm_profile_tcp resource"/>
+  <meta name="product" content="F5 BIG-IP Resources for Terraform"/>
+  <meta name="version" content=""/>
+  <meta name="updated_date"  content="2023-04-26 10:21:57"/>
+  <meta name="archived" content="Archived documents excluded"/>
+  <meta name="doc_type" content="Manual"/>
+  <meta name="lifecycle" content="release"/>
+  <meta name="F5 BIG-IP Resources for Terraform" content=""/>
+
+
+  
+
+  
+  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
+
+</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>layout: “bigip” page_title: “BIG-IP: bigip_ltm_profile_tcp” sidebar_current: “docs-bigip-resource-profile_tcp-x” description: |- Provides details about bigip_ltm_profile_tcp resource &#8212; F5 Modules for Terraform</title>
+    <link rel="stylesheet" href="../_static/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/table_styling.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/21fb8a09c3.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+  
+    
+
+  
+  </head><body>
+  <div id="clouddocs-header"></div>
+
+    <div id="dismiss">
+      <button type="button" class="btn btn-info navbar-btn site-hidden">
+        <i class="fa fa-align-justify"></i>
+      </button>
+    </div>
+    <div id="sidebar" class="section-nav">
+      
+      <!--  version selector ------------------>
+      <div id="version_selector_wrapper">
+      </div>
+      <nav class="nav-sidebartoc">
+
+        
+         <h5>F5 BIG-IP Resources for Terraform  </h5>
+        
+<div id="searchbox" role="search">
+  <form class="search" action="../search.html" method="get">
+    <input type="text" class="search" name="q" placeholder=" Search..." />
+    <button type="submit" class="btn btn-info navbar-btn"><i class="fa fa-search"></i></button>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        <hr>
+        <span class="nav-sidebartoc">
+            <p class="caption"><span class="caption-text">F5 Terraform Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">F5 Terraform Resources Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/installing.html">Installing Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/configuring.html">Configuring Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/support.html">Support</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5 BIG-IP Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/index-bigip.html">F5 BIG-IP Provider Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/release-notes.html">F5 BIG-IP Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/bigip-modules/index.html">F5 BIG-IP Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/as3-integration.html">AS3 Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/awaf-integration/index.html">Advanced WAF Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/fast-integration/index.html">FAST Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/do-integration.html">Declarative Onboarding Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/bigiq-licensing.html">Licensing BIG-IP with BIG-IQ</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5OS Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/F5OS/index-f5os.html">F5OS Resources for Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/F5OS/release-notes.html">F5OS Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/F5OS/f5os-modules.html">F5OS Tenant Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/F5OS/f5os-qsg.html">F5OS Quick Start Guide</a></li>
+</ul>
+
+        </span><!-- Use this file to add extra links to the bottom of the ToC sidebar -->
+<hr>
+  <span class="nav-sidebartoc">
+ <!-- insert content here -->
+  </span>
+      </nav>
+    </div>
+
+
+    <div id="right-sidebar">
+      <h7 style="font-weight:normal">On this page:</h7>
+      <nav class="nav-sidebartoc">
+        <span class="nav-sidebartoc">
+            <ul>
+<li><a class="reference internal" href="#">layout: “bigip”
+page_title: “BIG-IP: bigip_ltm_profile_tcp”
+sidebar_current: “docs-bigip-resource-profile_tcp-x”
+description: |-
+Provides details about bigip_ltm_profile_tcp resource</a></li>
+<li><a class="reference internal" href="#bigip-ltm-profile-tcp">bigip_ltm_profile_tcp</a><ul>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#argument-reference">Argument Reference</a></li>
+</ul>
+</li>
+</ul>
+
+         </span>
+      </nav>
+    </div>
+
+
+
+
+
+  
+  <div class="main active" id="content" >
+    <article class="docs-container site-article-inner">
+            <nav class="site-breadcrumb-nav site-nav">
+          <ul class="site-breadcrumb-list">
+            <li class="breadcrumb-item"><button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn site-hidden"><i class="fa fa-align-justify"></i></button>&#x20 <a href="/">CloudDocs Home</a> &gt; <a href="../index.html">F5 BIG-IP Resources for Terraform </a> &gt; layout: “bigip” page_title: “BIG-IP: bigip_ltm_profile_tcp” sidebar_current: “docs-bigip-resource-profile_tcp-x” description: |- Provides details about bigip_ltm_profile_tcp resource</li>
+          </ul>
+      </nav>
+      
+      
+
+
+    <!--a title="Export PDF" id="export-pdf" class="btn btn btn-link pull-right">View PDF</a-->
+    <button type="button" id="export-pdf" class="btn btn-link right">PDF</button>
+
+
+    
+     
+         <div class="sidebar" id="version-warning" style="display: none;">
+           <p class="first sidebar-title">
+           <span class="icon fa fa-info-circle fa-lg"></span> Version notice:</p>
+           <p class="last" id="currentVersion"></p>
+          </div>
+
+
+     <div role="main">
+        
+  <hr class="docutils" />
+<div class="section" id="layout-bigip-page-title-big-ip-bigip-ltm-profile-tcp-sidebar-current-docs-bigip-resource-profile-tcp-x-description-provides-details-about-bigip-ltm-profile-tcp-resource">
+<h1>layout: “bigip”
+page_title: “BIG-IP: bigip_ltm_profile_tcp”
+sidebar_current: “docs-bigip-resource-profile_tcp-x”
+description: |-
+Provides details about bigip_ltm_profile_tcp resource<a class="headerlink" href="#layout-bigip-page-title-big-ip-bigip-ltm-profile-tcp-sidebar-current-docs-bigip-resource-profile-tcp-x-description-provides-details-about-bigip-ltm-profile-tcp-resource" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="bigip-ltm-profile-tcp">
+<h1>bigip_ltm_profile_tcp<a class="headerlink" href="#bigip-ltm-profile-tcp" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">bigip_ltm_profile_tcp</span></code> Configures a custom profile_tcp for use by health checks.</p>
+<p>For resources should be named with their “full path”. The full path is the combination of the partition + name of the resource. For example /Common/my-pool.</p>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-hcl notranslate"><div class="highlight"><pre><span></span>resource &quot;bigip_ltm_profile_tcp&quot; &quot;sanjose-tcp-lan-profile&quot; {
+  name               = &quot;sanjose-tcp-lan-profile&quot;
+  idle_timeout       = 200
+  close_wait_timeout = 5
+  finwait_2timeout   = 5
+  finwait_timeout    = 300
+  keepalive_interval = 1700
+  deferred_accept    = &quot;enabled&quot;
+  fast_open          = &quot;enabled&quot;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="argument-reference">
+<h2>Argument Reference<a class="headerlink" href="#argument-reference" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">name</span></code> (Required) Name of the profile_tcp</li>
+<li><code class="docutils literal notranslate"><span class="pre">partition</span></code> - (Optional) Displays the administrative partition within which this profile resides</li>
+<li><code class="docutils literal notranslate"><span class="pre">defaults_from</span></code> - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.</li>
+<li><code class="docutils literal notranslate"><span class="pre">idle_timeout</span></code> - (Optional) Specifies the number of seconds that a connection is idle before the connection is eligible for deletion. The default value is 300 seconds.</li>
+<li><code class="docutils literal notranslate"><span class="pre">close_wait_timeout</span></code> - (Optional) Specifies the number of seconds that a connection remains in a LAST-ACK state before quitting. A value of 0 represents a term of forever (or until the maxrtx of the FIN state). The default value is 5 seconds.</li>
+<li><code class="docutils literal notranslate"><span class="pre">finwait_timeout</span></code> - (Optional) Specifies the number of seconds that a connection is in the FIN-WAIT-1 or closing state before quitting. The default value is 5 seconds. A value of 0 (zero) represents a term of forever (or until the maxrtx of the FIN state). You can also specify immediate or indefinite.</li>
+<li><code class="docutils literal notranslate"><span class="pre">finwait_2timeout</span></code> - (Optional) Specifies the number of seconds that a connection is in the FIN-WAIT-2 state before quitting. The default value is 300 seconds. A value of 0 (zero) represents a term of forever (or until the maxrtx of the FIN state).</li>
+<li><code class="docutils literal notranslate"><span class="pre">keepalive_interval</span></code> - (Optional) Specifies the keep alive probe interval, in seconds. The default value is 1800 seconds.</li>
+<li><code class="docutils literal notranslate"><span class="pre">fast_open</span></code> - (Optional) When enabled, permits TCP Fast Open, allowing properly equipped TCP clients to send data with the SYN packet.</li>
+<li><code class="docutils literal notranslate"><span class="pre">deferred_accept</span></code> - (Optional) Specifies, when enabled, that the system defers allocation of the connection chain context until the client response is received. This option is useful for dealing with 3-way handshake DOS attacks. The default value is disabled.</li>
+</ul>
+</div>
+</div>
+
+
+     </div>
+    
+
+    </article>
+  </div>
+
+</div>
+
+
+  <div id="clouddocs-footer"></div>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script src="../_static/js/index.js"></script>
+  <script src="../_static/js/bootstrap.min.js"></script>
+  <script src="../_static/js/clouddocs.js"></script>
+  <script src="../_static/js/jquery.appear.js"></script>
+  <script src="../_static/js/printThis.js"></script>
+  </body>
+</html>

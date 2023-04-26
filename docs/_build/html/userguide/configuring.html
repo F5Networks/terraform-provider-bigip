@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<head>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PPZPQ6');</script>
+  <!-- End Google Tag Manager -->
+    <title>Configuring Terraform</title>
+  
+
+  <meta charset="utf-8">
+  <!-- Twitter Bootstrap viewport setting -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- F5 metadata -->
+  <meta name="title" content="Configuring Terraform"/>
+  <meta name="product" content="F5 BIG-IP Resources for Terraform"/>
+  <meta name="version" content=""/>
+  <meta name="updated_date"  content="2023-04-26 10:21:57"/>
+  <meta name="archived" content="Archived documents excluded"/>
+  <meta name="doc_type" content="Manual"/>
+  <meta name="lifecycle" content="release"/>
+  <meta name="F5 BIG-IP Resources for Terraform" content=""/>
+
+
+  
+
+  
+  <link href="https://cdn.f5.com/favicon.ico" rel="icon">
+
+</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Configuring Terraform &#8212; F5 Modules for Terraform</title>
+    <link rel="stylesheet" href="../_static/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/table_styling.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/f5-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/21fb8a09c3.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Support" href="support.html" />
+    <link rel="prev" title="Installing Terraform" href="installing.html" />
+
+  
+    
+
+  
+  </head><body>
+  <div id="clouddocs-header"></div>
+
+    <div id="dismiss">
+      <button type="button" class="btn btn-info navbar-btn site-hidden">
+        <i class="fa fa-align-justify"></i>
+      </button>
+    </div>
+    <div id="sidebar" class="section-nav">
+      
+      <!--  version selector ------------------>
+      <div id="version_selector_wrapper">
+      </div>
+      <nav class="nav-sidebartoc">
+
+        
+         <h5>F5 BIG-IP Resources for Terraform  </h5>
+        
+<div id="searchbox" role="search">
+  <form class="search" action="../search.html" method="get">
+    <input type="text" class="search" name="q" placeholder=" Search..." />
+    <button type="submit" class="btn btn-info navbar-btn"><i class="fa fa-search"></i></button>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        <hr>
+        <span class="nav-sidebartoc">
+            <p class="caption"><span class="caption-text">F5 Terraform Resources</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">F5 Terraform Resources Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing Terraform</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuring Terraform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-terraform-resource">Sample Terraform Resource</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#initializing">Initializing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#applying-changes">Applying changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-a-big-ip-provider-binary">Generating a BIG-IP Provider Binary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="support.html">Support</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5 BIG-IP Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index-bigip.html">F5 BIG-IP Provider Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">F5 BIG-IP Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bigip-modules/index.html">F5 BIG-IP Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="as3-integration.html">AS3 Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="awaf-integration/index.html">Advanced WAF Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fast-integration/index.html">FAST Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="do-integration.html">Declarative Onboarding Integration with Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bigiq-licensing.html">Licensing BIG-IP with BIG-IQ</a></li>
+</ul>
+<p class="caption"><span class="caption-text">F5OS Provider</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/index-f5os.html">F5OS Resources for Terraform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/release-notes.html">F5OS Provider Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/f5os-modules.html">F5OS Tenant Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F5OS/f5os-qsg.html">F5OS Quick Start Guide</a></li>
+</ul>
+
+        </span><!-- Use this file to add extra links to the bottom of the ToC sidebar -->
+<hr>
+  <span class="nav-sidebartoc">
+ <!-- insert content here -->
+  </span>
+      </nav>
+    </div>
+
+
+    <div id="right-sidebar">
+      <h7 style="font-weight:normal">On this page:</h7>
+      <nav class="nav-sidebartoc">
+        <span class="nav-sidebartoc">
+            <ul>
+<li><a class="reference internal" href="#">Configuring Terraform</a><ul>
+<li><a class="reference internal" href="#sample-terraform-resource">Sample Terraform Resource</a></li>
+<li><a class="reference internal" href="#initializing">Initializing</a></li>
+<li><a class="reference internal" href="#applying-changes">Applying changes</a></li>
+<li><a class="reference internal" href="#generating-a-big-ip-provider-binary">Generating a BIG-IP Provider Binary</a></li>
+</ul>
+</li>
+</ul>
+
+         </span>
+      </nav>
+    </div>
+
+
+
+
+
+  
+  <div class="main active" id="content" >
+    <article class="docs-container site-article-inner">
+            <nav class="site-breadcrumb-nav site-nav">
+          <ul class="site-breadcrumb-list">
+            <li class="breadcrumb-item"><button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn site-hidden"><i class="fa fa-align-justify"></i></button>&#x20 <a href="/">CloudDocs Home</a> &gt; <a href="../index.html">F5 BIG-IP Resources for Terraform </a> &gt; Configuring Terraform</li>
+          </ul>
+      </nav>
+      
+      
+
+
+    <!--a title="Export PDF" id="export-pdf" class="btn btn btn-link pull-right">View PDF</a-->
+    <button type="button" id="export-pdf" class="btn btn-link right">PDF</button>
+
+
+    
+     
+         <div class="sidebar" id="version-warning" style="display: none;">
+           <p class="first sidebar-title">
+           <span class="icon fa fa-info-circle fa-lg"></span> Version notice:</p>
+           <p class="last" id="currentVersion"></p>
+          </div>
+
+
+     <div role="main">
+        
+  <div class="section" id="configuring-terraform">
+<h1>Configuring Terraform<a class="headerlink" href="#configuring-terraform" title="Permalink to this headline">¶</a></h1>
+<p>The set of files used to describe infrastructure in Terraform is known as a Terraform <cite>configuration</cite>. To read about the syntax of the configuration files, see <a href="https://www.terraform.io/docs/configuration/syntax.html" target="_blank">this documentation</a>. F5 recommends only using JSON when the configuration is generated by a machine. F5 recommends using a standalone machine or VM where Terraform is installed for configuration. If you need to use Terraform Cloud, you should set up a proper RBAC to protect the F5 BIG-IP credentials.</p>
+<p>Below is an example of the entire configuration. Each section is described below the example. Save the contents to a file named <code class="docutils literal notranslate"><span class="pre">bigip_ltm_policy.tf</span></code>.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Verify that there are no other <code class="docutils literal notranslate"><span class="pre">*.tf</span></code> files in your directory, since Terraform loads all of them.</p>
+</div>
+<div class="section" id="sample-terraform-resource">
+<h2>Sample Terraform Resource<a class="headerlink" href="#sample-terraform-resource" title="Permalink to this headline">¶</a></h2>
+<p>The following sample demonstrates creating a policy on the F5 BIG-IP system:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">provider</span> <span class="s2">&quot;bigip&quot;</span> <span class="p">{</span>
+    <span class="nx">address</span> <span class="o">=</span> <span class="s2">&quot;x.x.x.x&quot;</span>
+    <span class="nx">username</span> <span class="o">=</span> <span class="s2">&quot;xxxx&quot;</span>
+    <span class="nx">password</span> <span class="o">=</span> <span class="s2">&quot;xxxx&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">resource</span> <span class="s2">&quot;bigip_ltm_policy&quot;</span> <span class="s2">&quot;test-policy&quot;</span> <span class="p">{</span>
+    <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;/Common/test-policy&quot;</span>
+    <span class="nx">strategy</span> <span class="o">=</span> <span class="s2">&quot;first-match&quot;</span>
+    <span class="nx">requires</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">]</span>
+    <span class="nx">controls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;forwarding&quot;</span><span class="p">]</span>
+    <span class="nx">rule</span> <span class="p">{</span>
+        <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;rule6&quot;</span>
+        <span class="nx">action</span> <span class="p">{</span>
+            <span class="nx">tm_name</span> <span class="o">=</span> <span class="s2">&quot;20&quot;</span>
+            <span class="nx">forward</span> <span class="o">=</span> <span class="kc">true</span>
+            <span class="nx">pool</span> <span class="o">=</span> <span class="s2">&quot;/Common/mypool&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">depends_on</span> <span class="o">=</span> <span class="p">[</span><span class="nx">bigip_ltm_pool</span><span class="p">.</span><span class="nx">mypool</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">resource</span> <span class="s2">&quot;bigip_ltm_pool&quot;</span> <span class="s2">&quot;mypool&quot;</span> <span class="p">{</span>
+    <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;/Common/mypool&quot;</span>
+    <span class="nx">monitors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/Common/http&quot;</span><span class="p">]</span>
+    <span class="nx">allow_nat</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
+    <span class="nx">allow_snat</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
+    <span class="nx">load_balancing_mode</span> <span class="o">=</span> <span class="s2">&quot;round-robin&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">provider</span></code> block is used to configure the named provider, in this case “bigip”. A provider is responsible for creating and managing resources. Multiple provider blocks can exist if a Terraform configuration is composed of multiple providers, which is a common situation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">resource</span></code> block defines a resource that exists within the infrastructure. The resource block has two strings before opening the block: the resource type and the resource name. In this example, the resource type is “bigip_ltm_policy” and the name is “test_policy.” The prefix of the type maps to the provider. In this case “bigip_ltm_policy” automatically tells Terraform that it is managed by the “bigip” provider.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="13%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Options</th>
+<th class="head">Description/Notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Required</td>
+<td>Describes the name of the policy.</td>
+</tr>
+<tr class="row-odd"><td>strategy</td>
+<td>Optional</td>
+<td>This value specifies the match strategy.</td>
+</tr>
+<tr class="row-even"><td>requires</td>
+<td>Optional</td>
+<td>This value specifies the protocol.</td>
+</tr>
+<tr class="row-odd"><td>published_copy</td>
+<td>Optional</td>
+<td>This value determines if you want to publish the policy else it will be deployed in Drafts mode.</td>
+</tr>
+<tr class="row-even"><td>controls</td>
+<td>Optional</td>
+<td>This value specifies the controls.</td>
+</tr>
+<tr class="row-odd"><td>rule</td>
+<td>Optional</td>
+<td>Use this policy to apply rules.</td>
+</tr>
+<tr class="row-even"><td>tm_name</td>
+<td>Required</td>
+<td>If Rule is used, then you need to provide the tm_name. It can be any value.</td>
+</tr>
+<tr class="row-odd"><td>forward</td>
+<td>Optional</td>
+<td>This action sets forwarding.</td>
+</tr>
+<tr class="row-even"><td>pool</td>
+<td>Optional</td>
+<td>This action will direct the stream to this pool.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="initializing">
+<h2>Initializing<a class="headerlink" href="#initializing" title="Permalink to this headline">¶</a></h2>
+<p>The first command to run for a new configuration, or after checking out an existing configuration from version control, is <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">init</span></code>, which initializes local settings and data that will be used by subsequent commands.</p>
+<p>Terraform uses a plugin-based architecture to support available infrastructure and service providers. As of Terraform version 0.10.0, each “Provider” is its own encapsulated binary distributed separately from Terraform itself. The <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">init</span></code> command will automatically download and install any Provider binary for the providers in use within the configuration, which in this case is just the BIG-IP provider:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">$</span> <span class="nx">terraform</span> <span class="nx">init</span>
+
+ <span class="nx">Initializing</span> <span class="nx">the</span> <span class="nx">backend</span><span class="p">...</span>
+
+ <span class="nx">Initializing</span> <span class="nx">provider</span> <span class="nx">plugins</span><span class="p">...</span>
+
+ <span class="nx">Terraform</span> <span class="nx">has</span> <span class="nx">been</span> <span class="nx">successfully</span> <span class="nx">initialized</span><span class="o">!</span>
+</pre></div>
+</div>
+<p>You may now begin working with Terraform. To see changes that are required for your infrastructure, run the command <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">plan</span></code>. All Terraform commands should now work.</p>
+<p>If you ever set or change resources or the backend configuration for Terraform, rerun this command to reinitialize your working directory. If you forget, other commands will detect it and remind you to do so if necessary.</p>
+</div>
+<div class="section" id="applying-changes">
+<h2>Applying changes<a class="headerlink" href="#applying-changes" title="Permalink to this headline">¶</a></h2>
+<p>The commands shown in this guide apply to Terraform 0.11 and above. To see the execution plan before applying it, you must run the <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">plan</span></code> command in versions earlier than Terraform 0.11. Use <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">version</span></code> to confirm your running version.</p>
+<p>In the same directory as the bigip_ltm_policy.tf file you created, run <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">apply</span></code>.</p>
+<p>The output below shows the execution plan and describes which actions Terraform will take in order to change real infrastructure to match the configuration. The output format is similar to the diff format generated by tools such as Git. The output has a + next to bigip_ltm_policy.test-policy, meaning that Terraform will create this resource. Beneath that, it shows the attributes that will be set. When the value displayed is <code class="docutils literal notranslate"><span class="pre">(known</span> <span class="pre">after</span> <span class="pre">apply)</span></code>, it means that the value won’t be known until the resource is created.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span>$ terraform apply
+
+ An execution plan has been generated and is shown below.
+ Resource actions are indicated with the following symbols:
+ + create
+
+ Terraform will perform the following actions:
+
+   # bigip_ltm_policy.test-policy will be created
+   + resource &quot;bigip_ltm_policy&quot; &quot;test-policy&quot; {
+       + controls = [
+           + &quot;forwarding&quot;,
+         ]
+       + id = (known after apply)
+       + name = &quot;/Common/test-policy&quot;
+       + requires = [
+           + &quot;http&quot;,
+         ]
+       + strategy = &quot;first-match&quot;
+
+       + rule {
+           + name = &quot;rule6&quot;
+
+           + action {
+               + app_service = (known after apply)
+               + application = (known after apply)
+               + asm = (known after apply)
+               + avr = (known after apply)
+               + cache = (known after apply)
+               + carp = (known after apply)
+               + category = (known after apply)
+               + classify = (known after apply)
+               + clone_pool = (known after apply)
+               + code = (known after apply)
+               + compress = (known after apply)
+               + content = (known after apply)
+               + cookie_hash = (known after apply)
+               + cookie_insert = (known after apply)
+               + cookie_passive = (known after apply)
+               + cookie_rewrite = (known after apply)
+               + decompress = (known after apply)
+               + defer = (known after apply)
+               + destination_address = (known after apply)
+               + disable = (known after apply)
+               + domain = (known after apply)
+               + enable = (known after apply)
+               + expiry = (known after apply)
+               + expiry_secs = (known after apply)
+               + expression = (known after apply)
+               + extension = (known after apply)
+               + facility = (known after apply)
+               + forward = true
+               + from_profile = (known after apply)
+               + hash = (known after apply)
+               + host = (known after apply)
+               + http = (known after apply)
+               + http_basic_auth = (known after apply)
+               + http_cookie = (known after apply)
+               + http_header = (known after apply)
+               + http_referer = (known after apply)
+               + http_reply = (known after apply)
+               + http_set_cookie = (known after apply)
+               + http_uri = (known after apply)
+               + ifile = (known after apply)
+               + insert = (known after apply)
+               + internal_virtual = (known after apply)
+               + ip_address = (known after apply)
+               + key = (known after apply)
+               + l7dos = (known after apply)
+               + length = (known after apply)
+               + location = (known after apply)
+               + log = (known after apply)
+               + ltm_policy = (known after apply)
+               + member = (known after apply)
+               + message = (known after apply)
+               + netmask = (known after apply)
+               + nexthop = (known after apply)
+               + node = (known after apply)
+               + offset = (known after apply)
+               + path = (known after apply)
+               + pem = (known after apply)
+               + persist = (known after apply)
+               + pin = (known after apply)
+               + policy = (known after apply)
+               + pool = &quot;/Common/mypool&quot;
+               + port = (known after apply)
+               + priority = (known after apply)
+               + profile = (known after apply)
+               + protocol = (known after apply)
+               + query_string = (known after apply)
+               + rateclass = (known after apply)
+               + redirect = (known after apply)
+               + remove = (known after apply)
+               + replace = (known after apply)
+               + request = (known after apply)
+               + request_adapt = (known after apply)
+               + reset = (known after apply)
+               + response = (known after apply)
+               + response_adapt = (known after apply)
+               + scheme = (known after apply)
+               + script = (known after apply)
+               + select = (known after apply)
+               + server_ssl = (known after apply)
+               + set_variable = (known after apply)
+               + snat = (known after apply)
+               + snatpool = (known after apply)
+               + source_address = (known after apply)
+               + ssl_client_hello = (known after apply)
+               + ssl_server_handshake = (known after apply)
+               + ssl_server_hello = (known after apply)
+               + ssl_session_id = (known after apply)
+               + status = (known after apply)
+               + tcl = (known after apply)
+               + tcp_nagle = (known after apply)
+               + text = (known after apply)
+               + timeout = (known after apply)
+               + tm_name = &quot;20&quot;
+               + uie = (known after apply)
+               + universal = (known after apply)
+               + value = (known after apply)
+               + virtual = (known after apply)
+               + vlan = (known after apply)
+               + vlan_id = (known after apply)
+               + wam = (known after apply)
+               + write = (known after apply)
+          }
+       }
+   }
+
+ # bigip_ltm_pool.mypool will be created
+ + resource &quot;bigip_ltm_pool&quot; &quot;mypool&quot; {
+ + allow_nat = &quot;yes&quot;
+ + allow_snat = &quot;yes&quot;
+ + id = (known after apply)
+ + load_balancing_mode = &quot;round-robin&quot;
+ + monitors = [
+ + &quot;/Common/http&quot;,
+ ]
+ + name = &quot;/Common/mypool&quot;
+ + reselect_tries = (known after apply)
+ + service_down_action = (known after apply)
+ + slow_ramp_time = (known after apply)
+ }
+
+ Plan: 2 to add, 0 to change, 0 to destroy.
+
+ Do you want to perform these actions?
+   Terraform will perform the actions described above.
+   Only &#39;yes&#39; will be accepted to approve.
+
+   Enter a value: yes
+
+ bigip_ltm_pool.mypool: Creating...
+ bigip_ltm_pool.mypool: Creation complete after 0s [id=/Common/mypool]
+ bigip_ltm_policy.test-policy: Creating...
+ bigip_ltm_policy.test-policy: Creation complete after 0s [id=test-policy]
+
+ Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">apply</span></code> failed with an error, read the error message and fix the error that occurred. At this stage, it is likely to be a syntax error in the configuration.</p>
+<p>If the plan was created successfully, Terraform will now pause and wait for approval before proceeding. If anything in the plan seems incorrect or dangerous, it is safe to exit here with no changes made to your infrastructure. If the plan looks acceptable, so type <code class="docutils literal notranslate"><span class="pre">yes</span></code> at the confirmation prompt to proceed.</p>
+<p>You can now verify the new policy created by Terraform in BIG-IP.</p>
+<p>Terraform also wrote some data into the <code class="docutils literal notranslate"><span class="pre">terraform.tfstate</span> <span class="pre">file</span></code>. This state file is important; it keeps track of the IDs of created resources so that Terraform knows what it is managing. This file must be saved and distributed to anyone who will run Terraform. It is generally recommended to setup <a href="https://www.terraform.io/docs/state/remote.html" target="_blank">remote state</a> when working with Terraform, to share the state automatically, but this is not necessary for simple situations like this Getting Started guide.</p>
+<p>You can inspect the current state using <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">show</span></code>:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span>$ terraform show
+# bigip_ltm_policy.test-policy:
+resource &quot;bigip_ltm_policy&quot; &quot;test-policy&quot; {
+    controls = [
+        &quot;forwarding&quot;,
+    ]
+    id = &quot;test-policy&quot;
+    name = &quot;/common/test-policy&quot;
+    requires = [
+        &quot;http&quot;,
+    ]
+    strategy = &quot;/Common/first-match&quot;
+
+    rule {
+        name = &quot;rule6&quot;
+
+        action {
+             asm = false
+             avr = false
+             cache = false
+             carp = false
+             classify = false
+             code = 0
+             compress = false
+             cookie_hash = false
+             cookie_insert = false
+             cookie_passive = false
+             cookie_rewrite = false
+             decompress = false
+             defer = false
+             destination_address = false
+             disable = false
+             enable = false
+             expiry_secs = 0
+             forward = true
+             hash = false
+             http = false
+             http_basic_auth = false
+             http_cookie = false
+             http_header = false
+             http_host = false
+             http_referer = false
+             http_reply = false
+             http_set_cookie = false
+             http_uri = false
+             insert = false
+             l7dos = false
+             length = 0
+             log = false
+             ltm_policy = false
+             offset = 0
+             pem = false
+             persist = false
+             pin = false
+             pool = &quot;/Common/mypool&quot;
+             port = 0
+             redirect = false
+             remove = false
+             replace = false
+             request = false
+             request_adapt = false
+             reset = false
+             response = false
+             response_adapt = false
+             select = false
+             server_ssl = false
+             set_variable = false
+             source_address = false
+             ssl_client_hello = false
+             ssl_server_handshake = false
+             ssl_server_hello = false
+             ssl_session_id = false
+             status = 0
+             tcl = false
+             tcp_nagle = false
+             timeout = 0
+             tm_name = &quot;20&quot;
+             uie = false
+             universal = false
+             vlan_id = 0
+             wam = false
+             write = false
+        }
+    }
+}
+
+# bigip_ltm_pool.mypool:
+resource &quot;bigip_ltm_pool&quot; &quot;mypool&quot; {
+    allow_nat = &quot;yes&quot;
+    allow_snat = &quot;yes&quot;
+    id = &quot;/Common/mypool&quot;
+    load_balancing_mode = &quot;round-robin&quot;
+    monitors = [
+        &quot;/Common/http&quot;,
+    ]
+    name = &quot;/Common/mypool&quot;
+    reselect_tries = 0
+    service_down_action = &quot;none&quot;
+    slow_ramp_time = 0
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="generating-a-big-ip-provider-binary">
+<h2>Generating a BIG-IP Provider Binary<a class="headerlink" href="#generating-a-big-ip-provider-binary" title="Permalink to this headline">¶</a></h2>
+<p>Use the following steps to build a Terraform BIG-IP provider binary:</p>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://golang.org/doc/install">Go</a> 1.11</li>
+<li>Terraform <a class="reference internal" href="installing.html"><span class="doc">installed</span></a></li>
+</ul>
+<p><strong>To build locally</strong></p>
+<ol class="arabic simple">
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/F5Networks/terraform-provider-bigip.git</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">terraform-provider-bigip</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">GOFLAGS=-mod=vendor</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">go</span> <span class="pre">build</span></code></li>
+<li>Move the binary to the current working directory where Terraform config files are located.</li>
+</ol>
+<p>What’s Next?</p>
+<ul class="simple">
+<li><a class="reference internal" href="support.html"><span class="doc">Support</span></a></li>
+<li><a class="reference internal" href="../index.html#revision-history"><span class="std std-ref">Revision History</span></a></li>
+</ul>
+</div>
+</div>
+
+
+     </div>
+    
+     <div class="row next-prev-btn-row">
+       <div class="col-lg-12">
+       
+        <a href="installing.html" title="Installing Terraform" accesskey="p" class="btn btn-primary left"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Previous</a>
+       
+       
+          <a href="support.html" title="Support" accesskey="n" class="btn btn-primary right">Next <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+       
+     </div>
+     </div>
+    
+
+    </article>
+  </div>
+
+</div>
+
+
+  <div id="clouddocs-footer"></div>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script src="../_static/js/index.js"></script>
+  <script src="../_static/js/bootstrap.min.js"></script>
+  <script src="../_static/js/clouddocs.js"></script>
+  <script src="../_static/js/jquery.appear.js"></script>
+  <script src="../_static/js/printThis.js"></script>
+  </body>
+</html>
