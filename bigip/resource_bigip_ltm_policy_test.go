@@ -500,6 +500,29 @@ func TestAccBigipLtmPolicy_create_newpoolbehavior(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmPolicyIssue794TestCases(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ltm_policy_issue794.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/policy-issue-591"),
+					testCheckPolicyExists("/Common/policy_issue794_tc1"),
+					testCheckPolicyExists("/Common/policy_issue794_tc2"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.policy_issue794_tc1", "strategy", "first-match"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.policy_issue794_tc1", "name", "/Common/policy_issue794_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.policy_issue794_tc2", "strategy", "first-match"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.policy_issue794_tc2", "name", "/Common/policy_issue794_tc2"),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipLtmPolicy_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

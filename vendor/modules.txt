@@ -42,10 +42,10 @@ github.com/apparentlymart/go-textseg/v13/textseg
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20230227165314-9b31aa3d380e
+# github.com/f5devcentral/go-bigip v0.0.0-20230412170344-5684f43111ff
 ## explicit
 github.com/f5devcentral/go-bigip
-# github.com/f5devcentral/go-bigip/f5teem v0.0.0-20230227165314-9b31aa3d380e
+# github.com/f5devcentral/go-bigip/f5teem v0.0.0-20230412170344-5684f43111ff
 ## explicit; go 1.13
 github.com/f5devcentral/go-bigip/f5teem
 # github.com/fatih/color v1.13.0

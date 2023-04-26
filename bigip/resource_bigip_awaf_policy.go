@@ -579,7 +579,9 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		if policyWaf.Template.Name != "" && polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
-
+		if policyWaf.ApplicationLanguage != "" {
+			polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = policyWaf.ApplicationLanguage
+		}
 		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v
@@ -626,6 +628,17 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileTypeList
 		} else {
 			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileType
+		}
+		hostName := make([]interface{}, len(policyWaf.HostNames))
+		for i, v := range policyWaf.HostNames {
+			hostName[i] = v
+		}
+		_, hostTyOK := polJsn1.Policy.(map[string]interface{})["host-names"]
+		if hostTyOK {
+			hostNameList := append(polJsn1.Policy.(map[string]interface{})["host-names"].([]interface{}), hostName...)
+			polJsn1.Policy.(map[string]interface{})["host-names"] = hostNameList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["host-names"] = hostName
 		}
 		if policyWaf.Description != "" {
 			polJsn1.Policy.(map[string]interface{})["description"] = policyWaf.Description
