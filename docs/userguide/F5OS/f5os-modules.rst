@@ -8,8 +8,9 @@ This topic describes how to manage the F5OS tenant.
 Prerequisites
 --------------
 
-- |f5OS_terraform-Dwnlds|  v0.13.x or later
-- |f5OS_go|  v1.18 or later
+- |f5OS_terraform-Dwnlds|  v1.0 or later
+
+.. f5OS_go|  v1.18 or later
 
 .. _f5os_tenantEx:
 
@@ -44,20 +45,24 @@ The following example demonstrates a resource used to manage F5OS tenant.
 **Optional parameters**
 
 - ``cpu_cores`` (integer) - The number of vCPUs you want added to the tenant. Required for create operations.
-- ``cryptos`` (string) - Whether crypto and compression hardware offload should be enabled on the tenant. We recommend it is enabled, otherwise crypto and compression may be processed in CPU.
-- ``deployment_file`` (string) - Deployment file used for BIG-IP-Next . Required for if type is BIG-IP-Next.
-- ``nodes`` (integer list) - List of integers. Specifies on which blades nodes the tenants are deployed. Required for create operations. For single blade platforms like rSeries only the value of 1 should be provided.
+- ``cryptos`` (string) - Whether crypto and compression hardware offload should be enabled on the tenant. We recommend it is enabled,
+  otherwise crypto and compression may be processed in CPU.
+- ``nodes`` (integer list) - List of integers. Specifies on which blades nodes the tenants are deployed. Required for create operations.
+  For single blade platforms like rSeries only the value of 1 should be provided.
 - ``running_state`` (string) - Desired running_state of the tenant.
 - ``timeout`` (integer) - The number of seconds to wait for image import to finish.
 - ``type`` (string) - Name of the tenant image to be used. Required for create operations
 - ``virtual_disk_size`` (integer) - Minimum virtual disk size required for Tenant deployment
 - ``vlans`` (integer list) - The existing VLAN IDs in the chassis partition that should be added to the tenant. The order
-  of these VLANs is ignored. This module orders the VLANs automatically, if you deliberately re-order them in subsequent tasks, this module will not register a change. Required for create operations
+  of these VLANs is ignored. This module orders the VLANs automatically, if you deliberately re-order them in subsequent tasks,
+  this module will not register a change. Required for create operations.
+
+.. for when Next is in LA: deployment_file`` (string) - Deployment file used for BIG-IP-Next (currently limited access). Required for if type is BIG-IP-Next (coming soon).
 
 **Read-only parameters**
 
-- ``id`` (string) - Tenant identifier
-- ``status`` (string) - Tenant status
+- ``id`` (string) - Tenant identifier.
+- ``status`` (string) - Tenant status.
 
 .. _f5os_tenantExImg:
 
@@ -94,7 +99,7 @@ The following example demonstrates a resource used to manage F5OS tenant image.
 **Read-only parameters**
 
 - ``id`` (string) - Example identifier.
-- ``status`` (string) - Status of imported image
+- ``status`` (string) - Status of imported image.
 
 
 

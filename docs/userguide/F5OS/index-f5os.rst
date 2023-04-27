@@ -9,12 +9,16 @@ Controller (ADC) solution, F5 rSeries, bridges the gap between traditional and m
 API-first platform designed to meet the needs of your traditional and emerging applications.
 
 F5 VELOS and F5 rSeries rely on a Kubernetes-based platform layer (F5OS) that is tightly integrated with F5’s Traffic
-Management Operating System (TMOS) software, aligning with your modern architecture plans. This new microservices platform
-layer powers the next-generation of BIG-IP software, BIG-IP Next, which is built to offer greater automatability, scalability,
+Management Operating System (TMOS) software, aligning with your modern architecture plans. F5OS Terraform provider for F5
+VELOS and F5 rSeries helps you automate configurations and interactions with various services provided by F5 VELOS platform
+and F5 rSeries appliances. F5OS Terraform provider is open source and |f5_terraform_F5OSgithub|.
+
+
+.. HIDDEN until LA for NEXT: This new microservices platform
+layer powers the next-generation of BIG-IP software, BIG-IP Next (currently limited access), which is built to offer greater automatability, scalability,
 and ease-of-use for organizations running applications on-premises, in the cloud, or at the edge.
 
-F5OS Terraform provider for F5 VELOS and F5 rSeries helps you automate configurations and interactions with various services
-provided by F5 VELOS platform and F5 rSeries appliances. F5OS Terraform provider is open source and |f5_terraform_F5OSgithub|.
+
 
 For more information:
 
@@ -30,23 +34,21 @@ These F5OS versions are supported in these Terraform versions.
 
 **F5 VELOS**
 
-+-------------------------+----------------------+----------------------+
-| VELOS F5OS version      | Terraform 0.14       | Terraform 0.13       |
-+=========================+======================+======================+
-| 1.4.1                   | X                    | X                    |
-+-------------------------+----------------------+----------------------+
-| 1.3.1                   | X                    | X                    |
-+-------------------------+----------------------+----------------------+
++-------------------------+----------------------+----------------------+----------------------+
+| VELOS F5OS version      | Terraform 1.2        | Terraform 1.3        | Terraform 1.4        |
++=========================+======================+======================+======================+
+| 1.5.1                   | X                    | X                    |        X             |
++-------------------------+----------------------+----------------------+----------------------+
+
 
 **F5 rSeries**
 
-+-------------------------+----------------------+----------------------+
-| rSeries F5OS version    | Terraform 0.14       | Terraform 0.13       |
-+=========================+======================+======================+
-| 1.2.0                   | X                    | X                    |
-+-------------------------+----------------------+----------------------+
-| 1.1.0                   | X                    | X                    |
-+-------------------------+----------------------+----------------------+
++-------------------------+----------------------+----------------------+----------------------+
+| rSeries F5OS version    | Terraform 1.2        | Terraform 1.3        | Terraform 1.4        |
++=========================+======================+======================+======================+
+| 1.4.0                   | X                    | X                    |        X             |
++-------------------------+----------------------+----------------------+----------------------+
+
 
 **Supported Resources**
 
@@ -59,7 +61,7 @@ F5OS Terraform provider currently supports the following modules for F5OS-based 
 +---------------------------------+--------------------------------------------------------------------------------------------+
 | velos_partition                 | Manage partitions on the VELOS chassis.                                                    |
 +---------------------------------+--------------------------------------------------------------------------------------------+
-| velos_partition_wait            | Waits for the specified timeout value for the partition to match the desired state.        |
+| velos_partition_wait            | Wait for the specified timeout value for the partition to match the desired state.         |
 +---------------------------------+--------------------------------------------------------------------------------------------+
 | velos_partition_change_password | Manage password of a particular user on a partition.                                       |
 +---------------------------------+--------------------------------------------------------------------------------------------+
@@ -73,7 +75,7 @@ F5OS Terraform provider currently supports the following modules for F5OS-based 
 +---------------------------------+--------------------------------------------------------------------------------------------+
 | f5os_tenant                     | Manage F5OS tenant configuration.                                                          |
 +---------------------------------+--------------------------------------------------------------------------------------------+
-| velos_tenant_wait               | Waits for a tenant to be in a desired running state.                                       |
+| velos_tenant_wait               | Wait  for a tenant to be in a desired running state.                                       |
 +---------------------------------+--------------------------------------------------------------------------------------------+
 
 \* Use this module with partitions that have existing physical interfaces.
