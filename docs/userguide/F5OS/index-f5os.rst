@@ -14,9 +14,7 @@ VELOS and F5 rSeries helps you automate configurations and interactions with var
 and F5 rSeries appliances. F5OS Terraform provider is open source and |f5_terraform_F5OSgithub|.
 
 
-.. HIDDEN until LA for NEXT: This new microservices platform
-layer powers the next-generation of BIG-IP software, BIG-IP Next (currently limited access), which is built to offer greater automatability, scalability,
-and ease-of-use for organizations running applications on-premises, in the cloud, or at the edge.
+.. HIDDEN until LA for NEXT: This new microservices platform layer powers the next-generation of BIG-IP software, BIG-IP Next (currently limited access), which is built to offer greater automatability, scalability, and ease-of-use for organizations running applications on-premises, in the cloud, or at the edge.
 
 
 
