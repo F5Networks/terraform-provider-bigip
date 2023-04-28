@@ -25,59 +25,60 @@ provided by F5 VELOS platform and F5 rSeries appliances.
 
 .. code-block:: javascript
 
-    variable "tenant_name" {
-      description = "the name of the tenant"
-    }
+   variable "tenant_name" {
+     description = "the name of the tenant"
+   }
 
-    variable "tenant_image_name" {
-      description = "the name of the image that is to be used for the tenant"
-    }
+   variable "tenant_image_name" {
+     description = "the name of the image that is to be used for the tenant"
+   }
 
-    variable "tenant_deployment_file" {
-      description = "the name of deployment file used for deploying the tenant"
-    }
+   variable "tenant_type" {
+     description = "type of the tenant"
+     default     = "BIG-IP-Next"
+   }
 
-    variable "tenant_type" {
-      description = "type of the tenant"
-      default = "BIG-IP-Next"
-    }
+   variable "cpu_cores" {
+     description = "the number of vCPUs to be added to the tenant"
+     default     = 8
+   }
 
-    variable "cpu_cores" {
-      description = "the number of vCPUs to be added to the tenant"
-      default = 8
-    }
+   variable "running_state" {
+     description = "the desired state for the tenant, should be either 'configured' or 'deployed'"
+     default     = "deployed"
+   }
 
-    variable "running_state" {
-      description = "the desired state for the tenant, should be either 'configured' or 'deployed'"
-      default = "deployed"
-    }
+   variable "mgmt_ip" {
+     description = "ip address of the tenant"
+   }
 
-    variable "mgmt_ip" {
-      description = "ip address of the tenant"
-    }
+   variable "mgmt_gateway" {
+     description = "management gateway for the tenant"
+   }
 
-    variable "mgmt_gateway" {
-      description = "management gateway for the tenant"
-    }
+   variable "mgmt_prefix" {
+     description = "tenant management CIDR prefix"
+   }
 
-    variable "mgmt_prefix" {
-      description = "tenant management CIDR prefix"
-    }
+   variable "timeout" {
+     description = "the number of seconds to wait for the tenant to have the desired running state"
+     default     = 360
+   }
 
-    variable "timeout" {
-      description = "the number of seconds to wait for the tenant to have the desired running state"
-      default = 360
-    }
+   variable "disk_size" {
+     description = "minimum virtual disk size required for tenant deployment"
+     default     = 15
+   }
 
-    variable "disk_size" {
-      description = "minimum virtual disk size required for tenant deployment"
-      default = 15
-    }
+   variable "vlans" {
+     description = "list of vlans"
+     default     = []
+   }
 
-    variable "new_passwd" {
-      description = "new password for the bigip next tenant"
-      default = ""
-    }
+   variable "new_passwd" {
+     description = "new password for the bigip next tenant"
+     default     = ""
+   }
 
 .. _f5os_inputs:
 
@@ -85,19 +86,18 @@ provided by F5 VELOS platform and F5 rSeries appliances.
 
 .. code-block:: javascript
 
-    cpu_cores 				= 8
-    cryptos		 			= "disabled"
-    tenant_deployment_file 	= "BIG-IP-Next-0.10.0-4.38.5+0.0.14.yaml"
-    id 						= (known after apply)
-    tenant_image_name 		= "BIG-IP-Next-0.10.0-4.38.5+0.0.14"
-    mgmt_gateway 			= "10.1.10.253"
-    mgmt_ip 				= "10.1.10.1"
-    mgmt_prefix 			= 24
-    tenant_name 			= "testnext"
-    running_state 			= "deployed"
-    timeout 				= 360
-    tenant_type 			= "BIG-IP-Next"
-    disk_size 				= 15
+   cpu_cores            = 8
+   cryptos              = "disabled"
+   tenant_image_name    = "BIGIP-17.1.0-0.0.16.ALL-F5OS.qcow2.zip.bundle"
+   mgmt_gateway         = "10.1.10.253"
+   mgmt_ip              = "10.1.10.1"
+   mgmt_prefix          = 24
+   tenant_name          = "mybigip"
+   running_state        = "deployed"
+   timeout              = 360
+   tenant_type          = "BIG-IP"
+   disk_size            = 82
+   vlans                = [3]
 
 .. _f5os_outputs:
 
@@ -105,9 +105,9 @@ provided by F5 VELOS platform and F5 rSeries appliances.
 
 .. code-block:: javascript
 
-    output "tenant_status" {
-      value = tenant_status
-    }
+   output "tenant_status" {
+     value        = tenant_status
+   }
 
 .. _f5os_providers:
 
@@ -115,20 +115,21 @@ provided by F5 VELOS platform and F5 rSeries appliances.
 
 .. code-block:: javascript
 
-    terraform {
-      required_providers {
-        f5os = {
-          source  = "F5Networks/f5os"
-          version = "1.0.0"
-        }
-      }
-    }
+   terraform {
+     required_providers {
+       f5os = {
+         source  = "F5Networks/f5os"
+         version = "1.0.0"
+       }
+     }
+   }
 
-    provider "f5os" {
-      host 		= "10.10.100.100"
-      username 	= "username"
-      password 	= "passwd"
-    }
+   provider "f5os" {
+     host        = "10.10.100.100"
+     username    = "username"
+     password    = "passwd"
+}
+
 
 .. _f5os_main:
 
@@ -136,50 +137,27 @@ provided by F5 VELOS platform and F5 rSeries appliances.
 
 .. code-block:: javascript
 
-    resource "random_string" "dynamic_password" {
-      length      = 16
-      min_upper   = 1
-      min_lower   = 1
-      min_numeric = 1
-      special     = false
-    }
+   resource "random_string" "dynamic_password" {
+     length       = 16
+     min_upper    = 1
+     min_lower    = 1
+     min_numeric  = 1
+     special      = false
+   }
 
-    resource "f5os_tenant" "bigip_next_tenant" {
-      name 				= var.tenant_name
-      image_name 		= var.tenant_image_name
-      deployment_file 	= var.tenant_deployment_file
-      mgmt_ip 			= var.mgmt_ip
-      mgmt_prefix 		= var.mgmt_prefix
-      mgmt_gateway 		= var.mgmt_gateway
-      cpu_cores 		= var.cpu_cores
-      running_state 	= var.running_state
-      type 				= var.tenant_type
-      virtual_disk_size = var.disk_size
-
-      provisioner "local-exec" {
-        command = <<EOF
-          if [ ${var.running_state} = "deployed" ]
-          then
-            num_seconds=100
-            expected_http=200
-            endpoint="https://${var.mgmt_ip}:5443/gui"
-            for((i=0; i<$num_seconds; i++)); do
-              http_resp=$(curl -k -s -o /dev/null -w "%%{http_code}" $endpoint)
-              if [ $http_resp -eq $expected_http ]; then
-                curl -k -u admin:admin \
-                --header 'Content-Type: application/json' \
-                -X PUT https://${var.mgmt_ip}:5443/api/v1/me \
-                --data '{"newPassword": "${var.new_passwd != "" ? var.new_passwd : random_string.dynamic_password.result}", "currentPassword": "admin"}'
-                exit 0
-              fi
-              sleep 2
-            done
-            echo "Could not change the password, maybe the tenant is not yet in the running state"
-            exit 1
-          fi
-        EOF
-      }
-    }
+   resource "f5os_tenant" "bigip_next_tenant" {
+     name                = var.tenant_name
+     image_name          = var.tenant_image_name
+     deployment_file     = var.tenant_deployment_file
+     mgmt_ip             = var.mgmt_ip
+     mgmt_prefix         = var.mgmt_prefix
+     mgmt_gateway        = var.mgmt_gateway
+     cpu_cores           = var.cpu_cores
+     running_state       = var.running_state
+     type                = var.tenant_type
+     virtual_disk_size   = var.disk_size
+     vlans               = var.vlans
+   }
 
 .. _f5os_deploy:
 
@@ -215,38 +193,41 @@ Deploying BIG-IP on VELOS
 
    .. code-block:: console
 
-      # f5os_tenant.bigip_next_tenant will be created
+      # module.next_on_velos.f5os_tenant.bigip_next_tenant will be created
       + resource "f5os_tenant" "bigip_next_tenant" {
-              + cpu_cores = 8
-              + cryptos = "disabled"
-              + deployment_file = "BIG-IP-Next-0.10.0-4.38.5+0.0.14.yaml"
-              + id = (known after apply)
-              + image_name = "BIG-IP-Next-0.10.0-4.38.5+0.0.14"
-              + mgmt_gateway = "10.1.10.253"
-              + mgmt_ip = "10.1.10.1"
-              + mgmt_prefix = 24
-              + name = "testnext"
-              + running_state = "deployed"
-              + status = (known after apply)
-              + timeout = 360
-              + type = "BIG-IP-Next"
-              + virtual_disk_size = 15
- 	          }
-      # random_string.dynamic_password will be created
+              + cpu_cores           = 8
+              + cryptos             = "disabled"
+              + id                  = (known after apply)
+              + image_name          = "BIGIP-17.1.0-0.0.16.ALL-F5OS.qcow2.zip.bundle"
+              + mgmt_gateway        = "10.1.10.253"
+              + mgmt_ip             = "10.1.10.1"
+              + mgmt_prefix         = 24
+              + name                = "mybigip"
+              + running_state       = "deployed"
+              + status              = (known after apply)
+              + timeout             = 360
+              + type                = "BIG-IP"
+              + virtual_disk_size   = 82
+              + vlans               = [
+                  + 3,
+                ]
+        }
+
+      # module.next_on_velos.random_string.dynamic_password will be created
       + resource "random_string" "dynamic_password" {
-              + id = (known after apply)
-              + length = 16
-              + lower = true
-              + min_lower = 1
-              + min_numeric = 1
-              + min_special = 0
-              + min_upper = 1
-              + number = true
-              + numeric = true
-              + result = (known after apply)
-              + special = false
-              + upper = true
-            }
+              + id           = (known after apply)
+              + length       = 16
+              + lower        = true
+              + min_lower    = 1
+              + min_numeric  = 1
+              + min_special  = 0
+              + min_upper    = 1
+              + number       = true
+              + numeric      = true
+              + result       = (known after apply)
+              + special      = false
+              + upper        = true
+             }
 
       Plan: 2 to add, 0 to change, 0 to destroy.
       Changes to Outputs: ``+ tenant_status = (known after apply)``
@@ -254,7 +235,7 @@ Deploying BIG-IP on VELOS
    a. Use ``bigip-velos`` to save your plan.
 
 3. Use ``Terraform Apply`` to execute the changes defined by your Terraform configuration and create, update, or destroy resources.
-   To perform exactly the previous example actions, run the following command to apply the plan.
+   To perform the previous example actions, run the following ``apply`` command and apply the plan:
 
    ``terraform apply "bigip-velos"``
 
@@ -262,46 +243,30 @@ Deploying BIG-IP on VELOS
 
    .. code-block:: console
 
-        $ terraform apply "bigip-velos"
-        random_string.dynamic_password: Creating...
-        random_string.dynamic_password: Creation complete after 0s [id=TlROhi9CjZVUPq6E]
-        f5os_tenant.bigip_next_tenant: Creating...
-        f5os_tenant.bigip_next_tenant: Still creating... [10s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [20s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [30s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [40s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [50s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m0s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m10s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m20s elapsed]
-        f5os_tenant.bigip_next_tenant: Provisioning with 'local-exec'...
-        f5os_tenant.bigip_next_tenant (local-exec): Executing: ["/bin/sh" "-c" " if [ deployed = \"deployed\" ]\n then\n num_seconds=100\n expected_http=200\n endpoint=\"https://10.1.10.1:5443/gui\"\n for((i=0; i<$num_seconds; i++)); do\n http_resp=$(curl -k -s -o /dev/null -w \"%{http_code}\" $endpoint)\n if [ $http_resp -eq $expected_http ]; then\n curl -k -u admin:admin \\\n --header 'Content-Type: application/json' \\\n -X PUT https://10.1.10.1:5443/api/v1/me \\\n --data '{\"newPassword\": \"F5site02\", \"currentPassword\": \"admin\"}'\n exit 0\n fi\n sleep 2\n done\n echo \"Could not change the password, maybe the tenant is not yet in the running state\"\n exit 1\n fi\n"]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m30s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m40s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [1m50s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m0s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m10s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m20s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m30s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m40s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [2m50s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [3m0s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [3m10s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [3m20s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [3m30s elapsed]
-        f5os_tenant.bigip_next_tenant: Still creating... [3m40s elapsed]
-        f5os_tenant.bigip_next_tenant (local-exec):	  % Total	 % Received	% Xferd	Average Speed	Time	Time	Time	Current
-        f5os_tenant.bigip_next_tenant (local-exec):    								Dload  Upload 	Total 	Spent 	Left 	Speed
-        f5os_tenant.bigip_next_tenant (local-exec):   0     0	 0     0 	0 	  0 	0 	   0 --:--:-- --:--:-- --:--:--      0
-        f5os_tenant.bigip_next_tenant (local-exec):   0     0	 0     0 	0 	  0 	0 	   0 --:--:-- --:--:-- --:--:--      0
-        f5os_tenant.bigip_next_tenant (local-exec): 100    55    0     0  100    55 	0 	  36  0:00:01  0:00:01 --:--:--     36
-        f5os_tenant.bigip_next_tenant: Creation complete after 3m42s [id=testnext]
+      $ terraform apply "bigip-velos"
+      module.next_on_velos.random_string.dynamic_password: Creating...
+      module.next_on_velos.random_string.dynamic_password: Creation complete after 0s [id=3XnnlQdoILSgi3Ik]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Creating...
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [10s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [20s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [30s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [40s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [50s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m0s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m10s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m20s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m30s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m40s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [1m50s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Still creating... [2m0s elapsed]
+      module.next_on_velos.f5os_tenant.bigip_next_tenant: Creation complete after 2m10s [id=testcbip]
 
-        Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+      Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 
-        Outputs:
+      Outputs:
 
-        tenant_status = "Configured"
+      tenant_status = "Running"
+
 
 
 

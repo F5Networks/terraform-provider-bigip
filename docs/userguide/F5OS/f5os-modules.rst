@@ -49,6 +49,8 @@ The following example demonstrates a resource used to manage F5OS tenant.
   otherwise crypto and compression may be processed in CPU.
 - ``nodes`` (integer list) - List of integers. Specifies on which blades nodes the tenants are deployed. Required for create operations.
   For single blade platforms like rSeries only the value of 1 should be provided.
+- ``deployment_file`` (string) - Deployment file used for BIG-IP-Next (currently limited access). Required for if type
+  is BIG-IP-Next (limited access coming soon).
 - ``running_state`` (string) - Desired running_state of the tenant.
 - ``timeout`` (integer) - The number of seconds to wait for image import to finish.
 - ``type`` (string) - Name of the tenant image to be used. Required for create operations
@@ -57,7 +59,7 @@ The following example demonstrates a resource used to manage F5OS tenant.
   of these VLANs is ignored. This module orders the VLANs automatically, if you deliberately re-order them in subsequent tasks,
   this module will not register a change. Required for create operations.
 
-.. for when Next is in LA: deployment_file`` (string) - Deployment file used for BIG-IP-Next (currently limited access). Required for if type is BIG-IP-Next (coming soon).
+
 
 **Read-only parameters**
 

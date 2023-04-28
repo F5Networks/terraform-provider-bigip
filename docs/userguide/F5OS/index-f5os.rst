@@ -9,12 +9,12 @@ Controller (ADC) solution, F5 rSeries, bridges the gap between traditional and m
 API-first platform designed to meet the needs of your traditional and emerging applications.
 
 F5 VELOS and F5 rSeries rely on a Kubernetes-based platform layer (F5OS) that is tightly integrated with F5’s Traffic
-Management Operating System (TMOS) software, aligning with your modern architecture plans. F5OS Terraform provider for F5
-VELOS and F5 rSeries helps you automate configurations and interactions with various services provided by F5 VELOS platform
-and F5 rSeries appliances. F5OS Terraform provider is open source and |f5_terraform_F5OSgithub|.
+Management Operating System (TMOS) software, aligning with your modern architecture plans. This new microservices platform
+layer powers the next-generation of BIG-IP software, BIG-IP Next (limited access coming soon), which is built to offer
+greater automatability, scalability, and ease-of-use for organizations running applications on-premises, in the cloud, or at the edge.
 
-
-.. HIDDEN until LA for NEXT: This new microservices platform layer powers the next-generation of BIG-IP software, BIG-IP Next (currently limited access), which is built to offer greater automatability, scalability, and ease-of-use for organizations running applications on-premises, in the cloud, or at the edge.
+F5OS Terraform provider for F5 VELOS and F5 rSeries helps you automate configurations and interactions with various
+services provided by F5 VELOS platform and F5 rSeries appliances. F5OS Terraform provider is open source and |f5_terraform_F5OSgithub|.
 
 
 
