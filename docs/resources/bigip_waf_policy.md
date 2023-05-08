@@ -117,6 +117,10 @@ The `file_types` block supports the following:
 
 * `type` - (Optional , `string`) Determines the type of the name attribute. Only when setting the type to `wildcard` will the special wildcard characters in the name be interpreted as such
 
+* `allowed` - (Optional , `bool`) Determines whether the file type is allowed or disallowed. In either of these cases the VIOL_FILETYPE violation is issued (if enabled) for an incoming request- 
+  * No allowed file type matched the file type of the request.
+  * The file type of the request matched a disallowed file type.
+
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:

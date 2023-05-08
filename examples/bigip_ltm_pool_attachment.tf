@@ -65,9 +65,8 @@ resource "bigip_ltm_pool_attachment" "pa_tc6" {
 }
 
 resource "bigip_ltm_pool_attachment" "pa_tc7" {
-  pool = bigip_ltm_pool.pa_tc1.name
-  node = "1.1.11.2:80"
-  //node                  = ""
+  pool                  = bigip_ltm_pool.pa_tc1.name
+  node                  = "1.1.11.2:80"
   ratio                 = 2
   connection_limit      = 2
   connection_rate_limit = 2

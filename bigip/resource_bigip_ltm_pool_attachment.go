@@ -71,6 +71,12 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 					"This helps detect Denial of Service attacks, where connection requests flood a pool member. Setting this to 0 turns off connection limits. The default is 0.",
 				Computed: true,
 			},
+			"monitor": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "Specifies the health monitors that the system uses to monitor this pool member,value can be `none` (or) `default` (or) list of monitors joined with and ( ex: `/Common/test_monitor_pa_tc1 and /Common/gateway_icmp`)",
+			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -187,6 +193,7 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			PriorityGroup:   d.Get("priority_group").(int),
 			RateLimit:       d.Get("connection_rate_limit").(string),
 			Ratio:           d.Get("ratio").(int),
+			Monitor:         d.Get("monitor").(string),
 		}
 		if node1.FQDN.Name != "" {
 			log.Printf("[DEBUG] adding autopopulate for fqdn ")
@@ -220,6 +227,7 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			PriorityGroup:   d.Get("priority_group").(int),
 			RateLimit:       d.Get("connection_rate_limit").(string),
 			Ratio:           d.Get("ratio").(int),
+			Monitor:         d.Get("monitor").(string),
 		}
 		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
 		if !IsValidIP(ipNode) {
