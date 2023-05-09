@@ -27,40 +27,37 @@ func resourceBigipSysIapp() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-
 			"jsonfile": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "Address of the Iapp which needs to be Iappensed",
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Description: "Address of the Iapp which needs to be Iappensed",
 			},
-
 			"partition": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "Common",
 				Description: "Address of the Iapp which needs to be Iappensed",
 			},
-
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Address of the Iapp which needs to be Iappensed",
 			},
-
 			"devicegroup": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "none",
+				Computed:    true,
 				Description: "BIG-IP password",
 			},
 			"execute_action": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "BIG-IP password",
 			},
 			"inherited_devicegroup": {
@@ -69,7 +66,6 @@ func resourceBigipSysIapp() *schema.Resource {
 				Default:     "true",
 				Description: "BIG-IP password",
 			},
-
 			"inherited_traffic_group": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -82,13 +78,11 @@ func resourceBigipSysIapp() *schema.Resource {
 				Default:     "enabled",
 				Description: "BIG-IP password",
 			},
-
 			"template": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-
 			"template_modified": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -100,7 +94,6 @@ func resourceBigipSysIapp() *schema.Resource {
 				Optional:    true,
 				Description: "BIG-IP password",
 			},
-
 			"traffic_group": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -219,12 +212,9 @@ func resourceBigipSysIapp() *schema.Resource {
 func resourceBigipSysIappCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	description := d.Get("description").(string)
 
 	log.Println("[INFO] Creating Iapp       " + name)
 	p := dataToIapp(d)
-	d.SetId(name)
-	d.SetId(description)
 	err := client.CreateIapp(&p)
 
 	if err != nil {
@@ -257,6 +247,7 @@ func resourceBigipSysIappRead(ctx context.Context, d *schema.ResourceData, meta 
 	log.Println("[INFO] Reading Iapp " + name)
 
 	p, err := client.Iapp(name)
+	log.Printf("[INFO] Iapp Info:%+v", p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Iapp  (%s) (%v)", name, err)
 		return diag.FromErr(err)
@@ -269,22 +260,13 @@ func resourceBigipSysIappRead(ctx context.Context, d *schema.ResourceData, meta 
 	_ = d.Set("name", name)
 	_ = d.Set("partition", p.Partition)
 	_ = d.Set("devicegroup", p.DeviceGroup)
-
-	_ = d.Set("execute_action", p.ExecuteAction)
-
 	_ = d.Set("inherited_devicegroup", p.InheritedDevicegroup)
-
 	_ = d.Set("inherited_traffic_group", p.InheritedTrafficGroup)
-
 	_ = d.Set("strict_updates", p.StrictUpdates)
-
 	_ = d.Set("template_modified", p.TemplateModified)
-
 	_ = d.Set("template_prerequisite_errors", p.TemplatePrerequisiteErrors)
 	_ = d.Set("traffic_group", p.TrafficGroup)
-	_ = d.Set("tables", p.Tables)
 	_ = d.Set("lists", p.Lists)
-	_ = d.Set("variables", p.Variables)
 	_ = d.Set("metadata", p.Metadata)
 	return nil
 }
@@ -301,19 +283,33 @@ func resourceBigipSysIappDelete(ctx context.Context, d *schema.ResourceData, met
 	return nil
 }
 
-// // This function "IappToData...." helps to unmarshal json to Go struct
-// func IappToData(p *bigip.Iapp, d *schema.ResourceData) error {
-//
-//	return nil
-// }
-
 func dataToIapp(d *schema.ResourceData) bigip.Iapp {
 	var p bigip.Iapp
-
 	jsonblob := []byte(d.Get("jsonfile").(string))
 	err := json.Unmarshal(jsonblob, &p)
 	if err != nil {
 		fmt.Println("error", err)
+	}
+	if _, ok := d.GetOk("execute_action"); ok {
+		p.ExecuteAction = d.Get("execute_action").(string)
+	}
+	if _, ok := d.GetOk("partition"); ok {
+		p.Partition = d.Get("partition").(string)
+	}
+	if _, ok := d.GetOk("template_modified"); ok {
+		p.TemplateModified = d.Get("template_modified").(string)
+	}
+	if _, ok := d.GetOk("strict_updates"); ok {
+		p.StrictUpdates = d.Get("strict_updates").(string)
+	}
+	if _, ok := d.GetOk("description"); ok {
+		p.Description = d.Get("description").(string)
+	}
+	if _, ok := d.GetOk("inherited_devicegroup"); ok {
+		p.InheritedDevicegroup = d.Get("inherited_devicegroup").(string)
+	}
+	if _, ok := d.GetOk("inherited_traffic_group"); ok {
+		p.InheritedTrafficGroup = d.Get("inherited_traffic_group").(string)
 	}
 	return p
 }

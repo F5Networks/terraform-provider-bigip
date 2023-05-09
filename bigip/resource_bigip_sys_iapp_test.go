@@ -15,9 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TEST_IAPP_NAME = "/" + TestPartition + "/test-iapp"
+var TestIappName = "/" + TestPartition + "/test-iapp"
 
-var TEST_IAPP_RESOURCE = `
+var TestIappResource = `
 	resource "bigip_sys_iapp" "test-iapp" {
 		name = "test-iapp"
 		jsonfile = <<EOF
@@ -142,8 +142,6 @@ var TEST_IAPP_RESOURCE = `
 					}
 			]
 	}
-	 
-
 EOF
 	}`
 
@@ -156,9 +154,9 @@ func TestAccBigipSysIapp_create(t *testing.T) {
 		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IAPP_RESOURCE,
+				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TEST_IAPP_NAME),
+					testCheckIappExists(TestIappName),
 				),
 			},
 		},
@@ -174,11 +172,11 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 		CheckDestroy: testCheckIappDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_IAPP_RESOURCE,
+				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TEST_IAPP_NAME),
+					testCheckIappExists(TestIappName),
 				),
-				ResourceName:      TEST_IAPP_NAME,
+				ResourceName:      TestIappName,
 				ImportState:       false,
 				ImportStateVerify: true,
 			},
