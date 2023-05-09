@@ -223,6 +223,11 @@ func resourceBigipAwafPolicy() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice([]string{"explicit", "wildcard"}, false),
 						},
+						"allowed": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Determines whether the file type is allowed or disallowed. In either of these cases the VIOL_FILETYPE violation is issued (if enabled) for an incoming request- \n 1. No allowed file type matched the file type of the request. \n 2. The file type of the request matched a disallowed file type",
+						},
 					},
 				},
 			},
@@ -488,6 +493,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		for _, item := range val.(*schema.Set).List() {
 			fileType.Name = item.(map[string]interface{})["name"].(string)
 			fileType.Type = item.(map[string]interface{})["type"].(string)
+			fileType.Allowed = item.(map[string]interface{})["allowed"].(bool)
 			fileTypes = append(fileTypes, fileType)
 		}
 	}
