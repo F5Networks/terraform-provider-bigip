@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
 	"regexp"
 	"strings"
@@ -76,6 +77,13 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Computed:    true,
 				Optional:    true,
 				Description: "Specifies the health monitors that the system uses to monitor this pool member,value can be `none` (or) `default` (or) list of monitors joined with and ( ex: `/Common/test_monitor_pa_tc1 and /Common/gateway_icmp`)",
+			},
+			"state": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled", "forced_offline"}, false),
+				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline",
 			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
@@ -195,6 +203,20 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			Ratio:           d.Get("ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 		}
+
+		userState := d.Get("state").(string)
+		if userState == "enabled" {
+			config.Session = "user-enabled"
+			config.State = "user-up"
+		}
+		if userState == "disabled" {
+			config.Session = "user-disabled"
+			config.State = "user-up"
+		}
+		if userState == "forced_offline" {
+			config.Session = "user-disabled"
+			config.State = "user-down"
+		}
 		if node1.FQDN.Name != "" {
 			log.Printf("[DEBUG] adding autopopulate for fqdn ")
 			var autoPopulate string
@@ -230,6 +252,19 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			Monitor:         d.Get("monitor").(string),
 		}
 		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
+		userState := d.Get("state").(string)
+		if userState == "enabled" {
+			config.Session = "user-enabled"
+			config.State = "user-up"
+		}
+		if userState == "disabled" {
+			config.Session = "user-disabled"
+			config.State = "user-up"
+		}
+		if userState == "forced_offline" {
+			config.Session = "user-disabled"
+			config.State = "user-down"
+		}
 		if !IsValidIP(ipNode) {
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {
