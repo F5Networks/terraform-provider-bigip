@@ -110,6 +110,8 @@ resource "bigip_ltm_pool_attachment" "k8sprod" {
 
 * `monitor` - (Optional) Specifies the health monitors that the system uses to monitor this pool member,value can be `none` (or) `default` (or) list of monitors joined with and ( ex: `/Common/test_monitor_pa_tc1 and /Common/gateway_icmp`).
 
+* `state` - (Optional) Specifies the state the pool member should be in,value can be `enabled` (or) `disabled` (or) `forced_offline`).
+
 * `fqdn_autopopulate` - (Optional) Specifies whether the system automatically creates ephemeral nodes using the IP addresses returned by the resolution of a DNS query for a node defined by an FQDN. The default is enabled
 
 ## Importing
