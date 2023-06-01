@@ -112,6 +112,9 @@ func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	if certificate == nil {
+		return diag.Errorf("Reading Certificate Failed with certificate :%+v", certificate)
+	}
 	log.Printf("[INFO] Certificate content:%+v", certificate)
 	_ = d.Set("name", certificate.Name)
 	_ = d.Set("partition", certificate.Partition)

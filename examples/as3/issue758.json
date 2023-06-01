@@ -1,0 +1,75 @@
+{
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "id": "example-declaration-01",
+        "label": "Sample 1",
+        "remark": "Simple HTTP application with round robin pool",
+        "Sample_new": {
+            "class": "Tenant",
+            "defaultRouteDomain": 0,
+            "Application_1": {
+                "class": "Application",
+                "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "allowVlans": [
+                        {"bigip": "/Common/trans_notexist"}
+                    ],
+                    "virtualAddresses": [
+                        "10.0.1.10"
+                    ],
+                    "pool": "web_pool"
+                },
+                "web_pool": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "192.0.1.100",
+                                "192.0.1.110"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "Sample_03": {
+            "class": "Tenant",
+            "defaultRouteDomain": 0,
+            "Application_3": {
+                "class": "Application",
+                "template": "http",
+                "serviceMain": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "10.2.2.11"
+                    ],
+                    "pool": "web_pool3"
+                },
+                "web_pool3": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "192.3.1.102",
+                                "192.3.1.112"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -48,3 +48,19 @@ resource "bigip_ltm_monitor" "TC5" {
   name   = "/Common/test_monitor_tc5"
   parent = "/Common/mysql"
 }
+
+resource "bigip_ltm_monitor" "TC6" {
+  name     = "/Common/HC4_HTTP_OUR_CUSTOM_MONITOR_PARENT"
+  parent   = "/Common/http"
+  send     = "GET /some/path\r\n"
+  timeout  = "999"
+  interval = "990"
+}
+resource "bigip_ltm_monitor" "TC7" {
+  name          = "/Common/HC4_HTTP_OUR_CUSTOM_MONITOR_CHILD"
+  parent        = "/Common/http"
+  custom_parent = bigip_ltm_monitor.TC6.name
+  send          = "GET /some/path\r\n"
+  timeout       = "999"
+  interval      = "980"
+}

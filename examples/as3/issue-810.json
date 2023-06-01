@@ -1,0 +1,51 @@
+{
+  "class": "AS3",
+  "action": "deploy",
+  "persist": true,
+  "declaration": {
+    "class": "ADC",
+    "schemaVersion": "3.16.0",
+    "label": "snat_pool_existing",
+    "remark": "reference_snat_pool",
+    "Sample_new": {
+      "class": "Tenant",
+      "defaultRouteDomain": 0,
+      "Application_1": {
+        "class": "Application",
+        "template": "http",
+        "serviceMain": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.0.1.10"
+          ],
+          "pool": "web_pool",
+          "snat": {
+            "use": "test-snat-pool"
+          }
+        },
+        "web_pool": {
+          "class": "Pool",
+          "monitors": [
+            "http"
+          ],
+          "members": [
+            {
+              "servicePort": 80,
+              "serverAddresses": [
+                "192.0.1.100",
+                "192.0.1.110"
+              ]
+            }
+          ]
+        },
+        "test-snat-pool": {
+          "class": "SNAT_Pool",
+          "snatAddresses": [
+            "192.0.96.10",
+            "192.0.96.11"
+          ]
+        }
+      }
+    }
+  }
+}

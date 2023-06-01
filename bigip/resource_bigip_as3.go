@@ -196,7 +196,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 		if len(successfulTenants) != len(tenantList) {
-			log.Printf("%v", err)
+			return diag.FromErr(err)
 		}
 	}
 	if !client.Teem {
@@ -284,60 +284,6 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	return nil
 }
 
-// func resourceBigipAs3Exists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//	log.Printf("[INFO] Checking if As3 config exists in BIGIP")
-//	var name string
-//	var tList string
-//
-//	if d.Get("as3_json") != nil {
-//		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
-//	}
-//
-//	if d.Id() != "" && tList != "" {
-//		name = tList
-//	} else {
-//		name = d.Id()
-//	}
-//	applicationList := d.Get("application_list").(string)
-//	tenantFilter := d.Get("tenant_filter").(string)
-//	if tenantFilter != "" {
-//		if !contains(strings.Split(name, ","), tenantFilter) {
-//			log.Printf("[WARNING]tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
-//		} else {
-//			name = tenantFilter
-//		}
-//	}
-//	if name != "" {
-//		as3Resp, err := client.GetAs3(name, applicationList)
-//		if err != nil {
-//			log.Printf("[ERROR] Unable to retrieve json ")
-//			if err.Error() == "unexpected end of JSON input" {
-//				log.Printf("[ERROR] %v", err)
-//				return true, nil
-//			}
-//			d.SetId("")
-//			return false, err
-//		}
-//		log.Printf("[INFO] AS3 response Body:%+v", as3Resp)
-//		if as3Resp == "" {
-//			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-//			return false, nil
-//		}
-//	} else if d.Get("task_id") != nil {
-//		taskResponse, err := client.Getas3TaskResponse(d.Get("task_id").(string))
-//		if err != nil {
-//			d.SetId("")
-//			return false, nil
-//		}
-//		if taskResponse == nil {
-//			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-//			return false, nil
-//		}
-//	}
-//	return true, nil
-// }
-
 func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	as3Json := d.Get("as3_json").(string)
@@ -380,7 +326,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 		if len(successfulTenants) != len(tenantList) {
-			log.Printf("%v", err)
+			return diag.FromErr(err)
 		}
 	}
 	createdTenants = d.Get("tenant_list").(string)

@@ -63,6 +63,8 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 
 * `parent` - (Required,type `string`)  Parent monitor for the system to use for setting initial values for the new monitor.
 
+* `custom_parent` - (Optional,type `string`)  Custom parent monitor for the system to use for setting initial values for the new monitor.
+
 * `interval` - (Optional,type `int`) Specifies, in seconds, the frequency at which the system issues the monitor check when either the resource is down or the status of the resource is unknown,value of `interval` should be always less than `timeout`. Default is `5`.
 
 * `up_interval` - (Optional,type `int`) Specifies the interval for the system to use to perform the health check when a resource is up. The default is `0(Disabled)`
