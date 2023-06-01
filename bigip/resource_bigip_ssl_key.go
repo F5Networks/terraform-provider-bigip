@@ -108,13 +108,16 @@ func resourceBigipSslKeyRead(ctx context.Context, d *schema.ResourceData, meta i
 		}
 	}
 	certkey, err := client.GetKey(name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	if certkey == nil {
+		return diag.Errorf("Reading Certificate key failed with key:%v", certkey)
+	}
 	log.Printf("[INFO] SSL key content:%+v", certkey)
 	_ = d.Set("name", certkey.Name)
 	_ = d.Set("partition", certkey.Partition)
 	_ = d.Set("full_path", certkey.FullPath)
-	if err != nil {
-		return diag.FromErr(err)
-	}
 	return nil
 }
 

@@ -18,6 +18,7 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBigipLtmPoolAttachment() *schema.Resource {
@@ -70,6 +71,19 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 				Description: "Specifies the maximum number of connections-per-second allowed for a pool member. When the number of connections-per-second reaches the limit for a given pool member, the system drops (UDP) or resets (TCP) additional connection requests. " +
 					"This helps detect Denial of Service attacks, where connection requests flood a pool member. Setting this to 0 turns off connection limits. The default is 0.",
 				Computed: true,
+			},
+			"monitor": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "Specifies the health monitors that the system uses to monitor this pool member,value can be `none` (or) `default` (or) list of monitors joined with and ( ex: `/Common/test_monitor_pa_tc1 and /Common/gateway_icmp`)",
+			},
+			"state": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "enabled",
+				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled", "forced_offline"}, false),
+				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline",
 			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
@@ -187,6 +201,21 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			PriorityGroup:   d.Get("priority_group").(int),
 			RateLimit:       d.Get("connection_rate_limit").(string),
 			Ratio:           d.Get("ratio").(int),
+			Monitor:         d.Get("monitor").(string),
+		}
+
+		userState := d.Get("state").(string)
+		if userState == "enabled" {
+			config.Session = "user-enabled"
+			config.State = "user-up"
+		}
+		if userState == "disabled" {
+			config.Session = "user-disabled"
+			config.State = "user-up"
+		}
+		if userState == "forced_offline" {
+			config.Session = "user-disabled"
+			config.State = "user-down"
 		}
 		if node1.FQDN.Name != "" {
 			log.Printf("[DEBUG] adding autopopulate for fqdn ")
@@ -220,8 +249,22 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			PriorityGroup:   d.Get("priority_group").(int),
 			RateLimit:       d.Get("connection_rate_limit").(string),
 			Ratio:           d.Get("ratio").(int),
+			Monitor:         d.Get("monitor").(string),
 		}
 		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
+		userState := d.Get("state").(string)
+		if userState == "enabled" {
+			config.Session = "user-enabled"
+			config.State = "user-up"
+		}
+		if userState == "disabled" {
+			config.Session = "user-disabled"
+			config.State = "user-up"
+		}
+		if userState == "forced_offline" {
+			config.Session = "user-disabled"
+			config.State = "user-down"
+		}
 		if !IsValidIP(ipNode) {
 			var autoPopulate string
 			if d.Get("fqdn_autopopulate").(string) == "" {

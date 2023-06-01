@@ -333,6 +333,58 @@ func TestAccBigipLtmPoolAttachment_Delete(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmPoolAttachment_StateSet(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmPoolattachState(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.11:80", true),
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.12:80", true),
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.13:80", true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc2"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "forced_offline"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc3"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "enabled"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmPoolAttachment_ModifyState(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmPoolattachStateChange(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.11:80", true),
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.12:80", true),
+					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.13:80", true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "forced_offline"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc2"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc3"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "disabled"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmPoolAttachmentTestCases(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -490,6 +542,72 @@ func testaccbigipltmPoolattachIssu661() string {
   			pool = bigip_ltm_pool.example.name
   			node = "2.3.2.2%30:8080"
   			connection_limit = 11
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmPoolattachState() string {
+	tfConfig := `
+		resource "bigip_ltm_pool" "pa_tc1" {
+			name = "/Common/test_pool_pa_tc1"
+			monitors = ["/Common/http"]
+			allow_nat = "yes"
+			allow_snat = "yes"
+			description = "Test-Pool-Sample"
+			load_balancing_mode = "round-robin"
+			slow_ramp_time = "5"
+			service_down_action = "reset"
+			reselect_tries = "2"
+		}
+		resource "bigip_ltm_pool_attachment" "pa_tc1" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.11:80"
+		  state 				= "disabled"
+		}
+		
+		resource "bigip_ltm_pool_attachment" "pa_tc2" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.12:80"
+		  state 				= "forced_offline"
+		}
+		
+		resource "bigip_ltm_pool_attachment" "pa_tc3" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.13:80"
+		  state 				= "enabled"
+		}`
+	return tfConfig
+}
+
+func testaccbigipltmPoolattachStateChange() string {
+	tfConfig := `
+		resource "bigip_ltm_pool" "pa_tc1" {
+			name = "/Common/test_pool_pa_tc1"
+			monitors = ["/Common/http"]
+			allow_nat = "yes"
+			allow_snat = "yes"
+			description = "Test-Pool-Sample"
+			load_balancing_mode = "round-robin"
+			slow_ramp_time = "5"
+			service_down_action = "reset"
+			reselect_tries = "2"
+		}
+		resource "bigip_ltm_pool_attachment" "pa_tc1" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.11:80"
+		  state 				= "forced_offline"
+		}
+		
+		resource "bigip_ltm_pool_attachment" "pa_tc2" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.12:80"
+		  state 				= "enabled"
+		}
+		
+		resource "bigip_ltm_pool_attachment" "pa_tc3" {
+		  pool                  = bigip_ltm_pool.pa_tc1.name
+		  node                  = "10.10.100.13:80"
+		  state 				= "disabled"
 		}`
 	return tfConfig
 }

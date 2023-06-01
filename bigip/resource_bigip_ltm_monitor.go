@@ -59,6 +59,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				ForceNew:     true,
 				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp or /Common/tcp_half_open or /Common/smtp.",
 			},
+			"custom_parent": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Custom parent monitor to inherit from.",
+			},
 			"interval": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -260,7 +265,11 @@ func resourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, me
 			_ = d.Set("reverse", m.Reverse)
 			_ = d.Set("transparent", m.Transparent)
 			_ = d.Set("ip_dscp", m.IPDSCP)
-			_ = d.Set("parent", m.ParentMonitor)
+			if _, ok := d.GetOk("custom_parent"); ok {
+				_ = d.Set("custom_parent", m.ParentMonitor)
+			} else {
+				_ = d.Set("parent", m.ParentMonitor)
+			}
 			_ = d.Set("time_until_up", m.TimeUntilUp)
 			_ = d.Set("manual_resume", m.ManualResume)
 			_ = d.Set("destination", m.Destination)
@@ -349,6 +358,9 @@ func monitorParent(s string) string {
 
 func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.Monitor {
 	config.ParentMonitor = d.Get("parent").(string)
+	if _, ok := d.GetOk("custom_parent"); ok {
+		config.ParentMonitor = d.Get("custom_parent").(string)
+	}
 	config.Adaptive = d.Get("adaptive").(string)
 	config.AdaptiveLimit = d.Get("adaptive_limit").(int)
 	config.Compatibility = d.Get("compatibility").(string)

@@ -22,14 +22,14 @@ resource "bigip_sys_iapp" "simplehttp" {
 
 ## Argument Reference
 
-* `name` -  Name of the iApp.
-
-* `jsonfile` - Refer to the Json file which will be deployed on F5 BIG-IP.
-
-
+* `name` - (Required, type `string`) Name of the iApp.
+* `jsonfile` - (Required, type `string`) Refer to the Json file which will be deployed on F5 BIG-IP.
+* `description` - (Optional type `string`) - User defined description.
+* `partition` - (Optional type `string`) - Displays the administrative partition within which the application resides.
+* `execute_action` - (Optional type `string`) - Run the specified template action associated with the application, this option can be specified in `json` with `executeAction`, value specified with `execute_action` attribute take precedence over `json` value
 
 ## Example Usage of Json file
-```
+```json
 {  
 "fullPath":"/Common/simplehttp.app/simplehttp",
 "generation":222,
@@ -161,18 +161,14 @@ resource "bigip_sys_iapp" "simplehttp" {
 }
 ```
 
- * `description` - User defined description.
- * `deviceGroup` - The name of the device group that the application service is assigned to.
- * `executeAction` - Run the specified template action associated with the application.
- * `inheritedDevicegroup`- Read-only. Shows whether the application folder will automatically remain with the same device-group as its parent folder. Use 'device-group default' or 'device-group non-default' to set this.
- * `inheritedTrafficGroup` - Read-only. Shows whether the application folder will automatically remain with the same traffic-group as its parent folder. Use 'traffic-group default' or 'traffic-group non-default' to set this.
- * `partition` - Displays the administrative partition within which the application resides.
- * `strictUpdates` - Specifies whether configuration objects contained in the application may be directly modified, outside the context of the system's application management interfaces.
- * `template` - The template defines the configuration for the application. This may be changed after the application has been created to move the application to a new template.
- * `templateModified` - Indicates that the application template used to deploy the application has been modified. The application should be updated to make use of the latest changes.
- * `templatePrerequisiteErrors` - Indicates any missing prerequisites associated with the template that defines this application.
- * `trafficGroup` - The name of the traffic group that the application service is assigned to.
- * `lists` - string values
- * `metadata` - User defined generic data for the application service. It is a name and value pair.
- * `tables` - Values provided like pool name, nodes etc.
- * `variables` - Name, values, encrypted or not
+## Attribute Reference
+
+* `inherited_devicegroup` - Read-only. Shows whether the application folder will automatically remain with the same device-group as its parent folder. Use 'device-group default' or 'device-group non-default' to set this.
+* `inherited_traffic_group` - Read-only. Shows whether the application folder will automatically remain with the same traffic-group as its parent folder. Use 'traffic-group default' or 'traffic-group non-default' to set this.
+* `strict_updates` - Specifies whether configuration objects contained in the application may be directly modified, outside the context of the system's application management interfaces.
+* `template` - The template defines the configuration for the application. This may be changed after the application has been created to move the application to a new template.
+* `template_modified` - Indicates that the application template used to deploy the application has been modified. The application should be updated to make use of the latest changes.
+* `template_prerequisite_errors` - Indicates any missing prerequisites associated with the template that defines this application.
+* `traffic_group` - The name of the traffic group that the application service is assigned to.
+* `lists` - string values
+* `metadata` - User defined generic data for the application service. It is a name and value pair.

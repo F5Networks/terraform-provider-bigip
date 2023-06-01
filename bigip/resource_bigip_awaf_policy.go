@@ -189,8 +189,102 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the unique name of the GraphQL profile you are creating or editing",
+						},
+						"metachar_elementcheck": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Specifies when checked (enabled) that the system enforces the security policy settings of a meta character for the GraphQL profile. After you enable this setting, the system displays a list of meta characters. The default is enabled",
+						},
+						"attack_signatures_check": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Specifies when checked (enabled) that you want attack signatures and threat campaigns to be detected on this GraphQL profile and possibly override the security policy settings of an attack signature or threat campaign specifically for this GraphQL profile. After you enable this setting, the system displays a list of attack signatures and and threat campaigns. The default is enabled",
+						},
+						"defense_attributes": {
+							Type:        schema.TypeSet,
+							Description: "defense_attributes settings for policy",
+							Optional:    true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"allow_introspection_queries": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Description: "Introspection queries can also be enforced to prevent attackers from using them to\nunderstand the API structure and potentially breach an application",
+									},
+									"tolerate_parsing_warnings": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Description: "Specifies, when checked (enabled), that the system does not report when the security enforcer encounters warnings while parsing GraphQL content. Specifies when cleared (disabled), that the security policy reports when the security enforcer encounters warnings while parsing GraphQL content. The default setting is disabled",
+									},
+									"maximum_batched_queries": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Specifies the highest number of batched queries allowed by the security policy. The default setting is 10",
+									},
+									"maximum_structure_depth": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Specifies the greatest nesting depth found in the GraphQL structure allowed by the security policy. The default setting is a specified depth of 10.",
+									},
+									"maximum_total_length": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Specifies the longest length, in bytes, allowed by the security policy of the request payload, or parameter value, where the GraphQL data was found. The default setting is a specified length of 100000 bytes",
+									},
+									"maximum_value_length": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Specifies the longest length (in bytes) of the longest GraphQL element value in the document allowed by the security policy. The default setting is a specified length of 10000 bytes",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"ip_exceptions": {
+				Type:        schema.TypeSet,
+				Description: "An IP address exception is an IP address that you want the system to treat in a specific way for a security policy. For example, you can specify IP addresses from which the system should always trust traffic, IP addresses for which you do not want the system to generate learning suggestions for the traffic, and IP addresses for which you want to exclude information from the logs",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the IP address that you want the system to trust",
+						},
+						"ip_mask": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the netmask of the exceptional IP address. This is an optional field",
+						},
+						"description": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Specifies a brief description of the IP address",
+						},
+						"block_requests": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"always", "never", "policy-default"}, false),
+						},
+						"trustedby_policybuilder": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Specifies when enabled the Policy Builder considers traffic from this IP address as being safe",
+						},
+						"ignore_anomalies": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Specifies when enabled that the system considers this IP address legitimate and does not take it into account when performing brute force prevention",
+						},
+						"ignore_ipreputation": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Specifies when enabled that the system considers this IP address legitimate even if it is found in the IP Intelligence database (a database of questionable IP addresses)",
 						},
 					},
 				},
@@ -222,6 +316,11 @@ func resourceBigipAwafPolicy() *schema.Resource {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice([]string{"explicit", "wildcard"}, false),
+						},
+						"allowed": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Determines whether the file type is allowed or disallowed. In either of these cases the VIOL_FILETYPE violation is issued (if enabled) for an incoming request- \n 1. No allowed file type matched the file type of the request. \n 2. The file type of the request matched a disallowed file type",
 						},
 					},
 				},
@@ -465,8 +564,20 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	var graphProfles []bigip.GraphqlProfile
 	if val, ok := d.GetOk("graphql_profiles"); ok {
 		var gralPro bigip.GraphqlProfile
+		var defenceAtt bigip.DefenseAttribute
 		for _, item := range val.(*schema.Set).List() {
 			gralPro.Name = item.(map[string]interface{})["name"].(string)
+			gralPro.MetacharElementCheck = item.(map[string]interface{})["metachar_elementcheck"].(bool)
+			gralPro.AttackSignaturesCheck = item.(map[string]interface{})["attack_signatures_check"].(bool)
+			for _, defAttr := range item.(map[string]interface{})["defense_attributes"].(*schema.Set).List() {
+				defenceAtt.MaximumStructureDepth = defAttr.(map[string]interface{})["maximum_structure_depth"]
+				defenceAtt.MaximumTotalLength = defAttr.(map[string]interface{})["maximum_total_length"]
+				defenceAtt.MaximumValueLength = defAttr.(map[string]interface{})["maximum_value_length"]
+				defenceAtt.MaximumBatchedQueries = defAttr.(map[string]interface{})["maximum_batched_queries"]
+				defenceAtt.TolerateParsingWarnings = defAttr.(map[string]interface{})["tolerate_parsing_warnings"].(bool)
+				defenceAtt.AllowIntrospectionQueries = defAttr.(map[string]interface{})["allow_introspection_queries"].(bool)
+			}
+			gralPro.DefenseAttributes = defenceAtt
 			graphProfles = append(graphProfles, gralPro)
 		}
 	}
@@ -482,16 +593,34 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		}
 	}
 	policyWaf.HostNames = hostNames
+
 	var fileTypes []bigip.Filetype
 	if val, ok := d.GetOk("file_types"); ok {
 		var fileType bigip.Filetype
 		for _, item := range val.(*schema.Set).List() {
 			fileType.Name = item.(map[string]interface{})["name"].(string)
 			fileType.Type = item.(map[string]interface{})["type"].(string)
+			fileType.Allowed = item.(map[string]interface{})["allowed"].(bool)
 			fileTypes = append(fileTypes, fileType)
 		}
 	}
 	policyWaf.Filetypes = fileTypes
+
+	var ipExceptions []bigip.WhitelistIp
+	if val, ok := d.GetOk("ip_exceptions"); ok {
+		var ipException bigip.WhitelistIp
+		for _, item := range val.(*schema.Set).List() {
+			ipException.IpAddress = item.(map[string]interface{})["ip_address"].(string)
+			ipException.IpMask = item.(map[string]interface{})["ip_mask"].(string)
+			ipException.BlockRequests = item.(map[string]interface{})["block_requests"].(string)
+			ipException.TrustedByPolicyBuilder = item.(map[string]interface{})["trustedby_policybuilder"].(bool)
+			ipException.IgnoreAnomalies = item.(map[string]interface{})["ignore_anomalies"].(bool)
+			ipException.IgnoreIpReputation = item.(map[string]interface{})["ignore_ipreputation"].(bool)
+			ipExceptions = append(ipExceptions, ipException)
+		}
+	}
+	policyWaf.WhitelistIps = ipExceptions
+
 	policyWaf.Type = d.Get("type").(string)
 	policyWaf.Template = struct {
 		Name string `json:"name,omitempty"`
@@ -629,6 +758,19 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		} else {
 			polJsn1.Policy.(map[string]interface{})["filetypes"] = fileType
 		}
+
+		ipException := make([]interface{}, len(policyWaf.WhitelistIps))
+		for i, v := range policyWaf.WhitelistIps {
+			ipException[i] = v
+		}
+		_, ipExceOK := polJsn1.Policy.(map[string]interface{})["whitelist-ips"]
+		if ipExceOK {
+			ipExceptionList := append(polJsn1.Policy.(map[string]interface{})["whitelist-ips"].([]interface{}), ipException...)
+			polJsn1.Policy.(map[string]interface{})["whitelist-ips"] = ipExceptionList
+		} else {
+			polJsn1.Policy.(map[string]interface{})["whitelist-ips"] = ipException
+		}
+
 		hostName := make([]interface{}, len(policyWaf.HostNames))
 		for i, v := range policyWaf.HostNames {
 			hostName[i] = v
