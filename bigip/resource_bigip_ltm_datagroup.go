@@ -127,12 +127,12 @@ func resourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData, 
 
 	name := d.Id()
 	log.Printf("[DEBUG] Retrieving Data Group List %s", name)
-	if d.Get("internal").(bool) {
-		datagroup, err := client.GetInternalDataGroup(name)
-		if err != nil {
-			return diag.FromErr(fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err))
-		}
+	datagroup, err := client.GetInternalDataGroup(name)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err))
+	}
 
+	if datagroup != nil {
 		if datagroup == nil {
 			log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
 			d.SetId("")
