@@ -133,11 +133,6 @@ func resourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if datagroup != nil {
-		if datagroup == nil {
-			log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
-			d.SetId("")
-			return nil
-		}
 		_ = d.Set("name", datagroup.FullPath)
 		_ = d.Set("type", datagroup.Type)
 		for _, record := range datagroup.Records {
