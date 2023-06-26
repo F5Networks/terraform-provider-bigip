@@ -250,10 +250,12 @@ func getEPConfig(ep *bigip.Parameter, d *schema.ResourceData) {
 	}
 	if urlVal, OK := d.GetOk("url"); OK {
 		for _, v := range urlVal.([]interface{}) {
-			ep.URL.Name = v.(map[string]interface{})["name"].(string)
-			ep.URL.Method = v.(map[string]interface{})["method"].(string)
-			ep.URL.Type = v.(map[string]interface{})["type"].(string)
-			ep.URL.Protocol = v.(map[string]interface{})["protocol"].(string)
+			ep1 := bigip.ParameterUrl{}
+			ep1.Name = v.(map[string]interface{})["name"].(string)
+			ep1.Method = v.(map[string]interface{})["method"].(string)
+			ep1.Type = v.(map[string]interface{})["type"].(string)
+			ep1.Protocol = v.(map[string]interface{})["protocol"].(string)
+			ep.URL = ep1
 		}
 	}
 }
