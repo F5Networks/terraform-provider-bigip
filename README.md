@@ -24,13 +24,12 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 These BIG-IP versions are supported in these Terraform versions.
 
-| BIG-IP version	|Terraform 1.x  |	Terraform 0.13  |	Terraform 0.12  | Terraform 0.11  |
+| BIG-IP version	 |Terraform 1.x  |	Terraform 0.13  |	Terraform 0.12  | Terraform 0.11  |
 |-----------------|---------------|-----------------|-----------------|-----------------|
+| BIG-IP 17.x	    |      X        |       X         |       X         |      X          |
 | BIG-IP 16.x	    |      X        |       X         |       X         |      X          |
 | BIG-IP 15.x	    |      X        |       X         |       X         |      X          |
 | BIG-IP 14.x	    | 	   X        |       X         |       X         |      X          |
-| BIG-IP 12.x	    |      X        |      	X         |       X         |      X          | 
-| BIG-IP 13.x	    |      X        |       X         |       X         |      X          |
 
 
 # Documentation
@@ -82,17 +81,12 @@ partition for creating objects. You can change the partition by setting `BIGIP_T
 BIGIP_HOST=f5.mycompany.com BIGIP_USER=foo BIGIP_PASSWORD=secret make testacc
 ```
 
-
 Read [here](https://github.com/hashicorp/terraform/blob/master/.github/CONTRIBUTING.md#running-an-acceptance-test) for
 more information about acceptance testing in Terraform.
 
-# Community Help
-
-We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on Terraform Resources (click the **terraform** channel). There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance. This slack channel community support should **not** be considered a substitute for F5 Technical Support. See the [Slack Channel Statement](slack-channel-statement.md) for guidelines on using this channel.
-
 ## Copyright
 
-Copyright 2014-2020 F5 Networks Inc.
+Copyright 2014-2023 F5 Networks Inc.
 
 ### F5 Networks Contributor License Agreement
 

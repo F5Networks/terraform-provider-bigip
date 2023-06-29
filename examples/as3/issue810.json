@@ -1,0 +1,87 @@
+{
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.20.0",
+        "id": "githubissue810",
+        "remark": "Auto AS3 config",
+        "Common": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "aes_128-256": {
+                    "class": "Cipher_Group",
+                    "allowCipherRules": [
+                        {
+                            "use": "/Common/Shared/aes_128-256_cipher-rules"
+                        }
+                    ]
+                },
+                "aes_128-256_cipher-rules": {
+                    "class": "Cipher_Rule",
+                    "cipherSuites": [
+                        "AES256-SHA256",
+                        "AES128-SHA256",
+                        "AES256-SHA",
+                        "AES128-SHA"
+                    ]
+                },
+                "tcp-progressive-backported_lan-v1.0": {
+                    "class": "TCP_Profile",
+                    "minimumRto": 200,
+                    "slowStart": false,
+                    "synCookieEnable": true,
+                    "synRtoBase": 200
+                },
+                "tcp-progressive-backported_wan-v1.0": {
+                    "class": "TCP_Profile",
+                    "minimumRto": 600,
+                    "synCookieEnable": true,
+                    "synRtoBase": 600
+                },
+                "httpv2.1": {
+                    "class": "HTTP_Profile",
+                    "whiteOutHeader": "Is-SSL-Call",
+                    "xForwardedFor": true,
+                    "proxyType": "reverse",
+                    "serverHeaderValue": "unknown"
+                },
+                "http-compressionv2.0": {
+                    "class": "HTTP_Compress",
+                    "allowHTTP10": true,
+                    "contentTypeIncludes": [
+                        "application/(xml|x-javascript|vnd.ms-excel)"
+                    ],
+                    "preferMethod": "gzip"
+                },
+                "https_redirect1": {
+                    "class": "Endpoint_Policy",
+                    "rules": [
+                        {
+                            "name": "https_redirect_policy_rule",
+                            "actions": [
+                                {
+                                    "event": "request",
+                                    "type": "httpRedirect",
+                                    "location": "tcl:https://[HTTP::host][HTTP::uri]"
+                                }
+                            ]
+                        }
+                    ],
+                    "strategy": "first-match"
+                },
+                "snatpool2": {
+                    "class": "SNAT_Pool",
+                    "snatAddresses": [
+                        "10.10.10.1",
+                        "10.10.10.2",
+                        "10.10.10.3"
+                    ]
+                },
+                "template": "shared"
+            }
+        }
+    }
+}
