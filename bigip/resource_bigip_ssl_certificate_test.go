@@ -17,18 +17,18 @@ import (
 )
 
 var folder, _ = os.Getwd()
-var SSLCERTIFICATE_NAME = "servercert.crt"
-var TEST_SSLCERTIFICATE_NAME = fmt.Sprintf("/%s/%s", TestPartition, SSLCERTIFICATE_NAME)
+var SslcertificateName = "servercert.crt"
+var TestSslcertificateName = fmt.Sprintf("/%s/%s", TestPartition, SslcertificateName)
 
-var TEST_SSL_CERTIFICATE_RESOURCE = `
+var TestSslCertificateResource = `
 resource "bigip_ssl_certificate" "test-cert" {
-        name = "` + SSLCERTIFICATE_NAME + `"
+        name = "` + SslcertificateName + `"
         content = "${file("` + folder + `/../examples/servercert.crt")}"
         partition = "Common"
 }
 `
 
-func TestAccSslCertificateImportToBigip(t *testing.T) {
+func TestAccBigipSslCertificateImportToBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -37,11 +37,51 @@ func TestAccSslCertificateImportToBigip(t *testing.T) {
 		CheckDestroy: testChecksslcertificateDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SSL_CERTIFICATE_RESOURCE,
+				Config: TestSslCertificateResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksslcertificateExists(TEST_SSLCERTIFICATE_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "name", SSLCERTIFICATE_NAME),
+					testChecksslcertificateExists(TestSslcertificateName, true),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "name", SslcertificateName),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.test-cert", "partition", TestPartition),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSslCertificateTCs(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksslcertificateDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_cert_keys.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslcertificateExists("ssl-test-certificate-tc1", true),
+					testChecksslcertificateExists("ssl-test-certificate-tc2", true),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "ssl-test-certificate-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc2", "name", "ssl-test-certificate-tc2"),
+				),
+			},
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_cert_keys.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslcertificateExists("ssl-test-certificate-tc1", true),
+					testChecksslcertificateExists("ssl-test-certificate-tc2", true),
+					testChecksslcertificateExists("ssl-test-certificate-tc10", false),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "ssl-test-certificate-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc2", "name", "ssl-test-certificate-tc2"),
+				),
+			},
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_certificate.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslcertificateExists("ssl-test-certificate-tc1", true),
+					testChecksslcertificateExists("ssl-test-certificate-tc2", true),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "ssl-test-certificate-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc2", "name", "ssl-test-certificate-tc2"),
 				),
 			},
 		},
@@ -56,7 +96,7 @@ func testChecksslcertificateExists(name string, exists bool) resource.TestCheckF
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf("SSL Certificate %s was not created.", name)
+			return fmt.Errorf(" SSL Certificate %s was not created.", name)
 		}
 		if !exists && p != nil {
 			return fmt.Errorf("SSL Certificate %s still exists.", name)

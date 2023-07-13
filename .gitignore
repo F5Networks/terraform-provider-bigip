@@ -36,6 +36,7 @@ website/node_modules
 *.iml
 *.test
 *.tf
+.terraform.lock.hcl
 website/vendor
 keymap
 README.md
