@@ -6,6 +6,7 @@
 examples/*
 examples/aws/*.tf
 build/terraform-provider-bigip
+terraform-provider-bigip
 .idea/
 bin/
 target/
