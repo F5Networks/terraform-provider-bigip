@@ -17,18 +17,18 @@ import (
 )
 
 var folder1, _ = os.Getwd()
-var SSLKEY_NAME = "serverkey.key"
-var TEST_SSLKEY_NAME = fmt.Sprintf("/%s/%s", TestPartition, SSLKEY_NAME)
+var SslkeyName = "serverkey.key"
+var TestSslkeyName = fmt.Sprintf("/%s/%s", TestPartition, SslkeyName)
 
-var TEST_SSL_KEY_RESOURCE = `
+var TestSslKeyResource = `
 resource "bigip_ssl_key" "test-key" {
-        name = "` + SSLKEY_NAME + `"
+        name = "` + SslkeyName + `"
         content = "${file("` + folder1 + `/../examples/serverkey.key")}"
         partition = "` + TestPartition + `"
 }
 `
 
-func TestAccSslKeyImportToBigip(t *testing.T) {
+func TestAccBigipSslKeyImportToBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -37,11 +37,51 @@ func TestAccSslKeyImportToBigip(t *testing.T) {
 		CheckDestroy: testChecksslKeyDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TEST_SSL_KEY_RESOURCE,
+				Config: TestSslKeyResource,
 				Check: resource.ComposeTestCheckFunc(
-					testChecksslkeyExists(TEST_SSLKEY_NAME, true),
-					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "name", SSLKEY_NAME),
+					testChecksslkeyExists(TestSslkeyName, true),
+					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "name", SslkeyName),
 					resource.TestCheckResourceAttr("bigip_ssl_key.test-key", "partition", TestPartition),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSslKeyTCs(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksslKeyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_key.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslkeyExists("ssl-test-key-tc1", true),
+					testChecksslkeyExists("ssl-test-key-tc2", true),
+					testChecksslkeyExists("ssl-test-key-tc100", false),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc1", "name", "ssl-test-key-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc2", "name", "ssl-test-key-tc2"),
+				),
+			},
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_key.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslkeyExists("ssl-test-key-tc1", true),
+					testChecksslkeyExists("ssl-test-key-tc2", true),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc1", "name", "ssl-test-key-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc2", "name", "ssl-test-key-tc2"),
+				),
+			},
+			{
+				Config: loadFixtureString("../examples/bigip_ssl_cert_keys.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslkeyExists("ssl-test-key-tc1", true),
+					testChecksslkeyExists("ssl-test-key-tc2", true),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc1", "name", "ssl-test-key-tc1"),
+					resource.TestCheckResourceAttr("bigip_ssl_key.ssl-test-key-tc2", "name", "ssl-test-key-tc2"),
 				),
 			},
 		},

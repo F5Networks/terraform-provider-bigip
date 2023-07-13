@@ -1,12 +1,71 @@
-provider "bigip" {
-  address  = "xxx.xxx.xxx.xxx"
-  username = "xxxx"
-  password = "xxxx"
-}
+resource "bigip_ssl_key" "ssl-test-key-tc2" {
+  name      = "ssl-test-key-tc2"
+  content   = <<EOT
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDXSTUmCJBauE3D
+Xb1YmDHFP/aTXzjQVBxbLUXvv9VfyxPvteH3l0RuxPJCOzTCpSArYJ5MDlxjH366
+MrsXJWjBVuucidWSFGDikmlvDEhWCb9KemK6300cD3hSwq0O7heY6klJ0VnLGNk1
+uuQdTwfPUM7ZRZzCP5TRiRls8Hi5M4S/h1/9Pqf6j8/5pzwH5juoD+UeboWf9hIM
+5LYUDR+v/7+ymBvaAa6Jl9pUjAtHyiN1swqWAMjGYYwbBpSrFqPLXaSZE/z8dLUZ
+ecI6ZMz+yA0Y9JZ3e4A7EDLsSvwdy5q4mWBMsXzlhiX6c8wWBmhhwqZu3I4WA6ip
+Uv+wWET5AgMBAAECggEBAJBTDKVdsmCPE9q4GfqttRf2JHhxqqXG7WeWdz8dzI62
+lrvpo/4W05Kqx3ntNRaUGnfaAuUb74WoFI4A+nmu44ZRngxIPvv6W2UpIDOI+Wls
+iWgFmfCLSKdaG6Dnz5qltP4XemBZT6gfFWa2zrxzQdoS40i3KTrz4vGBxqDIqTYF
+/9+CSBFP4MiV/xINdXIJX9Z3jY1CLxc2G9AaizhXVUyQLMLplGrFM3xf2Z4QLKiD
+id8WYVlKMacAQtKJ/NoTffwNBqorYjW3s5aGgK0FCP3tyzzkblEC0ytKtphRwFW+
+64SWW7r7FZsJlMuGnd+xeMeoOqcKssDjRR/4o9LK2Y0CgYEA7ERg0PMx85pPxbWk
+73ihbmxnGZmlVfc/so3F1KlxUgZU1/tiABIi/SmSsxUvltA06mtxr50SulF8Aw3h
+HBJ3qiB0mztEgge9obzUIJs/N7QzSlqE4WjdcqkZxUJeE3Gmrfs+0AKCUvNlOA4v
+txAHFMOuwIJYak6tK+tv6ve9G6cCgYEA6UQ7c0Pr7yXp4x76BamGe2QQ3IFAJNSf
+Nh6KHWjkbjn0IOY2zknJRahekj7PDtCUg/mJaahmiBEArXVTHCvYMCsSCpbEXcxO
+jwjAmjT6gu/pY1Z+gwyMTbX2EVmJegrIDkyMPy9J8jk4Xx0OnPjnDifULLBM0kgi
+EEZPn6KVLl8CgYEA4Z/2+POVmzWcwojRhmKjfukEmBzzGCIycRgUeR6K+jLTqSIG
+F106jpq53kz4EkSok8ihW3xbmxQfomcJtx4nqo6t7GPv62DrBd5mkPDQsShj5riE
+tyHGgC3eT1MutdDNxM3u0QPkYsTOv3ZEuMQUjw7D/lE7j+GsXAnM6g1FSXcCgYBS
+UAeCdxdMPl64DHhBgz63T+o7RUizNmwwFrq6AgeJdd3VtibkyFjDwdQNWyiJm8Ss
+hWOd6xSzMvzAOMRpDnetF6W4IteMGcom4vnD8Knthmce7Kib6dOgoHMCUEwYyrEp
+io16xl8boGFp/sDnV1WBQ0C1vEh/c4DBqW3zcNWflQKBgQDa6QQTrqRasMPoqdqv
+BxJsp7Bi8KzJYkMEHnblNvfTu3eW7pxCpIRupi4TKKB29Md8Z2bH0lUPLZ3m3lum
+vY4r7yynOH18JjHzUe5bs/gB1NW3ITWbGRFL6BQRVH8ZI63cuy9m1PMtZyB9PSRh
+MURd/NDXz1I3lAtimR1C3vmgfg==
+-----END PRIVATE KEY-----
 
-resource "bigip_ssl_key" "test-cert" {
-  name      = "serverkey.key"
-  content   = file("serverkey.key")
+EOT
   partition = "Common"
 }
 
+resource "bigip_ssl_key" "ssl-test-key-tc1" {
+  name      = "ssl-test-key-tc1"
+  content   = <<EOT
+-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDMc6YGT9LRlWeI
+kUKbemSk97h/CeAF8Ra2JI+6Gi/ok0sP5Hwg0C8YErlx706dg5V9Wku2lcZftMs4
+rk62x2cJKeMmuXPHiwSpPsX9HltoaKJBo7dQGAP1h0r/oULZmp9ogeHCkWiFsOi7
+pN/2sfjBFBcmrWtIq7fSYH+dzQitGib3rbjO1JE8lQplAeSfzYXwQGhva+HA1g5H
+aOy4VD1AfULEFMOmw3xzvF+y7sdZ9oCpp8I4186fxz/yXoVkPncHFXXyNsdU0kae
+P0N6blial9WdHesWgEJTjk1W/GxQq/fsxcpmDj6XBjz54VR+dCDL5h/6e8Tp47a1
+l34D66aZAgMBAAECggEADHaESWA2TrZX0Fhigg3M8s1y/rOAZ3xR0RqbdFHCV+Aa
+tEZOVsW6CTKjAVIALdPmmfSWJvQsWosv1C2z+KphGormIOcvKpvL1fFQqmReWBgA
+xBWRyB0eqKntpXWUGKW3T+yS8YRhpbyqAz5CtMwWiNaLrrzljFGDbBybyufDvqF8
+l+940pSPZJCePL6cRRNAnKTePWAiW6kXoKT+MOIBSTva6s6p2BULyEjIPnFb0iyv
+z7SDKmm0tUzZDN39pVCbzlnhhPoi6wePkrPaDhGYsghnF6hDq+guAyVM8Pifb/z8
+OY6mgAOv52uyRyLDd42lA6p/gCDHBBEugZnxfKWfsQKBgQDm2N3bR6l7746gTNS0
+if46rNVB3zxorRZznnZVUJFYN8GbVvQzg+I0n1fcSddJVzoIlHdAGsKvmwlSahTf
+viemqLQFBo2oqq/lPEIhHTZNsx9A6RdFdXuIvuFkXTc0Oh0x5s8xNwFf46ypB8u1
+c0NhpvhPvKgpB+DjgV2dzhIihQKBgQDiuoW9fA7TWrzMj/O1AelUoC0AGXwxpBeR
+UjUd+0LaD6UGKIY3Zs/cBphiZRSHE223LTLjNCJgw6o7maaYLCDd5GRlpsvsB9pQ
+1U5GckJwTXrxnZM3uHs21iUuzjlOWU1Vhygg7UrGyrNfmlsscryY3lgMLixZwxyc
+0FxH+3cyBQKBgDJKCkLL4MMsE9EeC7Rs32Je5nJcNGfFVT/IxJSfYZprQxUZI0fZ
+sjyufdBykaDbjLvzw+rGKaVhy+0VSQjY/wBSfi0eGVwmGv2AXBOkroDMxcE5RiWO
+i2Pl2Woo2G7bPiLx2i8pgXYnPiTwmtMjkglC+5M7URLnMXm+Y+uNyeuVAoGAKYLa
+/7FaCYpgbNeiWC6saMkW1CDWY0RW6E1z2jRprgEVRsZepIAXaIJwnftBweVlvhbx
+bTXbYXoRje342X2i2t15ID9ksKdTal9TgIRk86jL7LbcAGSvcn/MuQAa7+Rby1/+
+keDAQxtTshpRvRaYvyheWISPrDOT5oYjjy5USX0CgYBdchFOxx74r3biwdYW8ZMM
+e5WCm8tPu72zttOfWEwxJEVeNKp0rMqkY0guu+z1XW8fpWDoJqfgwuA7RA7O8XHs
+5vfSlmmACAtvB1U0lKPaY8My15DsOW/fXO1on0tuhtEaT+D8FgGrM4LB0JmJd95P
+WLTSkSUQLhEsUQBi9o+uxA==
+-----END PRIVATE KEY-----
+
+EOT
+  partition = "Common"
+}
