@@ -6,6 +6,7 @@
 examples/*
 examples/aws/*.tf
 build/terraform-provider-bigip
+terraform-provider-bigip
 .idea/
 bin/
 target/
@@ -36,6 +37,7 @@ website/node_modules
 *.iml
 *.test
 *.tf
+.terraform.lock.hcl
 website/vendor
 keymap
 README.md

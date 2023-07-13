@@ -14,7 +14,7 @@ require (
 	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20230629161824-6ac8bd4b0a16
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.25.0
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.8.4
 	golang.org/x/text v0.7.0
 )
 
