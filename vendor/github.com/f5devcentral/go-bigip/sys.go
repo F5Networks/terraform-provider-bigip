@@ -304,7 +304,7 @@ type Certificate struct {
 	CreatedBy               string `json:"createdBy,omitempty"`
 	CreateTime              string `json:"createTime,omitempty"`
 	Email                   string `json:"email,omitempty"`
-	ExpirationDate          int    `json:"expirationDate,omitempty"`
+	ExpirationDate          int64  `json:"expirationDate,omitempty"`
 	ExpirationString        string `json:"expirationString,omitempty"`
 	Fingerprint             string `json:"fingerprint,omitempty"`
 	FullPath                string `json:"fullPath,omitempty"`
