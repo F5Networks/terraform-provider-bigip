@@ -132,7 +132,11 @@ func resourceBigipDoCreate(ctx context.Context, d *schema.ResourceData, meta int
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while creating http request with DO json:%v", err))
 	}
-	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	if clientBigip.Token != "" {
+		req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+	} else {
+		req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
@@ -180,10 +184,13 @@ func resourceBigipDoCreate(ctx context.Context, d *schema.ResourceData, meta int
 			log.Printf("[DEBUG]Value of Timeout counter in seconds :%v", math.Ceil(time.Since(start).Seconds()))
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 			req, _ := http.NewRequest("GET", url, nil)
-			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+			if clientBigip.Token != "" {
+				req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+			} else {
+				req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+			}
 			req.Header.Set("Accept", "application/json")
 			req.Header.Set("Content-Type", "application/json")
-
 			taskResp, err := client.Do(req)
 			if taskResp == nil {
 				log.Printf("[DEBUG]taskResp of DO is empty,but continue the loop until timeout \n")
@@ -240,7 +247,11 @@ func resourceBigipDoCreate(ctx context.Context, d *schema.ResourceData, meta int
 		log.Printf("[DEBUG] Didn't get successful response within timeout")
 		url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 		req, _ := http.NewRequest("GET", url, nil)
-		req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+		if clientBigip.Token != "" {
+			req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+		} else {
+			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+		}
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
@@ -292,10 +303,13 @@ func resourceBigipDoRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while creating http request for reading Do config:%v", err))
 	}
-	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	if clientBigip.Token != "" {
+		req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+	} else {
+		req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-
 	resp, err := client.Do(req)
 
 	defer func() {
@@ -353,10 +367,13 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while creating http request with DO json:%v ", err))
 	}
-	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	if clientBigip.Token != "" {
+		req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+	} else {
+		req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-
 	resp, err := client.Do(req)
 
 	defer func() {
@@ -398,10 +415,13 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 			log.Printf("[DEBUG]Value of loop counter :%d", i)
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 			req, _ := http.NewRequest("GET", url, nil)
-			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+			if clientBigip.Token != "" {
+				req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+			} else {
+				req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+			}
 			req.Header.Set("Accept", "application/json")
 			req.Header.Set("Content-Type", "application/json")
-
 			taskResp, err := client.Do(req)
 
 			defer func() {
@@ -458,7 +478,11 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		log.Printf("[DEBUG] Didn't get successful response within timeout")
 		url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 		req, _ := http.NewRequest("GET", url, nil)
-		req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+		if clientBigip.Token != "" {
+			req.Header.Set("X-F5-Auth-Token", clientBigip.Token)
+		} else {
+			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+		}
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
