@@ -71,7 +71,7 @@ func resourceBigipAwafPolicy() *schema.Resource {
 			"application_language": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "utf-8",
+				Default:     "auto-detect",
 				Description: "The character encoding for the web application. The character encoding determines how the policy processes the character sets. The default is Auto detect",
 			},
 			"case_insensitive": {

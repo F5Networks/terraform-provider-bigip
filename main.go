@@ -7,6 +7,7 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/F5Networks/terraform-provider-bigip/bigip"
@@ -14,8 +15,12 @@ import (
 )
 
 func main() {
+	var debug bool
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	plugin.Serve(&plugin.ServeOpts{
+		Debug:        debug,
 		ProviderFunc: bigip.Provider,
 	})
 }

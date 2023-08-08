@@ -119,8 +119,12 @@ func resourceBigipNetSelfIPRead(ctx context.Context, d *schema.ResourceData, met
 
 	// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
 	regex := regexp.MustCompile(`\/Common\/(.+)`)
+	log.Printf("traffic_group:%+v", selfIP.TrafficGroup)
+	_ = d.Set("traffic_group", selfIP.TrafficGroup)
 	trafficGroup := regex.FindStringSubmatch(selfIP.TrafficGroup)
-	_ = d.Set("traffic_group", trafficGroup[1])
+	if len(trafficGroup) > 0 {
+		_ = d.Set("traffic_group", trafficGroup[1])
+	}
 	if selfIP.AllowService == nil {
 		_ = d.Set("port_lockdown", []string{"none"})
 	} else {

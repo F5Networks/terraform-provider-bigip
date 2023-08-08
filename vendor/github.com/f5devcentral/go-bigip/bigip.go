@@ -25,6 +25,7 @@ import (
 	"reflect"
 	"strings"
 	"time"
+	"log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -232,7 +233,8 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	url := fmt.Sprintf(format, b.Host, options.URL)
 	body := bytes.NewReader([]byte(options.Body))
 	req, _ = http.NewRequest(strings.ToUpper(options.Method), url, body)
-	if b.Token != "" {
+	req.SetBasicAuth(b.User, b.Password)
+	if b.Token != "" && b.Transport.Proxy == nil {
 		req.Header.Set("X-F5-Auth-Token", b.Token)
 	} else if options.URL != "mgmt/shared/authn/login" {
 		req.SetBasicAuth(b.User, b.Password)
@@ -243,6 +245,8 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
+
+	log.Printf("Req:%+v",req)
 
 	res, err := client.Do(req)
 	if err != nil {

@@ -10,7 +10,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
+	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 )
@@ -40,7 +43,24 @@ func Client(config *bigip.Config) (*bigip.BigIP, error) {
 		}
 	}
 	if config.Address != "" && config.Username != "" && config.Password != "" {
+		log.Printf("client connection before :%+v", client.Transport.Proxy)
 		client.Transport.TLSClientConfig.InsecureSkipVerify = config.CertVerifyDisable
+		httpProxy, httpProxyOK := os.LookupEnv("HTTP_PROXY")
+		httpsProxy, httpsProxyOK := os.LookupEnv("HTTPS_PROXY")
+		var proxy any
+		if httpProxyOK {
+			proxy, _ = url.Parse(httpProxy)
+		}
+		if httpsProxyOK {
+			proxy, _ = url.Parse(httpsProxy)
+		}
+		//log.Println("HTTP PROXY from Env:", httpproxy.FromEnvironment())
+		if proxy != nil {
+			client.Transport.Proxy = http.ProxyURL(proxy.(*url.URL))
+			client.Transport.TLSClientConfig.InsecureSkipVerify = true
+		}
+		log.Printf("client connection after proxy:%+v", client.Transport.Proxy)
+		time.Sleep(10 * time.Second)
 		if !config.CertVerifyDisable {
 			rootCAs, _ := x509.SystemCertPool()
 			if rootCAs == nil {
