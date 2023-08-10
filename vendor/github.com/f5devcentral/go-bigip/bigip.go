@@ -20,12 +20,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
 	"strings"
 	"time"
-	"log"
 )
 
 var defaultConfigOptions = &ConfigOptions{
@@ -99,20 +100,20 @@ func (r *RequestError) Error() error {
 // NewSession sets up our connection to the BIG-IP system.
 // func NewSession(host, port, user, passwd string, configOptions *ConfigOptions) *BigIP {
 func NewSession(bigipConfig *Config) *BigIP {
-	var url string
+	var urlString string
 	if !strings.HasPrefix(bigipConfig.Address, "http") {
-		url = fmt.Sprintf("https://%s", bigipConfig.Address)
+		urlString = fmt.Sprintf("https://%s", bigipConfig.Address)
 	} else {
-		url = bigipConfig.Address
+		urlString = bigipConfig.Address
 	}
 	if bigipConfig.Port != "" {
-		url = url + ":" + bigipConfig.Port
+		urlString = urlString + ":" + bigipConfig.Port
 	}
 	if bigipConfig.ConfigOptions == nil {
 		bigipConfig.ConfigOptions = defaultConfigOptions
 	}
 	return &BigIP{
-		Host:     url,
+		Host:     urlString,
 		User:     bigipConfig.Username,
 		Password: bigipConfig.Password,
 		Transport: &http.Transport{
@@ -220,34 +221,35 @@ func (client *BigIP) ValidateConnection() error {
 // APICall is used to query the BIG-IP web API.
 func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	var req *http.Request
-	client := &http.Client{
-		Transport: b.Transport,
-		Timeout:   b.ConfigOptions.APICallTimeout,
-	}
 	var format string
 	if strings.Contains(options.URL, "mgmt/") {
 		format = "%s/%s"
 	} else {
 		format = "%s/mgmt/tm/%s"
 	}
-	url := fmt.Sprintf(format, b.Host, options.URL)
+	urlString := fmt.Sprintf(format, b.Host, options.URL)
 	body := bytes.NewReader([]byte(options.Body))
-	req, _ = http.NewRequest(strings.ToUpper(options.Method), url, body)
-	req.SetBasicAuth(b.User, b.Password)
-	if b.Token != "" && b.Transport.Proxy == nil {
+	req, _ = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+	log.Printf(" Transport Before:%+v\n", b.Transport.Proxy)
+	b.Transport.Proxy = func(reqNew *http.Request) (*url.URL, error) {
+		return http.ProxyFromEnvironment(reqNew)
+	}
+	log.Printf(" Transport After:%+v\n", b.Transport.Proxy)
+	client := &http.Client{
+		Transport: b.Transport,
+		Timeout:   b.ConfigOptions.APICallTimeout,
+	}
+	if b.Token != "" {
 		req.Header.Set("X-F5-Auth-Token", b.Token)
 	} else if options.URL != "mgmt/shared/authn/login" {
 		req.SetBasicAuth(b.User, b.Password)
 	}
-
-	//fmt.Println("REQ -- ", options.Method, " ", url," -- ",options.Body)
+	//fmt.Println("REQ -- ", options.Method, " ", urlString," -- ",options.Body)
 
 	if len(options.ContentType) > 0 {
 		req.Header.Set("Content-Type", options.ContentType)
 	}
-
-	log.Printf("Req:%+v",req)
-
+	log.Printf("Req:%+v", req)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -437,7 +439,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 	} else {
 		format = "%s/mgmt/%s"
 	}
-	url := fmt.Sprintf(format, b.Host, options.URL)
+	urlString := fmt.Sprintf(format, b.Host, options.URL)
 	chunkSize := 512 * 1024
 	var start, end int64
 	for {
@@ -453,7 +455,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 			chunk = chunk[:n]
 		}
 		body := bytes.NewReader(chunk)
-		req, _ := http.NewRequest(strings.ToUpper(options.Method), url, body)
+		req, _ := http.NewRequest(strings.ToUpper(options.Method), urlString, body)
 		if b.Token != "" {
 			req.Header.Set("X-F5-Auth-Token", b.Token)
 		} else {
@@ -488,7 +490,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 	}
 }
 
-// Get a url and populate an entity. If the entity does not exist (404) then the
+// Get a urlString and populate an entity. If the entity does not exist (404) then the
 // passed entity will be untouched and false will be returned as the second parameter.
 // You can use this to distinguish between a missing entity or an actual error.
 func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
