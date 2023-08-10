@@ -419,10 +419,6 @@ func (b *BigIP) fastPatch(body interface{}, path ...string) ([]byte, error) {
 
 // Upload a file read from a Reader
 func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error) {
-	client := &http.Client{
-		Transport: b.Transport,
-		Timeout:   b.ConfigOptions.APICallTimeout,
-	}
 	options := &APIRequest{
 		Method:      "post",
 		URL:         b.iControlPath(path),
@@ -458,6 +454,13 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 		}
 		req.Header.Add("Content-Type", options.ContentType)
 		req.Header.Add("Content-Range", fmt.Sprintf("%d-%d/%d", start, end-1, size))
+		b.Transport.Proxy = func(reqNew *http.Request) (*url.URL, error) {
+			return http.ProxyFromEnvironment(reqNew)
+		}
+		client := &http.Client{
+			Transport: b.Transport,
+			Timeout:   b.ConfigOptions.APICallTimeout,
+		}
 		// Try to upload chunk
 		res, err := client.Do(req)
 		if err != nil {
