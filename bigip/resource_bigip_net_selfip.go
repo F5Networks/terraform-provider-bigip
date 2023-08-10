@@ -119,7 +119,6 @@ func resourceBigipNetSelfIPRead(ctx context.Context, d *schema.ResourceData, met
 
 	// Extract Traffic Group name from the full path (ignoring /Common/ prefix)
 	regex := regexp.MustCompile(`\/Common\/(.+)`)
-	log.Printf("traffic_group:%+v", selfIP.TrafficGroup)
 	_ = d.Set("traffic_group", selfIP.TrafficGroup)
 	trafficGroup := regex.FindStringSubmatch(selfIP.TrafficGroup)
 	if len(trafficGroup) > 0 {
