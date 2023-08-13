@@ -181,12 +181,12 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 
 func resourceBigipSSLKeyCertDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	log.Println("[INFO] Deleteing SSL Key and Certificate")
+	log.Println("[INFO] Deleting SSL Key and Certificate")
 	keyName := d.Get("key_name").(string)
 	partition := d.Get("partition").(string)
 	certName := d.Get("cert_name").(string)
 
-	log.Printf("[INFO] Deleteing SSL Key %s and Certificate %s", keyName, certName)
+	log.Printf("[INFO] Deleting SSL Key %s and Certificate %s", keyName, certName)
 
 	keyFullPath := "/" + partition + "/" + keyName
 	certFullPath := "/" + partition + "/" + certName

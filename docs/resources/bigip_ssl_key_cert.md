@@ -18,9 +18,9 @@ The certificate and the key can be imported from files on the local disk, in PEM
 ```hcl
 
 resource "bigip_ssl_key_cert" "testkeycert" {
-  partition   = "Common"
-  key_name    = "ssl-test-key"
-  key_content = file("key.pem")
+  partition    = "Common"
+  key_name     = "ssl-test-key"
+  key_content  = file("key.pem")
   cert_name    = "ssl-test-cert"
   cert_content = file("certificate.pem")
 }
