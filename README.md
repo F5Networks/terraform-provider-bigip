@@ -7,16 +7,15 @@
 
 A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
-[![Build Status](https://travis-ci.org/f5devcentral/terraform-provider-bigip.svg?branch=master)](https://travis-ci.org/f5devcentral/terraform-provider-bigip)
+![Build Status](https://github.com/F5Networks/terraform-provider-bigip/actions/workflows/golint.yaml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/f5devcentral/terraform-provider-bigip)](https://goreportcard.com/report/github.com/f5devcentral/terraform-provider-bigip)
 [![license](https://img.shields.io/badge/license-Mozilla-red.svg?style=flat)](https://github.com/f5devcentral/terraform-provider-bigip/blob/master/LICENSE)
-[![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
+[![GitHub release(latest by date)](https://img.shields.io/github/v/release/F5Networks/terraform-provider-bigip)](https://github.com/F5Networks/terraform-provider-bigip/releases)
 
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 # Requirements
--	[Terraform](https://www.terraform.io/downloads.html) 0.11.x / 0.12.x /0.13.x
--	[Go](https://golang.org/doc/install) 1.16 (to build the provider plugin)
+-	[Terraform](https://www.terraform.io/downloads.html) > 0.12.x
+-	[Go](https://golang.org/doc/install) 1.19 (to build the provider plugin)
 
 # F5 BigIP LTM requirements
 
@@ -24,12 +23,12 @@ A [Terraform](terraform.io) provider for F5 BigIP LTM.
 
 These BIG-IP versions are supported in these Terraform versions.
 
-| BIG-IP version	 |Terraform 1.x  |	Terraform 0.13  |	Terraform 0.12  | Terraform 0.11  |
-|-----------------|---------------|-----------------|-----------------|-----------------|
-| BIG-IP 17.x	    |      X        |       X         |       X         |      X          |
-| BIG-IP 16.x	    |      X        |       X         |       X         |      X          |
-| BIG-IP 15.x	    |      X        |       X         |       X         |      X          |
-| BIG-IP 14.x	    | 	   X        |       X         |       X         |      X          |
+| BIG-IP version	 | Terraform 1.x | 	Terraform 0.13 | 	Terraform 0.12 |
+|-----------------|---------------|-----------------|-----------------|
+| BIG-IP 17.x	    | X             | X               | X               |
+| BIG-IP 16.x	    | X             | X               | X               |
+| BIG-IP 15.x	    | X             | X               | X               |
+| BIG-IP 14.x	    | 	   X         | X               | X               |
 
 
 # Documentation
