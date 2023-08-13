@@ -58,6 +58,7 @@ type BigIP struct {
 	UserAgent     string
 	Teem          bool
 	ConfigOptions *ConfigOptions
+	Transaction   string
 }
 
 // APIRequest builds our request before sending it to the server.
@@ -236,6 +237,9 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		req.Header.Set("X-F5-Auth-Token", b.Token)
 	} else if options.URL != "mgmt/shared/authn/login" {
 		req.SetBasicAuth(b.User, b.Password)
+	}
+	if len(b.Transaction) > 0 {
+		req.Header.Set("X-F5-REST-Coordination-Id", b.Transaction)
 	}
 
 	//fmt.Println("REQ -- ", options.Method, " ", url," -- ",options.Body)

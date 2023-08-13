@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+
 	//"strings"
 	"time"
 )
@@ -285,6 +286,7 @@ const (
 	uriSslCert         = "ssl-cert"
 	uriSslKey          = "ssl-key"
 	uriDataGroup       = "data-group"
+	uriTransaction     = "transaction"
 	REST_DOWNLOAD_PATH = "/var/config/rest/downloads"
 )
 
@@ -358,6 +360,17 @@ type Key struct {
 	SourcePath     string `json:"sourcePath,omitempty"`
 	SystemPath     string `json:"systemPath,omitempty"`
 	UpdatedBy      string `json:"updatedBy,omitempty"`
+}
+
+type Transaction struct {
+	TransID          int64  `json:"transId,omitempty"`
+	State            string `json:"state,omitempty"`
+	TimeoutSeconds   int64  `json:"timeoutSeconds,omitempty"`
+	AsyncExecution   bool   `json:"asyncExecution,omitempty"`
+	ValidateOnly     bool   `json:"validateOnly,omitempty"`
+	ExecutionTimeout int64  `json:"executionTimeout,omitempty"`
+	ExecutionTime    int64  `json:"executionTime,omitempty"`
+	FailureReason    string `json:"failureReason,omitempty"`
 }
 
 // Certificates returns a list of certificates.
@@ -777,6 +790,40 @@ func (b *BigIP) CreateTRAP(name string, authPasswordEncrypted string, authProtoc
 		Version:                  version,
 	}
 	return b.post(config, uriSys, uriSnmp, uriTraps)
+}
+
+func (b *BigIP) StartTransaction() (*Transaction, error) {
+	body := make(map[string]interface{})
+	resp, err := b.postReq(body, uriMgmt, uriTm, uriTransaction)
+
+	if err != nil {
+		return nil, fmt.Errorf("error encountered while starting transaction: %v", err)
+	}
+	transaction := &Transaction{}
+	err = json.Unmarshal(resp, transaction)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("[INFO] Transaction: %v", transaction)
+	b.Transaction = fmt.Sprint(transaction.TransID)
+	return transaction, nil
+}
+
+func (b *BigIP) EndTransaction(tId int64) error {
+	commitTransaction := map[string]interface{}{
+		"state":        "VALIDATING",
+		"validateOnly": false,
+	}
+	payload, err := json.Marshal(commitTransaction)
+	if err != nil {
+		return fmt.Errorf("unable create commit transaction payload: %s", err)
+	}
+	err = b.patch(payload, uriMgmt, uriTm, uriTransaction, string(tId))
+	if err != nil {
+		return fmt.Errorf("%s", err)
+	}
+	b.Transaction = ""
+	return nil
 }
 
 func (b *BigIP) ModifyTRAP(config *TRAP) error {
