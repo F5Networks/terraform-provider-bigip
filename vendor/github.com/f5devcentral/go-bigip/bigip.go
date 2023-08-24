@@ -63,6 +63,7 @@ type BigIP struct {
 	UserAgent     string
 	Teem          bool
 	ConfigOptions *ConfigOptions
+	Transaction   string
 }
 
 // APIRequest builds our request before sending it to the server.
@@ -241,18 +242,22 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		client := &http.Client{
 			Transport: b.Transport,
 			Timeout:   b.ConfigOptions.APICallTimeout,
-		}
-		if b.Token != "" {
-			req.Header.Set("X-F5-Auth-Token", b.Token)
-		} else if options.URL != "mgmt/shared/authn/login" {
-			req.SetBasicAuth(b.User, b.Password)
-		}
-		//fmt.Println("REQ -- ", options.Method, " ", urlString," -- ",options.Body)
+	if b.Token != "" {
+		req.Header.Set("X-F5-Auth-Token", b.Token)
+	} else if options.URL != "mgmt/shared/authn/login" {
+		req.SetBasicAuth(b.User, b.Password)
+	}
+ 
+	if len(b.Transaction) > 0 {
+		req.Header.Set("X-F5-REST-Coordination-Id", b.Transaction)
+	}
 
-		if len(options.ContentType) > 0 {
-			req.Header.Set("Content-Type", options.ContentType)
-		}
-		res, err := client.Do(req)
+	//fmt.Println("REQ -- ", options.Method, " ", url," -- ",options.Body)
+
+	if len(options.ContentType) > 0 {
+		req.Header.Set("Content-Type", options.ContentType)
+	}
+   res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
