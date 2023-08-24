@@ -8,7 +8,7 @@ description: |-
 
 # bigip\_sys\_iapp
 
-`bigip_sys_iapp` resource helps you to deploy Application Services template that can be used to automate and orchestrate Layer 4-7 applications service deployments using F5 Network.  
+`bigip_sys_iapp` resource helps you to deploy Application Services template that can be used to automate and orchestrate Layer 4-7 applications service deployments using F5 Network.
 
 ## Example Usage
 
@@ -30,7 +30,7 @@ resource "bigip_sys_iapp" "simplehttp" {
 
 ## Example Usage of Json file
 ```json
-{  
+{
 "fullPath":"/Common/simplehttp.app/simplehttp",
 "generation":222,
 "inheritedDevicegroup":"true",
@@ -41,46 +41,46 @@ resource "bigip_sys_iapp" "simplehttp" {
 "selfLink":"https://localhost/mgmt/tm/sys/application/service/~Common~simplehttp.app~simplehttp?ver=13.0.0",
 "strictUpdates":"enabled",
 "subPath":"simplehttp.app",
-"tables":[  
-   {  
+"tables":[
+   {
       "name":"basic__snatpool_members"
    },
-   {  
+   {
       "name":"net__snatpool_members"
    },
-   {  
+   {
       "name":"optimizations__hosts"
    },
-   {  
-      "columnNames":[  
+   {
+      "columnNames":[
          "name"
       ],
       "name":"pool__hosts",
-      "rows":[  
-         {  
-            "row":[  
+      "rows":[
+         {
+            "row":[
                "f5.cisco.com"
             ]
          }
       ]
    },
-   {  
-      "columnNames":[  
+   {
+      "columnNames":[
          "addr",
          "port",
          "connection_limit"
       ],
       "name":"pool__members",
-      "rows":[  
-         {  
-            "row":[  
+      "rows":[
+         {
+            "row":[
                "10.0.2.167",
                "80",
                "0"
             ]
          },
-         {  
-            "row":[  
+         {
+            "row":[
                "10.0.2.168",
                "80",
                "0"
@@ -88,17 +88,17 @@ resource "bigip_sys_iapp" "simplehttp" {
          }
       ]
    },
-   {  
+   {
       "name":"server_pools__servers"
    }
 ],
 "template":"/Common/f5.http",
 "templateModified":"no",
-"templateReference":{  
+"templateReference":{
    "link":"https://localhost/mgmt/tm/sys/application/template/~Common~f5.http?ver=13.0.0"
 },
 "trafficGroup":"/Common/traffic-group-1",
-"trafficGroupReference":{  
+"trafficGroupReference":{
    "link":"https://localhost/mgmt/tm/cm/traffic-group/~Common~traffic-group-1?ver=13.0.0"
 },
 "variables":[  

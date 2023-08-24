@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestIappName = "/" + TestPartition + "/test-iapp"
+var TestIappName = "test-iapp"
 
 var TestIappResource = `
 	resource "bigip_sys_iapp" "test-iapp" {
@@ -83,7 +83,7 @@ var TestIappResource = `
 			"templateReference": {
 					"link": "https://localhost/mgmt/tm/sys/application/template/~Common~f5.http?ver=13.0.0"
 			},
-		 
+
 			"variables": [
 					{
 							"encrypted": "no",
@@ -156,7 +156,7 @@ func TestAccBigipSysIapp_create(t *testing.T) {
 			{
 				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TestIappName),
+					testCheckIappExists(TestIappName, TestPartition),
 				),
 			},
 		},
@@ -174,7 +174,7 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 			{
 				Config: TestIappResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckIappExists(TestIappName),
+					testCheckIappExists(TestIappName, TestPartition),
 				),
 				ResourceName:      TestIappName,
 				ImportState:       false,
@@ -184,11 +184,11 @@ func TestAccBigipSysIapp_import(t *testing.T) {
 	})
 }
 
-func testCheckIappExists(name string) resource.TestCheckFunc {
+func testCheckIappExists(name, partition string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 
-		jsonfile, err := client.Iapp(name)
+		jsonfile, err := client.Iapp(name, partition)
 		log.Println(" I am here in Exists !!!!!!!!!!!!", name)
 		if err != nil {
 			return fmt.Errorf("Error while fetching iapp: %v", err)
@@ -216,10 +216,11 @@ func testCheckIappDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
+		partition := rs.Primary.Attributes["partition"]
 		log.Println(" I am in Destroy function currently +++++++++++++++++++++++++++ ", name)
 
 		// Join three strings into one.
-		jsonfile, err := client.Iapp(name)
+		jsonfile, err := client.Iapp(name, partition)
 
 		if err != nil {
 			return nil
