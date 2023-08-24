@@ -10,19 +10,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"os"
-	"reflect"
-	"regexp"
-	"sort"
-	"strings"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"log"
+	"os"
+	"reflect"
+	"regexp"
+	"sort"
+	"strings"
 )
 
 var CONTROLS = schema.NewSet(schema.HashString, []interface{}{"caching", "compression", "classification", "forwarding", "request-adaptation", "response-adaptation", "server-ssl"})
@@ -45,6 +44,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Description:  "Name of the Policy",
 				ForceNew:     true,
 				ValidateFunc: validateF5NameWithDirectory,
+			},
+			"description": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies descriptive text that identifies the ltm policy.",
 			},
 			"published_copy": {
 				Type:        schema.TypeString,
@@ -1182,35 +1186,6 @@ func resourceBigipLtmPolicyRead(ctx context.Context, d *schema.ResourceData, met
 	return policyToData(p, d)
 }
 
-// func resourceBigipLtmPolicyExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-//	client := meta.(*bigip.BigIP)
-//
-//	name := d.Id()
-//	polStr := strings.Split(name, "/")
-//
-//	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
-//	match := re.FindStringSubmatch(name)
-//	if match == nil {
-//		return false, fmt.Errorf("Policy name failed to match the regex, and should be of format /partition/policy_name")
-//	}
-//	partition := strings.Join(polStr[:len(polStr)-1], "/")
-//	policyName := polStr[len(polStr)-1]
-//
-//	log.Println("[INFO] Fetching policy " + policyName)
-//	p, err := client.GetPolicy(policyName, partition)
-//
-//	if err != nil {
-//		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", name, err)
-//		return false, err
-//	}
-//	if p == nil {
-//		log.Printf("[WARN] Policy  (%s) not found, removing from state", d.Id())
-//		d.SetId("")
-//		return false, nil
-//	}
-//	return true, nil
-//}
-
 func resourceBigipLtmPolicyUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
@@ -1300,6 +1275,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	result := strings.Join(values, "")
 	p.Name = result
 	p.Strategy = d.Get("strategy").(string)
+	p.Description = d.Get("description").(string)
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
 
@@ -1394,6 +1370,10 @@ func policyToData(p *bigip.Policy, d *schema.ResourceData) diag.Diagnostics {
 	}
 	if err := d.Set("requires", makeStringSet(&p.Requires)); err != nil {
 		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Requires  state for Policy (%s): %s", d.Id(), err))
+	}
+
+	if val, ok := d.GetOk("description"); ok {
+		p.Description = val.(string)
 	}
 
 	_ = d.Set("name", p.FullPath)
