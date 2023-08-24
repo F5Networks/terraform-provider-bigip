@@ -675,6 +675,7 @@ type Policy struct {
 	Name        string
 	PublishCopy string
 	Partition   string
+	Description string
 	FullPath    string
 	Controls    []string
 	Requires    []string
@@ -685,6 +686,7 @@ type policyDTO struct {
 	Name        string   `json:"name"`
 	PublishCopy string   `json:"publishedCopy"`
 	Partition   string   `json:"partition,omitempty"`
+	Description string   `json:"description"`
 	Controls    []string `json:"controls,omitempty"`
 	Requires    []string `json:"requires,omitempty"`
 	Strategy    string   `json:"strategy,omitempty"`
@@ -700,6 +702,7 @@ func (p *Policy) MarshalJSON() ([]byte, error) {
 		PublishCopy: p.PublishCopy,
 		Partition:   p.Partition,
 		Controls:    p.Controls,
+		Description: p.Description,
 		Requires:    p.Requires,
 		Strategy:    p.Strategy,
 		FullPath:    p.FullPath,
@@ -715,13 +718,13 @@ func (p *Policy) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-
 	p.Name = dto.Name
 	p.PublishCopy = dto.PublishCopy
 	p.Partition = dto.Partition
 	p.Controls = dto.Controls
 	p.Requires = dto.Requires
 	p.Strategy = dto.Strategy
+	p.Description = dto.Description
 	p.Rules = dto.Rules.Items
 	p.FullPath = dto.FullPath
 
@@ -2814,7 +2817,7 @@ func (b *BigIP) CheckDraftPolicy(name string, partition string) (bool, error) {
 	if p.FullPath == "" {
 		return false, nil
 	}
-	return true , nil
+	return true, nil
 }
 
 func normalizePolicy(p *Policy) {
