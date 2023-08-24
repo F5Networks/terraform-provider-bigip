@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
 )
 
-var x = 0
+// var x = 0
 var m sync.Mutex
 var createdTenants string
 
@@ -167,12 +167,12 @@ func resourceBigipAs3() *schema.Resource {
 
 func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	as3Json := d.Get("as3_json").(string)
 	m.Lock()
 	defer m.Unlock()
-	log.Printf("[INFO] Creating As3 config")
+	as3Json := d.Get("as3_json").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
+	log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
 	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
@@ -227,8 +227,6 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		d.SetId("Common")
 	}
 	createdTenants = d.Get("tenant_list").(string)
-	x++
-	log.Printf("[TRACE] %+v", x)
 	return resourceBigipAs3Read(ctx, d, meta)
 }
 func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -286,11 +284,12 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 
 func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	as3Json := d.Get("as3_json").(string)
 	m.Lock()
 	defer m.Unlock()
+	as3Json := d.Get("as3_json").(string)
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	tenantList, _, _ := client.GetTenantList(as3Json)
+	log.Printf("[INFO] Updating As3 Config for tenants:%s", tenantList)
 	oldTenantList := d.Get("tenant_list").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
 	if tenantFilter == "" {
@@ -331,7 +330,6 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	}
 	createdTenants = d.Get("tenant_list").(string)
 	_ = d.Set("task_id", taskID)
-	x++
 	return resourceBigipAs3Read(ctx, d, meta)
 }
 
@@ -339,7 +337,6 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	client := meta.(*bigip.BigIP)
 	m.Lock()
 	defer m.Unlock()
-	log.Printf("[INFO] Deleting As3 config")
 	var name string
 	var tList string
 
@@ -352,6 +349,7 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	} else {
 		name = d.Id()
 	}
+	log.Printf("[INFO] Deleting As3 config for tenants:%+v", name)
 	err, failedTenants := client.DeleteAs3Bigip(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
@@ -361,7 +359,6 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 		_ = d.Set("tenant_list", name)
 		return resourceBigipAs3Read(ctx, d, meta)
 	}
-	x++
 	d.SetId("")
 	return nil
 }

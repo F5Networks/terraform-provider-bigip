@@ -29,10 +29,15 @@ import (
 
 var defaultConfigOptions = &ConfigOptions{
 	APICallTimeout: 60 * time.Second,
+	// Define new configuration options; are these user-override-able at the provider level or does that take more work?
+	TokenTimeout:   1200 * time.Second,
+	APICallRetries: 10,
 }
 
 type ConfigOptions struct {
 	APICallTimeout time.Duration
+	TokenTimeout   time.Duration
+	APICallRetries int
 }
 
 type Config struct {
@@ -226,43 +231,58 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		format = "%s/mgmt/tm/%s"
 	}
 	urlString := fmt.Sprintf(format, b.Host, options.URL)
-	body := bytes.NewReader([]byte(options.Body))
-	req, _ = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
-	b.Transport.Proxy = func(reqNew *http.Request) (*url.URL, error) {
-		return http.ProxyFromEnvironment(reqNew)
-	}
-	client := &http.Client{
-		Transport: b.Transport,
-		Timeout:   b.ConfigOptions.APICallTimeout,
-	}
-	if b.Token != "" {
-		req.Header.Set("X-F5-Auth-Token", b.Token)
-	} else if options.URL != "mgmt/shared/authn/login" {
-		req.SetBasicAuth(b.User, b.Password)
-	}
-	//fmt.Println("REQ -- ", options.Method, " ", urlString," -- ",options.Body)
-
-	if len(options.ContentType) > 0 {
-		req.Header.Set("Content-Type", options.ContentType)
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	data, _ := io.ReadAll(res.Body)
-
-	if res.StatusCode >= 400 {
-		if res.Header["Content-Type"][0] == "application/json" {
-			return data, b.checkError(data)
+	maxRetries := b.ConfigOptions.APICallRetries
+	for i := 0; i < maxRetries; i++ {
+		body := bytes.NewReader([]byte(options.Body))
+		req, _ = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+		b.Transport.Proxy = func(reqNew *http.Request) (*url.URL, error) {
+			return http.ProxyFromEnvironment(reqNew)
 		}
+		client := &http.Client{
+			Transport: b.Transport,
+			Timeout:   b.ConfigOptions.APICallTimeout,
+		}
+		if b.Token != "" {
+			req.Header.Set("X-F5-Auth-Token", b.Token)
+		} else if options.URL != "mgmt/shared/authn/login" {
+			req.SetBasicAuth(b.User, b.Password)
+		}
+		//fmt.Println("REQ -- ", options.Method, " ", urlString," -- ",options.Body)
 
-		return data, errors.New(fmt.Sprintf("HTTP %d :: %s", res.StatusCode, string(data[:])))
+		if len(options.ContentType) > 0 {
+			req.Header.Set("Content-Type", options.ContentType)
+		}
+		res, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+		data, _ := io.ReadAll(res.Body)
+		contentType := ""
+		if ctHeaders, ok := res.Header["Content-Type"]; ok && len(ctHeaders) > 0 {
+			contentType = ctHeaders[0]
+		}
+		if res.StatusCode >= 400 {
+			if strings.Contains(contentType, "application/json") {
+				var reqError RequestError
+				err = json.Unmarshal(data, &reqError)
+				if err != nil {
+					return nil, err
+				}
+				// With how some of the requests come back from AS3, we sometimes have a nested error, so check the entire message for the "active asynchronous task" error
+				if res.StatusCode == 503 || reqError.Code == 503 || strings.Contains(strings.ToLower(reqError.Message), strings.ToLower("there is an active asynchronous task executing")) {
+					time.Sleep(10 * time.Second)
+					continue
+				}
+				return data, b.checkError(data)
+			} else {
+				return data, fmt.Errorf("HTTP %d :: %s", res.StatusCode, string(data[:]))
+			}
+			//return data, errors.New(fmt.Sprintf("HTTP %d :: %s", res.StatusCode, string(data[:])))
+		}
+		return data, nil
 	}
-
-	return data, nil
+	return nil, fmt.Errorf("service unavailable after %d attempts", maxRetries)
 }
 
 func (b *BigIP) iControlPath(parts []string) string {
