@@ -128,7 +128,7 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 				return b.PostAs3Bigip(as3NewJson, tenantFilter)
 			}
 			for _, id := range taskIds {
-				if b.pollingStatus(id) {
+				if b.pollingStatus(id, 5*time.Second) {
 					return b.PostAs3Bigip(as3NewJson, tenantFilter)
 				}
 			}
@@ -201,7 +201,7 @@ func (b *BigIP) DeleteAs3Bigip(tenantName string) (error, string) {
 				return b.DeleteAs3Bigip(tenantName)
 			}
 			for _, id := range taskIds {
-				if b.pollingStatus(id) {
+				if b.pollingStatus(id, 5*time.Second) {
 					return b.DeleteAs3Bigip(tenantName)
 				}
 			}
@@ -239,7 +239,7 @@ func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
 				return err
 			}
 			for _, id := range taskIds {
-				if b.pollingStatus(id) {
+				if b.pollingStatus(id, 5*time.Second) {
 					return b.ModifyAs3(tenantFilter, as3_json)
 				}
 			}
@@ -363,21 +363,25 @@ func (b *BigIP) getas3Taskid() ([]string, error) {
 	}
 	return taskIDs, nil
 }
-func (b *BigIP) pollingStatus(id string) bool {
+
+func (b *BigIP) pollingStatus(id string, backoff time.Duration) bool {
+	log.Printf("[INFO]pollingStatus DELAY -- %d ", int(backoff.Seconds()))
 	var taskList As3TaskType
 	err, _ := b.getForEntity(&taskList, uriMgmt, uriShared, uriAppsvcs, uriTask, id)
 	if err != nil {
 		return false
 	}
-	if taskList.Results[0].Code != 200 && taskList.Results[0].Code != 503 {
-		time.Sleep(1 * time.Second)
-		return b.pollingStatus(id)
+	if taskList.Results[0].Code != 200 {
+		if backoff > 30*time.Second {
+			backoff = 30 * time.Second // cap at 30 seconds
+		}
+		time.Sleep(backoff)
+		return b.pollingStatus(id, backoff*2) // recursive call with doubled delay
 	}
-	if taskList.Results[0].Code == 503 {
-		return false
-	}
+
 	return true
 }
+
 func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
 	tenantList := make([]string, 0)
 	applicationList := make([]string, 0)
