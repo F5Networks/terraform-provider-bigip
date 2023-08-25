@@ -145,6 +145,7 @@ resource "bigip_ltm_policy" "policy_issue_838_tc1" {
   controls    = ["forwarding"]
   rule {
     name = "rule6"
+    description = "rule6-create"
     action {
       forward    = true
       connection = false

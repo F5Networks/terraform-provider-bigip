@@ -747,18 +747,20 @@ type PolicyRules struct {
 }
 
 type PolicyRule struct {
-	Name       string
-	FullPath   string
-	Ordinal    int
-	Conditions []PolicyRuleCondition
-	Actions    []PolicyRuleAction
+	Name        string
+	FullPath    string
+	Ordinal     int
+	Description string
+	Conditions  []PolicyRuleCondition
+	Actions     []PolicyRuleAction
 }
 
 type policyRuleDTO struct {
-	Name       string `json:"name"`
-	Ordinal    int    `json:"ordinal"`
-	FullPath   string `json:"fullPath,omitempty"`
-	Conditions struct {
+	Name        string `json:"name"`
+	Ordinal     int    `json:"ordinal"`
+	FullPath    string `json:"fullPath,omitempty"`
+	Description string `json:"description,omitempty"`
+	Conditions  struct {
 		Items []PolicyRuleCondition `json:"items,omitempty"`
 	} `json:"conditionsReference,omitempty"`
 	Actions struct {
@@ -768,9 +770,10 @@ type policyRuleDTO struct {
 
 func (p *PolicyRule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(policyRuleDTO{
-		Name:     p.Name,
-		Ordinal:  p.Ordinal,
-		FullPath: p.FullPath,
+		Name:        p.Name,
+		Ordinal:     p.Ordinal,
+		FullPath:    p.FullPath,
+		Description: p.Description,
 		Conditions: struct {
 			Items []PolicyRuleCondition `json:"items,omitempty"`
 		}{Items: p.Conditions},
@@ -792,6 +795,7 @@ func (p *PolicyRule) UnmarshalJSON(b []byte) error {
 	p.Actions = dto.Actions.Items
 	p.Conditions = dto.Conditions.Items
 	p.FullPath = dto.FullPath
+	p.Description = dto.Description
 
 	return nil
 }
