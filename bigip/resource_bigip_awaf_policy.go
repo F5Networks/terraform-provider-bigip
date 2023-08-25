@@ -717,9 +717,9 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		if appLang, ok := d.GetOk("application_language"); ok {
 			polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = appLang
 		}
-		//if policyWaf.ApplicationLanguage != "" {
+		// if policyWaf.ApplicationLanguage != "" {
 		//	polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = policyWaf.ApplicationLanguage
-		//}
+		// }
 		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v

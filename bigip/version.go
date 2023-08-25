@@ -1,4 +1,4 @@
 package bigip
 
 // ProviderVersion is set at build-time in the release process
-var ProviderVersion = "1.18.1"
+var ProviderVersion = "1.19.0"
