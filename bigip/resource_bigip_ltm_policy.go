@@ -92,6 +92,11 @@ func resourceBigipLtmPolicy() *schema.Resource {
 							Required:    true,
 							Description: "Rule name",
 						},
+						"description": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Specifies descriptive text that identifies the irule attached to policy.",
+						},
 						"action": {
 							Type:     schema.TypeList,
 							Optional: true,
@@ -1285,6 +1290,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 		var polRule bigip.PolicyRule
 		for _, item := range val.([]interface{}) {
 			polRule.Name = item.(map[string]interface{})["name"].(string)
+			polRule.Description = item.(map[string]interface{})["description"].(string)
 			var policyRulesActions []bigip.PolicyRuleAction
 			for _, itemAction := range item.(map[string]interface{})["action"].([]interface{}) {
 				var a bigip.PolicyRuleAction
@@ -1402,6 +1408,9 @@ func flattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
 
 		if v.Name != "" {
 			obj["name"] = v.Name
+		}
+		if v.Description != "" {
+			obj["description"] = v.Description
 		}
 
 		if len(v.Actions) > 0 {

@@ -54,11 +54,9 @@ resource "bigip_ltm_policy" "test-policy" {
 *  `controls` - (Optional) Specifies the controls
 
 * `rule` - (Optional,type `list`) List of Rules can be applied using the policy. Each rule is block type with following arguments.
-
     * `name` -  (Required,type `string`) Name of Rule to be applied in policy.
-    
+    * `description` - (Optional) Specifies descriptive text that identifies the irule attached to policy.
     * `condition` - (Optional,type `set`) Block type. See [condition](#condition) block for more details.
-    
     * `action` - (Optional,type `set`) Block type. See [action](#action) block for more details.
 
 * `forward` - (Optional) This action will affect forwarding.
