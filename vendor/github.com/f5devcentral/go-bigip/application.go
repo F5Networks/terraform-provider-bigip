@@ -76,7 +76,7 @@ func (b *BigIP) CreateIapp(p *Iapp) error {
 func (b *BigIP) UpdateIapp(name string, p *Iapp) error {
 
 	values := []string{}
-	values = append(values, "~Common~")
+	values = append(values, fmt.Sprintf("~%s~", p.Partition))
 	values = append(values, name)
 	values = append(values, ".app~")
 	values = append(values, name)
@@ -86,11 +86,11 @@ func (b *BigIP) UpdateIapp(name string, p *Iapp) error {
 	return b.patch(p, uriSysa, uriApp, uriService, result)
 }
 
-func (b *BigIP) Iapp(name string) (*Iapp, error) {
+func (b *BigIP) Iapp(name, partition string) (*Iapp, error) {
 	var iapp Iapp
 	log.Println(" Value of iapp before read  ", &iapp)
 	values := []string{}
-	values = append(values, "~Common~")
+	values = append(values, fmt.Sprintf("~%s~", partition))
 	values = append(values, name)
 	values = append(values, ".app~")
 	values = append(values, name)
@@ -105,9 +105,9 @@ func (b *BigIP) Iapp(name string) (*Iapp, error) {
 	return &iapp, nil
 }
 
-func (b *BigIP) DeleteIapp(name string) error {
+func (b *BigIP) DeleteIapp(name, partition string) error {
 	values := []string{}
-	values = append(values, "~Common~")
+	values = append(values, fmt.Sprintf("~%s~", partition))
 	values = append(values, name)
 	values = append(values, ".app~")
 	values = append(values, name)

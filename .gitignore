@@ -38,6 +38,7 @@ website/node_modules
 *.test
 *.tf
 .terraform.lock.hcl
+cover.out
 website/vendor
 keymap
 README.md

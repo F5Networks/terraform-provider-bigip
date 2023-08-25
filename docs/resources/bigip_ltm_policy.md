@@ -45,6 +45,8 @@ resource "bigip_ltm_policy" "test-policy" {
 
 * `strategy` - (Optional) Specifies the match strategy
 
+* `description` - (Optional) Specifies descriptive text that identifies the ltm policy.
+
 * `requires` - (Optional) Specifies the protocol
 
 * `published_copy` - (Optional) If you want to publish the policy else it will be deployed in Drafts mode.

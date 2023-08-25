@@ -128,3 +128,27 @@ resource "bigip_ltm_policy" "policy_issue794_tc2" {
     }
   }
 }
+
+resource "bigip_ltm_pool" "pool_issue_838_tc1" {
+  name                   = "/Common/pool_issue_838_tc1"
+  load_balancing_mode    = "round-robin"
+  allow_snat             = "yes"
+  allow_nat              = "yes"
+  minimum_active_members = 2
+}
+
+resource "bigip_ltm_policy" "policy_issue_838_tc1" {
+  name        = "/Common/policy_issue_838_tc1"
+  strategy    = "/Common/first-match"
+  description = "policy_issue_838_tc1 description"
+  requires    = ["http"]
+  controls    = ["forwarding"]
+  rule {
+    name = "rule6"
+    action {
+      forward    = true
+      connection = false
+      pool       = bigip_ltm_pool.pool_issue_838_tc1.name
+    }
+  }
+}

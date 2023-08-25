@@ -243,10 +243,11 @@ func resourceBigipSysIappRead(ctx context.Context, d *schema.ResourceData, meta 
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
+	partition := d.Get("partition").(string)
 
 	log.Println("[INFO] Reading Iapp " + name)
 
-	p, err := client.Iapp(name)
+	p, err := client.Iapp(name, partition)
 	log.Printf("[INFO] Iapp Info:%+v", p)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Iapp  (%s) (%v)", name, err)
@@ -274,7 +275,8 @@ func resourceBigipSysIappRead(ctx context.Context, d *schema.ResourceData, meta 
 func resourceBigipSysIappDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	err := client.DeleteIapp(name)
+	partition := d.Get("partition").(string)
+	err := client.DeleteIapp(name, partition)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Iapp  (%s) (%v)", name, err)
 		return diag.FromErr(err)

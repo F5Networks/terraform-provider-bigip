@@ -1,0 +1,37 @@
+---
+name: GoLang Build
+on:
+  pull_request:
+    types: ['opened', 'synchronize']
+    paths:
+      - '**.go'
+      - 'vendor/**'
+      - '.github/workflows/**'
+jobs:
+  gobuild:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        # list whatever GO versions here you would like to support
+        golang:
+          - '1.19.*'
+#          - '1.18.*'
+#          - '1.17.*'
+#          - '1.16.*'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.golang }}
+          cache: true
+      - name: Get dependencies
+        run: |
+          go mod download
+      - name: Build
+        run: |
+          ls -ltr
+          pwd
+          go version
+          go build -v .
+          ls -ltr

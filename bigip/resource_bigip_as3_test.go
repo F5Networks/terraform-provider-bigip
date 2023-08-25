@@ -128,7 +128,8 @@ func TestAccBigipAs3_create_PartialSuccess(t *testing.T) {
 		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
-				Config: TestAs3Resource2,
+				Config:      TestAs3Resource2,
+				ExpectError: regexp.MustCompile("as3 config post error response"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("Sample_03", true),
 					testCheckAs3Exists("Sample_04", false),
@@ -200,6 +201,25 @@ func TestAccBigipAs3_update_deleteTenant(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("Sample_01,Sample_02", true),
 					testCheckAs3Exists("Sample_03", false),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ResourceTC20(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      loadFixtureString("../examples/as3/main.tf"),
+				ExpectError: regexp.MustCompile("posting as3 config failed for tenants"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_http_02", false),
 				),
 			},
 		},

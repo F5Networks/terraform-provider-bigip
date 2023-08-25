@@ -71,7 +71,6 @@ func resourceBigipAwafPolicy() *schema.Resource {
 			"application_language": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "utf-8",
 				Description: "The character encoding for the web application. The character encoding determines how the policy processes the character sets. The default is Auto detect",
 			},
 			"case_insensitive": {
@@ -467,7 +466,9 @@ func resourceBigipAwafPolicyRead(ctx context.Context, d *schema.ResourceData, me
 	}
 	_ = d.Set("policy_id", wafpolicy.ID)
 	_ = d.Set("type", policyJson.Policy.Type)
-	_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
+	if _, ok := d.GetOk("application_language"); ok {
+		_ = d.Set("application_language", policyJson.Policy.ApplicationLanguage)
+	}
 	if _, ok := d.GetOk("enforcement_mode"); ok {
 		_ = d.Set("enforcement_mode", policyJson.Policy.EnforcementMode)
 	}
@@ -538,11 +539,16 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 	if partition != "Common" {
 		fullPath = fmt.Sprintf("/%s/%s", partition, name)
 	}
+	var appLang1 string
+	appLang1 = "auto-detect"
+	if val, ok := d.GetOk("application_language"); ok {
+		appLang1 = val.(string)
+	}
 	policyWaf := bigip.WafPolicy{
 		Name:                name,
 		Partition:           partition,
 		FullPath:            fullPath,
-		ApplicationLanguage: d.Get("application_language").(string),
+		ApplicationLanguage: appLang1,
 	}
 	policyWaf.CaseInsensitive = d.Get("case_insensitive").(bool)
 	policyWaf.EnablePassiveMode = d.Get("enable_passivemode").(bool)
@@ -708,9 +714,12 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		if policyWaf.Template.Name != "" && polJsn1.Policy.(map[string]interface{})["template"] != policyWaf.Template {
 			polJsn1.Policy.(map[string]interface{})["template"] = policyWaf.Template
 		}
-		if policyWaf.ApplicationLanguage != "" {
-			polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = policyWaf.ApplicationLanguage
+		if appLang, ok := d.GetOk("application_language"); ok {
+			polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = appLang
 		}
+		// if policyWaf.ApplicationLanguage != "" {
+		//	polJsn1.Policy.(map[string]interface{})["applicationLanguage"] = policyWaf.ApplicationLanguage
+		// }
 		urlList := make([]interface{}, len(policyWaf.Urls))
 		for i, v := range policyWaf.Urls {
 			urlList[i] = v

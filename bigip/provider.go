@@ -153,6 +153,7 @@ func Provider() *schema.Provider {
 			"bigip_fast_udp_app":                    resourceBigipFastUdpApp(),
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
+			"bigip_ssl_key_cert":                    resourceBigipSSLKeyCert(),
 			"bigip_command":                         resourceBigipCommand(),
 			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
 			"bigip_bigiq_as3":                       resourceBigiqAs3(),
