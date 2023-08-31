@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	//"strings"
 	"time"
@@ -809,20 +810,17 @@ func (b *BigIP) StartTransaction() (*Transaction, error) {
 	return transaction, nil
 }
 
-func (b *BigIP) EndTransaction(tId int64) error {
+func (b *BigIP) CommitTransaction(tId int64) error {
+	b.Transaction = ""
 	commitTransaction := map[string]interface{}{
-		"state":        "VALIDATING",
-		"validateOnly": false,
+		"state": "VALIDATING",
 	}
-	payload, err := json.Marshal(commitTransaction)
-	if err != nil {
-		return fmt.Errorf("unable create commit transaction payload: %s", err)
-	}
-	err = b.patch(payload, uriMgmt, uriTm, uriTransaction, string(tId))
+	log.Printf("[INFO] Commiting Transaction with TransactionID: %v", tId)
+
+	err := b.patch(commitTransaction, uriMgmt, uriTm, uriTransaction, strconv.Itoa(int(tId)))
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
-	b.Transaction = ""
 	return nil
 }
 
