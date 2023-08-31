@@ -3,7 +3,7 @@ layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_pool_attachment"
 subcategory: "Local Traffic Manager(LTM)"
 description: |-
-  Provides details about bigip_ltm_pool_attachment resource
+Provides details about bigip_ltm_pool_attachment resource
 ---
 
 # bigip\_ltm\_pool\_attachment
@@ -12,11 +12,18 @@ description: |-
 
 ## Example Usage
 
+There are two ways to use `bigip_ltm_pool_attachment` resource for `node` attribute
 
-There are two ways to use ltm_pool_attachment resource, where we can take node reference from ltm_node or we can specify node directly with ip:port/fqdn:port which will also create node and atach to pool.
+* It can be reference from `bigip_ltm_node` (or)
+* It can be specify directly with `ipv4:port`/`fqdn:port`/`ipv6.port` which will also create node and attach member to pool.
+
+~> For adding IPv6 node/member to pool it should be specific in `node` attribute in format like `ipv6_address.port`.
+IPv4 should be specified as `ipv4_address:port`
 
 
-### Pool attachment with node directly taking  `ip:port` / `fqdn:port`
+### Usage Pool attachment with node/member directly attaching to pool.
+
+node can be specified in format `ipv4:port` / `fqdn:port` / `ipv6.port`
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {
@@ -34,14 +41,20 @@ resource "bigip_ltm_pool" "pool" {
   allow_nat           = "yes"
 }
 
-resource "bigip_ltm_pool_attachment" "attach_node" {
+# attaching ipv4 address with service port
+resource "bigip_ltm_pool_attachment" "ipv4_node_attach" {
   pool = bigip_ltm_pool.pool.name
   node = "1.1.1.1:80"
+}
+# attaching ipv6 address with service port
+resource "bigip_ltm_pool_attachment" "ipv6_node_attach" {
+  pool = bigip_ltm_pool.pool.name
+  node = "2003::4.80"
 }
 
 ```
 
-### Pool attachment with node referenced from `bigip_ltm_node`
+### Usage Pool attachment with node referenced from `bigip_ltm_node`
 
 ```hcl
 resource "bigip_ltm_monitor" "monitor" {

@@ -115,6 +115,28 @@ resource "bigip_ltm_pool_attachment" "pa_tc11" {
   connection_limit = 11
 }
 
+resource "bigip_ltm_pool" "tf-mypool" {
+  name                = "/Common/tf-mypool"
+  monitors            = ["/Common/http"]
+  allow_nat           = "yes"
+  allow_snat          = "yes"
+  load_balancing_mode = "round-robin"
+}
+
+resource "bigip_ltm_pool_attachment" "ipv6attach2" {
+  pool = bigip_ltm_pool.tf-mypool.name
+  node = "2003::4.80"
+}
+resource "bigip_ltm_pool_attachment" "ipv6attach3" {
+  pool = bigip_ltm_pool.tf-mypool.name
+  node = "fe80:0:0:0:0:0:0:12.80"
+}
+resource "bigip_ltm_pool_attachment" "ipv4attach2" {
+  pool = bigip_ltm_pool.tf-mypool.name
+  node = "192.168.100.11:80"
+}
+
+
 //resource "bigip_ltm_pool" "pool" {
 //  name                = "/Common/Axiom_Environment_APP1_Pool"
 //  load_balancing_mode = "round-robin"

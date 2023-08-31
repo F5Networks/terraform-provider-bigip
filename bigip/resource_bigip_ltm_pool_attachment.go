@@ -106,7 +106,7 @@ func resourceBigipLtmPoolAttachmentCreate(ctx context.Context, d *schema.Resourc
 	poolName := d.Get("pool").(string)
 	nodeName := d.Get("node").(string)
 	poolPartition := strings.Split(poolName, "/")[1]
-	parts := strings.Split(nodeName, ":")
+	parts := SplitNodePort(nodeName)
 	log.Printf("[INFO][CREATE] Attaching Node :%+v to pool : %+v", nodeName, poolName)
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
@@ -146,6 +146,7 @@ func resourceBigipLtmPoolAttachmentCreate(ctx context.Context, d *schema.Resourc
 		return resourceBigipLtmPoolAttachmentUpdate(ctx, d, meta)
 	} else {
 		log.Println("[DEBUG] creating node from pool attachment resource")
+		// split IP address for route domains
 		ipNode := strings.Split(parts[0], "%")[0]
 		config := &bigip.PoolMember{
 			Name:      nodeName,
@@ -179,7 +180,7 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 	re := regexp.MustCompile(`/([a-zA-z0-9?_-]+)/([a-zA-z0-9.?_-]+):(\d+)`)
 	match := re.FindStringSubmatch(nodeName)
 	if match != nil {
-		parts := strings.Split(nodeName, ":")
+		parts := SplitNodePort(nodeName)
 		node1, err := client.GetNode(parts[0])
 		if err != nil {
 			return diag.FromErr(err)
@@ -190,7 +191,7 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			return nil
 		}
 
-		poolMem := strings.Split(nodeName, ":")[0]
+		poolMem := SplitNodePort(nodeName)[0]
 		nodeName1 := strings.Split(poolMem, "/")[2]
 		poolName := d.Get("pool").(string)
 		config := &bigip.PoolMember{
@@ -237,9 +238,10 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 		poolName := d.Id()
 		poolPartition := strings.Split(poolName, "/")[1]
 		nodeName := d.Get("node").(string)
-		parts := strings.Split(nodeName, ":")
+		parts := SplitNodePort(nodeName)
 		ipNode := strings.Split(parts[0], "%")[0]
 		poolMem := fmt.Sprintf("/%s/%s", poolPartition, nodeName)
+		log.Printf("[DEBUG] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
 		config := &bigip.PoolMember{
 			Name:            nodeName,
 			FullPath:        poolMem,
@@ -251,7 +253,7 @@ func resourceBigipLtmPoolAttachmentUpdate(ctx context.Context, d *schema.Resourc
 			Ratio:           d.Get("ratio").(int),
 			Monitor:         d.Get("monitor").(string),
 		}
-		log.Printf("[INFO] Modifying pool member (%+v) from pool (%+v)", poolMem, poolName)
+		log.Printf("[DEBUG] Modifying pool member config:%+v", config)
 		userState := d.Get("state").(string)
 		if userState == "enabled" {
 			config.Session = "user-enabled"
@@ -415,4 +417,16 @@ func resourceBigipLtmPoolAttachmentImport(ctx context.Context, d *schema.Resourc
 	d.SetId(id)
 
 	return []*schema.ResourceData{d}, nil
+}
+func SplitNodePort(s string) []string {
+	m := strings.Index(s, ":")
+	n := strings.Index(s, ".")
+	switch {
+	case m > n:
+		return strings.Split(s, ":")
+	case m < n:
+		return strings.Split(s, ".")
+	default:
+		return nil
+	}
 }
