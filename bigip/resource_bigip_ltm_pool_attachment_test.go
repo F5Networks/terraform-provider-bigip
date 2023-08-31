@@ -102,14 +102,6 @@ resource "bigip_ltm_pool" "test-pool" {
 }
 `
 var TestPoolResource5 = `
-resource "bigip_ltm_node" "test-node" {
-        name = "` + TestNodeName + `"
-        address = "10.10.100.11"
-        connection_limit = "0"
-        dynamic_ratio = "1"
-        monitor = "default"
-        rate_limit = "disabled"
-}
 resource "bigip_ltm_pool" "test-pool" {
         name = "` + TestPoolName + `"
         monitors = ["/Common/http"]
@@ -349,10 +341,10 @@ func TestAccBigipLtmPoolAttachment_StateSet(t *testing.T) {
 					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.13:80", true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc1"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc2"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "forced_offline"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc3"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc2", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc2", "state", "forced_offline"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc3", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc3", "state", "enabled"),
 				),
 			},
 		},
@@ -375,10 +367,10 @@ func TestAccBigipLtmPoolAttachment_ModifyState(t *testing.T) {
 					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/10.10.100.13:80", true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc1"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "forced_offline"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc2"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "pool", "/Common/test_pool_pa_tc3"),
-					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc1", "state", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc2", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc2", "state", "enabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc3", "pool", "/Common/test_pool_pa_tc1"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc3", "state", "disabled"),
 				),
 			},
 		},
@@ -399,10 +391,15 @@ func TestAccBigipLtmPoolAttachmentTestCases(t *testing.T) {
 					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/test3.com:80", true),
 					testCheckPoolAttachment("/Common/test_pool_pa_tc1", "/Common/test_node_pa_tc5:80", true),
 					testCheckPoolAttachment("/TEST3/test_pool_pa_tc10", "/TEST3/2.3.2.2%50:8080", true),
+					testCheckPoolAttachment("/Common/tf-mypool", "/Common/2003::4.80", true),
+					testCheckPoolAttachment("/Common/tf-mypool", "/Common/fe80:0:0:0:0:0:0:12.80", true),
+					testCheckPoolAttachment("/Common/tf-mypool", "/Common/192.168.100.11:80", true),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc9", "pool", "/Common/test_pool_pa_tc9"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "pool", "/Common/test_pool_pa_tc1"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc8", "node", "1.1.12.2:80"),
 					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.pa_tc6", "node", "/Common/test3.com:80"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.ipv6attach2", "node", "2003::4.80"),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.ipv6attach3", "node", "fe80:0:0:0:0:0:0:12.80"),
 				),
 			},
 		},
