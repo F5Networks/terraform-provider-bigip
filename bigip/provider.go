@@ -111,6 +111,7 @@ func Provider() *schema.Provider {
 			"bigip_net_route":                       resourceBigipNetRoute(),
 			"bigip_net_selfip":                      resourceBigipNetSelfIP(),
 			"bigip_net_vlan":                        resourceBigipNetVlan(),
+			"bigip_ltm_cipher_rule":                 resourceBigipLtmCipherRule(),
 			"bigip_ltm_irule":                       resourceBigipLtmIRule(),
 			"bigip_ltm_datagroup":                   resourceBigipLtmDataGroup(),
 			"bigip_ltm_monitor":                     resourceBigipLtmMonitor(),

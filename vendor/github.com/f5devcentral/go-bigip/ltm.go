@@ -1886,6 +1886,14 @@ type HttpCompressionProfile struct {
 	VaryHeader         string   `json:"varyHeader,omitempty"`
 }
 
+type CipherRule struct {
+	Name                string `json:"name,omitempty"`
+	Partition           string `json:"partition,omitempty"`
+	Cipher              string `json:"cipher,omitempty"`
+	DHGroups            string `json:"dhGroups,omitempty"`
+	SignatureAlgorithms string `json:"signatureAlgorithms,omitempty"`
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -1928,6 +1936,8 @@ const (
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
 	uriCreateDraft    = "?options=create-draft"
+	uriCipher         = "cipher"
+	uriRule           = "rule"
 )
 
 var cidr = map[string]string{
@@ -3917,4 +3927,34 @@ func (b *BigIP) DeleteHttpCompressionProfile(name string) error {
 // Fields that can be modified are referenced in the HttpCompressionProfile struct.
 func (b *BigIP) ModifyHttpCompressionProfile(name string, config *HttpCompressionProfile) error {
 	return b.put(config, uriLtm, uriProfile, uriHttpcompress, name)
+}
+
+func (b *BigIP) CreateCipherRule(cipherRule *CipherRule) error {
+	return b.post(cipherRule, uriLtm, uriCipher, uriRule)
+}
+
+func (b *BigIP) ModifyCipherRule(cipherRule *CipherRule) error {
+	modifyPath := fmt.Sprintf("~%s~%s", cipherRule.Partition, cipherRule.Name)
+	return b.patch(cipherRule, uriLtm, uriCipher, uriRule, modifyPath)
+}
+
+func (b *BigIP) DeleteCipherRule(name, partition string) error {
+	deletePath := fmt.Sprintf("~%s~%s", partition, name)
+	return b.delete(uriLtm, uriCipher, uriRule, deletePath)
+}
+
+func (b *BigIP) GetCipherRule(name, partition string) (*CipherRule, error) {
+	cipherRule := &CipherRule{}
+	fullPath := fmt.Sprintf("~%s~%s", partition, name)
+	log.Printf("-------------------fullPath: %s--------------------", fullPath)
+	err, ok := b.getForEntity(&cipherRule, uriLtm, uriCipher, uriRule, fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return cipherRule, nil
 }
