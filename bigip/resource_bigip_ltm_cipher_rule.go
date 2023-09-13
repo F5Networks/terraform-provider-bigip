@@ -93,7 +93,7 @@ func resourceBigipLtmCipherRuleCreate(ctx context.Context, d *schema.ResourceDat
 			"Terraform Version": client.UserAgent,
 		}
 		tsVer := strings.Split(client.UserAgent, "/")
-		err = teemDevice.Report(f, "bigip_ltm_pool", tsVer[3])
+		err = teemDevice.Report(f, "bigip_ltm_cipher_rule", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
