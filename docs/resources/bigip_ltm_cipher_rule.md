@@ -34,6 +34,9 @@ resource "bigip_ltm_cipher_rule" "test_cipher_rule" {
 
 * `signature_algorithms` - (Optional,type `string`) Specifies the Signature Algorithms, separated by colons (:).
 
+## Read-Only
+
+* `full_path` - (String) The full path of the cipher rule, e.g. /Common/test_cipher_rule.
 
 ## Importing
 An existing cipher rule can be imported into this resource by supplying the cipher rule's `full path` as `id`.

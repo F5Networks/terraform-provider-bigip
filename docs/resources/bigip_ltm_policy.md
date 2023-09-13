@@ -37,7 +37,7 @@ resource "bigip_ltm_policy" "test-policy" {
   }
   depends_on = [bigip_ltm_pool.mypool]
 }
-```      
+```
 
 ## Argument Reference
 
