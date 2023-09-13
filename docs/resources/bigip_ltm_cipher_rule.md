@@ -14,10 +14,10 @@ description: |-
 
 ```hcl
 resource "bigip_ltm_cipher_rule" "test_cipher_rule" {
-  name = "test_cipher_rule"
-  partition = "Uncommon"
-  cipher_suites = "TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-SHA384"
-  dh_groups = "P256:P384:FFDHE2048:FFDHE3072:FFDHE4096"
+  name                 = "test_cipher_rule"
+  partition            = "Uncommon"
+  cipher_suites        = "TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-SHA384"
+  dh_groups            = "P256:P384:FFDHE2048:FFDHE3072:FFDHE4096"
   signature_algorithms = "DEFAULT"
 }
 ```
