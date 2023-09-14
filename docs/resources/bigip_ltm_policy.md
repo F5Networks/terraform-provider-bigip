@@ -49,7 +49,7 @@ resource "bigip_ltm_policy" "test-policy" {
 
 * `requires` - (Optional) Specifies the protocol
 
-* `published_copy` - (Optional) If you want to publish the policy else it will be deployed in Drafts mode.
+* `published_copy` - (Deprecated) If you want to publish the policy else it will be deployed in Drafts mode. This attribute is deprecated and will be removed in a future release.
 
 *  `controls` - (Optional) Specifies the controls
 
