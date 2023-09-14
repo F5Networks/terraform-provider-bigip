@@ -41,6 +41,9 @@ resource "bigip_ltm_policy" "test-policy" {
 
 ## Argument Reference
 
+> [!NOTE]
+> The attribute `published_copy` is not required anymore as the resource automatically publishes the policy, hence it's deprecated and will be removed from future release.
+
 * `name`- (Required) Name of the Policy ( policy name should be in full path which is combination of partition and policy name )
 
 * `strategy` - (Optional) Specifies the match strategy
