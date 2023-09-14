@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/f5devcentral/go-bigip"
+	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -97,6 +97,10 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 		Passphrase: passphrase,
 	}
 
+	t, err := client.StartTransaction()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
+	}
 	err = client.AddKey(&keyCfg)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
@@ -104,6 +108,10 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 	err = client.UploadCertificate(certName, certPath, partition)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while uploading the ssl cert: %v", err))
+	}
+	err = client.CommitTransaction(t.TransID)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while ending transaction: %d", err))
 	}
 
 	id := keyName + "_" + certName
@@ -166,6 +174,11 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	keyFullPath := fmt.Sprintf("/%s/%s", partition, keyName)
+
+	t, err := client.StartTransaction()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while trying to start transaction: %s", err))
+	}
 	err = client.ModifyKey(keyFullPath, &keyCfg)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
@@ -174,6 +187,10 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 	err = client.UpdateCertificate(certName, certPath, partition)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while updating the ssl certificate (%s): %s", certName, err))
+	}
+	err = client.CommitTransaction(t.TransID)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while trying to end transaction: %s", err))
 	}
 
 	return resourceBigipSSLKeyCertRead(ctx, d, meta)
@@ -191,7 +208,12 @@ func resourceBigipSSLKeyCertDelete(ctx context.Context, d *schema.ResourceData, 
 	keyFullPath := "/" + partition + "/" + keyName
 	certFullPath := "/" + partition + "/" + certName
 
-	err := client.DeleteKey(keyFullPath)
+	t, err := client.StartTransaction()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
+	}
+
+	err = client.DeleteKey(keyFullPath)
 	if err != nil {
 		log.Printf("[ERROR] unable to delete the ssl key (%s) (%v) ", keyFullPath, err)
 	}
@@ -199,6 +221,11 @@ func resourceBigipSSLKeyCertDelete(ctx context.Context, d *schema.ResourceData, 
 	err = client.DeleteCertificate(certFullPath)
 	if err != nil {
 		log.Printf("[ERROR] unable to delete the ssl certificate (%s) (%v) ", certFullPath, err)
+	}
+
+	err = client.CommitTransaction(t.TransID)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while ending transaction: %v", err))
 	}
 
 	d.SetId("")
