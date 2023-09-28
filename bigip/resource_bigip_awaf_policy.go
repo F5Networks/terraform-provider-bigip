@@ -540,7 +540,7 @@ func getpolicyConfig(d *schema.ResourceData) (string, error) {
 		fullPath = fmt.Sprintf("/%s/%s", partition, name)
 	}
 	var appLang1 string
-	appLang1 = "auto-detect"
+	appLang1 = "utf-8"
 	if val, ok := d.GetOk("application_language"); ok {
 		appLang1 = val.(string)
 	}
