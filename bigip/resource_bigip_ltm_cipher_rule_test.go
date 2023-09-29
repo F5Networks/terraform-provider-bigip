@@ -2,16 +2,17 @@ package bigip
 
 import (
 	"fmt"
+	"testing"
+
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"testing"
 )
 
 const testCipherRuleConfigTC1 = `
 resource "bigip_ltm_cipher_rule" "test-cipher-rule" {
-	name = "/Common/test-cipher-rule"
-	cipher = "aes"
+  name   = "/Common/test-cipher-rule"
+  cipher = "aes"
 }
 `
 

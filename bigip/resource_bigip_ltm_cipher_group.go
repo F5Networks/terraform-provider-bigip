@@ -7,10 +7,15 @@ package bigip
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmCipherGroup() *schema.Resource {
@@ -67,14 +72,31 @@ func resourceBigipLtmCipherGroupCreate(ctx context.Context, d *schema.ResourceDa
 
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
-	cipherGroup, err := getCipherGroupConfig(d, cipherGrouptmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipherGroup := getCipherGroupConfig(d, cipherGrouptmp)
+
 	log.Printf("[INFO] cipherGroup config :%+v", cipherGroup)
-	err = client.AddLtmCipherGroup(cipherGroup)
+	err := client.AddLtmCipherGroup(cipherGroup)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error creating cipher rule (%s): %s", name, err))
+	}
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_cipher_group", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 	d.SetId(name)
 	return resourceBigipLtmCipherGroupRead(ctx, d, meta)
@@ -101,10 +123,8 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	name := d.Id()
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
-	cipherGroupconfig, err := getCipherGroupConfig(d, cipherGrouptmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipherGroupconfig := getCipherGroupConfig(d, cipherGrouptmp)
+
 	if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
 	}
@@ -127,7 +147,7 @@ func resourceBigipLtmCipherGroupDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroupReq) (*bigip.CipherGroupReq, error) {
+func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroupReq) *bigip.CipherGroupReq {
 	cipherGroup.Ordering = d.Get("ordering").(string)
 	if p, ok := d.GetOk("allow"); ok {
 		for _, r := range p.(*schema.Set).List() {
@@ -139,5 +159,5 @@ func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroup
 			cipherGroup.Require = append(cipherGroup.Require, r.(string))
 		}
 	}
-	return cipherGroup, nil
+	return cipherGroup
 }

@@ -67,12 +67,10 @@ func resourceBigipLtmCipherRuleCreate(ctx context.Context, d *schema.ResourceDat
 
 	cipherRuletmp := &bigip.CipherRuleReq{}
 	cipherRuletmp.Name = name
-	cipherRule, err := getCipherRuleConfig(d, cipherRuletmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipherRule := getCipherRuleConfig(d, cipherRuletmp)
+
 	log.Printf("[INFO] cipherRule config :%+v", cipherRule)
-	err = client.AddLtmCipherRule(cipherRule)
+	err := client.AddLtmCipherRule(cipherRule)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error creating cipher rule (%s): %s", name, err))
 	}
@@ -123,10 +121,7 @@ func resourceBigipLtmCipherRuleUpdate(ctx context.Context, d *schema.ResourceDat
 	name := d.Id()
 	cipherRuletmp := &bigip.CipherRuleReq{}
 	cipherRuletmp.Name = name
-	cipheRuleconfig, err := getCipherRuleConfig(d, cipherRuletmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipheRuleconfig := getCipherRuleConfig(d, cipherRuletmp)
 	if err := client.ModifyLtmCipherRule(name, cipheRuleconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher rule %s: %v", name, err))
 	}
@@ -145,10 +140,10 @@ func resourceBigipLtmCipherRuleDelete(ctx context.Context, d *schema.ResourceDat
 	d.SetId("")
 	return nil
 }
-func getCipherRuleConfig(d *schema.ResourceData, cipherRule *bigip.CipherRuleReq) (*bigip.CipherRuleReq, error) {
+func getCipherRuleConfig(d *schema.ResourceData, cipherRule *bigip.CipherRuleReq) *bigip.CipherRuleReq {
 	cipherRule.Cipher = d.Get("cipher").(string)
 	cipherRule.DhGroups = d.Get("dh_groups").(string)
 	cipherRule.SignatureAlgorithms = d.Get("signature_algorithms").(string)
 	cipherRule.Description = d.Get("description").(string)
-	return cipherRule, nil
+	return cipherRule
 }
