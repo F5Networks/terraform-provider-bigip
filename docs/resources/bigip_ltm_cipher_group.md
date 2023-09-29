@@ -14,9 +14,9 @@ Provides details about bigip_ltm_cipher_rule resource
 
 ```hcl
 resource "bigip_ltm_cipher_group" "test-cipher-group" {
-  name = "/Common/test-cipher-group-01"
-  allow = ["/Common/f5-aes"]
-  require = ["/Common/f5-quic"]
+  name     = "/Common/test-cipher-group-01"
+  allow    = ["/Common/f5-aes"]
+  require  = ["/Common/f5-quic"]
   ordering = "speed"
 }
 ```

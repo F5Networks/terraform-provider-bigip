@@ -124,7 +124,7 @@ func resourceBigipLtmCipherRuleUpdate(ctx context.Context, d *schema.ResourceDat
 	cipheRuleconfig := getCipherRuleConfig(d, cipherRuletmp)
 	if err := client.ModifyLtmCipherRule(name, cipheRuleconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher rule %s: %v", name, err))
-	}  
+	}
 	return resourceBigipLtmCipherRuleRead(ctx, d, meta)
 }
 
