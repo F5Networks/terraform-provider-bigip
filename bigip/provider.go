@@ -111,7 +111,6 @@ func Provider() *schema.Provider {
 			"bigip_net_route":                       resourceBigipNetRoute(),
 			"bigip_net_selfip":                      resourceBigipNetSelfIP(),
 			"bigip_net_vlan":                        resourceBigipNetVlan(),
-			"bigip_ltm_cipher_rule":                 resourceBigipLtmCipherRule(),
 			"bigip_ltm_irule":                       resourceBigipLtmIRule(),
 			"bigip_ltm_datagroup":                   resourceBigipLtmDataGroup(),
 			"bigip_ltm_monitor":                     resourceBigipLtmMonitor(),
@@ -166,6 +165,8 @@ func Provider() *schema.Provider {
 			"bigip_ipsec_profile":                   resourceBigipIpsecProfile(),
 			"bigip_waf_policy":                      resourceBigipAwafPolicy(),
 			"bigip_vcmp_guest":                      resourceBigipVcmpGuest(),
+			"bigip_ltm_cipher_rule":                 resourceBigipLtmCipherRule(),
+			"bigip_ltm_cipher_group":                resourceBigipLtmCipherGroup(),
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
