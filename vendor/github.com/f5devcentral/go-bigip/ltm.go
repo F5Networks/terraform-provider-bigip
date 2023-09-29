@@ -1886,6 +1886,14 @@ type HttpCompressionProfile struct {
 	VaryHeader         string   `json:"varyHeader,omitempty"`
 }
 
+type CipherRule struct {
+	Name                string `json:"name,omitempty"`
+	Partition           string `json:"partition,omitempty"`
+	Cipher              string `json:"cipher,omitempty"`
+	DHGroups            string `json:"dhGroups,omitempty"`
+	SignatureAlgorithms string `json:"signatureAlgorithms,omitempty"`
+}
+
 const (
 	uriLtm            = "ltm"
 	uriNode           = "node"
@@ -1929,6 +1937,7 @@ const (
 	uriSSL            = "ssl"
 	uriUniversal      = "universal"
 	uriCreateDraft    = "?options=create-draft"
+	uriRule           = "rule"
 )
 
 var cidr = map[string]string{
@@ -3952,7 +3961,6 @@ func (b *BigIP) GetLtmCipherRule(name string) (*CipherRuleReq, error) {
 	if !ok {
 		return nil, nil
 	}
-
 	return &cipherRule, nil
 }
 

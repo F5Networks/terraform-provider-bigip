@@ -17,8 +17,10 @@ import (
 
 const testCipherGroupConfigTC1 = `
 resource "bigip_ltm_cipher_group" "test-cipher-group" {
-	name = "/Common/test-cipher-group-01"
-	//cipher = "aes"
+  name     = "/Common/test-cipher-group-01"
+  allow    = ["/Common/f5-aes"]
+  require  = ["/Common/f5-quic"]
+  ordering = "speed"
 }
 `
 

@@ -56,6 +56,7 @@ func resourceBigipLtmPolicy() *schema.Resource {
 				Optional:    true,
 				Description: "Publish the Policy",
 				ForceNew:    true,
+				Deprecated:  "This attribute is not required anymore because the resource automatically publishes the policy, for that reason this field is deprecated and will be removed in a future release.",
 			},
 			"controls": {
 				Type:     schema.TypeSet,

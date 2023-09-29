@@ -211,10 +211,11 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Description: "Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is TCP. The Protocol setting is not available when you select Performance (HTTP) as the Type.",
 			},
 			"policies": {
-				Type:     schema.TypeSet,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-				Optional: true,
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Optional:    true,
+				Description: "Specifies the policies for the virtual server",
 			},
 			"vlans": {
 				Type:     schema.TypeSet,

@@ -7,10 +7,15 @@ package bigip
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/f5devcentral/go-bigip/f5teem"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"log"
 )
 
 func resourceBigipLtmCipherGroup() *schema.Resource {
@@ -26,7 +31,7 @@ func resourceBigipLtmCipherGroup() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				Description:  "Name of the cipher rule,name should be in pattern ``partition` + `cipher rule name``",
+				Description:  "Name of the cipher group,name should be in pattern ``partition` + `cipher group name``",
 				ForceNew:     true,
 				ValidateFunc: validateF5Name,
 			},
@@ -36,22 +41,24 @@ func resourceBigipLtmCipherGroup() *schema.Resource {
 				Description: "Specifies descriptive text that identifies the cipher rule",
 			},
 			"ordering": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies one or more Cipher Suites used.Note: For SM2, type the following cipher suite string: ECC-SM4-SM3.",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				//Default:     "default",
+				Description: "Controls the order of the Cipher String list in the Cipher Audit section. Options are Default, Speed, Strength, FIPS, and Hardware. The rules are processed in the order listed",
 			},
 			"allow": {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Specifies the DH Groups Elliptic Curve Diffie-Hellman key exchange algorithms, separated by colons (:).Note: You can also type a special keyword, DEFAULT, which represents the recommended set of named groups",
+				Description: "Specifies the configuration of the allowed groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
 			},
 			"require": {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Specifies the DH Groups Elliptic Curve Diffie-Hellman key exchange algorithms, separated by colons (:).Note: You can also type a special keyword, DEFAULT, which represents the recommended set of named groups",
-			},
+				Description: "Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
+      },
 		},
 	}
 }
@@ -65,14 +72,31 @@ func resourceBigipLtmCipherGroupCreate(ctx context.Context, d *schema.ResourceDa
 
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
-	cipherGroup, err := getCipherGroupConfig(d, cipherGrouptmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipherGroup := getCipherGroupConfig(d, cipherGrouptmp)
+
 	log.Printf("[INFO] cipherGroup config :%+v", cipherGroup)
-	err = client.AddLtmCipherGroup(cipherGroup)
+	err := client.AddLtmCipherGroup(cipherGroup)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error creating cipher rule (%s): %s", name, err))
+	}
+	if !client.Teem {
+		id := uuid.New()
+		uniqueID := id.String()
+		assetInfo := f5teem.AssetInfo{
+			Name:    "Terraform-provider-bigip",
+			Version: client.UserAgent,
+			Id:      uniqueID,
+		}
+		apiKey := os.Getenv("TEEM_API_KEY")
+		teemDevice := f5teem.AnonymousClient(assetInfo, apiKey)
+		f := map[string]interface{}{
+			"Terraform Version": client.UserAgent,
+		}
+		tsVer := strings.Split(client.UserAgent, "/")
+		err = teemDevice.Report(f, "bigip_ltm_cipher_group", tsVer[3])
+		if err != nil {
+			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
 	}
 	d.SetId(name)
 	return resourceBigipLtmCipherGroupRead(ctx, d, meta)
@@ -82,13 +106,14 @@ func resourceBigipLtmCipherGroupRead(ctx context.Context, d *schema.ResourceData
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Fetching Cipher group :%+v", name)
-
-	cipherRule, err := client.GetLtmCipherGroup(name)
+	cipherGroup, err := client.GetLtmCipherGroup(name)
 	if err != nil {
-		log.Printf("[ERROR] Unable to retrieve cipher rule %s  %v :", name, err)
+		log.Printf("[ERROR] Unable to retrieve cipher group %s  %v :", name, err)
 		return diag.FromErr(err)
 	}
-	log.Printf("[INFO] Cipher rule response :%+v", cipherRule)
+	_ = d.Set("name", cipherGroup.FullPath)
+	_ = d.Set("ordering", cipherGroup.Ordering)
+	log.Printf("[INFO] Cipher group response :%+v", cipherGroup)
 	return nil
 }
 
@@ -97,10 +122,7 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	name := d.Id()
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
-	cipherGroupconfig, err := getCipherGroupConfig(d, cipherGrouptmp)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
-	}
+	cipherGroupconfig := getCipherGroupConfig(d, cipherGrouptmp)
 	if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
 	}
@@ -123,7 +145,8 @@ func resourceBigipLtmCipherGroupDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroupReq) (*bigip.CipherGroupReq, error) {
+
+func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroupReq) *bigip.CipherGroupReq {
 	cipherGroup.Ordering = d.Get("ordering").(string)
 	if p, ok := d.GetOk("allow"); ok {
 		for _, r := range p.(*schema.Set).List() {
@@ -134,6 +157,6 @@ func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroup
 		for _, r := range p.(*schema.Set).List() {
 			cipherGroup.Require = append(cipherGroup.Require, r.(string))
 		}
-	}
-	return cipherGroup, nil
+	}	
+  return cipherGroup
 }

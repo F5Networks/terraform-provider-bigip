@@ -90,6 +90,8 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `vlans` - (Optional) The virtual server is enabled/disabled on this set of VLANs,enable/disabled will be desided by attribute `vlan_enabled`
 
+* `policies` - (Optional) Specifies the policies for the virtual server.
+
 * `vlans_enabled` - (Optional Bool) Enables the virtual server on the VLANs specified by the `vlans` option.
 By default it is `false` i.e vlanDisabled on specified vlans, if we want enable virtual server on VLANs specified by `vlans`, mark this attribute to `true`.
 
