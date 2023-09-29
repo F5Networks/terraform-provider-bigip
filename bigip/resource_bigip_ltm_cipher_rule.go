@@ -1,3 +1,7 @@
+// Copyright 2023 F5 Networks Inc.
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 package bigip
 
 import (
@@ -23,39 +27,33 @@ func resourceBigipLtmCipherRule() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
+				Type:         schema.TypeString,
+				Required:     true,
+				Description:  "Name of the cipher rule,name should be in pattern ``partition` + `cipher rule name``",
+				ForceNew:     true,
+				ValidateFunc: validateF5Name,
+			},
+			"description": {
 				Type:        schema.TypeString,
-				Description: "The cipher rule name.",
+				Optional:    true,
+				Description: "Specifies descriptive text that identifies the cipher rule",
+			},
+			"cipher": {
+				Type:        schema.TypeString,
 				Required:    true,
-			},
-			"partition": {
-				Type:        schema.TypeString,
-				Description: "The partition name.",
-				Optional:    true,
-				Default:     "Common",
-			},
-			"cipher_suites": {
-				Type:        schema.TypeString,
-				Description: "The cipher suites.",
-				Default:     "DEFAULT",
-				Optional:    true,
+				Description: "Specifies one or more Cipher Suites used.Note: For SM2, type the following cipher suite string: ECC-SM4-SM3.",
 			},
 			"dh_groups": {
 				Type:        schema.TypeString,
-				Description: "The DH groups.",
 				Optional:    true,
+				Description: "Specifies the DH Groups Elliptic Curve Diffie-Hellman key exchange algorithms, separated by colons (:).Note: You can also type a special keyword, DEFAULT, which represents the recommended set of named groups",
 			},
 			"signature_algorithms": {
 				Type:        schema.TypeString,
-				Description: "The signature algorithms.",
 				Optional:    true,
-			},
-			"full_path": {
-				Type:        schema.TypeString,
-				Description: "The full path of the cipher rule.",
-				Computed:    true,
+				Description: "Specifies the Signature Algorithms, separated by colons (:), that you want to include in the cipher rule. You can also type a special keyword, DEFAULT, which represents the recommended set of signature algorithms",
 			},
 		},
 	}
@@ -64,21 +62,21 @@ func resourceBigipLtmCipherRule() *schema.Resource {
 func resourceBigipLtmCipherRuleCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	partition := d.Get("partition").(string)
-	log.Println("[INFO] Creating Cipher Rule: ", name, " in partition: ", partition)
-	cipherRule := &bigip.CipherRule{
-		Name:                name,
-		Partition:           partition,
-		Cipher:              d.Get("cipher_suites").(string),
-		DHGroups:            d.Get("dh_groups").(string),
-		SignatureAlgorithms: d.Get("signature_algorithms").(string),
-	}
-	err := client.CreateCipherRule(cipherRule)
+
+	log.Printf("[INFO] Creating Cipher rule:%+v", name)
+
+	cipherRuletmp := &bigip.CipherRuleReq{}
+	cipherRuletmp.Name = name
+	cipherRule, err := getCipherRuleConfig(d, cipherRuletmp)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
 	}
-	fullPath := fmt.Sprintf("/%s/%s", partition, name)
-	d.SetId(fullPath)
+	log.Printf("[INFO] cipherRule config :%+v", cipherRule)
+	err = client.AddLtmCipherRule(cipherRule)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error creating cipher rule (%s): %s", name, err))
+	}
+	d.SetId(name)
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -103,61 +101,54 @@ func resourceBigipLtmCipherRuleCreate(ctx context.Context, d *schema.ResourceDat
 
 func resourceBigipLtmCipherRuleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-
-	id := d.Id()
-	id = strings.Replace(id, "/", "", 1)
-	name_partition := strings.Split(id, "/")
-	name := name_partition[1]
-	partition := name_partition[0]
-
-	log.Printf("----------------name_partition: %v------------------", name_partition)
-
-	log.Println("[INFO] Reading Cipher Rule: ", name)
-	cipherRule, err := client.GetCipherRule(name, partition)
+	name := d.Id()
+	log.Printf("[INFO] Fetching Cipher rule :%+v", name)
+	cipherRule, err := client.GetLtmCipherRule(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to retrieve cipher rule %s  %v :", name, err)
 		return diag.FromErr(err)
 	}
-	if cipherRule == nil {
-		return diag.FromErr(fmt.Errorf("cipher Rule not found"))
-	}
-	fullPath := fmt.Sprintf("/%s/%s", partition, name)
+	log.Printf("[INFO] Cipher rule response :%+v", cipherRule)
 	_ = d.Set("name", cipherRule.Name)
 	_ = d.Set("partition", cipherRule.Partition)
 	_ = d.Set("cipher_suites", cipherRule.Cipher)
-	_ = d.Set("dh_groups", cipherRule.DHGroups)
+	_ = d.Set("dh_groups", cipherRule.DhGroups)
 	_ = d.Set("signature_algorithms", cipherRule.SignatureAlgorithms)
-	_ = d.Set("full_path", fullPath)
 	return nil
 }
 
 func resourceBigipLtmCipherRuleUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	name := d.Get("name").(string)
-	partition := d.Get("partition").(string)
-	log.Println("[INFO] Updating Cipher Rule: ", name, " in partition: ", partition)
-	cipherRule := &bigip.CipherRule{
-		Name:                name,
-		Partition:           partition,
-		Cipher:              d.Get("cipher_suites").(string),
-		DHGroups:            d.Get("dh_groups").(string),
-		SignatureAlgorithms: d.Get("signature_algorithms").(string),
-	}
-	err := client.ModifyCipherRule(cipherRule)
+
+	name := d.Id()
+	cipherRuletmp := &bigip.CipherRuleReq{}
+	cipherRuletmp.Name = name
+	cipheRuleconfig, err := getCipherRuleConfig(d, cipherRuletmp)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.FromErr(fmt.Errorf("reading input config failed(%s): %s", name, err))
+	}
+	if err := client.ModifyLtmCipherRule(name, cipheRuleconfig); err != nil {
+		return diag.FromErr(fmt.Errorf("error modifying cipher rule %s: %v", name, err))
 	}
 	return resourceBigipLtmCipherRuleRead(ctx, d, meta)
 }
 
 func resourceBigipLtmCipherRuleDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	name := d.Get("name").(string)
-	partition := d.Get("partition").(string)
-	log.Println("[INFO] Deleting Cipher Rule: ", name, " in partition: ", partition)
-	err := client.DeleteCipherRule(name, partition)
+	name := d.Id()
+	log.Printf("[INFO] Deleting cipher rule :%+v", name)
+	err := client.DeleteLtmCipherRule(name)
 	if err != nil {
+		log.Printf("[ERROR] Unable to Delete cipher rule %s  %v : ", name, err)
 		return diag.FromErr(err)
 	}
 	d.SetId("")
 	return nil
+}
+func getCipherRuleConfig(d *schema.ResourceData, cipherRule *bigip.CipherRuleReq) (*bigip.CipherRuleReq, error) {
+	cipherRule.Cipher = d.Get("cipher").(string)
+	cipherRule.DhGroups = d.Get("dh_groups").(string)
+	cipherRule.SignatureAlgorithms = d.Get("signature_algorithms").(string)
+	cipherRule.Description = d.Get("description").(string)
+	return cipherRule, nil
 }
