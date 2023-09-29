@@ -58,7 +58,7 @@ func resourceBigipLtmCipherGroup() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
-			},
+      },
 		},
 	}
 }
@@ -106,7 +106,6 @@ func resourceBigipLtmCipherGroupRead(ctx context.Context, d *schema.ResourceData
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
 	log.Printf("[INFO] Fetching Cipher group :%+v", name)
-
 	cipherGroup, err := client.GetLtmCipherGroup(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve cipher group %s  %v :", name, err)
@@ -124,7 +123,6 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
 	cipherGroupconfig := getCipherGroupConfig(d, cipherGrouptmp)
-
 	if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
 	}
@@ -147,6 +145,7 @@ func resourceBigipLtmCipherGroupDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
+
 func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroupReq) *bigip.CipherGroupReq {
 	cipherGroup.Ordering = d.Get("ordering").(string)
 	if p, ok := d.GetOk("allow"); ok {
@@ -158,6 +157,6 @@ func getCipherGroupConfig(d *schema.ResourceData, cipherGroup *bigip.CipherGroup
 		for _, r := range p.(*schema.Set).List() {
 			cipherGroup.Require = append(cipherGroup.Require, r.(string))
 		}
-	}
-	return cipherGroup
+	}	
+  return cipherGroup
 }

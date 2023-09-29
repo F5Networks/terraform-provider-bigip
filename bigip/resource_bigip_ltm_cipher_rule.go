@@ -67,6 +67,7 @@ func resourceBigipLtmCipherRuleCreate(ctx context.Context, d *schema.ResourceDat
 
 	cipherRuletmp := &bigip.CipherRuleReq{}
 	cipherRuletmp.Name = name
+
 	cipherRule := getCipherRuleConfig(d, cipherRuletmp)
 
 	log.Printf("[INFO] cipherRule config :%+v", cipherRule)
@@ -117,14 +118,13 @@ func resourceBigipLtmCipherRuleRead(ctx context.Context, d *schema.ResourceData,
 
 func resourceBigipLtmCipherRuleUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-
 	name := d.Id()
 	cipherRuletmp := &bigip.CipherRuleReq{}
 	cipherRuletmp.Name = name
 	cipheRuleconfig := getCipherRuleConfig(d, cipherRuletmp)
 	if err := client.ModifyLtmCipherRule(name, cipheRuleconfig); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher rule %s: %v", name, err))
-	}
+	}  
 	return resourceBigipLtmCipherRuleRead(ctx, d, meta)
 }
 
@@ -140,6 +140,7 @@ func resourceBigipLtmCipherRuleDelete(ctx context.Context, d *schema.ResourceDat
 	d.SetId("")
 	return nil
 }
+
 func getCipherRuleConfig(d *schema.ResourceData, cipherRule *bigip.CipherRuleReq) *bigip.CipherRuleReq {
 	cipherRule.Cipher = d.Get("cipher").(string)
 	cipherRule.DhGroups = d.Get("dh_groups").(string)
