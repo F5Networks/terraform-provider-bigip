@@ -873,8 +873,8 @@ func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) 
 		config.Ciphers = ciphers.(string)
 		config.CipherGroup = "none"
 	}
-	if cipher_grp, ok := d.GetOk("cipher_group"); ok && cipher_grp != "none" {
-		config.CipherGroup = cipher_grp.(string)
+	if cipherGrp, ok := d.GetOk("cipher_group"); ok && cipherGrp != "none" {
+		config.CipherGroup = cipherGrp.(string)
 		config.Ciphers = "none"
 	}
 	config.ClientCertCa = d.Get("client_cert_ca").(string)
