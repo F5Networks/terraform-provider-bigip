@@ -113,7 +113,18 @@ func resourceBigipLtmCipherGroupRead(ctx context.Context, d *schema.ResourceData
 	}
 	_ = d.Set("name", cipherGroup.FullPath)
 	_ = d.Set("ordering", cipherGroup.Ordering)
-	log.Printf("[INFO] Cipher group response :%+v", cipherGroup)
+	var allowList []interface{}
+	for _, val := range cipherGroup.Allow {
+		tmpCipher := fmt.Sprintf("/%s/%s", val.(map[string]interface{})["partition"].(string), val.(map[string]interface{})["name"].(string))
+		allowList = append(allowList, tmpCipher)
+	}
+	_ = d.Set("allow", allowList)
+	var requireList []interface{}
+	for _, val := range cipherGroup.Require {
+		tmpCipher := fmt.Sprintf("/%s/%s", val.(map[string]interface{})["partition"].(string), val.(map[string]interface{})["name"].(string))
+		requireList = append(requireList, tmpCipher)
+	}
+	_ = d.Set("require", requireList)
 	return nil
 }
 
