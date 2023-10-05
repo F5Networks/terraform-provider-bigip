@@ -166,9 +166,10 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Description: "Specifies how the system handles HTTP content that is chunked by a server. The default is Selective",
 			},
 			"server_agent_name": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				// Computed:    true,
+				Default:     "BigIP",
 				Description: "Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. If no string is specified, then no Server header will be added to such responses",
 			},
 			"via_host_name": {
@@ -197,6 +198,72 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Computed:    true,
 				Description: "Specifies alternative XFF headers instead of the default X-forwarded-for header",
 			},
+			"http_strict_transport_security": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"include_subdomains": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "enabled",
+							Description: "Specifies whether to include the includeSubdomains directive in the HSTS header.",
+						},
+						"maximum_age": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     16070400,
+							Description: "Specifies the maximum age to assume the connection should remain secure.",
+						},
+						"mode": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "disabled",
+							Description: "Specifies whether to include the HSTS response header.",
+						},
+						"preload": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "disabled",
+							Description: "Specifies whether to include the preload directive in the HSTS header.",
+						},
+					},
+				},
+			},
+			"enforcement": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"known_methods": {
+							Type: schema.TypeSet,
+							Set:  schema.HashString,
+							Computed: 	 true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Optional:    true,
+							Description: "Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them.",
+						},
+						"max_header_count": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     64,
+							Description: "Specifies the maximum number of headers allowed in HTTP request/response.",
+						},
+						"max_header_size": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     32768,
+							Description: "Specifies the maximum header size.",
+						},
+						"unknown_method": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "allow",
+							Description: "Specifies whether to allow, reject or switch to pass-through mode when an unknown HTTP method is parsed.",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -211,6 +278,15 @@ func resourceBigipLtmProfileHttpCreate(ctx context.Context, d *schema.ResourceDa
 		Name: name,
 	}
 	config := getHttpProfileConfig(d, pss)
+
+	if p, ok := d.GetOk("enforcement"); ok {
+		for _, r := range p.(*schema.Set).List() {
+			if len(r.(map[string]interface{})["known_methods"].(*schema.Set).List()) == 0 {
+				defaultKnownMethods := [...]string{"CONNECT", "DELETE", "GET", "HEAD", "LOCK", "OPTIONS", "POST", "PROPFIND", "PUT", "TRACE", "UNLOCK"}
+				config.Enforcement.KnownMethods = defaultKnownMethods[:]
+			}
+		}
+	}
 
 	err := client.AddHttpProfile(config)
 	if err != nil {
@@ -325,6 +401,28 @@ func resourceBigipLtmProfileHttpRead(ctx context.Context, d *schema.ResourceData
 	}
 	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
 
+	log.Printf("Known Methods--------", pp.Enforcement.KnownMethods)
+
+	var enforcementList []interface{}
+	enforcement := make(map[string]interface{})
+	enforcement["max_header_count"] = pp.Enforcement.MaxHeaderCount
+	enforcement["max_header_size"] = pp.Enforcement.MaxHeaderSize
+	enforcement["unknown_method"] = pp.Enforcement.UnknownMethod
+	enforcement["known_methods"] = pp.Enforcement.KnownMethods
+
+	enforcementList = append(enforcementList, enforcement)
+	_ = d.Set("enforcement", enforcementList)
+	
+	var hstsList []interface{}
+	hsts := make(map[string]interface{})
+	hsts["include_subdomains"] = pp.Hsts.IncludeSubdomains
+	hsts["maximum_age"] = pp.Hsts.MaximumAge
+	hsts["mode"] = pp.Hsts.Mode
+	hsts["preload"] = pp.Hsts.Preload
+
+	hstsList = append(hstsList, hsts)
+	_ = d.Set("http_strict_transport_security", hstsList) 
+
 	return nil
 }
 
@@ -337,6 +435,16 @@ func resourceBigipLtmProfileHttpUpdate(ctx context.Context, d *schema.ResourceDa
 		Name: name,
 	}
 	config := getHttpProfileConfig(d, pss)
+
+	if p, ok := d.GetOk("enforcement"); ok {
+		for _, r := range p.(*schema.Set).List() {
+			if len(r.(map[string]interface{})["known_methods"].(*schema.Set).List()) == 0 {
+				defaultKnownMethods := [...]string{"CONNECT", "DELETE", "GET", "HEAD", "LOCK", "OPTIONS", "POST", "PROPFIND", "PUT", "TRACE", "UNLOCK"}
+				config.Enforcement.KnownMethods = defaultKnownMethods[:]
+			}
+		}
+	}
+
 	err := client.ModifyHttpProfile(name, config)
 
 	if err != nil {
@@ -387,5 +495,24 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 	config.ViaRequest = d.Get("via_request").(string)
 	config.ViaResponse = d.Get("via_response").(string)
 	config.XffAlternativeNames = setToInterfaceSlice(d.Get("xff_alternative_names").(*schema.Set))
+	config.LwsWidth = d.Get("lws_width").(int)
+	if p, ok := d.GetOk("http_strict_transport_security"); ok {
+		for _, r := range p.(*schema.Set).List() {
+			config.Hsts.IncludeSubdomains = r.(map[string]interface{})["include_subdomains"].(string)
+			config.Hsts.Mode = r.(map[string]interface{})["preload"].(string)
+			config.Hsts.Preload = r.(map[string]interface{})["mode"].(string)
+			config.Hsts.MaximumAge = r.(map[string]interface{})["maximum_age"].(int)
+		}
+	}
+
+	if p, ok := d.GetOk("enforcement"); ok {
+		for _, r := range p.(*schema.Set).List() {
+			config.Enforcement.KnownMethods = setToStringSlice(r.(map[string]interface{})["known_methods"].(*schema.Set))
+			config.Enforcement.UnknownMethod = r.(map[string]interface{})["unknown_method"].(string)
+			config.Enforcement.MaxHeaderCount = r.(map[string]interface{})["max_header_count"].(int)
+			config.Enforcement.MaxHeaderSize = r.(map[string]interface{})["max_header_size"].(int)
+		}
+	}
+
 	return config
 }
