@@ -130,6 +130,7 @@ type ClientSSLProfile struct {
 	Key                             string      `json:"key,omitempty"`
 	ModSslMethods                   string      `json:"modSslMethods,omitempty"`
 	Mode                            string      `json:"mode,omitempty"`
+	OcspStapling                    string      `json:"ocspStapling,omitempty"`
 	TmOptions                       interface{} `json:"tmOptions,omitempty"`
 	Passphrase                      string      `json:"passphrase,omitempty"`
 	PeerCertMode                    string      `json:"peerCertMode,omitempty"`
@@ -2100,7 +2101,7 @@ func (b *BigIP) GetClientSSLProfile(name string) (*ClientSSLProfile, error) {
 	if !ok {
 		return nil, nil
 	}
-	log.Printf("------------------ssl profile: %+v-----------------", clientSSLProfile)
+
 	return &clientSSLProfile, nil
 }
 
