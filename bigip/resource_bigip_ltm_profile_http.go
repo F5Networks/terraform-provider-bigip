@@ -237,9 +237,9 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"known_methods": {
-							Type:     schema.TypeList,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Type:        schema.TypeList,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 							Optional:    true,
 							Description: "Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them.",
 						},
@@ -273,12 +273,11 @@ func resourceBigipLtmProfileHttpCreate(ctx context.Context, d *schema.ResourceDa
 
 	name := d.Get("name").(string)
 	log.Printf("[INFO] Creating HTTP Profile:%+v ", name)
-	
+
 	pss := &bigip.HttpProfile{
 		Name: name,
 	}
 	config := getHttpProfileConfig(d, pss)
-
 
 	err := client.AddHttpProfile(config)
 	if err != nil {
@@ -393,7 +392,6 @@ func resourceBigipLtmProfileHttpRead(ctx context.Context, d *schema.ResourceData
 	}
 	_ = d.Set("xff_alternative_names", pp.XffAlternativeNames)
 
-
 	var enforcementList []interface{}
 	enforcement := make(map[string]interface{})
 	enforcement["max_header_count"] = pp.Enforcement.MaxHeaderCount
@@ -490,14 +488,13 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 	config.XffAlternativeNames = setToInterfaceSlice(d.Get("xff_alternative_names").(*schema.Set))
 	config.LwsWidth = d.Get("lws_width").(int)
 	p := d.Get("http_strict_transport_security")
-	
+
 	for _, r := range p.(*schema.Set).List() {
 		config.Hsts.IncludeSubdomains = r.(map[string]interface{})["include_subdomains"].(string)
 		config.Hsts.Mode = r.(map[string]interface{})["preload"].(string)
 		config.Hsts.Preload = r.(map[string]interface{})["mode"].(string)
 		config.Hsts.MaximumAge = r.(map[string]interface{})["maximum_age"].(int)
 	}
-
 
 	v := d.Get("enforcement")
 
