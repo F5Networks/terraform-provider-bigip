@@ -83,7 +83,7 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 The `enforcement` block supports the following:
 
-* `known_methods` - (Optional , `list`) Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them. Default value is [CONNECT DELETE GET HEAD LOCK OPTIONS POST PROPFIND PUT TRACE UNLOCK]. If no value is specified, then default value will be added to such responses. In order to remove it, [""]  list is to be passed.
+* `known_methods` - (Optional , `list`) Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them. Default value is [CONNECT DELETE GET HEAD LOCK OPTIONS POST PROPFIND PUT TRACE UNLOCK].If no value is specified while creating, then default value will be assigned. In order to remove it, [""]  list is to be passed.
 
 * `unknown_method` - (Optional , `string`) Specifies whether to allow, reject or switch to pass-through mode when an unknown HTTP method is parsed. Default value is allow. If no string is specified, then default value will be assigned.
 
