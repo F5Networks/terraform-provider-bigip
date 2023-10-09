@@ -342,6 +342,87 @@ func TestAccBigipLtmProfileHttpUpdateEncryptCookies(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileHttpUpdateEnforcement(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-enforcement"
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, "enforcement"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "CONNECT"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "DELETE"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "GET"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "HEAD"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "LOCK"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "POST"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "PROPFIND"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "PUT"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "TRACE"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "UNLOCK"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.unknown_method", "allow"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.max_header_count", "40"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.max_header_size", "80"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmProfileHttpUpdateHSTS(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-hsts"
+	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, "hsts"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.include_subdomains", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.preload", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.mode", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.maximum_age", "80"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileHttpImport(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -469,6 +550,22 @@ func testaccbigipltmprofilehttpUpdateParam(instName, updateParam string) string 
 	case "basic_auth_realm":
 		resPrefix = fmt.Sprintf(`%s
 			  basic_auth_realm = "titanic"`, resPrefix)
+	case "enforcement":
+		resPrefix = fmt.Sprintf(`%s
+			enforcement {
+				known_methods = ["CONNECT","DELETE","GET","HEAD","LOCK","OPTIONS","POST","PROPFIND","PUT","TRACE","UNLOCK"]
+				unknown_method = "allow"
+				max_header_count = 40
+				max_header_size = 80
+			}`, resPrefix)
+	case "hsts":
+		resPrefix = fmt.Sprintf(`%s
+				http_strict_transport_security {
+					include_subdomains = "disabled"
+					preload = "enabled"
+					mode = "enabled"
+					maximum_age = 80
+				}`, resPrefix)
 	default:
 	}
 	return fmt.Sprintf(`%s

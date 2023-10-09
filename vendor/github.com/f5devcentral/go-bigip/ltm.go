@@ -1835,6 +1835,29 @@ type HttpProfile struct {
 	ViaRequest                string        `json:"viaRequest,omitempty"`
 	ViaResponse               string        `json:"viaResponse,omitempty"`
 	XffAlternativeNames       []interface{} `json:"xffAlternativeNames,omitempty"`
+	Hsts 					  HTTPStrictTransportSecurity `json:"hsts,omitempty"`
+	Enforcement Enforcement `json:"enforcement,omitempty"`
+}
+
+type HTTPStrictTransportSecurity struct {
+	IncludeSubdomains  string	`json:"includeSubdomains,omitempty"`
+	MaximumAge int `json:"maximumAge,omitempty"`
+	Mode string `json:"mode,omitempty"`
+	Preload string `json:"preload,omitempty"`
+}
+
+type Enforcement struct {
+	KnownMethods []string `json:"knownMethods,omitempty"`
+	ExcessClientHeaders string
+	ExcessServerHeaders string
+	MaxHeaderCount int	`json:"maxHeaderCount,omitempty"`
+	MaxHeaderSize int 	`json:"maxHeaderSize,omitempty"`
+	MaxRequests int
+	OversizeClientHeaders string
+	OversizeServerHeaders string
+	Pipeline string
+	TruncatedRedirects string
+	UnknownMethod string `json:"unknownMethod,omitempty"`
 }
 
 type OneconnectProfiles struct {
