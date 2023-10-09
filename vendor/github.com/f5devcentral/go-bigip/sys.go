@@ -239,6 +239,28 @@ type ExternalDGFile struct {
 	Type       string `json:"type"`
 }
 
+type OCSP struct {
+	Name                       string `json:"name,omitempty"`
+	FullPath                   string `json:"fullPath,omitempty"`
+	Partition                  string `json:"partition,omitempty"`
+	ProxyServerPool            string `json:"proxyServerPool,omitempty"`
+	DnsResolver                string `json:"dnsResolver,omitempty"`
+	RouteDomain                string `json:"routeDomain,omitempty"`
+	ConcurrentConnectionsLimit int64  `json:"concurrentConnectionsLimit,omitempty"`
+	ResponderUrl               string `json:"responderUrl,omitempty"`
+	ConnectionTimeout          int64  `json:"timeout,omitempty"`
+	TrustedResponders          string `json:"trustedResponders,omitempty"`
+	ClockSkew                  int64  `json:"clockSkew,omitempty"`
+	StatusAge                  int64  `json:"statusAge,omitempty"`
+	StrictRespCertCheck        string `json:"strictRespCertCheck,omitempty"`
+	CacheTimeout               string `json:"cacheTimeout,omitempty"`
+	CacheErrorTimeout          int64  `json:"cacheErrorTimeout,omitempty"`
+	SignerCert                 string `json:"signerCert,omitempty"`
+	SignerKey                  string `json:"signerKey,omitempty"`
+	Passphrase                 string `json:"passphrase,omitempty"`
+	SignHash                   string `json:"signHash,omitempty"`
+}
+
 func (p *LogPublisher) MarshalJSON() ([]byte, error) {
 	return json.Marshal(destinationsDTO{
 		Name: p.Name,
@@ -994,4 +1016,37 @@ func (b *BigIP) UploadDataGroupFile(f *os.File, tmpName string) (*Upload, error)
 	}
 	log.Printf("tmpName:%+v", tmpName)
 	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, fmt.Sprintf("%s", tmpName))
+}
+
+func (b *BigIP) CreateOCSP(ocsp *OCSP) error {
+	return b.post(ocsp, uriSys, "crypto", "cert-validator", "ocsp")
+}
+
+func (b *BigIP) ModifyOCSP(name string, ocsp *OCSP) error {
+	return b.put(ocsp, uriSys, "crypto", "cert-validator", "ocsp", name)
+}
+
+func (b *BigIP) GetOCSP(name string) (*OCSP, error) {
+	var ocsp OCSP
+	err, _ := b.getForEntity(&ocsp, uriSys, "crypto", "cert-validator", "ocsp", name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	js, err := json.Marshal(ocsp)
+
+	if err != nil {
+		return nil, fmt.Errorf("error encountered while marshalling ocsp: %v", err)
+	}
+
+	if string(js) == "{}" {
+		return nil, nil
+	}
+
+	return &ocsp, nil
+}
+
+func (b *BigIP) DeleteOCSP(name string) error {
+	return b.delete(uriSys, "crypto", "cert-validator", "ocsp", name)
 }
