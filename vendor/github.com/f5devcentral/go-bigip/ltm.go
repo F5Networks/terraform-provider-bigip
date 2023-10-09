@@ -1809,56 +1809,56 @@ type HttpProfiles struct {
 }
 
 type HttpProfile struct {
-	AcceptXff                 string        `json:"acceptXff,omitempty"`
-	AppService                string        `json:"appService,omitempty"`
-	BasicAuthRealm            string        `json:"basicAuthRealm,omitempty"`
-	DefaultsFrom              string        `json:"defaultsFrom,omitempty"`
-	Description               string        `json:"description,omitempty"`
-	EncryptCookieSecret       string        `json:"encryptCookieSecret,omitempty"`
-	EncryptCookies            []string      `json:"encryptCookies,omitempty"`
-	FallbackHost              string        `json:"fallbackHost,omitempty"`
-	FallbackStatusCodes       []string      `json:"fallbackStatusCodes,omitempty"`
-	HeaderErase               string        `json:"headerErase,omitempty"`
-	HeaderInsert              string        `json:"headerInsert,omitempty"`
-	InsertXforwardedFor       string        `json:"insertXforwardedFor,omitempty"`
-	LwsSeparator              string        `json:"lwsSeparator,omitempty"`
-	LwsWidth                  int           `json:"lwsWidth,omitempty"`
-	Name                      string        `json:"name,omitempty"`
-	OneconnectTransformations string        `json:"oneconnectTransformations,omitempty"`
-	TmPartition               string        `json:"tmPartition,omitempty"`
-	ProxyType                 string        `json:"proxyType,omitempty"`
-	RedirectRewrite           string        `json:"redirectRewrite,omitempty"`
-	RequestChunking           string        `json:"requestChunking,omitempty"`
-	ResponseChunking          string        `json:"responseChunking,omitempty"`
-	ResponseHeadersPermitted  []interface{} `json:"responseHeadersPermitted,omitempty"`
-	ServerAgentName           string        `json:"serverAgentName,omitempty"`
-	ViaHostName               string        `json:"viaHostName,omitempty"`
-	ViaRequest                string        `json:"viaRequest,omitempty"`
-	ViaResponse               string        `json:"viaResponse,omitempty"`
-	XffAlternativeNames       []interface{} `json:"xffAlternativeNames,omitempty"`
-	Hsts 					  HTTPStrictTransportSecurity `json:"hsts,omitempty"`
-	Enforcement Enforcement `json:"enforcement,omitempty"`
+	AcceptXff                 string                      `json:"acceptXff,omitempty"`
+	AppService                string                      `json:"appService,omitempty"`
+	BasicAuthRealm            string                      `json:"basicAuthRealm,omitempty"`
+	DefaultsFrom              string                      `json:"defaultsFrom,omitempty"`
+	Description               string                      `json:"description,omitempty"`
+	EncryptCookieSecret       string                      `json:"encryptCookieSecret,omitempty"`
+	EncryptCookies            []string                    `json:"encryptCookies,omitempty"`
+	FallbackHost              string                      `json:"fallbackHost,omitempty"`
+	FallbackStatusCodes       []string                    `json:"fallbackStatusCodes,omitempty"`
+	HeaderErase               string                      `json:"headerErase,omitempty"`
+	HeaderInsert              string                      `json:"headerInsert,omitempty"`
+	InsertXforwardedFor       string                      `json:"insertXforwardedFor,omitempty"`
+	LwsSeparator              string                      `json:"lwsSeparator,omitempty"`
+	LwsWidth                  int                         `json:"lwsWidth,omitempty"`
+	Name                      string                      `json:"name,omitempty"`
+	OneconnectTransformations string                      `json:"oneconnectTransformations,omitempty"`
+	TmPartition               string                      `json:"tmPartition,omitempty"`
+	ProxyType                 string                      `json:"proxyType,omitempty"`
+	RedirectRewrite           string                      `json:"redirectRewrite,omitempty"`
+	RequestChunking           string                      `json:"requestChunking,omitempty"`
+	ResponseChunking          string                      `json:"responseChunking,omitempty"`
+	ResponseHeadersPermitted  []interface{}               `json:"responseHeadersPermitted,omitempty"`
+	ServerAgentName           string                      `json:"serverAgentName,omitempty"`
+	ViaHostName               string                      `json:"viaHostName,omitempty"`
+	ViaRequest                string                      `json:"viaRequest,omitempty"`
+	ViaResponse               string                      `json:"viaResponse,omitempty"`
+	XffAlternativeNames       []interface{}               `json:"xffAlternativeNames,omitempty"`
+	Hsts                      HTTPStrictTransportSecurity `json:"hsts,omitempty"`
+	Enforcement               Enforcement                 `json:"enforcement,omitempty"`
 }
 
 type HTTPStrictTransportSecurity struct {
-	IncludeSubdomains  string	`json:"includeSubdomains,omitempty"`
-	MaximumAge int `json:"maximumAge,omitempty"`
-	Mode string `json:"mode,omitempty"`
-	Preload string `json:"preload,omitempty"`
+	IncludeSubdomains string `json:"includeSubdomains,omitempty"`
+	MaximumAge        int    `json:"maximumAge,omitempty"`
+	Mode              string `json:"mode,omitempty"`
+	Preload           string `json:"preload,omitempty"`
 }
 
 type Enforcement struct {
-	KnownMethods []string `json:"knownMethods,omitempty"`
-	ExcessClientHeaders string
-	ExcessServerHeaders string
-	MaxHeaderCount int	`json:"maxHeaderCount,omitempty"`
-	MaxHeaderSize int 	`json:"maxHeaderSize,omitempty"`
-	MaxRequests int
+	KnownMethods          []string `json:"knownMethods,omitempty"`
+	ExcessClientHeaders   string
+	ExcessServerHeaders   string
+	MaxHeaderCount        int `json:"maxHeaderCount,omitempty"`
+	MaxHeaderSize         int `json:"maxHeaderSize,omitempty"`
+	MaxRequests           int
 	OversizeClientHeaders string
 	OversizeServerHeaders string
-	Pipeline string
-	TruncatedRedirects string
-	UnknownMethod string `json:"unknownMethod,omitempty"`
+	Pipeline              string
+	TruncatedRedirects    string
+	UnknownMethod         string `json:"unknownMethod,omitempty"`
 }
 
 type OneconnectProfiles struct {
