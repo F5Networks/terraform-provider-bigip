@@ -158,8 +158,8 @@ func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData
 	_ = d.Set("full_path", certificate.FullPath)
 	_ = d.Set("issuer_cert", certificate.IssuerCert)
 	if certificate.CertValidationOptions != nil && len(certificate.CertValidationOptions) > 0 {
-		monitor_type := certificate.CertValidationOptions[0]
-		_ = d.Set("monitoring_type", monitor_type)
+		monitorType := certificate.CertValidationOptions[0]
+		_ = d.Set("monitoring_type", monitorType)
 	}
 
 	return nil

@@ -480,10 +480,10 @@ github.com/envoyproxy/go-control-plane v0.10.3/go.mod h1:fJJn/j26vwOu972OllsvAgJ
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/envoyproxy/protoc-gen-validate v0.6.7/go.mod h1:dyJXwwfPK2VSqiB9Klm1J6romD608Ba7Hij42vrOBCo=
 github.com/envoyproxy/protoc-gen-validate v0.9.1/go.mod h1:OKNgG7TCp5pF4d6XftA0++PMirau2/yoOwVac3AbF2w=
-github.com/f5devcentral/go-bigip v0.0.0-20231009171253-d493844bd648 h1:9PAZ2F7qRAJGXTaYDQ9VT9GjaC/gJ9bOeNUcxVP/Fuc=
-github.com/f5devcentral/go-bigip v0.0.0-20231009171253-d493844bd648/go.mod h1:0Lkr0fBU6O1yBxF2mt9JFwXpaFbIb/wAY7oM3dMJDdA=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20231009171253-d493844bd648 h1:WT+LOLH5/fiodf6Pnr6dAJ045Uk1Ga+5a1T0XouAocc=
-github.com/f5devcentral/go-bigip/f5teem v0.0.0-20231009171253-d493844bd648/go.mod h1:r7o5I22EvO+fps2u10bz4ZUlTlNHopQSWzVcW19hK3U=
+github.com/f5devcentral/go-bigip v0.0.0-20231011173025-84b03e0e0bf7 h1:xaK/uXNpvs510yY0PiNGL6Ak+X6zh3Vf7WpOI2e8/JY=
+github.com/f5devcentral/go-bigip v0.0.0-20231011173025-84b03e0e0bf7/go.mod h1:0Lkr0fBU6O1yBxF2mt9JFwXpaFbIb/wAY7oM3dMJDdA=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20231011173025-84b03e0e0bf7 h1:p76I5H3ztS0IqokrJHJyFf67xsEtzE/wKDZbrBkN99w=
+github.com/f5devcentral/go-bigip/f5teem v0.0.0-20231011173025-84b03e0e0bf7/go.mod h1:r7o5I22EvO+fps2u10bz4ZUlTlNHopQSWzVcW19hK3U=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
