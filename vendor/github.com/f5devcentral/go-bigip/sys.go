@@ -320,38 +320,49 @@ type Certificates struct {
 
 // Certificate represents an SSL Certificate.
 type Certificate struct {
-	AppService              string `json:"appService,omitempty"`
-	CachePath               string `json:"cachePath,omitempty"`
-	CertificateKeyCurveName string `json:"certificateKeyCurveName,omitempty"`
-	CertificateKeySize      int    `json:"certificateKeySize,omitempty"`
-	CertValidationOptions   string `json:"certValidationOptions,omitempty"`
-	Checksum                string `json:"checksum,omitempty"`
-	CreatedBy               string `json:"createdBy,omitempty"`
-	CreateTime              string `json:"createTime,omitempty"`
-	Email                   string `json:"email,omitempty"`
-	ExpirationDate          int64  `json:"expirationDate,omitempty"`
-	ExpirationString        string `json:"expirationString,omitempty"`
-	Fingerprint             string `json:"fingerprint,omitempty"`
-	FullPath                string `json:"fullPath,omitempty"`
-	Generation              int    `json:"generation,omitempty"`
-	IsBundle                string `json:"isBundle,omitempty"`
-	IsDynamic               string `json:"isDynamic,omitempty"`
-	Issuer                  string `json:"issuer,omitempty"`
-	IssuerCert              string `json:"issuerCert,omitempty"`
-	KeyType                 string `json:"keyType,omitempty"`
-	LastUpdateTime          string `json:"lastUpdateTime,omitempty"`
-	Mode                    int    `json:"mode,omitempty"`
-	Name                    string `json:"name,omitempty"`
-	Partition               string `json:"partition,omitempty"`
-	Revision                int    `json:"revision,omitempty"`
-	SerialNumber            string `json:"serialNumber,omitempty"`
-	Size                    uint64 `json:"size,omitempty"`
-	SourcePath              string `json:"sourcePath,omitempty"`
-	Subject                 string `json:"subject,omitempty"`
-	SubjectAlternativeName  string `json:"subjectAlternativeName,omitempty"`
-	SystemPath              string `json:"systemPath,omitempty"`
-	UpdatedBy               string `json:"updatedBy,omitempty"`
-	Version                 int    `json:"version,omitempty"`
+	AppService              string                  `json:"appService,omitempty"`
+	CachePath               string                  `json:"cachePath,omitempty"`
+	CertificateKeyCurveName string                  `json:"certificateKeyCurveName,omitempty"`
+	CertificateKeySize      int                     `json:"certificateKeySize,omitempty"`
+	CertValidationOptions   []string                `json:"certValidationOptions,omitempty"`
+	Checksum                string                  `json:"checksum,omitempty"`
+	CreatedBy               string                  `json:"createdBy,omitempty"`
+	CreateTime              string                  `json:"createTime,omitempty"`
+	Email                   string                  `json:"email,omitempty"`
+	ExpirationDate          int64                   `json:"expirationDate,omitempty"`
+	ExpirationString        string                  `json:"expirationString,omitempty"`
+	Fingerprint             string                  `json:"fingerprint,omitempty"`
+	FullPath                string                  `json:"fullPath,omitempty"`
+	Generation              int                     `json:"generation,omitempty"`
+	IsBundle                string                  `json:"isBundle,omitempty"`
+	IsDynamic               string                  `json:"isDynamic,omitempty"`
+	Issuer                  string                  `json:"issuer,omitempty"`
+	IssuerCert              string                  `json:"issuerCert,omitempty"`
+	KeyType                 string                  `json:"keyType,omitempty"`
+	LastUpdateTime          string                  `json:"lastUpdateTime,omitempty"`
+	Mode                    int                     `json:"mode,omitempty"`
+	Name                    string                  `json:"name,omitempty"`
+	Partition               string                  `json:"partition,omitempty"`
+	Revision                int                     `json:"revision,omitempty"`
+	SerialNumber            string                  `json:"serialNumber,omitempty"`
+	Size                    uint64                  `json:"size,omitempty"`
+	SourcePath              string                  `json:"sourcePath,omitempty"`
+	Subject                 string                  `json:"subject,omitempty"`
+	SubjectAlternativeName  string                  `json:"subjectAlternativeName,omitempty"`
+	SystemPath              string                  `json:"systemPath,omitempty"`
+	UpdatedBy               string                  `json:"updatedBy,omitempty"`
+	Version                 int                     `json:"version,omitempty"`
+	CertValidatorRef        *CertValidatorReference `json:"certValidatorsReference,omitempty"`
+}
+
+type CertValidatorReference struct {
+	Items []CertValidatorState `json:"items,omitempty"`
+}
+
+type CertValidatorState struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
 }
 
 // Keys represents a list of installed keys.
@@ -429,25 +440,22 @@ func (b *BigIP) ModifyExternalDatagroupfile(dgName string, dataGroup *ExternalDG
 
 // ModifyCertificate installs a certificate.
 func (b *BigIP) ModifyCertificate(certName string, cert *Certificate) error {
-	return b.patch(cert, uriSys, uriFile, uriSslCert, certName)
+	return b.patch(cert, uriSys, uriFile, uriSslCert, certName, "?expandSubcollections=true")
 }
 
 // UploadCertificate copies a certificate local disk to BIGIP
-func (b *BigIP) UploadCertificate(certname, certpath, partition string) error {
+func (b *BigIP) UploadCertificate(certpath string, cert *Certificate) error {
 	certbyte := []byte(certpath)
-	_, err := b.UploadBytes(certbyte, certname)
+	_, err := b.UploadBytes(certbyte, cert.Name)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + cert.Name
 	log.Printf("[DEBUG] sourcepath :%+v", sourcepath)
-	cert := Certificate{
-		Name:       certname,
-		SourcePath: sourcepath,
-		Partition:  partition,
-	}
+
+	cert.SourcePath = sourcepath
 	log.Printf("cert: %+v\n", cert)
-	err = b.AddCertificate(&cert)
+	err = b.AddCertificate(cert)
 	if err != nil {
 		return err
 	}
@@ -474,20 +482,18 @@ func (b *BigIP) DeleteCertificate(name string) error {
 }
 
 // UpdateCertificate copies a certificate local disk to BIGIP
-func (b *BigIP) UpdateCertificate(certname, certpath, partition string) error {
+func (b *BigIP) UpdateCertificate(certpath string, cert *Certificate) error {
 	certbyte := []byte(certpath)
-	_, err := b.UploadBytes(certbyte, certname)
+	_, err := b.UploadBytes(certbyte, cert.Name)
 	if err != nil {
 		return err
 	}
-	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + certname
-	cert := Certificate{
-		Name:       certname,
-		SourcePath: sourcepath,
-	}
-	certName := fmt.Sprintf("/%s/%s", partition, certname)
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + cert.Name
+
+	cert.SourcePath = sourcepath
+	certName := fmt.Sprintf("/%s/%s", cert.Partition, cert.Name)
 	log.Printf("certName: %+v\n", certName)
-	err = b.ModifyCertificate(certName, &cert)
+	err = b.ModifyCertificate(certName, cert)
 	if err != nil {
 		return err
 	}

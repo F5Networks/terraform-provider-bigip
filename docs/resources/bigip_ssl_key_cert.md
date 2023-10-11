@@ -42,6 +42,11 @@ resource "bigip_ssl_key_cert" "testkeycert" {
 
 * `passphrase` - (Optional,type `string`) Passphrase on the SSL key.
 
+* `cert_monitoring_type` - (Optional,type `string`) Specifies the type of monitoring used.
+
+* `issuer_cert` - (Optional,type `string`) Specifies the issuer certificate.
+
+* `cert_ocsp` - (Optional,type `string`) Specifies the OCSP responder.
 
 
 ## Attribute Reference
