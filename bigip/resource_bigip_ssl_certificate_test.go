@@ -28,6 +28,17 @@ resource "bigip_ssl_certificate" "test-cert" {
 }
 `
 
+var TestSslCertOCSPResource = `
+resource "bigip_ssl_certificate" "ssl-test-certificate-tc1" {
+  name            = "test-certificate"
+  content         = "${file("` + folder + `/../examples/mycertocspv2.crt")}"
+  partition       = "Common"
+  monitoring_type = "ocsp"
+  issuer_cert     = "/Common/MyCA"
+  ocsp            = "/Common/testocsp1"
+}
+`
+
 func TestAccBigipSslCertificateImportToBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -82,6 +93,29 @@ func TestAccBigipSslCertificateTCs(t *testing.T) {
 					testChecksslcertificateExists("ssl-test-certificate-tc2", true),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "ssl-test-certificate-tc1"),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc2", "name", "ssl-test-certificate-tc2"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSslCertificateOCSP(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testChecksslcertificateDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestSslCertOCSPResource,
+				Check: resource.ComposeTestCheckFunc(
+					testChecksslcertificateExists("test-certificate", true),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "test-certificate"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "monitoring_type", "ocsp"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "issuer_cert", "/Common/MyCA"),
+					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "ocsp", "/Common/testocsp1"),
 				),
 			},
 		},

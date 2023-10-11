@@ -58,6 +58,21 @@ func resourceBigipSSLKeyCert() *schema.Resource {
 				Computed:    true,
 				Description: "Full Path Name of ssl certificate",
 			},
+			"cert_monitoring_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the type of monitoring used.",
+			},
+			"issuer_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the issuer certificate",
+			},
+			"cert_ocsp": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the OCSP responder",
+			},
 			"passphrase": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -105,13 +120,36 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
 	}
-	err = client.UploadCertificate(certName, certPath, partition)
+
+	cert := &bigip.Certificate{
+		Name:      certName,
+		Partition: partition,
+	}
+	if val, ok := d.GetOk("cert_monitoring_type"); ok {
+		cert.CertValidationOptions = []string{val.(string)}
+	}
+	if val, ok := d.GetOk("issuer_cert"); ok {
+		cert.IssuerCert = val.(string)
+	}
+
+	err = client.UploadCertificate(certPath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while uploading the ssl cert: %v", err))
 	}
 	err = client.CommitTransaction(t.TransID)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while ending transaction: %d", err))
+	}
+
+	if val, ok := d.GetOk("cert_ocsp"); ok {
+		certValidState := &bigip.CertValidatorState{Name: val.(string)}
+		certValidRef := &bigip.CertValidatorReference{}
+		certValidRef.Items = append(certValidRef.Items, *certValidState)
+		cert.CertValidatorRef = certValidRef
+		err = client.UpdateCertificate(certPath, cert)
+		if err != nil {
+			log.Printf("[ERROR]Unable to add ocsp to the certificate:%v", err)
+		}
 	}
 
 	id := keyName + "_" + certName
@@ -147,6 +185,11 @@ func resourceBigipSSLKeyCertRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("cert_name", certificate.Name)
 	d.Set("cert_full_path", certificate.FullPath)
 	d.Set("partition", key.Partition)
+	d.Set("issuer_cert", certificate.IssuerCert)
+	if certificate.CertValidationOptions != nil && len(certificate.CertValidationOptions) > 0 {
+		monitor_type := certificate.CertValidationOptions[0]
+		_ = d.Set("cert_monitoring_type", monitor_type)
+	}
 
 	return nil
 }
@@ -184,7 +227,24 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
 	}
 
-	err = client.UpdateCertificate(certName, certPath, partition)
+	cert := &bigip.Certificate{
+		Name:      certName,
+		Partition: partition,
+	}
+	if val, ok := d.GetOk("cert_monitoring_type"); ok {
+		cert.CertValidationOptions = []string{val.(string)}
+	}
+	if val, ok := d.GetOk("issuer_cert"); ok {
+		cert.IssuerCert = val.(string)
+	}
+	if val, ok := d.GetOk("cert_ocsp"); ok {
+		certValidState := &bigip.CertValidatorState{Name: val.(string)}
+		certValidRef := &bigip.CertValidatorReference{}
+		certValidRef.Items = append(certValidRef.Items, *certValidState)
+		cert.CertValidatorRef = certValidRef
+	}
+
+	err = client.UpdateCertificate(certPath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while updating the ssl certificate (%s): %s", certName, err))
 	}
