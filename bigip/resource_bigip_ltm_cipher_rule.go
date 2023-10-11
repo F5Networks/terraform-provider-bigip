@@ -48,11 +48,13 @@ func resourceBigipLtmCipherRule() *schema.Resource {
 			"dh_groups": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the DH Groups Elliptic Curve Diffie-Hellman key exchange algorithms, separated by colons (:).Note: You can also type a special keyword, DEFAULT, which represents the recommended set of named groups",
 			},
 			"signature_algorithms": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the Signature Algorithms, separated by colons (:), that you want to include in the cipher rule. You can also type a special keyword, DEFAULT, which represents the recommended set of signature algorithms",
 			},
 		},
@@ -108,9 +110,8 @@ func resourceBigipLtmCipherRuleRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 	log.Printf("[INFO] Cipher rule response :%+v", cipherRule)
-	_ = d.Set("name", cipherRule.Name)
-	_ = d.Set("partition", cipherRule.Partition)
-	_ = d.Set("cipher_suites", cipherRule.Cipher)
+	_ = d.Set("name", cipherRule.FullPath)
+	_ = d.Set("cipher", cipherRule.Cipher)
 	_ = d.Set("dh_groups", cipherRule.DhGroups)
 	_ = d.Set("signature_algorithms", cipherRule.SignatureAlgorithms)
 	return nil

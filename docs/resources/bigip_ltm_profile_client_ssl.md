@@ -49,6 +49,8 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 
 * `cipher_group` - (Optional) Specifies the cipher group for the SSL server profile. It is mutually exclusive with the argument, `ciphers`. The default value is `none`.
 
+* `ocsp_stapling` - (Optional) Specifies whether the system uses OCSP stapling. The default value is `disabled`.
+
 * `peer_cert_mode` - (Optional) Specifies the way the system handles client certificates.When ignore, specifies that the system ignores certificates from client systems.When require, specifies that the system requires a client to present a valid certificate.When request, specifies that the system requests a valid certificate from a client but always authenticate the client.
 
 * `renegotiation` - (Optional) Enables or disables SSL renegotiation.When creating a new profile, the setting is provided by the parent profile

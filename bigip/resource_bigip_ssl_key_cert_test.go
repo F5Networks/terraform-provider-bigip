@@ -42,6 +42,19 @@ resource "bigip_ltm_profile_server_ssl" "test-ServerSsl" {
 }
 `
 
+var sslProfileCertKeyOCSP = `
+resource "bigip_ssl_key_cert" "testkeycert" {
+  partition            = "Common"
+  key_name             = "ssl-test-key"
+  key_content          = "${file("` + folder + `/../examples/mycertocspv2.pem")}"
+  cert_name            = "ssl-test-cert"
+  cert_content         = "${file("` + folder + `/../examples/mycertocspv2.crt")}"
+  cert_monitoring_type = "ocsp"
+  issuer_cert          = "/Common/MyCA"
+  cert_ocsp            = "/Common/testocsp1"
+}
+`
+
 func TestAccBigipSSLCertKeyCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -107,6 +120,28 @@ func TestAccBigipSSLCertKeyCreateCertKeyProfile(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "partition", "Common"),
 					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "key_content", string(key2Content)),
 					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "cert_content", string(crt2Content)),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipSSLCertKeyCreateCertKeyProfileOCSP(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: sslProfileCertKeyOCSP,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "key_name", "ssl-test-key"),
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "cert_name", "ssl-test-cert"),
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "partition", "Common"),
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "cert_monitoring_type", "ocsp"),
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "issuer_cert", "/Common/MyCA"),
+					resource.TestCheckResourceAttr("bigip_ssl_key_cert.testkeycert", "cert_ocsp", "/Common/testocsp1"),
 				),
 			},
 		},

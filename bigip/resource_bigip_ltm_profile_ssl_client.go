@@ -328,6 +328,13 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "ModSSL Methods enabled / disabled.  Default is disabled.",
 			},
 
+			"ocsp_stapling": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "disabled",
+				Description: "Specifies whether the system uses OCSP stapling.",
+			},
+
 			"tm_options": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -686,6 +693,10 @@ func resourceBigipLtmProfileClientSSLRead(ctx context.Context, d *schema.Resourc
 		_ = d.Set("tm_options", tmOptions)
 	}
 
+	if _, ok := d.GetOk("ocsp_stapling"); ok {
+		_ = d.Set("ocsp_stapling", obj.OcspStapling)
+	}
+
 	if _, ok := d.GetOk("proxy_ca_cert"); ok {
 		_ = d.Set("proxy_ca_cert", obj.ProxyCaCert)
 	}
@@ -856,6 +867,7 @@ func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) 
 	config.CaFile = d.Get("ca_file").(string)
 	config.CacheSize = d.Get("cache_size").(int)
 	config.CacheTimeout = d.Get("cache_timeout").(int)
+	config.OcspStapling = d.Get("ocsp_stapling").(string)
 	log.Printf("[DEBUG] Length of certKeyChains :%+v", len(certKeyChains))
 	log.Printf("[DEBUG] certKeyChains :%+v", certKeyChains)
 	if len(certKeyChains) == 0 {
@@ -873,8 +885,8 @@ func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) 
 		config.Ciphers = ciphers.(string)
 		config.CipherGroup = "none"
 	}
-	if cipher_grp, ok := d.GetOk("cipher_group"); ok && cipher_grp != "none" {
-		config.CipherGroup = cipher_grp.(string)
+	if cipherGrp, ok := d.GetOk("cipher_group"); ok && cipherGrp != "none" {
+		config.CipherGroup = cipherGrp.(string)
 		config.Ciphers = "none"
 	}
 	config.ClientCertCa = d.Get("client_cert_ca").(string)

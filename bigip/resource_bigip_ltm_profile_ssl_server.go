@@ -493,8 +493,12 @@ func resourceBigipLtmProfileServerSslRead(ctx context.Context, d *schema.Resourc
 	_ = d.Set("ca_file", obj.CaFile)
 	_ = d.Set("cert", obj.Cert)
 	_ = d.Set("chain", obj.Chain)
-	_ = d.Set("ciphers", obj.Ciphers)
-	_ = d.Set("cipher_group", obj.CipherGroup)
+	if _, ok := d.GetOk("ciphers"); ok {
+		_ = d.Set("ciphers", obj.Ciphers)
+	}
+	if _, ok := d.GetOk("cipher_group"); ok {
+		_ = d.Set("cipher_group", obj.CipherGroup)
+	}
 	_ = d.Set("expire_cert_response_control", obj.ExpireCertResponseControl)
 	_ = d.Set("cache_size", obj.CacheSize)
 	_ = d.Set("handshake_timeout", obj.HandshakeTimeout)
@@ -637,8 +641,8 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 		config.Ciphers = ciphers.(string)
 		config.CipherGroup = "none"
 	}
-	if cipher_grp, ok := d.GetOk("cipher_group"); ok && cipher_grp != "none" {
-		config.CipherGroup = cipher_grp.(string)
+	if cipherGrp, ok := d.GetOk("cipher_group"); ok && cipherGrp != "none" {
+		config.CipherGroup = cipherGrp.(string)
 		config.Ciphers = "none"
 	}
 	config.ExpireCertResponseControl = d.Get("expire_cert_response_control").(string)

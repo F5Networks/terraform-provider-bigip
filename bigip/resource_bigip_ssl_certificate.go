@@ -39,13 +39,27 @@ func resourceBigipSslCertificate() *schema.Resource {
 				//ForceNew:    true,
 				Description: "Content of certificate on Disk",
 			},
-
 			"partition": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "Common",
 				Description:  "Partition of ssl certificate",
 				ValidateFunc: validatePartitionName,
+			},
+			"monitoring_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the type of monitoring used",
+			},
+			"issuer_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the issuer certificate",
+			},
+			"ocsp": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the OCSP responder",
 			},
 			"full_path": {
 				Type:        schema.TypeString,
@@ -64,7 +78,19 @@ func resourceBigipSslCertificateCreate(ctx context.Context, d *schema.ResourceDa
 
 	certPath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
-	err := client.UploadCertificate(name, certPath, partition)
+	cert := &bigip.Certificate{
+		Name:      name,
+		Partition: partition,
+	}
+
+	if val, ok := d.GetOk("monitoring_type"); ok {
+		cert.CertValidationOptions = []string{val.(string)}
+	}
+	if val, ok := d.GetOk("issuer_cert"); ok {
+		cert.IssuerCert = val.(string)
+	}
+
+	err := client.UploadCertificate(certPath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error in Importing certificate (%s): %s", name, err))
 	}
@@ -86,6 +112,17 @@ func resourceBigipSslCertificateCreate(ctx context.Context, d *schema.ResourceDa
 		err = teemDevice.Report(f, "bigip_ssl_certificate", tsVer[3])
 		if err != nil {
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
+		}
+	}
+
+	if val, ok := d.GetOk("ocsp"); ok {
+		certValidState := &bigip.CertValidatorState{Name: val.(string)}
+		certValidRef := &bigip.CertValidatorReference{}
+		certValidRef.Items = append(certValidRef.Items, *certValidState)
+		cert.CertValidatorRef = certValidRef
+		err = client.UpdateCertificate(certPath, cert)
+		if err != nil {
+			log.Printf("[ERROR]Unable to add ocsp to the certificate:%v", err)
 		}
 	}
 	return resourceBigipSslCertificateRead(ctx, d, meta)
@@ -119,6 +156,11 @@ func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData
 	_ = d.Set("name", certificate.Name)
 	_ = d.Set("partition", certificate.Partition)
 	_ = d.Set("full_path", certificate.FullPath)
+	_ = d.Set("issuer_cert", certificate.IssuerCert)
+	if certificate.CertValidationOptions != nil && len(certificate.CertValidationOptions) > 0 {
+		monitorType := certificate.CertValidationOptions[0]
+		_ = d.Set("monitoring_type", monitorType)
+	}
 
 	return nil
 }
@@ -129,10 +171,26 @@ func resourceBigipSslCertificateUpdate(ctx context.Context, d *schema.ResourceDa
 	log.Println("[INFO] Certificate Name " + name)
 	certpath := d.Get("content").(string)
 	partition := d.Get("partition").(string)
-	/*if !strings.HasSuffix(name, ".crt") {
-		name = name + ".crt"
-	}*/
-	err := client.UpdateCertificate(name, certpath, partition)
+
+	cert := &bigip.Certificate{
+		Name:      name,
+		Partition: partition,
+	}
+
+	if val, ok := d.GetOk("monitoring_type"); ok {
+		cert.CertValidationOptions = []string{val.(string)}
+	}
+	if val, ok := d.GetOk("issuer_cert"); ok {
+		cert.IssuerCert = val.(string)
+	}
+	if val, ok := d.GetOk("ocsp"); ok {
+		certValidState := &bigip.CertValidatorState{Name: val.(string)}
+		certValidRef := &bigip.CertValidatorReference{}
+		certValidRef.Items = append(certValidRef.Items, *certValidState)
+		cert.CertValidatorRef = certValidRef
+	}
+
+	err := client.UpdateCertificate(certpath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error in Importing certificate (%s): %s", name, err))
 	}
