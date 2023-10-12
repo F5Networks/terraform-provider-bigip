@@ -7,7 +7,7 @@ package bigip
 
 import (
 	"fmt"
-	// "regexp"
+	"regexp"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -45,26 +45,26 @@ func TestAccBigipLtmWebAccelerationProfileCreate(t *testing.T) {
 	})
 }
 
-// func TestAccBigipLtmWebAccelerationProfileCreateFail(t *testing.T) {
-// 	resource.Test(t, resource.TestCase{
-// 		PreCheck: func() {
-// 			testAcctPreCheck(t)
-// 		},
-// 		Providers:    testAccProviders,
-// 		CheckDestroy: testCheckWebAccelerationDestroyed,
-// 		Steps: []resource.TestStep{
-// 			{
-// 				Config: TestWebAccelerationResource,
-// 				Check: resource.ComposeTestCheckFunc(
-// 					testCheckWebAccelerationExists(TestWebAccelerationName),
-// 					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "name", "/Common/web_acceleration"),
-// 					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "defaults_from", "/Common/web_acceleration"),
-// 				),
-// 				ExpectError: regexp.MustCompile("Attribute 'defaults_from' expected"),
-// 			},
-// 		},
-// 	})
-// }
+func TestAccBigipLtmWebAccelerationProfileCreateFail(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckWebAccelerationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestWebAccelerationResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckWebAccelerationExists(TestWebAccelerationName),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "name", "/Common/web_acceleration"),
+					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "defaults_from", "/Common/web_acceleration"),
+				),
+				ExpectError: regexp.MustCompile("Attribute 'defaults_from' expected"),
+			},
+		},
+	})
+}
 
 func TestAccBigipLtmWebAccelerationProfileUpdateCacheSize(t *testing.T) {
 	t.Parallel()
@@ -461,6 +461,27 @@ func TestAccBigipLtmWebAccelerationProfileUpdateCacheAgingRate(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmWebAccelerationProfileImport(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckWebAccelerationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccBigipLtmWebAccelerationProfileImportConfig(),
+			},
+			{
+				ResourceName:      "bigip_ltm_profile_web_acceleration.test-web-acceleration",
+				ImportStateId:     "/Common/test-web-acceleration",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testCheckWebAccelerationExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
@@ -494,6 +515,15 @@ func testCheckWebAccelerationDestroyed(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testaccBigipLtmWebAccelerationProfileImportConfig() string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_web_acceleration" "test-web-acceleration" {
+  name          = "%s"
+  defaults_from = "/Common/webacceleration"
+}
+`, "/Common/test-web-acceleration")
 }
 
 func testAccBigipLtmWebAccelerationProfileDefaultConfig(instName, updateParam string) string {
