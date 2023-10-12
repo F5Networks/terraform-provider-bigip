@@ -166,10 +166,9 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Description: "Specifies how the system handles HTTP content that is chunked by a server. The default is Selective",
 			},
 			"server_agent_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				// Computed:    true,
-				Default:     "BigIP",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. If no string is specified, then no Server header will be added to such responses",
 			},
 			"via_host_name": {
