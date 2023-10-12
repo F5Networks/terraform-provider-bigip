@@ -77,7 +77,7 @@ func resourceBigipLtmProfileWebAcceleration() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Computed: 	 true,
+				Computed:    true,
 				Description: "Configures a list of URIs to exclude from the cache. The default value of none specifies no URIs are excluded.",
 			},
 			"cache_uri_include": {
@@ -85,7 +85,7 @@ func resourceBigipLtmProfileWebAcceleration() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Computed: 	 true,
+				Computed:    true,
 				Description: "Configures a list of URIs to include in the cache. The default value of .* specifies that all URIs are cacheable.",
 			},
 			"cache_uri_include_override": {
@@ -93,16 +93,16 @@ func resourceBigipLtmProfileWebAcceleration() *schema.Resource {
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Computed: 	 true,
-				Description: "Configures a list of URIs to include in the cache even if they would normally be excluded due to factors like object size or HTTP request type. The default value of none specifies no URIs are to be forced into the cache.",		
+				Computed:    true,
+				Description: "Configures a list of URIs to include in the cache even if they would normally be excluded due to factors like object size or HTTP request type. The default value of none specifies no URIs are to be forced into the cache.",
 			},
 			"cache_uri_pinned": {
 				Type:        schema.TypeSet,
 				Set:         schema.HashString,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				Computed: 	 true,
-				Description: "Configures a list of URIs to keep in the cache. The pinning process keeps URIs in cache when they would normally be evicted to make room for more active URIs.",		
+				Computed:    true,
+				Description: "Configures a list of URIs to keep in the cache. The pinning process keeps URIs in cache when they would normally be evicted to make room for more active URIs.",
 			},
 			"cache_client_cache_control_mode": {
 				Type:        schema.TypeString,
@@ -222,7 +222,7 @@ func resourceBigipLtmProfileWebAccelerationRead(ctx context.Context, d *schema.R
 	if _, ok := d.GetOk("cache_aging_rate"); ok {
 		_ = d.Set("cache_aging_rate", wap.CacheAgingRate)
 	}
-	
+
 	return nil
 }
 
@@ -244,7 +244,7 @@ func resourceBigipLtmProfileWebAccelerationUpdate(ctx context.Context, d *schema
 	}
 
 	return resourceBigipLtmProfileWebAccelerationRead(ctx, d, meta)
-	
+
 }
 
 func resourceBigipLtmProfileWebAccelerationDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -267,7 +267,7 @@ func getHttpProfileWebAccelerationConfig(d *schema.ResourceData, config *bigip.W
 	config.CacheMaxEntries = d.Get("cache_max_entries").(int)
 	config.CacheMaxAge = d.Get("cache_max_age").(int)
 	config.CacheObjectMinSize = d.Get("cache_object_min_size").(int)
-	config.CacheObjectMaxSize =  d.Get("cache_object_max_size").(int)
+	config.CacheObjectMaxSize = d.Get("cache_object_max_size").(int)
 	config.CacheUriExclude = setToStringSlice(d.Get("cache_uri_exclude").(*schema.Set))
 	config.CacheUriInclude = setToStringSlice(d.Get("cache_uri_include").(*schema.Set))
 	config.CacheUriIncludeOverride = setToStringSlice(d.Get("cache_uri_include_override").(*schema.Set))
@@ -275,6 +275,6 @@ func getHttpProfileWebAccelerationConfig(d *schema.ResourceData, config *bigip.W
 	config.CacheClientCacheControlMode = d.Get("cache_client_cache_control_mode").(string)
 	config.CacheInsertAgeHeader = d.Get("cache_insert_age_header").(string)
 	config.CacheAgingRate = d.Get("cache_aging_rate").(int)
-	
+
 	return config
 }

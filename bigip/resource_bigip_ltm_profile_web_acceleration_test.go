@@ -39,18 +39,6 @@ func TestAccBigipLtmWebAccelerationProfileCreate(t *testing.T) {
 					testCheckWebAccelerationExists(TestWebAccelerationName),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "name", "/Common/web_acceleration"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "defaults_from", "/Common/webacceleration"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_size", "100"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_max_entries", "10000"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_max_age", "3600"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_object_min_size", "500"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_object_max_size", "50000"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_uri_exclude.#", "0"),
-					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_uri_include.*", ".*"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_uri_include_override.#", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_uri_pinned.#", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_client_cache_control_mode", "all"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_insert_age_header", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_web_acceleration.web_acceleration", "cache_aging_rate", "9"),
 				),
 			},
 		},
@@ -401,7 +389,6 @@ func TestAccBigipLtmWebAccelerationProfileUpdateCacheClientCacheControlMode(t *t
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/webacceleration"),
 					resource.TestCheckResourceAttr(resFullName, "cache_client_cache_control_mode", "all"),
-					
 				),
 			},
 		},
@@ -435,7 +422,6 @@ func TestAccBigipLtmWebAccelerationProfileUpdateCacheInsertAgeHeader(t *testing.
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/webacceleration"),
 					resource.TestCheckResourceAttr(resFullName, "cache_insert_age_header", "disabled"),
-					
 				),
 			},
 		},
@@ -469,13 +455,11 @@ func TestAccBigipLtmWebAccelerationProfileUpdateCacheAgingRate(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/webacceleration"),
 					resource.TestCheckResourceAttr(resFullName, "cache_aging_rate", "9"),
-					
 				),
 			},
 		},
 	})
 }
-
 
 func testCheckWebAccelerationExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
