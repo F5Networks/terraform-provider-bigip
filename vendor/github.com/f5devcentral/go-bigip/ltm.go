@@ -4060,6 +4060,10 @@ func (b *BigIP) ModifyLtmCipherGroup(name string, config *CipherGroupReq) error 
 	return b.put(config, uriLtm, uriCipher, "group", name)
 }
 
+func (b *BigIP) ModifyLtmCipherGroupNew(name string, config interface{}) error {
+	return b.put(config, uriLtm, uriCipher, "group", name)
+}
+
 func (b *BigIP) DeleteLtmCipherGroup(name string) error {
 	return b.delete(uriLtm, uriCipher, "group", name)
 }
