@@ -144,7 +144,6 @@ const (
 	uriGtmmonitor = "monitor"
 	uriHttp       = "http"
 	uriPool_a     = "pool/a"
-	uriWebAcceleration = "web-acceleration"
 )
 
 func (b *BigIP) Datacenters() (*Datacenter, error) {

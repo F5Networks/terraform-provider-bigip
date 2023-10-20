@@ -157,9 +157,9 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	//
-	//if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
+	// if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
 	//	return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
-	//}
+	// }
 
 	return resourceBigipLtmCipherGroupRead(ctx, d, meta)
 }
