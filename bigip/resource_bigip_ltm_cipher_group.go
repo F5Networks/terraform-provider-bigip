@@ -50,12 +50,14 @@ func resourceBigipLtmCipherGroup() *schema.Resource {
 			"allow": {
 				Type:        schema.TypeSet,
 				Optional:    true,
+				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Specifies the configuration of the allowed groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
 			},
 			"require": {
 				Type:        schema.TypeSet,
 				Optional:    true,
+				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
 			},
@@ -134,9 +136,30 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	cipherGrouptmp := &bigip.CipherGroupReq{}
 	cipherGrouptmp.Name = name
 	cipherGroupconfig := getCipherGroupConfig(d, cipherGrouptmp)
-	if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
+	if p, ok := d.GetOk("require"); ok {
+		for _, r := range p.(*schema.Set).List() {
+			cipherGroupconfig.Require = append(cipherGroupconfig.Require, r.(string))
+		}
+	}
+	type CipherGroupReqnew struct {
+		bigip.CipherGroupReq
+		Require []interface{} `json:"require"`
+		Allow   []interface{} `json:"allow"`
+	}
+	new := &CipherGroupReqnew{}
+	new.Require = cipherGroupconfig.Require
+	new.Name = cipherGroupconfig.Name
+	new.Ordering = cipherGroupconfig.Ordering
+	new.Allow = cipherGroupconfig.Allow
+
+	if err := client.ModifyLtmCipherGroupNew(name, new); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
 	}
+
+	//
+	// if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
+	//	return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
+	// }
 
 	return resourceBigipLtmCipherGroupRead(ctx, d, meta)
 }

@@ -1809,35 +1809,35 @@ type HttpProfiles struct {
 }
 
 type HttpProfile struct {
-	AcceptXff                 string        `json:"acceptXff,omitempty"`
-	AppService                string        `json:"appService,omitempty"`
-	BasicAuthRealm            string        `json:"basicAuthRealm,omitempty"`
-	DefaultsFrom              string        `json:"defaultsFrom,omitempty"`
-	Description               string        `json:"description,omitempty"`
-	EncryptCookieSecret       string        `json:"encryptCookieSecret,omitempty"`
-	EncryptCookies            []string      `json:"encryptCookies,omitempty"`
-	FallbackHost              string        `json:"fallbackHost,omitempty"`
-	FallbackStatusCodes       []string      `json:"fallbackStatusCodes,omitempty"`
-	HeaderErase               string        `json:"headerErase,omitempty"`
-	HeaderInsert              string        `json:"headerInsert,omitempty"`
-	InsertXforwardedFor       string        `json:"insertXforwardedFor,omitempty"`
-	LwsSeparator              string        `json:"lwsSeparator,omitempty"`
-	LwsWidth                  int           `json:"lwsWidth,omitempty"`
-	Name                      string        `json:"name,omitempty"`
-	OneconnectTransformations string        `json:"oneconnectTransformations,omitempty"`
-	TmPartition               string        `json:"tmPartition,omitempty"`
-	ProxyType                 string        `json:"proxyType,omitempty"`
-	RedirectRewrite           string        `json:"redirectRewrite,omitempty"`
-	RequestChunking           string        `json:"requestChunking,omitempty"`
-	ResponseChunking          string        `json:"responseChunking,omitempty"`
-	ResponseHeadersPermitted  []interface{} `json:"responseHeadersPermitted,omitempty"`
-	ServerAgentName           string        `json:"serverAgentName,omitempty"`
-	ViaHostName               string        `json:"viaHostName,omitempty"`
-	ViaRequest                string        `json:"viaRequest,omitempty"`
-	ViaResponse               string        `json:"viaResponse,omitempty"`
-	XffAlternativeNames       []interface{} `json:"xffAlternativeNames,omitempty"`
-	Hsts 					  HTTPStrictTransportSecurity `json:"hsts,omitempty"`
-	Enforcement Enforcement `json:"enforcement,omitempty"`
+	AcceptXff                 string                      `json:"acceptXff,omitempty"`
+	AppService                string                      `json:"appService,omitempty"`
+	BasicAuthRealm            string                      `json:"basicAuthRealm,omitempty"`
+	DefaultsFrom              string                      `json:"defaultsFrom,omitempty"`
+	Description               string                      `json:"description,omitempty"`
+	EncryptCookieSecret       string                      `json:"encryptCookieSecret,omitempty"`
+	EncryptCookies            []string                    `json:"encryptCookies,omitempty"`
+	FallbackHost              string                      `json:"fallbackHost,omitempty"`
+	FallbackStatusCodes       []string                    `json:"fallbackStatusCodes,omitempty"`
+	HeaderErase               string                      `json:"headerErase,omitempty"`
+	HeaderInsert              string                      `json:"headerInsert,omitempty"`
+	InsertXforwardedFor       string                      `json:"insertXforwardedFor,omitempty"`
+	LwsSeparator              string                      `json:"lwsSeparator,omitempty"`
+	LwsWidth                  int                         `json:"lwsWidth,omitempty"`
+	Name                      string                      `json:"name,omitempty"`
+	OneconnectTransformations string                      `json:"oneconnectTransformations,omitempty"`
+	TmPartition               string                      `json:"tmPartition,omitempty"`
+	ProxyType                 string                      `json:"proxyType,omitempty"`
+	RedirectRewrite           string                      `json:"redirectRewrite,omitempty"`
+	RequestChunking           string                      `json:"requestChunking,omitempty"`
+	ResponseChunking          string                      `json:"responseChunking,omitempty"`
+	ResponseHeadersPermitted  []interface{}               `json:"responseHeadersPermitted,omitempty"`
+	ServerAgentName           string                      `json:"serverAgentName,omitempty"`
+	ViaHostName               string                      `json:"viaHostName,omitempty"`
+	ViaRequest                string                      `json:"viaRequest,omitempty"`
+	ViaResponse               string                      `json:"viaResponse,omitempty"`
+	XffAlternativeNames       []interface{}               `json:"xffAlternativeNames,omitempty"`
+	Hsts                      HTTPStrictTransportSecurity `json:"hsts,omitempty"`
+	Enforcement               Enforcement                 `json:"enforcement,omitempty"`
 }
 
 type HTTPStrictTransportSecurity struct {
@@ -1856,9 +1856,9 @@ type Enforcement struct {
 	MaxRequests           int
 	OversizeClientHeaders string
 	OversizeServerHeaders string
-	Pipeline string
-	TruncatedRedirects string
-	UnknownMethod string `json:"unknownMethod,omitempty"`
+	Pipeline              string
+	TruncatedRedirects    string
+	UnknownMethod         string `json:"unknownMethod,omitempty"`
 }
 
 type WebAccelerationProfileService struct {
@@ -1936,49 +1936,50 @@ type CipherRule struct {
 }
 
 const (
-	uriLtm            = "ltm"
-	uriNode           = "node"
-	uriPool           = "pool"
-	uriPoolMember     = "members"
-	uriProfile        = "profile"
-	uriCipher         = "cipher"
-	uriServerSSL      = "server-ssl"
-	uriClientSSL      = "client-ssl"
-	uriVirtual        = "virtual"
-	uriVirtualAddress = "virtual-address"
-	uriSnatPool       = "snatpool"
-	uriMonitor        = "monitor"
-	uriIRule          = "rule"
-	uriDatagroup      = "data-group"
-	uriInternal       = "internal"
-	uriExternal       = "external"
-	uriPolicy         = "policy"
-	uriOneconnect     = "one-connect"
-	uriPersistence    = "persistence"
-	ENABLED           = "enable"
-	DISABLED          = "disable"
-	CONTEXT_SERVER    = "serverside"
-	CONTEXT_CLIENT    = "clientside"
-	CONTEXT_ALL       = "all"
-	uriTcp            = "tcp"
-	uriFtp            = "ftp"
-	uriFasthttp       = "fasthttp"
-	uriFastl4         = "fastl4"
-	uriHttpcompress   = "http-compression"
-	uriHttp2          = "http2"
-	uriSnat           = "snat"
-	uriSnatpool       = "snatpool"
-	uriCookie         = "cookie"
-	uriDestAddr       = "dest-addr"
-	uriHash           = "hash"
-	uriHost           = "host"
-	uriMSRDP          = "msrdp"
-	uriSIP            = "sip"
-	uriSourceAddr     = "source-addr"
-	uriSSL            = "ssl"
-	uriUniversal      = "universal"
-	uriCreateDraft    = "?options=create-draft"
-	uriRule           = "rule"
+	uriLtm             = "ltm"
+	uriNode            = "node"
+	uriPool            = "pool"
+	uriPoolMember      = "members"
+	uriProfile         = "profile"
+	uriCipher          = "cipher"
+	uriServerSSL       = "server-ssl"
+	uriClientSSL       = "client-ssl"
+	uriVirtual         = "virtual"
+	uriVirtualAddress  = "virtual-address"
+	uriSnatPool        = "snatpool"
+	uriMonitor         = "monitor"
+	uriIRule           = "rule"
+	uriDatagroup       = "data-group"
+	uriInternal        = "internal"
+	uriExternal        = "external"
+	uriPolicy          = "policy"
+	uriOneconnect      = "one-connect"
+	uriPersistence     = "persistence"
+	ENABLED            = "enable"
+	DISABLED           = "disable"
+	CONTEXT_SERVER     = "serverside"
+	CONTEXT_CLIENT     = "clientside"
+	CONTEXT_ALL        = "all"
+	uriTcp             = "tcp"
+	uriFtp             = "ftp"
+	uriFasthttp        = "fasthttp"
+	uriFastl4          = "fastl4"
+	uriHttpcompress    = "http-compression"
+	uriHttp2           = "http2"
+	uriSnat            = "snat"
+	uriSnatpool        = "snatpool"
+	uriCookie          = "cookie"
+	uriDestAddr        = "dest-addr"
+	uriHash            = "hash"
+	uriHost            = "host"
+	uriMSRDP           = "msrdp"
+	uriSIP             = "sip"
+	uriSourceAddr      = "source-addr"
+	uriSSL             = "ssl"
+	uriUniversal       = "universal"
+	uriCreateDraft     = "?options=create-draft"
+	uriRule            = "rule"
+	uriWebAcceleration = "web-acceleration"
 )
 
 var cidr = map[string]string{
@@ -4057,6 +4058,10 @@ func (b *BigIP) AddLtmCipherGroup(config *CipherGroupReq) error {
 }
 
 func (b *BigIP) ModifyLtmCipherGroup(name string, config *CipherGroupReq) error {
+	return b.put(config, uriLtm, uriCipher, "group", name)
+}
+
+func (b *BigIP) ModifyLtmCipherGroupNew(name string, config interface{}) error {
 	return b.put(config, uriLtm, uriCipher, "group", name)
 }
 
