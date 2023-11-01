@@ -17,6 +17,7 @@ This provider uses the iControlREST API. All the resources are validated with Bi
 ~> **NOTE** For AWAF resources, F5 BIG-IP version should be > v16.x , and ASM need to be provisioned.
 
 ## Example Usage
+
 ```hcl
 variable hostname {}
 variable username {}
@@ -45,6 +46,9 @@ provider "bigip" {
 - `password` - (type `string`) BIG-IP Password for authentication. Can be set via the `BIGIP_PASSWORD` environment variable.
 - `token_auth` - (Optional, Default `true`) Enable to use token authentication. Can be set via the `BIGIP_TOKEN_AUTH` environment variable.
 - `token_value` - (Optional) A token generated outside the provider, in place of password
+- `api_timeout` - (Optional, type `int`) A timeout for AS3 requests, represented as a number of seconds.
+- `token_timeout` - (Optional, type `int`) A lifespan to request for the AS3 auth token, represented as a number of seconds.
+- `api_retries` - (Optional, type `int`) Amount of times to retry AS3 API requests.
 - `login_ref` - (Optional,Default `tmos`) Login reference for token authentication (see BIG-IP REST docs for details). May be set via the `BIGIP_LOGIN_REF` environment variable.
 - `port` - (Optional) Management Port to connect to BIG-IP,this is mainly required if we have single nic BIG-IP in AWS/Azure/GCP (or) Management port other than `443`. Can be set via `BIGIP_PORT` environment variable.
 - `validate_certs_disable` - (Optional, Default `true`) If set to true, Disables TLS certificate check on BIG-IP. Can be set via the `BIGIP_VERIFY_CERT_DISABLE` environment variable.
