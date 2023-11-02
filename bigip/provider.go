@@ -102,7 +102,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Amount of times to retry AS3 API requests. Default: 10.",
-				DefaultFunc: schema.EnvDefaultFunc("API_TIMEOUT", 10),
+				DefaultFunc: schema.EnvDefaultFunc("API_RETRIES", 10),
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
