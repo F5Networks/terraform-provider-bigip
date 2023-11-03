@@ -93,6 +93,12 @@ See [TLS Client Profile](#tls-client-profile) below for more details.
 * `waf_security_policy` - (Optional,`set`) `waf_security_policy` block takes input for FAST-Generated WAF Security Policy.
 See [WAF Security Policy](#waf-security-policy) below for more details.
 
+* `persistence_profile` - (Optional,`string`) Name of an existing BIG-IP persistence profile to be used.
+
+* `persistence_type` - (Optional,`string`) Type of persistence profile to be created. Using this option will enable use of FAST generated persistence profiles.
+
+* `fallback_persistence` - (Optional,`string`) Type of fallback persistence record to be created for each new client connection.
+
 * `existing_pool` - (Optional,`string`) Name of an existing BIG-IP pool.
 
 * `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.

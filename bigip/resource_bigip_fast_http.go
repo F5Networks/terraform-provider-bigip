@@ -77,6 +77,32 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
+			"persistence_profile": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Description:   "Name of an existing BIG-IP persistence profile to be used.",
+				ConflictsWith: []string{"persistence_type"},
+			},
+			"persistence_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Type of persistence profile to be created.",
+				ValidateFunc: validation.StringInSlice([]string{
+					"cookie",
+					"msrdp",
+					"tls-session-id",
+					"destination-address",
+					"source-address"}, false),
+				ConflictsWith: []string{"persistence_profile"},
+			},
+			"fallback_persistence": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Type of fallback persistence record to be created for each new client connection.",
+				ValidateFunc: validation.StringInSlice([]string{
+					"destination-address",
+					"source-address"}, false),
+			},
 			"existing_pool": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -120,111 +146,10 @@ func resourceBigipHttpFastApp() *schema.Resource {
 			},
 			"service_discovery": {
 				Type:          schema.TypeList,
-				Computed:      true,
 				Optional:      true,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_pool"},
 			},
-			// "service_discovery_list": {
-			//	Type:     schema.TypeSet,
-			//	Optional: true,
-			//	Elem: &schema.Resource{
-			//		Schema: map[string]*schema.Schema{
-			//			"sd_type": {
-			//				Type:     schema.TypeString,
-			//				Required: true,
-			//			},
-			//			"sd_port": {
-			//				Type:     schema.TypeInt,
-			//				Required: true,
-			//			},
-			//			"sd_aws_tag_key": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_aws_tag_val": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_aws_region": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_aws_access_key": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_aws_secret_access_key": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_address_realm": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Default:  "private",
-			//			},
-			//			"sd_undetectable_action": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Default:  "remove",
-			//			},
-			//			"sd_azure_resource_group": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Computed: true,
-			//			},
-			//			"sd_azure_subscription_id": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Computed: true,
-			//			},
-			//			"sd_azure_resource_id": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Computed: true,
-			//				// ConflictsWith: []string{"service_discovery.sd_azure_tag_key", "service_discovery.sd_azure_tag_val"},
-			//			},
-			//			"sd_azure_directory_id": {
-			//				Type:     schema.TypeString,
-			//				Optional: true,
-			//				Computed: true,
-			//				// ConflictsWith: []string{"sd_azure_tag_key", "sd_azure_tag_val"},
-			//			},
-			//			"sd_azure_tag_key": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//				// ConflictsWith: []string{"sd_azure_resource_id", "sd_azure_directory_id"},
-			//			},
-			//			"sd_azure_tag_val": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//				// ConflictsWith: []string{"sd_azure_resource_id", "sd_azure_directory_id"},
-			//			},
-			//			"sd_gce_tag_key": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_gce_tag_val": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//			"sd_gce_region": {
-			//				Type:     schema.TypeString,
-			//				Computed: true,
-			//				Optional: true,
-			//			},
-			//		},
-			//	},
-			// },
 			"load_balancing_mode": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -486,6 +411,12 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 	if _, ok := d.GetOk("endpoint_ltm_policy"); ok {
 		_ = d.Set("endpoint_ltm_policy", data.EndpointPolicyNames)
 	}
+	if _, ok := d.GetOk("fallback_persistence"); ok {
+		_ = d.Set("fallback_persistence", data.FallbackPersistenceType)
+	}
+	if _, ok := d.GetOk("persistence_profile"); ok {
+		_ = d.Set("persistence_profile", data.PersistenceProfile)
+	}
 	if _, ok := d.GetOk("monitor"); ok {
 		if err := d.Set("monitor", []interface{}{flattenFastMonitor(data)}); err != nil {
 			return fmt.Errorf("error setting monitor: %w", err)
@@ -645,59 +576,6 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	httpJson.ServiceDiscovery = serviceDiscovery
 
-	// if p, ok := d.GetOk("service_discovery"); ok {
-	//	httpJson.SdEnable = true
-	//	httpJson.PoolEnable = true
-	//	httpJson.MakePool = true
-	//	var sdObjs []bigip.ServiceDiscoverObj
-	//	for _, r := range p.(*schema.Set).List() {
-	//		sdObj := bigip.ServiceDiscoverObj{}
-	//		sdObj.SdType = r.(map[string]interface{})["sd_type"].(string)
-	//		sdObj.SdPort = r.(map[string]interface{})["sd_port"].(int)
-	//		sdObj.SdAddressRealm = r.(map[string]interface{})["sd_address_realm"].(string)
-	//		if sdObj.SdType == "aws" {
-	//			if r.(map[string]interface{})["sd_aws_tag_key"].(string) == "" || r.(map[string]interface{})["sd_aws_tag_val"].(string) == "" {
-	//				return "", fmt.Errorf("'sd_aws_tag_key' and 'sd_aws_tag_val' must be specified for aws service discovery")
-	//			}
-	//			sdObj.SdTagKey = r.(map[string]interface{})["sd_aws_tag_key"].(string)
-	//			sdObj.SdTagVal = r.(map[string]interface{})["sd_aws_tag_val"].(string)
-	//			sdObj.SdAwsRegion = r.(map[string]interface{})["sd_aws_region"].(string)
-	//			sdObj.SdAccessKeyId = r.(map[string]interface{})["sd_aws_access_key"].(string)
-	//			sdObj.SdSecretAccessKey = r.(map[string]interface{})["sd_aws_secret_access_key"].(string)
-	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-	//			sdObjs = append(sdObjs, sdObj)
-	//		}
-	//		if sdObj.SdType == "azure" {
-	//			if r.(map[string]interface{})["sd_azure_resource_group"].(string) == "" || r.(map[string]interface{})["sd_azure_subscription_id"].(string) == "" {
-	//				return "", fmt.Errorf("'sd_azure_resource_group' and 'sd_azure_subscription_id' must be specified for azure service discovery")
-	//			}
-	//			sdObj.SdRg = r.(map[string]interface{})["sd_azure_resource_group"].(string)
-	//			sdObj.SdSid = r.(map[string]interface{})["sd_azure_subscription_id"].(string)
-	//			sdObj.SdRtype = "tag"
-	//			sdObj.SdUseManagedIdentity = true
-	//			if r.(map[string]interface{})["sd_azure_tag_key"].(string) != "" && r.(map[string]interface{})["sd_azure_tag_val"].(string) != "" {
-	//				sdObj.SdAzureTagKey = r.(map[string]interface{})["sd_azure_tag_key"].(string)
-	//				sdObj.SdAzureTagVal = r.(map[string]interface{})["sd_azure_tag_val"].(string)
-	//			} else if r.(map[string]interface{})["sd_azure_resource_id"].(string) != "" {
-	//				sdObj.SdRid = r.(map[string]interface{})["sd_azure_resource_id"].(string)
-	//				// sdObj.SdDirid = r.(map[string]interface{})["sd_azure_directory_id"].(string)
-	//			}
-	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-	//			sdObjs = append(sdObjs, sdObj)
-	//		}
-	//		if sdObj.SdType == "gce" {
-	//			if r.(map[string]interface{})["sd_gce_tag_key"].(string) == "" || r.(map[string]interface{})["sd_gce_tag_val"].(string) == "" || r.(map[string]interface{})["sd_gce_region"].(string) == "" {
-	//				return "", fmt.Errorf("'sd_gce_tag_key' , 'sd_gce_tag_val' and 'sd_gce_region' must be specified for GCE service discovery")
-	//			}
-	//			sdObj.SdTagKey = r.(map[string]interface{})["sd_gce_tag_key"].(string)
-	//			sdObj.SdTagVal = r.(map[string]interface{})["sd_gce_tag_val"].(string)
-	//			sdObj.SdRegion = r.(map[string]interface{})["sd_gce_region"].(string)
-	//			sdObj.SdUndetectableAction = r.(map[string]interface{})["sd_undetectable_action"].(string)
-	//			sdObjs = append(sdObjs, sdObj)
-	//		}
-	//	}
-	//	httpJson.ServiceDiscovery = sdObjs
-	// }
 	httpJson.SnatEnable = true
 	httpJson.SnatAutomap = true
 	httpJson.WafPolicyEnable = false
@@ -717,6 +595,22 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 			snatAdd = append(snatAdd, addr.(string))
 		}
 		httpJson.SnatAddresses = snatAdd
+	}
+	httpJson.EnablePersistence = false
+	httpJson.UseExistingPersistence = false
+	httpJson.EnableFallbackPersistence = false
+	if v, ok := d.GetOk("persistence_profile"); ok {
+		httpJson.EnablePersistence = true
+		httpJson.UseExistingPersistence = true
+		httpJson.PersistenceProfile = v.(string)
+	}
+	if v, ok := d.GetOk("persistence_type"); ok {
+		httpJson.EnablePersistence = true
+		httpJson.PersistenceType = v.(string)
+	}
+	if v, ok := d.GetOk("fallback_persistence"); ok {
+		httpJson.EnableFallbackPersistence = true
+		httpJson.FallbackPersistenceType = v.(string)
 	}
 	if s, ok := d.GetOk("endpoint_ltm_policy"); ok {
 		var endptPolicy []string
