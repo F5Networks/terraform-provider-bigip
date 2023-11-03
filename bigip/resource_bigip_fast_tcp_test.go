@@ -54,7 +54,7 @@ resource "bigip_fast_tcp_app" "fast-tcp-app" {
 	port = 443
   }
   
-  persistence_profile = "/Common/source_addr"
+  persistence_profile  = "/Common/source_addr"
   fallback_persistence = "destination-address"
   
   pool_members {
