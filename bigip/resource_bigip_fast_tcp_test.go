@@ -44,6 +44,29 @@ resource "bigip_fast_tcp_app" "fast_tcp_app" {
 }
 `, appName, tenantName)
 
+var cfg3 = fmt.Sprintf(`
+resource "bigip_fast_tcp_app" "fast-tcp-app" {
+  application = "%v"
+  tenant      = "%v"
+  
+  virtual_server {
+	ip   = "11.12.16.30"
+	port = 443
+  }
+  
+  persistence_profile  = "/Common/source_addr"
+  fallback_persistence = "destination-address"
+  
+  pool_members {
+	addresses        = ["10.11.34.65", "56.43.23.76"]
+	port             = 443
+	priority_group   = 1
+	connection_limit = 4
+	share_nodes      = true
+  }
+}
+`, appName, tenantName)
+
 func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -78,6 +101,28 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 	})
 }
 
+func TestAccFastTCPAppPersistenceAttributes(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastTCPAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: cfg3,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(appName, tenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast-tcp-app", "application", "fast_tcp_app"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast-tcp-app", "tenant", "fast_tcp_tenant"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast-tcp-app", "persistence_profile", "/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_fast_tcp_app.fast-tcp-app", "fallback_persistence", "destination-address"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckFastTCPAppDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 	for _, rs := range s.RootModule().Resources {
@@ -86,6 +131,10 @@ func testCheckFastTCPAppDestroyed(s *terraform.State) error {
 		}
 		name := rs.Primary.ID
 		template, err := client.GetFastApp(tenant, name)
+		appNotFound := fmt.Sprintf("Client Error: Could not find application %s/%s", tenantName, appName)
+		if err != nil && err.Error() != appNotFound {
+			return nil
+		}
 		if err != nil {
 			return err
 		}

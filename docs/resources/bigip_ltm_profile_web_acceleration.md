@@ -17,9 +17,9 @@ For resources should be named with their "full path". The full path is the combi
 
 ```hcl
 resource "bigip_ltm_profile_web_acceleration" "sample-resource" {
-  name = "/Common/sample-resource"
-  defaults_from = "/Common/test2"
-  cache_size = 101
+  name              = "/Common/sample-resource"
+  defaults_from     = "/Common/test2"
+  cache_size        = 101
   cache_max_entries = 201
 }
 ```      

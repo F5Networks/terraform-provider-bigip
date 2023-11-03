@@ -46,25 +46,31 @@ type TmplArrType struct {
 }
 
 type FastTCPJson struct {
-	Tenant            string         `json:"tenant_name,omitempty"`
-	Application       string         `json:"app_name,omitempty"`
-	VirtualAddress    string         `json:"virtual_address,omitempty"`
-	VirtualPort       interface{}    `json:"virtual_port,omitempty"`
-	SnatEnable        bool           `json:"enable_snat,omitempty"`
-	SnatAutomap       bool           `json:"snat_automap"`
-	MakeSnatPool      bool           `json:"make_snatpool"`
-	SnatPoolName      string         `json:"snatpool_name,omitempty"`
-	SnatAddresses     []string       `json:"snat_addresses,omitempty"`
-	PoolEnable        bool           `json:"enable_pool"`
-	MakePool          bool           `json:"make_pool"`
-	PoolName          string         `json:"pool_name,omitempty"`
-	PoolMembers       []FastHttpPool `json:"pool_members,omitempty"`
-	LoadBalancingMode string         `json:"load_balancing_mode,omitempty"`
-	SlowRampTime      int            `json:"slow_ramp_time,omitempty"`
-	MonitorEnable     bool           `json:"enable_monitor,omitempty"`
-	MakeMonitor       bool           `json:"make_monitor"`
-	TCPMonitor        string         `json:"monitor_name,omitempty"`
-	MonitorInterval   int            `json:"monitor_interval,omitempty"`
+	Tenant                        string         `json:"tenant_name,omitempty"`
+	Application                   string         `json:"app_name,omitempty"`
+	VirtualAddress                string         `json:"virtual_address,omitempty"`
+	VirtualPort                   interface{}    `json:"virtual_port,omitempty"`
+	SnatEnable                    bool           `json:"enable_snat,omitempty"`
+	SnatAutomap                   bool           `json:"snat_automap"`
+	MakeSnatPool                  bool           `json:"make_snatpool"`
+	SnatPoolName                  string         `json:"snatpool_name,omitempty"`
+	SnatAddresses                 []string       `json:"snat_addresses,omitempty"`
+	PoolEnable                    bool           `json:"enable_pool"`
+	MakePool                      bool           `json:"make_pool"`
+	PoolName                      string         `json:"pool_name,omitempty"`
+	PoolMembers                   []FastHttpPool `json:"pool_members,omitempty"`
+	LoadBalancingMode             string         `json:"load_balancing_mode,omitempty"`
+	SlowRampTime                  int            `json:"slow_ramp_time,omitempty"`
+	MonitorEnable                 bool           `json:"enable_monitor,omitempty"`
+	MakeMonitor                   bool           `json:"make_monitor"`
+	TCPMonitor                    string         `json:"monitor_name,omitempty"`
+	MonitorInterval               int            `json:"monitor_interval,omitempty"`
+	EnablePersistence             bool           `json:"enable_persistence"`
+	PersistenceProfile            string         `json:"persistence_profile,omitempty"`
+	PersistenceType               string         `json:"persistence_type,omitempty"`
+	UseExistingPersistenceProfile bool           `json:"use_existing_persistence_profile,omitempty"`
+	EnableFallbackPersistence     bool           `json:"enable_fallback_persistence"`
+	FallbackPersistenceType       string         `json:"fallback_persistence_type,omitempty"`
 }
 
 type FastUDPJson struct {
