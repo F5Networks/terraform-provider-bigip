@@ -78,7 +78,7 @@ func TestAccFastHTTPAppCreateTC03(t *testing.T) {
 			{
 				Config: getFastHTTPAppConfigTC03(httpTenant3Name, httpApp3Name),
 				Check: resource.ComposeTestCheckFunc(
-					//testCheckFastAppExists(httpApp3Name, httpTenant3Name, true),
+					testCheckFastAppExists(httpApp3Name, httpTenant3Name, true),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "application", httpApp3Name),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "tenant", httpTenant3Name),
 					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "virtual_server.0.ip", "10.200.21.2"),
@@ -136,10 +136,10 @@ resource "bigip_fast_http_app" "fast_http_app_tc3" {
     addresses = ["10.1.20.120", "10.1.10.121", "10.1.10.122"]
     port      = 80
   }
-  persistence_profile="/Common/dest_addr"
+  persistence_profile  = "/Common/dest_addr"
   fallback_persistence = "source-address"
-  load_balancing_mode = "least-connections-member"
-  endpoint_ltm_policy = ["/Common/testpolicy1"]
+  load_balancing_mode  = "least-connections-member"
+  endpoint_ltm_policy  = ["/Common/testpolicy1"]
 }
 `, httpTenantName, httpAppName)
 }
