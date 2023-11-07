@@ -531,10 +531,11 @@ func waitLicenseRevoke(bigipRef *bigip.BigIP) (map[string]interface{}, error) {
 
 func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 	bigiqConfig := bigip.Config{
-		Address:  d.Get("bigiq_address").(string),
-		Port:     d.Get("bigiq_port").(string),
-		Username: d.Get("bigiq_user").(string),
-		Password: d.Get("bigiq_password").(string),
+		Address:           d.Get("bigiq_address").(string),
+		Port:              d.Get("bigiq_port").(string),
+		Username:          d.Get("bigiq_user").(string),
+		Password:          d.Get("bigiq_password").(string),
+		CertVerifyDisable: true,
 	}
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)
