@@ -65,6 +65,32 @@ func TestAccFastHTTPAppCreateTC02(t *testing.T) {
 	})
 }
 
+func TestAccFastHTTPAppCreateTC03(t *testing.T) {
+	var httpApp3Name = "fast_http_apptc3"
+	var httpTenant3Name = "fast_http_tenanttc3"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckFastHTTPAppDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPAppConfigTC03(httpTenant3Name, httpApp3Name),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpApp3Name, httpTenant3Name, true),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "application", httpApp3Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "tenant", httpTenant3Name),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "virtual_server.0.ip", "10.200.21.2"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "virtual_server.0.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "persistence_profile", "/Common/dest_addr"),
+					resource.TestCheckResourceAttr("bigip_fast_http_app.fast_http_app_tc3", "fallback_persistence", "source-address"),
+				),
+			},
+		},
+	})
+}
+
 func getFastHTTPAppConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_http_app" "fast_http_app" {
@@ -93,6 +119,27 @@ resource "bigip_fast_http_app" "fast_http_app_tc2" {
   }
   load_balancing_mode = "least-connections-member"
   endpoint_ltm_policy = ["/Common/testpolicy1"]
+}
+`, httpTenantName, httpAppName)
+}
+
+func getFastHTTPAppConfigTC03(httpTenantName, httpAppName string) string {
+	return fmt.Sprintf(`
+resource "bigip_fast_http_app" "fast_http_app_tc3" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.200.21.2"
+    port = 443
+  }
+  pool_members {
+    addresses = ["10.1.20.120", "10.1.10.121", "10.1.10.122"]
+    port      = 80
+  }
+  persistence_profile  = "/Common/dest_addr"
+  fallback_persistence = "source-address"
+  load_balancing_mode  = "least-connections-member"
+  endpoint_ltm_policy  = ["/Common/testpolicy1"]
 }
 `, httpTenantName, httpAppName)
 }

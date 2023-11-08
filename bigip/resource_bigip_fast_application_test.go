@@ -55,18 +55,18 @@ func TestAccFastAppCreateOnBigip(t *testing.T) {
 	})
 }
 
-func testCheckFastAppExists(app, tenant string, exists bool) resource.TestCheckFunc {
+func testCheckFastAppExists(app1, tenant1 string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.GetFastApp(tenant, app)
+		p, err := client.GetFastApp(tenant1, app1)
 		if err != nil {
 			return err
 		}
 		if exists && p == "" {
-			return fmt.Errorf("fast application %s was not created", app)
+			return fmt.Errorf("fast application %s was not created", app1)
 		}
 		if !exists && p != "" {
-			return fmt.Errorf("fast application  %s still exists", app)
+			return fmt.Errorf("fast application  %s still exists", app1)
 		}
 		return nil
 	}

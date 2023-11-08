@@ -310,7 +310,7 @@ func resourceBigipFastUdpAppRead(ctx context.Context, d *schema.ResourceData, me
 		d.SetId("")
 		return nil
 	}
-	_ = d.Set("fast_json", fastJson)
+	_ = d.Set("fast_udp_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastUdp)
 	if err != nil {
 		return diag.FromErr(err)

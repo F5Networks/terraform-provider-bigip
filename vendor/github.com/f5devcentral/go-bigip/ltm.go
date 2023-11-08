@@ -1861,6 +1861,23 @@ type Enforcement struct {
 	UnknownMethod         string `json:"unknownMethod,omitempty"`
 }
 
+type WebAccelerationProfileService struct {
+	Name                        string   `json:"name,omitempty"`
+	DefaultsFrom                string   `json:"defaultsFrom,omitempty"`
+	CacheSize                   int      `json:"cacheSize,omitempty"`
+	CacheMaxEntries             int      `json:"cacheMaxEntries,omitempty"`
+	CacheMaxAge                 int      `json:"cacheMaxAge,omitempty"`
+	CacheObjectMinSize          int      `json:"cacheObjectMinSize,omitempty"`
+	CacheObjectMaxSize          int      `json:"cacheObjectMaxSize,omitempty"`
+	CacheUriExclude             []string `json:"cacheUriExclude,omitempty"`
+	CacheUriInclude             []string `json:"cacheUriInclude,omitempty"`
+	CacheUriIncludeOverride     []string `json:"cacheUriIncludeOverride,omitempty"`
+	CacheUriPinned              []string `json:"cacheUriPinned,omitempty"`
+	CacheClientCacheControlMode string   `json:"cacheClientCacheControlMode,omitempty"`
+	CacheInsertAgeHeader        string   `json:"cacheInsertAgeHeader,omitempty"`
+	CacheAgingRate              int      `json:"cacheAgingRate,omitempty"`
+}
+
 type OneconnectProfiles struct {
 	OneconnectProfiles []OneconnectProfile `json:"items"`
 }
@@ -1919,49 +1936,50 @@ type CipherRule struct {
 }
 
 const (
-	uriLtm            = "ltm"
-	uriNode           = "node"
-	uriPool           = "pool"
-	uriPoolMember     = "members"
-	uriProfile        = "profile"
-	uriCipher         = "cipher"
-	uriServerSSL      = "server-ssl"
-	uriClientSSL      = "client-ssl"
-	uriVirtual        = "virtual"
-	uriVirtualAddress = "virtual-address"
-	uriSnatPool       = "snatpool"
-	uriMonitor        = "monitor"
-	uriIRule          = "rule"
-	uriDatagroup      = "data-group"
-	uriInternal       = "internal"
-	uriExternal       = "external"
-	uriPolicy         = "policy"
-	uriOneconnect     = "one-connect"
-	uriPersistence    = "persistence"
-	ENABLED           = "enable"
-	DISABLED          = "disable"
-	CONTEXT_SERVER    = "serverside"
-	CONTEXT_CLIENT    = "clientside"
-	CONTEXT_ALL       = "all"
-	uriTcp            = "tcp"
-	uriFtp            = "ftp"
-	uriFasthttp       = "fasthttp"
-	uriFastl4         = "fastl4"
-	uriHttpcompress   = "http-compression"
-	uriHttp2          = "http2"
-	uriSnat           = "snat"
-	uriSnatpool       = "snatpool"
-	uriCookie         = "cookie"
-	uriDestAddr       = "dest-addr"
-	uriHash           = "hash"
-	uriHost           = "host"
-	uriMSRDP          = "msrdp"
-	uriSIP            = "sip"
-	uriSourceAddr     = "source-addr"
-	uriSSL            = "ssl"
-	uriUniversal      = "universal"
-	uriCreateDraft    = "?options=create-draft"
-	uriRule           = "rule"
+	uriLtm             = "ltm"
+	uriNode            = "node"
+	uriPool            = "pool"
+	uriPoolMember      = "members"
+	uriProfile         = "profile"
+	uriCipher          = "cipher"
+	uriServerSSL       = "server-ssl"
+	uriClientSSL       = "client-ssl"
+	uriVirtual         = "virtual"
+	uriVirtualAddress  = "virtual-address"
+	uriSnatPool        = "snatpool"
+	uriMonitor         = "monitor"
+	uriIRule           = "rule"
+	uriDatagroup       = "data-group"
+	uriInternal        = "internal"
+	uriExternal        = "external"
+	uriPolicy          = "policy"
+	uriOneconnect      = "one-connect"
+	uriPersistence     = "persistence"
+	ENABLED            = "enable"
+	DISABLED           = "disable"
+	CONTEXT_SERVER     = "serverside"
+	CONTEXT_CLIENT     = "clientside"
+	CONTEXT_ALL        = "all"
+	uriTcp             = "tcp"
+	uriFtp             = "ftp"
+	uriFasthttp        = "fasthttp"
+	uriFastl4          = "fastl4"
+	uriHttpcompress    = "http-compression"
+	uriHttp2           = "http2"
+	uriSnat            = "snat"
+	uriSnatpool        = "snatpool"
+	uriCookie          = "cookie"
+	uriDestAddr        = "dest-addr"
+	uriHash            = "hash"
+	uriHost            = "host"
+	uriMSRDP           = "msrdp"
+	uriSIP             = "sip"
+	uriSourceAddr      = "source-addr"
+	uriSSL             = "ssl"
+	uriUniversal       = "universal"
+	uriCreateDraft     = "?options=create-draft"
+	uriRule            = "rule"
+	uriWebAcceleration = "web-acceleration"
 )
 
 var cidr = map[string]string{
@@ -3827,6 +3845,20 @@ func (b *BigIP) GetHttpProfile(name string) (*HttpProfile, error) {
 	return &httpProfile, nil
 }
 
+func (b *BigIP) GetWebAccelerationProfile(name string) (*WebAccelerationProfileService, error) {
+	var webAccelerationProfileService WebAccelerationProfileService
+	err, ok := b.getForEntity(&webAccelerationProfileService, uriLtm, uriProfile, uriWebAcceleration, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &webAccelerationProfileService, nil
+}
+
 // CreateHttpProfile creates a new http profile on the BIG-IP system.
 func (b *BigIP) CreateHttpProfile(name string, parent string) error {
 	config := &HttpProfile{
@@ -3842,15 +3874,30 @@ func (b *BigIP) AddHttpProfile(config *HttpProfile) error {
 	return b.post(config, uriLtm, uriProfile, uriHttp)
 }
 
+// AddWebAcceleration creates a new web acceleration profile service on the BIG-IP system.
+func (b *BigIP) AddWebAcceleration(config *WebAccelerationProfileService) error {
+	return b.post(config, uriLtm, uriProfile, uriWebAcceleration)
+}
+
 // DeleteHttpProfile removes a http profile.
 func (b *BigIP) DeleteHttpProfile(name string) error {
 	return b.delete(uriLtm, uriProfile, uriHttp, name)
+}
+
+// DeleteWebAccelerationProfile removes a web acceleration profile.
+func (b *BigIP) DeleteWebAccelerationProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriWebAcceleration, name)
 }
 
 // ModifyHttpProfile allows you to change any attribute of a http profile.
 // Fields that can be modified are referenced in the HttpProfile struct.
 func (b *BigIP) ModifyHttpProfile(name string, config *HttpProfile) error {
 	return b.patch(config, uriLtm, uriProfile, uriHttp, name)
+}
+
+// ModifyWebAccelerationProfile allows you to change any attribute of a Web Acceleration profile.
+func (b *BigIP) ModifyWebAccelerationProfile(name string, config *WebAccelerationProfileService) error {
+	return b.patch(config, uriLtm, uriProfile, uriWebAcceleration, name)
 }
 
 // OneconnectProfiles returns a list of HTTP profiles
@@ -4011,6 +4058,10 @@ func (b *BigIP) AddLtmCipherGroup(config *CipherGroupReq) error {
 }
 
 func (b *BigIP) ModifyLtmCipherGroup(name string, config *CipherGroupReq) error {
+	return b.put(config, uriLtm, uriCipher, "group", name)
+}
+
+func (b *BigIP) ModifyLtmCipherGroupNew(name string, config interface{}) error {
 	return b.put(config, uriLtm, uriCipher, "group", name)
 }
 

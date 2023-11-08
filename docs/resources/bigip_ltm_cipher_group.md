@@ -1,9 +1,9 @@
 ---
 layout: "bigip"
-page_title: "BIG-IP: bigip_ltm_cipher_rule"
+page_title: "BIG-IP: bigip_ltm_cipher_group"
 subcategory: "Local Traffic Manager(LTM)"
 description: |-
-Provides details about bigip_ltm_cipher_rule resource
+Provides details about bigip_ltm_cipher_group resource
 ---
 
 # bigip\_ltm\_cipher\_group

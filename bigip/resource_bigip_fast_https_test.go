@@ -162,6 +162,31 @@ func TestAccFastHTTPSAppProfileTC5(t *testing.T) {
 	})
 }
 
+func TestAccFastHTTPSAppProfileTC6(t *testing.T) {
+	httpsAppName = "fast_https_apptc6"
+	httpsTenantName = "fast_https_tenanttc6"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: getFastHTTPSAppConfigTC6(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckFastAppExists(httpsAppName, httpsTenantName, true),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "application", "fast_https_apptc6"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "tenant", "fast_https_tenanttc6"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.ip", "10.20.33.1"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "virtual_server.0.port", "443"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "persistence_profile", "/Common/source_addr"),
+					resource.TestCheckResourceAttr("bigip_fast_https_app.fast_https_app", "fallback_persistence", "destination-address"),
+				),
+			},
+		},
+	})
+}
+
 func getFastHTTPSAppConfig() string {
 	return fmt.Sprintf(`
 resource "bigip_fast_https_app" "fast_https_app" {
@@ -279,6 +304,27 @@ resource "bigip_fast_https_app" "fast_https_app" {
     enable = true
   }
   endpoint_ltm_policy = ["/Common/testpolicy1"]
+}
+`, httpsTenantName, httpsAppName)
+}
+
+func getFastHTTPSAppConfigTC6() string {
+	return fmt.Sprintf(`
+resource "bigip_fast_https_app" "fast_https_app" {
+  tenant      = "%v"
+  application = "%v"
+  virtual_server {
+    ip   = "10.20.33.1"
+    port = 443
+  }
+  pool_members {
+    addresses = ["10.11.40.120", "10.11.30.121", "10.11.30.122"]
+    port      = 80
+  }
+  load_balancing_mode  = "least-connections-member"
+  endpoint_ltm_policy  = ["/Common/testpolicy1"]
+  persistence_profile  = "/Common/source_addr"
+  fallback_persistence = "destination-address"
 }
 `, httpsTenantName, httpsAppName)
 }

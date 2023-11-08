@@ -87,6 +87,12 @@ See [Pool Members](#pool-members) below for more details.
 * `monitor` - (Optional,`set`) `monitor` block takes input for FAST-Generated Pool Monitor.
 See [Pool Monitor](#pool-monitor) below for more details.
 
+* `persistence_profile` - (Optional,`string`) Name of an existing BIG-IP persistence profile to be used.
+
+* `persistence_type` - (Optional,`string`) Type of persistence profile to be created. Using this option will enable use of FAST generated persistence profiles.
+
+* `fallback_persistence` - (Optional,`string`) Type of fallback persistence record to be created for each new client connection.
+
 * `existing_waf_security_policy` - (Optional,`string`) Name of an existing WAF Security policy.
 
 * `endpoint_ltm_policy` - (Optional,`list`) List of LTM Policies to be applied FAST HTTP Application.

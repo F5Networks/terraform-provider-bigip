@@ -3,6 +3,7 @@ Copyright 2021 F5 Networks Inc.
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+
 package bigip
 
 import (
@@ -61,6 +62,32 @@ func resourceBigipFastTcpApp() *schema.Resource {
 						},
 					},
 				},
+			},
+			"persistence_profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Select an existing BIG-IP persistence profile.",
+				ConflictsWith: []string{
+					"persistence_type",
+				},
+			},
+			"persistence_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Type of persistence profile to be created.",
+				// Default:     "source-address",
+				ValidateFunc: validation.StringInSlice([]string{
+					"destination-address",
+					"source-address"}, false),
+				ConflictsWith: []string{"persistence_profile"},
+			},
+			"fallback_persistence": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Type of fallback persistence record to be created for each new client connection.",
+				ValidateFunc: validation.StringInSlice([]string{
+					"destination-address",
+					"source-address"}, false),
 			},
 			"existing_snat_pool": {
 				Type:          schema.TypeString,
@@ -229,10 +256,16 @@ func resourceBigipFastTcpAppRead(ctx context.Context, d *schema.ResourceData, me
 
 	log.Printf("[INFO] Reading FAST TCP Application config")
 	fastJson, err := client.GetFastApp(tenant, appName)
-	log.Printf("[DEBUG] FAST json retreived from the GET call in Read function : %s", fastJson)
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve json ")
-		if err.Error() == "unexpected end of JSON input" {
+		err_msg := err.Error()
+		appNotFound := fmt.Sprintf("Client Error: Could not find application %s/%s", tenant, appName)
+		if err_msg == appNotFound {
+			log.Printf("[INFO] %v", err)
+			d.SetId("")
+			return nil
+		}
+		if err_msg == "unexpected end of JSON input" {
 			log.Printf("[ERROR] %v", err)
 			d.SetId("")
 			return nil
@@ -244,7 +277,8 @@ func resourceBigipFastTcpAppRead(ctx context.Context, d *schema.ResourceData, me
 		d.SetId("")
 		return nil
 	}
-	_ = d.Set("fast_json", fastJson)
+	log.Printf("[DEBUG] FAST json retreived from the GET call in Read function : %s", fastJson)
+	_ = d.Set("fast_tcp_json", fastJson)
 	err = json.Unmarshal([]byte(fastJson), &fastTcp)
 	if err != nil {
 		return diag.FromErr(err)
@@ -287,7 +321,7 @@ func resourceBigipFastTcpAppDelete(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId("")
+	// d.SetId("")
 	return resourceBigipFastTcpAppRead(ctx, d, meta)
 }
 
@@ -309,13 +343,18 @@ func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
 	}
 	_ = d.Set("existing_monitor", data.TCPMonitor)
 	monitorData := make(map[string]interface{})
-	monitorData["enable"] = data.MonitorEnable
 	monitorData["interval"] = data.MonitorInterval
 	if _, ok := d.GetOk("monitor"); ok {
 		if err := d.Set("monitor", []interface{}{monitorData}); err != nil {
 			return fmt.Errorf("error setting monitor: %w", err)
 		}
 	}
+	if data.PersistenceProfile != "" {
+		d.Set("persistence_profile", data.PersistenceProfile)
+	} else {
+		d.Set("persistence_type", data.PersistenceType)
+	}
+	_ = d.Set("fallback_persistence", data.FallbackPersistenceType)
 	return nil
 }
 
@@ -342,6 +381,21 @@ func getParamsConfigMap(d *schema.ResourceData) (string, error) {
 		tcpJson.SnatAutomap = false
 		tcpJson.MakeSnatPool = false
 	}
+
+	tcpJson.EnablePersistence = true
+	if v, ok := d.GetOk("persistence_profile"); ok {
+		tcpJson.UseExistingPersistenceProfile = true
+		tcpJson.PersistenceProfile = v.(string)
+	} else {
+		tcpJson.PersistenceType = d.Get("persistence_type").(string)
+		tcpJson.UseExistingPersistenceProfile = false
+	}
+
+	if v, ok := d.GetOk("fallback_persistence"); ok {
+		tcpJson.EnableFallbackPersistence = true
+		tcpJson.FallbackPersistenceType = v.(string)
+	}
+
 	if s, ok := d.GetOk("snat_pool_address"); ok {
 		tcpJson.SnatAutomap = false
 		tcpJson.MakeSnatPool = true

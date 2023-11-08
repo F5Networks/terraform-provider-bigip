@@ -126,6 +126,7 @@ func Provider() *schema.Provider {
 			"bigip_ltm_profile_tcp":                 resourceBigipLtmProfileTcp(),
 			"bigip_ltm_profile_ftp":                 resourceBigipLtmProfileFtp(),
 			"bigip_ltm_profile_http":                resourceBigipLtmProfileHttp(),
+			"bigip_ltm_profile_web_acceleration":    resourceBigipLtmProfileWebAcceleration(),
 			"bigip_ltm_persistence_profile_srcaddr": resourceBigipLtmPersistenceProfileSrcAddr(),
 			"bigip_ltm_persistence_profile_dstaddr": resourceBigipLtmPersistenceProfileDstAddr(),
 			"bigip_ltm_persistence_profile_ssl":     resourceBigipLtmPersistenceProfileSSL(),

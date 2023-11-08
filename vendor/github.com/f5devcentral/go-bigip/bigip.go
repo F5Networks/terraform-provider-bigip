@@ -527,7 +527,7 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		var reqError RequestError
 		json.Unmarshal(resp, &reqError)
 		if reqError.Code == 404 {
-			return nil, false
+			return err, false
 		}
 		return err, false
 	}
