@@ -43,6 +43,54 @@ func TestAccBigipLtmCipherGroupCreateTC1(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmCipherGroupRemoveRequire(t *testing.T) {
+	cipherGrpCfg := `
+resource "bigip_ltm_cipher_group" "test-cipher-group" {
+  name     = "/Common/testciphergrp"
+  allow    = ["/Common/f5-aes"]
+  %s
+}
+`
+	requireAndOrdering := `
+  require  = ["/Common/f5-quic"]
+  ordering = "speed"
+`
+
+	c1 := fmt.Sprintf(cipherGrpCfg, requireAndOrdering)
+	c2 := fmt.Sprintf(cipherGrpCfg, "")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: c1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckCipherGroupExists("/Common/testciphergrp"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "name", "/Common/testciphergrp"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "allow.#", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "require.#", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "allow.0", "/Common/f5-aes"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "require.0", "/Common/f5-quic"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "ordering", "speed"),
+				),
+			},
+			{
+				Config: c2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckCipherGroupExists("/Common/testciphergrp"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "name", "/Common/testciphergrp"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "allow.#", "1"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "require.#", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "allow.0", "/Common/f5-aes"),
+					resource.TestCheckResourceAttr("bigip_ltm_cipher_group.test-cipher-group", "ordering", "default"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckCipherGroupExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
@@ -52,7 +100,7 @@ func testCheckCipherGroupExists(name string) resource.TestCheckFunc {
 			return err
 		}
 		if p == nil {
-			return fmt.Errorf("Pool %s does not exist ", name)
+			return fmt.Errorf("cipher group %s does not exist ", name)
 		}
 
 		return nil
@@ -66,11 +114,11 @@ func testCheckCipherGroupDestroyed(s *terraform.State) error {
 			continue
 		}
 		name := rs.Primary.ID
-		pool, err := client.GetLtmCipherGroup(name)
+		cipherGroup, err := client.GetLtmCipherGroup(name)
 		if err != nil {
 			return err
 		}
-		if pool != nil {
+		if cipherGroup != nil {
 			return fmt.Errorf("Cipher rule %s not destroyed ", name)
 		}
 	}
