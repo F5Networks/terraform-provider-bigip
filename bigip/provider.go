@@ -169,6 +169,7 @@ func Provider() *schema.Provider {
 			"bigip_vcmp_guest":                      resourceBigipVcmpGuest(),
 			"bigip_ltm_cipher_rule":                 resourceBigipLtmCipherRule(),
 			"bigip_ltm_cipher_group":                resourceBigipLtmCipherGroup(),
+			"bigip_partition":                       resourceBigipPartition(),
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
