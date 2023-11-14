@@ -144,6 +144,19 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 		Token struct {
 			Token string
 		}
+		Timeout struct {
+			Timeout int64
+		}
+	}
+
+	type timeoutReq struct {
+		Timeout int64 `json:"timeout"`
+	}
+
+	type timeoutResp struct {
+		Timeout struct {
+			Timeout int64
+		}
 	}
 
 	auth := authReq{
@@ -152,7 +165,7 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 		bigipConfig.LoginReference,
 	}
 
-	marshalJSON, err := json.Marshal(auth)
+	marshalJSONauth, err := json.Marshal(auth)
 	if err != nil {
 		return
 	}
@@ -160,7 +173,7 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 	req := &APIRequest{
 		Method:      "post",
 		URL:         "mgmt/shared/authn/login",
-		Body:        string(marshalJSON),
+		Body:        string(marshalJSONauth),
 		ContentType: "application/json",
 	}
 
@@ -207,6 +220,46 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 
 	b.Token = aresp.Token.Token
 
+	//Once we have obtained a token, we should actually apply the configured timeout to it
+	if time.Duration(aresp.Timeout.Timeout)*time.Second != bigipConfig.ConfigOptions.TokenTimeout { // The inital value is the max timespan
+		timeout := timeoutReq{
+			int64(bigipConfig.ConfigOptions.TokenTimeout.Seconds()),
+		}
+
+		marshalJSONtimeout, errToken := json.Marshal(timeout)
+		if errToken != nil {
+			return b, errToken
+		}
+
+		timeoutReq := &APIRequest{
+			Method:      "patch",
+			URL:         ("mgmt/shared/authz/tokens/" + b.Token),
+			Body:        string(marshalJSONtimeout),
+			ContentType: "application/json",
+		}
+
+		resp, errToken := b.APICall(timeoutReq)
+		if errToken != nil {
+			return b, errToken
+		}
+
+		if resp == nil {
+			errToken = fmt.Errorf("unable to update token timeout")
+			return b, errToken
+		}
+
+		var tresp timeoutResp
+		errToken = json.Unmarshal(resp, &tresp)
+		if err != nil {
+			return b, errToken
+		}
+
+		if time.Duration(tresp.Timeout.Timeout)*time.Second != bigipConfig.ConfigOptions.TokenTimeout {
+			err = fmt.Errorf("failed to update token lifespan")
+			return
+		}
+
+	}
 	return
 }
 
