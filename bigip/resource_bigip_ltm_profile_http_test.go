@@ -7,12 +7,12 @@ package bigip
 
 import (
 	"fmt"
-	"regexp"
-	"testing"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"regexp"
+	"strings"
+	"testing"
 )
 
 var TestHttpName = fmt.Sprintf("/%s/test-http", TestPartition)
@@ -100,6 +100,15 @@ func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 			},
 			{
 				Config: testaccbigipltmprofilehttpUpdateServeragentConfig(TestPartition, TestHttpName, "http-profile-test"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, "server_agent_name", "myBIG-IP"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpDefaultConfig(TestPartition, TestHttpName, "http-profile-test"),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckhttpExists(TestHttpName),
 					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
@@ -419,6 +428,18 @@ func TestAccBigipLtmProfileHttpUpdateHSTS(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.maximum_age", "80"),
 				),
 			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.include_subdomains", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.preload", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.mode", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "http_strict_transport_security.0.maximum_age", "80"),
+				),
+			},
 		},
 	})
 }
@@ -470,6 +491,9 @@ func testCheckHttpsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		http, err := client.GetHttpProfile(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if http != nil {
