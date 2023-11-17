@@ -392,6 +392,27 @@ func TestAccBigipLtmProfileHttpUpdateEnforcement(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "enforcement.0.max_header_size", "80"),
 				),
 			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "CONNECT"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "DELETE"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "GET"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "HEAD"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "LOCK"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "POST"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "PROPFIND"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "PUT"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "TRACE"),
+					resource.TestCheckTypeSetElemAttr(resFullName, "enforcement.0.known_methods.*", "UNLOCK"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.unknown_method", "allow"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.max_header_count", "40"),
+					resource.TestCheckResourceAttr(resFullName, "enforcement.0.max_header_size", "80"),
+				),
+			},
 		},
 	})
 }
