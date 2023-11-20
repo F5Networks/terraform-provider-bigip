@@ -53,6 +53,10 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 
 * `peer_cert_mode` - (Optional) Specifies the way the system handles client certificates.When ignore, specifies that the system ignores certificates from client systems.When require, specifies that the system requires a client to present a valid certificate.When request, specifies that the system requests a valid certificate from a client but always authenticate the client.
 
+* `ca_file` - (Optional) (Trusted Certificate Authorities)Specifies a client CA that the system trusts. The default is `None`.
+
+* `client_cert_ca` - (Optional)(Advertised Certificate Authorities)Specifies that the CAs that the system advertises to clients is being trusted by the profile. The default is `None`.
+
 * `renegotiation` - (Optional) Enables or disables SSL renegotiation.When creating a new profile, the setting is provided by the parent profile
 
 * `retain_certificate` - (Optional) When `true`, client certificate is retained in SSL session.
