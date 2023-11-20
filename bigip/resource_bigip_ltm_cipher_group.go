@@ -41,23 +41,20 @@ func resourceBigipLtmCipherGroup() *schema.Resource {
 				Description: "Specifies descriptive text that identifies the cipher rule",
 			},
 			"ordering": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				//Default:     "default",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "default",
 				Description: "Controls the order of the Cipher String list in the Cipher Audit section. Options are Default, Speed, Strength, FIPS, and Hardware. The rules are processed in the order listed",
 			},
 			"allow": {
 				Type:        schema.TypeSet,
 				Optional:    true,
-				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Specifies the configuration of the allowed groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
 			},
 			"require": {
 				Type:        schema.TypeSet,
 				Optional:    true,
-				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list",
 			},
@@ -155,11 +152,6 @@ func resourceBigipLtmCipherGroupUpdate(ctx context.Context, d *schema.ResourceDa
 	if err := client.ModifyLtmCipherGroupNew(name, new); err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
 	}
-
-	//
-	// if err := client.ModifyLtmCipherGroup(name, cipherGroupconfig); err != nil {
-	//	return diag.FromErr(fmt.Errorf("error modifying cipher group %s: %v", name, err))
-	// }
 
 	return resourceBigipLtmCipherGroupRead(ctx, d, meta)
 }
