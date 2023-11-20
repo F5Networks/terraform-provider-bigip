@@ -296,6 +296,9 @@ const (
 	uriAsm             = "asm"
 	uriApm             = "apm"
 	uriAvr             = "avr"
+	uriAuth            = "auth"
+	uriPartition       = "partition"
+	uriFolder          = "folder"
 	uriIlx             = "ilx"
 	uriSyslog          = "syslog"
 	uriSnmp            = "snmp"
@@ -405,6 +408,12 @@ type Transaction struct {
 	ExecutionTimeout int64  `json:"executionTimeout,omitempty"`
 	ExecutionTime    int64  `json:"executionTime,omitempty"`
 	FailureReason    string `json:"failureReason,omitempty"`
+}
+
+type Partition struct {
+	Name        string `json:"name,omitempty"`
+	RouteDomain int    `json:"defaultRouteDomain"`
+	Description string `json:"description,omitempty"`
 }
 
 // Certificates returns a list of certificates.
@@ -1055,4 +1064,36 @@ func (b *BigIP) GetOCSP(name string) (*OCSP, error) {
 
 func (b *BigIP) DeleteOCSP(name string) error {
 	return b.delete(uriSys, "crypto", "cert-validator", "ocsp", name)
+}
+
+func (b *BigIP) CreatePartition(partition *Partition) error {
+	return b.post(partition, uriAuth, uriPartition)
+}
+
+func (b *BigIP) GetPartition(name string) (*Partition, error) {
+	var partition Partition
+	err, ok := b.getForEntity(&partition, uriAuth, uriPartition, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &partition, err
+}
+
+func (b *BigIP) ModifyPartition(name string, partition *Partition) error {
+	return b.patch(partition, uriAuth, uriPartition, name)
+}
+
+func (b *BigIP) DeletePartition(name string) error {
+	return b.delete(uriAuth, uriPartition, name)
+}
+
+func (b *BigIP) ModifyFolderDescription(partition string, body map[string]string) error {
+	partition = fmt.Sprintf("~%s", partition)
+	return b.patch(body, uriSys, uriFolder, partition)
 }

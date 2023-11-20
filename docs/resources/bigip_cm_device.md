@@ -23,4 +23,4 @@ resource "bigip_cm_device" "my_new_device" {
   mirror_secondary_ip = "11.11.11.11"
 }
 
-```       
+```

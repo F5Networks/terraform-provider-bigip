@@ -3,11 +3,10 @@ layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_cipher_group"
 subcategory: "Local Traffic Manager(LTM)"
 description: |-
-Provides details about bigip_ltm_cipher_group resource
+  Provides details about bigip_ltm_cipher_group resource
 ---
 
 # bigip\_ltm\_cipher\_group
-
 `bigip_ltm_cipher_group` Manages F5 BIG-IP LTM cipher group using iControl REST.
 
 ## Example Usage
@@ -25,11 +24,11 @@ resource "bigip_ltm_cipher_group" "test-cipher-group" {
 
 * `name` - (Required,type `string`) Name of the Cipher group. Name should be in pattern `partition` + `cipher_group_name`
 
-* `allow` - (Optional,type `list` of `strings` ) Specifies the configuration of the allowed groups of ciphers. You can select a cipher rule from the Available Cipher Rules list.
+* `allow` - (Optional,type `list` of `strings` ) Specifies the configuration of the allowed groups of ciphers. You can select a cipher rule from the Available Cipher Rules list. To have no allowed ciphers, omit this attribute in the config or set it to an empty set like, `[]`.
 
-* `require` - (Optional,type `list` of `string`) Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list.
+* `require` - (Optional,type `list` of `string`) Specifies the configuration of the restrict groups of ciphers. You can select a cipher rule from the Available Cipher Rules list. To have no restricted ciphers, omit this attribute in the config or set it to an empty set like, `[]`.
 
-* `ordering` - (Optional,type `string`) Controls the order of the Cipher String list in the Cipher Audit section. Options are Default, Speed, Strength, FIPS, and Hardware. The rules are processed in the order listed.
+* `ordering` - (Optional,type `string`) Controls the order of the Cipher String list in the Cipher Audit section. Options are Default, Speed, Strength, FIPS, and Hardware. The rules are processed in the order listed. The default is `default`.
 
 ## Importing
 An existing cipher group can be imported into this resource by supplying the cipher rule full path name ex : `/partition/name`

@@ -118,7 +118,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Client certificate file path.  Default None.",
+				Description: "(Trusted Certificate Authorities)Specifies a client CA that the system trusts. The default is `None`",
 			},
 			"cache_size": {
 				Type:        schema.TypeInt,
@@ -276,7 +276,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "client certificate name",
+				Description: "(Advertised Certificate Authorities)Specifies that the CAs that the system advertises to clients is being trusted by the profile. The default is `None`",
 			},
 
 			"crl_file": {
