@@ -73,7 +73,7 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `xff_alternative_names` - (Optional) Specifies alternative XFF headers instead of the default X-forwarded-for header.
 
-* `server_agent_name` - (Optional) Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. If no string is specified, then default value will be added to such responses. In order to remove it, "none" string is to be passed.
+* `server_agent_name` - (Optional) Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. In order to remove it, "none" string is to be passed. If server_agent_name is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "BigIP" explicitly.
 
 * `enforcement` -See [Enforcement](#enforcement) below for more details.
 
@@ -83,26 +83,26 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 The `enforcement` block supports the following:
 
-* `known_methods` - (Optional , `list`) Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them. Default value is [CONNECT DELETE GET HEAD LOCK OPTIONS POST PROPFIND PUT TRACE UNLOCK].If no value is specified while creating, then default value will be assigned. In order to remove it, [""]  list is to be passed.
+* `known_methods` - (Optional , `list`) Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them. Default value is [CONNECT DELETE GET HEAD LOCK OPTIONS POST PROPFIND PUT TRACE UNLOCK].If no value is specified while creating, then default value will be assigned by BigIP. In order to remove it, [""] list is to be passed. If known_methods is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value , we need to pass [CONNECT DELETE GET HEAD LOCK OPTIONS POST PROPFIND PUT TRACE UNLOCK] explicitly.
 
-* `unknown_method` - (Optional , `string`) Specifies whether to allow, reject or switch to pass-through mode when an unknown HTTP method is parsed. Default value is allow. If no string is specified, then default value will be assigned.
+* `unknown_method` - (Optional , `string`) Specifies whether to allow, reject or switch to pass-through mode when an unknown HTTP method is parsed. Default value is "allow". If no string is specified while creating, then default value will be assigned by BigIP. If unknown_method is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "allow" explicitly.
 
-* `max_header_count` - (Optional , `int`) Specifies the maximum number of headers allowed in HTTP request/response. The default is 64 headers.If no value is specified, then default value will be assigned.
+* `max_header_count` - (Optional , `int`) Specifies the maximum number of headers allowed in HTTP request/response. The default is 64 headers.If no value is specified while creating, then default value will be assigned by BigIP. If max_header_count is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "64" explicitly.
 
-* `max_header_size` - (Optional , `int`) Specifies the maximum header size.The default value is 32768.If no string is specified, then default value will be assigned.
+* `max_header_size` - (Optional , `int`) Specifies the maximum header size. The default value is 32768. If no string is specified while creating, then default value will be assigned by BigIP. If max_header_size is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "32768" explicitly.
 
 
 ### Http_Strict_Transport_Security
 
 The `http_strict_transport_security` block supports the following:
 
-* `include_subdomains` - (Optional , `string`) Specifies whether to include the includeSubdomains directive in the HSTS header. The default is enabled. If no string is specified, then default value will be assigned.
+* `include_subdomains` - (Optional , `string`) The Include Subdomains setting applies the HSTS policy to the HSTS host and its subdomains. The default is "enabled". If no string is specified during Create, then default value will be assigned by BigIp. If include_subdomains is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "enabled" explicitly.
 
-* `preload` - (Optional , `string`) Specifies whether to include the preload directive in the HSTS header. The default is disabled. If no string is specified, then default value will be assigned.
+* `preload` - (Optional , `string`) An HSTS preload list is a list of domains built into a web browser. When you enable the Preload setting, the domain for the web site that this HTTP profile is associated with is submitted for inclusion in the browser's preload list. The default is "disabled". If no string is specified during Create, then default value will be assigned by BigIp. If preload is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "disabled" explicitly.
 
-* `mode` - (Optional , `string`) Specifies whether to include the HSTS response header. The default is disabled.If no string is specified, then default value will be assigned.
+* `mode` - (Optional , `string`) The Mode setting enables and disables HSTS functionality within the HTTP profile. The default is "disabled". If no string is specified during Create, then default value will be assigned by BigIp. If mode is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "disabled" explicitly.
 
-* `maximum_age` - (Optional , `int`) Specifies the maximum age to assume the connection should remain secure. The default is 16070400 seconds. If no value is specified, then default value will be assigned.
+* `maximum_age` - (Optional , `int`) The Maximum Age value specifies the length of time, in seconds, that HSTS functionality requests that clients only use HTTPS to connect to the current host and any subdomains of the current host's domain name.  The default is 16070400 seconds. If no value is specified during Create, then default value will be assigned by BigIp. If maximum_age is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value , we need to pass 16070400 explicitly.
 
 
 ## Import

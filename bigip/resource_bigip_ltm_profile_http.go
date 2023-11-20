@@ -200,30 +200,31 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"http_strict_transport_security": {
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"include_subdomains": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     "enabled",
+							Computed:    true,
 							Description: "Specifies whether to include the includeSubdomains directive in the HSTS header.",
 						},
 						"maximum_age": {
 							Type:        schema.TypeInt,
 							Optional:    true,
-							Default:     16070400,
+							Computed:    true,
 							Description: "Specifies the maximum age to assume the connection should remain secure.",
 						},
 						"mode": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     "disabled",
+							Computed:    true,
 							Description: "Specifies whether to include the HSTS response header.",
 						},
 						"preload": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     "disabled",
+							Computed:    true,
 							Description: "Specifies whether to include the preload directive in the HSTS header.",
 						},
 					},
@@ -243,21 +244,21 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 							Description: "Specifies which HTTP methods count as being known. Removing RFC-defined methods from this list will cause the HTTP filter to not recognize them.",
 						},
 						"max_header_count": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Default:     64,
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
 							Description: "Specifies the maximum number of headers allowed in HTTP request/response.",
 						},
 						"max_header_size": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Default:     32768,
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
 							Description: "Specifies the maximum header size.",
 						},
 						"unknown_method": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Default:     "allow",
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
 							Description: "Specifies whether to allow, reject or switch to pass-through mode when an unknown HTTP method is parsed.",
 						},
 					},
@@ -490,8 +491,8 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 
 	for _, r := range p.(*schema.Set).List() {
 		config.Hsts.IncludeSubdomains = r.(map[string]interface{})["include_subdomains"].(string)
-		config.Hsts.Mode = r.(map[string]interface{})["preload"].(string)
-		config.Hsts.Preload = r.(map[string]interface{})["mode"].(string)
+		config.Hsts.Mode = r.(map[string]interface{})["mode"].(string)
+		config.Hsts.Preload = r.(map[string]interface{})["preload"].(string)
 		config.Hsts.MaximumAge = r.(map[string]interface{})["maximum_age"].(int)
 	}
 
