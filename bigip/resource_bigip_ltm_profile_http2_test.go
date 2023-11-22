@@ -9,6 +9,7 @@ package bigip
 import (
 	"fmt"
 	"testing"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -490,6 +491,9 @@ func testCheckHttp2sDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		http2, err := client.GetHttp2(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if http2 != nil {

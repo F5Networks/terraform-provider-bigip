@@ -9,6 +9,7 @@ package bigip
 import (
 	"fmt"
 	"testing"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -170,6 +171,9 @@ func testCheckHttpcompresssDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		httpcompress, err := client.GetHttpcompress(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if httpcompress != nil {
