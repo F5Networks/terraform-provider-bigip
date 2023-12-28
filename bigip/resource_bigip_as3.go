@@ -321,7 +321,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
 	if err != nil {
 		if successfulTenants == "" {
-			return diag.FromErr(fmt.Errorf("Error updating json  %s: %v", tenantList, err))
+			return diag.FromErr(fmt.Errorf("error updating json  %s: %v", tenantList, err))
 		}
 		_ = d.Set("tenant_list", successfulTenants)
 		if len(successfulTenants) != len(tenantList) {
