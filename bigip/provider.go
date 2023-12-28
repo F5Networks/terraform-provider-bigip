@@ -198,7 +198,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 	}
 	if !d.Get("validate_certs_disable").(bool) {
 		if d.Get("trusted_cert_path").(string) == "" {
-			return nil, diag.FromErr(fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path"))
+			return nil, diag.FromErr(fmt.Errorf("valid Trust Certificate path not provided using :%+v ", "trusted_cert_path"))
 		}
 		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}

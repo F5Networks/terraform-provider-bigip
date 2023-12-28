@@ -64,7 +64,7 @@ func dataSourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData
 	log.Printf("[INFO] Retrieving Data Group List %s", name)
 	dataGroup, err := client.GetInternalDataGroup(name)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error retrieving Data Group List %s: %v ", name, err))
+		return diag.FromErr(fmt.Errorf("error retrieving Data Group List %s: %v ", name, err))
 	}
 	if dataGroup == nil {
 		log.Printf("[DEBUG] Data Group List %s not found, removing from state", name)
@@ -82,7 +82,7 @@ func dataSourceBigipLtmDataGroupRead(ctx context.Context, d *schema.ResourceData
 		records = append(records, dgRecord)
 	}
 	if err := d.Set("record", records); err != nil {
-		return diag.FromErr(fmt.Errorf("Error updating records in state for Data Group List %s: %v ", name, err))
+		return diag.FromErr(fmt.Errorf("error updating records in state for Data Group List %s: %v ", name, err))
 	}
 	d.SetId(dataGroup.FullPath)
 	return nil
