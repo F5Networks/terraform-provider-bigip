@@ -53,7 +53,6 @@ func resourceBigipNetVlan() *schema.Resource {
 							Optional:    true,
 							Description: "Vlan name",
 						},
-
 						"tagged": {
 							Type:        schema.TypeBool,
 							Optional:    true,
@@ -61,6 +60,13 @@ func resourceBigipNetVlan() *schema.Resource {
 						},
 					},
 				},
+			},
+			"mtu": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Description:  "Maximum Transmission Unit (MTU) for the VLAN",
+				Default:      1500,
+				ValidateFunc: validation.IntBetween(576, 9198),
 			},
 			"cmp_hash": {
 				Type:         schema.TypeString,
@@ -79,6 +85,7 @@ func resourceBigipNetVlanCreate(ctx context.Context, d *schema.ResourceData, met
 
 	name := d.Get("name").(string)
 	tag := d.Get("tag").(int)
+	mtu := d.Get("mtu").(int)
 
 	log.Printf("[INFO] Creating VLAN %s", name)
 
@@ -87,6 +94,7 @@ func resourceBigipNetVlanCreate(ctx context.Context, d *schema.ResourceData, met
 	r := &bigip.Vlan{
 		Name:    name,
 		Tag:     tag,
+		MTU:     mtu,
 		CMPHash: d.Get("cmp_hash").(string),
 	}
 
@@ -135,6 +143,7 @@ func resourceBigipNetVlanRead(ctx context.Context, d *schema.ResourceData, meta 
 	_ = d.Set("name", vlan.FullPath)
 	_ = d.Set("tag", vlan.Tag)
 	_ = d.Set("cmp_hash", vlan.CMPHash)
+	_ = d.Set("mtu", vlan.MTU)
 
 	log.Printf("[DEBUG] Reading VLAN %s Interfaces", name)
 
@@ -178,6 +187,7 @@ func resourceBigipNetVlanUpdate(ctx context.Context, d *schema.ResourceData, met
 	r := &bigip.Vlan{
 		Name:    name,
 		Tag:     d.Get("tag").(int),
+		MTU:     d.Get("mtu").(int),
 		CMPHash: d.Get("cmp_hash").(string),
 	}
 
