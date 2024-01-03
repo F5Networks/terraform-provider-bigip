@@ -22,6 +22,8 @@ const (
 	uriTask         = "task"
 	uriDeclare      = "declare"
 	uriAsyncDeclare = "declare?async=true"
+	uriSetting 		= "settings"
+	uriApplications = "applications"
 )
 
 type doValidate struct {
@@ -51,6 +53,17 @@ type Results1 struct {
 	Host      string `json:"host,omitempty"`
 	Tenant    string `json:"tenant,omitempty"`
 	RunTime   int64  `json:"runTime,omitempty"`
+}
+
+
+// PostPerAppBigIp - used for posting Per-Application Declarations
+func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, []byte) {
+	// resp, err := PostPerApp()
+	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications)
+	if err != nil {
+		return err, nil
+	}
+	return nil, resp
 }
 
 /*
@@ -474,6 +487,18 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	}
 	s = string(jsonData)
 	return s, nil
+}
+
+func (b *BigIP) CheckSetting() (bool, error) {
+
+	err, setting := b.getSetting(uriMgmt, uriShared, uriAppsvcs, uriSetting)
+	if err != nil {
+		return false, err
+	}
+	log.Printf("[INFO] BigIP Setting:%+v", setting)
+	perAppDeploymentAllowed := setting.BetaOptions.PerAppDeploymentAllowed
+
+	return perAppDeploymentAllowed, nil
 }
 
 func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {
