@@ -171,34 +171,61 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
-	tenantList, _, applicationList := client.GetTenantList(as3Json)
-	log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
-	tenantCount := strings.Split(tenantList, ",")
-	if tenantFilter != "" {
-		log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
-		if !contains(tenantCount, tenantFilter) {
-			return diag.FromErr(fmt.Errorf("tenant_filter: (%s) not exist in as3_json provided ", tenantFilter))
-		}
-		tenantList = tenantFilter
-	}
-	_ = d.Set("tenant_list", tenantList)
-	_ = d.Set("application_list", applicationList)
-	strTrimSpace, err := client.AddTeemAgent(as3Json)
+	var tenantCount []string
+	perApplication, err := client.CheckSetting()
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
-	err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
-	log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
-	if err != nil {
-		if successfulTenants == "" {
-			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err))
+
+	log.Printf("[DEBUG] perApplication:%+v", perApplication)
+
+	if perApplication {
+		if tenantFilter == "" {
+			return diag.FromErr(fmt.Errorf("tenant_filter is required when perApplication is:%+v" , perApplication))
 		}
-		_ = d.Set("tenant_list", successfulTenants)
-		if len(successfulTenants) != len(tenantList) {
+	
+		err, _ := client.PostPerAppBigIp(as3Json, tenantFilter)
+
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
+		}
+		tenantCount = append(tenantCount, tenantFilter)
+		_ = d.Set("tenant_list", tenantFilter)
+	} else {
+		tenantList, _, applicationList := client.GetTenantList(as3Json)
+		log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
+		tenantCount := strings.Split(tenantList, ",")
+		if tenantFilter != "" {
+			log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
+			if !contains(tenantCount, tenantFilter) {
+				return diag.FromErr(fmt.Errorf("tenant_filter: (%s) not exist in as3_json provided ", tenantFilter))
+			}
+			tenantList = tenantFilter
+		}
+		_ = d.Set("tenant_list", tenantList)
+		_ = d.Set("application_list", applicationList)
+		
+		strTrimSpace, err := client.AddTeemAgent(as3Json)
+		if err != nil {
 			return diag.FromErr(err)
 		}
+		log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
+		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
+		log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
+		if err != nil {
+			if successfulTenants == "" {
+				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantList, err))
+			}
+			_ = d.Set("tenant_list", successfulTenants)
+			if len(successfulTenants) != len(tenantList) {
+				return diag.FromErr(err)
+			}
+		}
+
+		log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
+		_ = d.Set("task_id", taskID)
 	}
+	
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -219,8 +246,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
-	log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
-	_ = d.Set("task_id", taskID)
+
 	if d.Get("tenant_list").(string) != "" {
 		d.SetId(d.Get("tenant_list").(string))
 	} else {
