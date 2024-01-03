@@ -413,7 +413,17 @@ func TestAccBigipLtmProfileClientSsl_UpdateCipherGroup(t *testing.T) {
 					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
 					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
 					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
-					resource.TestCheckResourceAttr(resFullName, "cipher_group", "none"),
+					// resource.TestCheckResourceAttr(resFullName, "cipher_group", "none"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofileclientsslUpdateparam(instName, "cipher_group"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckClientSslExists(instFullName),
+					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
+					resource.TestCheckResourceAttr(resFullName, "partition", "Common"),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/clientssl"),
+					resource.TestCheckResourceAttr(resFullName, "cipher_group", "/Common/f5-aes"),
 				),
 			},
 			{

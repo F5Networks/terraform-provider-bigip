@@ -267,7 +267,7 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 			"cipher_group": {
 				Type:          schema.TypeString,
 				Optional:      true,
-				Default:       "none",
+				Computed:      true,
 				Description:   "Cipher group for the ssl client profile",
 				ConflictsWith: []string{"ciphers"},
 			},

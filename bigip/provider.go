@@ -14,6 +14,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -84,6 +85,24 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "Login reference for token authentication (see BIG-IP REST docs for details)",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_LOGIN_REF", "tmos"),
+			},
+			"api_timeout": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "A timeout for AS3 requests, represented as a number of seconds. Default: 60",
+				DefaultFunc: schema.EnvDefaultFunc("API_TIMEOUT", 60),
+			},
+			"token_timeout": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "A lifespan to request for the AS3 auth token, represented as a number of seconds. Default: 1200",
+				DefaultFunc: schema.EnvDefaultFunc("TOKEN_TIMEOUT", 1200),
+			},
+			"api_retries": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Amount of times to retry AS3 API requests. Default: 10.",
+				DefaultFunc: schema.EnvDefaultFunc("API_RETRIES", 10),
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -185,6 +204,12 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
+	configOptions := &bigip.ConfigOptions{
+		APICallTimeout: time.Duration(d.Get("api_timeout").(int)) * time.Second,
+		TokenTimeout:   time.Duration(d.Get("token_timeout").(int)) * time.Second,
+		APICallRetries: d.Get("api_retries").(int),
+	}
+
 	config := &bigip.Config{
 		Address:           d.Get("address").(string),
 		Port:              d.Get("port").(string),
@@ -192,13 +217,14 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		Password:          d.Get("password").(string),
 		Token:             d.Get("token_value").(string),
 		CertVerifyDisable: d.Get("validate_certs_disable").(bool),
+		ConfigOptions:     configOptions,
 	}
 	if d.Get("token_auth").(bool) {
 		config.LoginReference = d.Get("login_ref").(string)
 	}
 	if !d.Get("validate_certs_disable").(bool) {
 		if d.Get("trusted_cert_path").(string) == "" {
-			return nil, diag.FromErr(fmt.Errorf("Valid Trust Certificate path not provided using :%+v ", "trusted_cert_path"))
+			return nil, diag.FromErr(fmt.Errorf("valid Trust Certificate path not provided using :%+v ", "trusted_cert_path"))
 		}
 		config.TrustedCertificate = d.Get("trusted_cert_path").(string)
 	}

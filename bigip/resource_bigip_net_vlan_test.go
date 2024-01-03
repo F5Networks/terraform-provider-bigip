@@ -26,6 +26,7 @@ resource "bigip_net_vlan" "test-vlan" {
 		vlanport = 1.1
 		tagged = true
 	}
+	mtu = 900
 }
 `
 
@@ -45,6 +46,7 @@ func TestAccBigipNetvlan_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "tag", "101"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.vlanport", "1.1"),
 					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "interfaces.0.tagged", "true"),
+					resource.TestCheckResourceAttr("bigip_net_vlan.test-vlan", "mtu", "900"),
 				),
 			},
 		},
