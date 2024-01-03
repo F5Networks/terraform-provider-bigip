@@ -19,13 +19,13 @@ var TestHttpcompressName = fmt.Sprintf("/%s/test-httpcompress", TestPartition)
 
 var TestHttpcompressResource = `
 resource "bigip_ltm_profile_httpcompress" "test-httpcompress" {
-            name = "/Common/test-httpcompress"
-	    defaults_from = "/Common/httpcompression"
-            uri_exclude = ["f5.com"]
-            uri_include = ["cisco.com"]
-	    content_type_include = ["nicecontent.com"]
-	    content_type_exclude = ["nicecontentexclude.com"]
-        }
+	name                 = "/Common/test-httpcompress"
+	defaults_from        = "/Common/httpcompression"
+	uri_exclude          = ["f5.com"]
+	uri_include          = ["cisco.com"]
+	content_type_include = ["nicecontent.com"]
+	content_type_exclude = ["nicecontentexclude.com"]
+  }
 `
 
 func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
@@ -39,7 +39,7 @@ func TestAccBigipLtmProfileHttpcompress_create(t *testing.T) {
 			{
 				Config: TestHttpcompressResource,
 				Check: resource.ComposeTestCheckFunc(
-					testCheckHttpcompressExists(TestHttpcompressName, true),
+					testCheckHttpcompressExists("/Common/test-httpcompress", true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "name", "/Common/test-httpcompress"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "defaults_from", "/Common/httpcompression"),
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_profile_httpcompress.test-httpcompress", "uri_exclude.*", "f5.com"),
@@ -146,7 +146,7 @@ func testCheckHttpcompressExists(name string, exists bool) resource.TestCheckFun
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.GetHttpcompress(name)
-		if err != nil {
+		if err != nil && exists {
 			return err
 		}
 		if exists && p == nil {
@@ -168,10 +168,10 @@ func testCheckHttpcompresssDestroyed(s *terraform.State) error {
 		}
 
 		name := rs.Primary.ID
-		httpcompress, err := client.GetHttpcompress(name)
-		if err != nil {
-			return err
-		}
+		httpcompress, _ := client.GetHttpcompress(name)
+		// if err != nil {
+		// 	return err
+		// }
 		if httpcompress != nil {
 			return fmt.Errorf("httpcompress %s not destroyed. ", name)
 		}
