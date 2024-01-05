@@ -155,6 +155,11 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "Name of Application",
 			},
+			"perapp_mode": {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Name of Application",
+			},
 			"task_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -173,6 +178,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	tenantFilter := d.Get("tenant_filter").(string)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
 	log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
+	log.Printf("[INFO] tenantList Length:%+v", len(tenantList))
 	tenantCount := strings.Split(tenantList, ",")
 	if tenantFilter != "" {
 		log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
@@ -187,7 +193,8 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
+	log.Printf("[INFO] Creating as3 config in bigip:%+v", strTrimSpace)
+	log.Printf("[INFO] tenantList in AS3 JSON BLOB:%+v", tenantList)
 	err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
 	log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
 	if err != nil {

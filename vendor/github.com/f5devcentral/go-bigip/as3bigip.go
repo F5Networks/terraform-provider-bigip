@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -56,10 +57,12 @@ type Results1 struct {
 /*
 PostAs3Bigip used for posting as3 json file to BIGIP
 */
-func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string, string) {
-	tenant := tenantFilter + "?async=true"
+func (b *BigIP) PostAs3Bigip(as3NewJson interface{}, tenantFilter string) (error, string, string) {
+	tenant := "ravitenant01"
+	// tenant := tenantFilter + "?async=true"
+	tenantnew := "applications?async=true"
 	successfulTenants := make([]string, 0)
-	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
+	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant, tenantnew)
 	if err != nil {
 		return err, "", ""
 	}
@@ -385,10 +388,20 @@ func (b *BigIP) pollingStatus(id string, backoff time.Duration) bool {
 func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
 	tenantList := make([]string, 0)
 	applicationList := make([]string, 0)
-	as3json := body.(string)
-	resp := []byte(as3json)
-	jsonRef := make(map[string]interface{})
-	json.Unmarshal(resp, &jsonRef)
+	if reflect.TypeOf(body) == "string" {
+		as3json := body.(string)
+		resp := []byte(as3json)
+		jsonRef := make(map[string]interface{})
+		json.Unmarshal(resp, &jsonRef)
+	}
+	if reflect.TypeOf(body) == map[string]interface{} {
+		
+	}
+
+	jsonRef := body.(map[string]interface{})
+	//resp := []byte(as3json)
+	//jsonRef := make(map[string]interface{})
+	//json.Unmarshal(resp, &jsonRef)
 	for key, value := range jsonRef {
 		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 			for k, v := range rec {
@@ -439,8 +452,8 @@ func (b *BigIP) GetTarget(body interface{}) string {
 	return ""
 }
 
-func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
-	var s string
+func (b *BigIP) AddTeemAgent(body interface{}) (interface{}, error) {
+	//var s string
 	as3json := body.(string)
 	resp := []byte(as3json)
 	jsonRef := make(map[string]interface{})
@@ -448,10 +461,10 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	//jsonRef["controls"] = map[string]interface{}{"class": "Controls", "userAgent": "Terraform Configured AS3"}
 	as3ver, err := b.getAs3version()
 	if err != nil {
-		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
+		return nil, fmt.Errorf("getting AS3 Version failed with %v", err)
 	}
 	if as3ver.Version == "" {
-		return "", fmt.Errorf("Getting AS3 Version failed,please check AS3 installed?")
+		return nil, fmt.Errorf("getting AS3 Version failed,please check AS3 installed?")
 	}
 	log.Printf("[DEBUG] AS3 Version:%+v", as3ver.Version)
 	log.Printf("[DEBUG] Terraform Version:%+v", b.UserAgent)
@@ -467,13 +480,14 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 			}
 		}
 	}
-	jsonData, err := json.Marshal(jsonRef)
-	if err != nil {
-		//log.Println(err)
-		return "", fmt.Errorf("Getting AS3 Version failed with %v", err)
-	}
-	s = string(jsonData)
-	return s, nil
+	return jsonRef, nil
+	// jsonData, err := json.Marshal(jsonRef)
+	// if err != nil {
+	// 	//log.Println(err)
+	// 	return "", fmt.Errorf("getting AS3 Version failed with %v", err)
+	// }
+	// s = string(jsonData)
+	// return s, nil
 }
 
 func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {

@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -282,6 +283,38 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	}
 	urlString := fmt.Sprintf(format, b.Host, options.URL)
 	maxRetries := b.ConfigOptions.APICallRetries
+	log.Printf("[DEBUG] Actual Body: %+v", string([]byte(options.Body)))
+	// options.Body = strings.TrimRight(string([]byte(options.Body)), "\n")
+	// payload := strings.NewReader(`
+	// {
+	// 	"Application1": {
+	// 	  "class": "Application",
+	// 	  "pool": {
+	// 		"class": "Pool",
+	// 		"members": [
+	// 		  {
+	// 			"serverAddresses": [
+	// 			  "192.0.2.10",
+	// 			  "192.0.2.20"
+	// 			],
+	// 			"servicePort": 80
+	// 		  }
+	// 		]
+	// 	  },
+	// 	  "service": {
+	// 		"class": "Service_HTTP",
+	// 		"pool": "pool",
+	// 		"virtualAddresses": [
+	// 		  "192.0.2.1"
+	// 		]
+	// 	  }
+	// 	},
+	// 	"controls": {
+	// 	  "class": "Controls",
+	// 	  "logLevel": "debug",
+	// 	  "trace": true
+	// 	}
+	//   }`)
 	for i := 0; i < maxRetries; i++ {
 		body := bytes.NewReader([]byte(options.Body))
 		req, _ = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
@@ -305,12 +338,16 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		if len(options.ContentType) > 0 {
 			req.Header.Set("Content-Type", options.ContentType)
 		}
+		log.Printf("[DEBUG] APICall: %+v", req)
+		//testByte, _ := io.ReadAll(req.Body)
+		// _, _ = req.Body.Read(testByte)
 		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		defer res.Body.Close()
 		data, _ := io.ReadAll(res.Body)
+		log.Printf("[DEBUG] Resp Body: %+v", string(data[:]))
 		contentType := ""
 		if ctHeaders, ok := res.Header["Content-Type"]; ok && len(ctHeaders) > 0 {
 			contentType = ctHeaders[0]
@@ -410,6 +447,7 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("[DEBUG] Post Req Body: %+v", strings.TrimRight(string(marshalJSON), "\n"))
 
 	req := &APIRequest{
 		Method:      "post",
@@ -417,7 +455,17 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 		Body:        strings.TrimRight(string(marshalJSON), "\n"),
 		ContentType: "application/json",
 	}
+	resp, callErr := b.APICall(req)
+	return resp, callErr
+}
 
+func (b *BigIP) postAS3Req(body interface{}, path ...string) ([]byte, error) {
+	req := &APIRequest{
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		Body:        body.(string),
+		ContentType: "application/json",
+	}
 	resp, callErr := b.APICall(req)
 	return resp, callErr
 }
