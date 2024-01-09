@@ -379,6 +379,17 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	return resp, callErr
 }
 
+func (b *BigIP) postAS3Req(body interface{}, path ...string) ([]byte, error) {
+	req := &APIRequest{
+        Method:      "post",
+        URL:         b.iControlPath(path),
+        Body:        body.(string),
+        ContentType: "application/json",
+    }
+    resp, callErr := b.APICall(req)
+    return resp, callErr
+}
+
 func (b *BigIP) put(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {

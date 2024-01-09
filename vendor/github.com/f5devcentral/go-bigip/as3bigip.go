@@ -59,7 +59,7 @@ type Results1 struct {
 // PostPerAppBigIp - used for posting Per-Application Declarations
 func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, []byte) {
 	// resp, err := PostPerApp()
-	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications)
+	resp, err := b.postAS3Req(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications)
 	if err != nil {
 		return err, nil
 	}
