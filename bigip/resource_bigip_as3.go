@@ -7,15 +7,15 @@ package bigip
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"reflect"
 	"strings"
 	"sync"
-	"crypto/rand"
-	"math/big"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
@@ -163,7 +163,7 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "ID of AS3 post declaration async task",
 			},
-			"per_app_mode" : {
+			"per_app_mode": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "Set True if Per-Application Mode is true",
@@ -187,18 +187,18 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 
-	if perApplication &&  len(tenantList) == 0 {
+	if perApplication && len(tenantList) == 0 {
 		tenant, err := GenerateRandomString(10)
 		log.Printf("[DEBUG] tenant name generated:%+v", tenant)
 		if err != nil {
 			// fmt.Println("Error:", err)
 			return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
 		}
-		
+
 		err, res := client.PostPerAppBigIp(as3Json, tenant)
 
 		log.Printf("[DEBUG] res from deployment :%+v", res)
-		
+
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
 		}
@@ -217,7 +217,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		}
 		_ = d.Set("tenant_list", tenantList)
 		_ = d.Set("application_list", applicationList)
-		
+
 		strTrimSpace, err := client.AddTeemAgent(as3Json)
 		if err != nil {
 			return diag.FromErr(err)
@@ -239,7 +239,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		_ = d.Set("task_id", taskID)
 		_ = d.Set("per_app_mode", false)
 	}
-	
+
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -339,20 +339,20 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 
 	if d.Get("per_app_mode").(bool) {
 
-		if perApplication &&  len(tenantList) == 0 {
+		if perApplication && len(tenantList) == 0 {
 			oldTenantList := d.Get("tenant_list").(string)
 
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
-			
+
 			err, res := client.PostPerAppBigIp(as3Json, oldTenantList)
 
 			log.Printf("[DEBUG] res from PostPerAppBigIp:%+v", res)
-			
+
 			if err != nil {
 				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenant:(%s) with error: %v", oldTenantList, err))
 			}
 			// tenantCount = append(tenantCount, tenant)
-		_ = d.Set("tenant_list", oldTenantList)
+			_ = d.Set("tenant_list", oldTenantList)
 		} else {
 			if !perApplication {
 				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))
@@ -360,7 +360,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 				return diag.FromErr(fmt.Errorf("Declartion not valid for Per-Application deployment"))
 			}
 		}
-		
+
 	} else {
 		log.Printf("[INFO] Updating As3 Config for tenants:%s", tenantList)
 		oldTenantList := d.Get("tenant_list").(string)
