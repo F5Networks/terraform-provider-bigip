@@ -7,9 +7,11 @@ package bigip
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"reflect"
 	"strings"
@@ -161,6 +163,11 @@ func resourceBigipAs3() *schema.Resource {
 				Optional:    true,
 				Description: "ID of AS3 post declaration async task",
 			},
+			"per_app_mode": {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Set True if Per-Application Mode is true",
+			},
 		},
 	}
 }
@@ -176,23 +183,29 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tenantList, _, applicationList := client.GetTenantList(as3Json)
 
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 
-	if perApplication {
-		if tenantFilter == "" {
-			return diag.FromErr(fmt.Errorf("tenant_filter is required when perApplication is:%+v" , perApplication))
+	if perApplication && len(tenantList) == 0 {
+		tenant, err := GenerateRandomString(10)
+		log.Printf("[DEBUG] tenant name generated:%+v", tenant)
+		if err != nil {
+			// fmt.Println("Error:", err)
+			return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
 		}
-	
-		err, _ := client.PostPerAppBigIp(as3Json, tenantFilter)
+
+		err, res := client.PostPerAppBigIp(as3Json, tenant)
+
+		log.Printf("[DEBUG] res from deployment :%+v", res)
 
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
 		}
-		tenantCount = append(tenantCount, tenantFilter)
-		_ = d.Set("tenant_list", tenantFilter)
+		tenantCount = append(tenantCount, tenant)
+		_ = d.Set("tenant_list", tenant)
+		_ = d.Set("per_app_mode", true)
 	} else {
-		tenantList, _, applicationList := client.GetTenantList(as3Json)
 		log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
 		tenantCount := strings.Split(tenantList, ",")
 		if tenantFilter != "" {
@@ -204,7 +217,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		}
 		_ = d.Set("tenant_list", tenantList)
 		_ = d.Set("application_list", applicationList)
-		
+
 		strTrimSpace, err := client.AddTeemAgent(as3Json)
 		if err != nil {
 			return diag.FromErr(err)
@@ -224,8 +237,9 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 
 		log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
 		_ = d.Set("task_id", taskID)
+		_ = d.Set("per_app_mode", false)
 	}
-	
+
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
@@ -315,47 +329,78 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	as3Json := d.Get("as3_json").(string)
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	tenantList, _, _ := client.GetTenantList(as3Json)
-	log.Printf("[INFO] Updating As3 Config for tenants:%s", tenantList)
-	oldTenantList := d.Get("tenant_list").(string)
-	tenantFilter := d.Get("tenant_filter").(string)
-	if tenantFilter == "" {
-		if tenantList != oldTenantList {
-			_ = d.Set("tenant_list", tenantList)
-			newList := strings.Split(tenantList, ",")
-			oldList := strings.Split(oldTenantList, ",")
-			deletedTenants := client.TenantDifference(oldList, newList)
-			if deletedTenants != "" {
-				err, _ := client.DeleteAs3Bigip(deletedTenants)
-				if err != nil {
-					log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
-					return diag.FromErr(err)
-				}
-			}
-		}
-	} else {
-		if !contains(strings.Split(tenantList, ","), tenantFilter) {
-			log.Printf("[WARNING]tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
-		} else {
-			tenantList = tenantFilter
-		}
-	}
-	strTrimSpace, err := client.AddTeemAgent(as3Json)
+
+	perApplication, err := client.CheckSetting()
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
-	log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
-	if err != nil {
-		if successfulTenants == "" {
-			return diag.FromErr(fmt.Errorf("error updating json  %s: %v", tenantList, err))
+	log.Printf("[DEBUG] perApplication:%+v", perApplication)
+	if d.Get("per_app_mode").(bool) {
+
+		if perApplication && len(tenantList) == 0 {
+			oldTenantList := d.Get("tenant_list").(string)
+
+			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
+
+			err, res := client.PostPerAppBigIp(as3Json, oldTenantList)
+
+			log.Printf("[DEBUG] res from PostPerAppBigIp:%+v", res)
+
+			if err != nil {
+				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenant:(%s) with error: %v", oldTenantList, err))
+			}
+			// tenantCount = append(tenantCount, tenant)
+			_ = d.Set("tenant_list", oldTenantList)
+		} else {
+			if !perApplication {
+				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))
+			} else {
+				return diag.FromErr(fmt.Errorf("Declartion not valid for Per-Application deployment"))
+			}
 		}
-		_ = d.Set("tenant_list", successfulTenants)
-		if len(successfulTenants) != len(tenantList) {
+	} else {
+		log.Printf("[INFO] Updating As3 Config for tenants:%s", tenantList)
+		oldTenantList := d.Get("tenant_list").(string)
+		tenantFilter := d.Get("tenant_filter").(string)
+		if tenantFilter == "" {
+			if tenantList != oldTenantList {
+				_ = d.Set("tenant_list", tenantList)
+				newList := strings.Split(tenantList, ",")
+				oldList := strings.Split(oldTenantList, ",")
+				deletedTenants := client.TenantDifference(oldList, newList)
+				if deletedTenants != "" {
+					err, _ := client.DeleteAs3Bigip(deletedTenants)
+					if err != nil {
+						log.Printf("[ERROR] Unable to Delete removed tenants: %v :", err)
+						return diag.FromErr(err)
+					}
+				}
+			}
+		} else {
+			if !contains(strings.Split(tenantList, ","), tenantFilter) {
+				log.Printf("[WARNING]tenant_filter: (%s) not exist in as3_json provided ", tenantFilter)
+			} else {
+				tenantList = tenantFilter
+			}
+		}
+		strTrimSpace, err := client.AddTeemAgent(as3Json)
+		if err != nil {
 			return diag.FromErr(err)
 		}
+		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
+		log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
+		if err != nil {
+			if successfulTenants == "" {
+				return diag.FromErr(fmt.Errorf("Error updating json  %s: %v", tenantList, err))
+			}
+			_ = d.Set("tenant_list", successfulTenants)
+			if len(successfulTenants) != len(tenantList) {
+				return diag.FromErr(err)
+			}
+		}
+		_ = d.Set("task_id", taskID)
 	}
 	createdTenants = d.Get("tenant_list").(string)
-	_ = d.Set("task_id", taskID)
 	return resourceBigipAs3Read(ctx, d, meta)
 }
 
@@ -396,4 +441,17 @@ func contains(s []string, str string) bool {
 		}
 	}
 	return false
+}
+
+func GenerateRandomString(length int) (string, error) {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	randomString := make([]byte, length)
+	for i := range randomString {
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		randomString[i] = charset[randomIndex.Int64()]
+	}
+	return string(randomString), nil
 }
