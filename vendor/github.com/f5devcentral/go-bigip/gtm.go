@@ -10,8 +10,10 @@ See the License for the specific language governing permissions and limitations 
 */
 package bigip
 
-import "encoding/json"
-import "log"
+import (
+	"encoding/json"
+	"log"
+)
 
 //ooo
 
@@ -142,7 +144,6 @@ const (
 	uriServer     = "server"
 	uriDatacenter = "datacenter"
 	uriGtmmonitor = "monitor"
-	uriHttp       = "http"
 	uriPool_a     = "pool/a"
 )
 
