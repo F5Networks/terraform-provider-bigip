@@ -195,15 +195,16 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 			return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
 		}
 
-		err, res := client.PostPerAppBigIp(as3Json, tenant)
+		err, taskID := client.PostPerAppBigIp(as3Json, tenant)
 
-		log.Printf("[DEBUG] res from deployment :%+v", res)
+		log.Printf("[DEBUG] task Id from deployment :%+v", taskID)
 
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
 		}
 		tenantCount = append(tenantCount, tenant)
 		_ = d.Set("tenant_list", tenant)
+		_ = d.Set("task_id", taskID)
 		_ = d.Set("per_app_mode", true)
 	} else {
 		log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
@@ -445,9 +446,15 @@ func contains(s []string, str string) bool {
 
 func GenerateRandomString(length int) (string, error) {
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	charLen := 0
 	randomString := make([]byte, length)
 	for i := range randomString {
-		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if i == 0 {
+			charLen = 52
+		} else {
+			charLen = len(charset)
+		}
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(charLen)))
 		if err != nil {
 			return "", err
 		}

@@ -22,7 +22,7 @@ const (
 	uriTask         = "task"
 	uriDeclare      = "declare"
 	uriAsyncDeclare = "declare?async=true"
-	uriSetting 		= "settings"
+	uriSetting      = "settings"
 	uriApplications = "applications"
 )
 
@@ -55,15 +55,38 @@ type Results1 struct {
 	RunTime   int64  `json:"runTime,omitempty"`
 }
 
-
 // PostPerAppBigIp - used for posting Per-Application Declarations
-func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, []byte) {
+func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, string) {
 	// resp, err := PostPerApp()
-	resp, err := b.postAS3Req(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications)
+	async := "?async=true"
+	resp, err := b.postAS3Req(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications, async)
 	if err != nil {
-		return err, nil
+		return err, ""
 	}
-	return nil, resp
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	respID := respRef["id"].(string)
+	taskStatus, err := b.getas3TaskStatus(respID)
+	respCode := taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
+	log.Printf("[DEBUG]Per-App Deployment Code = %+v,ID = %+v", respCode, respID)
+
+	for respCode != 200 || taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" {
+		log.Printf("[DEBUG]Per-App Deployment task status = %+v", taskStatus)
+		taskStatus, _ = b.getas3TaskStatus(respID)
+		respCode = taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
+		log.Printf("respCode: %v", respCode)
+		log.Printf("message: %v", taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string))
+		if err != nil {
+			return err, respID
+		}
+		if respCode == 503 || respCode >= 400 {
+			j, _ := json.MarshalIndent(taskStatus["results"].([]interface{}), "", "\t")
+			return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), respID
+		}
+		time.Sleep(3 * time.Second)
+	}
+
+	return nil, respID
 }
 
 /*
