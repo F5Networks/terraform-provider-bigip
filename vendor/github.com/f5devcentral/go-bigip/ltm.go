@@ -1980,6 +1980,8 @@ const (
 	uriCreateDraft     = "?options=create-draft"
 	uriRule            = "rule"
 	uriWebAcceleration = "web-acceleration"
+	uriHttp            = "http"
+	uriRequestLog      = "request-log"
 )
 
 var cidr = map[string]string{
@@ -4081,4 +4083,64 @@ func (b *BigIP) GetLtmCipherGroup(name string) (*CipherGroupReq, error) {
 	}
 
 	return &cipherGroup, nil
+}
+
+// json to golang struct
+type RequestLogProfile struct {
+	Name                       string `json:"name,omitempty"`
+	Partition                  string `json:"partition,omitempty"`
+	FullPath                   string `json:"fullPath,omitempty"`
+	AppService                 string `json:"appService,omitempty"`
+	DefaultsFrom               string `json:"defaultsFrom,omitempty"`
+	Description                string `json:"description,omitempty"`
+	LogRequestLoggingErrors    string `json:"logRequestLoggingErrors,omitempty"`
+	LogResponseByDefault       string `json:"logResponseByDefault,omitempty"`
+	LogResponseLoggingErrors   string `json:"logResponseLoggingErrors,omitempty"`
+	ProxyCloseOnError          string `json:"proxyCloseOnError,omitempty"`
+	ProxyRespondOnLoggingError string `json:"proxyRespondOnLoggingError,omitempty"`
+	ProxyResponse              string `json:"proxyResponse,omitempty"`
+	RequestLogErrorPool        string `json:"requestLogErrorPool,omitempty"`
+	RequestLogErrorProtocol    string `json:"requestLogErrorProtocol,omitempty"`
+	RequestLogErrorTemplate    string `json:"requestLogErrorTemplate,omitempty"`
+	RequestLogPool             string `json:"requestLogPool,omitempty"`
+	RequestLogProtocol         string `json:"requestLogProtocol,omitempty"`
+	RequestLogTemplate         string `json:"requestLogTemplate,omitempty"`
+	RequestLogging             string `json:"requestLogging,omitempty"`
+	ResponseLogErrorPool       string `json:"responseLogErrorPool,omitempty"`
+	ResponseLogErrorProtocol   string `json:"responseLogErrorProtocol,omitempty"`
+	ResponseLogErrorTemplate   string `json:"responseLogErrorTemplate,omitempty"`
+	ResponseLogPool            string `json:"responseLogPool,omitempty"`
+	ResponseLogProtocol        string `json:"responseLogProtocol,omitempty"`
+	ResponseLogTemplate        string `json:"responseLogTemplate,omitempty"`
+	ResponseLogging            string `json:"responseLogging,omitempty"`
+}
+
+// AddRequestLogProfile creates a new Request Log profile on the BIG-IP system.
+func (b *BigIP) AddRequestLogProfile(config *RequestLogProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriRequestLog)
+}
+
+// DeleteRequestLogProfile removes a Request Log profile.
+func (b *BigIP) DeleteRequestLogProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriRequestLog, name)
+}
+
+// ModifyRequestLogProfile allows you to change any attribute of a RequestLog profile.
+// Fields that can be modified are referenced in the RequestLogProfile struct.
+func (b *BigIP) ModifyRequestLogProfile(name string, config *RequestLogProfile) error {
+	return b.patch(config, uriLtm, uriProfile, uriRequestLog, name)
+}
+
+func (b *BigIP) GetRequestLogProfile(name string) (*RequestLogProfile, error) {
+	var requestLogProfile RequestLogProfile
+	err, ok := b.getForEntity(&requestLogProfile, uriLtm, uriProfile, uriRequestLog, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &requestLogProfile, nil
 }
