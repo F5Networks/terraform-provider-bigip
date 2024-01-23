@@ -72,6 +72,10 @@ func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, 
 
 	for respCode != 200 || taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" {
 		log.Printf("[DEBUG]Per-App Deployment task status = %+v", taskStatus)
+		if taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "no change" {
+			log.Printf("[DEBUG]Per-App Deployment task status = %+v", taskStatus)
+			break
+		}
 		taskStatus, _ = b.getas3TaskStatus(respID)
 		respCode = taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
 		log.Printf("respCode: %v", respCode)
@@ -81,11 +85,10 @@ func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, 
 		}
 		if respCode == 503 || respCode >= 400 {
 			j, _ := json.MarshalIndent(taskStatus["results"].([]interface{}), "", "\t")
-			return fmt.Errorf("Tenant Creation failed. Response: %+v", string(j)), respID
+			return fmt.Errorf("tenant Creation failed. Response: %+v", string(j)), respID
 		}
 		time.Sleep(3 * time.Second)
 	}
-
 	return nil, respID
 }
 
@@ -328,7 +331,9 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 						}
 					}
 					if sharedTenant == "Common" && sharedTenant != name {
-						delete(rec, sharedTenant)
+						// Removing delete call for shared tenant to address Issue #869
+						// delete(rec, sharedTenant)
+						log.Printf("[DEBUG]Shared Tenant:%+v", sharedTenant)
 					}
 				}
 			}
@@ -459,6 +464,29 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
 	return finalTenantlist, len(tenantList), finalApplicationList
 }
 
+func (b *BigIP) GetAppsList(body interface{}) string {
+	//tenantList := make([]string, 0)
+	appList := make([]string, 0)
+	as3json := body.(string)
+	resp := []byte(as3json)
+	jsonRef := make(map[string]interface{})
+	json.Unmarshal(resp, &jsonRef)
+	for key, value := range jsonRef {
+		//check value is of interface type
+		if _, ok := value.(map[string]interface{}); ok {
+			//check for class matches to Application
+			//range over the map and check if key is class and value is Application
+			for k1, v1 := range value.(map[string]interface{}) {
+				//check for class matches to Application
+				if k1 == "class" && v1 == "Application" {
+					appList = append(appList, key)
+				}
+			}
+		}
+	}
+	finalApplicationList := strings.Join(appList[:], ",")
+	return finalApplicationList
+}
 func (b *BigIP) GetTarget(body interface{}) string {
 	as3json := body.(string)
 	resp := []byte(as3json)

@@ -74,6 +74,7 @@ func resourceBigipAs3() *schema.Resource {
 								delete(rec, "id")
 								delete(rec, "label")
 								delete(rec, "remark")
+								delete(rec, "Common")
 							}
 						}
 					}
@@ -85,6 +86,7 @@ func resourceBigipAs3() *schema.Resource {
 								delete(rec, "id")
 								delete(rec, "label")
 								delete(rec, "remark")
+								delete(rec, "Common")
 							}
 						}
 					}
@@ -155,7 +157,7 @@ func resourceBigipAs3() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
-				Description: "Name of Application",
+				Description: "Application deployed through AS3 Declaration",
 			},
 			"task_id": {
 				Type:        schema.TypeString,
@@ -166,7 +168,7 @@ func resourceBigipAs3() *schema.Resource {
 			"per_app_mode": {
 				Type:        schema.TypeBool,
 				Computed:    true,
-				Description: "Set True if Per-Application Mode is true",
+				Description: "Will define Perapp mode enabled on BIG-IP or not",
 			},
 		},
 	}
@@ -191,20 +193,18 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		tenant, err := GenerateRandomString(10)
 		log.Printf("[DEBUG] tenant name generated:%+v", tenant)
 		if err != nil {
-			// fmt.Println("Error:", err)
 			return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
 		}
-
+		applicationList := client.GetAppsList(as3Json)
 		err, taskID := client.PostPerAppBigIp(as3Json, tenant)
-
 		log.Printf("[DEBUG] task Id from deployment :%+v", taskID)
-
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
 		}
 		tenantCount = append(tenantCount, tenant)
 		_ = d.Set("tenant_list", tenant)
 		_ = d.Set("task_id", taskID)
+		_ = d.Set("application_list", applicationList)
 		_ = d.Set("per_app_mode", true)
 	} else {
 		log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
@@ -276,7 +276,7 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	var name string
 	var tList string
 	as3Json := d.Get("as3_json").(string)
-
+	log.Printf("[INFO] AS3 config:%+v", as3Json)
 	if d.Get("as3_json") != nil {
 		tList, _, _ = client.GetTenantList(as3Json)
 		if createdTenants != "" && createdTenants != tList {
@@ -288,9 +288,9 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	} else {
 		name = d.Id()
 	}
-
 	applicationList := d.Get("application_list").(string)
 	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
+	log.Printf("[DEBUG] Applications in AS3 get call : %s", applicationList)
 	if name != "" {
 		as3Resp, err := client.GetAs3(name, applicationList)
 		log.Printf("[DEBUG] AS3 json retreived from the GET call in Read function : %s", as3Resp)
@@ -337,16 +337,11 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	}
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 	if d.Get("per_app_mode").(bool) {
-
 		if perApplication && len(tenantList) == 0 {
 			oldTenantList := d.Get("tenant_list").(string)
-
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
-
 			err, res := client.PostPerAppBigIp(as3Json, oldTenantList)
-
 			log.Printf("[DEBUG] res from PostPerAppBigIp:%+v", res)
-
 			if err != nil {
 				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenant:(%s) with error: %v", oldTenantList, err))
 			}
@@ -356,7 +351,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			if !perApplication {
 				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))
 			} else {
-				return diag.FromErr(fmt.Errorf("Declartion not valid for Per-Application deployment"))
+				return diag.FromErr(fmt.Errorf("declartion not valid for Per-Application deployment"))
 			}
 		}
 	} else {
