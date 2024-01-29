@@ -553,6 +553,10 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	var rules []string
 	if cfgRules, ok := d.GetOk("irules"); ok {
 		rules = listToStringSlice(cfgRules.([]interface{}))
+	} else {
+		if changed := d.HasChange("irules"); changed {
+			rules = listToStringSlice(append([]interface{}{}, ""))
+		}
 	}
 
 	var securityLogProfiles []string
