@@ -15,12 +15,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func resourceBigipLtmProfileBotDefence() *schema.Resource {
+func resourceBigipLtmProfileBotDefense() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceBigipLtmProfileBotDefenceCreate,
-		ReadContext:   resourceBigipLtmProfileBotDefenceRead,
-		UpdateContext: resourceBigipLtmProfileBotDefenceUpdate,
-		DeleteContext: resourceBigipLtmProfileBotDefenceDelete,
+		CreateContext: resourceBigipLtmProfileBotDefenseCreate,
+		ReadContext:   resourceBigipLtmProfileBotDefenseRead,
+		UpdateContext: resourceBigipLtmProfileBotDefenseUpdate,
+		DeleteContext: resourceBigipLtmProfileBotDefenseDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -29,7 +29,7 @@ func resourceBigipLtmProfileBotDefence() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				Description:  "Name of the Bot Defence profile",
+				Description:  "Name of the Bot Defense profile",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"defaults_from": {
@@ -43,7 +43,7 @@ func resourceBigipLtmProfileBotDefence() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "User defined description for Bot Defence profile",
+				Description: "User defined description for Bot Defense profile",
 			},
 			"template": {
 				Type:     schema.TypeString,
@@ -52,7 +52,7 @@ func resourceBigipLtmProfileBotDefence() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{
 					"relaxed",
 					"enabled"}, false),
-				Description: "Enables or disables Bot Defence. The default is `disabled`",
+				Description: "Enables or disables Bot Defense. The default is `disabled`",
 			},
 			"enforcement_mode": {
 				Type:     schema.TypeString,
@@ -67,33 +67,33 @@ func resourceBigipLtmProfileBotDefence() *schema.Resource {
 	}
 }
 
-func resourceBigipLtmProfileBotDefenceCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceBigipLtmProfileBotDefenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Get("name").(string)
-	log.Printf("[INFO] Creating Bot Defence Profile:%+v ", name)
+	log.Printf("[INFO] Creating Bot Defense Profile:%+v ", name)
 	pss := &bigip.BotDefenseProfile{
 		Name: name,
 	}
-	config := getProfileBotDefenceConfig(d, pss)
-	log.Printf("[DEBUG] Bot Defence Profile config :%+v ", config)
+	config := getProfileBotDefenseConfig(d, pss)
+	log.Printf("[DEBUG] Bot Defense Profile config :%+v ", config)
 	err := client.AddBotDefenseProfile(config)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	d.SetId(name)
-	return resourceBigipLtmProfileBotDefenceRead(ctx, d, meta)
+	return resourceBigipLtmProfileBotDefenseRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileBotDefenceRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceBigipLtmProfileBotDefenseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Reading Bot Defence Profile:%+v ", client)
+	log.Printf("[INFO] Reading Bot Defense Profile:%+v ", client)
 	name := d.Id()
-	log.Printf("[INFO] Reading Bot Defence Profile:%+v ", name)
+	log.Printf("[INFO] Reading Bot Defense Profile:%+v ", name)
 	botProfile, err := client.GetBotDefenseProfile(name)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	log.Printf("[DEBUG] Bot Defence Profile config :%+v ", botProfile)
+	log.Printf("[DEBUG] Bot Defense Profile config :%+v ", botProfile)
 	d.Set("name", botProfile.FullPath)
 	d.Set("defaults_from", botProfile.DefaultsFrom)
 	d.Set("description", botProfile.Description)
@@ -102,27 +102,27 @@ func resourceBigipLtmProfileBotDefenceRead(ctx context.Context, d *schema.Resour
 	return nil
 }
 
-func resourceBigipLtmProfileBotDefenceUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceBigipLtmProfileBotDefenseUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	name := d.Id()
-	log.Printf("[INFO] Updating Bot Defence Profile:%+v ", name)
+	log.Printf("[INFO] Updating Bot Defense Profile:%+v ", name)
 	pss := &bigip.BotDefenseProfile{
 		Name: name,
 	}
-	config := getProfileBotDefenceConfig(d, pss)
+	config := getProfileBotDefenseConfig(d, pss)
 
 	err := client.ModifyBotDefenseProfile(name, config)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	return resourceBigipLtmProfileBotDefenceRead(ctx, d, meta)
+	return resourceBigipLtmProfileBotDefenseRead(ctx, d, meta)
 }
 
-func resourceBigipLtmProfileBotDefenceDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceBigipLtmProfileBotDefenseDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-	log.Println("[INFO] Deleting Bot Defence Profile " + name)
+	log.Println("[INFO] Deleting Bot Defense Profile " + name)
 	err := client.DeleteBotDefenseProfile(name)
 	if err != nil {
 		return diag.FromErr(err)
@@ -132,12 +132,12 @@ func resourceBigipLtmProfileBotDefenceDelete(ctx context.Context, d *schema.Reso
 	return nil
 }
 
-func getProfileBotDefenceConfig(d *schema.ResourceData, config *bigip.BotDefenseProfile) *bigip.BotDefenseProfile {
+func getProfileBotDefenseConfig(d *schema.ResourceData, config *bigip.BotDefenseProfile) *bigip.BotDefenseProfile {
 	config.Name = d.Get("name").(string)
 	config.DefaultsFrom = d.Get("defaults_from").(string)
 	config.Description = d.Get("description").(string)
 	config.Template = d.Get("template").(string)
 	config.EnforcementMode = d.Get("enforcement_mode").(string)
-	log.Printf("[INFO][getProfileBotDefenceConfig] config:%+v ", config)
+	log.Printf("[INFO][getProfileBotDefenseConfig] config:%+v ", config)
 	return config
 }
