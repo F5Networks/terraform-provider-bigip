@@ -292,7 +292,17 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
 	log.Printf("[DEBUG] Applications in AS3 get call : %s", applicationList)
 	if name != "" {
-		as3Resp, err := client.GetAs3(name, applicationList)
+		as3Resp, err := client.GetAs3(name, applicationList, d.Get("per_app_mode").(bool))
+		if d.Get("per_app_mode").(bool) {
+			as3Json := make(map[string]interface{})
+			_ = json.Unmarshal([]byte(as3Resp), &as3Json)
+			out, _ := json.Marshal(as3Json)
+			as3Dec := string(out)
+			applicationList = client.GetAppsList(fmt.Sprintf("%v", as3Dec))
+			log.Printf("[DEBUG] Application List from retreived the GET call in Read function : %s", applicationList)
+			_ = d.Set("application_list", applicationList)
+		}
+
 		log.Printf("[DEBUG] AS3 json retreived from the GET call in Read function : %s", as3Resp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to retrieve json ")
@@ -329,8 +339,8 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
-	tenantList, _, _ := client.GetTenantList(as3Json)
-
+	tenantList, _, applicationList := client.GetTenantList(as3Json)
+	_ = d.Set("application_list", applicationList)
 	perApplication, err := client.CheckSetting()
 	if err != nil {
 		return diag.FromErr(err)
@@ -340,13 +350,14 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 		if perApplication && len(tenantList) == 0 {
 			oldTenantList := d.Get("tenant_list").(string)
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
-			err, res := client.PostPerAppBigIp(as3Json, oldTenantList)
-			log.Printf("[DEBUG] res from PostPerAppBigIp:%+v", res)
+			err, task_id := client.PostPerAppBigIp(as3Json, oldTenantList)
+			log.Printf("[DEBUG] task_id from PostPerAppBigIp:%+v", task_id)
 			if err != nil {
 				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenant:(%s) with error: %v", oldTenantList, err))
 			}
 			// tenantCount = append(tenantCount, tenant)
 			_ = d.Set("tenant_list", oldTenantList)
+			_ = d.Set("task_id", task_id)
 		} else {
 			if !perApplication {
 				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))

@@ -288,13 +288,22 @@ func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
 	return nil
 
 }
-func (b *BigIP) GetAs3(name, appList string) (string, error) {
+func (b *BigIP) GetAs3(name, appList string, perAppMode bool) (string, error) {
 	as3Json := make(map[string]interface{})
-	as3Json["class"] = "AS3"
-	as3Json["action"] = "deploy"
-	as3Json["persist"] = true
 	adcJson := make(map[string]interface{})
-	err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	var err error
+	var ok bool
+
+	log.Printf("[DEBUG] (GetAs3) Per App Mode :%+v", perAppMode)
+
+	if perAppMode {
+		err, ok = b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name, uriApplications)
+	} else {
+		as3Json["class"] = "AS3"
+		as3Json["action"] = "deploy"
+		as3Json["persist"] = true
+		err, ok = b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -303,7 +312,12 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 	}
 	delete(adcJson, "updateMode")
 	delete(adcJson, "controls")
-	as3Json["declaration"] = adcJson
+
+	if perAppMode {
+		as3Json = adcJson
+	} else {
+		as3Json["declaration"] = adcJson
+	}
 	out, _ := json.Marshal(as3Json)
 	as3String := string(out)
 	tenantList := strings.Split(appList, ",")
