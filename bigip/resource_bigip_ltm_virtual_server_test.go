@@ -46,10 +46,10 @@ resource "bigip_ltm_policy" "http_to_https_redirect" {
 }
 resource "bigip_ltm_virtual_server" "test-vs" {
 	name = "` + TestVsName + `"
-	destination = "10.255.255.254"
+	destination = "0.0.0.0"
 	description = "VirtualServer-test"
 	port = 9999
-	mask = "255.255.255.255"
+	mask = "0.0.0.0"
 	source_address_translation = "automap"
 	ip_protocol = "tcp"
 	irules = [bigip_ltm_irule.test-rule-vstc1.name]
@@ -99,10 +99,10 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists(TestVsName),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", TestVsName),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "10.255.255.254"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "0.0.0.0"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "port", "9999"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "state", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "255.255.255.255"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "mask", "0.0.0.0"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source", "0.0.0.0/0"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "source_address_translation", "automap"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),

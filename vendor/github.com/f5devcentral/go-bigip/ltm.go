@@ -2046,6 +2046,8 @@ const (
 	uriWebAcceleration = "web-acceleration"
 	uriHttp            = "http"
 	uriRequestLog      = "request-log"
+	uriSecurity        = "security"
+	uriBotDefense      = "bot-defense"
 )
 
 var cidr = map[string]string{
@@ -4265,4 +4267,43 @@ func (b *BigIP) GetRequestLogProfile(name string) (*RequestLogProfile, error) {
 	}
 
 	return &requestLogProfile, nil
+}
+
+type BotDefenseProfile struct {
+	Name               string `json:"name,omitempty"`
+	Partition          string `json:"partition,omitempty"`
+	FullPath           string `json:"fullPath,omitempty"`
+	DefaultsFrom       string `json:"defaultsFrom,omitempty"`
+	Description        string `json:"description,omitempty"`
+	Template           string `json:"template,omitempty"`
+	EnforcementMode    string `json:"enforcementMode,omitempty"`
+	AllowBrowserAccess string `json:"allowBrowserAccess,omitempty"`
+}
+
+// AddBotDefenseProfile creates a new Bot Defense profile on the BIG-IP system.
+func (b *BigIP) AddBotDefenseProfile(config *BotDefenseProfile) error {
+	return b.post(config, uriSecurity, uriBotDefense, uriProfile)
+}
+
+// DeleteBotDefenseProfile removes a Bot Defense profile.
+func (b *BigIP) DeleteBotDefenseProfile(name string) error {
+	return b.delete(uriSecurity, uriBotDefense, uriProfile, name)
+}
+
+// ModifyBotDefenseProfile allows you to change any attribute of a Bot Defense profile.
+// Fields that can be modified are referenced in the BotDefenseProfile struct.
+func (b *BigIP) ModifyBotDefenseProfile(name string, config *BotDefenseProfile) error {
+	return b.patch(config, uriSecurity, uriBotDefense, uriProfile, name)
+}
+
+func (b *BigIP) GetBotDefenseProfile(name string) (*BotDefenseProfile, error) {
+	var botDefenseProfile BotDefenseProfile
+	err, ok := b.getForEntity(&botDefenseProfile, uriSecurity, uriBotDefense, uriProfile, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &botDefenseProfile, nil
 }
