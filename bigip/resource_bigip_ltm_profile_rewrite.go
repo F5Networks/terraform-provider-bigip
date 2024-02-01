@@ -34,6 +34,11 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 				Description:  "Name of the rewrite profile.",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
+			"partition": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "name of partition",
+			},
 			"defaults_from": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -47,8 +52,9 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			},
 			"cache_type": {
 				Type:         schema.TypeString,
-				Required:     true,
-				Description:  "Specifies the type of Client caching.",
+				Optional:     true,
+				Default:      "cache-img-css-js",
+				Description:  "Specifies the type of client caching.",
 				ValidateFunc: validation.StringInSlice([]string{"cache-css-js", "cache-all", "no-cache", "cache-img-css-js"}, false),
 			},
 			"ca_file": {
@@ -110,21 +116,25 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to add the X-Forwarded For (XFF) header, to specify the originating IP address of the client.",
 						},
 						"insert_xfwd_host": {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to add the X-Forwarded Host header, to specify the originating host of the client.",
 						},
 						"insert_xfwd_protocol": {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to add the X-Forwarded Proto header, to specify the originating protocol of the client.",
 						},
 						"rewrite_headers": {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to rewrite headers in Request settings.",
 						},
 					},
 				},
@@ -138,121 +148,46 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to rewrite links in content in the response.",
 						},
 						"rewrite_headers": {
 							Type:         schema.TypeString,
 							ValidateFunc: validation.StringInSlice([]string{"enabled", "disabled"}, false),
 							Optional:     true,
+							Description:  "Enable to rewrite headers in the response.",
 						},
 					},
 				},
 			},
-			//"cookie_rules": {
-			//	Type:     schema.TypeList,
-			//	Optional: true,
-			//	Elem: &schema.Resource{
-			//		Schema: map[string]*schema.Schema{
-			//			"name": {
-			//				Type:     schema.TypeString,
-			//				Required: true,
-			//			},
-			//			"client": {
-			//				Type:     schema.TypeSet,
-			//				Required: true,
-			//				Elem: &schema.Resource{
-			//					Schema: map[string]*schema.Schema{
-			//						"domain": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"path": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//					},
-			//				},
-			//			},
-			//			"server": {
-			//				Type:     schema.TypeSet,
-			//				Required: true,
-			//				Elem: &schema.Resource{
-			//					Schema: map[string]*schema.Schema{
-			//						"domain": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"path": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//					},
-			//				},
-			//			},
-			//		},
-			//	},
-			//},
-			//"uri_rules": {
-			//	Type:     schema.TypeList,
-			//	Optional: true,
-			//	Elem: &schema.Resource{
-			//		Schema: map[string]*schema.Schema{
-			//			"name": {
-			//				Type:     schema.TypeString,
-			//				Required: true,
-			//			},
-			//			"client": {
-			//				Type:     schema.TypeSet,
-			//				Required: true,
-			//				Elem: &schema.Resource{
-			//					Schema: map[string]*schema.Schema{
-			//						"host": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"path": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"scheme": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"port": {
-			//							Type:     schema.TypeString,
-			//							Default:  "none",
-			//							Optional: true,
-			//						},
-			//					},
-			//				},
-			//			},
-			//			"server": {
-			//				Type:     schema.TypeSet,
-			//				Required: true,
-			//				Elem: &schema.Resource{
-			//					Schema: map[string]*schema.Schema{
-			//						"host": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"path": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"scheme": {
-			//							Type:     schema.TypeString,
-			//							Required: true,
-			//						},
-			//						"port": {
-			//							Type:     schema.TypeString,
-			//							Default:  "none",
-			//							Optional: true,
-			//						},
-			//					},
-			//				},
-			//			},
-			//		},
-			//	},
-			//},
+			"cookie_rules": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"rule_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of the cookie rewrite rule.",
+						},
+						"client_domain": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"client_path": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"server_domain": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"server_path": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -277,49 +212,6 @@ func resourceBigipLtmRewriteProfileCreate(ctx context.Context, d *schema.Resourc
 		log.Printf("[ERROR] Unable to Create Rewrite Profile %s %v :", name, err)
 		return diag.FromErr(err)
 	}
-	//if _, ok := d.GetOk("uri_rules"); ok {
-	//	ruleCount := d.Get("uri_rules.#").(int)
-	//	for i := 0; i < ruleCount; i++ {
-	//		var ruleConfig bigip.RewriteProfileUriRule
-	//		prefix := fmt.Sprintf("uri_rules.%d", i)
-	//		ruleConfig.Name = d.Get(prefix + ".name").(string)
-	//		ruleConfig.Type = d.Get(prefix + ".type").(string)
-	//		if val, ok := d.GetOk(prefix + ".client"); ok {
-	//			var rc bigip.RewriteProfileUrlClSrv
-	//			for _, item := range val.(*schema.Set).List() {
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["host"].(string))
-	//				rc.Host = item.(map[string]interface{})["host"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//				rc.Path = item.(map[string]interface{})["path"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["port"].(string))
-	//				rc.Port = item.(map[string]interface{})["port"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["scheme"].(string))
-	//				rc.Scheme = item.(map[string]interface{})["scheme"].(string)
-	//			}
-	//			ruleConfig.Client = rc
-	//		}
-	//		if val, ok := d.GetOk(prefix + ".server"); ok {
-	//			var sc bigip.RewriteProfileUrlClSrv
-	//			for _, item := range val.(*schema.Set).List() {
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["host"].(string))
-	//				sc.Host = item.(map[string]interface{})["host"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//				sc.Path = item.(map[string]interface{})["path"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["port"].(string))
-	//				sc.Port = item.(map[string]interface{})["port"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["scheme"].(string))
-	//				sc.Scheme = item.(map[string]interface{})["scheme"].(string)
-	//			}
-	//			ruleConfig.Server = sc
-	//		}
-	//		err := client.AddRewriteProfileUriRule(name, &ruleConfig)
-	//		if err != nil {
-	//			log.Printf("[ERROR] Unable to Create Url Rewrite Profile Rule %s %v :", name, err)
-	//			return diag.FromErr(err)
-	//		}
-	//	}
-	//}
-
 	d.SetId(name)
 
 	return resourceBigipLtmProfileRewriteRead(ctx, d, meta)
@@ -338,44 +230,6 @@ func resourceBigipLtmProfileRewriteRead(ctx context.Context, d *schema.ResourceD
 	}
 	log.Printf("[DEBUG] LTM rewrite profile:%+v", profile)
 	setRewriteProfileData(d, profile)
-
-	//uriRules, err := client.GetRewriteProfileUriRules(name)
-	//if err != nil {
-	//	return diag.FromErr(err)
-	//}
-	//if uriRules == nil {
-	//	log.Printf("No URI rules found associated with this LTM Rewrite Profile")
-	//}
-	//if uriRules != nil {
-	//	rules := make([]interface{}, len(uriRules.Uri))
-	//	for i, v := range uriRules.Uri {
-	//		obj := make(map[string]interface{})
-	//		if v.Name != "" {
-	//			obj["name"] = v.Name
-	//		}
-	//		cl := map[string]interface{}{
-	//			"host":   v.Client.Host,
-	//			"path":   v.Client.Path,
-	//			"scheme": v.Client.Scheme,
-	//			"port":   v.Client.Port,
-	//		}
-	//		obj["client"] = cl
-	//
-	//		sr := map[string]interface{}{
-	//			"host":   v.Client.Host,
-	//			"path":   v.Client.Path,
-	//			"scheme": v.Client.Scheme,
-	//			"port":   v.Client.Port,
-	//		}
-	//		obj["server"] = sr
-	//
-	//		rules[i] = obj
-	//	}
-	//	err := d.Set("uri_rules", rules)
-	//	if err != nil {
-	//		return diag.FromErr(err)
-	//	}
-	//}
 	return nil
 }
 
@@ -392,49 +246,6 @@ func resourceBigipLtmProfileRewriteUpdate(ctx context.Context, d *schema.Resourc
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying LTM Rewrite Profile (%s): %s", name, err))
 	}
-
-	//if _, ok := d.GetOk("uri_rules"); ok {
-	//	ruleCount := d.Get("uri_rules.#").(int)
-	//	for i := 0; i < ruleCount; i++ {
-	//		var ruleConfig bigip.RewriteProfileUriRule
-	//		prefix := fmt.Sprintf("uri_rules.%d", i)
-	//		ruleConfig.Name = d.Get(prefix + ".name").(string)
-	//		ruleConfig.Type = d.Get(prefix + ".type").(string)
-	//		if val, ok := d.GetOk(prefix + ".client"); ok {
-	//			var rc bigip.RewriteProfileUrlClSrv
-	//			for _, item := range val.(*schema.Set).List() {
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["host"].(string))
-	//				rc.Host = item.(map[string]interface{})["host"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//				rc.Path = item.(map[string]interface{})["path"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["port"].(string))
-	//				rc.Port = item.(map[string]interface{})["port"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["scheme"].(string))
-	//				rc.Scheme = item.(map[string]interface{})["scheme"].(string)
-	//			}
-	//			ruleConfig.Client = rc
-	//		}
-	//		if val, ok := d.GetOk(prefix + ".server"); ok {
-	//			var sc bigip.RewriteProfileUrlClSrv
-	//			for _, item := range val.(*schema.Set).List() {
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["host"].(string))
-	//				sc.Host = item.(map[string]interface{})["host"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//				sc.Path = item.(map[string]interface{})["path"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["port"].(string))
-	//				sc.Port = item.(map[string]interface{})["port"].(string)
-	//				log.Printf("Value:%+v", item.(map[string]interface{})["scheme"].(string))
-	//				sc.Scheme = item.(map[string]interface{})["scheme"].(string)
-	//			}
-	//			ruleConfig.Server = sc
-	//		}
-	//		err := client.ModifyRewriteProfileUriRule(name, ruleConfig.Name, &ruleConfig)
-	//		if err != nil {
-	//			log.Printf("[ERROR] Unable to Modify LTM Rewrite Profile Uri Rule %s %v :", name, err)
-	//			return diag.FromErr(err)
-	//		}
-	//	}
-	//}
 	return resourceBigipLtmProfileRewriteRead(ctx, d, meta)
 }
 
@@ -479,33 +290,36 @@ func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) d
 	res["rewrite_headers"] = data.Response.RewriteHeaders
 	resList = append(resList, res)
 	_ = d.Set("response", resList)
-	//cookies := make([]interface{}, len(data.Cookies))
-	//for i, v := range data.Cookies {
-	//	obj := make(map[string]interface{})
-	//	if v.Name != "" {
-	//		obj["name"] = v.Name
-	//	}
-	//	cl := map[string]interface{}{
-	//		"domain": v.Client.Domain,
-	//		"path":   v.Client.Path,
-	//	}
-	//	obj["client"] = cl
-	//	sr := map[string]interface{}{
-	//		"domain": v.Server.Domain,
-	//		"path":   v.Server.Path,
-	//	}
-	//	obj["server"] = sr
-	//	cookies[i] = obj
-	//}
-	//err := d.Set("cookie_rules", cookies)
-	//if err != nil {
-	//	return diag.FromErr(err)
-	//}
+	cookies := make([]interface{}, len(data.Cookies))
+	for i, v := range data.Cookies {
+		obj := make(map[string]interface{})
+		if v.Name != "" {
+			obj["rule_name"] = v.Name
+		}
+		if v.Client.Domain != "" {
+			obj["client_domain"] = v.Client.Domain
+		}
+		if v.Client.Path != "" {
+			obj["client_path"] = v.Client.Path
+		}
+		if v.Server.Domain != "" {
+			obj["server_domain"] = v.Server.Domain
+		}
+		if v.Server.Path != "" {
+			obj["server_path"] = v.Server.Path
+		}
+		cookies[i] = obj
+	}
+	err := d.Set("cookie_rules", cookies)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
 func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfile) *bigip.RewriteProfile {
 	config.DefaultsFrom = d.Get("defaults_from").(string)
+	config.Partition = d.Get("partition").(string)
 	config.Mode = d.Get("rewrite_mode").(string)
 	config.CaFile = d.Get("ca_file").(string)
 	config.CrlFile = d.Get("crl_file").(string)
@@ -520,13 +334,13 @@ func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfil
 	if val, ok := d.GetOk("request"); ok {
 		var reqAttrs bigip.RewriteProfileRequestd
 		for _, item := range val.(*schema.Set).List() {
-			log.Printf("Value:%+v", item.(map[string]interface{})["insert_xfwd_for"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_for"].(string))
 			reqAttrs.XfwdFor = item.(map[string]interface{})["insert_xfwd_for"].(string)
-			log.Printf("Value:%+v", item.(map[string]interface{})["insert_xfwd_host"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_host"].(string))
 			reqAttrs.XfwdHost = item.(map[string]interface{})["insert_xfwd_host"].(string)
-			log.Printf("Value:%+v", item.(map[string]interface{})["insert_xfwd_protocol"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_protocol"].(string))
 			reqAttrs.XfwdProtocol = item.(map[string]interface{})["insert_xfwd_protocol"].(string)
-			log.Printf("Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
 			reqAttrs.RewriteHeaders = item.(map[string]interface{})["rewrite_headers"].(string)
 		}
 		config.Request = reqAttrs
@@ -535,42 +349,31 @@ func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfil
 	if val, ok := d.GetOk("response"); ok {
 		var resAttrs bigip.RewriteProfileResponsed
 		for _, item := range val.(*schema.Set).List() {
-			log.Printf("Value:%+v", item.(map[string]interface{})["rewrite_content"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_content"].(string))
 			resAttrs.RewriteContent = item.(map[string]interface{})["rewrite_content"].(string)
-			log.Printf("Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
 			resAttrs.RewriteHeaders = item.(map[string]interface{})["rewrite_headers"].(string)
 		}
 		config.Response = resAttrs
 	}
 
-	//cookieCount := d.Get("cookie_rules.#").(int)
-	//log.Printf("[INFO] Cookie Count:%+v", cookieCount)
-	//config.Cookies = make([]bigip.RewriteProfileCookieRules, 0, cookieCount)
-	//for i := 0; i < cookieCount; i++ {
-	//	var cookieRules bigip.RewriteProfileCookieRules
-	//	prefix := fmt.Sprintf("cookie_rules.%d", i)
-	//	cookieRules.Name = d.Get(prefix + ".name").(string)
-	//	if val, ok := d.GetOk(prefix + ".client"); ok {
-	//		var cc bigip.RewriteProfileCookieClSrv
-	//		for _, item := range val.(*schema.Set).List() {
-	//			log.Printf("Value:%+v", item.(map[string]interface{})["domain"].(string))
-	//			cc.Domain = item.(map[string]interface{})["domain"].(string)
-	//			log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//			cc.Path = item.(map[string]interface{})["path"].(string)
-	//		}
-	//		cookieRules.Client = cc
-	//	}
-	//	if val, ok := d.GetOk(prefix + ".server"); ok {
-	//		var sc bigip.RewriteProfileCookieClSrv
-	//		for _, item := range val.(*schema.Set).List() {
-	//			log.Printf("Value:%+v", item.(map[string]interface{})["domain"].(string))
-	//			sc.Domain = item.(map[string]interface{})["domain"].(string)
-	//			log.Printf("Value:%+v", item.(map[string]interface{})["path"].(string))
-	//			sc.Path = item.(map[string]interface{})["path"].(string)
-	//		}
-	//		cookieRules.Server = sc
-	//	}
-	//	config.Cookies = append(config.Cookies, cookieRules)
-	//}
+	if val, ok := d.GetOk("cookie_rules"); ok {
+		var cookieRules []bigip.RewriteProfileCookieRules
+		for _, item := range val.(*schema.Set).List() {
+			cookieRule := bigip.RewriteProfileCookieRules{}
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rule_name"].(string))
+			cookieRule.Name = item.(map[string]interface{})["rule_name"].(string)
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["client_domain"].(string))
+			cookieRule.Client.Domain = item.(map[string]interface{})["client_domain"].(string)
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["client_path"].(string))
+			cookieRule.Client.Path = item.(map[string]interface{})["client_path"].(string)
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["server_domain"].(string))
+			cookieRule.Server.Domain = item.(map[string]interface{})["server_domain"].(string)
+			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["server_path"].(string))
+			cookieRule.Server.Path = item.(map[string]interface{})["server_path"].(string)
+			cookieRules = append(cookieRules, cookieRule)
+		}
+		config.Cookies = cookieRules
+	}
 	return config
 }

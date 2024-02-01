@@ -2116,15 +2116,15 @@ func (b *BigIP) ModifyRewriteProfile(name string, config *RewriteProfile) error 
 	return b.patch(config, uriLtm, uriProfile, uriRewrite, name)
 }
 
-// GetRewriteProfileUrlRules returns a list of url rules associated with rewrite profile.
-func (b *BigIP) GetRewriteProfileUriRules(name string) (*RewriteProfileUriRules, error) {
-	var urlRules RewriteProfileUriRules
-	err, _ := b.getForEntity(&urlRules, uriLtm, uriProfile, uriRewrite, name, uriRewriteRules)
+// GetRewriteProfileUrlRule returns an uri rule associated with rewrite profile.
+func (b *BigIP) GetRewriteProfileUriRule(profile_name string, rule_name string) (*RewriteProfileUriRule, error) {
+	var urlRule RewriteProfileUriRule
+	err, _ := b.getForEntity(&urlRule, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
 	if err != nil {
 		return nil, err
 	}
 
-	return &urlRules, nil
+	return &urlRule, nil
 }
 
 // AddRewriteProfile creates ltm rewrite profile on the BIG-IP system.
@@ -2134,13 +2134,13 @@ func (b *BigIP) AddRewriteProfileUriRule(name string, config *RewriteProfileUriR
 
 // ModifyRewriteProfileUrlRule allows you to change any attribute of an uri rule of rewrite profile.
 // Fields that can be modified are referenced in the RewriteProfileUriRule struct.
-func (b *BigIP) ModifyRewriteProfileUriRule(name string, rule_name string, config *RewriteProfileUriRule) error {
-	return b.patch(config, uriLtm, uriProfile, uriRewrite, name, uriRewriteRules, rule_name)
+func (b *BigIP) ModifyRewriteProfileUriRule(profile_name string, rule_name string, config *RewriteProfileUriRule) error {
+	return b.patch(config, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
 }
 
 // DeleteRewriteProfileUrlRule removes an url-rule in rewrite profile.
-func (b *BigIP) DeleteRewriteProfileUriRule(name string, rule_name string) error {
-	return b.delete(uriLtm, uriProfile, uriRewrite, name, uriRewriteRules, rule_name)
+func (b *BigIP) DeleteRewriteProfileUriRule(profile_name string, rule_name string) error {
+	return b.delete(uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
 }
 
 
