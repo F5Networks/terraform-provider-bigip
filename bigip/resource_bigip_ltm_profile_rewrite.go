@@ -9,12 +9,12 @@ package bigip
 import (
 	"context"
 	"fmt"
+	"log"
+
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
-	"strings"
 )
 
 func resourceBigipLtmRewriteProfile() *schema.Resource {
@@ -33,11 +33,6 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the rewrite profile.",
 				ValidateFunc: validateF5NameWithDirectory,
-			},
-			"partition": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "name of partition",
 			},
 			"defaults_from": {
 				Type:        schema.TypeString,
@@ -110,6 +105,7 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			"request": {
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"insert_xfwd_for": {
@@ -142,6 +138,7 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			"response": {
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"rewrite_content": {
@@ -196,11 +193,11 @@ func resourceBigipLtmRewriteProfileCreate(ctx context.Context, d *schema.Resourc
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
-	partition := strings.Split(name, "/")[1]
+	// partition := strings.Split(name, "/")[1]
 
 	pss := &bigip.RewriteProfile{
-		Name:      name,
-		Partition: partition,
+		Name: name,
+		// Partition: partition,
 	}
 	log.Printf("[INFO] Creating LTM rewrite profile config")
 	config := getRewriteProfileConfig(d, pss)
@@ -275,7 +272,6 @@ func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) d
 	_ = d.Set("split_tunneling", data.SplitTunnel)
 	_ = d.Set("rewrite_list", data.RewriteList)
 	_ = d.Set("bypass_list", data.BypassList)
-
 	var reqList []interface{}
 	req := make(map[string]interface{})
 	req["insert_xfwd_for"] = data.Request.XfwdFor
@@ -319,7 +315,7 @@ func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) d
 
 func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfile) *bigip.RewriteProfile {
 	config.DefaultsFrom = d.Get("defaults_from").(string)
-	config.Partition = d.Get("partition").(string)
+	// config.Partition = d.Get("partition").(string)
 	config.Mode = d.Get("rewrite_mode").(string)
 	config.CaFile = d.Get("ca_file").(string)
 	config.CrlFile = d.Get("crl_file").(string)
@@ -334,13 +330,9 @@ func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfil
 	if val, ok := d.GetOk("request"); ok {
 		var reqAttrs bigip.RewriteProfileRequestd
 		for _, item := range val.(*schema.Set).List() {
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_for"].(string))
 			reqAttrs.XfwdFor = item.(map[string]interface{})["insert_xfwd_for"].(string)
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_host"].(string))
 			reqAttrs.XfwdHost = item.(map[string]interface{})["insert_xfwd_host"].(string)
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["insert_xfwd_protocol"].(string))
 			reqAttrs.XfwdProtocol = item.(map[string]interface{})["insert_xfwd_protocol"].(string)
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
 			reqAttrs.RewriteHeaders = item.(map[string]interface{})["rewrite_headers"].(string)
 		}
 		config.Request = reqAttrs
@@ -349,9 +341,7 @@ func getRewriteProfileConfig(d *schema.ResourceData, config *bigip.RewriteProfil
 	if val, ok := d.GetOk("response"); ok {
 		var resAttrs bigip.RewriteProfileResponsed
 		for _, item := range val.(*schema.Set).List() {
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_content"].(string))
 			resAttrs.RewriteContent = item.(map[string]interface{})["rewrite_content"].(string)
-			log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["rewrite_headers"].(string))
 			resAttrs.RewriteHeaders = item.(map[string]interface{})["rewrite_headers"].(string)
 		}
 		config.Response = resAttrs

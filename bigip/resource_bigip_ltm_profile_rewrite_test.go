@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -26,7 +27,7 @@ func TestAccLtmRewriteProfileCreateOnBigipTC1(t *testing.T) {
 			{
 				Config: getLtmRewritePortalProfileConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testLtmRewriteProfileExists("/Common/tf_profile", true),
+					testLtmRewriteProfileExists("/Common/tf_profile-tc1", true),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "rewrite_mode", "portal"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cache_type", "cache-img-css-js"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "ca_file", "/Common/ca-bundle.crt"),
@@ -40,17 +41,15 @@ func TestAccLtmRewriteProfileCreateOnBigipTC1(t *testing.T) {
 func getLtmRewritePortalProfileConfig() string {
 	return fmt.Sprintf(`
 	resource "bigip_ltm_profile_rewrite" "test-profile" {
-	  name = "%v"
-      partition = "Common"
-	  defaults_from = "/Common/rewrite"
-	  rewrite_mode = "portal"
-	  cache_type = "cache-img-css-js"
-	  ca_file = "/Common/ca-bundle.crt"
-	  signing_cert = "/Common/default.crt"
-	  signing_key = "/Common/default.key"
-	  split_tunneling = "false"
-	}
-`, "/Common/tf_profile")
+		name            = "%v"
+		defaults_from   = "/Common/rewrite"
+		rewrite_mode    = "portal"
+		cache_type      = "cache-img-css-js"
+		ca_file         = "/Common/ca-bundle.crt"
+		signing_cert    = "/Common/default.crt"
+		signing_key     = "/Common/default.key"
+		split_tunneling = "false"
+	  }`, "/Common/tf_profile-tc1")
 }
 
 func TestAccLtmRewriteProfileCreateOnBigipTC2(t *testing.T) {
@@ -192,7 +191,7 @@ func testLtmRewriteProfileExists(name string, exists bool) resource.TestCheckFun
 		if err != nil {
 			return err
 		}
-		if exists && p != nil {
+		if exists && p == nil {
 			return fmt.Errorf("rewrite profile %s was not created", name)
 		}
 		if !exists && p != nil {
@@ -211,6 +210,9 @@ func testCheckLtmRewriteProfileDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		p, err := client.GetRewriteProfile(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if p != nil {
