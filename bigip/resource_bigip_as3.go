@@ -77,6 +77,9 @@ func resourceBigipAs3() *schema.Resource {
 								delete(rec, "Common")
 							}
 						}
+						if key == "persist" {
+							delete(oldJsonref, "persist")
+						}
 					}
 					for key, value := range newJsonref {
 						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
@@ -89,8 +92,10 @@ func resourceBigipAs3() *schema.Resource {
 								delete(rec, "Common")
 							}
 						}
+						if key == "persist" {
+							delete(newJsonref, "persist")
+						}
 					}
-
 					ignoreMetadata := d.Get("ignore_metadata").(bool)
 					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
 					if ignoreMetadata {
