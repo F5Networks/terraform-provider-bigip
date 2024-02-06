@@ -92,6 +92,12 @@ type RequestError struct {
 	ErrorStack []string `json:"errorStack,omitempty"`
 }
 
+type BigIPSetting struct {
+	BetaOptions	struct {
+		PerAppDeploymentAllowed	bool `json:"perAppDeploymentAllowed,omitempty"`
+	} `json:"betaOptions,omitempty"`
+}
+
 // Error returns the error message.
 func (r *RequestError) Error() error {
 	if r.Message != "" {
@@ -422,6 +428,17 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 	return resp, callErr
 }
 
+func (b *BigIP) postAS3Req(body interface{}, path ...string) ([]byte, error) {
+	req := &APIRequest{
+        Method:      "post",
+        URL:         b.iControlPath(path),
+        Body:        body.(string),
+        ContentType: "application/json",
+    }
+    resp, callErr := b.APICall(req)
+    return resp, callErr
+}
+
 func (b *BigIP) put(body interface{}, path ...string) error {
 	marshalJSON, err := jsonMarshal(body)
 	if err != nil {
@@ -559,6 +576,32 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 			return &upload, err
 		}
 	}
+}
+
+func (b *BigIP) getSetting(path ...string) (error, *BigIPSetting) {
+	req := &APIRequest{
+		Method:      "get",
+		URL:         b.iControlPath(path),
+		ContentType: "application/json",
+	}
+
+	resp, err := b.APICall(req)
+	if err != nil {
+		var reqError RequestError
+		json.Unmarshal(resp, &reqError)
+		if reqError.Code == 404 {
+			return err, nil
+		}
+		return err, nil
+	}
+
+	var setting BigIPSetting
+	err = json.Unmarshal(resp, &setting)
+	if err != nil {
+		return err, nil
+	}
+
+	return nil, &setting
 }
 
 // Get a urlString and populate an entity. If the entity does not exist (404) then the
