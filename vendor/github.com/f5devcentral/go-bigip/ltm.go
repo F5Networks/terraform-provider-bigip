@@ -1935,6 +1935,68 @@ type CipherRule struct {
 	SignatureAlgorithms string `json:"signatureAlgorithms,omitempty"`
 }
 
+type RewriteProfile struct {
+	Name                string `json:"name,omitempty"`
+	Partition           string `json:"partition,omitempty"`
+	FullPath            string `json:"fullPath,omitempty"`
+	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
+	AppService          string `json:"appService,omitempty"`
+	Mode				string `json:"rewriteMode,omitempty"`
+	CaFile				string `json:"javaCaFile,omitempty"`
+	CrlFile				string `json:"javaCrl,omitempty"`
+	CachingType			string `json:"clientCachingType,omitempty"`
+	SigningCert			string `json:"javaSigner,omitempty"`
+	SigningKey			string `json:"javaSignKey,omitempty"`
+	SigningKeyPass		string `json:"javaSignKeyPassphrase,omitempty"`
+	SplitTunnel			string `json:"splitTunneling,omitempty"`
+	RewriteList			[]string `json:"rewriteList,omitempty"`
+	BypassList			[]string `json:"bypassList,omitempty"`
+	Request				RewriteProfileRequestd `json:"request,omitempty"`
+	Response			RewriteProfileResponsed `json:"response,omitempty"`
+	Cookies 			[]RewriteProfileCookieRules `json:"setCookieRules,omitempty"`
+}
+
+type RewriteProfileRequestd struct {
+	XfwdFor             string `json:"insertXforwardedFor,omitempty"`
+	XfwdHost            string `json:"insertXforwardedHost,omitempty"`
+	XfwdProtocol        string `json:"insertXforwardedProto,omitempty"`
+	RewriteHeaders      string `json:"rewriteHeaders,omitempty"`
+}
+
+type RewriteProfileResponsed struct {
+	RewriteContent      string `json:"rewriteContent,omitempty"`
+	RewriteHeaders      string `json:"rewriteHeaders,omitempty"`
+}
+
+type RewriteProfileUriRules struct {
+	Uri 				[]RewriteProfileUriRule `json:"items,omitempty"`
+}
+
+type RewriteProfileUriRule struct {
+	Name 			    string `json:"name,omitempty"`
+	Type				string `json:"type,omitempty"`
+	Client         		RewriteProfileUrlClSrv`json:"client,omitempty"`
+	Server  			RewriteProfileUrlClSrv `json:"server,omitempty"`
+}
+
+type RewriteProfileUrlClSrv struct {
+	Host string `json:"host,omitempty"`
+	Path string `json:"path,omitempty"`
+	Port string `json:"port,omitempty"`
+	Scheme string `json:"scheme,omitempty"`
+}
+
+type RewriteProfileCookieClSrv struct {
+	Domain string `json:"domain,omitempty"`
+	Path string `json:"path,omitempty"`
+}
+
+type RewriteProfileCookieRules struct {
+	 Name 			    string `json:"name,omitempty"`
+	 Client				RewriteProfileCookieClSrv `json:"client,omitempty"`
+	 Server 			RewriteProfileCookieClSrv `json:"server,omitempty"`
+}
+
 const (
 	uriLtm             = "ltm"
 	uriNode            = "node"
@@ -1960,6 +2022,8 @@ const (
 	CONTEXT_SERVER     = "serverside"
 	CONTEXT_CLIENT     = "clientside"
 	CONTEXT_ALL        = "all"
+	uriRewrite		   = "rewrite"
+	uriRewriteRules    = "uri-rules"
 	uriTcp             = "tcp"
 	uriFtp             = "ftp"
 	uriFasthttp        = "fasthttp"
@@ -2021,6 +2085,64 @@ var cidr = map[string]string{
 	"31": "255.255.255.254",
 	"32": "255.255.255.255",
 }
+
+// AddRewriteProfile creates ltm rewrite profile on the BIG-IP system.
+func (b *BigIP) AddRewriteProfile(config *RewriteProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriRewrite)
+}
+
+// GetRewriteProfile gets a rewrite profile by name. Returns nil if the rewrite profile does not exist
+func (b *BigIP) GetRewriteProfile(name string) (*RewriteProfile, error) {
+	var rewriteProfile RewriteProfile
+	err, ok := b.getForEntity(&rewriteProfile, uriLtm, uriProfile, uriRewrite, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &rewriteProfile, nil
+}
+
+// DeleteRewriteProfile removes a rewrite profile.
+func (b *BigIP) DeleteRewriteProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriRewrite, name)
+}
+
+// ModifyRewriteProfile allows you to change any attribute of a rewrite profile.
+// Fields that can be modified are referenced in the RewriteProfile struct.
+func (b *BigIP) ModifyRewriteProfile(name string, config *RewriteProfile) error {
+	return b.patch(config, uriLtm, uriProfile, uriRewrite, name)
+}
+
+// GetRewriteProfileUrlRule returns an uri rule associated with rewrite profile.
+func (b *BigIP) GetRewriteProfileUriRule(profile_name string, rule_name string) (*RewriteProfileUriRule, error) {
+	var urlRule RewriteProfileUriRule
+	err, _ := b.getForEntity(&urlRule, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &urlRule, nil
+}
+
+// AddRewriteProfile creates ltm rewrite profile on the BIG-IP system.
+func (b *BigIP) AddRewriteProfileUriRule(name string, config *RewriteProfileUriRule) error {
+	return b.post(config, uriLtm, uriProfile, uriRewrite, name, uriRewriteRules)
+}
+
+// ModifyRewriteProfileUrlRule allows you to change any attribute of an uri rule of rewrite profile.
+// Fields that can be modified are referenced in the RewriteProfileUriRule struct.
+func (b *BigIP) ModifyRewriteProfileUriRule(profile_name string, rule_name string, config *RewriteProfileUriRule) error {
+	return b.patch(config, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
+}
+
+// DeleteRewriteProfileUrlRule removes an url-rule in rewrite profile.
+func (b *BigIP) DeleteRewriteProfileUriRule(profile_name string, rule_name string) error {
+	return b.delete(uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
+}
+
 
 // SnatPools returns a list of snatpools.
 func (b *BigIP) SnatPools() (*SnatPools, error) {
