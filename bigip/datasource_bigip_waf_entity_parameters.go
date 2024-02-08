@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -59,6 +58,16 @@ func dataSourceBigipWafEntityParameter() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "Determines whether a parameter has a restricted minimum length for value.",
+			},
+			"max_value_length": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Maximum length for value.",
+			},
+			"min_value_length": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Minimum length for value.",
 			},
 			"data_type": {
 				Type:        schema.TypeString,
@@ -202,6 +211,16 @@ func getEPConfig(ep *bigip.Parameter, d *schema.ResourceData) {
 	}
 	if d.Get("check_min_value_length") != nil {
 		ep.CheckMinValueLength = d.Get("check_min_value_length").(bool)
+	}
+	if d.Get("max_value_length") != nil {
+		if d.Get("check_max_value_length").(bool) && d.Get("data_type").(string) == "alpha-numeric" {
+			ep.MaximumLength = d.Get("max_value_length").(int)
+		}
+	}
+	if d.Get("min_value_length") != nil {
+		if d.Get("check_min_value_length").(bool) && d.Get("data_type").(string) == "alpha-numeric" {
+			ep.MinimumLength = d.Get("min_value_length").(int)
+		}
 	}
 	if d.Get("data_type") != nil {
 		ep.DataType = d.Get("data_type").(string)
