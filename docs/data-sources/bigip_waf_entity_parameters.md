@@ -37,6 +37,8 @@ data "bigip_waf_entity_parameter" "EPX" {
 * `attack_signatures_check` - Determines whether attack signatures and threat campaigns must be detected in a parameter's value.
 * `check_max_value_length` - Determines whether a parameter has a restricted maximum length for value.
 * `check_min_value_length` - Determines whether a parameter has a restricted minimum length for value.
+* `max_value_length` - Sets maximum length for value. Only applied to JSON when `check_max_value_length` is set to `true` and `data_type` is `alpha-numeric`.
+* `min_value_length` - Sets minimum length for value. Only applied to JSON when `check_min_value_length` is set to `true` and `data_type` is `alpha-numeric`.
 * `data_type` - Specifies data type of parameter's value.
 * `enable_regular_expression` - Determines whether the parameter value includes the pattern defined in regularExpression.
 * `is_base64` - Determines whether a parameter’s value contains a Base64 encoded string.
