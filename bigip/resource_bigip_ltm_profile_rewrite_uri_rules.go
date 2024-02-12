@@ -189,6 +189,7 @@ func resourceBigipLtmProfileRewriteUriRuleDelete(ctx context.Context, d *schema.
 func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) {
 	_ = d.Set("rule_name", data.Name)
 	_ = d.Set("rule_type", data.Type)
+
 	var clList []interface{}
 	cl := make(map[string]interface{})
 	cl["host"] = data.Client.Host
@@ -197,6 +198,7 @@ func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) 
 	cl["port"] = data.Client.Port
 	clList = append(clList, cl)
 	_ = d.Set("client", clList)
+
 	var srvList []interface{}
 	srv := make(map[string]interface{})
 	srv["host"] = data.Server.Host
@@ -205,7 +207,6 @@ func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) 
 	srv["port"] = data.Server.Port
 	srvList = append(srvList, srv)
 	_ = d.Set("server", srvList)
-	// return nil
 }
 
 func getUriRulesConfig(d *schema.ResourceData, config *bigip.RewriteProfileUriRule) *bigip.RewriteProfileUriRule {

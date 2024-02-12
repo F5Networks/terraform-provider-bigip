@@ -49,10 +49,10 @@ func resourceBigipLtmProfileBotDefense() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ForceNew: true,
 				ValidateFunc: validation.StringInSlice([]string{
 					"relaxed", "balanced", "strict"}, false),
-				ForceNew:    true,
-				Description: "Profile templates specify Mitigation and Verification Settings.possible ptions `balanced`,`relaxed` and `strict`",
+				Description: "Profile templates specify Mitigation and Verification Settings default values. possible ptions `balanced`,`relaxed` and `strict`",
 			},
 			"enforcement_mode": {
 				Type:     schema.TypeString,
