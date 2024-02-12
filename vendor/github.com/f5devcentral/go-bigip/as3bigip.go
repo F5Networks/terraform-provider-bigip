@@ -22,6 +22,8 @@ const (
 	uriTask         = "task"
 	uriDeclare      = "declare"
 	uriAsyncDeclare = "declare?async=true"
+	uriSetting      = "settings"
+	uriApplications = "applications"
 )
 
 type doValidate struct {
@@ -51,6 +53,43 @@ type Results1 struct {
 	Host      string `json:"host,omitempty"`
 	Tenant    string `json:"tenant,omitempty"`
 	RunTime   int64  `json:"runTime,omitempty"`
+}
+
+// PostPerAppBigIp - used for posting Per-Application Declarations
+func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, string) {
+	// resp, err := PostPerApp()
+	async := "?async=true"
+	resp, err := b.postAS3Req(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications, async)
+	if err != nil {
+		return err, ""
+	}
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	respID := respRef["id"].(string)
+	taskStatus, err := b.getas3TaskStatus(respID)
+	respCode := taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
+	log.Printf("[DEBUG]Per-App Deployment Code = %+v,ID = %+v", respCode, respID)
+
+	for respCode != 200 || taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string) != "success" {
+		log.Printf("[DEBUG]Per-App Deployment task status = %+v", taskStatus)
+		if taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string) == "no change" {
+			log.Printf("[DEBUG]Per-App Deployment task status = %+v", taskStatus)
+			break
+		}
+		taskStatus, _ = b.getas3TaskStatus(respID)
+		respCode = taskStatus["results"].([]interface{})[0].(map[string]interface{})["code"].(float64)
+		log.Printf("respCode: %v", respCode)
+		log.Printf("message: %v", taskStatus["results"].([]interface{})[0].(map[string]interface{})["message"].(string))
+		if err != nil {
+			return err, respID
+		}
+		if respCode == 503 || respCode >= 400 {
+			j, _ := json.MarshalIndent(taskStatus["results"].([]interface{}), "", "\t")
+			return fmt.Errorf("tenant Creation failed. Response: %+v", string(j)), respID
+		}
+		time.Sleep(3 * time.Second)
+	}
+	return nil, respID
 }
 
 /*
@@ -249,13 +288,22 @@ func (b *BigIP) ModifyAs3(tenantFilter string, as3_json string) error {
 	return nil
 
 }
-func (b *BigIP) GetAs3(name, appList string) (string, error) {
+func (b *BigIP) GetAs3(name, appList string, perAppMode bool) (string, error) {
 	as3Json := make(map[string]interface{})
-	as3Json["class"] = "AS3"
-	as3Json["action"] = "deploy"
-	as3Json["persist"] = true
 	adcJson := make(map[string]interface{})
-	err, ok := b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	var err error
+	var ok bool
+
+	log.Printf("[DEBUG] (GetAs3) Per App Mode :%+v", perAppMode)
+
+	if perAppMode {
+		err, ok = b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name, uriApplications)
+	} else {
+		as3Json["class"] = "AS3"
+		as3Json["action"] = "deploy"
+		as3Json["persist"] = true
+		err, ok = b.getForEntity(&adcJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, name)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -264,7 +312,12 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 	}
 	delete(adcJson, "updateMode")
 	delete(adcJson, "controls")
-	as3Json["declaration"] = adcJson
+
+	if perAppMode {
+		as3Json = adcJson
+	} else {
+		as3Json["declaration"] = adcJson
+	}
 	out, _ := json.Marshal(as3Json)
 	as3String := string(out)
 	tenantList := strings.Split(appList, ",")
@@ -292,7 +345,9 @@ func (b *BigIP) GetAs3(name, appList string) (string, error) {
 						}
 					}
 					if sharedTenant == "Common" && sharedTenant != name {
-						delete(rec, sharedTenant)
+						// Removing delete call for shared tenant to address Issue #869
+						// delete(rec, sharedTenant)
+						log.Printf("[DEBUG]Shared Tenant:%+v", sharedTenant)
 					}
 				}
 			}
@@ -423,6 +478,29 @@ func (b *BigIP) GetTenantList(body interface{}) (string, int, string) {
 	return finalTenantlist, len(tenantList), finalApplicationList
 }
 
+func (b *BigIP) GetAppsList(body interface{}) string {
+	//tenantList := make([]string, 0)
+	appList := make([]string, 0)
+	as3json := body.(string)
+	resp := []byte(as3json)
+	jsonRef := make(map[string]interface{})
+	json.Unmarshal(resp, &jsonRef)
+	for key, value := range jsonRef {
+		//check value is of interface type
+		if _, ok := value.(map[string]interface{}); ok {
+			//check for class matches to Application
+			//range over the map and check if key is class and value is Application
+			for k1, v1 := range value.(map[string]interface{}) {
+				//check for class matches to Application
+				if k1 == "class" && v1 == "Application" {
+					appList = append(appList, key)
+				}
+			}
+		}
+	}
+	finalApplicationList := strings.Join(appList[:], ",")
+	return finalApplicationList
+}
 func (b *BigIP) GetTarget(body interface{}) string {
 	as3json := body.(string)
 	resp := []byte(as3json)
@@ -474,6 +552,18 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 	}
 	s = string(jsonData)
 	return s, nil
+}
+
+func (b *BigIP) CheckSetting() (bool, error) {
+
+	err, setting := b.getSetting(uriMgmt, uriShared, uriAppsvcs, uriSetting)
+	if err != nil {
+		return false, err
+	}
+	log.Printf("[INFO] BigIP Setting:%+v", setting)
+	perAppDeploymentAllowed := setting.BetaOptions.PerAppDeploymentAllowed
+
+	return perAppDeploymentAllowed, nil
 }
 
 func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {

@@ -1935,6 +1935,68 @@ type CipherRule struct {
 	SignatureAlgorithms string `json:"signatureAlgorithms,omitempty"`
 }
 
+type RewriteProfile struct {
+	Name           string                      `json:"name,omitempty"`
+	Partition      string                      `json:"partition,omitempty"`
+	FullPath       string                      `json:"fullPath,omitempty"`
+	DefaultsFrom   string                      `json:"defaultsFrom,omitempty"`
+	AppService     string                      `json:"appService,omitempty"`
+	Mode           string                      `json:"rewriteMode,omitempty"`
+	CaFile         string                      `json:"javaCaFile,omitempty"`
+	CrlFile        string                      `json:"javaCrl,omitempty"`
+	CachingType    string                      `json:"clientCachingType,omitempty"`
+	SigningCert    string                      `json:"javaSigner,omitempty"`
+	SigningKey     string                      `json:"javaSignKey,omitempty"`
+	SigningKeyPass string                      `json:"javaSignKeyPassphrase,omitempty"`
+	SplitTunnel    string                      `json:"splitTunneling,omitempty"`
+	RewriteList    []string                    `json:"rewriteList,omitempty"`
+	BypassList     []string                    `json:"bypassList,omitempty"`
+	Request        RewriteProfileRequestd      `json:"request,omitempty"`
+	Response       RewriteProfileResponsed     `json:"response,omitempty"`
+	Cookies        []RewriteProfileCookieRules `json:"setCookieRules,omitempty"`
+}
+
+type RewriteProfileRequestd struct {
+	XfwdFor        string `json:"insertXforwardedFor,omitempty"`
+	XfwdHost       string `json:"insertXforwardedHost,omitempty"`
+	XfwdProtocol   string `json:"insertXforwardedProto,omitempty"`
+	RewriteHeaders string `json:"rewriteHeaders,omitempty"`
+}
+
+type RewriteProfileResponsed struct {
+	RewriteContent string `json:"rewriteContent,omitempty"`
+	RewriteHeaders string `json:"rewriteHeaders,omitempty"`
+}
+
+type RewriteProfileUriRules struct {
+	Uri []RewriteProfileUriRule `json:"items,omitempty"`
+}
+
+type RewriteProfileUriRule struct {
+	Name   string                 `json:"name,omitempty"`
+	Type   string                 `json:"type,omitempty"`
+	Client RewriteProfileUrlClSrv `json:"client,omitempty"`
+	Server RewriteProfileUrlClSrv `json:"server,omitempty"`
+}
+
+type RewriteProfileUrlClSrv struct {
+	Host   string `json:"host,omitempty"`
+	Path   string `json:"path,omitempty"`
+	Port   string `json:"port,omitempty"`
+	Scheme string `json:"scheme,omitempty"`
+}
+
+type RewriteProfileCookieClSrv struct {
+	Domain string `json:"domain,omitempty"`
+	Path   string `json:"path,omitempty"`
+}
+
+type RewriteProfileCookieRules struct {
+	Name   string                    `json:"name,omitempty"`
+	Client RewriteProfileCookieClSrv `json:"client,omitempty"`
+	Server RewriteProfileCookieClSrv `json:"server,omitempty"`
+}
+
 const (
 	uriLtm             = "ltm"
 	uriNode            = "node"
@@ -1960,6 +2022,8 @@ const (
 	CONTEXT_SERVER     = "serverside"
 	CONTEXT_CLIENT     = "clientside"
 	CONTEXT_ALL        = "all"
+	uriRewrite         = "rewrite"
+	uriRewriteRules    = "uri-rules"
 	uriTcp             = "tcp"
 	uriFtp             = "ftp"
 	uriFasthttp        = "fasthttp"
@@ -1980,6 +2044,10 @@ const (
 	uriCreateDraft     = "?options=create-draft"
 	uriRule            = "rule"
 	uriWebAcceleration = "web-acceleration"
+	uriHttp            = "http"
+	uriRequestLog      = "request-log"
+	uriSecurity        = "security"
+	uriBotDefense      = "bot-defense"
 )
 
 var cidr = map[string]string{
@@ -2016,6 +2084,63 @@ var cidr = map[string]string{
 	"30": "255.255.255.252",
 	"31": "255.255.255.254",
 	"32": "255.255.255.255",
+}
+
+// AddRewriteProfile creates ltm rewrite profile on the BIG-IP system.
+func (b *BigIP) AddRewriteProfile(config *RewriteProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriRewrite)
+}
+
+// GetRewriteProfile gets a rewrite profile by name. Returns nil if the rewrite profile does not exist
+func (b *BigIP) GetRewriteProfile(name string) (*RewriteProfile, error) {
+	var rewriteProfile RewriteProfile
+	err, ok := b.getForEntity(&rewriteProfile, uriLtm, uriProfile, uriRewrite, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+
+	return &rewriteProfile, nil
+}
+
+// DeleteRewriteProfile removes a rewrite profile.
+func (b *BigIP) DeleteRewriteProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriRewrite, name)
+}
+
+// ModifyRewriteProfile allows you to change any attribute of a rewrite profile.
+// Fields that can be modified are referenced in the RewriteProfile struct.
+func (b *BigIP) ModifyRewriteProfile(name string, config *RewriteProfile) error {
+	return b.patch(config, uriLtm, uriProfile, uriRewrite, name)
+}
+
+// GetRewriteProfileUrlRule returns an uri rule associated with rewrite profile.
+func (b *BigIP) GetRewriteProfileUriRule(profile_name string, rule_name string) (*RewriteProfileUriRule, error) {
+	var urlRule RewriteProfileUriRule
+	err, _ := b.getForEntity(&urlRule, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &urlRule, nil
+}
+
+// AddRewriteProfile creates ltm rewrite profile on the BIG-IP system.
+func (b *BigIP) AddRewriteProfileUriRule(name string, config *RewriteProfileUriRule) error {
+	return b.post(config, uriLtm, uriProfile, uriRewrite, name, uriRewriteRules)
+}
+
+// ModifyRewriteProfileUrlRule allows you to change any attribute of an uri rule of rewrite profile.
+// Fields that can be modified are referenced in the RewriteProfileUriRule struct.
+func (b *BigIP) ModifyRewriteProfileUriRule(profile_name string, rule_name string, config *RewriteProfileUriRule) error {
+	return b.patch(config, uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
+}
+
+// DeleteRewriteProfileUrlRule removes an url-rule in rewrite profile.
+func (b *BigIP) DeleteRewriteProfileUriRule(profile_name string, rule_name string) error {
+	return b.delete(uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
 }
 
 // SnatPools returns a list of snatpools.
@@ -4081,4 +4206,103 @@ func (b *BigIP) GetLtmCipherGroup(name string) (*CipherGroupReq, error) {
 	}
 
 	return &cipherGroup, nil
+}
+
+// json to golang struct
+type RequestLogProfile struct {
+	Name                       string `json:"name,omitempty"`
+	Partition                  string `json:"partition,omitempty"`
+	FullPath                   string `json:"fullPath,omitempty"`
+	AppService                 string `json:"appService,omitempty"`
+	DefaultsFrom               string `json:"defaultsFrom,omitempty"`
+	Description                string `json:"description,omitempty"`
+	LogRequestLoggingErrors    string `json:"logRequestLoggingErrors,omitempty"`
+	LogResponseByDefault       string `json:"logResponseByDefault,omitempty"`
+	LogResponseLoggingErrors   string `json:"logResponseLoggingErrors,omitempty"`
+	ProxyCloseOnError          string `json:"proxyCloseOnError,omitempty"`
+	ProxyRespondOnLoggingError string `json:"proxyRespondOnLoggingError,omitempty"`
+	ProxyResponse              string `json:"proxyResponse,omitempty"`
+	RequestLogErrorPool        string `json:"requestLogErrorPool,omitempty"`
+	RequestLogErrorProtocol    string `json:"requestLogErrorProtocol,omitempty"`
+	RequestLogErrorTemplate    string `json:"requestLogErrorTemplate,omitempty"`
+	RequestLogPool             string `json:"requestLogPool,omitempty"`
+	RequestLogProtocol         string `json:"requestLogProtocol,omitempty"`
+	RequestLogTemplate         string `json:"requestLogTemplate,omitempty"`
+	RequestLogging             string `json:"requestLogging,omitempty"`
+	ResponseLogErrorPool       string `json:"responseLogErrorPool,omitempty"`
+	ResponseLogErrorProtocol   string `json:"responseLogErrorProtocol,omitempty"`
+	ResponseLogErrorTemplate   string `json:"responseLogErrorTemplate,omitempty"`
+	ResponseLogPool            string `json:"responseLogPool,omitempty"`
+	ResponseLogProtocol        string `json:"responseLogProtocol,omitempty"`
+	ResponseLogTemplate        string `json:"responseLogTemplate,omitempty"`
+	ResponseLogging            string `json:"responseLogging,omitempty"`
+}
+
+// AddRequestLogProfile creates a new Request Log profile on the BIG-IP system.
+func (b *BigIP) AddRequestLogProfile(config *RequestLogProfile) error {
+	return b.post(config, uriLtm, uriProfile, uriRequestLog)
+}
+
+// DeleteRequestLogProfile removes a Request Log profile.
+func (b *BigIP) DeleteRequestLogProfile(name string) error {
+	return b.delete(uriLtm, uriProfile, uriRequestLog, name)
+}
+
+// ModifyRequestLogProfile allows you to change any attribute of a RequestLog profile.
+// Fields that can be modified are referenced in the RequestLogProfile struct.
+func (b *BigIP) ModifyRequestLogProfile(name string, config *RequestLogProfile) error {
+	return b.patch(config, uriLtm, uriProfile, uriRequestLog, name)
+}
+
+func (b *BigIP) GetRequestLogProfile(name string) (*RequestLogProfile, error) {
+	var requestLogProfile RequestLogProfile
+	err, ok := b.getForEntity(&requestLogProfile, uriLtm, uriProfile, uriRequestLog, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &requestLogProfile, nil
+}
+
+type BotDefenseProfile struct {
+	Name               string `json:"name,omitempty"`
+	Partition          string `json:"partition,omitempty"`
+	FullPath           string `json:"fullPath,omitempty"`
+	DefaultsFrom       string `json:"defaultsFrom,omitempty"`
+	Description        string `json:"description,omitempty"`
+	Template           string `json:"template,omitempty"`
+	EnforcementMode    string `json:"enforcementMode,omitempty"`
+	AllowBrowserAccess string `json:"allowBrowserAccess,omitempty"`
+}
+
+// AddBotDefenseProfile creates a new Bot Defense profile on the BIG-IP system.
+func (b *BigIP) AddBotDefenseProfile(config *BotDefenseProfile) error {
+	return b.post(config, uriSecurity, uriBotDefense, uriProfile)
+}
+
+// DeleteBotDefenseProfile removes a Bot Defense profile.
+func (b *BigIP) DeleteBotDefenseProfile(name string) error {
+	return b.delete(uriSecurity, uriBotDefense, uriProfile, name)
+}
+
+// ModifyBotDefenseProfile allows you to change any attribute of a Bot Defense profile.
+// Fields that can be modified are referenced in the BotDefenseProfile struct.
+func (b *BigIP) ModifyBotDefenseProfile(name string, config *BotDefenseProfile) error {
+	return b.patch(config, uriSecurity, uriBotDefense, uriProfile, name)
+}
+
+func (b *BigIP) GetBotDefenseProfile(name string) (*BotDefenseProfile, error) {
+	var botDefenseProfile BotDefenseProfile
+	err, ok := b.getForEntity(&botDefenseProfile, uriSecurity, uriBotDefense, uriProfile, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &botDefenseProfile, nil
 }

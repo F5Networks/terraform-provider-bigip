@@ -363,7 +363,9 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
 	_ = d.Set("pool", vs.Pool)
-	_ = d.Set("mask", vs.Mask)
+	if _, ok := d.GetOk("mask"); !ok {
+		_ = d.Set("mask", vs.Mask)
+	}
 
 	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
 	//	   so we need to extract it
