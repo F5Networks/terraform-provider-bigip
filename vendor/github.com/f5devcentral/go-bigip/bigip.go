@@ -93,8 +93,8 @@ type RequestError struct {
 }
 
 type BigIPSetting struct {
-	BetaOptions	struct {
-		PerAppDeploymentAllowed	bool `json:"perAppDeploymentAllowed,omitempty"`
+	BetaOptions struct {
+		PerAppDeploymentAllowed bool `json:"perAppDeploymentAllowed,omitempty"`
 	} `json:"betaOptions,omitempty"`
 }
 
@@ -430,13 +430,13 @@ func (b *BigIP) postReq(body interface{}, path ...string) ([]byte, error) {
 
 func (b *BigIP) postAS3Req(body interface{}, path ...string) ([]byte, error) {
 	req := &APIRequest{
-        Method:      "post",
-        URL:         b.iControlPath(path),
-        Body:        body.(string),
-        ContentType: "application/json",
-    }
-    resp, callErr := b.APICall(req)
-    return resp, callErr
+		Method:      "post",
+		URL:         b.iControlPath(path),
+		Body:        body.(string),
+		ContentType: "application/json",
+	}
+	resp, callErr := b.APICall(req)
+	return resp, callErr
 }
 
 func (b *BigIP) put(body interface{}, path ...string) error {

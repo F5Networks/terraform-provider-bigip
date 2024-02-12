@@ -49,10 +49,10 @@ func resourceBigipLtmProfileBotDefense() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ForceNew: true,
 				ValidateFunc: validation.StringInSlice([]string{
-					"relaxed",
-					"enabled"}, false),
-				Description: "Enables or disables Bot Defense. The default is `disabled`",
+					"relaxed", "balanced", "strict"}, false),
+				Description: "Profile templates specify Mitigation and Verification Settings default values. possible ptions `balanced`,`relaxed` and `strict`",
 			},
 			"enforcement_mode": {
 				Type:     schema.TypeString,
@@ -61,7 +61,7 @@ func resourceBigipLtmProfileBotDefense() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{
 					"transparent",
 					"blocking"}, false),
-				Description: "Specifies the protocol to be used for high-speed logging of requests. The default is `mds-udp`",
+				Description: "Select the enforcement mode, possible values are `transparent` and `blocking`.",
 			},
 		},
 	}

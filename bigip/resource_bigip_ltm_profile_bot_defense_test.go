@@ -72,12 +72,10 @@ func testCheckBotDefensesDestroyed(s *terraform.State) error {
 }
 
 func testaccbigipltmprofileBotDefenseDefaultConfig(partition, profileName, resourceName string) string {
-	return fmt.Sprintf(`
-	resource "bigip_ltm_profile_bot_defence" "%[3]s" {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_bot_defence" "%[3]s" {
 		name = "%[2]s"
 		defaults_from = "/%[1]s/bot-defense"
 		description = "test-bot"
 		template = "relaxed"
-	  }
-`, partition, profileName, resourceName)
+	}`, partition, profileName, resourceName)
 }

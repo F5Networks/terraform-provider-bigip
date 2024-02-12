@@ -1936,65 +1936,65 @@ type CipherRule struct {
 }
 
 type RewriteProfile struct {
-	Name                string `json:"name,omitempty"`
-	Partition           string `json:"partition,omitempty"`
-	FullPath            string `json:"fullPath,omitempty"`
-	DefaultsFrom        string `json:"defaultsFrom,omitempty"`
-	AppService          string `json:"appService,omitempty"`
-	Mode				string `json:"rewriteMode,omitempty"`
-	CaFile				string `json:"javaCaFile,omitempty"`
-	CrlFile				string `json:"javaCrl,omitempty"`
-	CachingType			string `json:"clientCachingType,omitempty"`
-	SigningCert			string `json:"javaSigner,omitempty"`
-	SigningKey			string `json:"javaSignKey,omitempty"`
-	SigningKeyPass		string `json:"javaSignKeyPassphrase,omitempty"`
-	SplitTunnel			string `json:"splitTunneling,omitempty"`
-	RewriteList			[]string `json:"rewriteList,omitempty"`
-	BypassList			[]string `json:"bypassList,omitempty"`
-	Request				RewriteProfileRequestd `json:"request,omitempty"`
-	Response			RewriteProfileResponsed `json:"response,omitempty"`
-	Cookies 			[]RewriteProfileCookieRules `json:"setCookieRules,omitempty"`
+	Name           string                      `json:"name,omitempty"`
+	Partition      string                      `json:"partition,omitempty"`
+	FullPath       string                      `json:"fullPath,omitempty"`
+	DefaultsFrom   string                      `json:"defaultsFrom,omitempty"`
+	AppService     string                      `json:"appService,omitempty"`
+	Mode           string                      `json:"rewriteMode,omitempty"`
+	CaFile         string                      `json:"javaCaFile,omitempty"`
+	CrlFile        string                      `json:"javaCrl,omitempty"`
+	CachingType    string                      `json:"clientCachingType,omitempty"`
+	SigningCert    string                      `json:"javaSigner,omitempty"`
+	SigningKey     string                      `json:"javaSignKey,omitempty"`
+	SigningKeyPass string                      `json:"javaSignKeyPassphrase,omitempty"`
+	SplitTunnel    string                      `json:"splitTunneling,omitempty"`
+	RewriteList    []string                    `json:"rewriteList,omitempty"`
+	BypassList     []string                    `json:"bypassList,omitempty"`
+	Request        RewriteProfileRequestd      `json:"request,omitempty"`
+	Response       RewriteProfileResponsed     `json:"response,omitempty"`
+	Cookies        []RewriteProfileCookieRules `json:"setCookieRules,omitempty"`
 }
 
 type RewriteProfileRequestd struct {
-	XfwdFor             string `json:"insertXforwardedFor,omitempty"`
-	XfwdHost            string `json:"insertXforwardedHost,omitempty"`
-	XfwdProtocol        string `json:"insertXforwardedProto,omitempty"`
-	RewriteHeaders      string `json:"rewriteHeaders,omitempty"`
+	XfwdFor        string `json:"insertXforwardedFor,omitempty"`
+	XfwdHost       string `json:"insertXforwardedHost,omitempty"`
+	XfwdProtocol   string `json:"insertXforwardedProto,omitempty"`
+	RewriteHeaders string `json:"rewriteHeaders,omitempty"`
 }
 
 type RewriteProfileResponsed struct {
-	RewriteContent      string `json:"rewriteContent,omitempty"`
-	RewriteHeaders      string `json:"rewriteHeaders,omitempty"`
+	RewriteContent string `json:"rewriteContent,omitempty"`
+	RewriteHeaders string `json:"rewriteHeaders,omitempty"`
 }
 
 type RewriteProfileUriRules struct {
-	Uri 				[]RewriteProfileUriRule `json:"items,omitempty"`
+	Uri []RewriteProfileUriRule `json:"items,omitempty"`
 }
 
 type RewriteProfileUriRule struct {
-	Name 			    string `json:"name,omitempty"`
-	Type				string `json:"type,omitempty"`
-	Client         		RewriteProfileUrlClSrv`json:"client,omitempty"`
-	Server  			RewriteProfileUrlClSrv `json:"server,omitempty"`
+	Name   string                 `json:"name,omitempty"`
+	Type   string                 `json:"type,omitempty"`
+	Client RewriteProfileUrlClSrv `json:"client,omitempty"`
+	Server RewriteProfileUrlClSrv `json:"server,omitempty"`
 }
 
 type RewriteProfileUrlClSrv struct {
-	Host string `json:"host,omitempty"`
-	Path string `json:"path,omitempty"`
-	Port string `json:"port,omitempty"`
+	Host   string `json:"host,omitempty"`
+	Path   string `json:"path,omitempty"`
+	Port   string `json:"port,omitempty"`
 	Scheme string `json:"scheme,omitempty"`
 }
 
 type RewriteProfileCookieClSrv struct {
 	Domain string `json:"domain,omitempty"`
-	Path string `json:"path,omitempty"`
+	Path   string `json:"path,omitempty"`
 }
 
 type RewriteProfileCookieRules struct {
-	 Name 			    string `json:"name,omitempty"`
-	 Client				RewriteProfileCookieClSrv `json:"client,omitempty"`
-	 Server 			RewriteProfileCookieClSrv `json:"server,omitempty"`
+	Name   string                    `json:"name,omitempty"`
+	Client RewriteProfileCookieClSrv `json:"client,omitempty"`
+	Server RewriteProfileCookieClSrv `json:"server,omitempty"`
 }
 
 const (
@@ -2022,7 +2022,7 @@ const (
 	CONTEXT_SERVER     = "serverside"
 	CONTEXT_CLIENT     = "clientside"
 	CONTEXT_ALL        = "all"
-	uriRewrite		   = "rewrite"
+	uriRewrite         = "rewrite"
 	uriRewriteRules    = "uri-rules"
 	uriTcp             = "tcp"
 	uriFtp             = "ftp"
@@ -2142,7 +2142,6 @@ func (b *BigIP) ModifyRewriteProfileUriRule(profile_name string, rule_name strin
 func (b *BigIP) DeleteRewriteProfileUriRule(profile_name string, rule_name string) error {
 	return b.delete(uriLtm, uriProfile, uriRewrite, profile_name, uriRewriteRules, rule_name)
 }
-
 
 // SnatPools returns a list of snatpools.
 func (b *BigIP) SnatPools() (*SnatPools, error) {

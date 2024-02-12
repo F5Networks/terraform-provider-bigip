@@ -28,6 +28,7 @@ func TestAccLtmRewriteProfileCreateOnBigipTC1(t *testing.T) {
 				Config: getLtmRewritePortalProfileConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testLtmRewriteProfileExists("/Common/tf_profile-tc1", true),
+					testLtmRewriteProfileExists("/Common/tf_profile-tc11", false),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "rewrite_mode", "portal"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cache_type", "cache-img-css-js"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "ca_file", "/Common/ca-bundle.crt"),
@@ -37,21 +38,6 @@ func TestAccLtmRewriteProfileCreateOnBigipTC1(t *testing.T) {
 		},
 	})
 }
-
-func getLtmRewritePortalProfileConfig() string {
-	return fmt.Sprintf(`
-	resource "bigip_ltm_profile_rewrite" "test-profile" {
-		name            = "%v"
-		defaults_from   = "/Common/rewrite"
-		rewrite_mode    = "portal"
-		cache_type      = "cache-img-css-js"
-		ca_file         = "/Common/ca-bundle.crt"
-		signing_cert    = "/Common/default.crt"
-		signing_key     = "/Common/default.key"
-		split_tunneling = "false"
-	  }`, "/Common/tf_profile-tc1")
-}
-
 func TestAccLtmRewriteProfileCreateOnBigipTC2(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -130,41 +116,46 @@ func TestAccLtmRewriteProfileCreateOnBigipTC3(t *testing.T) {
 	})
 }
 
-func getLtmRewriteUriRewriteProfileConfig() string {
-	return fmt.Sprintf(`
-	resource "bigip_ltm_profile_rewrite" "test-profile2" {
-	  name = "%v"
-	  defaults_from = "/Common/rewrite"
-  	  rewrite_mode = "uri-translation"
-
-	  request {
-		insert_xfwd_for = "enabled"
-		insert_xfwd_host = "disabled"
-		insert_xfwd_protocol = "enabled"
-	  }
-  
-	  cookie_rules {
-		rule_name = "cookie1"
-		client_domain = "wrong.com"
-		client_path   = "/this/"
-		server_domain = "right.com"
-		server_path   = "/that/"
-	  }
-
-	  cookie_rules {
-		rule_name = "cookie2"
-		client_domain = "incorrect.com"
-		client_path   = "/this/"
-		server_domain = "absolute.com"
-		server_path   = "/that/"
-	  }
-	}
-`, "/Common/tf_profile_translate")
+func getLtmRewritePortalProfileConfig() string {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile" {
+		name            = "/Common/%v"
+		defaults_from   = "/Common/rewrite"
+		rewrite_mode    = "portal"
+		cache_type      = "cache-img-css-js"
+		ca_file         = "/Common/ca-bundle.crt"
+		signing_cert    = "/Common/default.crt"
+		signing_key     = "/Common/default.key"
+		split_tunneling = "false"}`, "tf_profile-tc1")
 }
-
+func getLtmRewriteUriRewriteProfileConfig() string {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile2" {
+		name          = "%v"
+		defaults_from = "/Common/rewrite"
+		rewrite_mode  = "uri-translation"
+	  
+		request {
+		  insert_xfwd_for      = "enabled"
+		  insert_xfwd_host     = "disabled"
+		  insert_xfwd_protocol = "enabled"
+		}
+		cookie_rules {
+		  rule_name     = "cookie1"
+		  client_domain = "wrong.com"
+		  client_path   = "/this/"
+		  server_domain = "right.com"
+		  server_path   = "/that/"
+		}
+		cookie_rules {
+		  rule_name     = "cookie2"
+		  client_domain = "incorrect.com"
+		  client_path   = "/this/"
+		  server_domain = "absolute.com"
+		  server_path   = "/that/"
+		}
+	  }`, "/Common/tf_profile_translate")
+}
 func getLtmRewriteUriRewriteProfileConfigChanged() string {
-	return fmt.Sprintf(`
-	resource "bigip_ltm_profile_rewrite" "test-profile2" {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile2" {
 	  name = "%v"
 
 	  request {
@@ -180,10 +171,8 @@ func getLtmRewriteUriRewriteProfileConfigChanged() string {
 		server_domain = "totallyright.com"
 		server_path   = "/those/"
 	  }
-	}
-`, "/Common/tf_profile_translate")
+	}`, "/Common/tf_profile_translate")
 }
-
 func testLtmRewriteProfileExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)

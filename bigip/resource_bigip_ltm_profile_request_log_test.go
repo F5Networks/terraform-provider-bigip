@@ -136,8 +136,7 @@ resource "%[4]s" "%[3]s" {
 }
 
 func testAccBigipLtmProfileRequestLogTC2Config(partition, profileName, resourceName string) string {
-	return fmt.Sprintf(`
-resource "%[4]s" "%[3]s" {
+	return fmt.Sprintf(`resource "%[4]s" "%[3]s" {
 	name                       = "%[2]s"
 	defaults_from              = "/%[1]s/request-log"
 	request_logging            = "disabled"
@@ -145,13 +144,11 @@ resource "%[4]s" "%[3]s" {
 	requestlog_error_protocol  = "mds-tcp"
 	responselog_protocol       = "mds-tcp"
 	responselog_error_protocol = "mds-tcp"
-}
-`, partition, profileName, resourceName, resRequestLogName)
+}`, partition, profileName, resourceName, resRequestLogName)
 }
 
 func testAccBigipLtmProfileRequestLogTC2UpdateConfig(partition, profileName, resourceName string) string {
-	return fmt.Sprintf(`
-resource "%[4]s" "%[3]s" {
+	return fmt.Sprintf(`resource "%[4]s" "%[3]s" {
 	name                       = "%[2]s"
 	defaults_from              = "/%[1]s/request-log"
 	request_logging            = "enabled"
@@ -159,6 +156,5 @@ resource "%[4]s" "%[3]s" {
 	requestlog_error_protocol  = "mds-udp"
 	responselog_protocol       = "mds-udp"
 	responselog_error_protocol = "mds-udp"
-}
-`, partition, profileName, resourceName, resRequestLogName)
+}`, partition, profileName, resourceName, resRequestLogName)
 }

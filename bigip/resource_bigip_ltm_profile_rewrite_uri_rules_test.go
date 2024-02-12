@@ -8,16 +8,15 @@ package bigip
 
 import (
 	"fmt"
-	"github.com/f5devcentral/go-bigip"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 var rewPorfile = fmt.Sprintf("/%s/%s", TestPartition, "tf_profile")
-var rule1 = fmt.Sprintf("tf_rule")
-
+var rule1 = "tf_rule"
 var TestProfileResource = `
 resource "bigip_ltm_profile_rewrite" "tftest" {
   name = "` + rewPorfile + `"
