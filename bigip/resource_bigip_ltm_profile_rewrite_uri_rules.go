@@ -185,7 +185,6 @@ func resourceBigipLtmProfileRewriteUriRuleDelete(ctx context.Context, d *schema.
 	d.SetId("")
 	return nil
 }
-
 func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) {
 	_ = d.Set("rule_name", data.Name)
 	_ = d.Set("rule_type", data.Type)

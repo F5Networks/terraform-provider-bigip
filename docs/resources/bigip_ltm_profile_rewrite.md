@@ -15,48 +15,43 @@ For resources should be named with their `full path`. The full path is the combi
 ## Example Usage
 
 ```hcl
-
 resource "bigip_ltm_profile_rewrite" "test-profile" {
-  name = "/Common/tf_profile"
-  defaults_from = "/Common/rewrite"
-  bypass_list = ["http://notouch.com"]
-  rewrite_list = ["http://some.com"]
-  rewrite_mode = "portal"
-  cache_type = "cache-img-css-js"
-  ca_file = "/Common/ca-bundle.crt"
-  crl_file = "none"
-  signing_cert = "/Common/default.crt"
-  signing_key = "/Common/default.key"
+  name            = "/Common/tf_profile"
+  defaults_from   = "/Common/rewrite"
+  bypass_list     = ["http://notouch.com"]
+  rewrite_list    = ["http://some.com"]
+  rewrite_mode    = "portal"
+  cache_type      = "cache-img-css-js"
+  ca_file         = "/Common/ca-bundle.crt"
+  crl_file        = "none"
+  signing_cert    = "/Common/default.crt"
+  signing_key     = "/Common/default.key"
   split_tunneling = "true"
 }
 
 resource "bigip_ltm_profile_rewrite" "test-profile2" {
-  name = "/Common/tf_profile_translate"
+  name          = "/Common/tf_profile_translate"
   defaults_from = "/Common/rewrite"
-  rewrite_mode = "uri-translation"
-
+  rewrite_mode  = "uri-translation"
   request {
-    insert_xfwd_for = "enabled"
-    insert_xfwd_host = "disabled"
+    insert_xfwd_for      = "enabled"
+    insert_xfwd_host     = "disabled"
     insert_xfwd_protocol = "enabled"
-    rewrite_headers = "disabled"
+    rewrite_headers      = "disabled"
   }
-
   response {
     rewrite_content = "enabled"
     rewrite_headers = "disabled"
   }
-  
   cookie_rules {
-    rule_name = "cookie1"
+    rule_name     = "cookie1"
     client_domain = "wrong.com"
     client_path   = "/this/"
     server_domain = "wrong.com"
     server_path   = "/this/"
   }
-
   cookie_rules {
-    rule_name = "cookie2"
+    rule_name     = "cookie2"
     client_domain = "incorrect.com"
     client_path   = "/this/"
     server_domain = "absolute.com"
