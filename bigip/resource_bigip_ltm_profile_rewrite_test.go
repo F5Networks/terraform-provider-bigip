@@ -28,6 +28,7 @@ func TestAccLtmRewriteProfileCreateOnBigipTC1(t *testing.T) {
 				Config: getLtmRewritePortalProfileConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testLtmRewriteProfileExists("/Common/tf_profile-tc1", true),
+					testLtmRewriteProfileExists("/Common/tf_profile-tc11", false),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "rewrite_mode", "portal"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cache_type", "cache-img-css-js"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "ca_file", "/Common/ca-bundle.crt"),

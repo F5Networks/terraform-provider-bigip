@@ -10,8 +10,8 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.13.0
 	github.com/Azure/go-autorest/autorest v0.11.18
 	github.com/Azure/go-autorest/autorest/adal v0.9.13
-	github.com/f5devcentral/go-bigip v0.0.0-20240102182502-074c3e5c7aee
-	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20240102182502-074c3e5c7aee
+	github.com/f5devcentral/go-bigip v0.0.0-20240212051136-955cd7058e2a
+	github.com/f5devcentral/go-bigip/f5teem v0.0.0-20240212051136-955cd7058e2a
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.25.0
 	github.com/stretchr/testify v1.8.4

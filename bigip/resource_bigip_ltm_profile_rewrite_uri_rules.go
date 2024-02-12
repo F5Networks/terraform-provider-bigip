@@ -9,11 +9,12 @@ package bigip
 import (
 	"context"
 	"fmt"
+	"log"
+
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
 )
 
 func resourceBigipLtmRewriteProfileUriRules() *schema.Resource {
@@ -185,10 +186,9 @@ func resourceBigipLtmProfileRewriteUriRuleDelete(ctx context.Context, d *schema.
 	return nil
 }
 
-func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) diag.Diagnostics {
+func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) {
 	_ = d.Set("rule_name", data.Name)
 	_ = d.Set("rule_type", data.Type)
-
 	var clList []interface{}
 	cl := make(map[string]interface{})
 	cl["host"] = data.Client.Host
@@ -197,7 +197,6 @@ func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) 
 	cl["port"] = data.Client.Port
 	clList = append(clList, cl)
 	_ = d.Set("client", clList)
-
 	var srvList []interface{}
 	srv := make(map[string]interface{})
 	srv["host"] = data.Server.Host
@@ -206,8 +205,7 @@ func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) 
 	srv["port"] = data.Server.Port
 	srvList = append(srvList, srv)
 	_ = d.Set("server", srvList)
-
-	return nil
+	// return nil
 }
 
 func getUriRulesConfig(d *schema.ResourceData, config *bigip.RewriteProfileUriRule) *bigip.RewriteProfileUriRule {
