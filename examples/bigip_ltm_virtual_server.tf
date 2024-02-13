@@ -104,3 +104,28 @@ resource "bigip_ltm_virtual_server" "vs_tc6" {
   vlans_enabled              = true
   vlans                      = ["/Common/external"]
 }
+
+resource "bigip_ltm_irule" "github923" {
+  name  = "/Common/github923-irule"
+  irule = <<EOF
+when CLIENT_ACCEPTED {
+     log local0. "test"
+}
+EOF
+}
+
+resource "bigip_ltm_virtual_server" "github923" {
+  name                         = "/Common/github923vs"
+  destination                  = "fe80::11"
+  description                  = "VirtualServer-test"
+  port                         = 9999
+  source_address_translation   = "automap"
+  ip_protocol                  = "tcp"
+  irules                       = [bigip_ltm_irule.github923.name]
+  profiles                     = ["/Common/http"]
+  client_profiles              = ["/Common/tcp"]
+  server_profiles              = ["/Common/tcp-lan-optimized"]
+  persistence_profiles         = ["/Common/source_addr", "/Common/hash"]
+  default_persistence_profile  = "/Common/hash"
+  fallback_persistence_profile = "/Common/dest_addr"
+}

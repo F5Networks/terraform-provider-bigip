@@ -363,9 +363,12 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
 	_ = d.Set("pool", vs.Pool)
-	if _, ok := d.GetOk("mask"); !ok {
+	if vs.Mask != "any" {
 		_ = d.Set("mask", vs.Mask)
+	} else {
+		_ = d.Set("mask", "0.0.0.0")
 	}
+	// _ = d.Set("mask", vs.Mask)
 
 	//	/* Service port is provided by the API in the destination attribute "/partition_name/virtual_server_address[%route_domain]:(port)"
 	//	   so we need to extract it
@@ -555,6 +558,10 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	var rules []string
 	if cfgRules, ok := d.GetOk("irules"); ok {
 		rules = listToStringSlice(cfgRules.([]interface{}))
+	} else {
+		if changed := d.HasChange("irules"); changed {
+			rules = listToStringSlice(append([]interface{}{}, ""))
+		}
 	}
 
 	var securityLogProfiles []string

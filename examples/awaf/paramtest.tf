@@ -9,7 +9,6 @@ data "bigip_waf_entity_parameter" "Param1" {
   perform_staging = true
 }
 
-
 data "bigip_waf_entity_parameter" "Param2" {
   name            = "Param2"
   type            = "explicit"
@@ -25,4 +24,15 @@ data "bigip_waf_entity_parameter" "Param3" {
   max_value_length = 30
   min_value_length = 15
   perform_staging = true
+}
+
+resource "bigip_waf_policy" "github925-awaf" {
+  name                 = "github925-awaf"
+  partition            = "Common"
+  template_name        = "POLICY_TEMPLATE_API_SECURITY"
+  application_language = "utf-8"
+  enforcement_mode     = "blocking"
+  description          = "Rapid Deployment-2"
+  server_technologies  = ["MySQL", "Unix/Linux", "MongoDB"]
+  parameters           = [data.bigip_waf_entity_parameter.Param1.json, data.bigip_waf_entity_parameter.Param2.json,data.bigip_waf_entity_parameter.Param3.json]
 }
