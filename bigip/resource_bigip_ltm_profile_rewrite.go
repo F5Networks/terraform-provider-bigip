@@ -55,6 +55,7 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			"ca_file": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				Description:  "Specifies a CA against which to verify signed Java applets signatures.",
 				ValidateFunc: validateF5Name,
 			},
@@ -67,12 +68,14 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			"signing_cert": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				Description:  "Specifies a certificate to use for re-signing of signed Java applets after patching.",
 				ValidateFunc: validateF5Name,
 			},
 			"signing_key": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				Description:  "Specifies a private key for re-signing of signed Java applets after patching.",
 				ValidateFunc: validateF5Name,
 			},

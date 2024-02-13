@@ -188,7 +188,6 @@ func resourceBigipLtmProfileRewriteUriRuleDelete(ctx context.Context, d *schema.
 func setUriRulesData(d *schema.ResourceData, data *bigip.RewriteProfileUriRule) {
 	_ = d.Set("rule_name", data.Name)
 	_ = d.Set("rule_type", data.Type)
-
 	var clList []interface{}
 	cl := make(map[string]interface{})
 	cl["host"] = data.Client.Host
@@ -214,24 +213,16 @@ func getUriRulesConfig(d *schema.ResourceData, config *bigip.RewriteProfileUriRu
 	server := d.Get("server")
 
 	for _, item := range client.(*schema.Set).List() {
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["host"].(string))
 		config.Client.Host = item.(map[string]interface{})["host"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["path"].(string))
 		config.Client.Path = item.(map[string]interface{})["path"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["scheme"].(string))
 		config.Client.Scheme = item.(map[string]interface{})["scheme"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["port"].(string))
 		config.Client.Port = item.(map[string]interface{})["port"].(string)
 	}
 
 	for _, item := range server.(*schema.Set).List() {
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["host"].(string))
 		config.Server.Host = item.(map[string]interface{})["host"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["path"].(string))
 		config.Server.Path = item.(map[string]interface{})["path"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["scheme"].(string))
 		config.Server.Scheme = item.(map[string]interface{})["scheme"].(string)
-		log.Printf("[DEBUG] Value:%+v", item.(map[string]interface{})["port"].(string))
 		config.Server.Port = item.(map[string]interface{})["port"].(string)
 	}
 	return config
