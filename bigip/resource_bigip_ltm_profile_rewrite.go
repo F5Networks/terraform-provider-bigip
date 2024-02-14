@@ -89,6 +89,7 @@ func resourceBigipLtmRewriteProfile() *schema.Resource {
 			"signing_key_password": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				Sensitive:    true,
 				Description:  "Specifies a pass phrase to use for encrypting the private signing key.",
 				ValidateFunc: validateF5Name,
@@ -263,32 +264,73 @@ func resourceBigipLtmProfileRewriteDelete(ctx context.Context, d *schema.Resourc
 }
 
 func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) diag.Diagnostics {
+
 	_ = d.Set("name", data.FullPath)
-	_ = d.Set("defaults_from", data.DefaultsFrom)
 	_ = d.Set("rewrite_mode", data.Mode)
-	_ = d.Set("ca_file", data.CaFile)
-	_ = d.Set("crl_file", data.CrlFile)
-	_ = d.Set("signing_cert", data.SigningCert)
-	_ = d.Set("signing_key", data.SigningKey)
-	_ = d.Set("signing_key_password", data.SigningKeyPass)
-	_ = d.Set("cache_type", data.CachingType)
-	_ = d.Set("split_tunneling", data.SplitTunnel)
-	_ = d.Set("rewrite_list", data.RewriteList)
-	_ = d.Set("bypass_list", data.BypassList)
+	if _, ok := d.GetOk("defaults_from"); ok {
+		_ = d.Set("defaults_from", data.DefaultsFrom)
+	}
+	if _, ok := d.GetOk("ca_file"); ok {
+		_ = d.Set("ca_file", data.CaFile)
+	}
+	if _, ok := d.GetOk("crl_file"); ok {
+		_ = d.Set("crl_file", data.CrlFile)
+	}
+	if _, ok := d.GetOk("signing_cert"); ok {
+		_ = d.Set("signing_cert", data.SigningCert)
+	}
+	if _, ok := d.GetOk("signing_key"); ok {
+		_ = d.Set("signing_key", data.SigningKey)
+	}
+	if _, ok := d.GetOk("signing_key_password"); ok {
+		_ = d.Set("signing_key_password", data.SigningKeyPass)
+	}
+	if _, ok := d.GetOk("cache_type"); ok {
+		_ = d.Set("cache_type", data.CachingType)
+	}
+	if _, ok := d.GetOk("split_tunneling"); ok {
+		_ = d.Set("split_tunneling", data.SplitTunnel)
+	}
+	if _, ok := d.GetOk("rewrite_list"); ok {
+		_ = d.Set("rewrite_list", data.RewriteList)
+	}
+	if _, ok := d.GetOk("bypass_list"); ok {
+		_ = d.Set("bypass_list", data.BypassList)
+	}
 	var reqList []interface{}
 	req := make(map[string]interface{})
-	req["insert_xfwd_for"] = data.Request.XfwdFor
-	req["insert_xfwd_host"] = data.Request.XfwdHost
-	req["insert_xfwd_protocol"] = data.Request.XfwdProtocol
-	req["rewrite_headers"] = data.Request.RewriteHeaders
+	if val, ok := d.GetOk("request"); ok {
+		for _, item := range val.(*schema.Set).List() {
+			if val, ok := item.(map[string]interface{})["insert_xfwd_for"].(string); ok && val != "" {
+				req["insert_xfwd_for"] = val
+			}
+			if val, ok := item.(map[string]interface{})["insert_xfwd_host"].(string); ok && val != "" {
+				req["insert_xfwd_host"] = val
+			}
+			if val, ok := item.(map[string]interface{})["insert_xfwd_protocol"].(string); ok && val != "" {
+				req["insert_xfwd_protocol"] = val
+			}
+			if val, ok := item.(map[string]interface{})["rewrite_headers"].(string); ok && val != "" {
+				req["rewrite_headers"] = val
+			}
+		}
+	}
 	reqList = append(reqList, req)
 	_ = d.Set("request", reqList)
 	var resList []interface{}
 	res := make(map[string]interface{})
-	res["rewrite_content"] = data.Response.RewriteContent
-	res["rewrite_headers"] = data.Response.RewriteHeaders
-	resList = append(resList, res)
-	_ = d.Set("response", resList)
+	if val, ok := d.GetOk("response"); ok {
+		for _, item := range val.(*schema.Set).List() {
+			if val, ok := item.(map[string]interface{})["rewrite_content"].(string); ok && val != "" {
+				res["rewrite_content"] = val
+			}
+			if val, ok := item.(map[string]interface{})["rewrite_headers"].(string); ok && val != "" {
+				res["rewrite_headers"] = val
+			}
+		}
+		resList = append(resList, res)
+		_ = d.Set("response", resList)
+	}
 	cookies := make([]interface{}, len(data.Cookies))
 	for i, v := range data.Cookies {
 		obj := make(map[string]interface{})
