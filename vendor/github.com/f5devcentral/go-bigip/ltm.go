@@ -1947,7 +1947,7 @@ type RewriteProfile struct {
 	CachingType    string                      `json:"clientCachingType,omitempty"`
 	SigningCert    string                      `json:"javaSigner,omitempty"`
 	SigningKey     string                      `json:"javaSignKey,omitempty"`
-	SigningKeyPass string                      `json:"javaSignKeyPassphrase,omitempty"`
+	SigningKeyPass string                      `json:"javaSignKeyPassphraseEncrypted,omitempty"`
 	SplitTunnel    string                      `json:"splitTunneling,omitempty"`
 	RewriteList    []string                    `json:"rewriteList,omitempty"`
 	BypassList     []string                    `json:"bypassList,omitempty"`

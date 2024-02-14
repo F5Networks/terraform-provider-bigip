@@ -80,7 +80,7 @@ resource "bigip_ltm_profile_rewrite" "test-profile2" {
 
 * `signing_key` - (Optional, type `string`) Specifies a certificate to use for re-signing of signed Java applets after patching. (name should be in full path which is combination of partition and key name )
 
-* `signing_key_password` - (Optional, type `string`) Specifies a pass phrase to use for encrypting the private signing key.
+* `signing_key_password` - (Optional, type `string`) Specifies a pass phrase to use for encrypting the private signing key. Since it's a sensitive entity idempotency will fail in the update call.
 
 * `split_tunneling` - (Optional,type `string`) Specifies the type of Client caching. Valid choices are: `true, false`
 
