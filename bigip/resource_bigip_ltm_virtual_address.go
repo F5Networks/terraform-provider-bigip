@@ -230,6 +230,6 @@ func modifyNameForRouteDomain(name string) string {
 		name = url.PathEscape(name)
 	}
 
-	fmt.Printf("[INFO] updated name %v", name)
+	log.Printf("[INFO] updated name %v", name)
 	return name
 }
