@@ -163,6 +163,10 @@ type FastHttpJson struct {
 	EndpointPolicyNames       []string       `json:"endpoint_policy_names,omitempty"`
 	AsmLoggingEnable          bool           `json:"enable_asm_logging"`
 	LogProfileNames           []string       `json:"log_profile_names,omitempty"`
+	AnalyticEnable            bool           `json:"enable_analytics"`
+	MakeAnalytic              bool           `json:"make_analytics_profile"`
+	HttpAnalyticProfileName   string         `json:"analytics_existing_http_profile"`
+	TCPAnalyticEnable         bool           `json:"use_existing_analytics_tcp_profile"`
 }
 
 type FastHttpPool struct {

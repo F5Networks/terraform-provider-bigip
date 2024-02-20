@@ -77,6 +77,11 @@ func resourceBigipHttpFastApp() *schema.Resource {
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"existing_snat_pool"},
 			},
+			"existing_http_analytic": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Select an existing HTTP Analytic profile",
+			},
 			"persistence_profile": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -422,6 +427,8 @@ func setFastHttpData(d *schema.ResourceData, data bigip.FastHttpJson) error {
 			return fmt.Errorf("error setting monitor: %w", err)
 		}
 	}
+
+	_ = d.Set("existing_http_analytic", data.HttpAnalyticProfileName)
 	// if _, ok := d.GetOk("service_discovery"); ok {
 	//	//_ = d.Set("service_discovery", data.ServiceDiscovery)
 	//	_ = d.Set("service_discovery", flattenFastServiceDiscovery(data.ServiceDiscovery))
@@ -676,6 +683,14 @@ func getFastHttpConfig(d *schema.ResourceData) (string, error) {
 	}
 	if p, ok := d.GetOk("load_balancing_mode"); ok {
 		httpJson.LoadBalancingMode = p.(string)
+	}
+	httpJson.AnalyticEnable = false
+	httpJson.MakeAnalytic = false
+	if v, ok := d.GetOk("existing_http_analytic"); ok {
+		httpJson.HttpAnalyticProfileName = v.(string)
+		httpJson.AnalyticEnable = true
+		httpJson.MakeAnalytic = false
+		httpJson.TCPAnalyticEnable = false
 	}
 	if p, ok := d.GetOk("slow_ramp_time"); ok {
 		httpJson.SlowRampTime = p.(int)
