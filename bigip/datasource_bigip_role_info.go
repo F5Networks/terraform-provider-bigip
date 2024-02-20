@@ -67,7 +67,6 @@ func dataSourceBigipRoleInfo() *schema.Resource {
 
 func dataSourceBigipRoleInfoRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	d.SetId("")
 	name := d.Get("name").(string)
 
 	roleInfo, err := client.GetRoleInfo(name)
