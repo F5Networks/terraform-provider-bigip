@@ -71,6 +71,8 @@ See [virtual server](#virtual-server) below for more details.
 
 * `snat_pool_address` - (Optional,`list`) List of address to be used for FAST-Generated SNAT Pool.
 
+* `existing_http_analytic` - (Optional,`string`) Profile name of existing BIG-IP AVR HTTP Analytics Profile.
+
 * `exist_pool_name` - (Optional,`string`) Name of an existing BIG-IP pool.
 
 * `pool_members` - (Optional,`set`) `pool_members` block takes input for FAST-Generated Pool.
