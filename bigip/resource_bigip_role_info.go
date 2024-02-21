@@ -57,7 +57,6 @@ func resourceBigipRoleInfo() *schema.Resource {
 			},
 			"line_order": {
 				Type:        schema.TypeInt,
-				Default:     0,
 				Required:    true,
 				Description: "The line order of the role info",
 			},
