@@ -144,7 +144,6 @@ func resourceBigipAs3() *schema.Resource {
 			"tenant_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Deprecated:  "this attribute is no longer in use",
 				Description: "Name of Tenant",
 			},
 			"tenant_filter": {
@@ -195,11 +194,18 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 
 	if perApplication && len(tenantList) == 0 {
-		tenant, err := GenerateRandomString(10)
-		log.Printf("[DEBUG] tenant name generated:%+v", tenant)
-		if err != nil {
-			return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
+		log.Printf("[INFO] Creating As3 config perApplication : tenant name :%+v", d.Get("tenant_name").(string))
+		var tenant string
+		if d.Get("tenant_name").(string) != "" {
+			tenant = d.Get("tenant_name").(string)
+		} else {
+			tenant, err = GenerateRandomString(10)
+			if err != nil {
+				return diag.FromErr(fmt.Errorf("could not generate random tenant name"))
+			}
 		}
+		log.Printf("[DEBUG] tenant name :%+v", tenant)
+
 		applicationList := client.GetAppsList(as3Json)
 		err, taskID := client.PostPerAppBigIp(as3Json, tenant)
 		log.Printf("[DEBUG] task Id from deployment :%+v", taskID)
@@ -207,12 +213,14 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
 		}
 		tenantCount = append(tenantCount, tenant)
+		_ = d.Set("tenant_filter", tenant)
+		_ = d.Set("tenant_name", tenant)
 		_ = d.Set("tenant_list", tenant)
 		_ = d.Set("task_id", taskID)
 		_ = d.Set("application_list", applicationList)
 		_ = d.Set("per_app_mode", true)
 	} else {
-		log.Printf("[INFO] Creating As3 config for tenants:%+v", tenantList)
+		log.Printf("[INFO] Creating As3 config traditionally for tenants:%+v", tenantList)
 		tenantCount := strings.Split(tenantList, ",")
 		if tenantFilter != "" {
 			log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
@@ -244,6 +252,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		log.Printf("[DEBUG] ID for resource :%+v", d.Get("tenant_list").(string))
 		_ = d.Set("task_id", taskID)
 		_ = d.Set("per_app_mode", false)
+		_ = d.Set("tenant_name", tenantList)
 	}
 
 	if !client.Teem {
@@ -353,7 +362,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 	if d.Get("per_app_mode").(bool) {
 		if perApplication && len(tenantList) == 0 {
-			oldTenantList := d.Get("tenant_list").(string)
+			oldTenantList := d.Id()
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
 			err, task_id := client.PostPerAppBigIp(as3Json, oldTenantList)
 			log.Printf("[DEBUG] task_id from PostPerAppBigIp:%+v", task_id)
@@ -363,6 +372,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			// tenantCount = append(tenantCount, tenant)
 			_ = d.Set("tenant_list", oldTenantList)
 			_ = d.Set("task_id", task_id)
+			_ = d.Set("tenant_filter", oldTenantList)
 		} else {
 			if !perApplication {
 				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))
@@ -371,7 +381,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			}
 		}
 	} else {
-		log.Printf("[INFO] Updating As3 Config for tenants:%s", tenantList)
+		log.Printf("[INFO] Updating As3 Config Traditionally for tenants:%s", tenantList)
 		oldTenantList := d.Get("tenant_list").(string)
 		tenantFilter := d.Get("tenant_filter").(string)
 		if tenantFilter == "" {
@@ -403,7 +413,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 		log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
 		if err != nil {
 			if successfulTenants == "" {
-				return diag.FromErr(fmt.Errorf("Error updating json  %s: %v", tenantList, err))
+				return diag.FromErr(fmt.Errorf("error updating json  %s: %v", tenantList, err))
 			}
 			_ = d.Set("tenant_list", successfulTenants)
 			if len(successfulTenants) != len(tenantList) {
@@ -411,8 +421,13 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			}
 		}
 		_ = d.Set("task_id", taskID)
+		_ = d.Set("tenant_name", tenantList)
 	}
-	createdTenants = d.Get("tenant_list").(string)
+	if d.Get("tenant_filter").(string) != "" {
+		createdTenants = d.Get("tenant_filter").(string)
+	} else {
+		createdTenants = d.Get("tenant_list").(string)
+	}
 	return resourceBigipAs3Read(ctx, d, meta)
 }
 
