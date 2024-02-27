@@ -144,7 +144,7 @@ func resourceBigipAs3() *schema.Resource {
 			"tenant_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Name of Tenant",
+				Description: "Name of Tenant. This name is used only in the case of Per-Application Deployment. If it is not provided, then a random name would be generated.",
 			},
 			"tenant_filter": {
 				Type:        schema.TypeString,
