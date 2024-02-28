@@ -25,6 +25,20 @@ resource "bigip_ltm_virtual_address" "test-va" {
 	traffic_group = "/Common/none"
 }
 `
+var TEST_VA_ROUTE_DOMAIN_CONFIG = `
+resource "bigip_ltm_virtual_address" "test-va" {
+	name            = "/Common/1.1.1.1%50"
+	advertize_route = "selective"
+	icmp_echo = "any"
+  }
+`
+var TEST_VA_ROUTE_DOMAIN_CHANGED_CONFIG = `
+resource "bigip_ltm_virtual_address" "test-va" {
+	name            = "/Common/1.1.1.1%50"
+	advertize_route = "selective"
+	icmp_echo = "selective"
+  }
+`
 var TEST_VA_RESOURCE = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME)
 var TEST_VA_RESOURCE_NAME_CHANGED = fmt.Sprintf(TEST_VA_CONFIG, TEST_VA_NAME_CHANGED)
 
@@ -48,6 +62,35 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVAExists(TEST_VA_NAME, false),
 					testCheckVAExists(TEST_VA_NAME_CHANGED, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmVATCIssue936(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckVAsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TEST_VA_ROUTE_DOMAIN_CONFIG,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVAExists("/Common/1.1.1.1%50", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_address.test-va", "name", "/Common/1.1.1.1%50"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_address.test-va", "icmp_echo", "any"),
+				),
+			},
+			{
+				Config:    TEST_VA_ROUTE_DOMAIN_CHANGED_CONFIG,
+				PreConfig: func() { testCheckVAExists(TEST_VA_NAME, true) },
+				Check: resource.ComposeTestCheckFunc(
+					testCheckVAExists("/Common/1.1.1.1%50", true),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_address.test-va", "name", "/Common/1.1.1.1%50"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_address.test-va", "icmp_echo", "selective"),
 				),
 			},
 		},
