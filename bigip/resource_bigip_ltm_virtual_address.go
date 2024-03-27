@@ -10,6 +10,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -175,7 +177,7 @@ func resourceBigipLtmVirtualAddressUpdate(ctx context.Context, d *schema.Resourc
 	client := meta.(*bigip.BigIP)
 
 	name := d.Id()
-
+	name = modifyNameForRouteDomain(name)
 	va := hydrateVirtualAddress(d)
 
 	err := client.ModifyVirtualAddress(name, va)
@@ -211,6 +213,7 @@ func resourceBigipLtmVirtualAddressDelete(ctx context.Context, d *schema.Resourc
 		d.SetId("")
 		return nil
 	}
+	name = modifyNameForRouteDomain(name)
 	err := client.DeleteVirtualAddress(name)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Delete Virtual Address  (%s) (%v)", name, err)
@@ -218,4 +221,15 @@ func resourceBigipLtmVirtualAddressDelete(ctx context.Context, d *schema.Resourc
 	}
 	d.SetId("")
 	return nil
+}
+
+func modifyNameForRouteDomain(name string) string {
+	if idx := strings.LastIndex(name, "/"); idx != -1 {
+		name = name[:idx+1] + url.PathEscape(name[idx+1:])
+	} else {
+		name = url.PathEscape(name)
+	}
+
+	log.Printf("[INFO] updated name %v", name)
+	return name
 }
