@@ -123,6 +123,7 @@ func Provider() *schema.Provider {
 			"bigip_fast_aws_service_discovery":    dataSourceBigipFastAwsServiceDiscovery(),
 			"bigip_fast_azure_service_discovery":  dataSourceBigipFastAzureServiceDiscovery(),
 			"bigip_fast_gce_service_discovery":    dataSourceBigipFastGceServiceDiscovery(),
+			"bigip_role_info":                     dataSourceBigipRoleInfo(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
@@ -193,6 +194,7 @@ func Provider() *schema.Provider {
 			"bigip_ltm_profile_bot_defense":         resourceBigipLtmProfileBotDefense(),
 			"bigip_ltm_profile_rewrite":             resourceBigipLtmRewriteProfile(),
 			"bigip_ltm_profile_rewrite_uri_rules":   resourceBigipLtmRewriteProfileUriRules(),
+			"bigip_role_info":                       resourceBigipRoleInfo(),
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {

@@ -298,6 +298,8 @@ const (
 	uriAvr             = "avr"
 	uriAuth            = "auth"
 	uriPartition       = "partition"
+	uriRemoteRole      = "remote-role"
+	uriRoleInfo        = "role-info"
 	uriFolder          = "folder"
 	uriIlx             = "ilx"
 	uriSyslog          = "syslog"
@@ -414,6 +416,17 @@ type Partition struct {
 	Name        string `json:"name,omitempty"`
 	RouteDomain int    `json:"defaultRouteDomain"`
 	Description string `json:"description,omitempty"`
+}
+
+type RoleInfo struct {
+	Name          string `json:"name,omitempty"`
+	Attribute     string `json:"attribute"`
+	Console       string `json:"console,omitempty"`
+	Deny          string `json:"deny,omitempty"`
+	Description   string `json:"description,omitempty"`
+	LineOrder     int    `json:"lineOrder"`
+	Role          string `json:"role,omitempty"`
+	UserPartition string `json:"userPartition,omitempty"`
 }
 
 // Certificates returns a list of certificates.
@@ -1030,7 +1043,7 @@ func (b *BigIP) UploadDataGroupFile(f *os.File, tmpName string) (*Upload, error)
 		return nil, err
 	}
 	log.Printf("tmpName:%+v", tmpName)
-	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, fmt.Sprintf("%s", tmpName))
+	return b.Upload(f, info.Size(), uriShared, uriFileTransfer, uriUploads, tmpName)
 }
 
 func (b *BigIP) CreateOCSP(ocsp *OCSP) error {
@@ -1096,4 +1109,31 @@ func (b *BigIP) DeletePartition(name string) error {
 func (b *BigIP) ModifyFolderDescription(partition string, body map[string]string) error {
 	partition = fmt.Sprintf("~%s", partition)
 	return b.patch(body, uriSys, uriFolder, partition)
+}
+
+func (b *BigIP) CreateRoleInfo(roleInfo *RoleInfo) error {
+	return b.post(roleInfo, uriAuth, uriRemoteRole, uriRoleInfo)
+}
+
+func (b *BigIP) GetRoleInfo(name string) (*RoleInfo, error) {
+	var roleInfo RoleInfo
+	err, ok := b.getForEntity(&roleInfo, uriAuth, uriRemoteRole, uriRoleInfo, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
+		return nil, nil
+	}
+
+	return &roleInfo, err
+}
+
+func (b *BigIP) ModifyRoleInfo(name string, roleInfo *RoleInfo) error {
+	return b.patch(roleInfo, uriAuth, uriRemoteRole, uriRoleInfo, name)
+}
+
+func (b *BigIP) DeleteRoleInfo(name string) error {
+	return b.delete(uriAuth, uriRemoteRole, uriRoleInfo, name)
 }
