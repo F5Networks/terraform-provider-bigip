@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -124,6 +125,9 @@ func testCheckPoolsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		pool, err := client.GetPool(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if pool != nil {

@@ -134,13 +134,13 @@ func resourceBigipLtmPoolRead(ctx context.Context, d *schema.ResourceData, meta 
 	_ = d.Set("name", name)
 	log.Println("[INFO] Reading pool " + name)
 	pool, err := client.GetPool(name)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	if pool == nil {
+	if err != nil && strings.Contains(err.Error(), "not found") {
 		log.Printf("[WARN] Pool (%s) not found, removing from state", d.Id())
 		d.SetId("")
 		return nil
+	}
+	if err != nil {
+		return diag.FromErr(err)
 	}
 	_ = d.Set("allow_nat", pool.AllowNAT)
 	_ = d.Set("allow_snat", pool.AllowSNAT)
