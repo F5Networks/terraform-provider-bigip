@@ -23,6 +23,7 @@ import (
 
 var p = 0
 var q sync.Mutex
+var unknownVariableValue = "74D93920-ED26-11E3-AC10-0800200C9A66"
 
 func resourceBigiqAs3() *schema.Resource {
 	return &schema.Resource{
@@ -81,6 +82,15 @@ func resourceBigiqAs3() *schema.Resource {
 					return json
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// when an attribute A uses reference to an attribute B from a different resource
+					// and B is the kind that is 'known after apply', the attribute is temporarily set to
+					// the value of unknownVariableValue as a placeholder. Not handling this case results
+					// in an error that reads like, 'Error: Provider produced inconsistent final plan'.
+					// More information about this can be found on a different github issue, here:
+					// https://github.com/hashicorp/terraform-provider-google/issues/12043
+					if new == unknownVariableValue && old != new {
+						return false
+					}
 					oldResp := []byte(old)
 					newResp := []byte(new)
 					oldJsonref := make(map[string]interface{})
