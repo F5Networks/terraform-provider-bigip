@@ -32,15 +32,15 @@ data "bigip_waf_entity_url" "WAFURL1" {
   }
   cross_domain_allowed_origins {
     include_subdomains = true
-    origin_name = "app1.com"
-    origin_port = "80"
-    origin_protocol = "http"
+    origin_name        = "app1.com"
+    origin_port        = "80"
+    origin_protocol    = "http"
   }
   cross_domain_allowed_origins {
     include_subdomains = true
-    origin_name = "app2.com"
-    origin_port = "443"
-    origin_protocol = "http"
+    origin_name        = "app2.com"
+    origin_port        = "443"
+    origin_protocol    = "http"
   }
 }
 
