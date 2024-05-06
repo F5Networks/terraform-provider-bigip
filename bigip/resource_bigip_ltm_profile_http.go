@@ -76,7 +76,7 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 			"encrypt_cookie_secret": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Specifies a passphrase for the cookie encryption",
+				Description: "Specifies a passphrase for the cookie encryption. Note: Since it's a sensitive entity idempotency will fail for it in the update call.",
 			},
 			"fallback_host": {
 				Type:        schema.TypeString,

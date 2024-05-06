@@ -61,7 +61,7 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `encrypt_cookies` - (Optional) Type the cookie names for the system to encrypt.
 
-* `encrypt_cookie_secret` - (Optional) Type a passphrase for cookie encryption.
+* `encrypt_cookie_secret` - (Optional) Type a passphrase for cookie encryption. Note: Since it's a sensitive entity idempotency will fail for it in the update call.
 
 * `insert_xforwarded_for` - (Optional) Specifies, when enabled, that the system inserts an X-Forwarded-For header in an HTTP request with the client IP address, to use with connection pooling. The default is `Disabled`.
 
