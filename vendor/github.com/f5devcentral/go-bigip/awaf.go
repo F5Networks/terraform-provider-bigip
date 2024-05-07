@@ -86,7 +86,7 @@ type WafUrlJsons struct {
 }
 
 type WafUrlAllowedOrigins struct {
-	IncludeSubdomains bool   `json:"includeSubdomains,omitempty"`
+	IncludeSubdomains bool   `json:"includeSubDomains,omitempty"`
 	OriginPort        string `json:"originPort,omitempty"`
 	OriginName        string `json:"originName,omitempty"`
 	OriginProtocol    string `json:"originProtocol,omitempty"`

@@ -77,7 +77,7 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 					},
 				},
 			},
-			"cross_domain_allowed_origins": {
+			"cross_origin_requests_enforcement": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -160,14 +160,14 @@ func dataSourceBigipWafEntityUrlRead(ctx context.Context, d *schema.ResourceData
 		urlJson.MethodsOverrideOnUrlCheck = true
 	}
 
-	allowedOriginsCount := d.Get("cross_domain_allowed_origins.#").(int)
+	allowedOriginsCount := d.Get("cross_origin_requests_enforcement.#").(int)
 	if allowedOriginsCount > 0 {
 		urlJson.HTML5CrossOriginRequestsEnforcement.EnforcementMode = "enforce"
 
 		allowedOrigins := make([]bigip.WafUrlAllowedOrigins, 0, allowedOriginsCount)
 		for i := 0; i < allowedOriginsCount; i++ {
 			var a bigip.WafUrlAllowedOrigins
-			prefix := fmt.Sprintf("cross_domain_allowed_origins.%d", i)
+			prefix := fmt.Sprintf("cross_origin_requests_enforcement.%d", i)
 			a.IncludeSubdomains = d.Get(prefix + ".include_subdomains").(bool)
 			a.OriginName = d.Get(prefix + ".origin_name").(string)
 			a.OriginPort = d.Get(prefix + ".origin_port").(string)

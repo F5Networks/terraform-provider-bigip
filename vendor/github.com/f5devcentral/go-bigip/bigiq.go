@@ -463,6 +463,14 @@ func tenantTrimToDelete(resp string) (string, error) {
 	jsonRef := make(map[string]interface{})
 	json.Unmarshal([]byte(resp), &jsonRef)
 
+	if jsonRef["declaration"].(map[string]interface{})["remark"] == nil {
+		delete(jsonRef["declaration"].(map[string]interface{}), "remark")
+	}
+
+	if jsonRef["declaration"].(map[string]interface{})["label"] == nil {
+		delete(jsonRef["declaration"].(map[string]interface{}), "label")
+	}
+
 	for key, value := range jsonRef {
 		if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
 			for k, v := range rec {

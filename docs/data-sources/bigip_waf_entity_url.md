@@ -30,13 +30,13 @@ data "bigip_waf_entity_url" "WAFURL1" {
     allow  = true
     method = "BDELETE"
   }
-  cross_domain_allowed_origins {
+  cross_origin_requests_enforcement {
     include_subdomains = true
     origin_name        = "app1.com"
     origin_port        = "80"
     origin_protocol    = "http"
   }
-  cross_domain_allowed_origins {
+  cross_origin_requests_enforcement {
     include_subdomains = true
     origin_name        = "app2.com"
     origin_port        = "443"
@@ -58,7 +58,7 @@ data "bigip_waf_entity_url" "WAFURL1" {
 * `method_overrides` - (Optional) A list of methods that are allowed or disallowed for a specific URL.
   * `allow` - (Required) Specifies that the system allows or disallows a method for this URL
   * `method` - (Required) Specifies an HTTP method.
-* `cross_domain_allowed_origins` - (Optional) A list of options that enables your web-application to share data with a website hosted on a
+* `cross_origin_requests_enforcement` - (Optional) A list of options that enables your web-application to share data with a website hosted on a
 different domain.
   * `include_subdomains` - (Required) Determines whether the subdomains are allowed to receive data from the web application.
   * `origin_name` - (Required) Specifies the name of the origin with which you want to share your data.
