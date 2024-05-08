@@ -85,6 +85,13 @@ type WafUrlJsons struct {
 	WafUrlJsons []WafUrlJson `json:"items"`
 }
 
+type WafUrlAllowedOrigins struct {
+	IncludeSubdomains bool   `json:"includeSubDomains,omitempty"`
+	OriginPort        string `json:"originPort,omitempty"`
+	OriginName        string `json:"originName,omitempty"`
+	OriginProtocol    string `json:"originProtocol,omitempty"`
+}
+
 type WafUrlJson struct {
 	Name                                string            `json:"name,omitempty"`
 	Description                         string            `json:"description,omitempty"`
@@ -100,7 +107,8 @@ type WafUrlJson struct {
 	ClickjackingProtection              bool              `json:"clickjackingProtection,omitempty"`
 	DisallowFileUploadOfExecutables     bool              `json:"disallowFileUploadOfExecutables,omitempty"`
 	HTML5CrossOriginRequestsEnforcement struct {
-		EnforcementMode string `json:"enforcementMode,omitempty"`
+		EnforcementMode string                 `json:"enforcementMode,omitempty"`
+		AllowerOrigins  []WafUrlAllowedOrigins `json:"crossDomainAllowedOrigin,omitempty"`
 	} `json:"html5CrossOriginRequestsEnforcement,omitempty"`
 	MandatoryBody      bool `json:"mandatoryBody,omitempty"`
 	URLContentProfiles []struct {
@@ -335,8 +343,8 @@ type Parameter struct {
 	SensitiveParameter             bool                     `json:"sensitiveParameter,omitempty"`
 	SignatureOverrides             []map[string]interface{} `json:"signatureOverrides,omitempty"`
 	URL                            interface{}              `json:"url,omitempty"`
-	MaximumLength		   		   int						`json:"maximumLength,omitempty"`
-	MinimumLength		   		   int						`json:"minimumLength,omitempty"`
+	MaximumLength                  int                      `json:"maximumLength,omitempty"`
+	MinimumLength                  int                      `json:"minimumLength,omitempty"`
 }
 
 func (b *BigIP) GetWafSignature(signatureid int) (*Signatures, error) {

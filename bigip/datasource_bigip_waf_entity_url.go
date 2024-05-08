@@ -77,6 +77,35 @@ func dataSourceBigipWafEntityUrl() *schema.Resource {
 					},
 				},
 			},
+			"cross_origin_requests_enforcement": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"include_subdomains": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     false,
+							Description: "Specifies whether the subdomains are allowed to receive data from the web application.",
+						},
+						"origin_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the name of the origin with which you want to share your data.",
+						},
+						"origin_port": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the port that other web applications are allowed to use to request data from your web application.",
+						},
+						"origin_protocol": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Specifies the protocol that other web applications are allowed to use to request data from your web application.",
+						},
+					},
+				},
+			},
 			"signature_overrides_disable": {
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -129,6 +158,24 @@ func dataSourceBigipWafEntityUrlRead(ctx context.Context, d *schema.ResourceData
 		m.Method = d.Get(prefix + ".method").(string)
 		urlJson.MethodOverrides = append(urlJson.MethodOverrides, m)
 		urlJson.MethodsOverrideOnUrlCheck = true
+	}
+
+	allowedOriginsCount := d.Get("cross_origin_requests_enforcement.#").(int)
+	if allowedOriginsCount > 0 {
+		urlJson.HTML5CrossOriginRequestsEnforcement.EnforcementMode = "enforce"
+
+		allowedOrigins := make([]bigip.WafUrlAllowedOrigins, 0, allowedOriginsCount)
+		for i := 0; i < allowedOriginsCount; i++ {
+			var a bigip.WafUrlAllowedOrigins
+			prefix := fmt.Sprintf("cross_origin_requests_enforcement.%d", i)
+			a.IncludeSubdomains = d.Get(prefix + ".include_subdomains").(bool)
+			a.OriginName = d.Get(prefix + ".origin_name").(string)
+			a.OriginPort = d.Get(prefix + ".origin_port").(string)
+			a.OriginProtocol = d.Get(prefix + ".origin_protocol").(string)
+			allowedOrigins = append(allowedOrigins, a)
+		}
+
+		urlJson.HTML5CrossOriginRequestsEnforcement.AllowerOrigins = allowedOrigins
 	}
 
 	jsonString, err := json.Marshal(urlJson)
