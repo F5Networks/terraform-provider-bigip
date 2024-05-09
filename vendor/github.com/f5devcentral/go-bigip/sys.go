@@ -831,6 +831,7 @@ func (b *BigIP) CreateTRAP(name string, authPasswordEncrypted string, authProtoc
 }
 
 func (b *BigIP) StartTransaction() (*Transaction, error) {
+	b.Transaction = ""
 	body := make(map[string]interface{})
 	resp, err := b.postReq(body, uriMgmt, uriTm, uriTransaction)
 
