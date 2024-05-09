@@ -555,15 +555,29 @@ func (b *BigIP) AddTeemAgent(body interface{}) (string, error) {
 }
 
 func (b *BigIP) CheckSetting() (bool, error) {
-
-	err, setting := b.getSetting(uriMgmt, uriShared, uriAppsvcs, uriSetting)
+	err, resp := b.getSetting(uriMgmt, uriShared, uriAppsvcs, uriSetting)
 	if err != nil {
 		return false, err
 	}
-	log.Printf("[INFO] BigIP Setting:%+v", setting)
-	perAppDeploymentAllowed := setting.BetaOptions.PerAppDeploymentAllowed
-
+	respRef := make(map[string]interface{})
+	json.Unmarshal(resp, &respRef)
+	perAppDeploymentAllowed := false
+	if value, ok := respRef["betaOptions"].(map[string]interface{}); ok { //for AS3 version < 3.5
+		perAppDeploymentAllowed = value["perAppDeploymentAllowed"].(bool)
+	} else if value, ok := respRef["perAppDeploymentAllowed"]; ok { // for As3 version 3.5
+		perAppDeploymentAllowed = value.(bool)
+	}
+	log.Printf("[INFO] BigIP Setting perAppDeploymentAllowed:%+v", perAppDeploymentAllowed)
 	return perAppDeploymentAllowed, nil
+
+	// err, setting := b.getSetting(uriMgmt, uriShared, uriAppsvcs, uriSetting)
+	// if err != nil {
+	// 	return false, err
+	// }
+	// log.Printf("[INFO] BigIP Setting:%+v", setting)
+	// perAppDeploymentAllowed := setting.BetaOptions.PerAppDeploymentAllowed
+
+	// return perAppDeploymentAllowed, nil
 }
 
 func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {
