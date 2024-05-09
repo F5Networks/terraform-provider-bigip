@@ -578,7 +578,7 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 	}
 }
 
-func (b *BigIP) getSetting(path ...string) (error, *BigIPSetting) {
+func (b *BigIP) getSetting(path ...string) (error, []byte) {
 	req := &APIRequest{
 		Method:      "get",
 		URL:         b.iControlPath(path),
@@ -586,22 +586,24 @@ func (b *BigIP) getSetting(path ...string) (error, *BigIPSetting) {
 	}
 
 	resp, err := b.APICall(req)
-	if err != nil {
-		var reqError RequestError
-		json.Unmarshal(resp, &reqError)
-		if reqError.Code == 404 {
-			return err, nil
-		}
-		return err, nil
-	}
+	return err, resp
 
-	var setting BigIPSetting
-	err = json.Unmarshal(resp, &setting)
-	if err != nil {
-		return err, nil
-	}
+	// if err != nil {
+	// 	var reqError RequestError
+	// 	json.Unmarshal(resp, &reqError)
+	// 	if reqError.Code == 404 {
+	// 		return err, nil
+	// 	}
+	// 	return err, nil
+	// }
 
-	return nil, &setting
+	// var setting BigIPSetting
+	// err = json.Unmarshal(resp, &setting)
+	// if err != nil {
+	// 	return err, nil
+	// }
+
+	// return nil, &setting
 }
 
 // Get a urlString and populate an entity. If the entity does not exist (404) then the
