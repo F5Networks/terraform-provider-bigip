@@ -144,11 +144,13 @@ func resourceBigipAs3() *schema.Resource {
 			"tenant_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of Tenant. This name is used only in the case of Per-Application Deployment. If it is not provided, then a random name would be generated.",
 			},
 			"tenant_filter": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of Tenant",
 			},
 			"tenant_list": {
@@ -220,7 +222,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		_ = d.Set("application_list", applicationList)
 		_ = d.Set("per_app_mode", true)
 	} else {
-		log.Printf("[INFO] Creating As3 config traditionally for tenants:%+v", tenantList)
+		log.Printf("[INFO] Creating AS3 config traditionally for tenants:%+v", tenantList)
 		tenantCount := strings.Split(tenantList, ",")
 		if tenantFilter != "" {
 			log.Printf("[DEBUG] tenantFilter:%+v", tenantFilter)
@@ -286,12 +288,13 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 }
 func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Reading As3 config")
+	log.Printf("[INFO] Reading AS3 config")
 	var name string
 	var tList string
 	as3Json := d.Get("as3_json").(string)
+	perappMode := d.Get("per_app_mode").(bool)
 	log.Printf("[INFO] AS3 config:%+v", as3Json)
-	if d.Get("as3_json") != nil {
+	if d.Get("as3_json") != nil && !perappMode {
 		tList, _, _ = client.GetTenantList(as3Json)
 		if createdTenants != "" && createdTenants != tList {
 			tList = createdTenants
