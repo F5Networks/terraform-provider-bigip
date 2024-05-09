@@ -43,13 +43,13 @@ resource "bigip_as3" "as3-example1" {
 
 # Per-Application Deployment - Example Usage for json file with tenant name
 resource "bigip_as3" "as3-example1" {
-  as3_json   = file("perApplication_example.json")
+  as3_json    = file("perApplication_example.json")
   tenant_name = "Test"
 }
 
 # Per-Application Deployment - Example Usage for json file without tenant name - Random tenant name is generated in this case
 resource "bigip_as3" "as3-example1" {
-  as3_json   = file("perApplication_example.json")
+  as3_json = file("perApplication_example.json")
 }
 ```
 
