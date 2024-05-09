@@ -84,6 +84,21 @@ resource "bigip_as3"  "as3-example" {
 }
 `
 
+var TestAs3Resourcegithub972 = `
+resource "bigip_as3" "issue972" {
+	as3_json        = file("` + dir + `/../examples/as3/issue972.json")
+	ignore_metadata = true
+}
+resource "bigip_as3" "perapp1" {
+	as3_json        = file("` + dir + `/../examples/as3/perappdeclaration1.json")
+	ignore_metadata = true
+}
+resource "bigip_as3" "perapp2" {
+	as3_json        = file("` + dir + `/../examples/as3/perappdeclaration2.json")
+	ignore_metadata = true
+}
+`
+
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -317,6 +332,29 @@ func TestAccBigipAs3Issue600(t *testing.T) {
 //	})
 // }
 
+func TestAccBigipAs3Issue972(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resourcegithub592,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+			{
+				Config: TestAs3Resourcegithub600,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("A1", true),
+				),
+			},
+		},
+	})
+}
 func TestAccBigipAs3_import_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
