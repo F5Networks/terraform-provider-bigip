@@ -112,15 +112,6 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 		Passphrase: passphrase,
 	}
 
-	t, err := client.StartTransaction()
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
-	}
-	err = client.AddKey(&keyCfg)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
-	}
-
 	cert := &bigip.Certificate{
 		Name:      certName,
 		Partition: partition,
@@ -132,6 +123,16 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 		cert.IssuerCert = val.(string)
 	}
 
+	mutex.Lock()
+	t, err := client.StartTransaction()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
+	}
+	err = client.AddKey(&keyCfg)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
+	}
+
 	err = client.UploadCertificate(certPath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while uploading the ssl cert: %v", err))
@@ -140,6 +141,7 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while ending transaction: %d", err))
 	}
+	mutex.Unlock()
 
 	if val, ok := d.GetOk("cert_ocsp"); ok {
 		certValidState := &bigip.CertValidatorState{Name: val.(string)}
@@ -218,15 +220,6 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 
 	keyFullPath := fmt.Sprintf("/%s/%s", partition, keyName)
 
-	t, err := client.StartTransaction()
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to start transaction: %s", err))
-	}
-	err = client.ModifyKey(keyFullPath, &keyCfg)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
-	}
-
 	cert := &bigip.Certificate{
 		Name:      certName,
 		Partition: partition,
@@ -237,6 +230,17 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 	if val, ok := d.GetOk("issuer_cert"); ok {
 		cert.IssuerCert = val.(string)
 	}
+
+	mutex.Lock()
+	t, err := client.StartTransaction()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while trying to start transaction: %s", err))
+	}
+	err = client.ModifyKey(keyFullPath, &keyCfg)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
+	}
+
 	if val, ok := d.GetOk("cert_ocsp"); ok {
 		certValidState := &bigip.CertValidatorState{Name: val.(string)}
 		certValidRef := &bigip.CertValidatorReference{}
@@ -252,6 +256,7 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error while trying to end transaction: %s", err))
 	}
+	mutex.Unlock()
 
 	return resourceBigipSSLKeyCertRead(ctx, d, meta)
 }
