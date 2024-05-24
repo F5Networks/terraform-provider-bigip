@@ -89,6 +89,32 @@ func TestAccBigipLtmProfileRequestLogTC2(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileRequestLogTC3(t *testing.T) {
+	t.Parallel()
+	var instName = "request-log-profile-tc3"
+	var testPartition = "Common"
+	var testRequestLogProfileName = fmt.Sprintf("/%s/%s", testPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resRequestLogName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckProfileRequestLogDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccBigipLtmProfileRequestLogTC3Config(testPartition, testRequestLogProfileName, instName),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckRequestLogExists(testRequestLogProfileName),
+					resource.TestCheckResourceAttr(resFullName, "name", testRequestLogProfileName),
+					resource.TestCheckResourceAttr(resFullName, "requestlog_template", "<134> ${TIME_MSECS} ${TIME_OFFSET} bigip_host=${BIGIP_HOSTNAME} type=request x-client-cert-subject=\"$X-Client-Cert-Subject\""),
+					resource.TestCheckResourceAttr(resFullName, "responselog_template", "<134> ${TIME_MSECS} ${TIME_OFFSET} bigip_host=${BIGIP_HOSTNAME} type=response x-client-cert-subject=\"$X-Client-Cert-Subject\""),
+				),
+			},
+		},
+	})
+}
+
 func testCheckRequestLogExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
@@ -144,6 +170,17 @@ func testAccBigipLtmProfileRequestLogTC2Config(partition, profileName, resourceN
 	requestlog_error_protocol  = "mds-tcp"
 	responselog_protocol       = "mds-tcp"
 	responselog_error_protocol = "mds-tcp"
+}`, partition, profileName, resourceName, resRequestLogName)
+}
+
+func testAccBigipLtmProfileRequestLogTC3Config(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`resource "%[4]s" "%[3]s" {
+	name           	= "%[2]s"
+	defaults_from   = "/%[1]s/request-log"
+	request_logging    = "enabled"
+	requestlog_template 	= "<134> $${TIME_MSECS} $${TIME_OFFSET} bigip_host=$${BIGIP_HOSTNAME} type=request x-client-cert-subject=\"$X-Client-Cert-Subject\""
+	response_logging    	= "enabled"
+	responselog_template 	= "<134> $${TIME_MSECS} $${TIME_OFFSET} bigip_host=$${BIGIP_HOSTNAME} type=response x-client-cert-subject=\"$X-Client-Cert-Subject\""
 }`, partition, profileName, resourceName, resRequestLogName)
 }
 
