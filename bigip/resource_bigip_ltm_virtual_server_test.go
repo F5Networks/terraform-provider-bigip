@@ -452,12 +452,12 @@ func TestAccBigipLtmVirtualServerTCIssue729(t *testing.T) {
 			{
 				Config: testaccBigipLtmVSImportIssue729(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists("/Common/test-vs-issue729"),
+					testCheckVSExists("/Common/test_vs_issue729"),
 				),
 			},
 			{
-				ResourceName:      "bigip_ltm_virtual_server.test_vs_issue729_import",
-				ImportStateId:     "/Common/test-vs-issue729",
+				ResourceName:      "bigip_ltm_virtual_server.test_vs_issue729",
+				ImportStateId:     "/Common/test_vs_issue729",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -531,7 +531,7 @@ resource "bigip_ltm_virtual_server" "test_vs_issue729" {
   name                     = "%s"
   trafficmatching_criteria = "/Common/test-virtualserver_VS_TMC_OBJ"
 }
-`, "/Common/test-vs-issue729")
+`, "/Common/test_vs_issue729")
 }
 
 func testCheckVSExists(name string) resource.TestCheckFunc {

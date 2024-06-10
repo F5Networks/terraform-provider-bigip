@@ -178,7 +178,7 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Optional: true,
 			},
 			"security_log_profiles": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
@@ -399,6 +399,13 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 	_ = d.Set("irules", makeStringList(&vs.Rules))
+
+	for i, s := range vs.SecurityLogProfiles {
+		if strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"") {
+			vs.SecurityLogProfiles[i] = strings.Trim(s, "\"")
+		}
+	}
+
 	_ = d.Set("security_log_profiles", makeStringList(&vs.SecurityLogProfiles))
 	_ = d.Set("per_flow_request_access_policy", vs.PerFlowRequestAccessPolicy)
 	_ = d.Set("description", vs.Description)
@@ -566,7 +573,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 
 	var securityLogProfiles []string
 	if cfgLogProfiles, ok := d.GetOk("security_log_profiles"); ok {
-		securityLogProfiles = listToStringSlice(cfgLogProfiles.([]interface{}))
+		securityLogProfiles = setToStringSlice(cfgLogProfiles.(*schema.Set))
 	}
 
 	config.SecurityLogProfiles = securityLogProfiles

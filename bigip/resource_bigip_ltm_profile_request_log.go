@@ -259,16 +259,16 @@ func resourceBigipLtmProfileRequestLogRead(ctx context.Context, d *schema.Resour
 		_ = d.Set("proxyrespond_on_loggingerror", pp.ProxyRespondOnLoggingError)
 	}
 	if _, ok := d.GetOk("response_logging"); ok {
-		_ = d.Set("response_logging", pp.RequestLogging)
+		_ = d.Set("response_logging", pp.ResponseLogging)
 	}
 	if _, ok := d.GetOk("responselog_template"); ok {
 		_ = d.Set("responselog_template", strings.ReplaceAll(pp.ResponseLogTemplate, `\"`, `"`))
 	}
 	if _, ok := d.GetOk("requestlog_error_template"); ok {
-		_ = d.Set("requestlog_error_template", pp.RequestLogTemplate)
+		_ = d.Set("requestlog_error_template", pp.RequestLogErrorTemplate)
 	}
 	if _, ok := d.GetOk("responselog_error_template"); ok {
-		_ = d.Set("responselog_error_template", pp.RequestLogTemplate)
+		_ = d.Set("responselog_error_template", pp.ResponseLogErrorTemplate)
 	}
 	// if _, ok := d.GetOk("request_chunking"); ok {
 	// 	_ = d.Set("request_chunking", pp.RequestChunking)
