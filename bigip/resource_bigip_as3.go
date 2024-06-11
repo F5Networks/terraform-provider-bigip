@@ -452,20 +452,33 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
 	}
 
-	if d.Id() != "" && tList != "" {
+	if d.Id() != "" && tList != "" && d.Get("tenant_filter") == "" {
 		name = tList
 	} else {
 		name = d.Id()
 	}
 	log.Printf("[INFO] Deleting As3 config for tenants:%+v", name)
-	err, failedTenants := client.DeleteAs3Bigip(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
-		return diag.FromErr(err)
-	}
-	if failedTenants != "" {
-		_ = d.Set("tenant_list", name)
-		return resourceBigipAs3Read(ctx, d, meta)
+	if d.Get("per_app_mode").(bool) {
+		applicationList := d.Get("application_list").(string)
+		log.Printf("[INFO] Deleting As3 config for Applications:%+v", applicationList)
+		for _, appName := range strings.Split(applicationList, ",") {
+			log.Printf("[INFO] Deleting AS3 for Application : %s", appName)
+			err := client.DeletePerApplicationAs3Bigip(name, appName)
+			if err != nil {
+				log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
+				return diag.FromErr(err)
+			}
+		}
+	} else {
+		err, failedTenants := client.DeleteAs3Bigip(name)
+		if err != nil {
+			log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
+			return diag.FromErr(err)
+		}
+		if failedTenants != "" {
+			_ = d.Set("tenant_list", name)
+			return resourceBigipAs3Read(ctx, d, meta)
+		}
 	}
 	d.SetId("")
 	return nil

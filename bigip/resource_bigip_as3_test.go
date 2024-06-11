@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -96,6 +97,28 @@ resource "bigip_as3" "perapp1" {
 resource "bigip_as3" "perapp2" {
 	as3_json        = file("` + dir + `/../examples/as3/perappdeclaration2.json")
 	ignore_metadata = true
+}
+`
+var TestAs3PerAppResource = `
+resource "bigip_as3"  "as3-example" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/perApplication_example.json")}"
+}
+`
+var TestAs3PerAppResource1 = `
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example1.json")}"
+}
+`
+var TestAs3PerAppResource2 = `
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example1.json")}"
+}
+resource "bigip_as3"  "as3-example2" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example2.json")}"
 }
 `
 
@@ -434,6 +457,46 @@ func testCheckAs3Exists(name string, exists bool) resource.TestCheckFunc {
 	}
 }
 
+func testCheckAS3AppExists(tenantName, appNames string, exists bool) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		clientBigip := testAccProvider.Meta().(*bigip.BigIP)
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client := &http.Client{Transport: tr}
+
+		for _, appName := range strings.Split(appNames, ",") {
+			url := clientBigip.Host + "/mgmt/shared/appsvcs/declare/" + tenantName + "/applications/" + appName
+			req, err := http.NewRequest("GET", url, nil)
+			if err != nil {
+				return fmt.Errorf("[ERROR] Error while creating http request with AS3 json: %v", err)
+			}
+			req.SetBasicAuth(clientBigip.User, clientBigip.Password)
+			req.Header.Set("Accept", "application/json")
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := client.Do(req)
+			if err != nil {
+				return err
+			}
+
+			defer func() {
+				if err := resp.Body.Close(); err != nil {
+					log.Printf("[DEBUG] Could not close the request to %s", url)
+				}
+			}()
+			var body bytes.Buffer
+			_, err = io.Copy(&body, resp.Body)
+			// body, err := ioutil.ReadAll(resp.Body)
+			bodyString := body.String()
+			if (resp.Status == "204 No Content" || err != nil || resp.StatusCode == 404) && exists {
+				return fmt.Errorf("[ERROR] Error while checking as3resource present in bigip :%s  %v", bodyString, err)
+			}
+		}
+
+		return nil
+	}
+}
+
 func TestAccBigipAs3_badJSON(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -463,4 +526,67 @@ func testCheckAs3Destroy(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func TestAccBigipPer_AppAs3_SingleTenant(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3PerAppResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "Application1,Application2", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipPer_AppAs3_update_addApplication(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3PerAppResource1,
+
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "path_app1", true),
+				),
+			},
+			{
+				Config: TestAs3PerAppResource2,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "path_app1,path_app2", true),
+				),
+			},
+		},
+	})
+}
+
+// Per-App mode is disabled
+func TestAccBigipPer_AppAs3_update_invalidJson(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      TestAs3PerAppResource1,
+				ExpectError: regexp.MustCompile("Invalid request value"),
+			},
+		},
+	})
 }
