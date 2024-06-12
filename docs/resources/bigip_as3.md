@@ -19,6 +19,13 @@ This resource is helpful to configure AS3 declarative JSON on BIG-IP.
 ~> For Deploying AS3 JSON in Per-App mode, this resource provided with a attribute [tenant_name](#tenant_name) to be passed to add application on specified tenant, else random tenant name will be generated.
 
 
+As3 Declaration can be deployed in Traditional way as well as Per-Application Way : 
+
+- Traditional Way - Entire Declaration needs to be passed in during the create and update call along with the tenant details in the declaration.
+- Per-Application Way - Only application details needs to be passed in the as3_json. Tenant name needs to be passed else random tenant name will be generated. 
+
+**Note:** : PerApplication needs to be turned `true` as a Prerequisite on the Big-IP (BIG-IP AS3 version >3.50) device. For details : <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/per-app-declarations.html>
+
 ## Example Usage 
 
 ```hcl
@@ -35,7 +42,33 @@ resource "bigip_as3" "as3-example1" {
 }
 ```
 
-## Example Usage for Per-App mode deployment
+# Per-Application Deployment - Example Usage for json file with tenant name
+resource "bigip_as3" "as3-example1" {
+  as3_json   = file("perApplication_example.json")
+  tenant_name = "Test"
+}
+
+# Per-Application Deployment - Example Usage for json file without tenant name - Tenant with Random name is generated in this case
+resource "bigip_as3" "as3-example1" {
+  as3_json   = file("perApplication_example.json")
+}
+
+# Per-Application Deployment - Delete Example
+resource "bigip_as3" "as3-example1" {
+  tenant_name = "Test"
+  as3_json   = file("as3_per_app_example1.json")
+
+}
+
+resource "bigip_as3" "as3-example2" {
+  tenant_name = "Test"
+  as3_json   = file("as3_per_app_example2.json")
+  
+}
+
+On running above 2 resources , we will be able to deploy Applications - `path_app1 , path_app2` on Tenant `Test`
+now, if we run `terraform destroy -target=bigip_as3.as3-example2` , only `path_app2` will be deleted from Tenant.   
+
 
 [perApplication as3](#perApplication_example)
 
@@ -200,35 +233,12 @@ resource "bigip_as3" "as3-example1" {
  
 ```json
 {
-    "schemaVersion": "3.50.1",
     "Application1": {
         "class": "Application",
         "service": {
             "class": "Service_HTTP",
             "virtualAddresses": [
-                "192.1.1.1"
-            ],
-            "pool": "pool"
-        },
-        "pool": {
-            "class": "Pool",
-            "members": [
-                {
-                    "servicePort": 80,
-                    "serverAddresses": [
-                        "192.0.1.10",
-                        "192.0.1.20"
-                    ]
-                }
-            ]
-        }
-    },
-    "Application2": {
-        "class": "Application",
-        "service": {
-            "class": "Service_HTTP",
-            "virtualAddresses": [
-                "192.1.2.1"
+                "192.0.2.1"
             ],
             "pool": "pool"
         },
@@ -240,6 +250,28 @@ resource "bigip_as3" "as3-example1" {
                     "serverAddresses": [
                         "192.0.2.10",
                         "192.0.2.20"
+                    ]
+                }
+            ]
+        }
+    },  
+    "Application2": {
+        "class": "Application",
+        "service": {
+            "class": "Service_HTTP",
+            "virtualAddresses": [
+                "192.0.3.2"
+            ],
+            "pool": "pool"
+        },
+        "pool": {
+            "class": "Pool",
+            "members": [
+                {
+                    "servicePort": 80,
+                    "serverAddresses": [
+                        "192.0.3.30",
+                        "192.0.3.40"
                     ]
                 }
             ]

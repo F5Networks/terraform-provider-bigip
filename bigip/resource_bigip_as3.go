@@ -294,7 +294,7 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	as3Json := d.Get("as3_json").(string)
 	perappMode := d.Get("per_app_mode").(bool)
 	log.Printf("[INFO] AS3 config:%+v", as3Json)
-	if d.Get("as3_json") != nil && !perappMode {
+	if d.Get("as3_json") != nil && !perappMode && d.Get("tenant_filter") == "" {
 		tList, _, _ = client.GetTenantList(as3Json)
 		if createdTenants != "" && createdTenants != tList {
 			tList = createdTenants
@@ -310,17 +310,7 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	log.Printf("[DEBUG] Applications in AS3 get call : %s", applicationList)
 	if name != "" {
 		as3Resp, err := client.GetAs3(name, applicationList, d.Get("per_app_mode").(bool))
-		if d.Get("per_app_mode").(bool) {
-			as3Json := make(map[string]interface{})
-			_ = json.Unmarshal([]byte(as3Resp), &as3Json)
-			out, _ := json.Marshal(as3Json)
-			as3Dec := string(out)
-			applicationList = client.GetAppsList(fmt.Sprintf("%v", as3Dec))
-			log.Printf("[DEBUG] Application List from retreived the GET call in Read function : %s", applicationList)
-			_ = d.Set("application_list", applicationList)
-		}
 
-		log.Printf("[DEBUG] AS3 json retreived from the GET call in Read function : %s", as3Resp)
 		if err != nil {
 			log.Printf("[ERROR] Unable to retrieve json ")
 			if err.Error() == "unexpected end of JSON input" {
@@ -336,7 +326,24 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 			// d.SetId("")
 			return nil
 		}
-		_ = d.Set("as3_json", as3Resp)
+
+		if d.Get("per_app_mode").(bool) {
+			as3Json := make(map[string]interface{})
+			filteredAs3Json := make(map[string]interface{})
+			_ = json.Unmarshal([]byte(as3Resp), &as3Json)
+			for _, value := range strings.Split(applicationList, ",") {
+				log.Printf("[DEBUG] Fetching  AS3 get for Application : %s", value)
+				filteredAs3Json[value] = as3Json[value]
+			}
+			filteredAs3Json["schemaVersion"] = as3Json["schemaVersion"]
+			out, _ := json.Marshal(filteredAs3Json)
+			filteredAs3String := string(out)
+			log.Printf("[DEBUG] AS3 GET call in Read function : %s", filteredAs3Json)
+			_ = d.Set("as3_json", filteredAs3String)
+		} else {
+			_ = d.Set("as3_json", as3Resp)
+		}
+
 		_ = d.Set("tenant_list", name)
 	} else if d.Get("task_id") != nil {
 		taskResponse, err := client.Getas3TaskResponse(d.Get("task_id").(string))
@@ -445,20 +452,33 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
 	}
 
-	if d.Id() != "" && tList != "" {
+	if d.Id() != "" && tList != "" && d.Get("tenant_filter") == "" {
 		name = tList
 	} else {
 		name = d.Id()
 	}
 	log.Printf("[INFO] Deleting As3 config for tenants:%+v", name)
-	err, failedTenants := client.DeleteAs3Bigip(name)
-	if err != nil {
-		log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
-		return diag.FromErr(err)
-	}
-	if failedTenants != "" {
-		_ = d.Set("tenant_list", name)
-		return resourceBigipAs3Read(ctx, d, meta)
+	if d.Get("per_app_mode").(bool) {
+		applicationList := d.Get("application_list").(string)
+		log.Printf("[INFO] Deleting As3 config for Applications:%+v", applicationList)
+		for _, appName := range strings.Split(applicationList, ",") {
+			log.Printf("[INFO] Deleting AS3 for Application : %s", appName)
+			err := client.DeletePerApplicationAs3Bigip(name, appName)
+			if err != nil {
+				log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
+				return diag.FromErr(err)
+			}
+		}
+	} else {
+		err, failedTenants := client.DeleteAs3Bigip(name)
+		if err != nil {
+			log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
+			return diag.FromErr(err)
+		}
+		if failedTenants != "" {
+			_ = d.Set("tenant_list", name)
+			return resourceBigipAs3Read(ctx, d, meta)
+		}
 	}
 	d.SetId("")
 	return nil

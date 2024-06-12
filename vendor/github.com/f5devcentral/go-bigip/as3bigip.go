@@ -580,6 +580,15 @@ func (b *BigIP) CheckSetting() (bool, error) {
 	// return perAppDeploymentAllowed, nil
 }
 
+func (b *BigIP) DeletePerApplicationAs3Bigip(tenantName string, applicationName string) error {
+
+	_, err := b.deleteReq(uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantName, uriApplications, applicationName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *BigIP) AddServiceDiscoveryNodes(taskid string, config []interface{}) error {
 	resp, err := b.postReq(config, uriMgmt, uriShared, "service-discovery", "task", taskid, "nodes")
 	if err != nil {
