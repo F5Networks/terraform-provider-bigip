@@ -22,7 +22,9 @@ This resource is helpful to configure AS3 declarative JSON on BIG-IP.
 As3 Declaration can be deployed in Traditional way as well as Per-Application Way : 
 
 - Traditional Way - Entire Declaration needs to be passed in during the create and update call along with the tenant details in the declaration.
-- Per-Application Way - Only Specific application/s details needs to be passed and rest application can be added in the update call , without passing the entire declaration. Tenant name needs to be passed else random tenant name will be generated.  PerApplication needs to be turned `true` as a Prerequisite on the Big-IP (BIG-IP AS3 version >3.50) device. For details : <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/per-app-declarations.html>
+- Per-Application Way - Only application details needs to be passed in the as3_json. Tenant name needs to be passed else random tenant name will be generated. 
+
+**Note:** : PerApplication needs to be turned `true` as a Prerequisite on the Big-IP (BIG-IP AS3 version >3.50) device. For details : <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/per-app-declarations.html>
 
 ## Example Usage 
 
@@ -64,7 +66,7 @@ resource "bigip_as3" "as3-example2" {
   
 }
 
-on running above 2 resources , we will be able to deploy Applications - `path_app1 , path_app2` on Tenant `Test`
+On running above 2 resources , we will be able to deploy Applications - `path_app1 , path_app2` on Tenant `Test`
 now, if we run `terraform destroy -target=bigip_as3.as3-example2` , only `path_app2` will be deleted from Tenant.   
 
 
