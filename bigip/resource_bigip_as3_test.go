@@ -470,7 +470,6 @@ func testCheckAS3AppExists(tenantName, appNames string, exists bool) resource.Te
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 		client := &http.Client{Transport: tr}
-
 		for _, appName := range strings.Split(appNames, ",") {
 			url := clientBigip.Host + "/mgmt/shared/appsvcs/declare/" + tenantName + "/applications/" + appName
 			req, err := http.NewRequest("GET", url, nil)
@@ -568,6 +567,8 @@ func TestAccBigipPer_AppAs3_update_addApplication(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("dmz", true),
 					testCheckAS3AppExists("dmz", "path_app1", true),
+					testCheckAs3Exists("dmztest", false),
+					testCheckAS3AppExists("dmztest", "path_app1", false),
 				),
 			},
 			{
