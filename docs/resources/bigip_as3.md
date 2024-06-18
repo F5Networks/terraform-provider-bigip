@@ -67,8 +67,20 @@ resource "bigip_as3" "as3-example2" {
 }
 
 On running above 2 resources , we will be able to deploy Applications - `path_app1 , path_app2` on Tenant `Test`
-now, if we run `terraform destroy -target=bigip_as3.as3-example2` , only `path_app2` will be deleted from Tenant.   
+now, if we run `terraform destroy -target=bigip_as3.as3-example2` , only `path_app2` will be deleted from Tenant. 
 
+
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example1.json")}"
+}
+
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example3.json")}"
+}
+
+On running above calls , first call will create 2 applications `path_app1 , path_app2` and second call , will remove `path_app2` from Tenant
 
 [perApplication as3](#perApplication_example)
 

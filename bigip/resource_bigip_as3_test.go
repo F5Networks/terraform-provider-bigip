@@ -122,6 +122,13 @@ resource "bigip_as3"  "as3-example2" {
 }
 `
 
+var TestAs3PerAppResource3 = `
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example3.json")}"
+}
+`
+
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -463,7 +470,6 @@ func testCheckAS3AppExists(tenantName, appNames string, exists bool) resource.Te
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 		client := &http.Client{Transport: tr}
-
 		for _, appName := range strings.Split(appNames, ",") {
 			url := clientBigip.Host + "/mgmt/shared/appsvcs/declare/" + tenantName + "/applications/" + appName
 			req, err := http.NewRequest("GET", url, nil)
@@ -561,6 +567,8 @@ func TestAccBigipPer_AppAs3_update_addApplication(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("dmz", true),
 					testCheckAS3AppExists("dmz", "path_app1", true),
+					testCheckAs3Exists("dmztest", false),
+					testCheckAS3AppExists("dmztest", "path_app1", false),
 				),
 			},
 			{
@@ -568,6 +576,35 @@ func TestAccBigipPer_AppAs3_update_addApplication(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAs3Exists("dmz", true),
 					testCheckAS3AppExists("dmz", "path_app1,path_app2", true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipPer_AppAs3_remove_Application(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3PerAppResource3,
+
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "path_app1", true),
+					testCheckAS3AppExists("dmz", "path_app2", true),
+				),
+			},
+			{
+				Config: TestAs3PerAppResource1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "path_app1", true),
+					testCheckAS3AppExists("dmz", "path_app2", false),
 				),
 			},
 		},

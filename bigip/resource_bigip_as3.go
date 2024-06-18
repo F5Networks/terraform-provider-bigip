@@ -363,6 +363,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
+	oldApplicationList := d.Get("application_list").(string)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
 	_ = d.Set("application_list", applicationList)
 	perApplication, err := client.CheckSetting()
@@ -373,6 +374,20 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	if d.Get("per_app_mode").(bool) {
 		if perApplication && len(tenantList) == 0 {
 			oldTenantList := d.Id()
+			log.Printf("[INFO] oldApplicationList :%s", oldApplicationList)
+			curApplicationList := client.GetAppsList(as3Json)
+			log.Printf("[INFO] curApplicationList :%s", curApplicationList)
+			for _, appName := range strings.Split(oldApplicationList, ",") {
+				if !strings.Contains(curApplicationList, appName) {
+					log.Printf("[INFO] Deleting As3 Config for Application:%s in Tenant:%v", appName, oldTenantList)
+					err := client.DeletePerApplicationAs3Bigip(oldTenantList, appName)
+					if err != nil {
+						log.Printf("[ERROR] Unable to DeleteContext: %v :", err)
+						return diag.FromErr(err)
+					}
+				}
+			}
+
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
 			err, task_id := client.PostPerAppBigIp(as3Json, oldTenantList)
 			log.Printf("[DEBUG] task_id from PostPerAppBigIp:%+v", task_id)
@@ -383,6 +398,8 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			_ = d.Set("tenant_list", oldTenantList)
 			_ = d.Set("task_id", task_id)
 			_ = d.Set("tenant_filter", oldTenantList)
+			_ = d.Set("application_list", curApplicationList)
+
 		} else {
 			if !perApplication {
 				return diag.FromErr(fmt.Errorf("Per-Application should be true in Big-IP Setting"))
