@@ -19,11 +19,10 @@ description: |-
 
 ```hcl
 resource "bigip_as3" "as3-example1" {
-  as3_json   = file("perApplication_example.json")
+  as3_json    = file("perApplication_example.json")
   tenant_name = "Test"
 }
 ```
-
 
 Example AS3 declaration for the PerApp mode of deployment
 
