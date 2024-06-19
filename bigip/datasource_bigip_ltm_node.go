@@ -149,6 +149,7 @@ func dataSourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, met
 
 	_ = d.Set("name", node.Name)
 	_ = d.Set("partition", node.Partition)
+	_ = d.Set("description", node.Description)
 	_ = d.Set("full_path", node.FullPath)
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)

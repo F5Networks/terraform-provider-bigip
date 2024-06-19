@@ -229,7 +229,7 @@ func resourceBigipLtmProfileRequestLogRead(ctx context.Context, d *schema.Resour
 		_ = d.Set("requestlog_error_pool", pp.RequestLogErrorPool)
 	}
 	if _, ok := d.GetOk("requestlog_template"); ok {
-		_ = d.Set("requestlog_template", pp.RequestLogTemplate)
+		_ = d.Set("requestlog_template", strings.ReplaceAll(pp.RequestLogTemplate, `\"`, `"`))
 	}
 	if _, ok := d.GetOk("requestlog_protocol"); ok {
 		_ = d.Set("requestlog_protocol", pp.RequestLogProtocol)
@@ -262,7 +262,7 @@ func resourceBigipLtmProfileRequestLogRead(ctx context.Context, d *schema.Resour
 		_ = d.Set("response_logging", pp.ResponseLogging)
 	}
 	if _, ok := d.GetOk("responselog_template"); ok {
-		_ = d.Set("responselog_template", pp.ResponseLogTemplate)
+		_ = d.Set("responselog_template", strings.ReplaceAll(pp.ResponseLogTemplate, `\"`, `"`))
 	}
 	if _, ok := d.GetOk("requestlog_error_template"); ok {
 		_ = d.Set("requestlog_error_template", pp.RequestLogErrorTemplate)
@@ -341,9 +341,9 @@ func getRequestLogProfileConfig(d *schema.ResourceData, config *bigip.RequestLog
 	config.ResponseLogErrorProtocol = d.Get("responselog_error_protocol").(string)
 	config.RequestLogging = d.Get("request_logging").(string)
 	config.ResponseLogging = d.Get("response_logging").(string)
-	config.RequestLogTemplate = d.Get("requestlog_template").(string)
+	config.RequestLogTemplate = strings.ReplaceAll(d.Get("requestlog_template").(string), `"`, `\"`)
 	config.RequestLogErrorTemplate = d.Get("requestlog_error_template").(string)
-	config.ResponseLogTemplate = d.Get("responselog_template").(string)
+	config.ResponseLogTemplate = strings.ReplaceAll(d.Get("responselog_template").(string), `"`, `\"`)
 	config.ResponseLogErrorTemplate = d.Get("responselog_error_template").(string)
 	config.ProxyResponse = d.Get("proxy_response").(string)
 	config.ProxyCloseOnError = d.Get("proxyclose_on_error").(string)

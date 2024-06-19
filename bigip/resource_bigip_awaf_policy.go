@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -344,6 +345,16 @@ func resourceBigipAwafPolicy() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				//Computed:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					oldResp := []byte(old)
+					newResp := []byte(new)
+					oldJsonref := make(map[string]interface{})
+					newJsonref := make(map[string]interface{})
+					_ = json.Unmarshal(oldResp, &oldJsonref)
+					_ = json.Unmarshal(newResp, &newJsonref)
+					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
+					return jsonEqualityBefore
+				},
 				Description: "The payload of the WAF Policy to be used for IMPORT on to BIGIP",
 			},
 			"policy_export_json": {

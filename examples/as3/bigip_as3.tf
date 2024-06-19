@@ -25,4 +25,10 @@ resource "bigip_as3" "as3-example1" {
   depends_on = ["null_resource.install_as3"]
 }
 
+// Per-Application Deployment example
+resource "bigip_as3" "as3-example1" {
+  as3_json   = file("perApplication_example.json")
+  tenant_name = "Test"
+}
+
 
