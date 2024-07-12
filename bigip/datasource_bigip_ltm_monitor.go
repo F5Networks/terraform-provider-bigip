@@ -103,6 +103,32 @@ func dataSourceBigipLtmMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "the database in which your user is created",
 			},
+
+			"base": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies the location in the LDAP tree from which the monitor starts the health check",
+			},
+			"filter": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies an LDAP key for which the monitor searches",
+			},
+			"mandatory_attributes": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies whether the target must include attributes in its response to be considered up. The options are no (Specifies that the system performs only a one-level search (based on the Filter setting), and does not require that the target returns any attributes.) and yes (Specifies that the system performs a sub-tree search, and if the target returns no attributes, the target is considered down.)",
+			},
+			"chase_referrals": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies whether the system will query the LDAP servers pointed to by any referrals in the query results.",
+			},
+			"security": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Specifies the secure communications protocol that the monitor uses to communicate with the target. The options are none (Specifies that the system does not use a security protocol for communications with the target.), ssl (Specifies that the system uses the SSL protocol for communications with the target.), and tls (Specifies that the system uses the TLS protocol for communications with the target.)",
+			},
 		},
 	}
 }
@@ -141,6 +167,11 @@ func dataSourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, 
 			_ = d.Set("username", m.Username)
 			_ = d.Set("name", name)
 			_ = d.Set("database", m.Database)
+			_ = d.Set("base", m.Base)
+			_ = d.Set("filter", m.Filter)
+			_ = d.Set("mandatory_attributes", m.MandatoryAttributes)
+			_ = d.Set("chase_referrals", m.ChaseReferrals)
+			_ = d.Set("security", m.Security)
 			d.SetId(m.FullPath)
 			return nil
 		}

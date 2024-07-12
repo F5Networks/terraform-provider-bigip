@@ -196,6 +196,32 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Optional:    true,
 				Description: "the ssl profile",
 			},
+
+			"base": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the location in the LDAP tree from which the monitor starts the health check",
+			},
+			"filter": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies an LDAP key for which the monitor searches",
+			},
+			"mandatory_attributes": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies whether the target must include attributes in its response to be considered up. The options are no (Specifies that the system performs only a one-level search (based on the Filter setting), and does not require that the target returns any attributes.) and yes (Specifies that the system performs a sub-tree search, and if the target returns no attributes, the target is considered down.)",
+			},
+			"chase_referrals": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies whether the system will query the LDAP servers pointed to by any referrals in the query results.",
+			},
+			"security": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the secure communications protocol that the monitor uses to communicate with the target. The options are none (Specifies that the system does not use a security protocol for communications with the target.), ssl (Specifies that the system uses the SSL protocol for communications with the target.), and tls (Specifies that the system uses the TLS protocol for communications with the target.)",
+			},
 		},
 	}
 }
@@ -287,6 +313,12 @@ func resourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, me
 			_ = d.Set("password", m.Password)
 			_ = d.Set("name", name)
 			_ = d.Set("database", m.Database)
+
+			_ = d.Set("base", m.Base)
+			_ = d.Set("filter", m.Filter)
+			_ = d.Set("mandatory_attributes", m.MandatoryAttributes)
+			_ = d.Set("chase_referrals", m.ChaseReferrals)
+			_ = d.Set("security", m.Security)
 			return nil
 		}
 	}
@@ -382,5 +414,10 @@ func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.M
 	config.Password = d.Get("password").(string)
 	config.UpInterval = d.Get("up_interval").(int)
 	config.SSLProfile = d.Get("ssl_profile").(string)
+	config.Base = d.Get("base").(string)
+	config.Filter = d.Get("filter").(string)
+	config.MandatoryAttributes = d.Get("mandatory_attributes").(string)
+	config.ChaseReferrals = d.Get("chase_referrals").(string)
+	config.Security = d.Get("security").(string)
 	return config
 }
