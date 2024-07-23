@@ -79,4 +79,4 @@ require (
 
 go 1.21.3
 
-replace github.com/f5devcentral/go-bigip => github.com/efellowsbg/go-bigip v0.0.0-20240614094559-88a99e648815
+replace github.com/f5devcentral/go-bigip => github.com/efellowsbg/go-bigip v0.0.0-20240722114513-87d79b3b166e

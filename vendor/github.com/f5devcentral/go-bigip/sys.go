@@ -313,6 +313,7 @@ const (
 	uriSslKey          = "ssl-key"
 	uriDataGroup       = "data-group"
 	uriTransaction     = "transaction"
+	uriWorkspace       = "workspace"
 	REST_DOWNLOAD_PATH = "/var/config/rest/downloads"
 )
 

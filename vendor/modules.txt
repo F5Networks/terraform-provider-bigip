@@ -42,7 +42,7 @@ github.com/apparentlymart/go-textseg/v13/textseg
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/f5devcentral/go-bigip v0.0.0-20240614094559-88a99e648815 => github.com/efellowsbg/go-bigip v0.0.0-20240614094559-88a99e648815
+# github.com/f5devcentral/go-bigip v0.0.0-20240614094559-88a99e648815 => github.com/efellowsbg/go-bigip v0.0.0-20240722114513-87d79b3b166e
 ## explicit; go 1.20
 github.com/f5devcentral/go-bigip
 # github.com/f5devcentral/go-bigip/f5teem v0.0.0-20240614094559-88a99e648815
@@ -400,4 +400,4 @@ google.golang.org/protobuf/types/known/timestamppb
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# github.com/f5devcentral/go-bigip => github.com/efellowsbg/go-bigip v0.0.0-20240614094559-88a99e648815
+# github.com/f5devcentral/go-bigip => github.com/efellowsbg/go-bigip v0.0.0-20240722114513-87d79b3b166e
