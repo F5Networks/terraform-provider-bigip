@@ -1067,6 +1067,12 @@ type Monitor struct {
 	RecvRow        string `json:"recvRow,omitempty"`
 	RecvColumn     string `json:"recvColumn,omitempty"`
 	SSLProfile     string `json:"sslProfile,omitempty"`
+	// ldap specifics
+	Base                string `json:"base,omitempty"`
+	Filter              string `json:"filter,omitempty"`
+	MandatoryAttributes string `json:"mandatoryAttributes,omitempty"`
+	ChaseReferrals      string `json:"chaseReferrals,omitempty"`
+	Security            string `json:"security,omitempty"`
 }
 
 type monitorDTO struct {
@@ -1100,6 +1106,12 @@ type monitorDTO struct {
 	RecvRow        string `json:"recvRow,omitempty"`
 	RecvColumn     string `json:"recvColumn,omitempty"`
 	SSLProfile     string `json:"sslProfile,omitempty"`
+	// ldap specifics
+	Base                string `json:"base,omitempty"`
+	Filter              string `json:"filter,omitempty"`
+	MandatoryAttributes string `json:"mandatoryAttributes,omitempty"`
+	ChaseReferrals      string `json:"chaseReferrals,omitempty"`
+	Security            string `json:"security,omitempty"`
 }
 
 type Profiles struct {

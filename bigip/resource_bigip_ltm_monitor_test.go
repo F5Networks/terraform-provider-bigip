@@ -22,6 +22,7 @@ var TestHttpsMonitorName = fmt.Sprintf("/%s/test-https-monitor", TestPartition)
 var TestFtpMonitorName = fmt.Sprintf("/%s/test-ftp-monitor", TestPartition)
 var TestUdpMonitorName = fmt.Sprintf("/%s/test-udp-monitor", TestPartition)
 var TestPostgresqlMonitorName = fmt.Sprintf("/%s/test-postgresql-monitor", TestPartition)
+var TestLDAPMonitorName = fmt.Sprintf("/%s/test-ldap-monitor", TestPartition)
 var TestGatewayIcmpMonitorName = fmt.Sprintf("/%s/test-gateway", TestPartition)
 var TestTcpHalfOpenMonitorName = fmt.Sprintf("/%s/test-tcp-half-open", TestPartition)
 
@@ -97,6 +98,17 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 }
 `
 
+var TestLDAPMonitorResource = `
+resource "bigip_ltm_monitor" "test-ldap-monitor" {
+    name = "` + TestLDAPMonitorName + `"
+    parent = "/Common/ldap"
+    interval          = 5
+    timeout           = 16
+    base              = "DC=company,DC=com"
+    filter            = "(cn=username)"
+    security          = "ssl"
+}
+`
 var TestGatewayIcmpMonitorResource = `
 resource "bigip_ltm_monitor" "test-gateway-icmp-monitor" {
   name        = "` + TestGatewayIcmpMonitorName + `"
@@ -292,6 +304,30 @@ func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
 		},
 	})
 }
+func TestAccBigipLtmMonitor_LDAPCreate(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestLDAPMonitorResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TestLDAPMonitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "parent", "/Common/ldap"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "filter", "(cn=username)"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "security", "ssl"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-ldap-monitor", "base", "DC=company,DC=com"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
