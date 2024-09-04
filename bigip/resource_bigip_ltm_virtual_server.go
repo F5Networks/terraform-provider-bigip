@@ -423,18 +423,20 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	_ = d.Set("translate_port", vs.TranslatePort)
 	_ = d.Set("firewall_enforced_policy", vs.FwEnforcedPolicy)
 
+	if len(vs.PersistenceProfiles) > 0 {
+		default_persistence := fmt.Sprintf("/%s/%s", vs.PersistenceProfiles[0].Partition, vs.PersistenceProfiles[0].Name)
+		_ = d.Set("default_persistence_profile", default_persistence)
+	}
 	profileNames := schema.NewSet(schema.HashString, make([]interface{}, 0, len(vs.PersistenceProfiles)))
 	for _, profile := range vs.PersistenceProfiles {
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
 		profileNames.Add(FullProfileName)
 	}
 	if profileNames.Len() > 0 {
-		if _, ok := d.GetOk("persistence_profiles"); ok {
-			_ = d.Set("persistence_profiles", profileNames)
-			_ = d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile)
-		}
+		_ = d.Set("persistence_profiles", profileNames)
 	}
 
+	_ = d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile)
 	_ = d.Set("source_port", vs.SourcePort)
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
 	profiles, err := client.VirtualServerProfiles(name)
