@@ -49,8 +49,6 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
-github.com/efellowsbg/go-bigip v0.0.0-20240722114513-87d79b3b166e h1:fagUV2hY9sVEdVDwAzBkBYuQDOudprnwL+uVesFTYQw=
-github.com/efellowsbg/go-bigip v0.0.0-20240722114513-87d79b3b166e/go.mod h1:HLnsBrKbf/r79YAoE0OCfON92IPW4L5ATYV7JUQnmSQ=
 github.com/emirpasic/gods v1.12.0 h1:QAUIPSaCu4G+POclxeqb3F+WPpdKqFGlw36+yOzGlrg=
 github.com/emirpasic/gods v1.12.0/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3ymbK86o=
 github.com/f5devcentral/go-bigip/f5teem v0.0.0-20240614094559-88a99e648815 h1:djBhjzmQzoU7Up3Mwr+CXCo2QswlkpNEapwWX339JxI=
