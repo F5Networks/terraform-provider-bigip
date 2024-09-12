@@ -77,9 +77,10 @@ func extensionSchema() *schema.Resource {
 				Computed:    true,
 				Description: "The computed hash of the uploaded files in the workspace. Used to determine if the files have changed and need to be uploaded",
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					iContent, _ := getFileContent(d.Get("index_source_path").(string), d.Get("index_source").(string), "", "")
-					pContent, _ := getFileContent(d.Get("package_source_path").(string), d.Get("package_source").(string), "", "")
-					currentHash := computeHash(iContent, pContent)
+					currentHash, err := getFileHash(d.Get("index_source_path").(string), d.Get("index_source").(string), "", "")
+					if err != nil {
+						log.Fatalf("Error getting file hash: %v", err)
+					}
 					return old == currentHash
 				},
 			},
@@ -118,82 +119,26 @@ func resourceBigIPILXWorkspaceCreate(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func handleExtensionCreate(ctx context.Context, ext *schema.ResourceData, client *bigip.BigIP) {
+func resourceBigIPILXWorkspaceUpdate(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
+	client := m.(*bigip.BigIP)
+	var iContent, pContent string
+	var err error
+	ext := d.Get("extension").(*schema.ResourceData)
 	opts := bigip.ExtensionConfig{
 		WorkspaceName: ext.Get("name").(string),
 		Name:          ext.Get("extension_name").(string),
 		Partition:     ext.Get("partition").(string),
 	}
-	client.CreateExtension(ctx, opts)
-	var iContent, pContent string
-	var err error
-	if iContent, err = handleSourcePath(ctx, ext, client, opts, "index_source_path", "index_source", client.WriteExtensionFile, bigip.IndexJS); err != nil {
-		log.Fatalf("Error handling index source: %v", err)
-	}
-	if pContent, err = handleSourcePath(ctx, ext, client, opts, "package_source_path", "package_source", client.WriteExtensionFile, bigip.PackageJSON); err != nil {
-		log.Fatalf("Error handling package source: %v", err)
+	if ext_block := d.Get("extension").(*schema.ResourceData); ext_block != nil {
+		if iContent, err = handleSourcePath(ctx, ext, opts, "index_source_path", "index_source", client.WriteExtensionFile, bigip.IndexJS); err != nil {
+			log.Fatalf("Error handling index source: %v", err)
+		}
+		if pContent, err = handleSourcePath(ctx, ext, opts, "package_source_path", "package_source", client.WriteExtensionFile, bigip.PackageJSON); err != nil {
+			log.Fatalf("Error handling package source: %v", err)
+		}
 	}
 	hash := computeHash(iContent, pContent)
-	ext.Set("file_hash", hash)
-	compositeId := fmt.Sprintf("%s:%s:%s", opts.WorkspaceName, opts.Name, opts.Partition)
-	ext.SetId(compositeId)
-}
-
-func handleSourcePath(ctx context.Context, ext *schema.ResourceData, client *bigip.BigIP, opts bigip.ExtensionConfig, pathKey, sourceKey string, writeFunc func(context.Context, bigip.ExtensionConfig, string, bigip.ExtensionFile) error, filename bigip.ExtensionFile) (string, error) {
-	var content string
-	var err error
-
-	if path := ext.Get(pathKey).(string); path != "" {
-		b, err := os.ReadFile(path)
-		content = string(b)
-		if err != nil {
-			return content, fmt.Errorf("Error reading %s: %v", pathKey, err)
-		}
-	} else if source := ext.Get(sourceKey).(string); source != "" {
-		content = source
-	}
-
-	if content != "" {
-		err = writeFunc(ctx, opts, content, filename)
-		if err != nil {
-			return content, fmt.Errorf("Error writing %s: %v", pathKey, err)
-		}
-	}
-
-	return content, nil
-}
-
-func getFileContent(ipath, icontent, ppath, pcontent string) (string, error) {
-	var iContent, pContent string
-	if ipath != "" {
-		b, err := os.ReadFile(ipath)
-		iContent = string(b)
-		if err != nil {
-			return "", fmt.Errorf("Error reading index source: %v", err)
-		}
-	} else if icontent != "" {
-		iContent = icontent
-	}
-	if ppath != "" {
-		b, err := os.ReadFile(ppath)
-		pContent = string(b)
-		if err != nil {
-			return "", fmt.Errorf("Error reading package source: %v", err)
-		} else if pcontent != "" {
-			pContent = pcontent
-		}
-	}
-	return computeHash(iContent, pContent), nil
-}
-
-func computeHash(iContent, pContent string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(iContent+pContent)))
-}
-
-func resourceBigIPILXWorkspaceUpdate(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
-	client := m.(*bigip.BigIP)
-	filehash := d.Get("file_hash").(string)
-
+	d.Set("file_hash", hash)
 	return nil
 }
 
@@ -205,4 +150,76 @@ func resourceBigIPILXWorkspaceDelete(ctx context.Context, d *schema.ResourceData
 	}
 	d.SetId("")
 	return nil
+}
+
+func getFileHash(ipath, icontent, ppath, pcontent string) (string, error) {
+	var iContent, pContent string
+	if ipath != "" {
+		b, err := os.ReadFile(ipath)
+		iContent = string(b)
+		if err != nil {
+			return "", fmt.Errorf("error reading index source: %v", err)
+		}
+	} else if icontent != "" {
+		iContent = icontent
+	}
+	if ppath != "" {
+		b, err := os.ReadFile(ppath)
+		pContent = string(b)
+		if err != nil {
+			return "", fmt.Errorf("error reading package source: %v", err)
+		} else if pcontent != "" {
+			pContent = pcontent
+		}
+	}
+	return computeHash(iContent, pContent), nil
+}
+
+func handleExtensionCreate(ctx context.Context, ext *schema.ResourceData, client *bigip.BigIP) {
+	opts := bigip.ExtensionConfig{
+		WorkspaceName: ext.Get("name").(string),
+		Name:          ext.Get("extension_name").(string),
+		Partition:     ext.Get("partition").(string),
+	}
+	client.CreateExtension(ctx, opts)
+	var iContent, pContent string
+	var err error
+	if iContent, err = handleSourcePath(ctx, ext, opts, "index_source_path", "index_source", client.WriteExtensionFile, bigip.IndexJS); err != nil {
+		log.Fatalf("Error handling index source: %v", err)
+	}
+	if pContent, err = handleSourcePath(ctx, ext, opts, "package_source_path", "package_source", client.WriteExtensionFile, bigip.PackageJSON); err != nil {
+		log.Fatalf("Error handling package source: %v", err)
+	}
+	hash := computeHash(iContent, pContent)
+	ext.Set("file_hash", hash)
+	compositeId := fmt.Sprintf("%s:%s:%s", opts.WorkspaceName, opts.Name, opts.Partition)
+	ext.SetId(compositeId)
+}
+
+func handleSourcePath(ctx context.Context, ext *schema.ResourceData, opts bigip.ExtensionConfig, pathKey, sourceKey string, writeFunc func(context.Context, bigip.ExtensionConfig, string, bigip.ExtensionFile) error, filename bigip.ExtensionFile) (string, error) {
+	var content string
+	var err error
+
+	if path := ext.Get(pathKey).(string); path != "" {
+		b, err := os.ReadFile(path)
+		content = string(b)
+		if err != nil {
+			return content, fmt.Errorf("error reading %s: %v", pathKey, err)
+		}
+	} else if source := ext.Get(sourceKey).(string); source != "" {
+		content = source
+	}
+
+	if content != "" {
+		err = writeFunc(ctx, opts, content, filename)
+		if err != nil {
+			return content, fmt.Errorf("error writing %s: %v", pathKey, err)
+		}
+	}
+
+	return content, nil
+}
+
+func computeHash(iContent, pContent string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(iContent+pContent)))
 }
