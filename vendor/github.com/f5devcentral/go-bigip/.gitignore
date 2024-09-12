@@ -1,0 +1,5 @@
+.idea
+*.iml
+*.back
+*.swp
+node_modules
