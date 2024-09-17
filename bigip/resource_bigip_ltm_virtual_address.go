@@ -130,7 +130,8 @@ func resourceBigipLtmVirtualAddressRead(ctx context.Context, d *schema.ResourceD
 	if va.FullPath != name {
 		return diag.FromErr(fmt.Errorf("virtual address %s not found", name))
 	}
-	log.Printf("[DEBUG] virtual address configured on bigip is :%v", vas)
+	log.Printf("[DEBUG] virtual address configured on bigip is :%+v", vas)
+
 	_ = d.Set("name", name)
 	_ = d.Set("arp", va.ARP)
 	_ = d.Set("auto_delete", va.AutoDelete)
