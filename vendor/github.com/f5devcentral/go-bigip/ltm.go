@@ -2808,7 +2808,7 @@ func (b *BigIP) VirtualAddressStatus(vaddr, state string) error {
 // ModifyVirtualAddress allows you to change any attribute of a virtual address. Fields that
 // can be modified are referenced in the VirtualAddress struct.
 func (b *BigIP) ModifyVirtualAddress(vaddr string, config *VirtualAddress) error {
-	return b.put(config, uriLtm, uriVirtualAddress, vaddr)
+	return b.patch(config, uriLtm, uriVirtualAddress, vaddr)
 }
 
 func (b *BigIP) DeleteVirtualAddress(vaddr string) error {
