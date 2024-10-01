@@ -247,6 +247,7 @@ func deleteVirtualDisk(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("error retrieving vCMP virtual disks: %v", err)
 	}
 
+	diskFound := false
 	for _, disk := range virtualDisks.Disks {
 		if strings.HasPrefix(disk.Name, diskName) {
 			name := strings.Replace(disk.Name, "/", "~", 1)
@@ -254,10 +255,11 @@ func deleteVirtualDisk(d *schema.ResourceData, meta interface{}) error {
 			if err != nil {
 				return fmt.Errorf("error deleting vCMP virtual disk: %v %v", diskName, err)
 			}
-		} else {
-			return fmt.Errorf("cannot find vCMP virtual disk: %v ", diskName)
+			diskFound := true
 		}
-
+	}
+	if !diskFound {
+		return fmt.Errorf("cannot find vCMP virtual disk: %v ", diskName)
 	}
 	return nil
 }
