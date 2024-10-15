@@ -8,18 +8,22 @@
         "id": "example-declaration-01",
         "label": "Sample 1",
         "remark": "Simple HTTP application with round robin pool",
-        "Sample_new": {
+        "Example_Bot_Def": {
             "class": "Tenant",
             "defaultRouteDomain": 0,
-            "Application_1": {
+            "Application_Bot": {
                 "class": "Application",
                 "template": "http",
                 "serviceMain": {
                     "class": "Service_HTTP",
+                    "virtualPort": 8080,
                     "virtualAddresses": [
                         "10.0.1.10"
                     ],
                     "pool": "web_pool"
+                },
+                "profileBotDefense": {
+                    "bigip": "/Common/bot-defense"
                 },
                 "web_pool": {
                     "class": "Pool",

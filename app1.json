@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "3.50.1",
+  "path_app1": {
+      "class": "Application",
+      "vs_name_app1": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+              "192.1.1.24"
+          ],
+          "pool": "pool"
+      },
+      "pool": {
+          "class": "Pool",
+          "members": [
+              {
+                  "servicePort": 80,
+                  "serverAddresses": [
+                      "192.20.1.10",
+                      "192.30.1.20"
+                  ]
+              }
+          ]
+      }
+  }
+}
+
+
