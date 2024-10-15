@@ -98,6 +98,7 @@ type ClientSSLProfile struct {
 	Generation               int    `json:"generation,omitempty"`
 	AlertTimeout             string `json:"alertTimeout,omitempty"`
 	AllowNonSsl              string `json:"allowNonSsl,omitempty"`
+	AllowExpiredCrl          string `json:"allowExpiredCrl,omitempty"`
 	Authenticate             string `json:"authenticate,omitempty"`
 	AuthenticateDepth        int    `json:"authenticateDepth,omitempty"`
 	C3dClientFallbackCert    string `json:"c3dClientFallbackCert,omitempty"`
