@@ -55,6 +55,10 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 
 * `ca_file` - (Optional) (Trusted Certificate Authorities)Specifies a client CA that the system trusts. The default is `None`.
 
+* `crl_file` - (Optional) Specifies the name of a file containing a list of revoked client certificates. The default is `None`.
+
+* `allow_expired_crl` - (Optional) Instructs the system to use the specified CRL file even if it has expired. The default is `disabled`.
+
 * `client_cert_ca` - (Optional)(Advertised Certificate Authorities)Specifies that the CAs that the system advertises to clients is being trusted by the profile. The default is `None`.
 
 * `renegotiation` - (Optional) Enables or disables SSL renegotiation.When creating a new profile, the setting is provided by the parent profile

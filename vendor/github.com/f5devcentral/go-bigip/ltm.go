@@ -98,6 +98,7 @@ type ClientSSLProfile struct {
 	Generation               int    `json:"generation,omitempty"`
 	AlertTimeout             string `json:"alertTimeout,omitempty"`
 	AllowNonSsl              string `json:"allowNonSsl,omitempty"`
+	AllowExpiredCrl          string `json:"allowExpiredCrl,omitempty"`
 	Authenticate             string `json:"authenticate,omitempty"`
 	AuthenticateDepth        int    `json:"authenticateDepth,omitempty"`
 	C3dClientFallbackCert    string `json:"c3dClientFallbackCert,omitempty"`
@@ -2808,7 +2809,7 @@ func (b *BigIP) VirtualAddressStatus(vaddr, state string) error {
 // ModifyVirtualAddress allows you to change any attribute of a virtual address. Fields that
 // can be modified are referenced in the VirtualAddress struct.
 func (b *BigIP) ModifyVirtualAddress(vaddr string, config *VirtualAddress) error {
-	return b.put(config, uriLtm, uriVirtualAddress, vaddr)
+	return b.patch(config, uriLtm, uriVirtualAddress, vaddr)
 }
 
 func (b *BigIP) DeleteVirtualAddress(vaddr string) error {

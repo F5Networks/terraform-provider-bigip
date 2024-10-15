@@ -278,14 +278,18 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Computed:    true,
 				Description: "(Advertised Certificate Authorities)Specifies that the CAs that the system advertises to clients is being trusted by the profile. The default is `None`",
 			},
-
 			"crl_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Certificate revocation file name",
 			},
-
+			"allow_expired_crl": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "allow_expired_crl option to be `enabled` / `disabled`.  Default is `disabled`.",
+			},
 			"forward_proxy_bypass_default_action": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -653,6 +657,9 @@ func resourceBigipLtmProfileClientSSLRead(ctx context.Context, d *schema.Resourc
 	if _, ok := d.GetOk("crl_file"); ok {
 		_ = d.Set("crl_file", obj.CrlFile)
 	}
+	if _, ok := d.GetOk("allow_expired_crl"); ok {
+		_ = d.Set("allow_expired_crl", obj.AllowExpiredCrl)
+	}
 	if _, ok := d.GetOk("forward_proxy_bypass_default_action"); ok {
 		_ = d.Set("forward_proxy_bypass_default_action", obj.ForwardProxyBypassDefaultAction)
 	}
@@ -891,6 +898,7 @@ func getClientSslConfig(d *schema.ResourceData, config *bigip.ClientSSLProfile) 
 	}
 	config.ClientCertCa = d.Get("client_cert_ca").(string)
 	config.CrlFile = d.Get("crl_file").(string)
+	config.AllowExpiredCrl = d.Get("allow_expired_crl").(string)
 	config.ForwardProxyBypassDefaultAction = d.Get("forward_proxy_bypass_default_action").(string)
 	config.GenericAlert = d.Get("generic_alert").(string)
 	config.HandshakeTimeout = d.Get("handshake_timeout").(string)
