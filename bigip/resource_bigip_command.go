@@ -61,7 +61,9 @@ func resourceBigipCommandCreate(ctx context.Context, d *schema.ResourceData, met
 	if d.Get("when").(string) == "apply" {
 		if m, ok := d.GetOk("commands"); ok {
 			for _, cmd := range m.([]interface{}) {
-				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", cmd.(string)))
+				// Handle edge case where command contains our quote character
+				escapedCmd := strings.ReplaceAll(cmd.(string), "'", "'\\''")
+				commandList = append(commandList, fmt.Sprintf("-c 'tmsh %s'", escapedCmd))
 			}
 		}
 		log.Printf("[INFO] Running TMSH Command : %v ", commandList)
