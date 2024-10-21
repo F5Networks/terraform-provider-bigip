@@ -159,11 +159,11 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 		Timeout int64 `json:"timeout"`
 	}
 
-	type timeoutResp struct {
-		Timeout struct {
-			Timeout int64
-		}
-	}
+	// type timeoutResp struct {
+	// 	Timeout struct {
+	// 		Timeout int64
+	// 	}
+	// }
 
 	auth := authReq{
 		bigipConfig.Username,
@@ -254,7 +254,7 @@ func NewTokenSession(bigipConfig *Config) (b *BigIP, err error) {
 		}
 		var tresp map[string]interface{}
 		errToken = json.Unmarshal(resp, &tresp)
-		if err != nil {
+		if errToken != nil {
 			return b, errToken
 		}
 		if time.Duration(int64(tresp["timeout"].(float64)))*time.Second != bigipConfig.ConfigOptions.TokenTimeout {
