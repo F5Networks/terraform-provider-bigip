@@ -1126,7 +1126,6 @@ func resourceBigipLtmPolicyCreate(ctx context.Context, d *schema.ResourceData, m
 
 	p := dataToPolicy(name, d)
 
-	d.SetId(name)
 	err := client.CreatePolicy(&p)
 	if err != nil {
 		return diag.FromErr(err)
@@ -1141,7 +1140,7 @@ func resourceBigipLtmPolicyCreate(ctx context.Context, d *schema.ResourceData, m
 	if t != nil {
 		return diag.FromErr(t)
 	}
-
+	d.SetId(name)
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()
