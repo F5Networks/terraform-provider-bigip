@@ -40,7 +40,7 @@ resource "bigip_ltm_pool" "pool" {
 
 * `allow_snat` - (Optional,type `string`) Specifies whether SNATs are automatically enabled or disabled for any connections using this pool,[ Default : `yes`, Possible Values `yes` or `no`].
 
-* `load_balancing_mode` - (Optional, type `string`) Specifies the load balancing method. The default is Round Robin.
+* `load_balancing_mode` - (Optional, type `string`) Specifies the load balancing method. The default is `round-robin`. Possible options: [`dynamic-ratio-member`,`dynamic-ratio-node`, `fastest-app-response`,`fastest-node`, `least-connections-members`,`least-connections-node`,`least-sessions`,`observed-member`,`observed-node`,`predictive-member`,`predictive-node`,`ratio-least-connections-member`,`ratio-least-connections-node`,`ratio-member`,`ratio-node`,`ratio-session`,`round-robin`,`weighted-least-connections-member`,`weighted-least-connections-node`]
 
 * `minimum_active_members` - (Optional, type `int`) Specifies whether the system load balances traffic according to the priority number assigned to the pool member,Default Value is `0` meaning `disabled`.
 

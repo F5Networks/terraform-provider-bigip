@@ -328,6 +328,12 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 		for _, node := range nodes.PoolMembers {
 			if expected == node.FullPath {
 				_ = d.Set("node", expected)
+				_ = d.Set("priority_group", node.PriorityGroup)
+				_ = d.Set("ratio", node.Ratio)
+				_ = d.Set("connection_limit", node.ConnectionLimit)
+				_ = d.Set("connection_rate_limit", node.RateLimit)
+				_ = d.Set("dynamic_ratio", node.DynamicRatio)
+				_ = d.Set("monitor", node.Monitor)
 				found = true
 				break
 			}
@@ -337,6 +343,12 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 		for _, node := range nodes.PoolMembers {
 			if expected == node.Name {
 				_ = d.Set("node", expected)
+				_ = d.Set("priority_group", node.PriorityGroup)
+				_ = d.Set("ratio", node.Ratio)
+				_ = d.Set("connection_limit", node.ConnectionLimit)
+				_ = d.Set("connection_rate_limit", node.RateLimit)
+				_ = d.Set("dynamic_ratio", node.DynamicRatio)
+				_ = d.Set("monitor", node.Monitor)
 				found = true
 				break
 			}
@@ -402,6 +414,13 @@ func resourceBigipLtmPoolAttachmentImport(ctx context.Context, d *schema.Resourc
 	found := false
 	for _, node := range nodes.PoolMembers {
 		if expectedNode == node.FullPath {
+			_ = d.Set("node", expectedNode)
+			_ = d.Set("priority_group", node.PriorityGroup)
+			_ = d.Set("ratio", node.Ratio)
+			_ = d.Set("connection_limit", node.ConnectionLimit)
+			_ = d.Set("connection_rate_limit", node.RateLimit)
+			_ = d.Set("dynamic_ratio", node.DynamicRatio)
+			_ = d.Set("monitor", node.Monitor)
 			found = true
 			break
 		}
@@ -410,9 +429,7 @@ func resourceBigipLtmPoolAttachmentImport(ctx context.Context, d *schema.Resourc
 	if !found {
 		return nil, fmt.Errorf("cannot locate node %s in pool %s", expectedNode, poolName)
 	}
-
 	_ = d.Set("pool", poolName)
-	_ = d.Set("node", expectedNode)
 
 	d.SetId(id)
 
