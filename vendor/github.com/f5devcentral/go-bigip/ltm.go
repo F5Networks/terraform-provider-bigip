@@ -2061,6 +2061,8 @@ const (
 	uriRequestLog      = "request-log"
 	uriSecurity        = "security"
 	uriBotDefense      = "bot-defense"
+	uriSaas            = "saas"
+	uriSaasBotDefense  = "bd"
 )
 
 var cidr = map[string]string{
@@ -4318,4 +4320,130 @@ func (b *BigIP) GetBotDefenseProfile(name string) (*BotDefenseProfile, error) {
 		return nil, nil
 	}
 	return &botDefenseProfile, nil
+}
+
+// {
+//     "name": "/Common/bd-test",
+//     "applicationId": "89fb0bfcb4bf4c578fad9adb37ce3b19",
+//     "tenantId": "a-aavN9vaYOV",
+//     "apiKey": "49840d1dd6fa4c4d86c88762eb398eee",
+//     "shapeProtectionPool": "/Common/cs1.pool",
+//     "sslProfile": "/Common/cloud-service-default-ssl",
+//     "protectedEndpointsReference": {
+//         "items": [
+//             {
+//                 "name": "pe1",
+//                 "host": "abc.com",
+//                 "endpoint": "/login",
+//                 "post": "enabled"
+//             }
+//         ]
+//     }
+// }
+
+type SaasBotDefenseProfile struct {
+	Name                              string `json:"name,omitempty"`
+	Partition                         string `json:"partition,omitempty"`
+	ApiHostname                       string `json:"apiHostname,omitempty"`
+	ApiKey                            string `json:"apiKey,omitempty"`
+	ApplicationId                     string `json:"applicationId,omitempty"`
+	TenantId                          string `json:"tenantId,omitempty"`
+	FullPath                          string `json:"fullPath,omitempty"`
+	DefaultsFrom                      string `json:"defaultsFrom,omitempty"`
+	Description                       string `json:"description,omitempty"`
+	ShapeProtectionPool               string `json:"shapeProtectionPool,omitempty"`
+	SslProfile                        string `json:"sslProfile,omitempty"`
+	ServiceLevel                      string `json:"serviceLevel,omitempty"`
+	LogLevel                          string `json:"logLevel,omitempty"`
+	TelemetryHeaderPrefix             string `json:"telemetryHeaderPrefix,omitempty"`
+	TelemetryRequestBodySize          int    `json:"telemetryRequestBodySize,omitempty"`
+	TlsFingerprint                    string `json:"tlsFingerprint,omitempty"`
+	DeploymentEnvironment             string `json:"deploymentEnvironment,omitempty"`
+	AllowBrowserAccess                string `json:"allowBrowserAccess,omitempty"`
+	SourceOfClientIpAddress           string `json:"sourceOfClientIpAddress,omitempty"`
+	UseSni                            string `json:"useSni,omitempty"`
+	UseProxy                          string `json:"useProxy,omitempty"`
+	IncludePostBody                   string `json:"includePostBody,omitempty"`
+	InjectJsInSpecificUrl             string `json:"injectJsInSpecificUrl,omitempty"`
+	InjectTelemetryJsInBodyTag        string `json:"injectTelemetryJsInBodyTag,omitempty"`
+	LocationForShapeJsInjection       string `json:"locationForShapeJsInjection,omitempty"`
+	JsMode                            string `json:"jsMode,omitempty"`
+	ShapeJsUrlOrPath                  string `json:"shapeJsUrlOrPath,omitempty"`
+	ShapeApiResponseTimeout           int    `json:"shapeApiResponseTimeout,omitempty"`
+	ProxyCloseOnError                 string `json:"proxyCloseOnError,omitempty"`
+	ProxyRespondOnLoggingError        string `json:"proxyRespondOnLoggingError,omitempty"`
+	ProxyResponse                     string `json:"proxyResponse,omitempty"`
+	ReportTransactionResult           string `json:"reportTransactionResult,omitempty"`
+	MitigationHandler                 string `json:"mitigationHandler,omitempty"`
+	MobileApiHostname                 string `json:"mobileApiHostname,omitempty"`
+	MobileSdkConfigFetchUrlAndroid    string `json:"mobileSdkConfigFetchUrlAndroid,omitempty"`
+	MobileSdkConfigFetchUrlIos        string `json:"mobileSdkConfigFetchUrlIos,omitempty"`
+	MobileMitigationHandler           string `json:"mobileMitigationHandler,omitempty"`
+	MobileApplicationsInScope         string `json:"mobileApplicationsInScope,omitempty"`
+	MobileBlockResponseCode           int    `json:"mobileBlockResponseCode,omitempty"`
+	MobileBlockResponseContentType    string `json:"mobileBlockResponseContentType,omitempty"`
+	MobileBlockResponseBody           string `json:"mobileBlockResponseBody,omitempty"`
+	WebApplicationsInScope            string `json:"webApplicationsInScope,omitempty"`
+	BigipHandlesJsInjections          string `json:"bigipHandlesJsInjections,omitempty"`
+	BlockResponseBody                 string `json:"blockResponseBody,omitempty"`
+	BlockResponseCode                 int    `json:"blockResponseCode,omitempty"`
+	BlockResponseContentType          string `json:"blockResponseContentType,omitempty"`
+	CorsSupport                       string `json:"corsSupport,omitempty"`
+	ExcludeJsInjectionFromSpecificUrl string `json:"excludeJsInjectionFromSpecificUrl,omitempty"`
+	LogRequestLoggingErrors           string `json:"logRequestLoggingErrors,omitempty"`
+	LogResponseByDefault              string `json:"logResponseByDefault,omitempty"`
+	LogResponseLoggingErrors          string `json:"logResponseLoggingErrors,omitempty"`
+	RequestLogging                    string `json:"requestLogging,omitempty"`
+	ResponseLogging                   string `json:"responseLogging,omitempty"`
+	LogPublisher                      string `json:"logPublisher,omitempty"`
+	RedirectResponseCode              int    `json:"redirectResponseCode,omitempty"`
+	MobileIncludePostBody             string `json:"mobileIncludePostBody,omitempty"`
+	ProtectedEndpointsReference       struct {
+		Items []ProtectedEndpoint `json:"items,omitempty"`
+	} `json:"protectedEndpointsReference,omitempty"`
+}
+
+// type SaasBotDefense struct {
+// 	Name                string              `json:"name,omitempty"`
+// 	ApplicationId       string              `json:"applicationId,omitempty"`
+// 	TenantId            string              `json:"tenantId,omitempty"`
+// 	ApiKey              string              `json:"apiKey,omitempty"`
+// 	ShapeProtectionPool string              `json:"shapeProtectionPool,omitempty"`
+// 	SslProfile          string              `json:"sslProfile,omitempty"`
+// 	ProtectedEndpoints  []ProtectedEndpoint `json:"protectedEndpointsReference,omitempty"`
+// }
+
+type ProtectedEndpoint struct {
+	Name     string `json:"name,omitempty"`
+	Host     string `json:"host,omitempty"`
+	Endpoint string `json:"endpoint,omitempty"`
+	Post     string `json:"post,omitempty"`
+}
+
+// AddSaasBotDefenseProfile creates a new Saas Bot Defense profile on the BIG-IP system.
+func (b *BigIP) AddSaasBotDefenseProfile(config *SaasBotDefenseProfile) error {
+	return b.post(config, uriSaas, uriSaasBotDefense, uriProfile)
+}
+
+// DeleteSaasBotDefenseProfile removes a Saas Bot Defense profile.
+func (b *BigIP) DeleteSaasBotDefenseProfile(name string) error {
+	return b.delete(uriSaas, uriSaasBotDefense, uriProfile, name)
+}
+
+// ModifySaasBotDefenseProfile allows you to change any attribute of a Saas Bot Defense profile.
+// Fields that can be modified are referenced in the SaasBotDefense struct.
+func (b *BigIP) ModifySaasBotDefenseProfile(name string, config *SaasBotDefenseProfile) error {
+	return b.patch(config, uriSaas, uriSaasBotDefense, uriProfile, name)
+}
+
+func (b *BigIP) GetSaasBotDefenseProfile(name string) (*SaasBotDefenseProfile, error) {
+	var saasBotDefense SaasBotDefenseProfile
+	err, ok := b.getForEntity(&saasBotDefense, uriSaas, uriSaasBotDefense, uriProfile, name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &saasBotDefense, nil
 }
