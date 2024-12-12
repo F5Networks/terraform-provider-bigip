@@ -4414,10 +4414,13 @@ type SaasBotDefenseProfile struct {
 // }
 
 type ProtectedEndpoint struct {
-	Name     string `json:"name,omitempty"`
-	Host     string `json:"host,omitempty"`
-	Endpoint string `json:"endpoint,omitempty"`
-	Post     string `json:"post,omitempty"`
+	Name             string `json:"name,omitempty"`
+	Host             string `json:"host,omitempty"`
+	Endpoint         string `json:"endpoint,omitempty"`
+	Post             string `json:"post,omitempty"`
+	Put              string `json:"put,omitempty"`
+	AnyMethod        string `json:"anyMethod,omitempty"`
+	MitigationAction string `json:"mitigationAction,omitempty"`
 }
 
 // AddSaasBotDefenseProfile creates a new Saas Bot Defense profile on the BIG-IP system.
@@ -4438,7 +4441,7 @@ func (b *BigIP) ModifySaasBotDefenseProfile(name string, config *SaasBotDefenseP
 
 func (b *BigIP) GetSaasBotDefenseProfile(name string) (*SaasBotDefenseProfile, error) {
 	var saasBotDefense SaasBotDefenseProfile
-	err, ok := b.getForEntity(&saasBotDefense, uriSaas, uriSaasBotDefense, uriProfile, name)
+	err, ok := b.getForEntity(&saasBotDefense, uriSaas, uriSaasBotDefense, uriProfile, name, "?expandSubcollections=true")
 	if err != nil {
 		return nil, err
 	}

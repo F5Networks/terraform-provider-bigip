@@ -28,73 +28,89 @@ func resourceBigipSaasBotDefenseProfile() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				Description:  "Unique name for the Bot Defense profile",
+				Description:  "Unique name for the Distributed Cloud Services Bot Defense profile",
 				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"defaults_from": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "/Common/bd",
-				Description:  "Specifies the profile from which this profile inherits settings. The default is the system-supplied `bd` profile",
+				Description:  "Distributed Cloud Services Bot Defense parent profile from which this profile will inherit settings.",
 				ValidateFunc: validateF5Name,
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Specifies descriptive text that identifies the BD profile.",
 			},
 			"application_id": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "User defined description for Bot Defense profile",
+				Sensitive:   true,
+				Description: "Specifies the Bot Defense API application ID, enter the value provided by F5 Support",
 			},
 			"tenant_id": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Specifies the tenant ID, enter the value provided by F5 Support",
 			},
 			"api_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Specifies the API key, enter the value provided by F5 Support.",
 			},
 			"shape_protection_pool": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Specifies the web hostname to which API requests are made",
 			},
 			"ssl_profile": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Specifies a server-side SSL profile that is different from what the application pool uses",
 			},
 			"protected_endpoints": {
 				Type:        schema.TypeList,
 				Required:    true,
-				Description: "User defined description for Bot Defense profile",
+				Description: "Use these settings to configure which pages on the website will be protected by BD",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: "User defined description for Bot Defense profile",
+							Description: "Unique name for the protected endpoint",
 						},
 						"host": {
 							Type:        schema.TypeString,
-							Required:    true,
-							Description: "User defined description for Bot Defense profile",
+							Optional:    true,
+							Computed:    true,
+							Description: "hostname or IP address of the web page to be protected by the Bot Defense",
 						},
 						"endpoint": {
 							Type:        schema.TypeString,
-							Required:    true,
-							Description: "User defined description for Bot Defense profile",
+							Optional:    true,
+							Computed:    true,
+							Description: "Specifies the path to the web page to be protected by BD. For example, `/login`.",
+						},
+						"mitigation_action": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "Specifies whether the BIG-IP or F5 XC Bot Defense handles mitigation of malicious HTTP requests. This field is enabled only if the Service Level field is set to Advanced/Premium",
 						},
 						"post": {
 							Type:        schema.TypeString,
-							Required:    true,
-							Description: "User defined description for Bot Defense profile",
+							Optional:    true,
+							Computed:    true,
+							Description: "POST field to protect the path when it has a POST method, `enabled` or `disabled`",
+						},
+						"put": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "PUT field to protect the path when it has a PUT method,`enabled` or `disabled`",
 						},
 					},
 				},
@@ -129,10 +145,15 @@ func resourceBigipSaasBotDefenseProfileRead(ctx context.Context, d *schema.Resou
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	log.Printf("[DEBUG] Bot Defense Profile config :%+v ", botProfile)
+	log.Printf("[DEBUG] Defense Profile Resp :%+v ", botProfile)
 	d.Set("name", botProfile.FullPath)
 	d.Set("defaults_from", botProfile.DefaultsFrom)
 	d.Set("description", botProfile.Description)
+	d.Set("tenant_id", botProfile.TenantId)
+	d.Set("api_key", botProfile.ApiKey)
+	d.Set("shape_protection_pool", botProfile.ShapeProtectionPool)
+	d.Set("ssl_profile", botProfile.SslProfile)
+	d.Set("protected_endpoints", flattenProtectedEndpointsReference(botProfile.ProtectedEndpointsReference.Items))
 	return nil
 }
 
@@ -178,15 +199,32 @@ func getSaasBotDefenseProfileConfig(d *schema.ResourceData, config *bigip.SaasBo
 	for _, endpoint := range d.Get("protected_endpoints").([]interface{}) {
 		ep := endpoint.(map[string]interface{})
 		protectEndpoint = append(protectEndpoint, bigip.ProtectedEndpoint{
-			Name:     ep["name"].(string),
-			Host:     ep["host"].(string),
-			Endpoint: ep["endpoint"].(string),
-			Post:     ep["post"].(string),
+			Name:             ep["name"].(string),
+			Host:             ep["host"].(string),
+			Endpoint:         ep["endpoint"].(string),
+			Post:             ep["post"].(string),
+			Put:              ep["put"].(string),
+			MitigationAction: ep["mitigation_action"].(string),
 		})
 	}
 	config.ProtectedEndpointsReference.Items = protectEndpoint
 	log.Printf("[INFO][getSaasBotDefenseProfileConfig] config:%+v ", config)
 	return config
+}
+
+func flattenProtectedEndpointsReference(data interface{}) []interface{} {
+	var prtctEndpt []interface{}
+	for _, ep := range data.([]bigip.ProtectedEndpoint) {
+		prtctEndpt = append(prtctEndpt, map[string]interface{}{
+			"name":              ep.Name,
+			"host":              ep.Host,
+			"endpoint":          ep.Endpoint,
+			"post":              ep.Post,
+			"put":               ep.Put,
+			"mitigation_action": ep.MitigationAction,
+		})
+	}
+	return prtctEndpt
 }
 
 // {
