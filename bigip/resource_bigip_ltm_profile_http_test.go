@@ -121,6 +121,47 @@ func TestAccBigipLtmProfileHttpUpdateServerAgent(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmProfileHttpUpdateFallbackHost(t *testing.T) {
+	t.Parallel()
+	var instName = "test-http-Update-fallbackhost"
+	var TestHttpName = fmt.Sprintf("/%s/%s", TestPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resHttpName, "http-profile-test")
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers: testAccProviders,
+		// CheckDestroy: testCheckHttpsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmprofilehttpDefaultConfig(TestPartition, TestHttpName, "http-profile-test"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpUpdateFallbackHost(TestPartition, TestHttpName, "http-profile-test"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+					resource.TestCheckResourceAttr(resFullName, "fallback_host", "https://www.google.de"),
+				),
+			},
+			{
+				Config: testaccbigipltmprofilehttpDefaultConfig(TestPartition, TestHttpName, "http-profile-test"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckhttpExists(TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "name", TestHttpName),
+					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-FallbackHost"
@@ -540,6 +581,16 @@ resource "bigip_ltm_profile_http" "%[3]s" {
   name              = "%[2]s"
   defaults_from     = "/%[1]s/http"
   server_agent_name = "myBIG-IP"
+}
+`, partition, profileName, resourceName)
+}
+
+func testaccbigipltmprofilehttpUpdateFallbackHost(partition, profileName, resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_profile_http" "%[3]s" {
+  name              = "%[2]s"
+  defaults_from     = "/%[1]s/http"
+  fallback_host = "https://www.google.de"
 }
 `, partition, profileName, resourceName)
 }

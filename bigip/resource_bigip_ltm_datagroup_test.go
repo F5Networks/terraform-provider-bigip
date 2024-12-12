@@ -30,6 +30,15 @@ var TestDatagroupStringResource = `
                 }
         }`
 
+var TestExternalDatagroupResource = `
+resource "bigip_ltm_datagroup" "test-datagroup-string" {
+		name = "` + TestDatagroupName + `"
+		type = "string"
+		internal = false
+		records_src = "foo.bars"
+		
+}`
+
 var TestDatagroupIpResource = `
 	resource "bigip_ltm_datagroup" "test-datagroup-ip" {
 		name = "` + TestDatagroupName + `"
@@ -68,6 +77,24 @@ func TestAccBigipLtmDataGroup_Create_TypeString(t *testing.T) {
 				Config: TestDatagroupStringResource,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckDataGroupExists(TestDatagroupName),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmDataGroup_Create_External(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestExternalDatagroupResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckExternalDataGroupExists(TestDatagroupName),
 				),
 			},
 		},
@@ -179,6 +206,22 @@ func testCheckDataGroupExists(name string) resource.TestCheckFunc {
 		}
 
 		datagroupName := fmt.Sprintf("/%s/%s", datagroup.Partition, datagroup.Name)
+		if datagroupName != name {
+			return fmt.Errorf("Data Group name does not match. Expecting %s got %s ", name, datagroupName)
+		}
+		return nil
+	}
+}
+
+func testCheckExternalDataGroupExists(name string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		client := testAccProvider.Meta().(*bigip.BigIP)
+		datagroup, err := client.GetExternalDataGroup(name)
+		if err != nil {
+			return fmt.Errorf("Error while fetching Data Group: %v ", err)
+
+		}
+		datagroupName := datagroup.FullPath
 		if datagroupName != name {
 			return fmt.Errorf("Data Group name does not match. Expecting %s got %s ", name, datagroupName)
 		}
