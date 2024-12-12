@@ -162,38 +162,7 @@ func TestAccBigipLtmProfileHttpUpdateFallbackHost(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmProfileHttpUpdateFallbackhost(t *testing.T) {
-	t.Parallel()
-	var instName = "test-http-Update-FallbackHost"
-	var instFullName = fmt.Sprintf("/%s/%s", TestPartition, instName)
-	resFullName := fmt.Sprintf("%s.%s", resHttpName, instName)
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckHttpsDestroyed,
-		Steps: []resource.TestStep{
-			{
-				Config: testaccbigipltmprofilehttpUpdateParam(instName, ""),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
-					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
-					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-				),
-			},
-			{
-				Config: testaccbigipltmprofilehttpUpdateParam(instName, "fallback_host"),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckhttpExists(instFullName),
-					resource.TestCheckResourceAttr(resFullName, "name", instFullName),
-					resource.TestCheckResourceAttr(resFullName, "defaults_from", "/Common/http"),
-					resource.TestCheckResourceAttr(resFullName, "fallback_host", "titanic"),
-				),
-			},
-		},
-	})
-}
+
 func TestAccBigipLtmProfileHttpUpdateBasicAuthRealm(t *testing.T) {
 	t.Parallel()
 	var instName = "test-http-Update-BasicAuthRealm"
