@@ -79,9 +79,9 @@ func resourceBigipLtmProfileHttp() *schema.Resource {
 				Description: "Specifies a passphrase for the cookie encryption. Note: Since it's a sensitive entity idempotency will fail for it in the update call.",
 			},
 			"fallback_host": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				// Computed:    true,
 				Description: "Specifies an HTTP fallback host. HTTP redirection allows you to redirect HTTP traffic to another protocol identifier, host name, port number, or URI path.",
 			},
 			"fallback_status_codes": {
@@ -468,7 +468,12 @@ func getHttpProfileConfig(d *schema.ResourceData, config *bigip.HttpProfile) *bi
 	config.Description = d.Get("description").(string)
 	config.EncryptCookieSecret = d.Get("encrypt_cookie_secret").(string)
 	config.EncryptCookies = setToStringSlice(d.Get("encrypt_cookies").(*schema.Set))
-	config.FallbackHost = d.Get("fallback_host").(string)
+	if _, ok := d.GetOk("fallback_host"); ok {
+		config.FallbackHost = d.Get("fallback_host").(string)
+	} else {
+		config.FallbackHost = ""
+	}
+
 	config.FallbackStatusCodes = setToStringSlice(d.Get("fallback_status_codes").(*schema.Set))
 	config.HeaderErase = d.Get("head_erase").(string)
 	config.HeaderInsert = d.Get("head_insert").(string)
