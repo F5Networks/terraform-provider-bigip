@@ -558,7 +558,7 @@ func testaccbigipltmprofilehttpUpdateFallbackHost(partition, profileName, resour
 resource "bigip_ltm_profile_http" "%[3]s" {
   name              = "%[2]s"
   defaults_from     = "/%[1]s/http"
-  fallback_host = "https://www.google.de"
+  fallback_host     = "https://www.google.de"
 }
 `, partition, profileName, resourceName)
 }
