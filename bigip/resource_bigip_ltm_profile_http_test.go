@@ -21,11 +21,11 @@ var resHttpName = "bigip_ltm_profile_http"
 
 var TestHttpResource = `
 resource "bigip_ltm_profile_http" "test-http" {
-  name = "/Common/test-http"
-  defaults_from = "/Common/http"
-  description = "some http"
-  fallback_host = "titanic"
-  fallback_status_codes = ["400","500","300"]
+  name                  = "/Common/test-http"
+  defaults_from         = "/Common/http"
+  description           = "some http"
+  fallback_host         = "titanic"
+  fallback_status_codes = ["400", "500", "300"]
 }
 `
 
@@ -556,9 +556,9 @@ resource "bigip_ltm_profile_http" "%[3]s" {
 func testaccbigipltmprofilehttpUpdateFallbackHost(partition, profileName, resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_profile_http" "%[3]s" {
-  name              = "%[2]s"
-  defaults_from     = "/%[1]s/http"
-  fallback_host     = "https://www.google.de"
+  name          = "%[2]s"
+  defaults_from = "/%[1]s/http"
+  fallback_host = "https://www.google.de"
 }
 `, partition, profileName, resourceName)
 }
