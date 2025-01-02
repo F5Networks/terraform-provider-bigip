@@ -33,14 +33,14 @@ jobs:
         name: Import GPG key
         id: import_gpg
         # see https://github.com/hashicorp/terraform-provider-scaffolding/issues/22
-        uses: crazy-max/ghaction-import-gpg@v6.1.0
+        uses: crazy-max/ghaction-import-gpg@v6.2.0
         with:
           # These secrets will need to be configured for the repository:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
       -
         name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6.0.0
+        uses: goreleaser/goreleaser-action@v6.1.0
         with:
           version: v1.25.1
           args: release --rm-dist
