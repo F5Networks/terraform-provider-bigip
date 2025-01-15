@@ -129,6 +129,60 @@ resource "bigip_as3"  "as3-example1" {
 }
 `
 
+var TestAs3ControlParamDryRunTrue = `
+resource "bigip_as3"  "as3-controls" {
+    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}"
+	controls = {
+		dry_run = "yes"
+	}
+}
+`
+
+var TestAs3ControlParamDryRunFalse = `
+resource "bigip_as3"  "as3-controls" {
+    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}"
+	controls = {
+		dry_run = "no"
+	}
+}
+`
+
+func TestAccBigipAs3ControlsDryRunTrue(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3ControlParamDryRunTrue,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01", false),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ControlsDryRunFalse(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3ControlParamDryRunFalse,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01", true),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipAs3_create_SingleTenant(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

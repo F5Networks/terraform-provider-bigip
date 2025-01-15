@@ -20,6 +20,7 @@ import (
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
 	uuid "github.com/google/uuid"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
@@ -135,6 +136,15 @@ func resourceBigipAs3() *schema.Resource {
 					return
 				},
 			},
+			"controls": {
+				Type: schema.TypeMap,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:         true,
+				Description:      "Controls parameters for AS3, you can use the following parameters, dry_run, trace, trace_response, log_level, user_agent",
+				ValidateDiagFunc: validateControlsParam,
+			},
 			"ignore_metadata": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -180,6 +190,100 @@ func resourceBigipAs3() *schema.Resource {
 	}
 }
 
+func validateControlsParam(val interface{}, path cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	controls, ok := val.(map[string]interface{})
+	if !ok {
+		return diag.Diagnostics{{
+			Severity: diag.Error,
+			Summary:  "Invalid type",
+			Detail:   "The controls parameter must be a map.",
+		}}
+	}
+
+	allowedKeys := map[string]bool{
+		"dry_run":        true,
+		"trace":          true,
+		"trace_response": true,
+		"log_level":      true,
+		"user_agent":     true,
+	}
+
+	for k, v := range controls {
+		value := fmt.Sprintf("%v", v)
+		if !allowedKeys[k] {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Invalid key",
+				Detail:   fmt.Sprintf("The key %s is not allowed in the 'controls' attribute", k),
+			})
+			continue
+		}
+
+		switch k {
+		case "dry_run", "trace", "trace_response":
+			if value != "yes" && value != "no" {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Invalid value",
+					Detail:   fmt.Sprintf("The value for key %s must be yes or no", k),
+				})
+			}
+		case "log_level":
+			if value != "emergency" &&
+				value != "alert" &&
+				value != "critical" &&
+				value != "error" &&
+				value != "warning" &&
+				value != "notice" &&
+				value != "info" &&
+				value != "debug" {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Invalid value",
+					Detail:   fmt.Sprintf("The value for key %s must be one of emergency, alert, critical, error, warning, notice, info, debug", k),
+				})
+			}
+		case "user_agent":
+			// No specific validation for user_agent, just ensure the key is valid
+		}
+	}
+
+	return diags
+}
+
+func controlsQueraString(d *schema.ResourceData) string {
+	controls := d.Get("controls").(map[string]interface{})
+	query := ""
+	if dryRun, ok := controls["dry_run"]; ok {
+		if dryRun.(string) == "yes" {
+			query += "&controls.dryRun=true"
+		} else if dryRun.(string) == "no" {
+			query += "&controls.dryRun=false"
+		}
+	}
+	if trace, ok := controls["trace"]; ok {
+		if trace.(string) == "yes" {
+			query += "&controls.trace=true"
+		} else if trace.(string) == "no" {
+			query += "&controls.trace=false"
+		}
+	}
+	if traceResponse, ok := controls["trace_response"]; ok {
+		if traceResponse.(string) == "yes" {
+			query += "&controls.traceResponse=true"
+		} else if traceResponse.(string) == "no" {
+			query += "&controls.traceResponse=false"
+		}
+	}
+	if logLevel, ok := controls["log_level"]; ok {
+		query += fmt.Sprintf("&controls.logLevel=%s", logLevel.(string))
+	}
+
+	return query
+}
+
 func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
 	m.Lock()
@@ -192,6 +296,11 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		return diag.FromErr(err)
 	}
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
+
+	var controlsQuerParam string
+	if _, controls := d.GetOk("controls"); controls {
+		controlsQuerParam = controlsQueraString(d)
+	}
 
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
 
@@ -209,7 +318,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 		log.Printf("[DEBUG] tenant name :%+v", tenant)
 
 		applicationList := client.GetAppsList(as3Json)
-		err, taskID := client.PostPerAppBigIp(as3Json, tenant)
+		err, taskID := client.PostPerAppBigIp(as3Json, tenant, controlsQuerParam)
 		log.Printf("[DEBUG] task Id from deployment :%+v", taskID)
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("posting as3 config failed for tenants:(%s) with error: %v", tenantFilter, err))
@@ -239,7 +348,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 			return diag.FromErr(err)
 		}
 		log.Printf("[INFO] Creating as3 config in bigip:%s", strTrimSpace)
-		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
+		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList, controlsQuerParam)
 		log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
 		if err != nil {
 			if successfulTenants == "" {
@@ -365,6 +474,12 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	oldApplicationList := d.Get("application_list").(string)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
+
+	var controlsQuerParam string
+	if _, controls := d.GetOk("controls"); controls {
+		controlsQuerParam = controlsQueraString(d)
+	}
+
 	_ = d.Set("application_list", applicationList)
 	perApplication, err := client.CheckSetting()
 	if err != nil {
@@ -389,7 +504,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 			}
 
 			log.Printf("[INFO] Updating As3 Config for tenant:%s with Per-Application Mode:%v", oldTenantList, perApplication)
-			err, task_id := client.PostPerAppBigIp(as3Json, oldTenantList)
+			err, task_id := client.PostPerAppBigIp(as3Json, oldTenantList, controlsQuerParam)
 			log.Printf("[DEBUG] task_id from PostPerAppBigIp:%+v", task_id)
 			if err != nil {
 				return diag.FromErr(fmt.Errorf("posting as3 config failed for tenant:(%s) with error: %v", oldTenantList, err))
@@ -436,7 +551,7 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList)
+		err, successfulTenants, taskID := client.PostAs3Bigip(strTrimSpace, tenantList, controlsQuerParam)
 		log.Printf("[DEBUG] successfulTenants :%+v", successfulTenants)
 		if err != nil {
 			if successfulTenants == "" {
@@ -464,6 +579,14 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	var name string
 	var tList string
+
+	if c_attr, c_ok := d.GetOk("controls"); c_ok {
+		controls := c_attr.(map[string]interface{})
+		if dryRun, ok := controls["dry_run"]; ok && dryRun == "yes" {
+			d.SetId("")
+			return nil
+		}
+	}
 
 	if d.Get("as3_json") != nil {
 		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))

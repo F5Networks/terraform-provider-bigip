@@ -42,6 +42,21 @@ resource "bigip_as3" "as3-example1" {
 }
 ```
 
+## Example of controls parameters
+
+```hcl
+resource "bigip_as3" "as3-example1" {
+  as3_json = file("example1.json")
+  controls = {
+    dry_run = "no"
+    trace = "yes"
+    trace_response = "yes"
+    log_level = "debug"
+    user_agent = "dummy agent"
+  }
+}
+```
+
 # Per-Application Deployment - Example Usage for json file with tenant name
 resource "bigip_as3" "as3-example1" {
   as3_json   = file("perApplication_example.json")
@@ -109,6 +124,23 @@ resource "bigip_as3" "as3-example1" {
 * `per_app_mode` - (Computed) - Will specify whether is deployment is done via Per-Application Way or Traditional Way
 
 * `tenant_list` - (Optional) - List of tenants currently deployed on the Big-Ip
+
+* `controls` - (Optional) - A map that allows you to configure specific behavior controls for the AS3 declaration. Each key represents a particular control setting, and the corresponding value defines its configuration.
+
+    * `dry_run` (Optional) -  Enables or disables dry-run mode.
+      * Allowed values: "yes", "no"
+
+   * `trace` (Optional) - Enables or disables detailed trace of the configuration process.
+     * Allowed values: "yes", "no"
+
+   * `trace_response` (Optional) - If set to "yes" the response will contain the trace files.
+     * Allowed values: "yes", "no"
+
+   * `log_level` (Optional) - Controls the amount of detail in logs produced while configuring the Tenant.
+     * Allowed values: "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"
+
+   * `user_agent` (Optional) - Controls the User Agent information to include in TEEM report.
+
 
 * `application_list` - (Optional) - List of applications currently deployed on the Big-Ip
 
