@@ -56,9 +56,9 @@ type Results1 struct {
 }
 
 // PostPerAppBigIp - used for posting Per-Application Declarations
-func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, string) {
+func (b *BigIP) PostPerAppBigIp(as3NewJson, tenantFilter, queryParam string) (error, string) {
 	// resp, err := PostPerApp()
-	async := "?async=true"
+	async := "?async=true" + queryParam
 	resp, err := b.postAS3Req(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenantFilter, uriApplications, async)
 	if err != nil {
 		return err, ""
@@ -95,8 +95,9 @@ func (b *BigIP) PostPerAppBigIp(as3NewJson string, tenantFilter string) (error, 
 /*
 PostAs3Bigip used for posting as3 json file to BIGIP
 */
-func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, string, string) {
-	tenant := tenantFilter + "?async=true"
+func (b *BigIP) PostAs3Bigip(as3NewJson, tenantFilter, queryParam string) (error, string, string) {
+	tenant := tenantFilter + "?async=true" + queryParam
+
 	successfulTenants := make([]string, 0)
 	resp, err := b.postReq(as3NewJson, uriMgmt, uriShared, uriAppsvcs, uriDeclare, tenant)
 	if err != nil {
@@ -164,11 +165,11 @@ func (b *BigIP) PostAs3Bigip(as3NewJson string, tenantFilter string) (error, str
 			}
 			if len(taskIds) == 0 {
 				time.Sleep(2 * time.Second)
-				return b.PostAs3Bigip(as3NewJson, tenantFilter)
+				return b.PostAs3Bigip(as3NewJson, tenantFilter, queryParam)
 			}
 			for _, id := range taskIds {
 				if b.pollingStatus(id, 5*time.Second) {
-					return b.PostAs3Bigip(as3NewJson, tenantFilter)
+					return b.PostAs3Bigip(as3NewJson, tenantFilter, queryParam)
 				}
 			}
 		}
