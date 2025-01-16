@@ -48,11 +48,11 @@ resource "bigip_as3" "as3-example1" {
 resource "bigip_as3" "as3-example1" {
   as3_json = file("example1.json")
   controls = {
-    dry_run = "no"
-    trace = "yes"
+    dry_run        = "no"
+    trace          = "yes"
     trace_response = "yes"
-    log_level = "debug"
-    user_agent = "dummy agent"
+    log_level      = "debug"
+    user_agent     = "dummy agent"
   }
 }
 ```
