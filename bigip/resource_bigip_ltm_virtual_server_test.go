@@ -60,6 +60,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
     policies = [bigip_ltm_policy.http_to_https_redirect.name]
+	connection_limit = 100
 }
 `
 var TestVs6Name = fmt.Sprintf("/%s/test-vs6", TestPartition)
@@ -80,6 +81,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	persistence_profiles = ["/Common/source_addr", "/Common/hash"]
 	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
+	connection_limit = 200
 }
 `
 
@@ -112,6 +114,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "server_profiles.*", "/Common/tcp-lan-optimized"),
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "connection_limit", "100"),
 				),
 			},
 		},
@@ -148,6 +151,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/hash"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "connection_limit", "200"),
 				),
 			},
 		},
