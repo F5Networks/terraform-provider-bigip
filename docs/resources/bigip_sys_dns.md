@@ -22,10 +22,10 @@ resource "bigip_sys_dns" "dns1" {
 
 ## Argument Reference
 
-* `description`- (Required,type `string` )Provide description for your DNS server
+* `description` - (Required,type `string`) Provide description for your DNS server
 
-* `name_servers` - (Required,type `list` ) Specifies the name servers that the system uses to validate DNS lookups, and resolve host names.
+* `name_servers` - (Required,type `list`) Specifies the name servers that the system uses to validate DNS lookups, and resolve host names.
 
-* `number_of_dots` - (Optional,type `int` ) Configures the number of dots needed in a name before an initial absolute query will be made.
+* `number_of_dots` - (Optional,type `int`) Configures the number of dots needed in a name before an initial absolute query will be made.
 
-* `search` - (Optional,type `list` ) Specifies the domains that the system searches for local domain lookups, to resolve local host names.
+* `search` - (Optional,type `list`) Specifies the domains that the system searches for local domain lookups, to resolve local host names.

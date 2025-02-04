@@ -25,7 +25,7 @@ resource "bigip_ltm_profile_client_ssl" "test-ClientSsl" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Specifies the name of the profile.Name of Profile should be full path.The full path is the combination of the `partition + profile name`,For example `/Common/test-clientssl-profile`.
+* `name` - (Required,type `string`) Specifies the name of the profile. Name of Profile should be full path. The full path is the combination of the `partition + profile name`, for example `/Common/test-clientssl-profile`.
 
 * `defaults_from` - (Optional) Parent profile for this clientssl profile.Once this value has been set, it cannot be changed. Default value is `/Common/clientssl`. It Should Full path `/partition/profile_name`
 
@@ -83,13 +83,13 @@ There can be only one SSL profile with this setting enabled.
 
 * `ssl_forward_proxy_bypass` - (Optional) Specifies whether SSL forward proxy bypass feature is enabled or not. The default value is disabled.
 
-* `ssl_c3d` (Optional) Enables or disables SSL client certificate constrained delegation. The default option is disabled. Conversely, you can specify enabled to use the SSL client certificate constrained delegation.
+* `ssl_c3d` - (Optional) Enables or disables SSL client certificate constrained delegation. The default option is disabled. Conversely, you can specify enabled to use the SSL client certificate constrained delegation.
   
-* `c3d_client_fallback_cert` (Optional) Specifies the client certificate to use in SSL client certificate constrained delegation. This certificate will be used if client does not provide a cert during the SSL handshake. The default value is none.
+* `c3d_client_fallback_cert` - (Optional) Specifies the client certificate to use in SSL client certificate constrained delegation. This certificate will be used if client does not provide a cert during the SSL handshake. The default value is none.
 
-* `c3d_drop_unknown_ocsp_status` (Optional) Specifies the BIG-IP action when the OCSP responder returns unknown status. The default value is drop, which causes the onnection to be dropped. Conversely, you can specify ignore, which causes the connection to ignore the unknown status and continue.
+* `c3d_drop_unknown_ocsp_status` - (Optional) Specifies the BIG-IP action when the OCSP responder returns unknown status. The default value is drop, which causes the onnection to be dropped. Conversely, you can specify ignore, which causes the connection to ignore the unknown status and continue.
 
-* `c3d_ocsp` (Optional) Specifies the SSL client certificate constrained delegation OCSP object that the BIG-IP SSL should use to connect to the OCSP responder and check the client certificate status.
+* `c3d_ocsp` - (Optional) Specifies the SSL client certificate constrained delegation OCSP object that the BIG-IP SSL should use to connect to the OCSP responder and check the client certificate status.
 
 
 ## Importing

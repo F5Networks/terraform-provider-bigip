@@ -107,9 +107,9 @@ This IP address, combined with the port you specify below, becomes the BIG-IP vi
 
 The `virtual_server` block supports the following:
 
-* `ip` - (Optional , `string`) IP4/IPv6 address to be used for virtual server ex: `10.1.1.1`
+* `ip` - (Optional, `string`) IP4/IPv6 address to be used for virtual server ex: `10.1.1.1`
 
-* `port` -(Optional , `int`) Port number to used for accessing virtual server/application
+* `port` -(Optional, `int`) Port number to used for accessing virtual server/application
 
 ### Pool Members
 
@@ -117,15 +117,15 @@ Using this block will `enable` for FAST-Generated Pool.
 
 The `pool_members` block supports the following:
 
-* `addresses` - (Optional , `list`) List of server address to be used for FAST-Generated Pool.
+* `addresses` - (Optional, `list`) List of server address to be used for FAST-Generated Pool.
 
-* `port` - (Optional , `int`) port number of serviceport to be used for FAST-Generated Pool.
+* `port` - (Optional, `int`) port number of serviceport to be used for FAST-Generated Pool.
 
-* `connection_limit` - (Optional , `int`) connectionLimit value to be used for FAST-Generated Pool.
+* `connection_limit` - (Optional, `int`) connectionLimit value to be used for FAST-Generated Pool.
 
-* `priority_group` - (Optional , `int`) priorityGroup value to be used for FAST-Generated Pool.
+* `priority_group` - (Optional, `int`) priorityGroup value to be used for FAST-Generated Pool.
 
-* `share_nodes` - (Optional , `bool`) shareNodes value to be used for FAST-Generated Pool.
+* `share_nodes` - (Optional, `bool`) shareNodes value to be used for FAST-Generated Pool.
 
 
 ### Pool Monitor
@@ -134,21 +134,21 @@ Using this block will `enable` for FAST-Generated Pool Monitor.
 
 The `monitor` block supports the following:
 
-* `monitor_auth` - (Optional , `bool`) set `true` if the servers require login credentials for web access on FAST-Generated Pool Monitor. default is `false`.
+* `monitor_auth` - (Optional, `bool`) set `true` if the servers require login credentials for web access on FAST-Generated Pool Monitor. default is `false`.
 
-* `username` - (Optional , `string`) username for web access on FAST-Generated Pool Monitor.
+* `username` - (Optional, `string`) username for web access on FAST-Generated Pool Monitor.
 
-* `password` - (Optional , `string`) password for web access on FAST-Generated Pool Monitor.
+* `password` - (Optional, `string`) password for web access on FAST-Generated Pool Monitor.
 
-* `interval` - (Optional , `int`) Set the time between health checks,in seconds for FAST-Generated Pool Monitor. 
+* `interval` - (Optional, `int`) Set the time between health checks,in seconds for FAST-Generated Pool Monitor. 
 
-* `send_string` - (Optional , `string`) Specify data to be sent during each health check for FAST-Generated Pool Monitor.
+* `send_string` - (Optional, `string`) Specify data to be sent during each health check for FAST-Generated Pool Monitor.
 
-* `response` - (Optional , `string`) The presence of this string anywhere in the HTTP response implies availability.
+* `response` - (Optional, `string`) The presence of this string anywhere in the HTTP response implies availability.
 
 ### WAF Security policy
 Using this block will `enable` for FAST-Generated WAF Security Policy
 
 The `waf_security_policy` block supports the following:
 
-* `enable` - (Optional , `bool`) Setting `true` will enable FAST to create WAF Security Policy.
+* `enable` - (Optional, `bool`) Setting `true` will enable FAST to create WAF Security Policy.

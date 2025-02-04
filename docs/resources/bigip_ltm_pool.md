@@ -30,7 +30,7 @@ resource "bigip_ltm_pool" "pool" {
 
 ## Argument Reference
 
-* `name` - (Required,type `string`) Name of the pool,it should be `full path`.The full path is the combination of the `partition + name` of the pool.(For example `/Common/my-pool`)
+* `name` - (Required,type `string`) Name of the pool, it should be `full path`. The full path is the combination of the `partition + name` of the pool (For example `/Common/my-pool`).
 
 * `monitors` - (Optional,type `list`) List of monitor names to associate with the pool
 

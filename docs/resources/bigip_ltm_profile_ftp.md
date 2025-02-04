@@ -47,7 +47,7 @@ resource "bigip_ltm_profile_ftp" "sanjose-ftp-profile" {
 
 ## Argument Reference
 
-* `name` (Required) Name of the profile_ftp
+* `name` - (Required) Name of the profile_ftp
 
 * `partition` - (Optional) Displays the administrative partition within which this profile resides
 
@@ -62,31 +62,31 @@ https://support.f5.com/csp/article/K08859735
 
 * `enforce_tlssession_reuse` - (Optional) Specifies, when selected (enabled), that the system enforces the data connection to reuse a TLS session. The default value is unchecked (disabled)
 
-* `allow_active_mode` - (Optional)Specifies, when selected (enabled), that the system allows FTP Active Transfer mode. The default value is enabled
+* `allow_active_mode` - (Optional) Specifies, when selected (enabled), that the system allows FTP Active Transfer mode. The default value is enabled
 
 
 
 ### Arguments which are updated/available in Bigip versions (12.x - 13.x) for FTP profile.For more information refer below KB article
 https://support.f5.com/csp/article/K13044205
 
-* `allow_ftps` - (Optional)Allow explicit FTPS negotiation. The default is disabled.When enabled (selected), that the system allows explicit FTPS negotiation for SSL or TLS. 
+* `allow_ftps` - (Optional) Allow explicit FTPS negotiation. The default is disabled.When enabled (selected), that the system allows explicit FTPS negotiation for SSL or TLS. 
 
-* `translate_extended` - (Optional)Specifies, when selected (enabled), that the system uses ensures compatibility between IP version 4 and IP version 6 clients and servers when using the FTP protocol. The default is selected (enabled).
+* `translate_extended` - (Optional) Specifies, when selected (enabled), that the system uses ensures compatibility between IP version 4 and IP version 6 clients and servers when using the FTP protocol. The default is selected (enabled).
 
 
 
 ## Common Arguments for all versions
 
-* `security` - (Optional)Specifies, when checked (enabled), that the system inspects FTP traffic for security vulnerabilities using an FTP security profile. This option is available only on systems licensed for BIG-IP ASM.
+* `security` - (Optional) Specifies, when checked (enabled), that the system inspects FTP traffic for security vulnerabilities using an FTP security profile. This option is available only on systems licensed for BIG-IP ASM.
 
-* `port` - (Optional)Allows you to configure the FTP service to run on an alternate port. The default is 20.
+* `port` - (Optional) Allows you to configure the FTP service to run on an alternate port. The default is 20.
 
-* `log_profile` - (Optional)Configures the ALG log profile that controls logging
+* `log_profile` - (Optional) Configures the ALG log profile that controls logging
 
-* `log_publisher` - (Optional)Configures the log publisher that handles events logging for this profile
+* `log_publisher` - (Optional) Configures the log publisher that handles events logging for this profile
 
-*  `inherit_parent_profile` - (Optional)Enables the FTP data channel to inherit the TCP profile used by the control channel.If disabled,the data channel uses FastL4 only.
+*  `inherit_parent_profile` - (Optional) Enables the FTP data channel to inherit the TCP profile used by the control channel.If disabled,the data channel uses FastL4 only.
 
-* `description` - (Optional)User defined description for FTP profile
+* `description` - (Optional) User defined description for FTP profile
 
 

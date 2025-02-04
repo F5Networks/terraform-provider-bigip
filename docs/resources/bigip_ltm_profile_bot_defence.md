@@ -23,11 +23,11 @@ resource "bigip_ltm_profile_bot_defense" "test-bot-tc1" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Name of the Bot Defense profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/test-bot-tc1`.
+* `name` - (Required,type `string`) Name of the Bot Defense profile, name of Profile should be full path. Full path is the combination of the `partition + profile name`, for example `/Common/test-bot-tc1`.
 
-* `defaults_from` - (optional,type `string`) Specifies the profile from which this profile inherits settings. The default is the system-supplied `bot-defense` profile.
+* `defaults_from` - (Optional,type `string`) Specifies the profile from which this profile inherits settings. The default is the system-supplied `bot-defense` profile.
 
-* `description` - (optional,type `string`) Specifies user-defined description.
+* `description` - (Optional,type `string`) Specifies user-defined description.
 
 * `template` - (Optional,type `string`) Profile templates specify Mitigation and Verification Settings default values. possible ptions `balanced`,`relaxed` and `strict`.
 

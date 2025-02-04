@@ -23,7 +23,7 @@ resource "bigip_ipsec_profile" "azurevWAN_profile" {
 
 ## Argument Reference
 
-* `name` - (Required) Displays the name of the IPsec interface tunnel profile,it should be "full path".The full path is the combination of the partition + name of the IPSec profile.(For example `/Common/test-profile`)
+* `name` - (Required) Displays the name of the IPsec interface tunnel profile, it should be "full path". The full path is the combination of the partition + name of the IPSec profile (For example `/Common/test-profile`).
 
 * `description` - (Optional,type `string`) Specifies descriptive text that identifies the IPsec interface tunnel profile.
 

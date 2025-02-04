@@ -27,13 +27,13 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 ## Argument Reference
 
-* `name` - (Required,type `string`) Specifies the name of the http profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/test-http-profile`.
+* `name` - (Required,type `string`) Specifies the name of the http profile, name of Profile should be full path. Full path is the combination of the `partition + profile name`, for example `/Common/test-http-profile`.
 
-* `proxy_type` - (optional,type `string`) Specifies the proxy mode for this profile: reverse, explicit, or transparent. The default is `reverse`.
+* `proxy_type` - (Optional,type `string`) Specifies the proxy mode for this profile: reverse, explicit, or transparent. The default is `reverse`.
 
-* `defaults_from` - (optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (Optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
-* `description` - (optional,type `string`) Specifies user-defined description.
+* `description` - (Optional,type `string`) Specifies user-defined description.
 
 * `basic_auth_realm` - (Optional) Specifies a quoted string for the basic authentication realm. The system sends this string to a client whenever authorization fails. The default value is `none`
 
