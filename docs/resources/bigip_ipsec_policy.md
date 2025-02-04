@@ -31,7 +31,7 @@ resource "bigip_ipsec_policy" "test-policy" {
 ```      
 
 ## Argument Reference
-* `name` - (Required) Name of the IPSec policy,it should be "full path".The full path is the combination of the partition + name of the IPSec policy.(For example `/Common/test-policy`)
+* `name` - (Required) Name of the IPSec policy, it should be "full path". The full path is the combination of the partition + name of the IPSec policy (For example `/Common/test-policy`).
 
 * `description` - (Optional,type `string`) Description of the IPSec policy.
 
@@ -56,4 +56,4 @@ resource "bigip_ipsec_policy" "test-policy" {
 * `perfect_forward_secrecy` - (Optional, type `string`) Specifies the Diffie-Hellman group to use for IKE Phase 2 negotiation. Valid choices are: `none, modp768, modp1024, modp1536, modp2048, modp3072,
   modp4096, modp6144, modp8192`
 
-* `ipcomp` - (Optional, type `string`) Specifies whether to use IPComp encapsulation. Valid choices are: `none", null", deflate`
+* `ipcomp` - (Optional, type `string`) Specifies whether to use IPComp encapsulation. Valid choices are: `none, null, deflate`
