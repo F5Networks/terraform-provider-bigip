@@ -27,7 +27,7 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Specifies the name of the http profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/test-http-profile`.
+* `name` - (Required,type `string`) Specifies the name of the http profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/test-http-profile`.
 
 * `proxy_type` - (optional,type `string`) Specifies the proxy mode for this profile: reverse, explicit, or transparent. The default is `reverse`.
 
@@ -45,8 +45,6 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `head_insert` - (Optional) Specifies a quoted header string that you want to insert into an HTTP request.Default is `none`.
 
-* `insert_xforwarded_for` - (Optional) When using connection pooling, which allows clients to make use of other client requests' server-side connections, you can insert the X-Forwarded-For header and specify a client IP address
-
 * `response_headers_permitted` - (Optional,type `list`) Specifies headers that the BIG-IP system allows in an HTTP response.If you are specifying more than one header, separate the headers with a blank space.
 
 * `request_chunking` - (Optional,type `string`) Specifies how the system handles HTTP content that is chunked by a client. The default is `preserve`.
@@ -57,17 +55,13 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `redirect_rewrite` - (Optional) Specifies whether the system rewrites the URIs that are part of HTTP redirect (3XX) responses. The default is `none`.
 
-* `request_chunking` - (Optional) Specifies how the system handles HTTP content that is chunked by a client. The default is `preserve`.
-
 * `encrypt_cookies` - (Optional) Type the cookie names for the system to encrypt.
 
 * `encrypt_cookie_secret` - (Optional) Type a passphrase for cookie encryption. Note: Since it's a sensitive entity idempotency will fail for it in the update call.
 
-* `insert_xforwarded_for` - (Optional) Specifies, when enabled, that the system inserts an X-Forwarded-For header in an HTTP request with the client IP address, to use with connection pooling. The default is `Disabled`.
+* `insert_xforwarded_for` - (Optional) Specifies, when enabled, that the system inserts an X-Forwarded-For header in an HTTP request with the client IP address, to use with connection pooling. The default is `disabled`.
 
 * `lws_width` - (Optional,type `int`) Specifies the maximum column width for any given line, when inserting an HTTP header in an HTTP request. The default is `80`.
-
-* `lws_width` - (Optional,type `string`) Specifies the linear white space (LWS) separator that the system inserts when a header exceeds the maximum width you specify in the LWS Maximum Columns setting.
 
 * `accept_xff` - (Optional) Enables or disables trusting the client IP address, and statistics from the client IP address, based on the request's XFF (X-forwarded-for) headers, if they exist.
 
@@ -75,9 +69,9 @@ resource "bigip_ltm_profile_http" "sanjose-http" {
 
 * `server_agent_name` - (Optional) Specifies the value of the Server header in responses that the BIG-IP itself generates. The default is BigIP. In order to remove it, "none" string is to be passed. If server_agent_name is commented (or not passed) during the update call, then no changes would be applied and previous value will persist. In order to put default value, we need to pass "BigIP" explicitly.
 
-* `enforcement` -See [Enforcement](#enforcement) below for more details.
+* `enforcement` - (Optional) See [Enforcement](#enforcement) below for more details.
 
-* `http_strict_transport_security` -See [Http_Strict_Transport_Security](#http_strict_transport_security) below for more details.
+* `http_strict_transport_security` - (Optional) See [Http_Strict_Transport_Security](#http_strict_transport_security) below for more details.
 
 ### Enforcement
 
