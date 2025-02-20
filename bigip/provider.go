@@ -59,7 +59,7 @@ func Provider() *schema.Provider {
 			"token_auth": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Enable to use an external authentication source (LDAP, TACACS, etc)",
+				Description: "Enable to use token authentication. Can be set via the BIGIP_TOKEN_AUTH environment variable",
 				DefaultFunc: schema.EnvDefaultFunc("BIGIP_TOKEN_AUTH", true),
 			},
 			"validate_certs_disable": {

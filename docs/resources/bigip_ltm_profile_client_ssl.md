@@ -45,7 +45,23 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 
 * `chain` - (Optional) Contains a certificate chain that is relevant to the certificate and key mentioned earlier.This key is optional
 
-* `ciphers` - (Optional) Specifies the list of ciphers that the system supports. When creating a new profile, the default cipher list is provided by the parent profile.
+* `cert_key_chain` - (Optional,`list`) `tls_server_profile` Specifies one or more certificates and keys to associate with the SSL profile.
+See [Cert Key Chain](#cert-key-chain) below for more details.
+
+### Cert Key Chain
+Using this block to configure cert key chain options
+
+The `cert_key_chain` block supports the following:
+
+* `name` - (`string`) Name of Cert-key-chain
+
+* `cert` - (`string`) Name of Cert file want add to client ssl profile
+
+* `key` - (`string`) Name of key Cert file want add to client ssl profile
+
+* `chain` - (`string`) Name of ca-bundle file want add to client ssl profile
+
+* `passphrase` - (sensitvie,`string`) Type the name of the pass phrase used to encrypt the key.
 
 * `cipher_group` - (Optional) Specifies the cipher group for the SSL server profile. It is mutually exclusive with the argument, `ciphers`. The default value is `none`.
 
