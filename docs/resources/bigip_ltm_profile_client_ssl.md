@@ -48,7 +48,7 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 * `cert_key_chain` - (Optional,`list`) `cert_key_chain` Specifies one or more certificates and keys to associate with the SSL profile.
 See [Cert Key Chain](#cert-key-chain) below for more details.
 
-~> **NOTE**  `cert_key_chain` is recommend way for adding cert/key/chain to profile. If `cert_key_chain` block provided, we can skip providing `cert`, `key` and `chain`
+~> **NOTE**  `cert_key_chain` is recommend way for adding cert-key-chain to profile. If `cert_key_chain` block provided, we should not provide `cert`, `key` and `chain`.
 
 * `cipher_group` - (Optional) Specifies the cipher group for the SSL server profile. It is mutually exclusive with the argument, `ciphers`. The default value is `none`.
 
