@@ -39,13 +39,16 @@ Don't insert empty fragments and No TLSv1.3 are listed as Enabled Options. `Usag
 
 * `authenticate_depth` - (Optional) Specifies the maximum number of certificates to be traversed in a client certificate chain
 
-* `cert` - (Optional) Specifies a cert name for use.
+* `cert` - (Optional) Specifies the name of the certificate that the system uses for client-side SSL processing. The default is `default`
 
-* `key` - (Optional) Contains a key name
+* `key` - (Optional) Specifies the file name of the SSL key. The default is `default`
 
-* `chain` - (Optional) Contains a certificate chain that is relevant to the certificate and key mentioned earlier.This key is optional
+* `chain` - (Optional) Specifies a certificate chain file that a server can use for authentication. The default is `None`.
 
-* `ciphers` - (Optional) Specifies the list of ciphers that the system supports. When creating a new profile, the default cipher list is provided by the parent profile.
+* `cert_key_chain` - (Optional,`list`) `cert_key_chain` Specifies one or more certificates and keys to associate with the SSL profile.
+See [Cert Key Chain](#cert-key-chain) below for more details.
+
+~> **NOTE**  `cert_key_chain` is recommend way for adding cert-key-chain to profile. If `cert_key_chain` block provided, we should not provide `cert`, `key` and `chain`.
 
 * `cipher_group` - (Optional) Specifies the cipher group for the SSL server profile. It is mutually exclusive with the argument, `ciphers`. The default value is `none`.
 
@@ -90,6 +93,23 @@ There can be only one SSL profile with this setting enabled.
 * `c3d_drop_unknown_ocsp_status` (Optional) Specifies the BIG-IP action when the OCSP responder returns unknown status. The default value is drop, which causes the onnection to be dropped. Conversely, you can specify ignore, which causes the connection to ignore the unknown status and continue.
 
 * `c3d_ocsp` (Optional) Specifies the SSL client certificate constrained delegation OCSP object that the BIG-IP SSL should use to connect to the OCSP responder and check the client certificate status.
+
+
+### Cert Key Chain
+
+Using this block to configure cert key chain options
+
+The `cert_key_chain` block supports the following:
+
+* `name` - (`string`) Name of Cert-key-chain
+
+* `cert` - (optional)Specifies the name of the certificate that the system uses for client-side SSL processing. The default is `default`
+
+* `key` - (optional) Specifies the file name of the SSL key. The default is `default`
+
+* `chain` - (optional) Specifies a certificate chain file that a server can use for authentication. The default is `None`.
+
+* `passphrase` - (sensitvie,`string`) Type the name of the pass phrase used to encrypt the key.
 
 
 ## Importing

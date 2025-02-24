@@ -164,10 +164,11 @@ func resourceBigipLtmProfileClientSsl() *schema.Resource {
 				Description: "Client Certificate Constrained Delegation CA passphrase",
 			},
 			"cert_key_chain": {
-				Type:       schema.TypeList,
-				Optional:   true,
-				MaxItems:   1,
-				Deprecated: "This Field 'cert_key_chain' going to deprecate in future version, please specify with cert,key,chain,passphrase as separate attribute.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: "Specifies one or more certificates and keys to associate with the SSL profile",
+				// Deprecated: "This Field 'cert_key_chain' going to deprecate in future version, please specify with cert,key,chain,passphrase as separate attribute.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
