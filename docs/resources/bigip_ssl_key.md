@@ -28,7 +28,7 @@ resource "bigip_ssl_key" "test-key" {
 ## Argument Reference
 
 
-* `name`- (Required,type `string`) Name of the SSL Certificate key to be Imported on to BIGIP
+* `name` - (Required,type `string`) Name of the SSL Certificate key to be Imported on to BIGIP
 
 * `content` - (Required) Content of certificate key on Local Disk,path of SSL certificate key will be provided to terraform `file` function 
 

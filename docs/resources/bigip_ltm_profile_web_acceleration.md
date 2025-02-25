@@ -26,11 +26,11 @@ resource "bigip_ltm_profile_web_acceleration" "sample-resource" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Specifies the name of the web acceleration profile service ,name of Profile should be full path. Full path is the combination of the `partition + web acceleration profile name`,For example `/Common/sample-resource`.
+* `name` - (Required,type `string`) Specifies the name of the web acceleration profile service ,name of Profile should be full path. Full path is the combination of the `partition + web acceleration profile name`,For example `/Common/sample-resource`.
 
-* `defaults_from` - (optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
+* `defaults_from` - (Optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
-* `cache_size` - (optional,type `int`) 	Specifies the maximum size for the cache. When the cache reaches the maximum size, the system starts removing the oldest entries. The default value is `100 megabytes`.
+* `cache_size` - (Optional,type `int`) 	Specifies the maximum size for the cache. When the cache reaches the maximum size, the system starts removing the oldest entries. The default value is `100 megabytes`.
 
 * `cache_max_entries` - (Optional, type `int`) Specifies the maximum number of entries that can be in the cache. The default value is `0` (zero), which means that the system does not limit the maximum entries.
 

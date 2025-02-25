@@ -40,7 +40,7 @@ resource "bigip_vcmp_guest" "vcmp-test" {
 
 * `initial_hotfix` - (Optional, `string`) Specifies the hotfix ISO image file which is applied on top of the base image.
 
-* `vlans` - (Optional, `list`) Specifies the list of VLANs the vCMP guest uses to communicate with other guests, the host, and with the external network. The naming format must be the combination of the partition + name. For example /Common/my-vlan
+* `vlans` - (Optional, `list`) Specifies the list of VLANs the vCMP guest uses to communicate with other guests, the host, and with the external network. The naming format must be the combination of the partition + name (For example `/Common/my-vlan`).
 
 * `mgmt_network` - (Optional, `string`) Specifies the method by which the management address is used in the vCMP guest. options : [`bridged`,`isolated`,`host-only`].
 
