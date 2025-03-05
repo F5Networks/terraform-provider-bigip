@@ -113,9 +113,9 @@ func resourceBigipRoleInfoRead(ctx context.Context, d *schema.ResourceData, m in
 	d.Set("console", roleInfo.Console)
 	d.Set("deny", roleInfo.Deny)
 	d.Set("description", roleInfo.Description)
-	d.Set("line-order", roleInfo.LineOrder)
+	d.Set("line_order", roleInfo.LineOrder)
 	d.Set("role", roleInfo.Role)
-	d.Set("user-partition", roleInfo.UserPartition)
+	d.Set("user_partition", roleInfo.UserPartition)
 
 	return nil
 }
