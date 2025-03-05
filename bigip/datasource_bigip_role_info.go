@@ -83,9 +83,9 @@ func dataSourceBigipRoleInfoRead(ctx context.Context, d *schema.ResourceData, me
 	_ = d.Set("console", roleInfo.Console)
 	_ = d.Set("deny", roleInfo.Deny)
 	_ = d.Set("description", roleInfo.Description)
-	_ = d.Set("line-order", roleInfo.LineOrder)
+	_ = d.Set("line_order", roleInfo.LineOrder)
 	_ = d.Set("role", roleInfo.Role)
-	_ = d.Set("user-partition", roleInfo.UserPartition)
+	_ = d.Set("user_partition", roleInfo.UserPartition)
 
 	d.SetId(roleInfo.Name)
 
