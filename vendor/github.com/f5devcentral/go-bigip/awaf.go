@@ -41,6 +41,7 @@ type ExportPayload struct {
 	Filename        string `json:"filename,omitempty"`
 	Format          string `json:"format,omitempty"`
 	Inline          bool   `json:"inline,omitempty"`
+	Minimal         bool   `json:"minimal,omitempty"`
 	PolicyReference struct {
 		Link string `json:"link"`
 	} `json:"policyReference"`
@@ -427,6 +428,7 @@ func (b *BigIP) ExportPolicy(policyID string) (*PolicyStruct, error) {
 	var exportPayload ExportPayload
 	exportPayload.Format = "json"
 	exportPayload.Inline = true
+	exportPayload.Minimal = true
 	exportPayload.PolicyReference.Link = fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID)
 
 	log.Printf("[INFO]payload:%+v", exportPayload)
@@ -459,6 +461,7 @@ func (b *BigIP) ExportPolicyFull(policyID string) (*string, error) {
 	var exportPayload ExportPayload
 	exportPayload.Format = "json"
 	exportPayload.Inline = true
+	exportPayload.Minimal = true
 	exportPayload.PolicyReference.Link = fmt.Sprintf("https://localhost/mgmt/tm/asm/policies/%s", policyID)
 
 	log.Printf("[INFO] payload:%+v", exportPayload)
