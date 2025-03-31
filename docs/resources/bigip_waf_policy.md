@@ -131,28 +131,28 @@ The `defense_attributes` block supports the following:
 ### file types
 The `file_types` block supports the following:
 
-* `name` - (Optional , `string`) Specifies the file type name as appearing in the URL extension.
+* `name` - (Optional, `string`) Specifies the file type name as appearing in the URL extension.
 
-* `type` - (Optional , `string`) Determines the type of the name attribute. Only when setting the type to `wildcard` will the special wildcard characters in the name be interpreted as such
+* `type` - (Optional, `string`) Determines the type of the name attribute. Only when setting the type to `wildcard` will the special wildcard characters in the name be interpreted as such
 
-* `allowed` - (Optional , `bool`) Determines whether the file type is allowed or disallowed. In either of these cases the VIOL_FILETYPE violation is issued (if enabled) for an incoming request- 
+* `allowed` - (Optional, `bool`) Determines whether the file type is allowed or disallowed. In either of these cases the VIOL_FILETYPE violation is issued (if enabled) for an incoming request- 
   * No allowed file type matched the file type of the request.
   * The file type of the request matched a disallowed file type.
 
 ### IP Exceptions
 The `ip_exceptions` block supports the following:
 
-* `ip_address` - (Required , `string`) Specifies the IP address that you want the system to trust.
+* `ip_address` - (Required, `string`) Specifies the IP address that you want the system to trust.
 
-* `ip_mask` - (optional , `string`) Specifies the netmask of the exceptional IP address. This is an optional field.
+* `ip_mask` - (optional, `string`) Specifies the netmask of the exceptional IP address. This is an optional field.
 
-* `block_requests` - (Optional , `string`) Specifies how the system responds to blocking requests sent from this IP address. Possible options [`always`, `never`, `policy-default`].
+* `block_requests` - (Optional, `string`) Specifies how the system responds to blocking requests sent from this IP address. Possible options [`always`, `never`, `policy-default`].
 
-* `trustedby_policybuilder` - (Optional , `bool`) Specifies when enabled the Policy Builder considers traffic from this IP address as being safe.
+* `trustedby_policybuilder` - (Optional, `bool`) Specifies when enabled the Policy Builder considers traffic from this IP address as being safe.
 
-* `ignore_anomalies` - (Optional , `bool`) Specifies when enabled that the system considers this IP address legitimate and does not take it into account when performing brute force prevention.
+* `ignore_anomalies` - (Optional, `bool`) Specifies when enabled that the system considers this IP address legitimate and does not take it into account when performing brute force prevention.
 
-* `ignore_ipreputation` - (Optional , `bool`) Specifies when enabled that the system considers this IP address legitimate even if it is found in the IP Intelligence database (a database of questionable IP addresses).
+* `ignore_ipreputation` - (Optional, `bool`) Specifies when enabled that the system considers this IP address legitimate even if it is found in the IP Intelligence database (a database of questionable IP addresses).
 
 ## Attributes Reference
 

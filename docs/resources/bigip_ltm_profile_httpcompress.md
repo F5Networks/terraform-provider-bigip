@@ -29,7 +29,7 @@ resource "bigip_ltm_profile_httpcompress" "sjhttpcompression" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Name of the LTM http compress profile,named with their `full path`.The full path is the combination of the `partition + name` (example: `/Common/my-httpcompresprofile` ) or  `partition + directory + name` of the resource  (example: `my-httpcompresprofile`)
+* `name` - (Required,type `string`) Name of the LTM http compress profile, named with their `full path`. The full path is the combination of the `partition + name` (example: `/Common/my-httpcompresprofile` ) or  `partition + directory + name` of the resource  (example: `my-httpcompresprofile`)
 
 * `defaults_from` - (Optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
@@ -47,7 +47,7 @@ resource "bigip_ltm_profile_httpcompress" "sjhttpcompression" {
 
 * `gzip_memory_level` - (Optional,type `int`) Specifies the number of bytes of memory that the system uses for internal compression buffers when compressing a server response. The default is `8 kilobytes/8192 bytes`.
 
-* `gzip_window_size` - (Optional,type `int`)  Specifies the number of kilobytes in the window size that the system uses when compressing a server response. The default is `16` kilobytes
+* `gzip_window_size` - (Optional,type `int`) Specifies the number of kilobytes in the window size that the system uses when compressing a server response. The default is `16` kilobytes
 
 * `keep_accept_encoding` - (Optional,type `string`) Specifies, when checked (enabled), that the system does not remove the Accept-Encoding: header from an HTTP request. The default is `disabled`.
 
