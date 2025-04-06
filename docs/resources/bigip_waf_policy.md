@@ -15,6 +15,8 @@ It outputs an up-to-date WAF Policy in a JSON format
 
 ~> **NOTE** This Resource Requires F5 BIG-IP v16.x above version, and ASM need to be provisioned.
 
+~> **NOTE** For BIG-IP v17.x above version,Terraform BIG-IP Provider version must be > v1.23.0
+
 ## Example Usage 
 
 ```hcl
