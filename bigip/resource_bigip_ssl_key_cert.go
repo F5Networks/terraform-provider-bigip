@@ -182,13 +182,13 @@ func resourceBigipSSLKeyCertRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.Errorf("reading certificate failed  :%+v", certificate)
 	}
 
-	d.Set("key_name", key.Name)
-	d.Set("key_full_path", key.FullPath)
-	d.Set("cert_name", certificate.Name)
-	d.Set("cert_full_path", certificate.FullPath)
-	d.Set("partition", key.Partition)
-	d.Set("issuer_cert", certificate.IssuerCert)
-	if certificate.CertValidationOptions != nil && len(certificate.CertValidationOptions) > 0 {
+	_ = d.Set("key_name", key.Name)
+	_ = d.Set("key_full_path", key.FullPath)
+	_ = d.Set("cert_name", certificate.Name)
+	_ = d.Set("cert_full_path", certificate.FullPath)
+	_ = d.Set("partition", key.Partition)
+	_ = d.Set("issuer_cert", certificate.IssuerCert)
+	if len(certificate.CertValidationOptions) > 0 {
 		monitor_type := certificate.CertValidationOptions[0]
 		_ = d.Set("cert_monitoring_type", monitor_type)
 	}

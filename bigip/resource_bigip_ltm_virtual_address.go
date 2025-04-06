@@ -205,7 +205,7 @@ func hydrateVirtualAddress(d *schema.ResourceData) *bigip.VirtualAddress {
 
 func resourceBigipLtmVirtualAddressDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
-	log.Printf("[INFO] Deleting virtual address " + name)
+	log.Printf("[INFO] Deleting virtual address:%+v", name)
 	client := meta.(*bigip.BigIP)
 	vs, errCheck := resourceBigipLtmVirtualAddressExists(d, meta)
 

@@ -146,14 +146,14 @@ func resourceBigipSaasBotDefenseProfileRead(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Defense Profile Resp :%+v ", botProfile)
-	d.Set("name", botProfile.FullPath)
-	d.Set("defaults_from", botProfile.DefaultsFrom)
-	d.Set("description", botProfile.Description)
-	d.Set("tenant_id", botProfile.TenantId)
-	d.Set("api_key", botProfile.ApiKey)
-	d.Set("shape_protection_pool", botProfile.ShapeProtectionPool)
-	d.Set("ssl_profile", botProfile.SslProfile)
-	d.Set("protected_endpoints", flattenProtectedEndpointsReference(botProfile.ProtectedEndpointsReference.Items))
+	_ = d.Set("name", botProfile.FullPath)
+	_ = d.Set("defaults_from", botProfile.DefaultsFrom)
+	_ = d.Set("description", botProfile.Description)
+	_ = d.Set("tenant_id", botProfile.TenantId)
+	_ = d.Set("api_key", botProfile.ApiKey)
+	_ = d.Set("shape_protection_pool", botProfile.ShapeProtectionPool)
+	_ = d.Set("ssl_profile", botProfile.SslProfile)
+	_ = d.Set("protected_endpoints", flattenProtectedEndpointsReference(botProfile.ProtectedEndpointsReference.Items))
 	return nil
 }
 

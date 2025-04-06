@@ -85,8 +85,8 @@ func resourceBigipPartitionRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	log.Printf("[INFO] Partition: %+v", partition)
-	d.Set("name", partition.Name)
-	d.Set("route_domain_id", partition.RouteDomain)
+	_ = d.Set("name", partition.Name)
+	_ = d.Set("route_domain_id", partition.RouteDomain)
 
 	return nil
 }

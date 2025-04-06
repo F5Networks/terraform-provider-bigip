@@ -194,7 +194,7 @@ func resourceBigipSysOcspRead(ctx context.Context, d *schema.ResourceData, meta 
 
 	log.Printf("[INFO] ocsp response: %+v", string(ocspJson))
 
-	d.Set("name", ocsp.FullPath)
+	_ = d.Set("name", ocsp.FullPath)
 
 	setOcspStateData(d, ocsp)
 
@@ -305,32 +305,32 @@ func populateOcspConfig(ocsp *bigip.OCSP, d *schema.ResourceData) {
 
 func setOcspStateData(d *schema.ResourceData, ocsp *bigip.OCSP) {
 	if ocsp.ProxyServerPool != "" {
-		d.Set("proxy_server_pool", ocsp.ProxyServerPool)
+		_ = d.Set("proxy_server_pool", ocsp.ProxyServerPool)
 	} else {
-		d.Set("dns_resolver", ocsp.DnsResolver)
+		_ = d.Set("dns_resolver", ocsp.DnsResolver)
 	}
 	if ocsp.RouteDomain != "" {
-		d.Set("route_domain", ocsp.RouteDomain)
+		_ = d.Set("route_domain", ocsp.RouteDomain)
 	}
 	if ocsp.ResponderUrl != "" {
-		d.Set("responder_url", ocsp.ResponderUrl)
+		_ = d.Set("responder_url", ocsp.ResponderUrl)
 	}
 	if ocsp.TrustedResponders != "" {
-		d.Set("trusted_responders", ocsp.TrustedResponders)
+		_ = d.Set("trusted_responders", ocsp.TrustedResponders)
 	}
 	if ocsp.SignerCert != "" {
-		d.Set("signer_cert", ocsp.SignerCert)
+		_ = d.Set("signer_cert", ocsp.SignerCert)
 	}
 	if ocsp.SignerKey != "" {
-		d.Set("signer_key", ocsp.SignerKey)
+		_ = d.Set("signer_key", ocsp.SignerKey)
 	}
 
-	d.Set("concurrent_connections_limit", ocsp.ConcurrentConnectionsLimit)
-	d.Set("clock_skew", ocsp.ClockSkew)
-	d.Set("status_age", ocsp.StatusAge)
-	d.Set("cache_timeout", ocsp.CacheTimeout)
-	d.Set("cache_error_timeout", ocsp.CacheErrorTimeout)
-	d.Set("connection_timeout", ocsp.ConnectionTimeout)
-	d.Set("strict_resp_cert_check", ocsp.StrictRespCertCheck)
-	d.Set("sign_hash", ocsp.SignHash)
+	_ = d.Set("concurrent_connections_limit", ocsp.ConcurrentConnectionsLimit)
+	_ = d.Set("clock_skew", ocsp.ClockSkew)
+	_ = d.Set("status_age", ocsp.StatusAge)
+	_ = d.Set("cache_timeout", ocsp.CacheTimeout)
+	_ = d.Set("cache_error_timeout", ocsp.CacheErrorTimeout)
+	_ = d.Set("connection_timeout", ocsp.ConnectionTimeout)
+	_ = d.Set("strict_resp_cert_check", ocsp.StrictRespCertCheck)
+	_ = d.Set("sign_hash", ocsp.SignHash)
 }
