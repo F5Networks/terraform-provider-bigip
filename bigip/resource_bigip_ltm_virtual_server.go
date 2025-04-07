@@ -338,7 +338,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
-			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination))
+			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: %+v ", vs.Destination))
 		}
 		if len(destination) > 3 {
 			_ = d.Set("destination", destination[2])

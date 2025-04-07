@@ -350,9 +350,9 @@ func setFastTcpData(d *schema.ResourceData, data bigip.FastTCPJson) error {
 		}
 	}
 	if data.PersistenceProfile != "" {
-		d.Set("persistence_profile", data.PersistenceProfile)
+		_ = d.Set("persistence_profile", data.PersistenceProfile)
 	} else {
-		d.Set("persistence_type", data.PersistenceType)
+		_ = d.Set("persistence_type", data.PersistenceType)
 	}
 	_ = d.Set("fallback_persistence", data.FallbackPersistenceType)
 	return nil

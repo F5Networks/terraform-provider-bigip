@@ -94,11 +94,11 @@ func resourceBigipLtmProfileBotDefenseRead(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Bot Defense Profile config :%+v ", botProfile)
-	d.Set("name", botProfile.FullPath)
-	d.Set("defaults_from", botProfile.DefaultsFrom)
-	d.Set("description", botProfile.Description)
-	d.Set("template", botProfile.Template)
-	d.Set("enforcement_mode", botProfile.EnforcementMode)
+	_ = d.Set("name", botProfile.FullPath)
+	_ = d.Set("defaults_from", botProfile.DefaultsFrom)
+	_ = d.Set("description", botProfile.Description)
+	_ = d.Set("template", botProfile.Template)
+	_ = d.Set("enforcement_mode", botProfile.EnforcementMode)
 	return nil
 }
 
