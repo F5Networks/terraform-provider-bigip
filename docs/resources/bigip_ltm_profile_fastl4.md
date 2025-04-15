@@ -32,7 +32,7 @@ resource "bigip_ltm_profile_fastl4" "profile_fastl4" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Name of the LTM fastL4 Profile.The full path is the combination of the `partition + name` of the resource (For example `/Common/my-fastl4profile`) or  `partition + directory + name` of the resource  (example: `/Common/test/my-fastl4profile`)
+* `name` - (Required,type `string`) Name of the LTM fastL4 Profile. The full path is the combination of the `partition + name` of the resource (For example `/Common/my-fastl4profile`) or  `partition + directory + name` of the resource  (example: `/Common/test/my-fastl4profile`)
 
 * `defaults_from` - (Optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 
