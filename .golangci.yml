@@ -1,0 +1,8 @@
+linters-settings:
+  goanalysis_metalinter:
+    disabled-checkers:
+      - resourceExportData
+issues:
+  exclude-dirs:
+    - github.com/hashicorp/terraform-plugin-sdk/v2/helper
+
