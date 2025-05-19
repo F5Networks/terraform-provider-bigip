@@ -5,7 +5,6 @@ linters:
     - gocritic
     - govet
     - ineffassign
-    - staticcheck
     - unused
   exclusions:
     generated: lax
@@ -15,13 +14,13 @@ linters:
       - legacy
       - std-error-handling
     paths:
-      - vendor$
-      - examples$
+      - vendor
+      - examples
 formatters:
   enable:
     - gofmt
   exclusions:
     generated: lax
     paths:
-      - vendor$
-      - examples$
+      - vendor
+      - examples
