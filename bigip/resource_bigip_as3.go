@@ -63,6 +63,8 @@ func resourceBigipAs3() *schema.Resource {
 					newJsonref := make(map[string]interface{})
 					_ = json.Unmarshal(oldResp, &oldJsonref)
 					_ = json.Unmarshal(newResp, &newJsonref)
+					delete(oldJsonref, "$schema")
+					delete(newJsonref, "$schema")
 					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
 					if jsonEqualityBefore {
 						return true

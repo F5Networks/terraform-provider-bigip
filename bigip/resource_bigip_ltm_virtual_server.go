@@ -432,10 +432,8 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
 		profileNames.Add(FullProfileName)
 	}
-	if profileNames.Len() > 0 {
-		_ = d.Set("persistence_profiles", profileNames)
-	}
 
+	_ = d.Set("persistence_profiles", profileNames)
 	_ = d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile)
 	_ = d.Set("source_port", vs.SourcePort)
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
