@@ -1,32 +1,27 @@
 version: "2"
-
-run:
-  timeout: 5m
-  tests: true      # Enable linting for test files.
-  exclude-use-default: false
-
-linters-settings:
-  staticcheck:
-    checks:
-      - SA1000 # Customize which specific staticcheck rules to run.
-      - SA1019
-
-# issues:
-#   exclude-rules:
-#     - linters:
-#         - errcheck
-#       text: "ignoring file write error"  # Exclude specific error messages.
-#   max-issues-per-linter: 0  # No maximum issues per linter.
-#   max-same-issues: 5        # Prevent spamming with the same issue.
-#   exclude-use-default: false
-
-# output:
-#   format: colored-line-number # Output format for CLI.
-
-# linters:
-#   goanalysis_metalinter:
-#     disabled-checkers:
-#       - resourceExportData
-issues:
-  exclude-dirs:
-    - vendor
+linters:
+  default: none
+  enable:
+    - gocritic
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - vendor$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - vendor$
+      - examples$
