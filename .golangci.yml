@@ -50,28 +50,28 @@ run:
   # fall back to the number of logical CPUs in the machine)
   concurrency: 4
 
-# linters:
-#   default: none
-#   enable:
-#     - gocritic
-#     - govet
-#     - ineffassign
-#     - unused
-#   exclusions:
-#     generated: lax
-#     presets:
-#       - comments
-#       - common-false-positives
-#       - legacy
-#       - std-error-handling
-#     paths:
-#       - vendor
-#       - examples
-# formatters:
-#   enable:
-#     - gofmt
-#   exclusions:
-#     generated: lax
-#     paths:
-#       - vendor
-#       - examples
+linters:
+  default: none
+  enable:
+    - gocritic
+    - govet
+    - ineffassign
+    - unused
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - vendor
+      - examples
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - vendor
+      - examples
