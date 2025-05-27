@@ -24,7 +24,7 @@ resource "bigip_ltm_profile_oneconnect" "test-oneconnect" {
 
 ## Argument Reference
 
-* `name` (Required,`type string`) Name of Profile should be full path.The full path is the combination of the `partition + profile_name`,For example `/Common/test-oneconnect-profile`.
+* `name` - (Required,`type string`) Name of Profile should be full path.The full path is the combination of the `partition + profile_name`,For example `/Common/test-oneconnect-profile`.
 
 * `partition` - (Optional,`type string`) Displays the administrative partition within which this profile resides
 
