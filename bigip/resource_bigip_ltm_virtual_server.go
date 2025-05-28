@@ -114,6 +114,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Description:   "Specifies destination traffic matching information to which the virtual server sends traffic",
 				ConflictsWith: []string{"destination", "port"},
 			},
+			"connection_limit": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Specifies the maximum number of connections allowed for the virtual server.",
+				Computed:    true,
+			},
 			"pool": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -359,6 +365,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	_ = d.Set("trafficmatching_criteria", vs.TrafficMatchingCriteria)
+	_ = d.Set("connection_limit", vs.ConnectionLimit)
 	_ = d.Set("source", vs.Source)
 	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
@@ -586,6 +593,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	config.Vlans = vlans
 	config.IPProtocol = d.Get("ip_protocol").(string)
 	config.TrafficMatchingCriteria = d.Get("trafficmatching_criteria").(string)
+    config.ConnectionLimit = connectionLimit.(int)
 	srcAddrsTrans := struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`
