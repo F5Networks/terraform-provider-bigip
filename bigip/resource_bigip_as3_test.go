@@ -681,3 +681,151 @@ func TestAccBigipPer_AppAs3_update_invalidJson(t *testing.T) {
 		},
 	})
 }
+
+func TestAccBigipAs3ExportOnly(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+resource "bigip_as3" "export_example" {
+  tenant_name = "Sample_01"
+  export_only = true
+}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_as3.export_example", "export_only", "true"),
+					resource.TestCheckResourceAttrSet("bigip_as3.export_example", "as3_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ApplicationName(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resource1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02", true),
+				),
+			},
+			{
+				Config: `
+resource "bigip_as3" "app_specific" {
+  tenant_name      = "Sample_01"
+  application_name = "Application1"
+  export_only      = true
+}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_as3.app_specific", "application_name", "Application1"),
+					resource.TestCheckResourceAttrSet("bigip_as3.app_specific", "as3_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ResponseOutput(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_new", true),
+					resource.TestCheckResourceAttrSet("bigip_as3.as3-example", "as3_response"),
+				),
+			},
+		},
+	})
+}
+
+// give me the commands to test above 3 test cases
+
+func TestAccBigipAs3ExportOnlyCommand(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+resource "bigip_as3" "export_example" {
+  tenant_name = "Sample_01"
+  export_only = true
+}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_as3.export_example", "export_only", "true"),
+					resource.TestCheckResourceAttrSet("bigip_as3.export_example", "as3_response"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ApplicationNameCommand(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resource1,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_01,Sample_02", true),
+				),
+			},
+			{
+				Config: `
+resource "bigip_as3" "app_specific" {
+  tenant_name      = "Sample_01"
+  application_name = "Application1"
+  export_only      = true
+}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_as3.app_specific", "application_name", "Application1"),
+					resource.TestCheckResourceAttrSet("bigip_as3.app_specific", "as3_response"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func TestAccBigipAs3ResponseOutputCommand(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: TestAs3Resource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("Sample_new", true),
+					resource.TestCheckResourceAttrSet("bigip_as3.as3-example", "as3_response"),
+				),
+			},
+		},
+	})
+}

@@ -188,6 +188,21 @@ func resourceBigipAs3() *schema.Resource {
 				Computed:    true,
 				Description: "Will define Perapp mode enabled on BIG-IP or not",
 			},
+			"application_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Optional application name within the tenant for retrieval.",
+			},
+			"as3_response": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Output of the retrieved AS3 configuration as JSON.",
+			},
+			"export_only": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Set to true for retrieval/export-only functionality.",
+			},
 		},
 	}
 }
@@ -292,6 +307,7 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
+	exportOnly := d.Get("export_only").(bool)
 	var tenantCount []string
 	perApplication, err := client.CheckSetting()
 	if err != nil {
@@ -302,6 +318,12 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	var controlsQuerParam string
 	if _, controls := d.GetOk("controls"); controls {
 		controlsQuerParam = controlsQueraString(d)
+	}
+	// Skip deployment if export-only is enabled
+	if exportOnly {
+		log.Printf("[INFO] Skipping AS3 deployment due to export-only mode.")
+		d.SetId(fmt.Sprintf("export-only-%s", d.Get("tenant_name").(string))) // Set ID as export mode identifier
+		return diag.Diagnostics{}
 	}
 
 	log.Printf("[DEBUG] perApplication:%+v", perApplication)
@@ -397,14 +419,63 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	createdTenants = d.Get("tenant_list").(string)
 	return resourceBigipAs3Read(ctx, d, meta)
 }
+
 func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*bigip.BigIP)
-	log.Printf("[INFO] Reading AS3 config")
-	var name string
-	var tList string
+	log.Printf("[INFO] Reading AS3 declaration")
+
+	// Retrieve variables from schema
 	as3Json := d.Get("as3_json").(string)
 	perappMode := d.Get("per_app_mode").(bool)
-	log.Printf("[INFO] AS3 config:%+v", as3Json)
+	applicationList := d.Get("application_list").(string)
+	exportOnly := d.Get("export_only").(bool)
+	tenantName := d.Get("tenant_name").(string)
+	applicationName, appSpecified := d.GetOk("application_name")
+	log.Printf("[DEBUG] Export-only mode: %v, Tenant Name: %s, Application: %v", exportOnly, tenantName, applicationName)
+
+	if exportOnly {
+		// Use `client.GetAs3` for export-only retrieval
+		var as3Resp string
+		var err error
+
+		if appSpecified {
+			log.Printf("[DEBUG] Exporting AS3 for application '%s' in tenant '%s'", applicationName.(string), tenantName)
+			as3Resp, err = client.GetAs3(tenantName, applicationName.(string), false) // Application-specific retrieval
+		} else {
+			log.Printf("[DEBUG] Exporting AS3 for tenant '%s'", tenantName)
+			as3Resp, err = client.GetAs3(tenantName, "", false) // Tenant-wide retrieval
+		}
+
+		if err != nil {
+			log.Printf("[ERROR] Failed to retrieve AS3 declaration (export-only mode): %s", err.Error())
+			return diag.Errorf("[ERROR] Export-Only Retrieval Failed: %s", err.Error())
+		}
+
+		// Check if response is empty
+		if as3Resp == "" {
+			log.Printf("[WARN] No AS3 declaration found for tenant: '%s', application: '%v'", tenantName, applicationName)
+			_ = d.Set("as3_response", "") // Set empty response
+			d.SetId("")
+			return nil
+		}
+
+		// Parse AS3 declaration into `as3_response`
+		log.Printf("[INFO] Successfully retrieved AS3 declaration for tenant '%s'", tenantName)
+		_ = d.Set("as3_response", as3Resp)
+
+		// Set resource state for export-only mode
+		if appSpecified {
+			d.SetId(fmt.Sprintf("export-only-%s-%s", tenantName, applicationName))
+		} else {
+			d.SetId(fmt.Sprintf("export-only-%s", tenantName))
+		}
+
+		return nil
+	}
+
+	// Normal Stateful Read Logic
+	var name string
+	var tList string
 	if d.Get("as3_json") != nil && !perappMode && d.Get("tenant_filter") == "" {
 		tList, _, _ = client.GetTenantList(as3Json)
 		if createdTenants != "" && createdTenants != tList {
@@ -416,55 +487,48 @@ func resourceBigipAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 	} else {
 		name = d.Id()
 	}
-	applicationList := d.Get("application_list").(string)
-	log.Printf("[DEBUG] Tenants in AS3 get call : %s", name)
-	log.Printf("[DEBUG] Applications in AS3 get call : %s", applicationList)
-	if name != "" {
-		as3Resp, err := client.GetAs3(name, applicationList, d.Get("per_app_mode").(bool))
 
-		if err != nil {
-			log.Printf("[ERROR] Unable to retrieve json ")
-			if err.Error() == "unexpected end of JSON input" {
-				log.Printf("[ERROR] %v", err)
-				return nil
-			}
-			d.SetId("")
-			return diag.FromErr(err)
-		}
-		if as3Resp == "" {
-			log.Printf("[WARN] Json (%s) not found, removing from state", d.Id())
-			_ = d.Set("as3_json", "")
-			// d.SetId("")
-			return nil
-		}
+	log.Printf("[DEBUG] Tenant name resolved: %s", name)
+	log.Printf("[DEBUG] Applications in retrieval: %s", applicationList)
 
-		if d.Get("per_app_mode").(bool) {
-			as3Json := make(map[string]interface{})
-			filteredAs3Json := make(map[string]interface{})
-			_ = json.Unmarshal([]byte(as3Resp), &as3Json)
-			for _, value := range strings.Split(applicationList, ",") {
-				log.Printf("[DEBUG] Fetching  AS3 get for Application : %s", value)
-				filteredAs3Json[value] = as3Json[value]
-			}
-			filteredAs3Json["schemaVersion"] = as3Json["schemaVersion"]
-			out, _ := json.Marshal(filteredAs3Json)
-			filteredAs3String := string(out)
-			log.Printf("[DEBUG] AS3 GET call in Read function : %s", filteredAs3Json)
-			_ = d.Set("as3_json", filteredAs3String)
-		} else {
-			_ = d.Set("as3_json", as3Resp)
-		}
-
-		_ = d.Set("tenant_list", name)
-	} else if d.Get("task_id") != nil {
-		taskResponse, err := client.Getas3TaskResponse(d.Get("task_id").(string))
-		if err != nil {
-			d.SetId("")
-			return nil
-		}
-		_ = d.Set("as3_json", taskResponse)
-		_ = d.Set("tenant_list", name)
+	// Use `client.GetAs3` for stateful read logic
+	as3Resp, err := client.GetAs3(name, applicationList, perappMode)
+	if err != nil {
+		log.Printf("[ERROR] Failed to retrieve AS3 declaration: %s", err.Error())
+		d.SetId("")
+		return diag.FromErr(err)
 	}
+
+	if as3Resp == "" {
+		log.Printf("[WARN] No AS3 declaration found for tenant: '%s'", name)
+		_ = d.Set("as3_json", "")
+		d.SetId("")
+		return nil
+	}
+
+	if perappMode {
+		as3Data := make(map[string]interface{})
+		filteredAs3Json := make(map[string]interface{})
+		_ = json.Unmarshal([]byte(as3Resp), &as3Data)
+
+		for _, app := range strings.Split(applicationList, ",") {
+			log.Printf("[DEBUG] Filtering AS3 declaration for application: %s", app)
+			if val, exists := as3Data[app]; exists {
+				filteredAs3Json[app] = val
+			}
+		}
+		filteredAs3Json["schemaVersion"] = as3Data["schemaVersion"]
+
+		out, _ := json.Marshal(filteredAs3Json)
+		filteredAs3String := string(out)
+		log.Printf("[DEBUG] Filtered AS3: %s", filteredAs3String)
+		_ = d.Set("as3_json", filteredAs3String)
+	} else {
+		_ = d.Set("as3_json", as3Resp)
+	}
+
+	_ = d.Set("tenant_list", name)
+	d.SetId(name)
 	return nil
 }
 
@@ -475,11 +539,16 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	as3Json := d.Get("as3_json").(string)
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	oldApplicationList := d.Get("application_list").(string)
+	exportOnly := d.Get("export_only").(bool)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
 
 	var controlsQuerParam string
 	if _, controls := d.GetOk("controls"); controls {
 		controlsQuerParam = controlsQueraString(d)
+	}
+	if exportOnly {
+		log.Printf("[INFO] Skipping AS3 update due to export-only mode.")
+		return diag.Diagnostics{}
 	}
 
 	_ = d.Set("application_list", applicationList)
