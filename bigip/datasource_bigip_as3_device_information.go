@@ -119,13 +119,14 @@ func fetchAs3Configuration(client *bigip.BigIP, tenant string, applicationList [
 
 	as3Resp, err := client.GetAs3(tenant, applications, false)
 	if err != nil {
-		if strings.Contains(err.Error(), "404") {
+		switch {
+		case strings.Contains(err.Error(), "404"):
 			log.Printf("[WARN] Tenant '%s' not found on BIG-IP system", tenant)
 			return "", fmt.Errorf("tenant '%s' not found on BIG-IP system", tenant)
-		} else if strings.Contains(err.Error(), "401") {
+		case strings.Contains(err.Error(), "401"):
 			log.Printf("[ERROR] Unauthorized access for tenant '%s'. Check credentials.", tenant)
 			return "", fmt.Errorf("unauthorized access when fetching AS3 configuration for tenant '%s'", tenant)
-		} else {
+		default:
 			log.Printf("[ERROR] Failed to fetch AS3 configuration for tenant '%s': %v", tenant, err)
 			return "", fmt.Errorf("failed to fetch AS3 configuration for tenant '%s': %v", tenant, err)
 		}
