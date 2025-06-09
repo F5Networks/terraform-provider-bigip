@@ -16,6 +16,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/f5devcentral/go-bigip/f5teem"
@@ -188,6 +189,29 @@ func resourceBigipAs3() *schema.Resource {
 				Computed:    true,
 				Description: "Will define Perapp mode enabled on BIG-IP or not",
 			},
+			"delete_apps": {
+				Type:        schema.TypeList,
+				MaxItems:    1,    // Ensures only one delete_apps block is allowed
+				Optional:    true, // The block is optional in the configuration
+				Description: "Block for specifying tenant name and apps to delete.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"tenant_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The name of the tenant for application deletion.",
+						},
+						"apps": {
+							Type:        schema.TypeList,
+							Required:    true,
+							Description: "List of applications to delete from the specified tenant.",
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -292,6 +316,21 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
 	tenantFilter := d.Get("tenant_filter").(string)
+	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
+
+	// Check if delete_apps is set, call the delete_apps handler
+	// can you please properly fix the below code with proper logging?
+	// saying the delete_apps and as3_json is mutual exclusive
+
+	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
+		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
+	}
+
+	if len(deleteAppsBlocks) > 0 {
+		log.Printf("[INFO] Detected delete_apps block. Redirecting to deletion logic.")
+		return handleDeleteApps(ctx, d, client)
+	}
+
 	var tenantCount []string
 	perApplication, err := client.CheckSetting()
 	if err != nil {
@@ -473,6 +512,17 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	m.Lock()
 	defer m.Unlock()
 	as3Json := d.Get("as3_json").(string)
+	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
+
+	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
+		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
+	}
+
+	// Handle specific application deletions if delete_apps is set
+	if len(deleteAppsBlocks) > 0 {
+		log.Printf("[INFO] Detected delete_apps block. Redirecting to deletion-specific logic.")
+		return handleDeleteApps(ctx, d, client)
+	}
 	log.Printf("[INFO] Updating As3 Config :%s", as3Json)
 	oldApplicationList := d.Get("application_list").(string)
 	tenantList, _, applicationList := client.GetTenantList(as3Json)
@@ -581,6 +631,18 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	defer m.Unlock()
 	var name string
 	var tList string
+	as3Json := d.Get("as3_json").(string)
+	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
+
+	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
+		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
+	}
+
+	// Handle specific application deletions if delete_apps is set
+	if len(deleteAppsBlocks) > 0 {
+		log.Printf("[INFO] Detected delete_apps block. Redirecting to deletion-specific logic.")
+		return handleDeleteApps(ctx, d, client)
+	}
 
 	if c_attr, c_ok := d.GetOk("controls"); c_ok {
 		controls := c_attr.(map[string]interface{})
@@ -591,7 +653,7 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	}
 
 	if d.Get("as3_json") != nil {
-		tList, _, _ = client.GetTenantList(d.Get("as3_json").(string))
+		tList, _, _ = client.GetTenantList(as3Json)
 	}
 
 	if d.Id() != "" && tList != "" && d.Get("tenant_filter") == "" {
@@ -652,4 +714,42 @@ func GenerateRandomString(length int) (string, error) {
 		randomString[i] = charset[randomIndex.Int64()]
 	}
 	return string(randomString), nil
+}
+
+func handleDeleteApps(ctx context.Context, d *schema.ResourceData, client *bigip.BigIP) diag.Diagnostics {
+	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
+	tenantName := d.Get("tenant_name").(string)
+
+	for _, block := range deleteAppsBlocks {
+		blockData := block.(map[string]interface{})
+		tenant := blockData["tenant_name"].(string)
+		appsToDeleteRaw := blockData["apps"].([]interface{})
+		var appsToDelete []string
+		for _, app := range appsToDeleteRaw {
+			appsToDelete = append(appsToDelete, app.(string))
+		}
+
+		log.Printf("[INFO] Deleting applications %v under tenant '%s'", appsToDelete, tenant)
+
+		// Check if tenant exists
+		as3Resp, err := client.GetAs3(tenant, "", false)
+		if err != nil || len(as3Resp) == 0 {
+			log.Printf("[WARN] Skipping deletion: Tenant '%s' not found or empty: %v", tenant, err)
+			continue // Do not fail – just skip this block
+		}
+
+		for _, app := range appsToDelete {
+			log.Printf("[INFO] Attempting to delete application '%s' in tenant '%s'", app, tenant)
+
+			err := client.DeletePerApplicationAs3Bigip(tenant, app)
+			if err != nil {
+				log.Printf("[ERROR] Failed to delete application '%s' in tenant '%s': %v", app, tenant, err)
+				return diag.FromErr(fmt.Errorf("failed to delete app '%s': %v", app, err))
+			}
+			log.Printf("[INFO] Successfully deleted application '%s' in tenant '%s'", app, tenant)
+		}
+	}
+	d.SetId(fmt.Sprintf("deleted-%s-%d", tenantName, time.Now().Unix()))
+
+	return nil
 }
