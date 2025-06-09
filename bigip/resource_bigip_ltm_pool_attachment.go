@@ -444,6 +444,6 @@ func SplitNodePort(s string) []string {
 	case m < n:
 		return strings.Split(s, ".")
 	default:
-		return nil
+		return []string{s}
 	}
 }
