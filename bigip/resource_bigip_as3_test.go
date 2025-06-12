@@ -681,3 +681,60 @@ func TestAccBigipPer_AppAs3_update_invalidJson(t *testing.T) {
 		},
 	})
 }
+
+var TestAs3DeleteApps = `
+resource "bigip_as3" "delete_apps_test" {
+  delete_apps {
+    tenant_name = "dmz"
+    apps        = ["Application1", "Application2"]
+  }
+}
+`
+
+func TestAccBigipAs3_DeleteApps(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckAs3Destroy,
+		Steps: []resource.TestStep{
+			// First, create the tenant and apps (reuse existing config)
+			{
+				Config: TestAs3PerAppResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAs3Exists("dmz", true),
+					testCheckAS3AppExists("dmz", "Application1,Application2", true),
+				),
+			},
+			// Now, delete the apps using delete_apps
+			{
+				Config: TestAs3DeleteApps,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckAS3AppExists("dmz", "Application1,Application2", false),
+				),
+			},
+		},
+	})
+}
+
+var TestAs3DeleteAppsMutualExclusion = `
+resource "bigip_as3" "delete_apps_test" {
+  as3_json = "{}"
+  delete_apps {
+    tenant_name = "dmz"
+    apps        = ["Application1"]
+  }
+}
+`
+
+func TestAccBigipAs3_DeleteApps_MutualExclusion(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAcctPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      TestAs3DeleteAppsMutualExclusion,
+				ExpectError: regexp.MustCompile("'delete_apps' and 'as3_json' are mutually exclusive"),
+			},
+		},
+	})
+}
