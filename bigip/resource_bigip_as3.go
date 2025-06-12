@@ -50,9 +50,10 @@ func resourceBigipAs3() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"as3_json": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "AS3 json",
+				Type:          schema.TypeString,
+				Optional:      true,
+				Description:   "Full AS3 declaration as a JSON string to deploy on BIG-IP. **Mutually exclusive with `delete_apps`**: only one of `as3_json` or `delete_apps` can be set in a resource block.",
+				ConflictsWith: []string{"delete_apps"},
 				StateFunc: func(v interface{}) string {
 					jsonString, _ := structure.NormalizeJsonString(v)
 					return jsonString
@@ -190,10 +191,11 @@ func resourceBigipAs3() *schema.Resource {
 				Description: "Will define Perapp mode enabled on BIG-IP or not",
 			},
 			"delete_apps": {
-				Type:        schema.TypeList,
-				MaxItems:    1,    // Ensures only one delete_apps block is allowed
-				Optional:    true, // The block is optional in the configuration
-				Description: "Block for specifying tenant name and apps to delete.",
+				Type:          schema.TypeList,
+				MaxItems:      1,    // Ensures only one delete_apps block is allowed
+				Optional:      true, // The block is optional in the configuration
+				Description:   "Block for specifying tenant name and applications to delete from BIG-IP. **Mutually exclusive with `as3_json`**: only one of `delete_apps` or `as3_json` can be set in a resource block.",
+				ConflictsWith: []string{"as3_json"},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"tenant_name": {
@@ -321,10 +323,6 @@ func resourceBigipAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 	// Check if delete_apps is set, call the delete_apps handler
 	// can you please properly fix the below code with proper logging?
 	// saying the delete_apps and as3_json is mutual exclusive
-
-	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
-		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
-	}
 
 	if len(deleteAppsBlocks) > 0 {
 		log.Printf("[INFO] Detected delete_apps block. Redirecting to deletion logic.")
@@ -514,10 +512,6 @@ func resourceBigipAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 	as3Json := d.Get("as3_json").(string)
 	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
 
-	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
-		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
-	}
-
 	// Handle specific application deletions if delete_apps is set
 	if len(deleteAppsBlocks) > 0 {
 		log.Printf("[INFO] Detected delete_apps block. Redirecting to deletion-specific logic.")
@@ -633,10 +627,6 @@ func resourceBigipAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	var tList string
 	as3Json := d.Get("as3_json").(string)
 	deleteAppsBlocks := d.Get("delete_apps").([]interface{})
-
-	if len(deleteAppsBlocks) > 0 && len(as3Json) > 0 {
-		return diag.FromErr(fmt.Errorf("'delete_apps' and 'as3_json' are mutually exclusive. Please use only one of these attributes"))
-	}
 
 	// Handle specific application deletions if delete_apps is set
 	if len(deleteAppsBlocks) > 0 {
