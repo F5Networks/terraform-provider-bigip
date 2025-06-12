@@ -25,6 +25,7 @@ var TestPostgresqlMonitorName = fmt.Sprintf("/%s/test-postgresql-monitor", TestP
 var TestLDAPMonitorName = fmt.Sprintf("/%s/test-ldap-monitor", TestPartition)
 var TestGatewayIcmpMonitorName = fmt.Sprintf("/%s/test-gateway", TestPartition)
 var TestTcpHalfOpenMonitorName = fmt.Sprintf("/%s/test-tcp-half-open", TestPartition)
+var TestSMPTPMonitorName = fmt.Sprintf("/%s/test-smtp", TestPartition)
 
 var TestMonitorResource = `
 resource "bigip_ltm_monitor" "test-monitor" {
@@ -129,6 +130,17 @@ resource "bigip_ltm_monitor" "test-tcp-half-open-monitor" {
 }
 `
 
+var TestSMPTPMonitorResource = `
+resource "bigip_ltm_monitor" "test-smtp-monitor" {
+  name        = "` + TestSMPTPMonitorName + `"
+  parent      = "/Common/smtp"
+  timeout     = "16"
+  interval    = "5"
+  destination = "10.10.10.10:1234"
+  domain 	  = "1.1.1.1" 
+}
+`
+
 func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -145,6 +157,29 @@ func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-gateway-icmp-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-gateway-icmp-monitor", "interval", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-gateway-icmp-monitor", "destination", "10.10.10.10:*"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_SMTPCreate(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestSMPTPMonitorResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TestSMPTPMonitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-smtp-monitor", "parent", "/Common/smtp"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-smtp-monitor", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-smtp-monitor", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-smtp-monitor", "destination", "10.10.10.10:1234"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-smtp-monitor", "domain", "1.1.1.1"),
 				),
 			},
 		},
