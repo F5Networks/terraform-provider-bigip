@@ -522,7 +522,7 @@ resource "bigip_as3" "test" {
 ```
 
 
-# bigip_as3
+# bigip_as3 delete one or more applications
 
 The `bigip_as3` resource allows you to **post full AS3 declarations** or **selectively delete one or more applications** from a specific tenant in BIG-IP.
 
