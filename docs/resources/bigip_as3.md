@@ -522,14 +522,6 @@ resource "bigip_as3" "test" {
 ```
 
 
----
-layout: "bigip"
-page_title: "BIG-IP: bigip_as3"
-subcategory: "AS3"
-description: |-
-  Provides support for posting AS3 declarations or deleting specific applications from a tenant using BIG-IP AS3.
----
-
 # bigip_as3
 
 The `bigip_as3` resource allows you to **post full AS3 declarations** or **selectively delete one or more applications** from a specific tenant in BIG-IP.
