@@ -534,13 +534,13 @@ description: |-
 
 The `bigip_as3` resource allows you to **post full AS3 declarations** or **selectively delete one or more applications** from a specific tenant in BIG-IP.
 
-> ⚠️ **Note**: `delete_apps` and `as3_json` are **mutually exclusive**. You must use only one of them in a single `bigip_as3` resource block.
+> **Note**: `delete_apps` and `as3_json` are **mutually exclusive**. You must use only one of them in a single `bigip_as3` resource block.
 
 ---
 
 ## Example Usage
 
-### 🔁 Delete Specific Applications from a Tenant
+### Delete Specific Applications from a Tenant
 
 ```hcl
 resource "bigip_as3" "as3_app_deletion" {
@@ -554,7 +554,7 @@ resource "bigip_as3" "as3_app_deletion" {
 }
 ```
 
-### 📤 Post a Full AS3 Declaration
+### Post a Full AS3 Declaration
 
 ```hcl
 resource "bigip_as3" "as3_declare" {
@@ -566,7 +566,7 @@ resource "bigip_as3" "as3_declare" {
 
 ## Argument Reference
 
-### 🧱 Common Attributes
+### Common Attributes
 
 - `ignore_metadata` - (Optional, Default: false) Set to true to ignore AS3 metadata when comparing.
 - `tenant_filter` - (Optional) Filters tenants from AS3 declaration.
@@ -577,14 +577,14 @@ resource "bigip_as3" "as3_declare" {
 
 ---
 
-### 📦 delete_apps Block
+### delete_apps Block
 
 Block for deleting specific applications from a BIG-IP tenant.
 
 - `tenant_name` - (Required) Name of the tenant containing the apps to delete.
 - `apps` - (Required) List of application names to delete from the specified tenant.
 
-> ⚠️ `delete_apps` cannot be used together with `as3_json`.
+> `delete_apps` cannot be used together with `as3_json`.
 
 #### Example
 
@@ -597,7 +597,7 @@ delete_apps {
 
 ---
 
-## ⚙️ Behavior
+## Behavior
 
 When `delete_apps` is used, Terraform logs “Creating...”, but the underlying logic performs application deletion via REST API calls.
 
@@ -621,6 +621,6 @@ A synthetic resource ID is assigned to keep Terraform state consistent after suc
 
 ## Import
 
-⚠️ This resource does not support importing existing AS3 declarations or partial app deletion states.
+This resource does not support importing existing AS3 declarations or partial app deletion states.
 
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
