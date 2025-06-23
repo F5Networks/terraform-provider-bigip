@@ -24,7 +24,7 @@ resource "bigip_sys_snmp" "snmp" {
 
 ## Argument Reference
 
-* `sys_contact` -  (Optional) Specifies the contact information for the system administrator.
+* `sys_contact` - (Optional) Specifies the contact information for the system administrator.
 
 * `sys_location` - Describes the system's physical location.
 
