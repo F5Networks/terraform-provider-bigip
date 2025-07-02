@@ -410,9 +410,10 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 	}
 
 	if resp.StatusCode == http.StatusAccepted {
+		start := time.Now()
 	forLoop:
-		for i := 0; i <= timeoutSec; i++ {
-			log.Printf("[DEBUG]Value of loop counter :%d", i)
+		for time.Since(start).Seconds() < float64(timeoutSec) {
+			log.Printf("[DEBUG]Value of Timeout counter in seconds :%v", math.Ceil(time.Since(start).Seconds()))
 			url := clientBigip.Host + "/mgmt/shared/declarative-onboarding/task/" + respID
 			req, _ := http.NewRequest("GET", url, nil)
 			if clientBigip.Token != "" {
@@ -468,9 +469,9 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 					return diag.FromErr(fmt.Errorf("error while reading the response body :%v", resultMap))
 				}
 			default:
-				time.Sleep(1 * time.Second)
-				continue
+				log.Printf("StatusCode:%+v", taskResp.StatusCode)
 			}
+			time.Sleep(1 * time.Second)
 		}
 	}
 

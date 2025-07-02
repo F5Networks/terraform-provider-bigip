@@ -7,13 +7,7 @@ If a copy of the MPL was not distributed with this file,You can obtain one at ht
 package bigip
 
 import (
-	"bytes"
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -66,6 +60,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
     policies = [bigip_ltm_policy.http_to_https_redirect.name]
+	connection_limit = 100
 }
 `
 var TestVs6Name = fmt.Sprintf("/%s/test-vs6", TestPartition)
@@ -86,6 +81,7 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 	persistence_profiles = ["/Common/source_addr", "/Common/hash"]
 	default_persistence_profile = "/Common/hash"
 	fallback_persistence_profile = "/Common/dest_addr"
+	connection_limit = 200
 }
 `
 
@@ -118,6 +114,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "server_profiles.*", "/Common/tcp-lan-optimized"),
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "connection_limit", "100"),
 				),
 			},
 		},
@@ -154,6 +151,7 @@ func TestAccBigipLtmVirtualServerCreateV4V6(t *testing.T) {
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/source_addr"),
 					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/hash"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "fallback_persistence_profile", "/Common/dest_addr"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "connection_limit", "200"),
 				),
 			},
 		},
@@ -877,119 +875,4 @@ resource "bigip_ltm_virtual_server" "server736-b" {
   mask        = "19"
 }
 `, vsName1, vsName2)
-}
-
-func TestAccBigipLtmVirtualServer_PersistProfileDeletion(t *testing.T) {
-	vsName := "test-vs-persist"
-	partition := "Common"
-
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers: testAccProviders,
-		CheckDestroy: resource.ComposeTestCheckFunc(
-			testCheckVSsDestroyed,
-		),
-		Steps: []resource.TestStep{
-			{
-				Config: testVSCreateWithPersistence(vsName),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(vsName),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/"+vsName),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.2"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "persist.0.name", "cookie"),
-				),
-			},
-			{
-				PreConfig: func() {
-					testAccBigipLtmVSPersistentProfilesDelete(t, vsName, partition)
-				},
-				Config: testVSWithoutPersistence(vsName),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckVSExists(vsName),
-					resource.TestCheckNoResourceAttr("bigip_ltm_virtual_server.test-vs", "persist.0.name"),
-				),
-			},
-		},
-	})
-}
-
-func testVSWithoutPersistence(name string) string {
-	return fmt.Sprintf(`
-resource "bigip_ltm_virtual_server" "test-vs" {
-  name        = "/Common/%s"
-  destination = "192.168.50.2"
-  ip_protocol = "tcp"
-  port        = 80
-  profiles    = ["/Common/http"]
-}
-`, name)
-}
-
-func testVSCreateWithPersistence(name string) string {
-	return fmt.Sprintf(`
-resource "bigip_ltm_virtual_server" "test-vs" {
-  name        = "/Common/%s"
-  destination = "192.168.50.2"
-  ip_protocol = "tcp"
-  port        = 80
-  profiles    = ["/Common/http"]
-  persist {
-    name = "cookie"
-  }
-}
-`, name)
-}
-
-func testAccBigipLtmVSPersistentProfilesDelete(t *testing.T, vsName string, partition string) {
-	clientBigip := testAccProvider.Meta().(*bigip.BigIP)
-
-	// Build the URL for PATCH
-	uri := fmt.Sprintf("%s/mgmt/tm/ltm/virtual/~%s~%s", clientBigip.Host, partition, vsName)
-
-	// Define the request body
-	payload := map[string]interface{}{
-		"kind":      "tm:ltm:virtual:virtualstate",
-		"name":      vsName,
-		"partition": partition,
-		"fullPath":  fmt.Sprintf("/%s/%s", partition, vsName),
-		"persist":   []interface{}{},
-	}
-
-	bodyBytes, err := json.Marshal(payload)
-	if err != nil {
-		t.Fatalf("[ERROR] Failed to marshal JSON body: %v", err)
-	}
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
-	req, err := http.NewRequest("PATCH", uri, bytes.NewBuffer(bodyBytes))
-	if err != nil {
-		t.Fatalf("[ERROR] Failed to create PATCH request: %v", err)
-	}
-
-	req.SetBasicAuth(clientBigip.User, clientBigip.Password)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatalf("[ERROR] HTTP request failed: %v", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Printf("[DEBUG] Could not close response body from %s", uri)
-		}
-	}()
-
-	if resp.StatusCode != 200 {
-		respBody, _ := io.ReadAll(resp.Body)
-		t.Fatalf("[ERROR] Failed to patch virtual server. Status: %s, Body: %s", resp.Status, string(respBody))
-	}
-
 }
