@@ -521,4 +521,98 @@ resource "bigip_as3" "test" {
 
 ```
 
+
+# bigip_as3 delete one or more applications
+
+The `bigip_as3` resource allows you to **post full AS3 declarations** or **selectively delete one or more applications** from a specific tenant in BIG-IP.
+
+> **Note**: `delete_apps` and `as3_json` are **mutually exclusive**. You must use only one of them in a single `bigip_as3` resource block.
+
+---
+
+## Example Usage
+
+### Delete Specific Applications from a Tenant
+
+```hcl
+resource "bigip_as3" "as3_app_deletion" {
+  delete_apps {
+    tenant_name = "Tenant-2"
+    apps        = [
+      "terraform_vs_http",
+      "legacy_app"
+    ]
+  }
+}
+```
+
+### Post a Full AS3 Declaration
+
+```hcl
+resource "bigip_as3" "as3_declare" {
+  as3_json = file("${path.module}/as3_payload.json")
+}
+```
+
+---
+
+## Argument Reference
+
+### Common Attributes
+
+- `ignore_metadata` - (Optional, Default: false) Set to true to ignore AS3 metadata when comparing.
+- `tenant_filter` - (Optional) Filters tenants from AS3 declaration.
+- `tenant_name` - (Computed) The tenant name used.
+- `per_app_mode` - (Computed) Whether the AS3 was posted in per-app mode.
+- `task_id` - (Computed) The ID of the task created in BIG-IP when AS3 was posted.
+- `application_list` - (Computed) List of applications that were managed.
+
+---
+
+### delete_apps Block
+
+Block for deleting specific applications from a BIG-IP tenant.
+
+- `tenant_name` - (Required) Name of the tenant containing the apps to delete.
+- `apps` - (Required) List of application names to delete from the specified tenant.
+
+> `delete_apps` cannot be used together with `as3_json`.
+
+#### Example
+
+```hcl
+delete_apps {
+  tenant_name = "Tenant-2"
+  apps        = ["terraform_vs_http"]
+}
+```
+
+---
+
+## Behavior
+
+When `delete_apps` is used, Terraform logs “Creating...”, but the underlying logic performs application deletion via REST API calls.
+
+Each app in the `apps` list is deleted using:
+
+```
+DELETE /mgmt/shared/appsvcs/declare/{tenant}/applications/{app}
+```
+
+A synthetic resource ID is assigned to keep Terraform state consistent after successful deletion.
+
+---
+
+## Outputs
+
+- `task_id` – AS3 task ID used in BIG-IP.
+- `application_list` – List of deleted applications (if applicable).
+- `tenant_list` – List of affected tenants.
+
+---
+
+## Import
+
+This resource does not support importing existing AS3 declarations or partial app deletion states.
+
 * `AS3 documentation` - https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/composing-a-declaration.html
