@@ -198,6 +198,9 @@ const (
 	uriUtility       = "utility"
 	uriOfferings     = "offerings"
 	uriF5BIGMSPBT10G = "f37c66e0-a80d-43e8-924b-3bbe9fe96bbe"
+
+	uriResource = "resource"
+	uriWebtop   = "webtop"
 )
 
 func (p *LIC) MarshalJSON() ([]byte, error) {
@@ -330,6 +333,7 @@ func (b *BigIP) CreateDevicegroup(p *Devicegroup) error {
 func (b *BigIP) UpdateDevicegroup(name string, p *Devicegroup) error {
 	return b.put(p, uriCm, uriDG, name)
 }
+
 func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
 	return b.put(config, uriCm, uriDG)
 }

@@ -1068,6 +1068,7 @@ type Monitor struct {
 	RecvRow        string `json:"recvRow,omitempty"`
 	RecvColumn     string `json:"recvColumn,omitempty"`
 	SSLProfile     string `json:"sslProfile,omitempty"`
+	Domain         string `json:"domain,omitempty"`
 	// ldap specifics
 	Base                string `json:"base,omitempty"`
 	Filter              string `json:"filter,omitempty"`
