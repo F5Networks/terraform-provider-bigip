@@ -114,6 +114,12 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Description:   "Specifies destination traffic matching information to which the virtual server sends traffic",
 				ConflictsWith: []string{"destination", "port"},
 			},
+			"connection_limit": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Specifies the maximum number of connections allowed for the virtual server.",
+				Computed:    true,
+			},
 			"pool": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -338,7 +344,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		regex := regexp.MustCompile(`^(/.+/)(.*:[^%]*)(?:%\d+)?(?:\.(\d+))$`)
 		destination := regex.FindStringSubmatch(vs.Destination)
 		if destination == nil {
-			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: %+v ", vs.Destination))
+			return diag.FromErr(fmt.Errorf("Unable to extract destination address and port from virtual server destination: " + vs.Destination))
 		}
 		if len(destination) > 3 {
 			_ = d.Set("destination", destination[2])
@@ -359,6 +365,7 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	_ = d.Set("trafficmatching_criteria", vs.TrafficMatchingCriteria)
+	_ = d.Set("connection_limit", vs.ConnectionLimit)
 	_ = d.Set("source", vs.Source)
 	_ = d.Set("ip_protocol", vs.IPProtocol)
 	_ = d.Set("name", name)
@@ -432,8 +439,10 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 		FullProfileName := "/" + profile.Partition + "/" + profile.Name
 		profileNames.Add(FullProfileName)
 	}
+	if profileNames.Len() > 0 {
+		_ = d.Set("persistence_profiles", profileNames)
+	}
 
-	_ = d.Set("persistence_profiles", profileNames)
 	_ = d.Set("fallback_persistence_profile", vs.FallbackPersistenceProfile)
 	_ = d.Set("source_port", vs.SourcePort)
 	_ = d.Set("vlans_enabled", vs.VlansEnabled)
@@ -586,6 +595,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	config.Vlans = vlans
 	config.IPProtocol = d.Get("ip_protocol").(string)
 	config.TrafficMatchingCriteria = d.Get("trafficmatching_criteria").(string)
+	config.ConnectionLimit = d.Get("connection_Limit").(int)
 	srcAddrsTrans := struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`

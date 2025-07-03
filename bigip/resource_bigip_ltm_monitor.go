@@ -223,6 +223,11 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Optional:    true,
 				Description: "Specifies the secure communications protocol that the monitor uses to communicate with the target. The options are none (Specifies that the system does not use a security protocol for communications with the target.), ssl (Specifies that the system uses the SSL protocol for communications with the target.), and tls (Specifies that the system uses the TLS protocol for communications with the target.)",
 			},
+			"domain": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the domain name to check, for example, Domain is allowed only in case of Parent as /Common/smtp.",
+			},
 		},
 	}
 }
@@ -393,6 +398,11 @@ func getLtmMonitorConfig(d *schema.ResourceData, config *bigip.Monitor) *bigip.M
 	config.ParentMonitor = d.Get("parent").(string)
 	if _, ok := d.GetOk("custom_parent"); ok {
 		config.ParentMonitor = d.Get("custom_parent").(string)
+	}
+	if _, ok := d.GetOk("domain"); ok {
+		if config.ParentMonitor == "/Common/smtp" {
+			config.Domain = d.Get("domain").(string)
+		}
 	}
 	config.Adaptive = d.Get("adaptive").(string)
 	config.AdaptiveLimit = d.Get("adaptive_limit").(int)
