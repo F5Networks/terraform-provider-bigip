@@ -595,7 +595,7 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	config.Vlans = vlans
 	config.IPProtocol = d.Get("ip_protocol").(string)
 	config.TrafficMatchingCriteria = d.Get("trafficmatching_criteria").(string)
-	config.ConnectionLimit = d.Get("connection_Limit").(int)
+	config.ConnectionLimit = d.Get("connection_limit").(int)
 	srcAddrsTrans := struct {
 		Type string `json:"type,omitempty"`
 		Pool string `json:"pool,omitempty"`
