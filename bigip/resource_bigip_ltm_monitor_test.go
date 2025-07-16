@@ -142,6 +142,7 @@ resource "bigip_ltm_monitor" "test-smtp-monitor" {
 `
 
 func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -164,6 +165,7 @@ func TestAccBigipLtmMonitor_GatewayIcmpCreate(t *testing.T) {
 }
 
 func TestAccBigipLtmMonitor_SMTPCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -187,6 +189,7 @@ func TestAccBigipLtmMonitor_SMTPCreate(t *testing.T) {
 }
 
 func TestAccBigipLtmMonitor_TcpHalfOpenCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -202,6 +205,37 @@ func TestAccBigipLtmMonitor_TcpHalfOpenCreate(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-tcp-half-open-monitor", "timeout", "16"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-tcp-half-open-monitor", "interval", "5"),
 					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-tcp-half-open-monitor", "destination", "10.10.10.10:1234"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_create(t *testing.T) {
+	t.Parallel()
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestMonitorResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(TestMonitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "parent", "/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "send", "GET /some/path\\r\\n"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "timeout", "999"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "interval", "998"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive", "HTTP 1.1 302 Found"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive_disable", "HTTP/1.1 429"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "reverse", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "transparent", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "manual_resume", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "ip_dscp", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "destination", "1.2.3.4:1234"),
 				),
 			},
 		},
@@ -234,36 +268,9 @@ func TestAccBigipLtmMonitor_HttpCreate(t *testing.T) {
 		},
 	})
 }
-func TestAccBigipLtmMonitor_create(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {
-			testAcctPreCheck(t)
-		},
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
-		Steps: []resource.TestStep{
-			{
-				Config: TestMonitorResource,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckMonitorExists(TestMonitorName),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "parent", "/Common/http"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "send", "GET /some/path\\r\\n"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "timeout", "999"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "interval", "998"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive", "HTTP 1.1 302 Found"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "receive_disable", "HTTP/1.1 429"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "reverse", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "transparent", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "manual_resume", "disabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "ip_dscp", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "time_until_up", "0"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.test-monitor", "destination", "1.2.3.4:1234"),
-				),
-			},
-		},
-	})
-}
+
 func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -289,7 +296,9 @@ func TestAccBigipLtmMonitor_HttpsCreate(t *testing.T) {
 		},
 	})
 }
+
 func TestAccBigipLtmMonitor_FtpCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -317,6 +326,7 @@ func TestAccBigipLtmMonitor_FtpCreate(t *testing.T) {
 	})
 }
 func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -340,6 +350,7 @@ func TestAccBigipLtmMonitor_UdpCreate(t *testing.T) {
 	})
 }
 func TestAccBigipLtmMonitor_LDAPCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -364,6 +375,7 @@ func TestAccBigipLtmMonitor_LDAPCreate(t *testing.T) {
 }
 
 func TestAccBigipLtmMonitor_PostgresqlCreate(t *testing.T) {
+	t.Parallel()
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
