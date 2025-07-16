@@ -26,10 +26,8 @@ func TestAccDataSourceBigipLtmMonitor_basic(t *testing.T) {
 }
 
 func testAccDataSourceBigipLtmMonitorConfig() string {
-	return `
-	data "bigip_ltm_monitor" "test" {
-		name      = "http"
-		partition = "Common"
-	}
-	`
+	return `data "bigip_ltm_monitor" "test" {
+	name      = "http"
+	partition = "Common"
+}`
 }
