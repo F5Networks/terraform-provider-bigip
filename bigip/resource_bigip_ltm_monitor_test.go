@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -415,6 +416,205 @@ func TestAccBigipLtmMonitorTestCases(t *testing.T) {
 					testCheckMonitorExists("/Common/test_monitor_tc4"),
 					testCheckMonitorExists("/Common/test_monitor_tc5"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_HttpMonitorStatusCreate(t *testing.T) {
+	t.Parallel()
+	const monitorName = "/Common/MON-APP-9-HTTP-STANDARD-TEST"
+	const monitorResource = `
+resource "bigip_ltm_monitor" "http_monitor" {
+  name    = "` + monitorName + `"
+  parent  = "/Common/http"
+  send    = "GET /status HTTP/1.0\\r\\n"
+  receive = ".*RUNNING.*"
+}
+`
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: monitorResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(monitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor", "parent", "/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor", "send", "GET /status HTTP/1.0\\r\\n"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor", "receive", ".*RUNNING.*"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_SmtpDomain(t *testing.T) {
+	t.Parallel()
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "smtp_monitor" {
+                        name     = "/Common/tf-test-smtp-monitor"
+                        parent   = "/Common/smtp"
+                        interval = 10
+                        timeout  = 31
+                        domain   = "mydomain.com"
+                    }
+                `,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"bigip_ltm_monitor.smtp_monitor", "domain", "mydomain.com"),
+					resource.TestCheckResourceAttr(
+						"bigip_ltm_monitor.smtp_monitor", "parent", "/Common/smtp"),
+				),
+			},
+			{
+				// Update domain value to verify change is reflected
+				Config: `
+                    resource "bigip_ltm_monitor" "smtp_monitor" {
+                        name     = "/Common/tf-test-smtp-monitor"
+                        parent   = "/Common/smtp"
+                        interval = 10
+                        timeout  = 31
+                        domain   = "newdomain.com"
+                    }
+                `,
+				Check: resource.TestCheckResourceAttr(
+					"bigip_ltm_monitor.smtp_monitor", "domain", "newdomain.com"),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_IntervalPersistence(t *testing.T) {
+	resourceName := "bigip_ltm_monitor.https_monitor"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			// Step 1: Create monitor with initial interval
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "https_monitor" {
+                        name     = "/Common/terraform-acc-https"
+                        parent   = "/Common/https"
+                        interval = 91
+                        timeout  = 94
+                        send     = "GET /"
+                        receive  = "200 OK"
+                    }
+                `,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "interval", "91"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "94"),
+				),
+			},
+			// Step 2: Change interval and verify update
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "https_monitor" {
+                        name     = "/Common/terraform-acc-https"
+                        parent   = "/Common/https"
+                        interval = 60
+                        timeout  = 63
+                        send     = "GET /"
+                        receive  = "200 OK"
+                    }
+                `,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "interval", "60"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "63"),
+				),
+			},
+			// Step 3: Reapply same config to ensure no drift
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "https_monitor" {
+                        name     = "/Common/terraform-acc-https"
+                        parent   = "/Common/https"
+                        interval = 60
+                        timeout  = 63
+                        send     = "GET /"
+                        receive  = "200 OK"
+                    }
+                `,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "interval", "60"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "63"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_AllIssues(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			// Plugin Crash/Basic Creation - parent required, type is NOT allowed
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "crash" {
+                        name     = "/Common/tf-test-crash-monitor2"
+                        parent   = "/Common/http"
+                        interval = 10
+                        timeout  = 31
+                    }
+                `,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "name", "/Common/tf-test-crash-monitor2"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "parent", "/Common/http"),
+				),
+			},
+			// Invalid Path Name Validation
+			{
+				Config: `
+			        resource "bigip_ltm_monitor" "invalid_path" {
+			            name     = "/invalid/path/name"
+			            parent   = "/Common/http"
+			            interval = 10
+			            timeout  = 31
+			        }
+			    `,
+				ExpectError: regexp.MustCompile("must match /Partition/Name"),
+			},
+			// Incorrect Parent Profile Name Validation
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "invalid_parent" {
+                        name     = "tf-test-invalid-parent"
+                        parent   = "not_a_valid_parent"
+                        interval = 10
+                        timeout  = 31
+                    }
+                `,
+				ExpectError: regexp.MustCompile("parent must be one of"),
+			},
+			// Import Parent Object Validation
+			{
+				Config: `
+                    resource "bigip_ltm_monitor" "import_test" {
+                        name     = "/Common/tf-test-import-monitor"
+                        parent   = "/Common/http"
+                        interval = 10
+                        timeout  = 31
+                    }
+                `,
+			},
+			{
+				ResourceName:      "bigip_ltm_monitor.import_test",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
