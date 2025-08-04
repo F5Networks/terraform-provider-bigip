@@ -28,19 +28,19 @@ resource "bigip_do" "do-example" {
 
 * `do_json` - (Required) Name of the of the Declarative DO JSON file
  
-* `bigip_address` - (optional) IP Address of BIGIP Host to be used for this resource,this is optional parameter.
+* `bigip_address` - (Optional) IP Address of BIGIP Host to be used for this resource,this is optional parameter.
 whenever we specify this parameter it gets overwrite provider configuration
 
-* `bigip_user` - (optional) UserName of BIGIP host to be used for this resource,this is optional parameter.
+* `bigip_user` - (Optional) UserName of BIGIP host to be used for this resource,this is optional parameter.
 whenever we specify this parameter it gets overwrite provider configuration
 
-* `bigip_port` - (optional) Port number of BIGIP host to be used for this resource,this is optional parameter.
+* `bigip_port` - (Optional) Port number of BIGIP host to be used for this resource,this is optional parameter.
 whenever we specify this parameter it gets overwrite provider configuration
 
-* `bigip_password` - (optional) Password of  BIGIP host to be used for this resource,this is optional parameter.
+* `bigip_password` - (Optional) Password of  BIGIP host to be used for this resource,this is optional parameter.
 whenever we specify this parameter it gets overwrite provider configuration
 
-* `timeout(minutes)` - (optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes )
+* `timeout(minutes)` - (Optional) timeout to keep polling DO endpoint until Bigip is provisioned by DO.( Default timeout is 20 minutes )
 
 ~> **Note:** If we want to replace provider BIGIP with other BIGIPs details we can specify with `bigip_address`,
 `bigip_user`,`bigip_port` and `bigip_password`. All Must be specified in such scenario.
