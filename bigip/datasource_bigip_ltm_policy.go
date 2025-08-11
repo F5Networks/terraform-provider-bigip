@@ -1080,21 +1080,27 @@ func dataSourceBigipLtmPolicyRead(ctx context.Context, d *schema.ResourceData, m
 
 	d.SetId("")
 	name := d.Get("name").(string)
-	log.Println("[DEBUG] Reading policy : " + name)
 
-	re := regexp.MustCompile("/([a-zA-z0-9? ,_-]+)/([a-zA-z0-9? ,._-]+)")
-	match := re.FindStringSubmatch(name)
-	if match == nil {
-		return diag.FromErr(fmt.Errorf("policy name failed to match the regex, and should be of format /partition/policy_name"))
+	fields, diags := parsePolicyPath(name)
+	if diags != nil {
+		return diag.FromErr(fmt.Errorf("failed to parse policy path: %v", diags))
 	}
-	partition := match[1]
-	policyName := match[2]
+	log.Printf("[INFO] Fetching policy: %s (partition: %s)", fields[len(fields)-1], fields[0])
 
-	log.Println("[INFO] Fetching policy " + policyName)
-	p, err := client.GetPolicy(policyName, partition)
+	var (
+		p   *bigip.Policy
+		err error
+	)
+	switch len(fields) {
+	case 2:
+		p, err = client.FetchPolicy(fields[0], fields[1])
+	case 3:
+		p, err = client.FetchPolicy(fields[0], fields[1], fields[2])
+	default:
+		return diag.FromErr(fmt.Errorf("unexpected number of path fields: %v", fields))
+	}
 
 	if err != nil {
-		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", policyName, err)
 		return diag.FromErr(err)
 	}
 
@@ -1124,6 +1130,27 @@ func dataSourceBigipLtmPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	}
 	d.SetId(name)
 	return DatapolicyToData(p, d)
+}
+
+// parsePolicyPath parses a policy path in the format /partition[/strategy]/policy_name
+// Returns the field segments or an error diagnostic.
+func parsePolicyPath(name string) ([]string, diag.Diagnostics) {
+	log.Println("[DEBUG] Reading policy:", name)
+
+	// Regex: /partition/(optional strategy/)?policy_name
+	re := regexp.MustCompile(`^/([^/]+)(?:/([^/]+))?/([^/]+)$`)
+	match := re.FindStringSubmatch(name)
+	if match == nil {
+		return nil, diag.FromErr(fmt.Errorf(
+			"policy name failed to match required format: /partition[/strategy]/policy_name, got: %q", name))
+	}
+
+	fields := []string{match[1]}
+	if match[2] != "" {
+		fields = append(fields, match[2])
+	}
+	fields = append(fields, match[3])
+	return fields, nil
 }
 
 func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) diag.Diagnostics {
@@ -1164,10 +1191,10 @@ func DatapolicyToData(p *bigip.Policy, d *schema.ResourceData) diag.Diagnostics 
 	return nil
 }
 
-func DataflattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
-	att := make([]interface{}, len(rules))
+func DataflattenPolicyRules(rules []bigip.PolicyRule) []any {
+	att := make([]any, len(rules))
 	for i, v := range rules {
-		obj := make(map[string]interface{})
+		obj := make(map[string]any)
 
 		if v.Name != "" {
 			obj["name"] = v.Name
@@ -1188,24 +1215,24 @@ func DataflattenPolicyRules(rules []bigip.PolicyRule) []interface{} {
 	return att
 }
 
-func DataflattenPolicyRuleActions(actions []bigip.PolicyRuleAction) []interface{} {
-	att := make([]interface{}, len(actions))
+func DataflattenPolicyRuleActions(actions []bigip.PolicyRuleAction) []any {
+	att := make([]any, len(actions))
 	for x, a := range actions {
 		att[x] = DatainterfaceToResourceData(a)
 	}
 	return att
 }
 
-func DataflattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) []interface{} {
-	att := make([]interface{}, len(conditions))
+func DataflattenPolicyRuleConditions(conditions []bigip.PolicyRuleCondition) []any {
+	att := make([]any, len(conditions))
 	for x, a := range conditions {
 		att[x] = DatainterfaceToResourceData(a)
 	}
 	return att
 }
 
-func DatainterfaceToResourceData(a interface{}) map[string]interface{} {
-	obj := make(map[string]interface{})
+func DatainterfaceToResourceData(a any) map[string]any {
+	obj := make(map[string]any)
 	v := reflect.ValueOf(a)
 	for i := 0; i < v.NumField(); i++ {
 		fn := toSnakeCase(v.Type().Field(i).Name)
