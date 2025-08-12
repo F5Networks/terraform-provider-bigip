@@ -34,3 +34,53 @@ data "bigip_ltm_policy" "test" {
 }
 `, name)
 }
+
+// add test for subfolder policy
+func TestAccDataSourceBigipLtmPolicy_subfolder(t *testing.T) {
+	policyName := "/Common/folder1/ecopolicy"
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAcctPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataSourceBigipLtmPolicySubfolderConfig(policyName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.bigip_ltm_policy.test2", "name", policyName),
+				),
+			},
+		},
+	})
+}
+
+func testAccDataSourceBigipLtmPolicySubfolderConfig(name string) string {
+	return fmt.Sprintf(`
+data "bigip_ltm_policy" "test2" {
+  name = "%s"
+}
+`, name)
+}
+
+// add test for subfolder policy with different name
+func TestAccDataSourceBigipLtmPolicy_subfolder2(t *testing.T) {
+	policyName := "/Common/testpolicy"
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAcctPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataSourceBigipLtmPolicySubfolder2Config(policyName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.bigip_ltm_policy.test2", "name", policyName),
+				),
+			},
+		},
+	})
+}
+
+func testAccDataSourceBigipLtmPolicySubfolder2Config(name string) string {
+	return fmt.Sprintf(`
+data "bigip_ltm_policy" "test2" {
+  name = "%s"
+}
+`, name)
+}

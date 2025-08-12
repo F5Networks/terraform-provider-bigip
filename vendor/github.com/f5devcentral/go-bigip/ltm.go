@@ -3123,6 +3123,7 @@ func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	// Join three strings into one.
 	//result := strings.Join(values, "")
 	policy_name := partition + "~" + name
+
 	err, ok := b.getForEntity(&p, uriLtm, uriPolicy, policy_name)
 	if err != nil {
 		return nil, err
@@ -3155,6 +3156,82 @@ func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	}
 
 	return &p, nil
+}
+
+// tildeJoin joins words with ~ and prepends a leading ~, e.g., tildeJoin("a", "b") => "~a~b"
+func tildeJoin(words ...string) string {
+	return "~" + strings.Join(words, "~")
+}
+
+// FetchPolicy retrieves a BIG-IP policy and recursively loads its rules, actions, and conditions.
+func (b *BigIP) FetchPolicy(pathfields ...string) (*Policy, error) {
+	policyName, err := buildPolicyName(pathfields...)
+	if err != nil {
+		return nil, err
+	}
+
+	var policy Policy
+
+	// Fetch the main policy entity
+	err, found := b.getForEntity(&policy, uriLtm, uriPolicy, policyName)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, nil
+	}
+
+	// Fetch and attach rules
+	if err := b.attachRules(&policy, policyName); err != nil {
+		return nil, err
+	}
+
+	return &policy, nil
+}
+
+// buildPolicyName validates input and constructs a policy name in tilde format.
+func buildPolicyName(pathfields ...string) (string, error) {
+	switch len(pathfields) {
+	case 2, 3:
+		return tildeJoin(pathfields...), nil
+	default:
+		return "", fmt.Errorf("invalid number of pathfields: got %d, want 2 or 3", len(pathfields))
+	}
+}
+
+// attachRules fetches and attaches rules, actions, and conditions to the policy.
+func (b *BigIP) attachRules(policy *Policy, policyName string) error {
+	var rules PolicyRules
+	if err, _ := b.getForEntity(&rules, uriLtm, uriPolicy, policyName, "rules"); err != nil {
+		return err
+	}
+	policy.Rules = rules.Items
+
+	// For each rule, fetch actions and conditions
+	for i := range policy.Rules {
+		rule := &policy.Rules[i]
+		if err := b.attachRuleDetails(policyName, rule); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// attachRuleDetails fetches actions and conditions for a single rule and attaches them.
+func (b *BigIP) attachRuleDetails(policyName string, rule *PolicyRule) error {
+	var acts PolicyRuleActions
+	var conds PolicyRuleConditions
+
+	if err, _ := b.getForEntity(&acts, uriLtm, uriPolicy, policyName, "rules", rule.Name, "actions"); err != nil {
+		return err
+	}
+	if err, _ := b.getForEntity(&conds, uriLtm, uriPolicy, policyName, "rules", rule.Name, "conditions"); err != nil {
+		return err
+	}
+
+	rule.Actions = acts.Items
+	rule.Conditions = conds.Items
+	return nil
 }
 
 // Load a fully policy definition. Policies seem to be best dealt with as one big entity.
