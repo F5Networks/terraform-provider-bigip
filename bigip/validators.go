@@ -53,7 +53,8 @@ func validateF5NameWithDirectory(value interface{}, field string) (ws []string, 
 	default:
 		errors = append(errors, fmt.Errorf("Unknown type %v in validateF5Name ", reflect.TypeOf(value)))
 	}
-	re := regexp.MustCompile(`(^/[\w_\-.]+/[\w_\-.:]+/[\w_\-.:]+$)|(^/[\w_\-.]+/[\w_\-.:]+$)`)
+	re := regexp.MustCompile(`^/([^/]+)(?:/([^/]+))?/([^/]+)$`)
+	// re := regexp.MustCompile(`(^/[\w_\-.]+/[\w_\-.:]+/[\w_\-.:]+$)|(^/[\w_\-.]+/[\w_\-.:]+$)`)
 	for _, v := range values {
 		match := re.MatchString(v)
 		if !match {
