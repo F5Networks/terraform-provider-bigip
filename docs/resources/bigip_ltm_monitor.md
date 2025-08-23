@@ -59,7 +59,7 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
 
 ## Argument Reference
 
-* `name` ((Required,type `string`) Specifies the Name of the LTM Monitor.Name of Monitor should be full path,full path is the combination of the `partition + monitor name`,For ex:`/Common/test-ltm-monitor`.
+* `name` ((Required,type `string`) Specifies the Name of the LTM Monitor. Name of Monitor should be full path, full path is the combination of the `partition + monitor name`, for ex:`/Common/test-ltm-monitor`.
 
 * `parent` - (Required,type `string`)  Parent monitor for the system to use for setting initial values for the new monitor.
 
