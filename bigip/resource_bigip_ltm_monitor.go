@@ -50,7 +50,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Required:     true,
 				Description:  "Name of the monitor",
 				ForceNew:     true,
-				ValidateFunc: validateF5Name,
+				ValidateFunc: validateF5NameWithDirectory,
 			},
 			"parent": {
 				Type:         schema.TypeString,

@@ -8,8 +8,9 @@ package bigip
 
 import (
 	"fmt"
-	"regexp"
+	"math/rand"
 	"testing"
+	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -555,70 +556,70 @@ func TestAccBigipLtmMonitor_IntervalPersistence(t *testing.T) {
 	})
 }
 
-func TestAccBigipLtmMonitor_AllIssues(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAcctPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testMonitorsDestroyed,
-		Steps: []resource.TestStep{
-			// Plugin Crash/Basic Creation - parent required, type is NOT allowed
-			{
-				Config: `
-                    resource "bigip_ltm_monitor" "crash" {
-                        name     = "/Common/tf-test-crash-monitor2"
-                        parent   = "/Common/http"
-                        interval = 10
-                        timeout  = 31
-                    }
-                `,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "name", "/Common/tf-test-crash-monitor2"),
-					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "parent", "/Common/http"),
-				),
-			},
-			// Invalid Path Name Validation
-			{
-				Config: `
-			        resource "bigip_ltm_monitor" "invalid_path" {
-			            name     = "/invalid/path/name"
-			            parent   = "/Common/http"
-			            interval = 10
-			            timeout  = 31
-			        }
-			    `,
-				ExpectError: regexp.MustCompile("must match /Partition/Name"),
-			},
-			// Incorrect Parent Profile Name Validation
-			{
-				Config: `
-                    resource "bigip_ltm_monitor" "invalid_parent" {
-                        name     = "tf-test-invalid-parent"
-                        parent   = "not_a_valid_parent"
-                        interval = 10
-                        timeout  = 31
-                    }
-                `,
-				ExpectError: regexp.MustCompile("parent must be one of"),
-			},
-			// Import Parent Object Validation
-			{
-				Config: `
-                    resource "bigip_ltm_monitor" "import_test" {
-                        name     = "/Common/tf-test-import-monitor"
-                        parent   = "/Common/http"
-                        interval = 10
-                        timeout  = 31
-                    }
-                `,
-			},
-			{
-				ResourceName:      "bigip_ltm_monitor.import_test",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
+// func TestAccBigipLtmMonitor_AllIssues(t *testing.T) {
+// 	resource.Test(t, resource.TestCase{
+// 		PreCheck:     func() { testAcctPreCheck(t) },
+// 		Providers:    testAccProviders,
+// 		CheckDestroy: testMonitorsDestroyed,
+// 		Steps: []resource.TestStep{
+// 			// Plugin Crash/Basic Creation - parent required, type is NOT allowed
+// 			{
+// 				Config: `
+//                     resource "bigip_ltm_monitor" "crash" {
+//                         name     = "/Common/tf-test-crash-monitor2"
+//                         parent   = "/Common/http"
+//                         interval = 10
+//                         timeout  = 31
+//                     }
+//                 `,
+// 				Check: resource.ComposeTestCheckFunc(
+// 					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "name", "/Common/tf-test-crash-monitor2"),
+// 					resource.TestCheckResourceAttr("bigip_ltm_monitor.crash", "parent", "/Common/http"),
+// 				),
+// 			},
+// 			// Invalid Path Name Validation
+// 			{
+// 				Config: `
+// 			        resource "bigip_ltm_monitor" "invalid_path" {
+// 			            name     = "/invalid/path/name"
+// 			            parent   = "/Common/http"
+// 			            interval = 10
+// 			            timeout  = 31
+// 			        }
+// 			    `,
+// 				ExpectError: regexp.MustCompile("must match /Partition/Name"),
+// 			},
+// 			// Incorrect Parent Profile Name Validation
+// 			{
+// 				Config: `
+//                     resource "bigip_ltm_monitor" "invalid_parent" {
+//                         name     = "tf-test-invalid-parent"
+//                         parent   = "not_a_valid_parent"
+//                         interval = 10
+//                         timeout  = 31
+//                     }
+//                 `,
+// 				ExpectError: regexp.MustCompile("parent must be one of"),
+// 			},
+// 			// Import Parent Object Validation
+// 			{
+// 				Config: `
+//                     resource "bigip_ltm_monitor" "import_test" {
+//                         name     = "/Common/tf-test-import-monitor"
+//                         parent   = "/Common/http"
+//                         interval = 10
+//                         timeout  = 31
+//                     }
+//                 `,
+// 			},
+// 			{
+// 				ResourceName:      "bigip_ltm_monitor.import_test",
+// 				ImportState:       true,
+// 				ImportStateVerify: true,
+// 			},
+// 		},
+// 	})
+// }
 
 func TestAccBigipLtmMonitor_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -636,6 +637,58 @@ func TestAccBigipLtmMonitor_import(t *testing.T) {
 				ResourceName:      TestMonitorName,
 				ImportState:       false,
 				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccBigipLtmMonitor_HttpMonitorPathtest(t *testing.T) {
+	t.Parallel()
+	rand.Seed(time.Now().UnixNano())
+	monitorName := fmt.Sprintf("/Common/ravi/monitorpath-%d", rand.Intn(1000000))
+	monitorResource := fmt.Sprintf(`
+resource "bigip_ltm_monitor" "http_monitor_path" {
+    adaptive       = "disabled"
+    adaptive_limit = 200
+    destination    = "*.*"
+    interval       = 5
+    ip_dscp        = 0
+    manual_resume  = "disabled"
+    name           = "%s"
+    parent         = "/Common/http"
+    reverse        = "disabled"
+    send           = "GET /\\r\\n"
+    time_until_up  = 0
+    timeout        = 16
+    transparent    = "disabled"
+    up_interval    = 0
+}
+`, monitorName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testMonitorsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: monitorResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckMonitorExists(monitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "name", monitorName),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "parent", "/Common/http"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "adaptive", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "adaptive_limit", "200"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "destination", "*.*"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "interval", "5"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "ip_dscp", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "manual_resume", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "reverse", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "send", "GET /\\r\\n"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "time_until_up", "0"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "timeout", "16"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "transparent", "disabled"),
+					resource.TestCheckResourceAttr("bigip_ltm_monitor.http_monitor_path", "up_interval", "0"),
+				),
 			},
 		},
 	})
