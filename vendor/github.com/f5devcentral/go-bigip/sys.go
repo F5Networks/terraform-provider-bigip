@@ -668,6 +668,48 @@ func (b *BigIP) DeleteIFile(name string) error {
 	return b.delete(uriSys, uriFile, "ifile", name)
 }
 
+// Add to the existing sys.go file after the IFile struct definition
+type LtmIFile struct {
+	Name              string             `json:"name,omitempty"`
+	Partition         string             `json:"partition,omitempty"`
+	SubPath           string             `json:"subPath,omitempty"`
+	FullPath          string             `json:"fullPath,omitempty"`
+	FileName          string             `json:"fileName,omitempty"`
+	FileNameReference *FileNameReference `json:"fileNameReference,omitempty"`
+}
+
+type FileNameReference struct {
+	Link string `json:"link,omitempty"`
+}
+
+// Create LTM iFile
+func (b *BigIP) CreateLtmIFile(ltmIfile *LtmIFile) error {
+	return b.post(ltmIfile, uriMgmt, uriTm, uriLtm, "ifile")
+}
+
+// Get LTM iFile
+func (b *BigIP) GetLtmIFile(name string) (*LtmIFile, error) {
+	var ltmIfile LtmIFile
+	err, ok := b.getForEntity(&ltmIfile, uriMgmt, uriTm, uriLtm, "ifile", name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &ltmIfile, nil
+}
+
+// Update LTM iFile
+func (b *BigIP) UpdateLtmIFile(ltmIfile *LtmIFile) error {
+	return b.put(ltmIfile, uriMgmt, uriTm, uriLtm, "ifile", ltmIfile.FullPath)
+}
+
+// Delete LTM iFile
+func (b *BigIP) DeleteLtmIFile(name string) error {
+	return b.delete(uriMgmt, uriTm, uriLtm, "ifile", name)
+}
+
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
 	config := &NTP{
 		Description: description,
