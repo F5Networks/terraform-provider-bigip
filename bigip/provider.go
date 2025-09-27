@@ -157,6 +157,7 @@ func Provider() *schema.Provider {
 			"bigip_ltm_snatpool":                    resourceBigipLtmSnatpool(),
 			"bigip_ltm_virtual_address":             resourceBigipLtmVirtualAddress(),
 			"bigip_ltm_virtual_server":              resourceBigipLtmVirtualServer(),
+			"bigip_ltm_ifile":                       resourceBigipLtmIfile(),
 			"bigip_sys_dns":                         resourceBigipSysDns(),
 			"bigip_sys_iapp":                        resourceBigipSysIapp(),
 			"bigip_sys_ntp":                         resourceBigipSysNtp(),
