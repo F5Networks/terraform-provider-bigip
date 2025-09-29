@@ -288,7 +288,11 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 	maxRetries := b.ConfigOptions.APICallRetries
 	for i := 0; i < maxRetries; i++ {
 		body := bytes.NewReader([]byte(options.Body))
-		req, _ = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+		var err error
+		req, err = http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+		}
 		b.Transport.Proxy = func(reqNew *http.Request) (*url.URL, error) {
 			return http.ProxyFromEnvironment(reqNew)
 		}
@@ -534,7 +538,10 @@ func (b *BigIP) Upload(r io.Reader, size int64, path ...string) (*Upload, error)
 			chunk = chunk[:n]
 		}
 		body := bytes.NewReader(chunk)
-		req, _ := http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+		req, err := http.NewRequest(strings.ToUpper(options.Method), urlString, body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+		}
 		if b.Token != "" {
 			req.Header.Set("X-F5-Auth-Token", b.Token)
 		} else {
