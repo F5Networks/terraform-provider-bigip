@@ -597,6 +597,119 @@ func (b *BigIP) DeleteKey(name string) error {
 	return b.delete(uriSys, uriFile, uriSslKey, name)
 }
 
+type IFile struct {
+	Name           string `json:"name,omitempty"`
+	Partition      string `json:"partition,omitempty"`
+	SubPath        string `json:"subPath,omitempty"`
+	FullPath       string `json:"fullPath,omitempty"`
+	SelfLink       string `json:"selfLink,omitempty"`
+	Checksum       string `json:"checksum,omitempty"`
+	CreateTime     string `json:"createTime,omitempty"`
+	CreatedBy      string `json:"createdBy,omitempty"`
+	LastUpdateTime string `json:"lastUpdateTime,omitempty"`
+	Mode           int    `json:"mode,omitempty"`
+	Revision       int    `json:"revision,omitempty"`
+	Size           int    `json:"size,omitempty"`
+	SourcePath     string `json:"sourcePath,omitempty"`
+	UpdatedBy      string `json:"updatedBy,omitempty"`
+}
+
+func (b *BigIP) ImportIfile(ifile *IFile, fileData, opCall string) error {
+	fileByte := []byte(fileData)
+	_, err := b.UploadBytes(fileByte, ifile.Name)
+	if err != nil {
+		return err
+	}
+	sourcepath := "file://" + REST_DOWNLOAD_PATH + "/" + ifile.Name
+	log.Println("[DEBUG]string:", sourcepath)
+	ifile.SourcePath = sourcepath
+	// fileName := fmt.Sprintf("/%s/%s", ifile.Partition, ifile.Name)
+	// log.Printf("[DEBUG]fileName: %+v\n", fileName)
+	if opCall == "POST" {
+		err = b.CreateIFile(ifile)
+		if err != nil {
+			return err
+		}
+	}
+	if opCall == "PUT" {
+		err = b.UpdateIFile(ifile.FullPath, ifile)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Create iFile
+func (b *BigIP) CreateIFile(ifile *IFile) error {
+	return b.post(ifile, uriSys, uriFile, "ifile")
+}
+
+// Get iFile
+func (b *BigIP) GetIFile(name string) (*IFile, error) {
+	var ifile IFile
+	err, ok := b.getForEntity(&ifile, uriSys, uriFile, "ifile", name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &ifile, nil
+}
+
+// Update iFile
+func (b *BigIP) UpdateIFile(name string, ifile *IFile) error {
+	return b.put(ifile, uriSys, uriFile, "ifile", name)
+}
+
+// Delete iFile
+func (b *BigIP) DeleteIFile(name string) error {
+	return b.delete(uriSys, uriFile, "ifile", name)
+}
+
+// Add to the existing sys.go file after the IFile struct definition
+type LtmIFile struct {
+	Name              string             `json:"name,omitempty"`
+	Partition         string             `json:"partition,omitempty"`
+	SubPath           string             `json:"subPath,omitempty"`
+	FullPath          string             `json:"fullPath,omitempty"`
+	FileName          string             `json:"fileName,omitempty"`
+	FileNameReference *FileNameReference `json:"fileNameReference,omitempty"`
+}
+
+type FileNameReference struct {
+	Link string `json:"link,omitempty"`
+}
+
+// Create LTM iFile
+func (b *BigIP) CreateLtmIFile(ltmIfile *LtmIFile) error {
+	return b.post(ltmIfile, uriMgmt, uriTm, uriLtm, "ifile")
+}
+
+// Get LTM iFile
+func (b *BigIP) GetLtmIFile(name string) (*LtmIFile, error) {
+	var ltmIfile LtmIFile
+	err, ok := b.getForEntity(&ltmIfile, uriMgmt, uriTm, uriLtm, "ifile", name)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &ltmIfile, nil
+}
+
+// Update LTM iFile
+func (b *BigIP) UpdateLtmIFile(ltmIfile *LtmIFile) error {
+	return b.put(ltmIfile, uriMgmt, uriTm, uriLtm, "ifile", ltmIfile.FullPath)
+}
+
+// Delete LTM iFile
+func (b *BigIP) DeleteLtmIFile(name string) error {
+	return b.delete(uriMgmt, uriTm, uriLtm, "ifile", name)
+}
+
 func (b *BigIP) CreateNTP(description string, servers []string, timezone string) error {
 	config := &NTP{
 		Description: description,
