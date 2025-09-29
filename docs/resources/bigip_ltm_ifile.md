@@ -65,11 +65,11 @@ resource "bigip_sys_ifile" "server_list" {
 resource "bigip_ltm_ifile" "ltm_servers" {
   name      = "ltm-server-mapping"
   partition = "Production"
-  file_name = bigip_sys_ifile.server_list.id
+  file_name = "/Production/server-mapping"
 }
 
 resource "bigip_ltm_irule" "server_selector" {
-  name = "select-server-rule"
+  name  = "select-server-rule"
   irule = <<-EOT
     when HTTP_REQUEST {
       set server_map [ifile get ltm-server-mapping]
