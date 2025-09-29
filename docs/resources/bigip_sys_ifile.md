@@ -98,12 +98,12 @@ resource "bigip_sys_ifile" "lookup_table" {
 resource "bigip_ltm_ifile" "ltm_lookup" {
   name      = "ltm-url-rewrite-map"
   partition = "Common"
-  file_name = bigip_sys_ifile.lookup_table.id
+  file_name = "/Common/url-rewrite-map"
 }
 
 # Use in an iRule
 resource "bigip_ltm_irule" "url_rewriter" {
-  name = "url-rewrite-rule"
+  name  = "url-rewrite-rule"
   irule = <<-EOT
     when HTTP_REQUEST {
       set uri [HTTP::uri]
