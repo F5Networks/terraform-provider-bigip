@@ -50,6 +50,8 @@ resource "bigip_ltm_node" "node" {
 
 * `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
 
+* `session` - (Optional) Enables or disables the node for new sessions. Can be set to `user-enabled` or `user-disabled`. (Default: `user-enabled`).
+
  ~> *NOTE* Below attributes needs to be configured under fqdn option.
 
 * `interval` - (Optional, type `string`) Specifies the amount of time before sending the next DNS query. Default is 3600. This needs to be specified inside the fqdn (fully qualified domain name).
