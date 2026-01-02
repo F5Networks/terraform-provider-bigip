@@ -32,6 +32,7 @@ var parentMonitors = map[string]bool{
 	"/Common/ftp":           true,
 	"/Common/ldap":          true,
 	"/Common/smtp":          true,
+	"/Common/dns":           true,
 }
 
 func resourceBigipLtmMonitor() *schema.Resource {
@@ -57,7 +58,7 @@ func resourceBigipLtmMonitor() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateParent,
 				ForceNew:     true,
-				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp or /Common/tcp_half_open or /Common/smtp.",
+				Description:  "Existing monitor to inherit from. Must be one of /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp or /Common/tcp_half_open or /Common/smtp or /Common/dns",
 			},
 			"custom_parent": {
 				Type:        schema.TypeString,
