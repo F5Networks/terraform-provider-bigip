@@ -388,7 +388,7 @@ func validateParent(v interface{}, k string) ([]string, []error) {
 		return nil, nil
 	}
 
-	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/mysql,/Common/mssql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp_half_open, /Common/tcp, /Common/ftp. /Common/smtp")}
+	return nil, []error{fmt.Errorf("parent must be one of /Common/udp, /Common/postgresql, /Common/mysql,/Common/mssql, /Common/http, /Common/https, /Common/icmp, /Common/gateway_icmp, /Common/tcp_half_open, /Common/tcp, /Common/ftp, /Common/smtp and /Common/dns")}
 }
 
 func monitorParent(s string) string {

@@ -55,6 +55,25 @@ resource "bigip_ltm_monitor" "test-postgresql-monitor" {
   username = "abcd"
   password = "abcd1234"
 }
+
+# Step 1: Create custom parent monitor (inherits from built-in)
+resource "bigip_ltm_monitor" "parent-monitor" {
+  name     = "/Common/parent"
+  parent   = "/Common/http"
+  interval = 999         # ← Child will inherit if not specified
+  timeout  = 1000        # ← Child will inherit if not specified
+  send     = "GET /\r\n" # ← Child will inherit if not specified
+  receive  = "200"       # ← Child will inherit if not specified
+}
+
+# Step 2: Create child monitor that inherits from custom parent
+# Inherited from parent: interval=999, timeout=1000, receive="200"
+resource "bigip_ltm_monitor" "child-monitor" {
+  name          = "/Common/child"
+  parent        = "/Common/http"
+  custom_parent = bigip_ltm_monitor.parent-monitor.name
+  send          = "GET /custom\r\n" # ← OVERRIDDEN: Uses this instead of parent's
+}
 ```      
 
 ## Argument Reference
