@@ -31,7 +31,7 @@ resource "bigip_ltm_snat" "test-snat" {
 
 ## Argument Reference
 
-* `name` - (Required) Name of the SNAT, name of SNAT should be full path. Full path is the combination of the `partition + SNAT name`,For example `/Common/test-snat`.
+* `name` - (Required) Name of the SNAT, name of SNAT should be full path. Full path is the combination of the `partition + SNAT name`, for example `/Common/test-snat`.
 
 * `origins` - (Required) Specifies, for each SNAT that you create, the origin addresses that are to be members of that SNAT. Specify origin addresses by their IP addresses and service ports
 
@@ -41,10 +41,10 @@ resource "bigip_ltm_snat" "test-snat" {
 
 * `mirror` - (Optional) Enables or disables mirroring of SNAT connections.
 
-* `autolasthop` -(Optional) Specifies whether to automatically map last hop for pools or not. The default is to use next level's default.
+* `autolasthop` - (Optional) Specifies whether to automatically map last hop for pools or not. The default is to use next level's default.
 
 * `sourceport` - (Optional) Specifies how the SNAT object handles the client's source port. The default is `preserve`.
 
-* `vlansdisabled` - (Optional,bool) Specifies the VLANs or tunnels for which the SNAT is enabled or disabled. The default is `true`, vlandisabled on VLANS specified by `vlans`,if set to `false` vlanEnabled set on VLANS specified by `vlans` .
+* `vlansdisabled` - (Optional,bool) Specifies the VLANs or tunnels for which the SNAT is enabled or disabled. The default is `true`, vlandisabled on VLANS specified by `vlans`, if set to `false` vlanEnabled set on VLANS specified by `vlans` .
 
 * `vlans` - (Optional) Specifies the available VLANs or tunnels and those for which the SNAT is enabled or disabled.

@@ -127,19 +127,19 @@ resource "bigip_as3" "as3-example1" {
 
 * `controls` - (Optional) - A map that allows you to configure specific behavior controls for the AS3 declaration. Each key represents a particular control setting, and the corresponding value defines its configuration.
 
-    * `dry_run` (Optional) -  Enables or disables dry-run mode.
+    * `dry_run` - (Optional) -  Enables or disables dry-run mode.
       * Allowed values: "yes", "no"
 
-   * `trace` (Optional) - Enables or disables detailed trace of the configuration process.
+   * `trace` - (Optional) - Enables or disables detailed trace of the configuration process.
      * Allowed values: "yes", "no"
 
-   * `trace_response` (Optional) - If set to "yes" the response will contain the trace files.
+   * `trace_response` - (Optional) - If set to "yes" the response will contain the trace files.
      * Allowed values: "yes", "no"
 
-   * `log_level` (Optional) - Controls the amount of detail in logs produced while configuring the Tenant.
+   * `log_level` - (Optional) - Controls the amount of detail in logs produced while configuring the Tenant.
      * Allowed values: "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"
 
-   * `user_agent` (Optional) - Controls the User Agent information to include in TEEM report.
+   * `user_agent` - (Optional) - Controls the User Agent information to include in TEEM report.
 
 
 * `application_list` - (Optional) - List of applications currently deployed on the Big-Ip
