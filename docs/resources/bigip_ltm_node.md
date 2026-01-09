@@ -50,11 +50,19 @@ resource "bigip_ltm_node" "node" {
 
 * `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
 
- ~> *NOTE* Below attributes needs to be configured under fqdn option.
+* `session` - (Optional) Enables or disables the node for new sessions. Can be set to `user-enabled` or `user-disabled`. (Default: `user-enabled`).
 
-* `interval` - (Optional, type `string`) Specifies the amount of time before sending the next DNS query. Default is 3600. This needs to be specified inside the fqdn (fully qualified domain name).
+### fqdn(fully qualified domain name) Configuration Block
 
-* `address_family` - (Optional) Specifies the node's address family. The default is 'unspecified', or IP-agnostic. This needs to be specified inside the fqdn (fully qualified domain name).
+* `name` - (Optional, type `string`) The fully qualified domain name of the node. Cannot configure with the `address` argument.
+
+* `interval` - (Optional, type `string`) Specifies the amount of time before sending the next DNS query. (Default: `3600`)
+
+* `address_family` - (Optional, type `string`) Specifies the node's address family. Can be `all`, `ipv4` or `ipv6` (Default: `ipv4`)
+
+* `autopopulate` - (Optional, type `string`) Specifies if the node should scale to the IP address set returned by DNS. (Default: `disabled`)
+
+* `downinterval` - (Optional, type `int`) The number of attempts to resolve a domain name. (Default: `5`)
 
 ## Importing
 An existing Node can be imported into this resource by supplying Node Name in `full path` as `id`.
