@@ -178,6 +178,7 @@ func Provider() *schema.Provider {
 			"bigip_ssl_certificate":                 resourceBigipSslCertificate(),
 			"bigip_ssl_key":                         resourceBigipSslKey(),
 <<<<<<< HEAD
+<<<<<<< HEAD
 			"bigip_ssl_key_cert":                    resourceBigipSSLKeyCert(),
 			"bigip_command":                         resourceBigipCommand(),
 			"bigip_common_license_manage_bigiq":     resourceBigiqLicenseManage(),
@@ -201,6 +202,9 @@ func Provider() *schema.Provider {
 =======
                         "bigip_gtm_wideip":                      resourceBigipGtmWideip(),
 >>>>>>> de7fd14b (create for gtm wideip)
+=======
+			"bigip_gtm_wideip":                      resourceBigipGtmWideip(),
+>>>>>>> f24e2564 (adding gtm wideip delete method)
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
