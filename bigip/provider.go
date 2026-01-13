@@ -197,6 +197,10 @@ func Provider() *schema.Provider {
 			"bigip_ltm_profile_rewrite":             resourceBigipLtmRewriteProfile(),
 			"bigip_ltm_profile_rewrite_uri_rules":   resourceBigipLtmRewriteProfileUriRules(),
 			"bigip_saas_bot_defense_profile":        resourceBigipSaasBotDefenseProfile(),
+			"bigip_gtm_wideip":                      resourceBigipGtmWideip(),
+			"bigip_gtm_pool":                        resourceBigipGtmPool(),
+			"bigip_gtm_datacenter":                  resourceBigipGtmDatacenter(),
+			"bigip_gtm_server":                      resourceBigipGtmServer(),
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
