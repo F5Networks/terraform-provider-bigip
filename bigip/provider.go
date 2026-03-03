@@ -17,6 +17,7 @@ import (
 	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"golang.org/x/text/cases"
@@ -361,4 +362,39 @@ func hashForState(value string) string {
 	}
 	hash := sha1.Sum([]byte(strings.TrimSpace(value)))
 	return hex.EncodeToString(hash[:])
+}
+
+// ctyObjectToMap converts a cty.Value of object type to a map[string]interface{},
+// suitable for passing to mapEntity. This reads directly from the raw Terraform
+// config, avoiding stale state contamination that occurs with TypeList index shifts.
+func ctyObjectToMap(val cty.Value) map[string]interface{} {
+	if val.IsNull() || !val.IsKnown() {
+		return nil
+	}
+	result := make(map[string]interface{})
+	for name, v := range val.AsValueMap() {
+		if v.IsNull() || !v.IsKnown() {
+			continue
+		}
+		switch v.Type() {
+		case cty.String:
+			result[name] = v.AsString()
+		case cty.Bool:
+			result[name] = v.True()
+		case cty.Number:
+			i, _ := v.AsBigFloat().Int64()
+			result[name] = int(i)
+		default:
+			if v.Type().IsListType() && v.Type().ElementType() == cty.String {
+				strs := make([]interface{}, 0, v.LengthInt())
+				for _, sv := range v.AsValueSlice() {
+					if !sv.IsNull() && sv.IsKnown() {
+						strs = append(strs, sv.AsString())
+					}
+				}
+				result[name] = strs
+			}
+		}
+	}
+	return result
 }

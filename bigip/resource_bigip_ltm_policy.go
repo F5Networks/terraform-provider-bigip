@@ -8,7 +8,6 @@ package bigip
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -1285,35 +1284,50 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	p.Controls = setToStringSlice(d.Get("controls").(*schema.Set))
 	p.Requires = setToStringSlice(d.Get("requires").(*schema.Set))
 
+	// Read rules from raw config to avoid TypeList state contamination.
+	// When a rule is removed from the middle of a TypeList, Terraform merges
+	// stale state values from the old index into the new index. Using
+	// GetRawConfig ensures we only read what the user wrote in their config.
 	var policyRules []bigip.PolicyRule
-	if val, ok := d.GetOk("rule"); ok {
-		var polRule bigip.PolicyRule
-		for _, item := range val.([]interface{}) {
-			polRule.Name = item.(map[string]interface{})["name"].(string)
-			polRule.Description = item.(map[string]interface{})["description"].(string)
+	rawConfig := d.GetRawConfig()
+	rawRules := rawConfig.GetAttr("rule")
+	if !rawRules.IsNull() && rawRules.IsKnown() {
+		for _, rawRule := range rawRules.AsValueSlice() {
+			var polRule bigip.PolicyRule
+			polRule.Name = rawRule.GetAttr("name").AsString()
+			if desc := rawRule.GetAttr("description"); !desc.IsNull() && desc.IsKnown() {
+				polRule.Description = desc.AsString()
+			}
+
 			var policyRulesActions []bigip.PolicyRuleAction
-			for _, itemAction := range item.(map[string]interface{})["action"].([]interface{}) {
-				var a bigip.PolicyRuleAction
-				b, _ := json.Marshal(itemAction)
-				_ = json.Unmarshal(b, &a)
-				if a.Disable {
-					a.Disable = true
-					a.Policy = ""
-					a.Select = false
-					a.Forward = false
-					a.Pool = ""
+			rawActions := rawRule.GetAttr("action")
+			if !rawActions.IsNull() && rawActions.IsKnown() {
+				for _, rawAction := range rawActions.AsValueSlice() {
+					var a bigip.PolicyRuleAction
+					actionMap := ctyObjectToMap(rawAction)
+					mapEntity(actionMap, &a)
+					if a.Disable {
+						a.Disable = true
+						a.Policy = ""
+						a.Select = false
+						a.Forward = false
+						a.Pool = ""
+					}
+					policyRulesActions = append(policyRulesActions, a)
 				}
-				mapEntity(itemAction.(map[string]interface{}), &a)
-				policyRulesActions = append(policyRulesActions, a)
 			}
+
 			var policyRuleConditions []bigip.PolicyRuleCondition
-			for _, itemCondition := range item.(map[string]interface{})["condition"].([]interface{}) {
-				var a bigip.PolicyRuleCondition
-				b, _ := json.Marshal(itemCondition)
-				_ = json.Unmarshal(b, &a)
-				mapEntity(itemCondition.(map[string]interface{}), &a)
-				policyRuleConditions = append(policyRuleConditions, a)
+			rawConditions := rawRule.GetAttr("condition")
+			if !rawConditions.IsNull() && rawConditions.IsKnown() {
+				for _, rawCondition := range rawConditions.AsValueSlice() {
+					var a bigip.PolicyRuleCondition
+					conditionMap := ctyObjectToMap(rawCondition)
+					mapEntity(conditionMap, &a)
+					policyRuleConditions = append(policyRuleConditions, a)
+				}
 			}
+
 			polRule.Actions = policyRulesActions
 			polRule.Conditions = policyRuleConditions
 			policyRules = append(policyRules, polRule)
