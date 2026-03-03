@@ -1,7 +1,7 @@
 ---
 layout: "bigip"
 page_title: "BIG-IP: bigip_ltm_ifile"
-subcategory: "Local Traffic Manager (LTM)"
+subcategory: "Local Traffic Manager(LTM)"
 description: |-
   Provides details about bigip_ltm_ifile resource
 ---
