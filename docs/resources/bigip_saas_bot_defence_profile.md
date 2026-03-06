@@ -30,11 +30,11 @@ resource "bigip_saas_bot_defense_profile" "test-bot-defense" {
 ```
 ## Argument Reference
 
-* `name` (Required,type `string`) Unique name for the Distributed Cloud Services Bot Defense profile. Full path is the combination of the `partition + profile name`,For example `/Common/test-bot-tc1`.
+* `name` - (Required,type `string`) Unique name for the Distributed Cloud Services Bot Defense profile. Full path is the combination of the `partition + profile name`, for example `/Common/test-bot-tc1`.
 
-* `defaults_from` - (optional,type `string`) Distributed Cloud Services Bot Defense parent profile from which this profile will inherit settings. The default is the system-supplied `bd` profile.
+* `defaults_from` - (Optional,type `string`) Distributed Cloud Services Bot Defense parent profile from which this profile will inherit settings. The default is the system-supplied `bd` profile.
 
-* `description` - (optional,type `string`) Specifies descriptive text that identifies the BD profile.
+* `description` - (Optional,type `string`) Specifies descriptive text that identifies the BD profile.
 
 * `application_id` - (Required,type `string`) Specifies the Bot Defense API application ID, enter the value provided by F5 Support
 
