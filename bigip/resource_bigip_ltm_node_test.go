@@ -8,6 +8,7 @@ package bigip
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -289,6 +290,9 @@ func testCheckNodesDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		node, err := client.GetNode(name)
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if node != nil {
