@@ -1291,6 +1291,9 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	var policyRules []bigip.PolicyRule
 	rawConfig := d.GetRawConfig()
 	rawRules := rawConfig.GetAttr("rule")
+	ruleSchema := resourceBigipLtmPolicy().Schema["rule"].Elem.(*schema.Resource).Schema
+	actionSchema := ruleSchema["action"].Elem.(*schema.Resource).Schema
+	conditionSchema := ruleSchema["condition"].Elem.(*schema.Resource).Schema
 	if !rawRules.IsNull() && rawRules.IsKnown() {
 		for _, rawRule := range rawRules.AsValueSlice() {
 			var polRule bigip.PolicyRule
@@ -1304,7 +1307,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 			if !rawActions.IsNull() && rawActions.IsKnown() {
 				for _, rawAction := range rawActions.AsValueSlice() {
 					var a bigip.PolicyRuleAction
-					actionMap := ctyObjectToMap(rawAction)
+					actionMap := ctyObjectToMap(rawAction, actionSchema)
 					mapEntity(actionMap, &a)
 					if a.Disable {
 						a.Disable = true
@@ -1322,7 +1325,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 			if !rawConditions.IsNull() && rawConditions.IsKnown() {
 				for _, rawCondition := range rawConditions.AsValueSlice() {
 					var a bigip.PolicyRuleCondition
-					conditionMap := ctyObjectToMap(rawCondition)
+					conditionMap := ctyObjectToMap(rawCondition, conditionSchema)
 					mapEntity(conditionMap, &a)
 					policyRuleConditions = append(policyRuleConditions, a)
 				}

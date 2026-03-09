@@ -367,13 +367,19 @@ func hashForState(value string) string {
 // ctyObjectToMap converts a cty.Value of object type to a map[string]interface{},
 // suitable for passing to mapEntity. This reads directly from the raw Terraform
 // config, avoiding stale state contamination that occurs with TypeList index shifts.
-func ctyObjectToMap(val cty.Value) map[string]interface{} {
+// If a schema is provided, Default values are applied for any null attributes.
+func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[string]interface{} {
 	if val.IsNull() || !val.IsKnown() {
 		return nil
 	}
 	result := make(map[string]interface{})
 	for name, v := range val.AsValueMap() {
 		if v.IsNull() || !v.IsKnown() {
+			if schemaMap != nil {
+				if s, ok := schemaMap[name]; ok && s.Default != nil {
+					result[name] = s.Default
+				}
+			}
 			continue
 		}
 		switch v.Type() {
