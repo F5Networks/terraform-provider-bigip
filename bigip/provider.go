@@ -11,6 +11,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -399,6 +400,8 @@ func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[stri
 					}
 				}
 				result[name] = strs
+			} else {
+				log.Printf("[WARN] ctyObjectToMap: unhandled type %s for attribute %q", v.Type().FriendlyName(), name)
 			}
 		}
 	}
