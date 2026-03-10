@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"math/big"
 	"reflect"
 	"regexp"
 	"strings"
@@ -389,8 +390,19 @@ func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[stri
 		case cty.Bool:
 			result[name] = v.True()
 		case cty.Number:
-			i, _ := v.AsBigFloat().Int64()
-			result[name] = int(i)
+			// Mirrors the SDK's internal hcl2shim.ConfigValueFromHCL2 logic:
+			// use int if exactly representable, otherwise float64.
+			f := v.AsBigFloat()
+			if i, acc := f.Int64(); acc == big.Exact {
+				const maxInt = int(^uint(0) >> 1)
+				const minInt = -maxInt - 1
+				if i <= int64(maxInt) && i >= int64(minInt) {
+					result[name] = int(i)
+					continue
+				}
+			}
+			f64, _ := f.Float64()
+			result[name] = f64
 		default:
 			if v.Type().IsListType() && v.Type().ElementType() == cty.String {
 				strs := make([]interface{}, 0, v.LengthInt())
