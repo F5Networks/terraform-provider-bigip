@@ -1294,17 +1294,17 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 	ruleSchema := resourceBigipLtmPolicy().Schema["rule"].Elem.(*schema.Resource).Schema
 	actionSchema := ruleSchema["action"].Elem.(*schema.Resource).Schema
 	conditionSchema := ruleSchema["condition"].Elem.(*schema.Resource).Schema
-	if !rawRules.IsNull() && rawRules.IsKnown() {
+	if ctyValIsSet(rawRules) {
 		for _, rawRule := range rawRules.AsValueSlice() {
 			var polRule bigip.PolicyRule
 			polRule.Name = rawRule.GetAttr("name").AsString()
-			if desc := rawRule.GetAttr("description"); !desc.IsNull() && desc.IsKnown() {
+			if desc := rawRule.GetAttr("description"); ctyValIsSet(desc) {
 				polRule.Description = desc.AsString()
 			}
 
 			var policyRulesActions []bigip.PolicyRuleAction
 			rawActions := rawRule.GetAttr("action")
-			if !rawActions.IsNull() && rawActions.IsKnown() {
+			if ctyValIsSet(rawActions) {
 				for _, rawAction := range rawActions.AsValueSlice() {
 					var a bigip.PolicyRuleAction
 					actionMap := ctyObjectToMap(rawAction, actionSchema)
@@ -1322,7 +1322,7 @@ func dataToPolicy(name string, d *schema.ResourceData) bigip.Policy {
 
 			var policyRuleConditions []bigip.PolicyRuleCondition
 			rawConditions := rawRule.GetAttr("condition")
-			if !rawConditions.IsNull() && rawConditions.IsKnown() {
+			if ctyValIsSet(rawConditions) {
 				for _, rawCondition := range rawConditions.AsValueSlice() {
 					var a bigip.PolicyRuleCondition
 					conditionMap := ctyObjectToMap(rawCondition, conditionSchema)

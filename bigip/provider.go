@@ -366,17 +366,22 @@ func hashForState(value string) string {
 	return hex.EncodeToString(hash[:])
 }
 
+// ctyValIsSet returns true if a cty.Value is non-null and fully resolved (known).
+func ctyValIsSet(val cty.Value) bool {
+	return !val.IsNull() && val.IsKnown()
+}
+
 // ctyObjectToMap converts a cty.Value of object type to a map[string]interface{},
 // suitable for passing to mapEntity. This reads directly from the raw Terraform
 // config, avoiding stale state contamination that occurs with TypeList index shifts.
 // If a schema is provided, Default values are applied for any null attributes.
 func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[string]interface{} {
-	if val.IsNull() || !val.IsKnown() {
+	if !ctyValIsSet(val) {
 		return nil
 	}
 	result := make(map[string]interface{})
 	for name, v := range val.AsValueMap() {
-		if v.IsNull() || !v.IsKnown() {
+		if !ctyValIsSet(v) {
 			if schemaMap != nil {
 				if s, ok := schemaMap[name]; ok && s.Default != nil {
 					result[name] = s.Default
@@ -407,7 +412,7 @@ func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[stri
 			if v.Type().IsListType() && v.Type().ElementType() == cty.String {
 				strs := make([]interface{}, 0, v.LengthInt())
 				for _, sv := range v.AsValueSlice() {
-					if !sv.IsNull() && sv.IsKnown() {
+					if ctyValIsSet(sv) {
 						strs = append(strs, sv.AsString())
 					}
 				}
