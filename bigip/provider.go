@@ -379,6 +379,10 @@ func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[stri
 	if !ctyValIsSet(val) {
 		return nil
 	}
+	if !val.Type().IsObjectType() && !val.Type().IsMapType() {
+		log.Printf("[WARN] ctyObjectToMap: expected object or map type, got %s", val.Type().FriendlyName())
+		return nil
+	}
 	result := make(map[string]interface{})
 	for name, v := range val.AsValueMap() {
 		if !ctyValIsSet(v) {
