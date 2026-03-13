@@ -568,6 +568,40 @@ func TestAccBigipLtmPolicy_import_newpoolbehavior(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmPolicy_Issue1128(t *testing.T) {
+	t.Parallel()
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPolicysDestroyed,
+		Steps: []resource.TestStep{
+			{
+				// Step 1: Create policy with 3 rules
+				Config: testaccbigipltmpolicyIssue1128Step1(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/test-policy-issue1128"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.#", "3"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.0.name", "rule1"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.1.name", "rule2"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.2.name", "default-rule"),
+				),
+			},
+			{
+				// Step 2: Remove the middle rule - this is the bug scenario
+				Config: testaccbigipltmpolicyIssue1128Step2(),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPolicyExists("/Common/test-policy-issue1128"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.#", "2"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.0.name", "rule1"),
+					resource.TestCheckResourceAttr("bigip_ltm_policy.test-policy-issue1128", "rule.1.name", "default-rule"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckPolicyExists(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
@@ -786,6 +820,93 @@ func testaccbigipltmpoolicyissue648() string {
 		  }
 		}`
 	return tfConfig
+}
+
+func testaccbigipltmpolicyIssue1128Step1() string {
+	return `
+resource "bigip_ltm_pool" "pool1-issue1128" {
+  name = "/Common/pool1-issue1128"
+}
+resource "bigip_ltm_pool" "pool2-issue1128" {
+  name = "/Common/pool2-issue1128"
+}
+resource "bigip_ltm_policy" "test-policy-issue1128" {
+  depends_on = [bigip_ltm_pool.pool1-issue1128, bigip_ltm_pool.pool2-issue1128]
+  name       = "/Common/test-policy-issue1128"
+  strategy   = "first-match"
+  requires   = ["http"]
+  controls   = ["forwarding"]
+  rule {
+    name = "rule1"
+    condition {
+      http_host = true
+      equals    = true
+      values    = ["host1"]
+    }
+    action {
+      forward    = true
+      connection = false
+      pool       = "/Common/pool1-issue1128"
+    }
+  }
+  rule {
+    name = "rule2"
+    condition {
+      http_host = true
+      equals    = true
+      values    = ["host2"]
+    }
+    action {
+      forward    = true
+      connection = false
+      pool       = "/Common/pool2-issue1128"
+    }
+  }
+  rule {
+    name = "default-rule"
+    action {
+      shutdown = true
+    }
+  }
+}
+	`
+}
+
+func testaccbigipltmpolicyIssue1128Step2() string {
+	return `
+resource "bigip_ltm_pool" "pool1-issue1128" {
+  name = "/Common/pool1-issue1128"
+}
+resource "bigip_ltm_pool" "pool2-issue1128" {
+  name = "/Common/pool2-issue1128"
+}
+resource "bigip_ltm_policy" "test-policy-issue1128" {
+  depends_on = [bigip_ltm_pool.pool1-issue1128, bigip_ltm_pool.pool2-issue1128]
+  name       = "/Common/test-policy-issue1128"
+  strategy   = "first-match"
+  requires   = ["http"]
+  controls   = ["forwarding"]
+  rule {
+    name = "rule1"
+    condition {
+      http_host = true
+      equals    = true
+      values    = ["host1"]
+    }
+    action {
+      forward    = true
+      connection = false
+      pool       = "/Common/pool1-issue1128"
+    }
+  }
+  rule {
+    name = "default-rule"
+    action {
+      shutdown = true
+    }
+  }
+}
+	`
 }
 
 func testaccbigipltmpoolicyissue737() string {
