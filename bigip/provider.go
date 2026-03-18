@@ -11,12 +11,15 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"log"
+	"math/big"
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"golang.org/x/text/cases"
@@ -361,4 +364,67 @@ func hashForState(value string) string {
 	}
 	hash := sha1.Sum([]byte(strings.TrimSpace(value)))
 	return hex.EncodeToString(hash[:])
+}
+
+// ctyValIsSet returns true if a cty.Value is non-null and fully resolved (known).
+func ctyValIsSet(val cty.Value) bool {
+	return !val.IsNull() && val.IsKnown()
+}
+
+// ctyObjectToMap converts a cty.Value of object type to a map[string]interface{},
+// suitable for passing to mapEntity. This reads directly from the raw Terraform
+// config, avoiding stale state contamination that occurs with TypeList index shifts.
+// If a schema is provided, Default values are applied for any null attributes.
+func ctyObjectToMap(val cty.Value, schemaMap map[string]*schema.Schema) map[string]interface{} {
+	if !ctyValIsSet(val) {
+		return nil
+	}
+	if !val.Type().IsObjectType() && !val.Type().IsMapType() {
+		log.Printf("[WARN] ctyObjectToMap: expected object or map type, got %s", val.Type().FriendlyName())
+		return nil
+	}
+	result := make(map[string]interface{})
+	for name, v := range val.AsValueMap() {
+		if !ctyValIsSet(v) {
+			if schemaMap != nil {
+				if s, ok := schemaMap[name]; ok && s.Default != nil {
+					result[name] = s.Default
+				}
+			}
+			continue
+		}
+		switch v.Type() {
+		case cty.String:
+			result[name] = v.AsString()
+		case cty.Bool:
+			result[name] = v.True()
+		case cty.Number:
+			// Mirrors the SDK's internal hcl2shim.ConfigValueFromHCL2 logic:
+			// use int if exactly representable, otherwise float64.
+			f := v.AsBigFloat()
+			if i, acc := f.Int64(); acc == big.Exact {
+				const maxInt = int(^uint(0) >> 1)
+				const minInt = -maxInt - 1
+				if i <= int64(maxInt) && i >= int64(minInt) {
+					result[name] = int(i)
+					continue
+				}
+			}
+			f64, _ := f.Float64()
+			result[name] = f64
+		default:
+			if v.Type().IsListType() && v.Type().ElementType() == cty.String {
+				strs := make([]interface{}, 0, v.LengthInt())
+				for _, sv := range v.AsValueSlice() {
+					if ctyValIsSet(sv) {
+						strs = append(strs, sv.AsString())
+					}
+				}
+				result[name] = strs
+			} else {
+				log.Printf("[WARN] ctyObjectToMap: unhandled type %s for attribute %q", v.Type().FriendlyName(), name)
+			}
+		}
+	}
+	return result
 }
