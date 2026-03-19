@@ -201,6 +201,11 @@ func Provider() *schema.Provider {
 			"bigip_gtm_pool":                        resourceBigipGtmPool(),
 			"bigip_gtm_datacenter":                  resourceBigipGtmDatacenter(),
 			"bigip_gtm_server":                      resourceBigipGtmServer(),
+			"bigip_gtm_monitor_http":                resourceBigipGtmMonitorHttp(),
+			"bigip_gtm_monitor_https":               resourceBigipGtmMonitorHttps(),
+			"bigip_gtm_monitor_tcp":                 resourceBigipGtmMonitorTcp(),
+			"bigip_gtm_monitor_postgresql":          resourceBigipGtmMonitorPostgresql(),
+			"bigip_gtm_monitor_bigip":               resourceBigipGtmMonitorBigip(),
 		},
 	}
 	p.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
