@@ -1,0 +1,81 @@
+# bigip_gtm_monitor_postgresql Resource
+
+Provides a BIG-IP GTM (Global Traffic Manager) PostgreSQL Monitor resource. This resource allows you to configure and manage GTM PostgreSQL health monitors on a BIG-IP system.
+
+## Description
+
+A GTM PostgreSQL monitor verifies the availability and performance of PostgreSQL database services across your GTM infrastructure. The monitor connects to a PostgreSQL database with optional authentication and evaluates the response to determine health status. PostgreSQL monitors support database-specific fields including database name, username, password, and probe count configuration.
+
+## Example Usage
+
+### Basic PostgreSQL Monitor
+
+```hcl
+resource "bigip_gtm_monitor_postgresql" "example" {
+  name = "/Common/my_postgresql_monitor"
+}
+```
+
+### PostgreSQL Monitor with Authentication
+
+```hcl
+resource "bigip_gtm_monitor_postgresql" "advanced" {
+  name                 = "/Common/my_postgresql_monitor"
+  defaults_from        = "/Common/postgresql"
+  destination          = "*:5432"
+  interval             = 10
+  timeout              = 60
+  probe_timeout        = 3
+  ignore_down_response = "disabled"
+  database             = "mydb"
+  username             = "monitor_user"
+  password             = "monitor_pass"
+  receive              = "SELECT"
+  debug                = "no"
+}
+```
+
+## Argument Reference
+
+The following arguments are supported:
+
+### Required Arguments
+
+* `name` - (Required, String) The full path name of the GTM PostgreSQL monitor (e.g., `/Common/my_postgresql_monitor`). Forces new resource.
+
+### Optional Arguments
+
+#### General Settings
+
+* `defaults_from` - (Optional, String) Specifies the parent monitor from which this monitor inherits settings. Default: `/Common/postgresql`.
+* `destination` - (Optional, String) Specifies the IP address and service port of the resource being monitored. Format: `ip:port`. Default: `*:*`.
+* `interval` - (Optional, Integer) Specifies, in seconds, the frequency at which the system issues the monitor check. Default: `30`.
+* `timeout` - (Optional, Integer) Specifies the number of seconds the target has in which to respond to the monitor request. Default: `120`.
+* `probe_timeout` - (Optional, Integer) Specifies the number of seconds after which the system times out the probe request. Default: `5`.
+* `ignore_down_response` - (Optional, String) Specifies whether the monitor ignores a down response from the system it is monitoring. Valid values: `enabled`, `disabled`. Default: `disabled`.
+
+#### Database Settings
+
+* `database` - (Optional, String) Specifies the name of the database that the monitor tries to access.
+* `username` - (Optional, String) Specifies the user name if the monitored target requires authentication.
+* `password` - (Optional, String, Sensitive) Specifies the password if the monitored target requires authentication.
+* `receive` - (Optional, String) Specifies the text string that the monitor looks for in the returned resource.
+
+#### Probe Settings
+
+* `probe_count` - (Optional, String) Specifies the number of monitor probes after which the system times out.
+* `debug` - (Optional, String) Specifies whether the monitor sends error messages and additional information to a log file created and labeled specifically for this monitor. Valid values: `yes`, `no`. Default: `no`.
+
+## Attribute Reference
+
+In addition to the arguments listed above, the following attributes are exported:
+
+* `id` - The full path name of the GTM PostgreSQL monitor.
+
+## Import
+
+GTM PostgreSQL Monitor resources can be imported using the full path name:
+
+```bash
+terraform import bigip_gtm_monitor_postgresql.example /Common/my_postgresql_monitor
+```
