@@ -493,36 +493,6 @@ type GtmPoolMembers struct {
 	Ratio                     int    `json:"ratio,omitempty"`
 }
 
-func (b *BigIP) Gtmmonitors() (*Gtmmonitor, error) {
-	var gtmmonitor Gtmmonitor
-	err, _ := b.getForEntity(&gtmmonitor, uriGtm, uriGtmmonitor, uriHttp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &gtmmonitor, nil
-}
-func (b *BigIP) CreateGtmmonitor(name, defaults_from string, interval, probeTimeout int, recv, send string) error {
-	config := &Gtmmonitor{
-		Name:          name,
-		Defaults_from: defaults_from,
-		Interval:      interval,
-		Probe_timeout: probeTimeout,
-		Recv:          recv,
-		Send:          send,
-	}
-	return b.post(config, uriGtm, uriGtmmonitor, uriHttp)
-}
-
-func (b *BigIP) ModifyGtmmonitor(*Gtmmonitor) error {
-	return b.patch(uriGtm, uriGtmmonitor, uriHttp)
-}
-
-func (b *BigIP) DeleteGtmmonitor(name string) error {
-	return b.delete(uriGtm, uriGtmmonitor, uriHttp, name)
-}
-
 // CreateGtmMonitor creates a GTM monitor of the specified type
 func (b *BigIP) CreateGtmMonitor(monitor *Gtmmonitor, monitorType string) error {
 	return b.post(monitor, uriGtm, uriGtmmonitor, monitorType)
