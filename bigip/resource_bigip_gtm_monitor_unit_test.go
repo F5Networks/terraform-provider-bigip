@@ -148,7 +148,7 @@ func TestResourceBigipGtmMonitorPostgresqlSchema(t *testing.T) {
 	}
 
 	// Test PostgreSQL-specific fields
-	postgresqlFields := []string{"database", "username", "password", "count", "debug"}
+	postgresqlFields := []string{"database", "username", "password", "probe_count", "debug"}
 	for _, field := range postgresqlFields {
 		if _, ok := resource.Schema[field]; !ok {
 			t.Errorf("Expected PostgreSQL-specific field '%s' to exist in schema", field)
