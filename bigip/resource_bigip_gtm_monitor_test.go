@@ -7,6 +7,7 @@ package bigip
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -281,6 +282,9 @@ func testCheckGtmMonitorHttpDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		monitor, err := client.GetGtmMonitor(name, "http")
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if monitor != nil {
@@ -316,6 +320,9 @@ func testCheckGtmMonitorHttpsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		monitor, err := client.GetGtmMonitor(name, "https")
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if monitor != nil {
@@ -351,6 +358,9 @@ func testCheckGtmMonitorTcpDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		monitor, err := client.GetGtmMonitor(name, "tcp")
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if monitor != nil {
@@ -386,6 +396,9 @@ func testCheckGtmMonitorPostgresqlDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		monitor, err := client.GetGtmMonitor(name, "postgresql")
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if monitor != nil {
@@ -421,6 +434,9 @@ func testCheckGtmMonitorBigipDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		monitor, err := client.GetGtmMonitor(name, "bigip")
 		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return nil
+			}
 			return err
 		}
 		if monitor != nil {
