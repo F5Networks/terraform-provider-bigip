@@ -30,7 +30,6 @@ resource "bigip_gtm_monitor_https" "with_cert" {
   receive       = "200 OK"
   cert          = "/Common/my_client_cert"
   key           = "/Common/my_client_key"
-  cipherlist    = "DEFAULT:+SHA:+3DES:+kEDH"
   compatibility = "enabled"
 }
 ```
