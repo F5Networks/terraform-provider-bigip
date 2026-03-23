@@ -96,7 +96,7 @@ func TestResourceBigipGtmMonitorHttpsSchema(t *testing.T) {
 
 	// Verify cipherlist default
 	if s, ok := resource.Schema["cipherlist"]; ok {
-		expectedDefault := "DEFAULT:+SHA:+3DES:+kEDH"
+		expectedDefault := "DEFAULT:!EXPORT"
 		if s.Default != expectedDefault {
 			t.Errorf("Expected cipherlist default to be '%s', got '%v'", expectedDefault, s.Default)
 		}
@@ -323,7 +323,7 @@ func TestResourceBigipGtmMonitorHttpDefaultSendString(t *testing.T) {
 	}
 
 	// HTTP monitor should have default send string
-	expectedDefault := "GET /\\r\\n"
+	expectedDefault := "GET /"
 	if sendSchema.Default != expectedDefault {
 		t.Errorf("Expected send default to be '%s', got '%v'", expectedDefault, sendSchema.Default)
 	}

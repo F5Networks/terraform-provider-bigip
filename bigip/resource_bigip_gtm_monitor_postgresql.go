@@ -56,7 +56,7 @@ func resourceBigipGtmMonitorPostgresql() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "Specifies the number of seconds the target has in which to respond to the monitor request",
-				Default:     120,
+				Default:     91,
 			},
 			"probe_timeout": {
 				Type:        schema.TypeInt,

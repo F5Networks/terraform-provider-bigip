@@ -52,7 +52,7 @@ The following arguments are supported:
 * `ignore_down_response` - (Optional, String) Specifies whether the monitor ignores a down response from the system it is monitoring. Valid values: `enabled`, `disabled`. Default: `disabled`.
 * `transparent` - (Optional, String) Specifies whether the monitor operates in transparent mode. Valid values: `enabled`, `disabled`. Default: `disabled`.
 * `reverse` - (Optional, String) Instructs the system to mark the target resource down when the test is successful. Valid values: `enabled`, `disabled`. Default: `disabled`.
-* `send` - (Optional, String) Specifies the text string that the monitor sends to the target object. Default: `GET /\r\n`.
+* `send` - (Optional, String) Specifies the text string that the monitor sends to the target object. Default: `GET /`.
 * `receive` - (Optional, String) Specifies the text string that the monitor looks for in the returned resource.
 
 ## Attribute Reference

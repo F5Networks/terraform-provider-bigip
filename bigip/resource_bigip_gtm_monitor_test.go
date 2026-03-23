@@ -26,7 +26,7 @@ resource "bigip_gtm_monitor_http" "test-gtm-http-monitor" {
   ignore_down_response  = "disabled"
   transparent           = "disabled"
   reverse               = "disabled"
-  send                  = "GET /\\r\\n"
+  send                  = "GET /"
   receive              = "200 OK"
 }
 `
@@ -42,9 +42,9 @@ resource "bigip_gtm_monitor_https" "test-gtm-https-monitor" {
   ignore_down_response  = "disabled"
   transparent           = "disabled"
   reverse               = "disabled"
-  send                  = "GET /\\r\\n"
+  send                  = "GET /"
   receive              = "200 OK"
-  cipherlist           = "DEFAULT:+SHA:+3DES:+kEDH"
+  cipherlist           = "DEFAULT:!EXPORT"
   compatibility        = "enabled"
 }
 `
@@ -69,7 +69,7 @@ resource "bigip_gtm_monitor_postgresql" "test-gtm-postgresql-monitor" {
   defaults_from         = "/Common/postgresql"
   destination           = "*:5432"
   interval              = 30
-  timeout               = 120
+  timeout               = 91
   probe_timeout         = 5
   ignore_down_response  = "disabled"
   database              = "testdb"
@@ -161,7 +161,7 @@ func TestAccBigipGtmMonitorHttp_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_http.test-gtm-http-monitor", "defaults_from", "/Common/http"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_http.test-gtm-http-monitor", "interval", "30"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_http.test-gtm-http-monitor", "timeout", "120"),
-					resource.TestCheckResourceAttr("bigip_gtm_monitor_http.test-gtm-http-monitor", "send", "GET /\\r\\n"),
+					resource.TestCheckResourceAttr("bigip_gtm_monitor_http.test-gtm-http-monitor", "send", "GET /"),
 				),
 			},
 		},
@@ -184,7 +184,7 @@ func TestAccBigipGtmMonitorHttps_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "defaults_from", "/Common/https"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "interval", "30"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "timeout", "120"),
-					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "DEFAULT:+SHA:+3DES:+kEDH"),
+					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "DEFAULT:!EXPORT"),
 				),
 			},
 		},
@@ -496,7 +496,7 @@ func TestAccBigipGtmMonitorHttps_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckGtmMonitorHttpsExists("/Common/test-gtm-https-monitor", true),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "interval", "30"),
-					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "DEFAULT:+SHA:+3DES:+kEDH"),
+					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "DEFAULT:!EXPORT"),
 				),
 			},
 			{

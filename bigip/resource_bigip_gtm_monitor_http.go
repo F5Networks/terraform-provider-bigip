@@ -86,7 +86,7 @@ func resourceBigipGtmMonitorHttp() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the text string that the monitor sends to the target object",
-				Default:     "GET /\\r\\n",
+				Default:     "GET /",
 			},
 			"receive": {
 				Type:        schema.TypeString,

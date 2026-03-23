@@ -86,7 +86,7 @@ func resourceBigipGtmMonitorHttps() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the text string that the monitor sends to the target object",
-				Default:     "GET /\\r\\n",
+				Default:     "GET /",
 			},
 			"receive": {
 				Type:        schema.TypeString,
@@ -107,7 +107,7 @@ func resourceBigipGtmMonitorHttps() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Specifies the list of ciphers for this monitor",
-				Default:     "DEFAULT:+SHA:+3DES:+kEDH",
+				Default:     "DEFAULT:!EXPORT",
 			},
 			"compatibility": {
 				Type:        schema.TypeString,

@@ -54,14 +54,14 @@ The following arguments are supported:
 * `ignore_down_response` - (Optional, String) Specifies whether the monitor ignores a down response from the system it is monitoring. Valid values: `enabled`, `disabled`. Default: `disabled`.
 * `transparent` - (Optional, String) Specifies whether the monitor operates in transparent mode. Valid values: `enabled`, `disabled`. Default: `disabled`.
 * `reverse` - (Optional, String) Instructs the system to mark the target resource down when the test is successful. Valid values: `enabled`, `disabled`. Default: `disabled`.
-* `send` - (Optional, String) Specifies the text string that the monitor sends to the target object. Default: `GET /\r\n`.
+* `send` - (Optional, String) Specifies the text string that the monitor sends to the target object. Default: `GET /`.
 * `receive` - (Optional, String) Specifies the text string that the monitor looks for in the returned resource.
 
 #### SSL Settings
 
 * `cert` - (Optional, String) Specifies a fully-qualified path for a client certificate that the monitor sends to the target SSL server.
 * `key` - (Optional, String) Specifies the key for the client certificate that the monitor sends to the target SSL server.
-* `cipherlist` - (Optional, String) Specifies the list of ciphers for this monitor. Default: `DEFAULT:+SHA:+3DES:+kEDH`.
+* `cipherlist` - (Optional, String) Specifies the list of ciphers for this monitor. Default: `DEFAULT:!EXPORT`.
 * `compatibility` - (Optional, String) Specifies the SSL version compatibility. Valid values: `enabled`, `disabled`. Default: `enabled`.
 
 ## Attribute Reference
