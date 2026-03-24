@@ -4,7 +4,7 @@ Provides a BIG-IP GTM (Global Traffic Manager) HTTPS Monitor resource. This reso
 
 ## Description
 
-A GTM HTTPS monitor verifies the availability and performance of HTTPS (SSL/TLS) services across your GTM infrastructure. The monitor establishes secure connections to target resources and evaluates the responses to determine health status. HTTPS monitors support client certificate authentication and configurable cipher lists, making them suitable for monitoring secure web services.
+A GTM HTTPS monitor verifies the HTTPS service by attempting to receive specific content from a web page protected by Secure Socket Layer (SSL) security. HTTPS monitors support client certificate authentication and configurable cipher lists.
 
 ## Example Usage
 

@@ -4,7 +4,7 @@ Provides a BIG-IP GTM (Global Traffic Manager) TCP Monitor resource. This resour
 
 ## Description
 
-A GTM TCP monitor verifies the availability of TCP-based services across your GTM infrastructure. The monitor establishes TCP connections to target resources and optionally sends a string and evaluates the response to determine health status. TCP monitors are commonly used to check the availability of services such as databases, mail servers, and other TCP-based applications.
+A GTM TCP monitor verifies the health of TCP-based services by establishing a connection to the target. It can optionally send a text string and evaluate the response for more specific health checks.
 
 ## Example Usage
 

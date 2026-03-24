@@ -4,7 +4,7 @@ Provides a BIG-IP GTM (Global Traffic Manager) HTTP Monitor resource. This resou
 
 ## Description
 
-A GTM HTTP monitor verifies the availability and performance of HTTP services across your GTM infrastructure. The monitor sends HTTP requests to target resources and evaluates the responses to determine health status. HTTP monitors are commonly used to check web server availability and verify that expected content is being served.
+A GTM HTTP monitor verifies the HTTP service by attempting to receive specific content from a web page.
 
 ## Example Usage
 

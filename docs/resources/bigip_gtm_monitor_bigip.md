@@ -1,10 +1,17 @@
 # bigip_gtm_monitor_bigip Resource
 
-Provides a BIG-IP GTM (Global Traffic Manager) BIG-IP Monitor resource. This resource allows you to configure and manage GTM BIG-IP health monitors on a BIG-IP system.
+Provides a BIG-IP GTM (Global Traffic Manager) BIG-IP Monitor resource. This resource allows you to configure and manage GTM BIG-IP monitors on a BIG-IP system.
 
 ## Description
 
-A GTM BIG-IP monitor is designed to monitor BIG-IP systems themselves within your GTM infrastructure. Unlike protocol-specific monitors (HTTP, TCP, etc.), the BIG-IP monitor collects health and performance data directly from BIG-IP devices, including metrics such as CPU usage, memory utilization, and throughput. This monitor type does not use `send`/`receive` strings or `probe_timeout` and instead focuses on aggregated system-level metrics.
+A GTM BIG-IP monitor is both a health and performance monitor that acquires data captured through monitors managed by a BIG-IP Local Traffic Manager.
+
+You can monitor only the following components with a BIG-IP monitor:
+
+* Global Traffic Manager server
+* Global Traffic Manager virtual server
+* Local Traffic Manager server
+* Local Traffic Manager virtual server
 
 ## Example Usage
 
@@ -45,7 +52,7 @@ The following arguments are supported:
 * `interval` - (Optional, Integer) Specifies, in seconds, the frequency at which the system issues the monitor check. Default: `30`.
 * `timeout` - (Optional, Integer) Specifies the number of seconds the target has in which to respond to the monitor request. Default: `90`.
 * `ignore_down_response` - (Optional, String) Specifies whether the monitor ignores a down response from the system it is monitoring. Valid values: `enabled`, `disabled`. Default: `disabled`.
-* `aggregation_type` - (Optional, String) Specifies how the system combines the monitor information it collects for a pool of monitored resources. Default: `none`.
+* `aggregation_type` - (Optional, String) Specifies how the system combines the monitor information it collects for a pool of monitored resources. Valid values: `none`, `average-members`, `average-nodes`, `sum-members`, `sum-nodes`. Default: `none`.
 
 ## Attribute Reference
 

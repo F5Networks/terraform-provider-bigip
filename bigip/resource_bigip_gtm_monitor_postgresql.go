@@ -90,7 +90,7 @@ func resourceBigipGtmMonitorPostgresql() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Specifies the number of monitor probes after which the system times out",
+				Description: "Specifies the number of instances for which the system keeps a connection open",
 			},
 			"debug": {
 				Type:        schema.TypeString,

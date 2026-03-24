@@ -4,7 +4,7 @@ Provides a BIG-IP GTM (Global Traffic Manager) PostgreSQL Monitor resource. This
 
 ## Description
 
-A GTM PostgreSQL monitor verifies the availability and performance of PostgreSQL database services across your GTM infrastructure. The monitor connects to a PostgreSQL database with optional authentication and evaluates the response to determine health status. PostgreSQL monitors support database-specific fields including database name, username, password, and probe count configuration.
+A GTM PostgreSQL monitor verifies PostgreSQL database services by connecting to a database and optionally executing a query and evaluating the response. PostgreSQL monitors support database-specific configuration including database name, username, password, and instance count.
 
 ## Example Usage
 
@@ -63,7 +63,7 @@ The following arguments are supported:
 
 #### Connection Settings
 
-* `instance_count` - (Optional, String) Specifies the number of instances for which the system keeps a connection open. A value of `0` keeps the connection open for all instances. A value of `1` opens a new connection for each instance. Any other positive value keeps the connection open for that many instances.
+* `instance_count` - (Optional, String) Specifies the number of instances for which the system keeps a connection open. By default, when you assign instances of this monitor to a resource, the system keeps the connection to the database open. With this option you can assign multiple instances to the database while reducing the overhead that multiple open connections can cause. A value of `0` keeps the connection open for all instances. A value of `1` opens a new connection for each instance. Any other positive value keeps the connection open for that many instances.
 * `debug` - (Optional, String) Specifies whether the monitor sends error messages and additional information to a log file created and labeled specifically for this monitor. Valid values: `yes`, `no`. Default: `no`.
 
 ## Attribute Reference
