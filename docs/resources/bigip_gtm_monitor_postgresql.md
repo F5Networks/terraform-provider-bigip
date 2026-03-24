@@ -61,9 +61,9 @@ The following arguments are supported:
 * `password` - (Optional, String, Sensitive) Specifies the password if the monitored target requires authentication.
 * `receive` - (Optional, String) Specifies the text string that the monitor looks for in the returned resource.
 
-#### Probe Settings
+#### Connection Settings
 
-* `probe_count` - (Optional, String) Specifies the number of monitor probes after which the system times out.
+* `instance_count` - (Optional, String) Specifies the number of instances for which the system keeps a connection open. A value of `0` keeps the connection open for all instances. A value of `1` opens a new connection for each instance. Any other positive value keeps the connection open for that many instances.
 * `debug` - (Optional, String) Specifies whether the monitor sends error messages and additional information to a log file created and labeled specifically for this monitor. Valid values: `yes`, `no`. Default: `no`.
 
 ## Attribute Reference

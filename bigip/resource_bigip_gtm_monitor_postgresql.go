@@ -86,7 +86,7 @@ func resourceBigipGtmMonitorPostgresql() *schema.Resource {
 				Sensitive:   true,
 				Description: "Specifies the password if the monitored target requires authentication",
 			},
-			"probe_count": {
+			"instance_count": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
@@ -124,7 +124,7 @@ func resourceBigipGtmMonitorPostgresqlCreate(ctx context.Context, d *schema.Reso
 		Database:             d.Get("database").(string),
 		Username:             d.Get("username").(string),
 		Password:             d.Get("password").(string),
-		Count:                d.Get("probe_count").(string),
+		Count:                d.Get("instance_count").(string),
 		Debug:                d.Get("debug").(string),
 		Recv:                 d.Get("receive").(string),
 	}
@@ -171,7 +171,7 @@ func resourceBigipGtmMonitorPostgresqlRead(ctx context.Context, d *schema.Resour
 	d.Set("database", monitor.Database)
 	d.Set("username", monitor.Username)
 	// Password is sensitive, don't set it back
-	d.Set("probe_count", monitor.Count)
+	d.Set("instance_count", monitor.Count)
 	d.Set("debug", monitor.Debug)
 	d.Set("receive", monitor.Recv)
 
@@ -195,7 +195,7 @@ func resourceBigipGtmMonitorPostgresqlUpdate(ctx context.Context, d *schema.Reso
 		Database:             d.Get("database").(string),
 		Username:             d.Get("username").(string),
 		Password:             d.Get("password").(string),
-		Count:                d.Get("probe_count").(string),
+		Count:                d.Get("instance_count").(string),
 		Debug:                d.Get("debug").(string),
 		Recv:                 d.Get("receive").(string),
 	}
