@@ -76,7 +76,11 @@ GTM resources must be created in a specific order due to dependencies:
 | `bigip_gtm_server` | BIG-IP system or generic host server | ✅ Available |
 | `bigip_gtm_pool` | Collection of virtual servers for load balancing | ✅ Available |
 | `bigip_gtm_wideip` | DNS name that GTM resolves | ✅ Available |
-| `bigip_gtm_monitor` | Health monitors for GTM | ❌ Not Yet Implemented |
+| `bigip_gtm_monitor_http` | HTTP health monitor | ✅ Available |
+| `bigip_gtm_monitor_https` | HTTPS health monitor | ✅ Available |
+| `bigip_gtm_monitor_tcp` | TCP health monitor | ✅ Available |
+| `bigip_gtm_monitor_postgresql` | PostgreSQL health monitor | ✅ Available |
+| `bigip_gtm_monitor_bigip` | BIG-IP health monitor | ✅ Available |
 | `bigip_gtm_prober_pool` | Pool of probers for health checking | ❌ Not Yet Implemented |
 | `bigip_gtm_topology` | Topology records for geographic routing | ❌ Not Yet Implemented |
 

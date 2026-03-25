@@ -84,12 +84,32 @@ type Gtmmonitors struct {
 }
 
 type Gtmmonitor struct {
-	Name          string `json:"name,omitempty"`
-	Defaults_from string `json:"defaultsFrom,omitempty"`
-	Interval      int    `json:"interval,omitempty"`
-	Probe_timeout int    `json:"probeTimeout,omitempty"`
-	Recv          string `json:"recv,omitempty"`
-	Send          string `json:"send,omitempty"`
+	Name                 string `json:"name,omitempty"`
+	FullPath             string `json:"fullPath,omitempty"`
+	Partition            string `json:"partition,omitempty"`
+	Defaults_from        string `json:"defaultsFrom,omitempty"`
+	Destination          string `json:"destination,omitempty"`
+	Interval             int    `json:"interval,omitempty"`
+	Timeout              int    `json:"timeout,omitempty"`
+	Probe_timeout        int    `json:"probeTimeout,omitempty"`
+	Ignore_down_response string `json:"ignoreDownResponse,omitempty"`
+	Transparent          string `json:"transparent,omitempty"`
+	Reverse              string `json:"reverse,omitempty"`
+	Recv                 string `json:"recv,omitempty"`
+	Send                 string `json:"send,omitempty"`
+	// HTTPS-specific fields
+	Cert          string `json:"cert,omitempty"`
+	Key           string `json:"key,omitempty"`
+	Cipherlist    string `json:"cipherlist,omitempty"`
+	Compatibility string `json:"compatibility,omitempty"`
+	// PostgreSQL-specific fields
+	Database string `json:"database,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Count    string `json:"count,omitempty"`
+	Debug    string `json:"debug,omitempty"`
+	// BIG-IP monitor-specific fields
+	Aggregate_dynamic_ratios string `json:"aggregateDynamicRatios,omitempty"`
 }
 
 type Servers struct {
@@ -473,34 +493,32 @@ type GtmPoolMembers struct {
 	Ratio                     int    `json:"ratio,omitempty"`
 }
 
-func (b *BigIP) Gtmmonitors() (*Gtmmonitor, error) {
-	var gtmmonitor Gtmmonitor
-	err, _ := b.getForEntity(&gtmmonitor, uriGtm, uriGtmmonitor, uriHttp)
+// CreateGtmMonitor creates a GTM monitor of the specified type
+func (b *BigIP) CreateGtmMonitor(monitor *Gtmmonitor, monitorType string) error {
+	return b.post(monitor, uriGtm, uriGtmmonitor, monitorType)
+}
 
+// GetGtmMonitor retrieves a GTM monitor of the specified type
+func (b *BigIP) GetGtmMonitor(name string, monitorType string) (*Gtmmonitor, error) {
+	var monitor Gtmmonitor
+	err, ok := b.getForEntity(&monitor, uriGtm, uriGtmmonitor, monitorType, name)
 	if err != nil {
 		return nil, err
 	}
-
-	return &gtmmonitor, nil
-}
-func (b *BigIP) CreateGtmmonitor(name, defaults_from string, interval, probeTimeout int, recv, send string) error {
-	config := &Gtmmonitor{
-		Name:          name,
-		Defaults_from: defaults_from,
-		Interval:      interval,
-		Probe_timeout: probeTimeout,
-		Recv:          recv,
-		Send:          send,
+	if !ok {
+		return nil, nil
 	}
-	return b.post(config, uriGtm, uriGtmmonitor, uriHttp)
+	return &monitor, nil
 }
 
-func (b *BigIP) ModifyGtmmonitor(*Gtmmonitor) error {
-	return b.patch(uriGtm, uriGtmmonitor, uriHttp)
+// ModifyGtmMonitor modifies a GTM monitor of the specified type
+func (b *BigIP) ModifyGtmMonitor(name string, monitor *Gtmmonitor, monitorType string) error {
+	return b.put(monitor, uriGtm, uriGtmmonitor, monitorType, name)
 }
 
-func (b *BigIP) DeleteGtmmonitor(name string) error {
-	return b.delete(uriGtm, uriGtmmonitor, uriHttp, name)
+// DeleteGtmMonitor deletes a GTM monitor of the specified type
+func (b *BigIP) DeleteGtmMonitor(name string, monitorType string) error {
+	return b.delete(uriGtm, uriGtmmonitor, monitorType, name)
 }
 
 func (b *BigIP) CreateGtmserver(p *Server) error {
