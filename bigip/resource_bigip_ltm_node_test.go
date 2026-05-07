@@ -144,6 +144,51 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 		},
 	})
 }
+
+// Verifies the Read function refreshes node.State from the device, so a
+// transition to user-down (e.g. admin force-offline) is observable in
+// Terraform state. Regression guard for issue #1153.
+func TestAccBigipLtmNode_StateRefresh(t *testing.T) {
+	t.Parallel()
+	instName := "test-node-state-refresh"
+	nodeName := fmt.Sprintf("/%s/%s", TestPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNodeName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmNodeStateConfig(instName, "user-up"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(nodeName),
+					resource.TestCheckResourceAttr(resFullName, "state", "user-up"),
+					resource.TestCheckResourceAttr(resFullName, "session", "user-enabled"),
+				),
+			},
+			{
+				Config: testaccbigipltmNodeStateConfig(instName, "user-down"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(nodeName),
+					resource.TestCheckResourceAttr(resFullName, "state", "user-down"),
+				),
+			},
+		},
+	})
+}
+
+func testaccbigipltmNodeStateConfig(instName, state string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_node" "%[1]s" {
+  name    = "/Common/%[1]s"
+  address = "192.168.100.101"
+  state   = "%[2]s"
+}
+`, instName, state)
+}
+
 func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 	t.Parallel()
 	var instName = "test-node-monitor"

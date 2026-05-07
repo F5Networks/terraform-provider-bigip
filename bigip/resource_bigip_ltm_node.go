@@ -227,6 +227,12 @@ func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta 
 	} else {
 		_ = d.Set("session", "user-disabled")
 	}
+	// Only user-down is an admin "forced offline" state; collapse monitor-driven runtime values (up/down/checking/unchecked/fqdn-*) to user-up to avoid spurious diffs.
+	if node.State == "user-down" {
+		_ = d.Set("state", "user-down")
+	} else {
+		_ = d.Set("state", "user-up")
+	}
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("description", node.Description)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)
