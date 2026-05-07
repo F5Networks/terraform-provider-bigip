@@ -81,9 +81,9 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 			"state": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "enabled",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled", "forced_offline"}, false),
-				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline",
+				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline. If unset, Terraform doesn't manage the state and leaves whatever the device reports in place.",
 			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
@@ -334,6 +334,15 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 				_ = d.Set("connection_rate_limit", node.RateLimit)
 				_ = d.Set("dynamic_ratio", node.DynamicRatio)
 				_ = d.Set("monitor", node.Monitor)
+				// Inverse of the Update mapping: state=user-down -> forced_offline; session=user-disabled (with state=user-up) -> disabled; everything else (including monitor-driven session/state) -> enabled.
+				switch {
+				case node.State == "user-down":
+					_ = d.Set("state", "forced_offline")
+				case node.Session == "user-disabled":
+					_ = d.Set("state", "disabled")
+				default:
+					_ = d.Set("state", "enabled")
+				}
 				found = true
 				break
 			}
@@ -349,6 +358,15 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 				_ = d.Set("connection_rate_limit", node.RateLimit)
 				_ = d.Set("dynamic_ratio", node.DynamicRatio)
 				_ = d.Set("monitor", node.Monitor)
+				// Inverse of the Update mapping: state=user-down -> forced_offline; session=user-disabled (with state=user-up) -> disabled; everything else (including monitor-driven session/state) -> enabled.
+				switch {
+				case node.State == "user-down":
+					_ = d.Set("state", "forced_offline")
+				case node.Session == "user-disabled":
+					_ = d.Set("state", "disabled")
+				default:
+					_ = d.Set("state", "enabled")
+				}
 				found = true
 				break
 			}
