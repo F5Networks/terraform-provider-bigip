@@ -255,6 +255,21 @@ func resourceBigipLtmVirtualServer() *schema.Resource {
 				Computed:    true,
 				Description: "Applies the specified AFM policy to the virtual in an enforcing way,when creating a new virtual, if this parameter is not specified, the enforced is disabled.this should be in full path ex: `/Common/afm-test-policy`",
 			},
+			"metadata": {
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return d.Get("ignore_metadata").(bool)
+				},
+				Description: "Metadata key/value pairs for the virtual server.",
+			},
+			"ignore_metadata": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Set true to ignore metadata drift and skip sending metadata in create/update requests.",
+			},
 		},
 	}
 }
@@ -291,8 +306,11 @@ func resourceBigipLtmVirtualServerCreate(ctx context.Context, d *schema.Resource
 	pss := &bigip.VirtualServer{
 		Name: name,
 	}
-	config := getVirtualServerConfig(d, pss)
-	err := client.CreateVirtualServer(config)
+	config, err := getVirtualServerConfig(d, pss)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = client.CreateVirtualServer(config)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Create Virtual Server  (%s) (%v)", name, err)
 		return diag.FromErr(err)
@@ -317,6 +335,7 @@ func resourceBigipLtmVirtualServerCreate(ctx context.Context, d *schema.Resource
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
+
 	return resourceBigipLtmVirtualServerRead(ctx, d, meta)
 }
 
@@ -429,6 +448,9 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 	_ = d.Set("translate_address", vs.TranslateAddress)
 	_ = d.Set("translate_port", vs.TranslatePort)
 	_ = d.Set("firewall_enforced_policy", vs.FwEnforcedPolicy)
+	if !d.Get("ignore_metadata").(bool) {
+		_ = d.Set("metadata", bigipMetadataToTfMetadata(vs.Metadata))
+	}
 
 	if len(vs.PersistenceProfiles) > 0 {
 		default_persistence := fmt.Sprintf("/%s/%s", vs.PersistenceProfiles[0].Partition, vs.PersistenceProfiles[0].Name)
@@ -485,11 +507,15 @@ func resourceBigipLtmVirtualServerUpdate(ctx context.Context, d *schema.Resource
 		Name: name,
 	}
 	log.Println("[INFO] Updating virtual server " + name)
-	config := getVirtualServerConfig(d, pss)
-	err := client.ModifyVirtualServer(name, config)
+	config, err := getVirtualServerConfig(d, pss)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	err = client.ModifyVirtualServer(name, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	return resourceBigipLtmVirtualServerRead(ctx, d, meta)
 }
 
@@ -508,7 +534,7 @@ func resourceBigipLtmVirtualServerDelete(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer) *bigip.VirtualServer {
+func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer) (*bigip.VirtualServer, error) {
 	ltmVirtualServerAttrDefaults(d)
 	port := d.Get("port").(int)
 	mask := d.Get("mask").(string)
@@ -616,5 +642,12 @@ func getVirtualServerConfig(d *schema.ResourceData, config *bigip.VirtualServer)
 	if d.Get("state").(string) == "enabled" {
 		config.Enabled = true
 	}
-	return config
+	if !d.Get("ignore_metadata").(bool) {
+		metadata, err := tfMetadataToBigipMetadata(d.Get("metadata").(map[string]interface{}))
+		if err != nil {
+			return nil, err
+		}
+		config.Metadata = metadata
+	}
+	return config, nil
 }

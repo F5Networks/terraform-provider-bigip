@@ -272,6 +272,13 @@ type Pools struct {
 	Pools []Pool `json:"items"`
 }
 
+// ResourceMetadata contains metadata key/value entries associated with LTM objects.
+type ResourceMetadata struct {
+	Name    string `json:"name,omitempty"`
+	Persist string `json:"persist,omitempty"`
+	Value   string `json:"value,omitempty"`
+}
+
 // Pool contains information about each pool. You can use all of these
 // fields when modifying a pool.
 type Pool struct {
@@ -299,6 +306,7 @@ type Pool struct {
 	ReselectTries          int    `json:"reselectTries"`
 	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
 	SlowRampTime           int    `json:"slowRampTime"`
+	Metadata               []ResourceMetadata `json:"metadata,omitempty"`
 }
 
 // Pool Members contains a list of pool members within a pool on the BIG-IP system.
@@ -377,9 +385,10 @@ type poolDTO struct {
 	QueueDepthLimit        int    `json:"queueDepthLimit,omitempty"`
 	QueueOnConnectionLimit string `json:"queueOnConnectionLimit,omitempty"`
 	QueueTimeLimit         int    `json:"queueTimeLimit,omitempty"`
-	ReselectTries          int    `json:"reselectTries"`
-	ServiceDownAction      string `json:"serviceDownAction,omitempty"`
-	SlowRampTime           int    `json:"slowRampTime"`
+	ReselectTries          int                `json:"reselectTries"`
+	ServiceDownAction      string             `json:"serviceDownAction,omitempty"`
+	SlowRampTime           int                `json:"slowRampTime"`
+	Metadata               []ResourceMetadata `json:"metadata,omitempty"`
 }
 
 func (p *Pool) MarshalJSON() ([]byte, error) {
@@ -589,6 +598,7 @@ type VirtualServer struct {
 	PersistenceProfiles        []Profile `json:"persist"`
 	Profiles                   []Profile `json:"profiles,omitempty"`
 	Policies                   []string  `json:"policies"`
+	Metadata                   []ResourceMetadata `json:"metadata,omitempty"`
 }
 
 // VirtualAddresses contains a list of all virtual addresses on the BIG-IP system.

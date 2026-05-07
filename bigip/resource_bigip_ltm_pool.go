@@ -93,6 +93,21 @@ func resourceBigipLtmPool() *schema.Resource {
 				Computed:    true,
 				Description: "Specifies the number of times the system tries to contact a new pool member after a passive failure.",
 			},
+			"metadata": {
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return d.Get("ignore_metadata").(bool)
+				},
+				Description: "Metadata key/value pairs for the pool.",
+			},
+			"ignore_metadata": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Set true to ignore metadata drift and skip sending metadata in create/update requests.",
+			},
 		},
 	}
 }
@@ -125,6 +140,7 @@ func resourceBigipLtmPoolCreate(ctx context.Context, d *schema.ResourceData, met
 			log.Printf("[ERROR]Sending Telemetry data failed:%v", err)
 		}
 	}
+
 	return resourceBigipLtmPoolUpdate(ctx, d, meta)
 }
 
@@ -152,6 +168,11 @@ func resourceBigipLtmPoolRead(ctx context.Context, d *schema.ResourceData, meta 
 	_ = d.Set("description", pool.Description)
 	monitors := strings.Split(strings.TrimSpace(pool.Monitor), " and ")
 	_ = d.Set("monitors", makeStringSet(&monitors))
+
+	if !d.Get("ignore_metadata").(bool) {
+		_ = d.Set("metadata", bigipMetadataToTfMetadata(pool.Metadata))
+	}
+
 	return nil
 }
 
@@ -191,6 +212,13 @@ func resourceBigipLtmPoolUpdate(ctx context.Context, d *schema.ResourceData, met
 		ReselectTries:     d.Get("reselect_tries").(int),
 		Monitor:           strings.Join(monitors, " and "),
 	}
+	if !d.Get("ignore_metadata").(bool) {
+		metadata, err := tfMetadataToBigipMetadata(d.Get("metadata").(map[string]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		pool.Metadata = metadata
+	}
 	err := client.ModifyPool(name, pool)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Modify Pool   (%s) (%v) ", name, err)
@@ -200,6 +228,7 @@ func resourceBigipLtmPoolUpdate(ctx context.Context, d *schema.ResourceData, met
 		}
 		return diag.FromErr(err)
 	}
+
 	return resourceBigipLtmPoolRead(ctx, d, meta)
 }
 func resourceBigipLtmPoolDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
