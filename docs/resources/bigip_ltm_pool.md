@@ -25,8 +25,13 @@ resource "bigip_ltm_pool" "pool" {
   load_balancing_mode    = "round-robin"
   minimum_active_members = 1
   monitors               = [bigip_ltm_monitor.monitor.name]
+  ignore_metadata        = false
+  metadata = {
+    environment = "dev"
+    owner       = "terraform"
+  }
 }
-```      
+```
 
 ## Argument Reference
 
@@ -34,7 +39,7 @@ resource "bigip_ltm_pool" "pool" {
 
 * `monitors` - (Optional,type `list`) List of monitor names to associate with the pool
 
-* `description` - (Optional,type `string`) Specifies descriptive text that identifies the pool. 
+* `description` - (Optional,type `string`) Specifies descriptive text that identifies the pool.
 
 * `allow_nat` - (Optional,type `string`) Specifies whether NATs are automatically enabled or disabled for any connections using this pool, [ Default : `yes`, Possible Values `yes` or `no`].
 
@@ -49,6 +54,10 @@ resource "bigip_ltm_pool" "pool" {
 * `service_down_action` - (Optional, type `string`) Specifies how the system should respond when the target pool member becomes unavailable. The default is `None`, Possible values: `[none, reset, reselect, drop]`.
 
 * `reselect_tries` - (Optional, type `int`) Specifies the number of times the system tries to contact a new pool member after a passive failure.
+
+* `metadata` - (Optional, type `map(string)`) Metadata key/value pairs to apply to the pool.
+
+* `ignore_metadata` - (Optional, type `bool`) Defaults to `true`. When `true`, metadata drift on BIG-IP is ignored and metadata is not sent in create/update requests.
 
 ## Importing
 An existing pool can be imported into this resource by supplying pool Name in `full path` as `id`.
