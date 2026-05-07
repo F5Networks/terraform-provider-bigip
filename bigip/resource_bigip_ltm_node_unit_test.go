@@ -19,6 +19,59 @@ import (
 	"testing"
 )
 
+func TestTranslateNodeState(t *testing.T) {
+	cases := []struct {
+		name           string
+		state, session string
+		wantState      string
+		wantSession    string
+	}{
+		{"canonical enabled", "enabled", "", "user-up", "user-enabled"},
+		{"canonical disabled", "disabled", "", "user-up", "user-disabled"},
+		{"canonical forced_offline", "forced_offline", "", "user-down", "user-disabled"},
+		{"canonical state ignores explicit session", "enabled", "user-disabled", "user-up", "user-enabled"},
+		{"legacy user-up passes through", "user-up", "user-enabled", "user-up", "user-enabled"},
+		{"legacy user-down passes through", "user-down", "user-disabled", "user-down", "user-disabled"},
+		{"empty passes through", "", "", "", ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			gotState, gotSession := translateNodeState(tc.state, tc.session)
+			assert.Equal(t, tc.wantState, gotState, "state")
+			assert.Equal(t, tc.wantSession, gotSession, "session")
+		})
+	}
+}
+
+func TestNodeStateForRead(t *testing.T) {
+	cases := []struct {
+		name                  string
+		prior                 string
+		apiState, apiSession  string
+		wantState, wantSession string
+	}{
+		// Canonical-prior scenarios (new style)
+		{"canonical prior, healthy", "enabled", "user-up", "monitor-enabled", "enabled", "user-enabled"},
+		{"canonical prior, user-disabled", "enabled", "user-up", "user-disabled", "disabled", "user-disabled"},
+		{"canonical prior, force-offlined", "enabled", "user-down", "user-disabled", "forced_offline", "user-disabled"},
+		{"canonical prior, monitor reports down (still user-up)", "enabled", "down", "monitor-enabled", "enabled", "user-enabled"},
+		// Legacy-prior scenarios (preserve current behavior)
+		{"legacy prior user-up, monitor-enabled", "user-up", "user-up", "monitor-enabled", "user-up", "user-enabled"},
+		{"legacy prior user-up, user-disabled", "user-up", "user-up", "user-disabled", "user-up", "user-disabled"},
+		{"legacy prior user-down, force offline", "user-down", "user-down", "user-disabled", "user-down", "user-disabled"},
+		// Empty prior (fresh import) defaults to canonical
+		{"empty prior treated as canonical", "", "user-up", "monitor-enabled", "enabled", "user-enabled"},
+		{"empty prior, force-offlined device", "", "user-down", "user-disabled", "forced_offline", "user-disabled"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			gotState, gotSession := nodeStateForRead(tc.prior, tc.apiState, tc.apiSession)
+			assert.Equal(t, tc.wantState, gotState, "state")
+			assert.Equal(t, tc.wantSession, gotSession, "session")
+		})
+	}
+}
+
 func testBigipLtmNodeInvalid(resourceName string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_node" "test-node" {

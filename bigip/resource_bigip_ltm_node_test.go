@@ -144,6 +144,59 @@ func TestAccBigipLtmNode_FqdnCreate(t *testing.T) {
 		},
 	})
 }
+// Exercises the canonical state interface (enabled/disabled/forced_offline)
+// on bigip_ltm_node, mirroring the model used by bigip_ltm_pool_attachment.
+// Walks through the three values to verify Create+Update+Read round-trip.
+func TestAccBigipLtmNode_CanonicalState(t *testing.T) {
+	t.Parallel()
+	instName := "test-node-canonical-state"
+	nodeName := fmt.Sprintf("/%s/%s", TestPartition, instName)
+	resFullName := fmt.Sprintf("%s.%s", resNodeName, instName)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckNodesDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testaccbigipltmNodeCanonicalStateConfig(instName, "enabled"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(nodeName),
+					resource.TestCheckResourceAttr(resFullName, "state", "enabled"),
+					resource.TestCheckResourceAttr(resFullName, "session", "user-enabled"),
+				),
+			},
+			{
+				Config: testaccbigipltmNodeCanonicalStateConfig(instName, "disabled"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(nodeName),
+					resource.TestCheckResourceAttr(resFullName, "state", "disabled"),
+					resource.TestCheckResourceAttr(resFullName, "session", "user-disabled"),
+				),
+			},
+			{
+				Config: testaccbigipltmNodeCanonicalStateConfig(instName, "forced_offline"),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckNodeExists(nodeName),
+					resource.TestCheckResourceAttr(resFullName, "state", "forced_offline"),
+					resource.TestCheckResourceAttr(resFullName, "session", "user-disabled"),
+				),
+			},
+		},
+	})
+}
+
+func testaccbigipltmNodeCanonicalStateConfig(instName, state string) string {
+	return fmt.Sprintf(`
+resource "bigip_ltm_node" "%[1]s" {
+  name    = "/Common/%[1]s"
+  address = "192.168.100.102"
+  state   = "%[2]s"
+}
+`, instName, state)
+}
+
 func TestAccBigipLtmNodeUpdateMonitor(t *testing.T) {
 	t.Parallel()
 	var instName = "test-node-monitor"
