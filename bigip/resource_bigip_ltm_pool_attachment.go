@@ -334,6 +334,15 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 				_ = d.Set("connection_rate_limit", node.RateLimit)
 				_ = d.Set("dynamic_ratio", node.DynamicRatio)
 				_ = d.Set("monitor", node.Monitor)
+				// Inverse of the Update mapping: state=user-down -> forced_offline; session=user-disabled (with state=user-up) -> disabled; everything else (including monitor-driven session/state) -> enabled.
+				switch {
+				case node.State == "user-down":
+					_ = d.Set("state", "forced_offline")
+				case node.Session == "user-disabled":
+					_ = d.Set("state", "disabled")
+				default:
+					_ = d.Set("state", "enabled")
+				}
 				found = true
 				break
 			}
@@ -349,6 +358,15 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 				_ = d.Set("connection_rate_limit", node.RateLimit)
 				_ = d.Set("dynamic_ratio", node.DynamicRatio)
 				_ = d.Set("monitor", node.Monitor)
+				// Inverse of the Update mapping: state=user-down -> forced_offline; session=user-disabled (with state=user-up) -> disabled; everything else (including monitor-driven session/state) -> enabled.
+				switch {
+				case node.State == "user-down":
+					_ = d.Set("state", "forced_offline")
+				case node.Session == "user-disabled":
+					_ = d.Set("state", "disabled")
+				default:
+					_ = d.Set("state", "enabled")
+				}
 				found = true
 				break
 			}
