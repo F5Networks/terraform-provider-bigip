@@ -18,6 +18,11 @@ resource "bigip_ltm_pool" "vs_tc1" {
   monitors            = [bigip_ltm_monitor.vs_tc1.name]
   allow_snat          = "yes"
   allow_nat           = "yes"
+  ignore_metadata     = false
+  metadata = {
+    environment = "dev"
+    owner       = "terraform"
+  }
 }
 
 resource "bigip_ltm_pool_attachment" "vs_tc1" {
@@ -36,6 +41,11 @@ resource "bigip_ltm_virtual_server" "vs_tc1" {
   destination                = "100.1.1.100"
   port                       = 80
   source_address_translation = "automap"
+  ignore_metadata            = false
+  metadata = {
+    environment = "dev"
+    owner       = "terraform"
+  }
 }
 
 resource "bigip_ltm_virtual_server" "vs_tc2" {
