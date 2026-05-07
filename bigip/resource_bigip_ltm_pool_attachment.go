@@ -81,9 +81,9 @@ func resourceBigipLtmPoolAttachment() *schema.Resource {
 			"state": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "enabled",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"disabled", "enabled", "forced_offline"}, false),
-				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline",
+				Description:  "Specifies the state the pool member should be in, value can be `enabled` (or) `disabled` (or) forced_offline. If unset, Terraform doesn't manage the state and leaves whatever the device reports in place.",
 			},
 			"dynamic_ratio": {
 				Type:        schema.TypeInt,
