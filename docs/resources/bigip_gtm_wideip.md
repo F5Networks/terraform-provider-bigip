@@ -28,6 +28,32 @@ resource "bigip_gtm_wideip" "example" {
 }
 ```
 
+### WideIP with Pools
+
+```hcl
+resource "bigip_gtm_wideip" "with_pools" {
+  name      = "app.example.com"
+  type      = "a"
+  partition = "Common"
+
+  description      = "Application WideIP with pools"
+  pool_lb_mode     = "round-robin"
+  minimal_response = "enabled"
+
+  pools {
+    name  = "/Common/primarypool"
+    order = 0
+    ratio = 1
+  }
+
+  pools {
+    name  = "/Common/secondarypool"
+    order = 1
+    ratio = 2
+  }
+}
+```
+
 ### WideIP with Last Resort Pool
 
 ```hcl
@@ -112,6 +138,10 @@ The following arguments are supported:
 * `ttl_persistence` - (Optional, Integer) Specifies the time to live (TTL) in seconds for persistence records. Default: `3600`.
 * `topology_prefer_edns0_client_subnet` - (Optional, String) Specifies whether to prefer EDNS0 client subnet data for topology-based load balancing. Valid values: `enabled`, `disabled`. Default: `disabled`.
 * `aliases` - (Optional, Set of Strings) Specifies alternate domain names (aliases) for the WideIP. These are additional names that resolve to the same WideIP configuration. Example: `["alias1.example.com", "alias2.example.com"]`.
+* `pools` - (Optional, List of Objects) Specifies the pools this WideIP uses for load balancing. Each pool block supports:
+  * `name` - (Required, String) Name of the GTM pool to associate with the WideIP (e.g., `/Common/mypool`).
+  * `order` - (Optional, Integer) Specifies the order of the pool within the WideIP. Lower values are evaluated first. Default: `0`.
+  * `ratio` - (Optional, Integer) Specifies the weight of the pool for load balancing. Default: `1`.
 
 ## Attribute Reference
 
@@ -226,4 +256,5 @@ This resource interacts with the following BIG-IP API endpoints:
 - `bigip_gtm_pool` - Manages GTM pools that can be referenced by WideIPs
 - `bigip_gtm_server` - Manages GTM servers that contain virtual servers
 - `bigip_gtm_datacenter` - Manages GTM data centers
-- `bigip_gtm_topology` - Manages topology records for topology-based load balancing
+- `bigip_gtm_topology_record` - Manages topology records for topology-based load balancing
+- `bigip_gtm_topology_region` - Manages topology regions for topology-based load balancing
