@@ -3,6 +3,9 @@
 # Features additions:
 
  - Added `pools` attribute to `bigip_gtm_wideip` resource for associating GTM pools with a WideIP
+ - Added `bigip_gtm_datacenter` data source for reading existing GTM datacenters
+ - Added `bigip_gtm_server` data source for reading existing GTM servers
+
 ## 1.3.0 (July 23, 2020)
 
 # Features additions:
