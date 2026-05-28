@@ -22,6 +22,8 @@ const (
 	uriGtmmonitor = "monitor"
 	uriPoolA      = "pool/a"
 	uriWideIp     = "wideip"
+	uriTopology   = "topology"
+	uriRegion     = "region"
 )
 
 type Datacenters struct {
@@ -740,6 +742,92 @@ func (b *BigIP) ModifyGTMDatacenter(fullPath string, config *GTMDatacenter) erro
 // DeleteGTMDatacenter removes a GTM datacenter
 func (b *BigIP) DeleteGTMDatacenter(fullPath string) error {
 	return b.delete(uriGtm, uriDatacenter, fullPath)
+}
+
+// GTMTopologyRecord represents a GTM topology record
+type GTMTopologyRecord struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Order       int    `json:"order,omitempty"`
+	Score       int    `json:"score,omitempty"`
+}
+
+type GTMTopologyRecords struct {
+	Items []GTMTopologyRecord `json:"items"`
+}
+
+// GTMRegion represents a GTM topology region
+type GTMRegion struct {
+	Name       string            `json:"name,omitempty"`
+	Partition  string            `json:"partition,omitempty"`
+	FullPath   string            `json:"fullPath,omitempty"`
+	Generation int               `json:"generation,omitempty"`
+	Members    []GTMRegionMember `json:"regionMembers,omitempty"`
+}
+
+type GTMRegions struct {
+	Items []GTMRegion `json:"items"`
+}
+
+// GTMRegionMember represents a member entry in a GTM region
+type GTMRegionMember struct {
+	Name string `json:"name,omitempty"`
+}
+
+// CreateGTMTopologyRecord creates a new GTM topology record
+func (b *BigIP) CreateGTMTopologyRecord(config *GTMTopologyRecord) error {
+	return b.post(config, uriGtm, uriTopology)
+}
+
+// GetGTMTopologyRecord retrieves a GTM topology record by its description
+func (b *BigIP) GetGTMTopologyRecord(description string) (*GTMTopologyRecord, error) {
+	var record GTMTopologyRecord
+	err, ok := b.getForEntity(&record, uriGtm, uriTopology, description)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &record, nil
+}
+
+// ModifyGTMTopologyRecord updates a GTM topology record
+func (b *BigIP) ModifyGTMTopologyRecord(description string, config *GTMTopologyRecord) error {
+	return b.put(config, uriGtm, uriTopology, description)
+}
+
+// DeleteGTMTopologyRecord removes a GTM topology record
+func (b *BigIP) DeleteGTMTopologyRecord(description string) error {
+	return b.delete(uriGtm, uriTopology, description)
+}
+
+// CreateGTMRegion creates a new GTM topology region
+func (b *BigIP) CreateGTMRegion(config *GTMRegion) error {
+	return b.post(config, uriGtm, uriRegion)
+}
+
+// GetGTMRegion retrieves a GTM topology region by full path
+func (b *BigIP) GetGTMRegion(fullPath string) (*GTMRegion, error) {
+	var region GTMRegion
+	err, ok := b.getForEntity(&region, uriGtm, uriRegion, fullPath)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &region, nil
+}
+
+// ModifyGTMRegion updates a GTM topology region
+func (b *BigIP) ModifyGTMRegion(fullPath string, config *GTMRegion) error {
+	return b.put(config, uriGtm, uriRegion, fullPath)
+}
+
+// DeleteGTMRegion removes a GTM topology region
+func (b *BigIP) DeleteGTMRegion(fullPath string) error {
+	return b.delete(uriGtm, uriRegion, fullPath)
 }
 
 // func (b *BigIP) GetDatacenters() (*GTMDatacenter, error) {
