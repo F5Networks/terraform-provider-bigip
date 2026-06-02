@@ -143,17 +143,17 @@ func resourceBigipGtmTopologyRegionUpdate(ctx context.Context, d *schema.Resourc
 		Partition: d.Get("partition").(string),
 	}
 
-	if v, ok := d.GetOk("members"); ok {
-		membersSet := v.(*schema.Set)
-		members := make([]bigip.GTMRegionMember, 0, membersSet.Len())
-		for _, item := range membersSet.List() {
-			memberMap := item.(map[string]interface{})
-			members = append(members, bigip.GTMRegionMember{
-				Name: memberMap["name"].(string),
-			})
-		}
-		config.Members = members
+	// Always set members so that removing all members from config sends an
+	// empty list to the API instead of silently preserving the old value.
+	membersSet := d.Get("members").(*schema.Set)
+	members := make([]bigip.GTMRegionMember, 0, membersSet.Len())
+	for _, item := range membersSet.List() {
+		memberMap := item.(map[string]interface{})
+		members = append(members, bigip.GTMRegionMember{
+			Name: memberMap["name"].(string),
+		})
 	}
+	config.Members = members
 
 	err := client.ModifyGTMRegion(fullPath, config)
 	if err != nil {

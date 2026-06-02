@@ -748,8 +748,8 @@ func (b *BigIP) DeleteGTMDatacenter(fullPath string) error {
 type GTMTopologyRecord struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	Order       int    `json:"order,omitempty"`
-	Score       int    `json:"score,omitempty"`
+	Order       int    `json:"order"`
+	Score       int    `json:"score"`
 }
 
 type GTMTopologyRecords struct {
@@ -762,7 +762,7 @@ type GTMRegion struct {
 	Partition  string            `json:"partition,omitempty"`
 	FullPath   string            `json:"fullPath,omitempty"`
 	Generation int               `json:"generation,omitempty"`
-	Members    []GTMRegionMember `json:"regionMembers,omitempty"`
+	Members    []GTMRegionMember `json:"regionMembers"`
 }
 
 type GTMRegions struct {
