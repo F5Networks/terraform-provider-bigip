@@ -19,6 +19,12 @@ func dataSourceBigipGtmServer() *schema.Resource {
 				Required:    true,
 				Description: "Name of the GTM server",
 			},
+			"partition": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "Common",
+				Description: "Partition of the GTM server",
+			},
 			"datacenter": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -140,18 +146,20 @@ func dataSourceBigipGtmServerRead(ctx context.Context, d *schema.ResourceData, m
 	client := meta.(*bigip.BigIP)
 
 	name := d.Get("name").(string)
+	partition := d.Get("partition").(string)
+	fullPath := fmt.Sprintf("/%s/%s", partition, name)
 
-	log.Printf("[DEBUG] Reading GTM Server data source: %s", name)
+	log.Printf("[DEBUG] Reading GTM Server data source: %s", fullPath)
 
-	server, err := client.GetGtmserver(name)
+	server, err := client.GetGtmserver(fullPath)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error retrieving GTM Server %s: %v", name, err))
 	}
 	if server == nil {
-		return diag.FromErr(fmt.Errorf("GTM Server %s not found", name))
+		return diag.FromErr(fmt.Errorf("GTM Server %s not found", fullPath))
 	}
 
-	d.SetId(name)
+	d.SetId(fullPath)
 	d.Set("name", server.Name)
 	d.Set("datacenter", server.Datacenter)
 	d.Set("description", server.Description)

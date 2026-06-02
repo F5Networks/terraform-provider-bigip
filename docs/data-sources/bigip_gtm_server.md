@@ -14,7 +14,8 @@ Use this data source (`bigip_gtm_server`) to look up an existing GTM server on t
 
 ```hcl
 data "bigip_gtm_server" "srv" {
-  name = "my-server"
+  name      = "my-server"
+  partition = "Common"
 }
 
 output "server_datacenter" {
@@ -33,6 +34,8 @@ output "server_addresses" {
 ## Argument Reference
 
 * `name` - (Required) Name of the GTM server.
+
+* `partition` - (Optional) Partition of the GTM server. Defaults to `Common`.
 
 ## Attributes Reference
 
