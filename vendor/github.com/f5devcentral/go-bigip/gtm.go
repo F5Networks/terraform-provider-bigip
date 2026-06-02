@@ -28,32 +28,37 @@ type Datacenters struct {
 	Datacenters []GTMDatacenter `json:"items"`
 }
 
-type GTMWideIP struct {
-	Name                              string   `json:"name,omitempty"`
-	Partition                         string   `json:"partition,omitempty"`
-	FullPath                          string   `json:"fullPath,omitempty"`
-	Generation                        int      `json:"generation,omitempty"`
-	AppService                        string   `json:"appService,omitempty"`
-	Description                       string   `json:"description,omitempty"`
-	Disabled                          bool     `json:"disabled,omitempty"`
-	Enabled                           bool     `json:"enabled,omitempty"`
-	FailureRcode                      string   `json:"failureRcode,omitempty"`
-	FailureRcodeResponse              string   `json:"failureRcodeResponse,omitempty"`
-	FailureRcodeTTL                   int      `json:"failureRcodeTtl,omitempty"`
-	LastResortPool                    string   `json:"lastResortPool,omitempty"`
-	LoadBalancingDecisionLogVerbosity []string `json:"loadBalancingDecisionLogVerbosity,omitempty"`
-	MinimalResponse                   string   `json:"minimalResponse,omitempty"`
-	PersistCidrIpv4                   int      `json:"persistCidrIpv4,omitempty"`
-	PersistCidrIpv6                   int      `json:"persistCidrIpv6,omitempty"`
-	Persistence                       string   `json:"persistence,omitempty"`
-	PoolLbMode                        string   `json:"poolLbMode,omitempty"`
-	TopologyPreferEdns0ClientSubnet   string   `json:"topologyPreferEdns0ClientSubnet,omitempty"`
-	TTLPersistence                    int      `json:"ttlPersistence,omitempty"`
-	Aliases                           []string `json:"aliases,omitempty"`
+// GTMWideIPPool represents a pool associated with a GTM WideIP
+type GTMWideIPPool struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	Order     int    `json:"order"`
+	Ratio     int    `json:"ratio"`
+}
 
-	// Not in the spec, but returned by the API
-	// Setting this field atomically updates all members.
-	//Pools *[]GTMWideIPPool `json:"pools,omitempty"`
+type GTMWideIP struct {
+	Name                              string          `json:"name,omitempty"`
+	Partition                         string          `json:"partition,omitempty"`
+	FullPath                          string          `json:"fullPath,omitempty"`
+	Generation                        int             `json:"generation,omitempty"`
+	AppService                        string          `json:"appService,omitempty"`
+	Description                       string          `json:"description,omitempty"`
+	Disabled                          bool            `json:"disabled,omitempty"`
+	Enabled                           bool            `json:"enabled,omitempty"`
+	FailureRcode                      string          `json:"failureRcode,omitempty"`
+	FailureRcodeResponse              string          `json:"failureRcodeResponse,omitempty"`
+	FailureRcodeTTL                   int             `json:"failureRcodeTtl,omitempty"`
+	LastResortPool                    string          `json:"lastResortPool,omitempty"`
+	LoadBalancingDecisionLogVerbosity []string        `json:"loadBalancingDecisionLogVerbosity,omitempty"`
+	MinimalResponse                   string          `json:"minimalResponse,omitempty"`
+	PersistCidrIpv4                   int             `json:"persistCidrIpv4,omitempty"`
+	PersistCidrIpv6                   int             `json:"persistCidrIpv6,omitempty"`
+	Persistence                       string          `json:"persistence,omitempty"`
+	PoolLbMode                        string          `json:"poolLbMode,omitempty"`
+	TopologyPreferEdns0ClientSubnet   string          `json:"topologyPreferEdns0ClientSubnet,omitempty"`
+	TTLPersistence                    int             `json:"ttlPersistence,omitempty"`
+	Aliases                           []string        `json:"aliases,omitempty"`
+	Pools                             []GTMWideIPPool `json:"pools"`
 }
 
 // type Datacenter struct {

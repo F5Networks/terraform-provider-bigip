@@ -137,6 +137,32 @@ func resourceBigipGtmWideip() *schema.Resource {
 				},
 				Description: "Specifies alternate domain names for the WideIP",
 			},
+			"pools": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of the GTM pool to associate with the WideIP (e.g., '/Common/mypool')",
+						},
+						"order": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     0,
+							Description: "Specifies the order of the pool within the WideIP",
+						},
+						"ratio": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     1,
+							Description: "Specifies the weight of the pool for load balancing",
+						},
+					},
+				},
+				Description: "Specifies the pools this WideIP uses for load balancing",
+			},
 		},
 	}
 }
@@ -243,6 +269,19 @@ func resourceBigipGtmWideipRead(ctx context.Context, d *schema.ResourceData, met
 		d.Set("aliases", wideip.Aliases)
 	}
 
+	// Handle Pools — always set, even when empty, so that external removal
+	// of pools is detected as drift rather than leaving stale state.
+	pools := make([]interface{}, 0, len(wideip.Pools))
+	for _, pool := range wideip.Pools {
+		poolMap := map[string]interface{}{
+			"name":  pool.Name,
+			"order": pool.Order,
+			"ratio": pool.Ratio,
+		}
+		pools = append(pools, poolMap)
+	}
+	d.Set("pools", pools)
+
 	return nil
 }
 
@@ -296,6 +335,21 @@ func resourceBigipGtmWideipUpdate(ctx context.Context, d *schema.ResourceData, m
 		}
 		wideip.Aliases = aliasesList
 	}
+
+	// Handle Pools — always set the field so that removing all pools from
+	// the config sends an empty list to the API instead of omitting it.
+	poolsList := d.Get("pools").([]interface{})
+	pools := make([]bigip.GTMWideIPPool, 0, len(poolsList))
+	for _, item := range poolsList {
+		poolMap := item.(map[string]interface{})
+		pool := bigip.GTMWideIPPool{
+			Name:  poolMap["name"].(string),
+			Order: poolMap["order"].(int),
+			Ratio: poolMap["ratio"].(int),
+		}
+		pools = append(pools, pool)
+	}
+	wideip.Pools = pools
 
 	err := client.ModifyGTMWideIP(fullPath, wideip, recordType)
 	if err != nil {
