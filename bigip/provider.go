@@ -127,6 +127,8 @@ func Provider() *schema.Provider {
 			"bigip_fast_azure_service_discovery":  dataSourceBigipFastAzureServiceDiscovery(),
 			"bigip_fast_gce_service_discovery":    dataSourceBigipFastGceServiceDiscovery(),
 			"bigip_as3_device_information":        dataSourceBigipAs3(),
+			"bigip_gtm_datacenter":                dataSourceBigipGtmDatacenter(),
+			"bigip_gtm_server":                    dataSourceBigipGtmServer(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bigip_cm_device":                       resourceBigipCmDevice(),
