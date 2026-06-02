@@ -32,8 +32,8 @@ type Datacenters struct {
 type GTMWideIPPool struct {
 	Name      string `json:"name,omitempty"`
 	Partition string `json:"partition,omitempty"`
-	Order     int    `json:"order,omitempty"`
-	Ratio     int    `json:"ratio,omitempty"`
+	Order     int    `json:"order"`
+	Ratio     int    `json:"ratio"`
 }
 
 type GTMWideIP struct {
