@@ -58,7 +58,7 @@ type GTMWideIP struct {
 	TopologyPreferEdns0ClientSubnet   string          `json:"topologyPreferEdns0ClientSubnet,omitempty"`
 	TTLPersistence                    int             `json:"ttlPersistence,omitempty"`
 	Aliases                           []string        `json:"aliases,omitempty"`
-	Pools                             []GTMWideIPPool `json:"pools,omitempty"`
+	Pools                             []GTMWideIPPool `json:"pools"`
 }
 
 // type Datacenter struct {

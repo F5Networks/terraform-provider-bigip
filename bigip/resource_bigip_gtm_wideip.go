@@ -269,19 +269,18 @@ func resourceBigipGtmWideipRead(ctx context.Context, d *schema.ResourceData, met
 		d.Set("aliases", wideip.Aliases)
 	}
 
-	// Handle Pools
-	if len(wideip.Pools) > 0 {
-		pools := make([]interface{}, 0, len(wideip.Pools))
-		for _, pool := range wideip.Pools {
-			poolMap := map[string]interface{}{
-				"name":  pool.Name,
-				"order": pool.Order,
-				"ratio": pool.Ratio,
-			}
-			pools = append(pools, poolMap)
+	// Handle Pools — always set, even when empty, so that external removal
+	// of pools is detected as drift rather than leaving stale state.
+	pools := make([]interface{}, 0, len(wideip.Pools))
+	for _, pool := range wideip.Pools {
+		poolMap := map[string]interface{}{
+			"name":  pool.Name,
+			"order": pool.Order,
+			"ratio": pool.Ratio,
 		}
-		d.Set("pools", pools)
+		pools = append(pools, poolMap)
 	}
+	d.Set("pools", pools)
 
 	return nil
 }
@@ -337,21 +336,20 @@ func resourceBigipGtmWideipUpdate(ctx context.Context, d *schema.ResourceData, m
 		wideip.Aliases = aliasesList
 	}
 
-	// Handle Pools
-	if v, ok := d.GetOk("pools"); ok {
-		poolsList := v.([]interface{})
-		pools := make([]bigip.GTMWideIPPool, 0, len(poolsList))
-		for _, item := range poolsList {
-			poolMap := item.(map[string]interface{})
-			pool := bigip.GTMWideIPPool{
-				Name:  poolMap["name"].(string),
-				Order: poolMap["order"].(int),
-				Ratio: poolMap["ratio"].(int),
-			}
-			pools = append(pools, pool)
+	// Handle Pools — always set the field so that removing all pools from
+	// the config sends an empty list to the API instead of omitting it.
+	poolsList := d.Get("pools").([]interface{})
+	pools := make([]bigip.GTMWideIPPool, 0, len(poolsList))
+	for _, item := range poolsList {
+		poolMap := item.(map[string]interface{})
+		pool := bigip.GTMWideIPPool{
+			Name:  poolMap["name"].(string),
+			Order: poolMap["order"].(int),
+			Ratio: poolMap["ratio"].(int),
 		}
-		wideip.Pools = pools
+		pools = append(pools, pool)
 	}
+	wideip.Pools = pools
 
 	err := client.ModifyGTMWideIP(fullPath, wideip, recordType)
 	if err != nil {
