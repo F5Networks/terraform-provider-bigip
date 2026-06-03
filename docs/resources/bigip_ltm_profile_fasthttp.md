@@ -34,7 +34,7 @@ resource "bigip_ltm_profile_fasthttp" "sjfasthttpprofile" {
 
 ## Argument Reference
 
-* `name` (Required) Name of the profile_fasthttp
+* `name` - (Required) Name of the profile_fasthttp
 
 * `defaults_from` - (Optional) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 

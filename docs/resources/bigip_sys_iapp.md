@@ -24,9 +24,9 @@ resource "bigip_sys_iapp" "simplehttp" {
 
 * `name` - (Required, type `string`) Name of the iApp.
 * `jsonfile` - (Required, type `string`) Refer to the Json file which will be deployed on F5 BIG-IP.
-* `description` - (Optional type `string`) - User defined description.
-* `partition` - (Optional type `string`) - Displays the administrative partition within which the application resides.
-* `execute_action` - (Optional type `string`) - Run the specified template action associated with the application, this option can be specified in `json` with `executeAction`, value specified with `execute_action` attribute take precedence over `json` value
+* `description` - (Optional type `string`) User defined description.
+* `partition` - (Optional type `string`) Displays the administrative partition within which the application resides.
+* `execute_action` - (Optional type `string`) Run the specified template action associated with the application, this option can be specified in `json` with `executeAction`, value specified with `execute_action` attribute take precedence over `json` value
 
 ## Example Usage of Json file
 ```json

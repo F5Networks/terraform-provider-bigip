@@ -29,11 +29,11 @@ resource "bigip_ltm_request_log_profile" "request-log-profile-tc1-child" {
 
 ## Argument Reference
 
-* `name` (Required,type `string`) Name of the Request Logging profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/request-log-profile-tc1`.
+* `name` - (Required,type `string`) Name of the Request Logging profile,name of Profile should be full path. Full path is the combination of the `partition + profile name`,For example `/Common/request-log-profile-tc1`.
 
-* `defaults_from` - (optional,type `string`) Specifies the profile from which this profile inherits settings. The default is the system-supplied `request-log` profile.
+* `defaults_from` - (Optional,type `string`) Specifies the profile from which this profile inherits settings. The default is the system-supplied `request-log` profile.
 
-* `description` - (optional,type `string`) Specifies user-defined description.
+* `description` - (Optional,type `string`) Specifies user-defined description.
 
 * `request_logging` - (Optional,type `string`) Enables or disables request logging. The default is `disabled`, possible values are `enabled` and `disabled`.
 
