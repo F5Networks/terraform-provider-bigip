@@ -24,6 +24,11 @@ resource "bigip_ltm_virtual_server" "http" {
   destination = "10.12.12.12"
   port        = 80
   pool        = "/Common/the-default-pool"
+  ignore_metadata = false
+  metadata = {
+    environment = "dev"
+    owner       = "terraform"
+  }
 }
 
 # A Virtual server with SSL enabled
@@ -51,7 +56,7 @@ resource "bigip_ltm_virtual_server" "https" {
   source_address_translation = "automap"
 }
 
-```      
+```
 
 ## Argument Reference
 
@@ -104,6 +109,10 @@ By default it is `false` i.e vlanDisabled on specified vlans, if we want enable 
 * `source_port` - (Optional,type `string`) Specifies whether the system preserves the source port of the connection. The default is `preserve`.
 
 * `firewall_enforced_policy` - (Optional,type `string`) Applies the specified AFM policy to the virtual in an enforcing way,when creating a new virtual, if this parameter is not specified, the enforced is disabled.This should be in full path ex: `/Common/afm-test-policy`.
+
+* `metadata` - (Optional, type `map(string)`) Metadata key/value pairs to apply to the virtual server.
+
+* `ignore_metadata` - (Optional, type `bool`) Defaults to `true`. When `true`, metadata drift on BIG-IP is ignored and metadata is not sent in create/update requests.
 
 ## Importing
 An existing virtual-server can be imported into this resource by supplying virtual-server Name in `full path` as `id`.
