@@ -47,16 +47,72 @@ func TestResourceBigipGtmTopologyRecordSchema(t *testing.T) {
 		t.Error("Expected DeleteContext to be defined")
 	}
 
-	// description is required and ForceNew
+	// ldns is required, TypeList, MaxItems 1
+	ldnsField, ok := resource.Schema["ldns"]
+	if !ok {
+		t.Fatal("Expected 'ldns' field to exist")
+	}
+	if !ldnsField.Required {
+		t.Error("Expected 'ldns' to be required")
+	}
+	if ldnsField.Type != schema.TypeList {
+		t.Errorf("Expected 'ldns' to be TypeList, got %v", ldnsField.Type)
+	}
+	if ldnsField.MaxItems != 1 {
+		t.Errorf("Expected 'ldns' MaxItems to be 1, got %d", ldnsField.MaxItems)
+	}
+	ldnsElem, ok := ldnsField.Elem.(*schema.Resource)
+	if !ok {
+		t.Fatal("Expected 'ldns' Elem to be a *schema.Resource")
+	}
+	if _, ok := ldnsElem.Schema["match_type"]; !ok {
+		t.Error("Expected 'ldns.match_type' field to exist")
+	}
+	if _, ok := ldnsElem.Schema["match_value"]; !ok {
+		t.Error("Expected 'ldns.match_value' field to exist")
+	}
+	if _, ok := ldnsElem.Schema["match_negate"]; !ok {
+		t.Error("Expected 'ldns.match_negate' field to exist")
+	}
+
+	// server is required, TypeList, MaxItems 1
+	serverField, ok := resource.Schema["server"]
+	if !ok {
+		t.Fatal("Expected 'server' field to exist")
+	}
+	if !serverField.Required {
+		t.Error("Expected 'server' to be required")
+	}
+	if serverField.Type != schema.TypeList {
+		t.Errorf("Expected 'server' to be TypeList, got %v", serverField.Type)
+	}
+	if serverField.MaxItems != 1 {
+		t.Errorf("Expected 'server' MaxItems to be 1, got %d", serverField.MaxItems)
+	}
+	serverElem, ok := serverField.Elem.(*schema.Resource)
+	if !ok {
+		t.Fatal("Expected 'server' Elem to be a *schema.Resource")
+	}
+	if _, ok := serverElem.Schema["match_type"]; !ok {
+		t.Error("Expected 'server.match_type' field to exist")
+	}
+	if _, ok := serverElem.Schema["match_value"]; !ok {
+		t.Error("Expected 'server.match_value' field to exist")
+	}
+	if _, ok := serverElem.Schema["match_negate"]; !ok {
+		t.Error("Expected 'server.match_negate' field to exist")
+	}
+
+	// description is optional
 	descField, ok := resource.Schema["description"]
 	if !ok {
 		t.Fatal("Expected 'description' field to exist")
 	}
-	if !descField.Required {
-		t.Error("Expected 'description' to be required")
+	if descField.Required {
+		t.Error("Expected 'description' to be optional, not required")
 	}
-	if !descField.ForceNew {
-		t.Error("Expected 'description' to be ForceNew")
+	if descField.Type != schema.TypeString {
+		t.Errorf("Expected 'description' to be TypeString, got %v", descField.Type)
 	}
 
 	// order is optional with default 0
@@ -147,9 +203,9 @@ func TestResourceBigipGtmTopologyRegionSchema(t *testing.T) {
 
 func TestGTMTopologyRecordMarshalJSON(t *testing.T) {
 	record := bigip.GTMTopologyRecord{
-		Description: "ldns: region /Common/east-coast server: datacenter /Common/dc1",
-		Order:       1,
-		Score:       100,
+		Name:  "ldns: region /Common/east-coast server: datacenter /Common/dc1",
+		Order: 1,
+		Score: 100,
 	}
 
 	data, err := json.Marshal(record)
@@ -162,8 +218,8 @@ func TestGTMTopologyRecordMarshalJSON(t *testing.T) {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
 
-	if result["description"] != "ldns: region /Common/east-coast server: datacenter /Common/dc1" {
-		t.Errorf("Expected description to match, got '%v'", result["description"])
+	if result["name"] != "ldns: region /Common/east-coast server: datacenter /Common/dc1" {
+		t.Errorf("Expected name to match, got '%v'", result["name"])
 	}
 	if int(result["order"].(float64)) != 1 {
 		t.Errorf("Expected order 1, got %v", result["order"])
@@ -176,7 +232,6 @@ func TestGTMTopologyRecordMarshalJSON(t *testing.T) {
 func TestGTMTopologyRecordUnmarshalJSON(t *testing.T) {
 	jsonData := `{
 		"name": "ldns: region /Common/east-coast server: datacenter /Common/dc1",
-		"description": "ldns: region /Common/east-coast server: datacenter /Common/dc1",
 		"order": 2,
 		"score": 50
 	}`
@@ -186,14 +241,155 @@ func TestGTMTopologyRecordUnmarshalJSON(t *testing.T) {
 		t.Fatalf("Failed to unmarshal GTMTopologyRecord: %v", err)
 	}
 
-	if record.Description != "ldns: region /Common/east-coast server: datacenter /Common/dc1" {
-		t.Errorf("Expected description match, got '%s'", record.Description)
+	if record.Name != "ldns: region /Common/east-coast server: datacenter /Common/dc1" {
+		t.Errorf("Expected name match, got '%s'", record.Name)
 	}
 	if record.Order != 2 {
 		t.Errorf("Expected order 2, got %d", record.Order)
 	}
 	if record.Score != 50 {
 		t.Errorf("Expected score 50, got %d", record.Score)
+	}
+}
+
+func TestParseTopologyName(t *testing.T) {
+	tests := []struct {
+		name         string
+		input        string
+		ldnsType     string
+		ldnsValue    string
+		ldnsNegate   bool
+		serverType   string
+		serverValue  string
+		serverNegate bool
+		expectErr    bool
+	}{
+		{
+			name:        "region to datacenter",
+			input:       "ldns: region /Common/east-coast server: datacenter /Common/dc1",
+			ldnsType:    "region",
+			ldnsValue:   "/Common/east-coast",
+			serverType:  "datacenter",
+			serverValue: "/Common/dc1",
+		},
+		{
+			name:        "subnet to pool",
+			input:       "ldns: subnet 10.0.0.0/8 server: pool /Common/internal-pool",
+			ldnsType:    "subnet",
+			ldnsValue:   "10.0.0.0/8",
+			serverType:  "pool",
+			serverValue: "/Common/internal-pool",
+		},
+		{
+			name:        "country to datacenter",
+			input:       "ldns: country US server: datacenter /Common/us-dc",
+			ldnsType:    "country",
+			ldnsValue:   "US",
+			serverType:  "datacenter",
+			serverValue: "/Common/us-dc",
+		},
+		{
+			name:        "state to datacenter",
+			input:       "ldns: state US/California server: datacenter /Common/west-dc",
+			ldnsType:    "state",
+			ldnsValue:   "US/California",
+			serverType:  "datacenter",
+			serverValue: "/Common/west-dc",
+		},
+		{
+			name:        "negated ldns",
+			input:       "ldns: not region /Common/east-coast server: datacenter /Common/dc1",
+			ldnsType:    "region",
+			ldnsValue:   "/Common/east-coast",
+			ldnsNegate:  true,
+			serverType:  "datacenter",
+			serverValue: "/Common/dc1",
+		},
+		{
+			name:         "negated server",
+			input:        "ldns: region /Common/east-coast server: not datacenter /Common/dc1",
+			ldnsType:     "region",
+			ldnsValue:    "/Common/east-coast",
+			serverType:   "datacenter",
+			serverValue:  "/Common/dc1",
+			serverNegate: true,
+		},
+		{
+			name:      "invalid format",
+			input:     "some invalid string",
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lt, lv, ln, st, sv, sn, err := parseTopologyName(tt.input)
+			if tt.expectErr {
+				if err == nil {
+					t.Error("Expected error but got none")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			if lt != tt.ldnsType {
+				t.Errorf("ldns type: expected '%s', got '%s'", tt.ldnsType, lt)
+			}
+			if lv != tt.ldnsValue {
+				t.Errorf("ldns value: expected '%s', got '%s'", tt.ldnsValue, lv)
+			}
+			if ln != tt.ldnsNegate {
+				t.Errorf("ldns negate: expected %v, got %v", tt.ldnsNegate, ln)
+			}
+			if st != tt.serverType {
+				t.Errorf("server type: expected '%s', got '%s'", tt.serverType, st)
+			}
+			if sv != tt.serverValue {
+				t.Errorf("server value: expected '%s', got '%s'", tt.serverValue, sv)
+			}
+			if sn != tt.serverNegate {
+				t.Errorf("server negate: expected %v, got %v", tt.serverNegate, sn)
+			}
+		})
+	}
+}
+
+func TestBuildEndpointString(t *testing.T) {
+	tests := []struct {
+		name     string
+		endpoint map[string]interface{}
+		expected string
+	}{
+		{
+			name:     "simple region",
+			endpoint: map[string]interface{}{"match_type": "region", "match_value": "/Common/east-coast", "match_negate": false},
+			expected: "region /Common/east-coast",
+		},
+		{
+			name:     "negated region",
+			endpoint: map[string]interface{}{"match_type": "region", "match_value": "/Common/east-coast", "match_negate": true},
+			expected: "not region /Common/east-coast",
+		},
+		{
+			name:     "subnet",
+			endpoint: map[string]interface{}{"match_type": "subnet", "match_value": "10.0.0.0/8", "match_negate": false},
+			expected: "subnet 10.0.0.0/8",
+		},
+		{
+			name:     "country",
+			endpoint: map[string]interface{}{"match_type": "country", "match_value": "US", "match_negate": false},
+			expected: "country US",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := buildEndpointString(tt.endpoint)
+			if result != tt.expected {
+				t.Errorf("Expected '%s', got '%s'", tt.expected, result)
+			}
+		})
 	}
 }
 
