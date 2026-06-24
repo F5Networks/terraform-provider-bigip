@@ -31,6 +31,23 @@ import (
 var m sync.Mutex
 var createdTenants string
 
+// stripAS3Metadata removes AS3-managed metadata fields from a parsed JSON declaration.
+// If stripCommon is true, the Common partition is also removed (for cases where BIG-IP
+// auto-creates it and the user did not define it).
+func stripAS3Metadata(jsonRef map[string]interface{}, stripCommon bool) {
+	if rec, ok := jsonRef["declaration"].(map[string]interface{}); ok {
+		delete(rec, "updateMode")
+		delete(rec, "schemaVersion")
+		delete(rec, "id")
+		delete(rec, "label")
+		delete(rec, "remark")
+		if stripCommon {
+			delete(rec, "Common")
+		}
+	}
+	delete(jsonRef, "persist")
+}
+
 func resourceBigipAs3() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceBigipAs3Create,
@@ -59,63 +76,30 @@ func resourceBigipAs3() *schema.Resource {
 					return jsonString
 				},
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					oldResp := []byte(old)
-					newResp := []byte(new)
 					oldJsonref := make(map[string]interface{})
 					newJsonref := make(map[string]interface{})
-					_ = json.Unmarshal(oldResp, &oldJsonref)
-					_ = json.Unmarshal(newResp, &newJsonref)
+					_ = json.Unmarshal([]byte(old), &oldJsonref)
+					_ = json.Unmarshal([]byte(new), &newJsonref)
 					delete(oldJsonref, "$schema")
 					delete(newJsonref, "$schema")
-					jsonEqualityBefore := reflect.DeepEqual(oldJsonref, newJsonref)
-					if jsonEqualityBefore {
+					if reflect.DeepEqual(oldJsonref, newJsonref) {
 						return true
 					}
-					for key, value := range oldJsonref {
-						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
-							for range rec {
-								delete(rec, "updateMode")
-								delete(rec, "schemaVersion")
-								delete(rec, "id")
-								delete(rec, "label")
-								delete(rec, "remark")
-								delete(rec, "Common")
-							}
-						}
-						if key == "persist" {
-							delete(oldJsonref, "persist")
+					if !d.Get("ignore_metadata").(bool) {
+						return false
+					}
+					// When ignore_metadata is true, strip AS3 metadata fields and compare again.
+					// Only strip Common from comparison if the user did not define it in their
+					// declaration (handles AS3 auto-creating Common for shared objects).
+					stripCommon := true
+					if newDecl, ok := newJsonref["declaration"].(map[string]interface{}); ok {
+						if _, hasCommon := newDecl["Common"]; hasCommon {
+							stripCommon = false
 						}
 					}
-					for key, value := range newJsonref {
-						if rec, ok := value.(map[string]interface{}); ok && key == "declaration" {
-							for range rec {
-								delete(rec, "updateMode")
-								delete(rec, "schemaVersion")
-								delete(rec, "id")
-								delete(rec, "label")
-								delete(rec, "remark")
-								delete(rec, "Common")
-							}
-						}
-						if key == "persist" {
-							delete(newJsonref, "persist")
-						}
-					}
-					ignoreMetadata := d.Get("ignore_metadata").(bool)
-					jsonEqualityAfter := reflect.DeepEqual(oldJsonref, newJsonref)
-					if ignoreMetadata {
-						if jsonEqualityAfter {
-							return true
-						} else {
-							return false
-						}
-
-					} else {
-						if !jsonEqualityBefore {
-							return false
-						}
-					}
-					return true
+					stripAS3Metadata(oldJsonref, stripCommon)
+					stripAS3Metadata(newJsonref, stripCommon)
+					return reflect.DeepEqual(oldJsonref, newJsonref)
 				},
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					if _, err := structure.NormalizeJsonString(v); err != nil {
@@ -152,7 +136,7 @@ func resourceBigipAs3() *schema.Resource {
 			"ignore_metadata": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Set True if you want to ignore metadata update",
+				Description: "Set to true to ignore AS3 metadata fields (updateMode, schemaVersion, id, label, remark, persist) when comparing declarations. If the user did not define a Common tenant in their declaration, auto-created Common is also excluded from comparison.",
 				Default:     false,
 			},
 			"tenant_name": {
