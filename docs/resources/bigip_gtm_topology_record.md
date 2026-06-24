@@ -10,9 +10,18 @@ A GTM topology record defines a routing rule for topology-based load balancing. 
 
 ```hcl
 resource "bigip_gtm_topology_record" "east_to_dc1" {
-  description = "ldns: region /Common/east-coast server: datacenter /Common/dc1"
-  order       = 1
-  score       = 100
+  ldns {
+    match_type  = "region"
+    match_value = "/Common/east-coast"
+  }
+
+  server {
+    match_type  = "datacenter"
+    match_value = "/Common/dc1"
+  }
+
+  order = 1
+  score = 100
 }
 ```
 
@@ -20,9 +29,18 @@ resource "bigip_gtm_topology_record" "east_to_dc1" {
 
 ```hcl
 resource "bigip_gtm_topology_record" "internal_to_pool" {
-  description = "ldns: subnet 10.0.0.0/8 server: pool /Common/internal-pool"
-  order       = 2
-  score       = 50
+  ldns {
+    match_type  = "subnet"
+    match_value = "10.0.0.0/8"
+  }
+
+  server {
+    match_type  = "pool"
+    match_value = "/Common/internal-pool"
+  }
+
+  order = 2
+  score = 50
 }
 ```
 
@@ -30,9 +48,37 @@ resource "bigip_gtm_topology_record" "internal_to_pool" {
 
 ```hcl
 resource "bigip_gtm_topology_record" "us_to_us_dc" {
-  description = "ldns: country US server: datacenter /Common/us-datacenter"
-  order       = 3
-  score       = 75
+  ldns {
+    match_type  = "country"
+    match_value = "US"
+  }
+
+  server {
+    match_type  = "datacenter"
+    match_value = "/Common/us-datacenter"
+  }
+
+  order = 3
+  score = 75
+}
+```
+
+### Using Negation
+
+```hcl
+resource "bigip_gtm_topology_record" "not_east_to_dc2" {
+  ldns {
+    match_type   = "region"
+    match_value  = "/Common/east-coast"
+    match_negate = true
+  }
+
+  server {
+    match_type  = "datacenter"
+    match_value = "/Common/dc2"
+  }
+
+  score = 50
 }
 ```
 
@@ -53,9 +99,18 @@ resource "bigip_gtm_topology_region" "east_coast" {
 }
 
 resource "bigip_gtm_topology_record" "east_to_dc1" {
-  description = "ldns: region /Common/east-coast server: datacenter /Common/dc1"
-  order       = 1
-  score       = 100
+  ldns {
+    match_type  = "region"
+    match_value = "/Common/east-coast"
+  }
+
+  server {
+    match_type  = "datacenter"
+    match_value = "/Common/dc1"
+  }
+
+  order = 1
+  score = 100
 
   depends_on = [bigip_gtm_topology_region.east_coast]
 }
@@ -63,15 +118,22 @@ resource "bigip_gtm_topology_record" "east_to_dc1" {
 
 ## Argument Reference
 
-* `description` - (Required) The topology record description that defines the source and destination match. This follows the BIG-IP format: `ldns: <source> server: <destination>`. Cannot be changed after creation. Valid source/destination types include:
-  - `region <path>` - e.g., `region /Common/east-coast`
-  - `datacenter <path>` - e.g., `datacenter /Common/dc1`
-  - `pool <path>` - e.g., `pool /Common/my-pool`
-  - `subnet <cidr>` - e.g., `subnet 10.0.0.0/8`
-  - `country <code>` - e.g., `country US`
-  - `state <country>/<state>` - e.g., `state US/California`
-  - `continent <code>` - e.g., `continent NA`
-  - `isp <name>` - e.g., `isp Comcast`
+* `ldns` - (Required) The LDNS (source) match criteria block. Cannot be changed after creation. Contains the following:
+  - `match_type` - (Required) The type of match. Valid values:
+    - `region` - e.g., match_value = `/Common/east-coast`
+    - `datacenter` - e.g., match_value = `/Common/dc1`
+    - `pool` - e.g., match_value = `/Common/my-pool`
+    - `subnet` - e.g., match_value = `10.0.0.0/8`
+    - `country` - e.g., match_value = `US`
+    - `state` - e.g., match_value = `US/California`
+    - `continent` - e.g., match_value = `NA`
+    - `isp` - e.g., match_value = `Comcast`
+  - `match_value` - (Required) The value to match against.
+  - `match_negate` - (Optional) If `true`, the match is negated. Default is `false`.
+
+* `server` - (Required) The server (destination) match criteria block. Cannot be changed after creation. Same nested arguments as `ldns`.
+
+* `description` - (Optional) User defined description.
 
 * `order` - (Optional) The order in which the topology record is evaluated. Lower values are evaluated first. Default is `0`.
 
@@ -81,11 +143,11 @@ resource "bigip_gtm_topology_record" "east_to_dc1" {
 
 In addition to the arguments listed above, the following computed attributes are exported:
 
-* `id` - The description string of the topology record.
+* `id` - The topology record identifier in the format `ldns: <type> <value> server: <type> <value>`.
 
 ## Import
 
-GTM topology records can be imported using the description string, e.g.
+GTM topology records can be imported using the topology definition string, e.g.
 
 ```
 terraform import bigip_gtm_topology_record.example "ldns: region /Common/east-coast server: datacenter /Common/dc1"
@@ -94,6 +156,6 @@ terraform import bigip_gtm_topology_record.example "ldns: region /Common/east-co
 ## Notes
 
 * Topology records are evaluated in order. Use the `order` field to control evaluation priority.
-* The `description` field cannot be changed after creation. To modify the source/destination match, destroy and recreate the record.
+* The `ldns` and `server` blocks cannot be changed after creation. To modify the source/destination match, destroy and recreate the record.
 * Regions referenced in topology records must exist before the record is created. Use `depends_on` to enforce ordering.
 * Topology records are only effective when a WideIP's `pool_lb_mode` is set to `topology`.
