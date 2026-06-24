@@ -144,7 +144,7 @@ resource "bigip_as3" "as3-example1" {
 
 * `application_list` - (Optional) - List of applications currently deployed on the Big-Ip
 
-* `ignore_metadata` - (Optional) Set True if you want to ignore metadata changes during update. By default it is set to false
+* `ignore_metadata` - (Optional, Default: false) Set to true to ignore AS3 metadata fields (`updateMode`, `schemaVersion`, `id`, `label`, `remark`, `persist`) when comparing the stored declaration against the desired state. When enabled, differences in these metadata fields (which BIG-IP AS3 may add or modify automatically) will not trigger an update. If the user does not define a `Common` tenant in their declaration, the auto-created `Common` partition is also excluded from comparison. If the user defines `Common` in their declaration, changes to it will be detected normally.
 
 * `as3_example1.json` - Example  AS3 Declarative JSON file with single tenant
 
@@ -362,7 +362,7 @@ resource "bigip_as3" "as3_declare" {
 
 ### Common Attributes
 
-- `ignore_metadata` - (Optional, Default: false) Set to true to ignore AS3 metadata when comparing.
+- `ignore_metadata` - (Optional, Default: false) Set to true to ignore AS3 metadata fields (`updateMode`, `schemaVersion`, `id`, `label`, `remark`, `persist`) when comparing the stored declaration against the desired state. When enabled, differences in these metadata fields (which BIG-IP AS3 may add or modify automatically) will not trigger an update. If the user does not define a `Common` tenant in their declaration, the auto-created `Common` partition is also excluded from comparison. If the user defines `Common` in their declaration, changes to it will be detected normally.
 - `tenant_filter` - (Optional) Filters tenants from AS3 declaration.
 - `tenant_name` - (Computed) The tenant name used.
 - `per_app_mode` - (Computed) Whether the AS3 was posted in per-app mode.
