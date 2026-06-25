@@ -48,9 +48,9 @@ resource "bigip_ltm_node" "node" {
 
 * `rate_limit`- (Optional,type `string`) Specifies the maximum number of connections per second allowed for a node or node address. The default value is 'disabled'.
 
-* `state` - (Optional) Default is "user-up" you can set to "user-down" if you want to disable
+* `state` - (Optional) Specifies the state of the node. Preferred values are `enabled`, `disabled`, or `forced_offline`, which map cleanly onto the underlying state and session controls (this matches the model used by `bigip_ltm_pool_attachment`). The legacy values `user-up` and `user-down` are still accepted; in legacy mode pair them with the `session` field below (`user-enabled` or `user-disabled`) to fully describe the desired state.
 
-* `session` - (Optional) Enables or disables the node for new sessions. Can be set to `user-enabled` or `user-disabled`. (Default: `user-enabled`).
+* `session` - (Optional, legacy) Controls whether the node accepts new sessions: `user-enabled` or `user-disabled`. Ignored when `state` is set to `enabled`/`disabled`/`forced_offline`, since those values control session implicitly.
 
 ### fqdn(fully qualified domain name) Configuration Block
 
