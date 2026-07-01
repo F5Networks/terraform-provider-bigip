@@ -87,14 +87,10 @@ func resourceBigipLtmDataGroupCreate(ctx context.Context, d *schema.ResourceData
 	name = d.Get("name").(string)
 	log.Printf("[DEBUG] Creating Data Group List %s", name)
 	if d.Get("internal").(bool) {
-		var records []bigip.DataGroupRecord
-		if rs.Len() > 0 {
-			for _, r := range rs.List() {
-				record := r.(map[string]interface{})
-				records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
-			}
-		} else {
-			records = nil
+		records := []bigip.DataGroupRecord{}
+		for _, r := range rs.List() {
+			record := r.(map[string]interface{})
+			records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
 		}
 		dg := &bigip.DataGroup{
 			Name:    name,
@@ -173,14 +169,10 @@ func resourceBigipLtmDataGroupUpdate(ctx context.Context, d *schema.ResourceData
 	dgtype := d.Get("type").(string)
 
 	if d.Get("internal").(bool) {
-		var records []bigip.DataGroupRecord
-		if rs.Len() > 0 {
-			for _, r := range rs.List() {
-				record := r.(map[string]interface{})
-				records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
-			}
-		} else {
-			records = nil
+		records := []bigip.DataGroupRecord{}
+		for _, r := range rs.List() {
+			record := r.(map[string]interface{})
+			records = append(records, bigip.DataGroupRecord{Name: record["name"].(string), Data: record["data"].(string)})
 		}
 
 		dgver := &bigip.DataGroup{
