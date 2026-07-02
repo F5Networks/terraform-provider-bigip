@@ -25,7 +25,7 @@ resource bigip_traffic_selector "test-selector" {
 
 ## Argument Reference
 
-* `name` - (Required) Name of the IPSec traffic-selector,it should be "full path".The full path is the combination of the partition + name of the IPSec traffic-selector.(For example `/Common/test-selector`)
+* `name` - (Required) Name of the IPSec traffic-selector, it should be "full path". The full path is the combination of the partition + name of the IPSec traffic-selector (For example `/Common/test-selector`).
 
 * `description` - (Optional,type `string`) Description of the traffic selector.
 

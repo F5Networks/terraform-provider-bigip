@@ -25,7 +25,7 @@ resource "bigip_sys_snmp_traps" "snmp_traps" {
 
 ## Argument Reference
 
-* `name` -  (Optional) Name of the snmp trap.
+* `name` - (Optional) Name of the snmp trap.
 
 * `community` - (Optional) Specifies the community string used for this trap.
 

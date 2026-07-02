@@ -29,7 +29,7 @@ resource "bigip_ltm_profile_tcp" "sanjose-tcp-lan-profile" {
 
 ## Argument Reference
 	
-* `name` (Required,type `string`) Name of the LTM TCP Profile,name should be `full path`. The full path is the combination of the `partition + name` (example: /Common/my-pool ) or  `partition + directory + name` of the resource  (example: /Common/test/my-pool )
+* `name` - (Required,type `string`) Name of the LTM TCP Profile,name should be `full path`. The full path is the combination of the `partition + name` (example: /Common/my-pool ) or  `partition + directory + name` of the resource  (example: /Common/test/my-pool )
 
 * `defaults_from` - (Optional,type `string`) Specifies the profile that you want to use as the parent profile. Your new profile inherits all settings and values from the parent profile specified.
 

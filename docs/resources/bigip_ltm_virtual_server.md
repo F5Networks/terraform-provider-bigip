@@ -74,7 +74,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `translate_port` - Enables or disables port translation. Turn port translation off for a virtual server if you want to use the virtual server to load balance connections to any service
 
-* `ip_protocol`- (Optional) Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is `tcp`. valid options are [`any`,`udp`,`tcp`]
+* `ip_protocol` - (Optional) Specifies a network protocol name you want the system to use to direct traffic on this virtual server. The default is `tcp`. valid options are [`any`,`udp`,`tcp`]
 
 * `profiles` - (Optional) List of profiles associated both client and server contexts on the virtual server. This includes protocol, ssl, http, etc.
 
@@ -82,7 +82,7 @@ resource "bigip_ltm_virtual_server" "https" {
 
 * `server_profiles` - (Optional) List of server context profiles associated on the virtual server. Not mutually exclusive with profiles and client_profiles
 
-* `source` -  (Optional) Specifies an IP address or network from which the virtual server will accept traffic.
+* `source` - (Optional) Specifies an IP address or network from which the virtual server will accept traffic.
 
 * `irules` - (Optional) The iRules list you want run on this virtual server. iRules help automate the intercepting, processing, and routing of application traffic.
 
