@@ -1,3 +1,12 @@
+## 1.28.0 (July 1st, 2026)
+
+# Features additions:
+
+ - Added `bigip_gtm_pool` resource for creating and managing GTM pools
+ - Added `bigip_gtm_pool_attachment` (or `pools` attribute improvements) to attach pools to WideIPs more reliably
+ - Added `bigip_gtm_virtual_server` data source for reading existing GTM virtual servers
+ - Improvements to GTM topology handling: better import/export and topology-region association
+
 ## 1.27.0 (June 3rd, 2026)
 
 # Features additions:
@@ -10,7 +19,7 @@
 
 ## 1.26.0 (March 25, 2026)
 
-- Add GTM (Global Traffic Manager) monitor resources support
+  - Add GTM (Global Traffic Manager) monitor resources support
   - bigip_gtm_monitor_http
   - bigip_gtm_monitor_https
   - bigip_gtm_monitor_tcp
