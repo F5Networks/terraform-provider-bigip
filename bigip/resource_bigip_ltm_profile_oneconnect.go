@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -155,6 +156,11 @@ func resourceBigipLtmProfileOneconnectRead(ctx context.Context, d *schema.Resour
 	name := d.Id()
 	log.Printf("[INFO] Reading OneConnect Profile :%+v", name)
 	obj, err := client.GetOneconnect(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] OneConnect Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		return diag.FromErr(err)
 	}

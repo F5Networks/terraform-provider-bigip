@@ -303,6 +303,11 @@ func resourceBigipLtmPoolAttachmentRead(ctx context.Context, d *schema.ResourceD
 	expected := d.Get("node").(string)
 
 	pool, err := client.GetPool(poolName)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Pool (%s) not found, removing from state", poolName)
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Pool (%s)  (%v) ", poolName, err)
 		return diag.FromErr(err)

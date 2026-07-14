@@ -315,6 +315,11 @@ func resourceBigipLtmProfileHttpRead(ctx context.Context, d *schema.ResourceData
 	log.Println("[INFO] Fetching HTTP  Profile " + name)
 
 	pp, err := client.GetHttpProfile(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] HTTP Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve HTTP Profile  (%s) ", err)
 		return diag.FromErr(err)

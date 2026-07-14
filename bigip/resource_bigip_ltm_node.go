@@ -197,6 +197,11 @@ func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta 
 	log.Println("[INFO] Fetching node " + name)
 
 	node, err := client.GetNode(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Node (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve node %s  %v :", name, err)
 		return diag.FromErr(err)
