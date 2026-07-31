@@ -134,6 +134,7 @@ func Provider() *schema.Provider {
 			"bigip_cm_device":                       resourceBigipCmDevice(),
 			"bigip_cm_devicegroup":                  resourceBigipCmDevicegroup(),
 			"bigip_net_route":                       resourceBigipNetRoute(),
+			"bigip_net_route_domain":                resourceBigipNetRouteDomain(),
 			"bigip_net_selfip":                      resourceBigipNetSelfIP(),
 			"bigip_net_vlan":                        resourceBigipNetVlan(),
 			"bigip_ltm_irule":                       resourceBigipLtmIRule(),
