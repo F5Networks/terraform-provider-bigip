@@ -4,7 +4,9 @@
 
 # Features additions:
 
-- Added single-object data sources for BIG-IP networking and system inventory, including `bigip_net_route`, `bigip_net_self`, `bigip_net_trunk`, `bigip_net_vlan`, `bigip_sys_dns`, `bigip_sys_ntp`, and `bigip_sys_version`
+- Added authentication resources for BIG-IP auth configuration, including `bigip_auth_ldap`, `bigip_auth_radius`, `bigip_auth_radius_server`, `bigip_auth_tacacs`, and `bigip_auth_user`
+- Added collection and single-object data sources for BIG-IP networking and system inventory, including `bigip_net_interfaces`, `bigip_net_routes`, `bigip_net_route`, `bigip_net_selfips`, `bigip_net_self`, `bigip_net_trunks`, `bigip_net_trunk`, `bigip_net_vlans`, `bigip_net_vlan`, `bigip_sys_dns`, `bigip_sys_ntp`, and `bigip_sys_version`
+- Added `sni_server_name` support to `bigip_gtm_monitor_https`
 - Added broader source-discovery and migration tooling for i-Series to r-Series/F5OS workflows, including TMOS version inventory, UCS backup generation, and expanded system/interface/trunk extraction scripts and guides
 - Added Terraform 1.11 write-only attribute support
 - Added automated acceptance execution in CI against an ephemeral BIG-IP DUT
