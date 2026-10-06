@@ -29,7 +29,7 @@ terraform {
       source = "terraform-providers/bigip"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.11.0"
 }
 
 provider "bigip" {

@@ -1,0 +1,190 @@
+/*
+Copyright 2019 F5 Networks Inc.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+package bigip
+
+// Template for a new bigip/*_unit_test.go file. See CONTRIBUTING.md for the
+// two unit-testing styles this repo uses and the shared helpers referenced
+// below (bigip/testing_helpers_test.go).
+//
+// This file uses "Widget" / "widget" as a stand-in for the real resource or
+// data source under test (schema type bigip_widget, Go identifiers
+// resourceBigipWidget*). To use this template:
+//
+//  1. Copy to bigip/resource_bigip_<module>_<name>_unit_test.go (or
+//     bigip/datasource_bigip_<name>_unit_test.go for a data source).
+//  2. Find-and-replace "Widget" -> your resource's Go identifier segment
+//     (e.g. "LtmPool") and "widget" -> its Terraform type suffix
+//     (e.g. "ltm_pool"), and fix up the REST endpoint paths and fields
+//     marked TODO below.
+//  3. Delete whichever of the two test-style sections (3 and 4) you don't
+//     need -- most files only need one, not both.
+//  4. Remove this header comment and the .tmpl suffix from the filename.
+//  5. Run `gofmt -s -w` and `golangci-lint run` on the new file, then
+//     `go test ./bigip/ -run <YourNewTestName> -v` to confirm it passes.
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/stretchr/testify/require"
+)
+
+// ---------------------------------------------------------------------
+// 1. Schema-shape assertion (no HTTP server needed)
+// ---------------------------------------------------------------------
+
+// TestResourceBigipWidgetSchema checks the resource's schema shape without
+// needing any BIG-IP connection: required/computed fields, and that the CRUD
+// functions are wired up.
+func TestResourceBigipWidgetSchema(t *testing.T) {
+	r := resourceBigipWidget() // TODO: replace with the real constructor, e.g. resourceBigipLtmPool()
+
+	if r.Schema == nil {
+		t.Fatal("Expected schema to be defined")
+	}
+	if r.CreateContext == nil {
+		t.Fatal("Expected CreateContext to be defined")
+	}
+
+	// TODO: assert on the fields that matter for this resource, e.g.:
+	nameSchema, ok := r.Schema["name"]
+	if !ok {
+		t.Fatal("Expected field 'name' to exist in schema")
+	}
+	if !nameSchema.Required {
+		t.Error("Expected field 'name' to be required")
+	}
+}
+
+// ---------------------------------------------------------------------
+// 2. Standard "invalidkey" schema-rejection test
+// ---------------------------------------------------------------------
+
+func testBigipWidgetInvalid(resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_widget" "test" {
+  name       = "%s"
+  invalidkey = "foo"
+}
+`, resourceName)
+}
+
+func TestAccBigipWidgetInvalid(t *testing.T) {
+	resourceName := "/Common/test-widget"
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		Providers:  testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testBigipWidgetInvalid(resourceName),
+				ExpectError: ExpectUnexpectedArgumentError,
+			},
+		},
+	})
+}
+
+// ---------------------------------------------------------------------
+// 3. SDK-driven create test using the shared setup()/teardown()/mux
+//    (style 1 in CONTRIBUTING.md)
+// ---------------------------------------------------------------------
+
+func testBigipWidgetCreate(resourceName string) string {
+	return fmt.Sprintf(`
+resource "bigip_widget" "test" {
+  name = "%s"
+  // TODO: other required arguments
+}
+`, resourceName)
+}
+
+func TestAccBigipWidgetUnitCreate(t *testing.T) {
+	resourceName := "/Common/test-widget"
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/mgmt/tm/net/self", func(w http.ResponseWriter, r *http.Request) {
+		AssertRequestMethod(t, r, http.MethodGet)
+		_, _ = fmt.Fprint(w, `{}`)
+	})
+	// TODO: replace "widget" in the path below with the real REST endpoint,
+	// e.g. "/mgmt/tm/ltm/pool" for bigip_ltm_pool.
+	mux.HandleFunc("/mgmt/tm/ltm/widget", func(w http.ResponseWriter, r *http.Request) {
+		AssertRequestMethod(t, r, http.MethodPost)
+		AssertJSONContentType(t, r)
+		_, _ = fmt.Fprintf(w, `{"name":"%s"}`, resourceName)
+	})
+	mux.HandleFunc("/mgmt/tm/ltm/widget/"+MangleFullPath(resourceName), func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintf(w, `{"name":"%s"}`, resourceName)
+	})
+
+	resource.Test(t, resource.TestCase{
+		IsUnitTest: true,
+		PreCheck:   func() { testAcctUnitPreCheck(t, server.URL) },
+		Providers:  testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testBigipWidgetCreate(resourceName),
+			},
+		},
+	})
+}
+
+// ---------------------------------------------------------------------
+// 4. Direct CRUD-function test using NewUnitTestClient/NewTestResourceData
+//    and a locally-owned httptest.Server (style 2 in CONTRIBUTING.md)
+// ---------------------------------------------------------------------
+
+func TestUnitWidgetCreateReadUpdateDelete(t *testing.T) {
+	name := "/Common/test-widget"
+	// TODO: replace "widget" with the real REST endpoint, e.g.
+	// "/mgmt/tm/ltm/pool/" for bigip_ltm_pool.
+	mangled := "/mgmt/tm/ltm/widget/" + MangleFullPath(name)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/mgmt/tm/ltm/widget", func(w http.ResponseWriter, r *http.Request) {
+		AssertRequestMethod(t, r, http.MethodPost)
+		_, _ = fmt.Fprintf(w, `{"name":"%s"}`, name)
+	})
+	mux.HandleFunc(mangled, func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			_, _ = fmt.Fprintf(w, `{"name":"%s"}`, name)
+		case http.MethodPatch, http.MethodPut:
+			_, _ = fmt.Fprintf(w, `{"name":"%s"}`, name)
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusOK)
+			_, _ = fmt.Fprint(w, `{}`)
+		}
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	client := NewUnitTestClient(server.URL)
+	r := resourceBigipWidget() // TODO: replace with the real constructor
+	d := NewTestResourceData(t, r, map[string]interface{}{
+		"name": name,
+		// TODO: other fields required by this resource's schema
+	}, "")
+
+	ctx := context.Background()
+
+	diags := resourceBigipWidgetCreate(ctx, d, client) // TODO: real Create function
+	require.False(t, diags.HasError(), "unexpected create error: %v", diags)
+
+	diags = resourceBigipWidgetRead(ctx, d, client) // TODO: real Read function
+	require.False(t, diags.HasError(), "unexpected read error: %v", diags)
+
+	diags = resourceBigipWidgetUpdate(ctx, d, client) // TODO: real Update function
+	require.False(t, diags.HasError(), "unexpected update error: %v", diags)
+
+	diags = resourceBigipWidgetDelete(ctx, d, client) // TODO: real Delete function
+	require.False(t, diags.HasError(), "unexpected delete error: %v", diags)
+}

@@ -86,15 +86,27 @@ func resourceBigipSslCertificateCreate(ctx context.Context, d *schema.ResourceDa
 	if val, ok := d.GetOk("monitoring_type"); ok {
 		cert.CertValidationOptions = []string{val.(string)}
 	}
-	if val, ok := d.GetOk("issuer_cert"); ok {
-		cert.IssuerCert = val.(string)
-	}
 
 	err := client.UploadCertificate(certPath, cert)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error in Importing certificate (%s): %s", name, err))
 	}
 	d.SetId(name)
+
+	// issuer_cert is silently ignored by BIG-IP when set on the initial
+	// upload/create above (AddCertificate's POST) -- it only takes effect
+	// via a follow-up PATCH/PUT against the already-created certificate,
+	// so it's applied here via ModifyCertificate instead. ModifyCertificate
+	// requires the full "/partition/name" path (it does not itself
+	// disambiguate a bare name against the partition field the way
+	// AddCertificate's request body does).
+	if val, ok := d.GetOk("issuer_cert"); ok {
+		cert.IssuerCert = val.(string)
+		fullPathName := fqdn(partition, name)
+		if err := client.ModifyCertificate(fullPathName, &bigip.Certificate{IssuerCert: cert.IssuerCert}); err != nil {
+			return diag.FromErr(fmt.Errorf("error setting issuer_cert on certificate (%s): %s", fullPathName, err))
+		}
+	}
 	if !client.Teem {
 		id := uuid.New()
 		uniqueID := id.String()

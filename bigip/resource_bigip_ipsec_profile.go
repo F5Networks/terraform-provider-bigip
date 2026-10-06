@@ -85,7 +85,7 @@ func resourceBigipIpsecProfileRead(ctx context.Context, d *schema.ResourceData, 
 	}
 	if ts == nil {
 		d.SetId("")
-		return diag.FromErr(fmt.Errorf("[ERROR] IPsec profile (%s) not found, removing from state", d.Id()))
+		return nil
 	}
 	if err := d.Set("parent_profile", ts.DefaultsFrom); err != nil {
 		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving IPsec parent profile (%s): %s", d.Id(), err))

@@ -111,6 +111,12 @@ resource "bigip_as3"  "as3-example1" {
     as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_example1.json")}"
 }
 `
+var TestAs3PerAppResourceInvalidJson = `
+resource "bigip_as3"  "as3-example1" {
+	tenant_name = "dmz"
+    as3_json = "${file("` + dir + `/../examples/as3/as3_per_app_invalid.json")}"
+}
+`
 var TestAs3PerAppResource2 = `
 resource "bigip_as3"  "as3-example1" {
 	tenant_name = "dmz"
@@ -131,19 +137,21 @@ resource "bigip_as3"  "as3-example1" {
 
 var TestAs3ControlParamDryRunTrue = `
 resource "bigip_as3"  "as3-controls" {
-    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}"
+    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}" 
 	controls = {
 		dry_run = "yes"
 	}
+	ignore_metadata = true
 }
 `
 
 var TestAs3ControlParamDryRunFalse = `
 resource "bigip_as3"  "as3-controls" {
-    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}"
+    as3_json = "${file("` + dir + `/../examples/as3/controls.json")}" 
 	controls = {
 		dry_run = "no"
 	}
+	ignore_metadata = true
 }
 `
 
@@ -665,7 +673,15 @@ func TestAccBigipPer_AppAs3_remove_Application(t *testing.T) {
 	})
 }
 
-// Per-App mode is disabled
+// as3_json containing syntactically invalid JSON must be rejected by
+// Terraform's own validation (ValidateFunc) before ever reaching BIG-IP,
+// the same way TestAccBigipAs3_badJSON tests this for the non-per-app
+// bigip_as3 resource shape. (This test's config previously pointed at a
+// perfectly valid per-app fixture while still expecting an "Invalid
+// request value" error that nothing in the config could ever produce --
+// it had never actually exercised invalid-JSON handling at all; fixed to
+// reference a genuinely malformed as3_per_app_invalid.json and the real
+// validation error message.)
 func TestAccBigipPer_AppAs3_update_invalidJson(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -675,8 +691,8 @@ func TestAccBigipPer_AppAs3_update_invalidJson(t *testing.T) {
 		CheckDestroy: testCheckAs3Destroy,
 		Steps: []resource.TestStep{
 			{
-				Config:      TestAs3PerAppResource1,
-				ExpectError: regexp.MustCompile("Invalid request value"),
+				Config:      TestAs3PerAppResourceInvalidJson,
+				ExpectError: regexp.MustCompile(`"as3_json" contains an invalid JSON:.*`),
 			},
 		},
 	})
@@ -732,8 +748,14 @@ func TestAccBigipAs3_DeleteApps_MutualExclusion(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      TestAs3DeleteAppsMutualExclusion,
-				ExpectError: regexp.MustCompile("'delete_apps' and 'as3_json' are mutually exclusive"),
+				Config: TestAs3DeleteAppsMutualExclusion,
+				// delete_apps and as3_json both declare
+				// ConflictsWith: []string{...} against each other in the
+				// schema -- the SDK's own standard "conflicts with"
+				// validation error fires, not a custom message (this
+				// resource has no hand-written mutual-exclusion check of
+				// its own to produce the originally-expected string).
+				ExpectError: regexp.MustCompile(`conflicts with`),
 			},
 		},
 	})

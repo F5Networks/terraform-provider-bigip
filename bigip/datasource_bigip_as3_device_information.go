@@ -132,9 +132,13 @@ func fetchAs3Configuration(client *bigip.BigIP, tenant string, applicationList [
 		}
 	}
 
+	// GetAs3 returns ("", nil) rather than a 404 error when the tenant's
+	// declaration does not exist on the device (see getForEntity's
+	// not-found/ok=false contract), so an empty response here means the
+	// tenant was not found rather than "found but empty".
 	if strings.TrimSpace(as3Resp) == "" {
-		log.Printf("[WARN] No AS3 configuration found for tenant '%s'", tenant)
-		return "", fmt.Errorf("no AS3 configuration found for tenant '%s'", tenant)
+		log.Printf("[WARN] Tenant '%s' not found on BIG-IP system", tenant)
+		return "", fmt.Errorf("tenant '%s' not found on BIG-IP system", tenant)
 	}
 
 	return as3Resp, nil

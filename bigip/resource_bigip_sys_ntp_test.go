@@ -12,7 +12,6 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
@@ -39,9 +38,12 @@ func TestAccBigipSysNtp_create(t *testing.T) {
 					testCheckntpExists(TEST_NTP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "description", TEST_NTP_NAME),
 					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "timezone", "America/Los_Angeles"),
-					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp",
-						fmt.Sprintf("servers.%d", schema.HashString("10.10.10.10")),
-						"10.10.10.10"),
+					// servers is a TypeList (order-preserving), not a
+					// TypeSet -- the SDK's own error confirms a
+					// schema.HashString-computed index ("servers.<hash>")
+					// isn't valid addressing for it regardless; a plain
+					// numeric index is correct here.
+					resource.TestCheckResourceAttr("bigip_sys_ntp.test-ntp", "servers.0", "10.10.10.10"),
 				),
 			},
 		},

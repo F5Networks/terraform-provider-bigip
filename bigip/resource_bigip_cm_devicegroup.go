@@ -174,10 +174,10 @@ func resourceBigipCmDevicegroupRead(ctx context.Context, d *schema.ResourceData,
 	if err := d.Set("type", p.Type); err != nil {
 		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Type  to state for Devicegroup (%s): %s", d.Id(), err))
 	}
-	_ = d.Set("fullLoadOnSync", p.FullLoadOnSync)
-	_ = d.Set("saveOnAutoSync", p.SaveOnAutoSync)
-	_ = d.Set("incrementalConfigSyncSizeMax", p.IncrementalConfigSyncSizeMax)
-	_ = d.Set("networkFailover", p.NetworkFailover)
+	_ = d.Set("full_load_on_sync", p.FullLoadOnSync)
+	_ = d.Set("save_on_auto_sync", p.SaveOnAutoSync)
+	_ = d.Set("incremental_config", p.IncrementalConfigSyncSizeMax)
+	_ = d.Set("network_failover", p.NetworkFailover)
 	return nil
 
 }

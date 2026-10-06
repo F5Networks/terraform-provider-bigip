@@ -1,3 +1,29 @@
+## Unreleased
+
+## 1.29.0 (October 6, 2026)
+
+# Features additions:
+
+- Added single-object data sources for BIG-IP networking and system inventory, including `bigip_net_route`, `bigip_net_self`, `bigip_net_trunk`, `bigip_net_vlan`, `bigip_sys_dns`, `bigip_sys_ntp`, and `bigip_sys_version`
+- Added broader source-discovery and migration tooling for i-Series to r-Series/F5OS workflows, including TMOS version inventory, UCS backup generation, and expanded system/interface/trunk extraction scripts and guides
+- Added Terraform 1.11 write-only attribute support
+- Added automated acceptance execution in CI against an ephemeral BIG-IP DUT
+
+# Bug Fixes:
+
+- Stabilized acceptance coverage and DUT orchestration, including DUT readiness waiting, GTM acceptance fixes, FAST health gating, and CI teardown ordering fixes
+- Fixed inherited `tm_options` drift handling for both `bigip_ltm_profile_client_ssl` and `bigip_ltm_profile_server_ssl` when updating unrelated attributes on child profiles using `defaults_from`
+- Fixed `bigip_gtm_monitor_https` default `sni_server_name` handling and GTM pool import/default/member state normalization
+- Fixed nil-on-404 refresh handling for traffic selector and IPSec resources so removed objects are dropped from state cleanly
+- Fixed credential-exposure handling
+
+# Improvements:
+
+- Greatly expanded unit test coverage across provider core, networking, LTM, GTM, SSL, IPsec, AS3/DO/FAST, system resources, and data sources
+- Added coverage tooling, Codecov reporting, and CI coverage threshold enforcement
+- Updated CI/CD and release publishing flow to mirror the terraform-provider-f5os process
+- Updated documentation, support policy notes, and govulncheck/CVE guidance
+
 ## 1.28.0 (July 1st, 2026)
 
 # Features additions:

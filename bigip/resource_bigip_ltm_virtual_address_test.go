@@ -71,7 +71,7 @@ func TestAccBigipLtmVA_create(t *testing.T) {
 func TestAccBigipLtmVATCIssue936(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckRouteDomain50(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckVAsDestroyed,

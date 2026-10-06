@@ -32,6 +32,7 @@ var HasIndexFunc = function.New(&function.Spec{
 		}
 		return cty.Bool, nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		return args[0].HasIndex(args[1]), nil
 	},
@@ -114,6 +115,7 @@ var LengthFunc = function.New(&function.Spec{
 			Name:             "collection",
 			Type:             cty.DynamicPseudoType,
 			AllowDynamicType: true,
+			AllowUnknown:     true,
 			AllowMarked:      true,
 		},
 	},
@@ -124,6 +126,7 @@ var LengthFunc = function.New(&function.Spec{
 		}
 		return cty.Number, nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		return args[0].Length(), nil
 	},
@@ -144,12 +147,6 @@ var ElementFunc = function.New(&function.Spec{
 	},
 	Type: func(args []cty.Value) (cty.Type, error) {
 		list := args[0]
-		index := args[1]
-		if index.IsKnown() {
-			if index.LessThan(cty.NumberIntVal(0)).True() {
-				return cty.DynamicPseudoType, fmt.Errorf("cannot use element function with a negative index")
-			}
-		}
 
 		listTy := list.Type()
 		switch {
@@ -173,6 +170,9 @@ var ElementFunc = function.New(&function.Spec{
 				return cty.DynamicPseudoType, errors.New("cannot use element function with an empty list")
 			}
 			index = index % len(etys)
+			if index < 0 {
+				index += len(etys)
+			}
 			return etys[index], nil
 		default:
 			return cty.DynamicPseudoType, fmt.Errorf("cannot read elements from %s", listTy.FriendlyName())
@@ -186,10 +186,6 @@ var ElementFunc = function.New(&function.Spec{
 			return cty.DynamicVal, fmt.Errorf("invalid index: %s", err)
 		}
 
-		if args[1].LessThan(cty.NumberIntVal(0)).True() {
-			return cty.DynamicVal, fmt.Errorf("cannot use element function with a negative index")
-		}
-
 		input, marks := args[0].Unmark()
 		if !input.IsKnown() {
 			return cty.UnknownVal(retType), nil
@@ -200,6 +196,9 @@ var ElementFunc = function.New(&function.Spec{
 			return cty.DynamicVal, errors.New("cannot use element function with an empty list")
 		}
 		index = index % l
+		if index < 0 {
+			index += l
+		}
 
 		// We did all the necessary type checks in the type function above,
 		// so this is guaranteed not to fail.
@@ -251,6 +250,7 @@ var CoalesceListFunc = function.New(&function.Spec{
 
 		return last, nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		for _, arg := range args {
 			if !arg.IsKnown() {
@@ -283,7 +283,8 @@ var CompactFunc = function.New(&function.Spec{
 			Type: cty.List(cty.String),
 		},
 	},
-	Type: function.StaticReturnType(cty.List(cty.String)),
+	Type:         function.StaticReturnType(cty.List(cty.String)),
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		listVal := args[0]
 		if !listVal.IsWhollyKnown() {
@@ -324,7 +325,8 @@ var ContainsFunc = function.New(&function.Spec{
 			Type: cty.DynamicPseudoType,
 		},
 	},
-	Type: function.StaticReturnType(cty.Bool),
+	Type:         function.StaticReturnType(cty.Bool),
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 		arg := args[0]
 		ty := arg.Type()
@@ -382,6 +384,7 @@ var DistinctFunc = function.New(&function.Spec{
 	Type: func(args []cty.Value) (cty.Type, error) {
 		return args[0].Type(), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		listVal := args[0]
 
@@ -426,6 +429,7 @@ var ChunklistFunc = function.New(&function.Spec{
 	Type: func(args []cty.Value) (cty.Type, error) {
 		return cty.List(args[0].Type()), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		listVal := args[0]
 		sizeVal := args[1]
@@ -513,6 +517,7 @@ var FlattenFunc = function.New(&function.Spec{
 		}
 		return cty.Tuple(tys), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		inputList := args[0]
 
@@ -611,6 +616,7 @@ var KeysFunc = function.New(&function.Spec{
 			return cty.DynamicPseudoType, function.NewArgErrorf(0, "must have map or object type")
 		}
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 		// We must unmark the value before we can use ElementIterator on it, and
 		// then re-apply the same marks (possibly none) when we return. Since we
@@ -832,6 +838,7 @@ var MergeFunc = function.New(&function.Spec{
 
 		return cty.Object(attrs), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		outputMap := make(map[string]cty.Value)
 		var markses []cty.ValueMarks // remember any marked maps/objects we find
@@ -891,6 +898,7 @@ var ReverseListFunc = function.New(&function.Spec{
 			return cty.NilType, function.NewArgErrorf(0, "can only reverse list or tuple values, not %s", argTy.FriendlyName())
 		}
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		in, marks := args[0].Unmark()
 		inVals := in.AsValueSlice()
@@ -919,10 +927,11 @@ var SetProductFunc = function.New(&function.Spec{
 	Description: `Calculates the cartesian product of two or more sets.`,
 	Params:      []function.Parameter{},
 	VarParam: &function.Parameter{
-		Name:        "sets",
-		Description: "The sets to consider. Also accepts lists and tuples, and if all arguments are of list or tuple type then the result will preserve the input ordering",
-		Type:        cty.DynamicPseudoType,
-		AllowMarked: true,
+		Name:         "sets",
+		Description:  "The sets to consider. Also accepts lists and tuples, and if all arguments are of list or tuple type then the result will preserve the input ordering",
+		Type:         cty.DynamicPseudoType,
+		AllowMarked:  true,
+		AllowUnknown: true,
 	},
 	Type: func(args []cty.Value) (retType cty.Type, err error) {
 		if len(args) < 2 {
@@ -964,6 +973,7 @@ var SetProductFunc = function.New(&function.Spec{
 		}
 		return cty.Set(cty.Tuple(elemTys)), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		ety := retType.ElementType()
 		var retMarks cty.ValueMarks
@@ -976,7 +986,7 @@ var SetProductFunc = function.New(&function.Spec{
 
 			// Continue processing after we find an argument with unknown
 			// length to ensure that we cover all the marks
-			if !arg.Length().IsKnown() {
+			if !(arg.IsKnown() && arg.Length().IsKnown()) {
 				hasUnknownLength = true
 				continue
 			}
@@ -988,7 +998,62 @@ var SetProductFunc = function.New(&function.Spec{
 		}
 
 		if hasUnknownLength {
-			return cty.UnknownVal(retType).WithMarks(retMarks), nil
+			defer func() {
+				// We're definitely going to return from somewhere in this
+				// branch and however we do it we must reapply the marks
+				// on the way out.
+				ret = ret.WithMarks(retMarks)
+			}()
+			ret := cty.UnknownVal(retType)
+
+			// Even if we don't know the exact length we may be able to
+			// constrain the upper and lower bounds of the resulting length.
+			maxLength := 1
+			for _, arg := range args {
+				arg, _ := arg.Unmark() // safe to discard marks because "retMarks" already contains them all
+				argRng := arg.Range()
+				ty := argRng.TypeConstraint()
+				var argMaxLen int
+				if ty.IsCollectionType() {
+					argMaxLen = argRng.LengthUpperBound()
+				} else if ty.IsTupleType() {
+					argMaxLen = ty.Length()
+				} else {
+					// Should not get here but if we do then we'll just
+					// bail out with an unrefined unknown value.
+					return ret, nil
+				}
+				// The upper bound of a totally-unrefined collection is
+				// math.MaxInt, which will quickly get us to integer overflow
+				// here, and so out of pragmatism we'll just impose a reasonable
+				// upper limit on what is a useful bound to track and return
+				// unrefined for unusually-large input.
+				if argMaxLen > 1024 { // arbitrarily-decided threshold
+					return ret, nil
+				}
+				maxLength *= argMaxLen
+				if maxLength > 2048 { // arbitrarily-decided threshold
+					return ret, nil
+				}
+				if maxLength < 0 { // Seems like we already overflowed, then.
+					return ret, nil
+				}
+			}
+
+			if maxLength == 0 {
+				// This refinement will typically allow the unknown value to
+				// collapse into a known empty collection.
+				ret = ret.Refine().CollectionLength(0).NewValue()
+			} else {
+				// If we know there's a nonzero maximum number of elements then
+				// set element coalescing cannot reduce to fewer than one
+				// element.
+				ret = ret.Refine().
+					CollectionLengthLowerBound(1).
+					CollectionLengthUpperBound(maxLength).
+					NewValue()
+			}
+			return ret, nil
 		}
 
 		if total == 0 {
@@ -1101,6 +1166,7 @@ var SliceFunc = function.New(&function.Spec{
 		}
 		return cty.Tuple(argTy.TupleElementTypes()[startIndex:endIndex]), nil
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		inputList, marks := args[0].Unmark()
 
@@ -1215,6 +1281,7 @@ var ValuesFunc = function.New(&function.Spec{
 		}
 		return cty.NilType, errors.New("values() requires a map as the first argument")
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		mapVar := args[0]
 
@@ -1303,6 +1370,7 @@ var ZipmapFunc = function.New(&function.Spec{
 			return cty.NilType, errors.New("values argument must be a list or tuple value")
 		}
 	},
+	RefineResult: refineNonNull,
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		keys := args[0]
 		values := args[1]
@@ -1434,8 +1502,8 @@ func Keys(inputMap cty.Value) (cty.Value, error) {
 }
 
 // Lookup performs a dynamic lookup into a map.
-// There are two required arguments, map and key, plus an optional default,
-// which is a value to return if no key is found in map.
+// There are three required arguments, inputMap and key, plus a defaultValue,
+// which is a value to return if the given key is not found in the inputMap.
 func Lookup(inputMap, key, defaultValue cty.Value) (cty.Value, error) {
 	return LookupFunc.Call([]cty.Value{inputMap, key, defaultValue})
 }

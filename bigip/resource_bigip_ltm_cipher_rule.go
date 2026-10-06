@@ -110,6 +110,11 @@ func resourceBigipLtmCipherRuleRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 	log.Printf("[INFO] Cipher rule response :%+v", cipherRule)
+	if cipherRule == nil {
+		log.Printf("[WARN] Cipher rule (%s) not found, removing from state", name)
+		d.SetId("")
+		return nil
+	}
 	_ = d.Set("name", cipherRule.FullPath)
 	_ = d.Set("cipher", cipherRule.Cipher)
 	_ = d.Set("dh_groups", cipherRule.DhGroups)

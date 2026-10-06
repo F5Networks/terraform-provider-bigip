@@ -70,7 +70,7 @@ resource "bigip_fast_tcp_app" "fast-tcp-app" {
 func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastTCPAppDestroyed,
@@ -104,7 +104,7 @@ func TestAccFastTCPAppCreateOnBigip(t *testing.T) {
 func TestAccFastTCPAppPersistenceAttributes(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastTCPAppDestroyed,

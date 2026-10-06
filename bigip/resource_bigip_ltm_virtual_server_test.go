@@ -454,7 +454,7 @@ func TestAccBigipLtmVirtualServerTCIssue736(t *testing.T) {
 func TestAccBigipLtmVirtualServerTCIssue729(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckTrafficMatchingCriteria(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckVSsDestroyed,
@@ -903,7 +903,7 @@ func TestAccBigipLtmVirtualServer_PersistProfileDeletion(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "name", "/Common/"+vsName),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "destination", "192.168.50.2"),
 					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "ip_protocol", "tcp"),
-					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "persist.0.name", "cookie"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.*", "/Common/cookie"),
 				),
 			},
 			{
@@ -913,7 +913,7 @@ func TestAccBigipLtmVirtualServer_PersistProfileDeletion(t *testing.T) {
 				Config: testVSWithoutPersistence(vsName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckVSExists(vsName),
-					resource.TestCheckNoResourceAttr("bigip_ltm_virtual_server.test-vs", "persist.0.name"),
+					resource.TestCheckResourceAttr("bigip_ltm_virtual_server.test-vs", "persistence_profiles.#", "0"),
 				),
 			},
 		},
@@ -923,11 +923,13 @@ func TestAccBigipLtmVirtualServer_PersistProfileDeletion(t *testing.T) {
 func testVSWithoutPersistence(name string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
-  name        = "/Common/%s"
-  destination = "192.168.50.2"
-  ip_protocol = "tcp"
-  port        = 80
-  profiles    = ["/Common/http"]
+  name            = "/Common/%s"
+  destination     = "192.168.50.2"
+  ip_protocol     = "tcp"
+  port            = 80
+  profiles        = ["/Common/http"]
+  client_profiles = ["/Common/tcp"]
+  server_profiles = ["/Common/tcp-lan-optimized"]
 }
 `, name)
 }
@@ -935,14 +937,14 @@ resource "bigip_ltm_virtual_server" "test-vs" {
 func testVSCreateWithPersistence(name string) string {
 	return fmt.Sprintf(`
 resource "bigip_ltm_virtual_server" "test-vs" {
-  name        = "/Common/%s"
-  destination = "192.168.50.2"
-  ip_protocol = "tcp"
-  port        = 80
-  profiles    = ["/Common/http"]
-  persist {
-    name = "cookie"
-  }
+  name                 = "/Common/%s"
+  destination          = "192.168.50.2"
+  ip_protocol          = "tcp"
+  port                 = 80
+  profiles             = ["/Common/http"]
+  client_profiles      = ["/Common/tcp"]
+  server_profiles      = ["/Common/tcp-lan-optimized"]
+  persistence_profiles = ["/Common/cookie"]
 }
 `, name)
 }

@@ -126,7 +126,7 @@ func testCheckCmDevicegroupsDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if devicegroup == nil {
+		if devicegroup != nil {
 			return fmt.Errorf("devicegroup %s not destroyed.", name)
 		}
 

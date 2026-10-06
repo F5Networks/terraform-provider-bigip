@@ -15,7 +15,7 @@ var TEST_POOL_TYPE = "a"
 func TestAccBigipGtmPool_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -40,7 +40,7 @@ func TestAccBigipGtmPool_create(t *testing.T) {
 func TestAccBigipGtmPool_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -71,7 +71,7 @@ func TestAccBigipGtmPool_withMembers(t *testing.T) {
 	poolName := "test_pool_with_members"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -92,7 +92,7 @@ func TestAccBigipGtmPool_withQoS(t *testing.T) {
 	poolName := "test_pool_qos"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -117,7 +117,7 @@ func TestAccBigipGtmPool_withLimits(t *testing.T) {
 	poolName := "test_pool_limits"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -139,7 +139,7 @@ func TestAccBigipGtmPool_withLimits(t *testing.T) {
 func TestAccBigipGtmPool_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmPoolDestroyed,
@@ -252,6 +252,49 @@ resource "bigip_gtm_pool" "test-pool" {
 
 func testAccBigipGtmPoolConfigWithMembers(poolName string) string {
 	return fmt.Sprintf(`
+resource "bigip_gtm_datacenter" "test-datacenter-pool-members" {
+  name      = "test_datacenter_pool_members"
+  partition = "Common"
+}
+
+resource "bigip_gtm_server" "test-server1" {
+  name       = "test_server1"
+  partition  = "Common"
+  datacenter = bigip_gtm_datacenter.test-datacenter-pool-members.id
+  product    = "generic-host"
+
+  virtual_server_discovery = "disabled"
+
+  addresses {
+    name = "10.10.20.10"
+  }
+
+  virtual_servers {
+    name        = "vs1"
+    destination = "10.10.20.10:80"
+    enabled     = true
+  }
+}
+
+resource "bigip_gtm_server" "test-server2" {
+  name       = "test_server2"
+  partition  = "Common"
+  datacenter = bigip_gtm_datacenter.test-datacenter-pool-members.id
+  product    = "generic-host"
+
+  virtual_server_discovery = "disabled"
+
+  addresses {
+    name = "10.10.20.11"
+  }
+
+  virtual_servers {
+    name        = "vs2"
+    destination = "10.10.20.11:80"
+    enabled     = true
+  }
+}
+
 resource "bigip_gtm_pool" "test-pool-members" {
   name      = "%s"
   type      = "%s"
@@ -260,7 +303,7 @@ resource "bigip_gtm_pool" "test-pool-members" {
   load_balancing_mode = "ratio"
 
   members {
-    name         = "test_server1:/Common/vs1"
+    name         = "/Common/test_server1:vs1"
     enabled      = true
     ratio        = 2
     member_order = 0
@@ -268,12 +311,17 @@ resource "bigip_gtm_pool" "test-pool-members" {
   }
 
   members {
-    name         = "test_server2:/Common/vs2"
+    name         = "/Common/test_server2:vs2"
     enabled      = true
     ratio        = 1
     member_order = 1
     monitor      = "default"
   }
+
+  depends_on = [
+    bigip_gtm_server.test-server1,
+    bigip_gtm_server.test-server2,
+  ]
 }
 `, poolName, TEST_POOL_TYPE)
 }

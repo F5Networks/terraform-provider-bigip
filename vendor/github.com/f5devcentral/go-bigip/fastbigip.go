@@ -28,6 +28,7 @@ type FastTask struct {
 	Parameters  map[string]interface{} `json:"parameters,omitempty"`
 	Application string                 `json:"application,omitempty"`
 	Operation   string                 `json:"operation,omitempty"`
+	Timestamp   string                 `json:"timestamp,omitempty"`
 }
 
 type FastTemplateSet struct {
@@ -350,6 +351,55 @@ func (b *BigIP) GetFastApp(tenant, app string) (string, error) {
 	return fastString, nil
 }
 
+// pollFastTask polls a FAST async task (via getFastTaskStatus) until it
+// reports success (code 200), a hard failure (code >= 400), or a bounded
+// timeout elapses, returning the final *FastTask on success.
+//
+// Replaces three previously-duplicated, unbounded "for respCode != 200 {
+// ... time.Sleep(3 * time.Second) }" loops (in PostFastAppBigip,
+// ModifyFastAppBigip, DeleteFastAppBigip) that had two real bugs: (1) no
+// timeout at all if the task's code genuinely never reached 200 or 400 --
+// confirmed directly in acceptance-test CI: a device-side instability
+// event during a FAST app's long-running task left one of these loops
+// spinning for over 800 seconds, consuming nearly the entire test
+// timeout budget; and (2) any transient error from getFastTaskStatus
+// (e.g. "X-F5-Auth-Token does not exist", observed directly when the
+// device's mgmt plane degraded mid-task) was treated as an immediate,
+// permanent failure rather than retried, even though the underlying FAST
+// task itself might still complete successfully moments later once the
+// device recovered.
+func (b *BigIP) pollFastTask(id string) (*FastTask, error) {
+	const (
+		pollInterval = 3 * time.Second
+		pollTimeout  = 10 * time.Minute
+	)
+
+	deadline := time.Now().Add(pollTimeout)
+	for {
+		task, err := b.getFastTaskStatus(id)
+		if err != nil {
+			// Transient errors (e.g. the device's mgmt plane briefly
+			// degrading mid-task) are tolerated here the same way a
+			// not-yet-200 status code is -- only a hard task failure
+			// (code >= 400) or the overall timeout below are terminal.
+			log.Printf("[DEBUG] error polling FAST task %s (will retry): %v", id, err)
+		} else {
+			log.Printf("[DEBUG] FAST task %s code = %+v", id, task.Code)
+			if task.Code == 200 {
+				return task, nil
+			}
+			if task.Code >= 400 {
+				return nil, fmt.Errorf("FAST task %s failed with: %+v", id, task.Message)
+			}
+		}
+
+		if time.Now().After(deadline) {
+			return nil, fmt.Errorf("timed out after %s waiting for FAST task %s to complete", pollTimeout, id)
+		}
+		time.Sleep(pollInterval)
+	}
+}
+
 // PostFastAppBigip used for posting FAST json file to BIGIP
 func (b *BigIP) PostFastAppBigip(body, fastTemplate, userAgent string) (tenant, app string, err error) {
 	param := []byte(body)
@@ -367,29 +417,12 @@ func (b *BigIP) PostFastAppBigip(body, fastTemplate, userAgent string) (tenant, 
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["message"].([]interface{})[0].(map[string]interface{})["id"].(string)
-	taskStatus, err := b.getFastTaskStatus(respID)
+	taskStatus, err := b.pollFastTask(respID)
 	if err != nil {
-		return "", "", err
+		return "", "", fmt.Errorf("FAST Application creation failed: %w", err)
 	}
-	respCode := taskStatus.Code
-	log.Printf("[DEBUG]Initial response code = %+v,ID = %+v", respCode, respID)
-	for respCode != 200 {
-		fastTask, err := b.getFastTaskStatus(respID)
-		if err != nil {
-			return "", "", err
-		}
-		respCode = fastTask.Code
-		log.Printf("[DEBUG]Response code = %+v,ID = %+v", respCode, respID)
-		if respCode == 200 {
-			log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
-			break // break here
-		}
-		if respCode >= 400 {
-			return "", "", fmt.Errorf("FAST Application creation failed with :%+v", fastTask.Message)
-		}
-		time.Sleep(3 * time.Second)
-	}
-	return taskStatus.Tenant, taskStatus.Application, err
+	log.Printf("[DEBUG]Sucessfully Created Application with ID  = %v", respID)
+	return taskStatus.Tenant, taskStatus.Application, nil
 }
 
 // ModifyFastAppBigip used for updating FAST application on BIGIP
@@ -407,29 +440,12 @@ func (b *BigIP) ModifyFastAppBigip(body, fastTenant, fastApp string) error {
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["message"].([]interface{})[0].(map[string]interface{})["id"].(string)
-	taskStatus, err := b.getFastTaskStatus(respID)
+	_, err = b.pollFastTask(respID)
 	if err != nil {
-		return err
+		return fmt.Errorf("FAST Application update failed: %w", err)
 	}
-	respCode := taskStatus.Code
-	log.Printf("[DEBUG]Code = %+v,ID = %+v", respCode, respID)
-	for respCode != 200 {
-		fastTask, err := b.getFastTaskStatus(respID)
-		if err != nil {
-			return err
-		}
-		respCode = fastTask.Code
-		if respCode == 200 {
-			log.Printf("[DEBUG]Sucessfully Modified Application with ID  = %v", respID)
-			break // break here
-		}
-		if respCode >= 400 {
-			return fmt.Errorf("FAST Application update failed with :%+v", fastTask.Message)
-			//return fmt.Errorf("FAST Application update failed")
-		}
-		time.Sleep(3 * time.Second)
-	}
-	return err
+	log.Printf("[DEBUG]Sucessfully Modified Application with ID  = %v", respID)
+	return nil
 }
 
 // DeleteFastAppBigip used for deleting FAST application on BIGIP
@@ -441,27 +457,11 @@ func (b *BigIP) DeleteFastAppBigip(fastTenant, fastApp string) error {
 	respRef := make(map[string]interface{})
 	json.Unmarshal(resp, &respRef)
 	respID := respRef["id"].(string)
-	taskStatus, err := b.getFastTaskStatus(respID)
+	_, err = b.pollFastTask(respID)
 	if err != nil {
-		return err
+		return fmt.Errorf("FAST Application deletion failed: %w", err)
 	}
-	respCode := taskStatus.Code
-	log.Printf("[DEBUG]Code = %+v,ID = %+v", respCode, respID)
-	for respCode != 200 {
-		fastTask, err := b.getFastTaskStatus(respID)
-		if err != nil {
-			return err
-		}
-		respCode = fastTask.Code
-		if respCode == 200 {
-			log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
-			break // break here
-		}
-		if respCode >= 400 {
-			return fmt.Errorf("FAST Application deletion failed")
-		}
-		time.Sleep(3 * time.Second)
-	}
+	log.Printf("[DEBUG]Sucessfully Deleted Application with ID  = %v", respID)
 	return nil
 }
 

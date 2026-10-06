@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -24,6 +25,40 @@ import (
 var p = 0
 var q sync.Mutex
 var unknownVariableValue = "74D93920-ED26-11E3-AC10-0800200C9A66"
+
+// bigiqAs3RetryDelayNanos is the delay (in nanoseconds) observed by
+// Read/Update/Delete before contacting BIG-IQ, giving an in-flight AS3
+// declaration time to settle. It is stored as an atomic value (rather than
+// a plain time.Duration) so that unit tests can safely override it via
+// setBigiqAs3RetryDelayForTest (defined in resource_bigiq_as3_unit_test.go)
+// -- without a data race, even if a test in that file is later marked
+// t.Parallel() -- instead of a bare package variable that concurrent
+// goroutines could read/write unsynchronized.
+var bigiqAs3RetryDelayNanos atomic.Int64
+
+func init() {
+	bigiqAs3RetryDelayNanos.Store(int64(20 * time.Second))
+}
+
+// getBigiqAs3RetryDelay returns the current retry delay.
+func getBigiqAs3RetryDelay() time.Duration {
+	return time.Duration(bigiqAs3RetryDelayNanos.Load())
+}
+
+// waitBigiqAs3RetryDelay blocks for the current retry delay, but returns
+// early with ctx.Err() if ctx is cancelled or times out first (e.g.
+// provider shutdown, or a Terraform-enforced operation timeout), instead of
+// unconditionally blocking the goroutine for the full delay.
+func waitBigiqAs3RetryDelay(ctx context.Context) error {
+	timer := time.NewTimer(getBigiqAs3RetryDelay())
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
 
 func resourceBigiqAs3() *schema.Resource {
 	return &schema.Resource{
@@ -185,7 +220,9 @@ func resourceBigiqAs3Create(ctx context.Context, d *schema.ResourceData, meta in
 }
 
 func resourceBigiqAs3Read(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	time.Sleep(20 * time.Second)
+	if err := waitBigiqAs3RetryDelay(ctx); err != nil {
+		return diag.FromErr(err)
+	}
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -225,7 +262,9 @@ func resourceBigiqAs3Read(ctx context.Context, d *schema.ResourceData, meta inte
 }
 
 func resourceBigiqAs3Update(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	time.Sleep(20 * time.Second)
+	if err := waitBigiqAs3RetryDelay(ctx); err != nil {
+		return diag.FromErr(err)
+	}
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -252,7 +291,9 @@ func resourceBigiqAs3Update(ctx context.Context, d *schema.ResourceData, meta in
 }
 
 func resourceBigiqAs3Delete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	time.Sleep(20 * time.Second)
+	if err := waitBigiqAs3RetryDelay(ctx); err != nil {
+		return diag.FromErr(err)
+	}
 	bigiqRef, err := connectBigIq(d)
 	if err != nil {
 		log.Printf("Connection to BIGIQ Failed with :%v", err)
@@ -270,7 +311,7 @@ func resourceBigiqAs3Delete(ctx context.Context, d *schema.ResourceData, meta in
 	}
 	if failedTenants != "" {
 		_ = d.Set("tenant_list", name)
-		return resourceBigipAs3Read(ctx, d, meta)
+		return resourceBigiqAs3Read(ctx, d, meta)
 	}
 	p++
 	d.SetId("")

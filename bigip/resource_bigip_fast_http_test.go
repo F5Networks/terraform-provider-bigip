@@ -21,7 +21,7 @@ var httpTenantName = "fast_http_tenant"
 func TestAccFastHTTPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPAppDestroyed,
@@ -45,7 +45,7 @@ func TestAccFastHTTPAppCreateTC02(t *testing.T) {
 	var httpTenant1Name = "fast_http_tenanttc2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPAppDestroyed,
@@ -70,7 +70,7 @@ func TestAccFastHTTPAppCreateTC03(t *testing.T) {
 	var httpTenant3Name = "fast_http_tenanttc3"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPAppDestroyed,

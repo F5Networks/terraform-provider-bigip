@@ -18,7 +18,7 @@ func TestAccBigipSaasBotDefenseProfileTC1(t *testing.T) {
 	resFullName := fmt.Sprintf("%s.%s", resSaasBotDefenseName, instName)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckSaasBotDefense(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckSaasBotDefensesDestroyed,

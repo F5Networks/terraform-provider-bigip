@@ -197,11 +197,39 @@ func resourceBigipLtmProfileServerSsl() *schema.Resource {
 			},
 
 			"cipher_group": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Default:       "none",
-				Description:   "Cipher group for the ssl server profile",
-				ConflictsWith: []string{"ciphers"},
+				Type:     schema.TypeString,
+				Optional: true,
+				// Computed rather than Default: "none" -- BIG-IP's own
+				// default for an unconfigured cipher_group varies by
+				// TMOS version (confirmed directly: 21.0.x defaults to
+				// "none" with ciphers = "DEFAULT", while 21.1.x defaults
+				// to "/Common/f5-default" with ciphers = "none", since
+				// TLS 1.3 support now requires a cipher group to be
+				// configured) -- a hardcoded client-side default can't
+				// track that, and Default+Computed cannot coexist on the
+				// same schema field (the SDK's own InternalValidate
+				// rejects it) so this must be Computed-only, matching
+				// resourceBigipLtmProfileServerSslRead's own
+				// unconditional d.Set("cipher_group", ...) below.
+				Computed: true,
+				// No ConflictsWith against "ciphers" -- BIG-IP 21.1.x
+				// legitimately requires setting both together
+				// (cipher_group = "none" alongside an explicit ciphers
+				// value) when overriding an inherited parent profile's
+				// cipher_group, confirmed directly against a live
+				// 21.1.0.1 device (same finding as
+				// resource_bigip_ltm_profile_ssl_client.go's identical
+				// cipher_group schema): setting ciphers alone (inheriting
+				// cipher_group from the parent) is rejected with "cannot
+				// contain both ciphers and a cipher-group", so the one
+				// combination that actually works on 21.1.x is exactly
+				// what a client-side ConflictsWith here would block.
+				// Whether a given combination is actually valid now
+				// depends on TMOS version and the profile's own
+				// defaults_from chain, so BIG-IP itself (via an
+				// apply-time API error) is the right place to enforce
+				// this, not a static client-side rule.
+				Description: "Cipher group for the ssl server profile",
 			},
 
 			"expire_cert_response_control": {
@@ -493,12 +521,14 @@ func resourceBigipLtmProfileServerSslRead(ctx context.Context, d *schema.Resourc
 	_ = d.Set("ca_file", obj.CaFile)
 	_ = d.Set("cert", obj.Cert)
 	_ = d.Set("chain", obj.Chain)
-	if _, ok := d.GetOk("ciphers"); ok {
-		_ = d.Set("ciphers", obj.Ciphers)
-	}
-	if _, ok := d.GetOk("cipher_group"); ok {
-		_ = d.Set("cipher_group", obj.CipherGroup)
-	}
+	// ciphers and cipher_group are both Optional+Computed (see their
+	// schema comments for why neither can use a static Default anymore);
+	// both must be set unconditionally here, the same way their
+	// neighboring fields are, so a fresh Read after Create -- where the
+	// user never set either explicitly -- still reflects BIG-IP's actual
+	// returned value instead of leaving the attribute entirely absent.
+	_ = d.Set("ciphers", obj.Ciphers)
+	_ = d.Set("cipher_group", obj.CipherGroup)
 	_ = d.Set("expire_cert_response_control", obj.ExpireCertResponseControl)
 	_ = d.Set("cache_size", obj.CacheSize)
 	_ = d.Set("handshake_timeout", obj.HandshakeTimeout)
@@ -507,9 +537,11 @@ func resourceBigipLtmProfileServerSslRead(ctx context.Context, d *schema.Resourc
 	_ = d.Set("mode", obj.Mode)
 	_ = d.Set("proxy_ca_cert", obj.ProxyCaCert)
 	_ = d.Set("proxy_ca_key", obj.ProxyCaKey)
-	xt := reflect.TypeOf(obj.TmOptions).Kind()
-	if obj.TmOptions != "none" {
-		if xt == reflect.String {
+	if obj.TmOptions == nil || obj.TmOptions == "none" {
+		_ = d.Set("tm_options", []string{})
+	} else {
+		switch reflect.TypeOf(obj.TmOptions).Kind() {
+		case reflect.String:
 			tmOptions := strings.Split(obj.TmOptions.(string), " ")
 			if len(tmOptions) > 0 {
 				tmOptions = tmOptions[1:]
@@ -518,17 +550,13 @@ func resourceBigipLtmProfileServerSslRead(ctx context.Context, d *schema.Resourc
 			if err := d.Set("tm_options", tmOptions); err != nil {
 				return diag.FromErr(fmt.Errorf("[DEBUG] Error saving TmOptions to state for Ssl profile  (%s): %s", d.Id(), err))
 			}
-
-		} else {
+		default:
 			var newObj []string
 			for _, v := range obj.TmOptions.([]interface{}) {
 				newObj = append(newObj, v.(string))
 			}
 			_ = d.Set("tm_options", newObj)
 		}
-	} else {
-		tmOptions := []string{}
-		_ = d.Set("tm_options", tmOptions)
 	}
 
 	_ = d.Set("passphrase", obj.Passphrase)
@@ -584,9 +612,31 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 		}
 	}
 
+	// tm_options has the same Optional+Computed defaults_from
+	// inheritance-drift bug fixed in getClientSslConfig (SFDC #01262589;
+	// see that function's comment in resource_bigip_ltm_profile_ssl_client.go
+	// for the full root-cause explanation) -- server-ssl shares the
+	// identical Optional+Computed tm_options schema/Read/Update pattern.
+	// Read only from the raw config -- what the user actually wrote in
+	// their current .tf -- to decide whether to include tm_options in the
+	// outgoing payload.
+	//
+	// Unlike getClientSslConfig, tmOptionsIsSet is captured separately from
+	// tmOptions itself (rather than just checking len(tmOptions) > 0 below)
+	// so that a practitioner who explicitly writes tm_options = [] in
+	// their .tf -- expressing intent to clear any inherited options rather
+	// than merely omitting the attribute -- still has that empty list
+	// assigned to config.TmOptions and sent to BIG-IP as an explicit
+	// "options {}" clear, rather than being silently dropped and left at
+	// its previously inherited value. getClientSslConfig does not yet make
+	// this same distinction (it still checks len(tmOptions) > 0), so an
+	// explicit tm_options = [] on bigip_ltm_profile_client_ssl is currently
+	// silently not sent; this asymmetry should be resolved by applying the
+	// same tmOptionsIsSet pattern there if/when that gap is addressed.
+	tmOptionsIsSet := rawConfigAttrIsSet(d, "tm_options")
 	var tmOptions []string
-	if t, ok := d.GetOk("tm_options"); ok {
-		tmOptions = setToStringSlice(t.(*schema.Set))
+	if tmOptionsIsSet {
+		tmOptions = setToStringSlice(d.Get("tm_options").(*schema.Set))
 	}
 
 	// Funky stuff toi get c3d to work
@@ -637,12 +687,22 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.Key = d.Get("key").(string)
 	config.Chain = d.Get("chain").(string)
 	config.Passphrase = d.Get("passphrase").(string)
-	if ciphers, ok := d.GetOk("ciphers"); ok {
-		config.Ciphers = ciphers.(string)
+	// ciphers and cipher_group are both Optional+Computed: once Read
+	// backfills state with an inherited value from a parent profile's
+	// defaults_from, d.GetOk would return ok=true for that backfilled
+	// value even though the practitioner's .tf never set it themselves,
+	// incorrectly re-sending it as an explicit override on the very next
+	// Update triggered by any other attribute changing -- see the
+	// identical fix (and its rawConfigAttrIsSet precedent) in
+	// resource_bigip_ltm_profile_ssl_client.go's getClientSslConfig,
+	// confirmed there via
+	// TestAccBigipLtmProfileClientSsl_ChildInheritanceAuditOtherFields.
+	if rawConfigAttrIsSet(d, "ciphers") {
+		config.Ciphers = d.Get("ciphers").(string)
 		config.CipherGroup = "none"
 	}
-	if cipherGrp, ok := d.GetOk("cipher_group"); ok && cipherGrp != "none" {
-		config.CipherGroup = cipherGrp.(string)
+	if rawConfigAttrIsSet(d, "cipher_group") && d.Get("cipher_group").(string) != "none" {
+		config.CipherGroup = d.Get("cipher_group").(string)
 		config.Ciphers = "none"
 	}
 	config.ExpireCertResponseControl = d.Get("expire_cert_response_control").(string)
@@ -672,7 +732,7 @@ func getServerSslConfig(d *schema.ResourceData, config *bigip.ServerSSLProfile) 
 	config.UncleanShutdown = d.Get("unclean_shutdown").(string)
 	config.UntrustedCertResponseControl = d.Get("untrusted_cert_response_control").(string)
 
-	if len(tmOptions) > 0 {
+	if tmOptionsIsSet {
 		config.TmOptions = tmOptions
 	}
 	return config

@@ -39,6 +39,12 @@ resource "bigip_gtm_datacenter" "custom_prober" {
 
   prober_preference = "pool"
   prober_fallback   = "outside-datacenter"
+  # prober_pool must reference an existing GTM prober pool
+  # (/mgmt/tm/gtm/prober-pool) when prober_preference or prober_fallback
+  # is "pool" -- this provider does not currently expose a resource to
+  # manage prober pools themselves, so one must be created out of band
+  # (e.g. via tmsh or the BIG-IP UI) before referencing it here.
+  prober_pool = "/Common/example_prober_pool"
 }
 ```
 
@@ -86,6 +92,8 @@ resource "bigip_gtm_datacenter" "maintenance" {
   - `outside-datacenter` - Fallback to probers outside this datacenter
   - `pool` - Fallback to a specific pool of probers
   - `inherit` - Inherit from parent configuration
+
+* `prober_pool` - (Optional) Full path of a GTM prober pool (e.g. `/Common/example_prober_pool`) to use for monitoring. Required when `prober_preference` or `prober_fallback` is set to `pool` -- BIG-IP rejects the configuration otherwise with "Select a valid Prober Pool value". This provider does not currently expose a resource to manage prober pools themselves; create one out of band (e.g. via tmsh or the BIG-IP UI) before referencing it here.
 
 ## Attributes Reference
 

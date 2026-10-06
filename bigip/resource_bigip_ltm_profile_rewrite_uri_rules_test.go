@@ -39,14 +39,15 @@ resource "bigip_ltm_profile_rewrite" "tftest" {
     rule_name = "cookie1"
     client_domain = "wrong.com"
     client_path   = "/this/"
-    server_domain = "wrong.com"
-    server_path   = "/this/"
+    server_domain = "right.com"
+    server_path   = "/that/"
   }
 }
 
 resource "bigip_ltm_profile_rewrite_uri_rules" "tftestrule1" {
+  depends_on = [bigip_ltm_profile_rewrite.tftest]
   profile_name = "` + rewPorfile + `"
-  rule_name = "` + rule1 + `""  
+  rule_name = "` + rule1 + `"
   rule_type = "request"
 
   client {
@@ -106,7 +107,7 @@ func testLtmRewriteProfileUriRuleExists(profile string, uri string, exists bool)
 		if err != nil {
 			return err
 		}
-		if exists && p != nil {
+		if exists && p == nil {
 			return fmt.Errorf("rewrite profile uri rule %s was not created", uri)
 		}
 		if !exists && p != nil {

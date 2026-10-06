@@ -298,8 +298,8 @@ func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) d
 		_ = d.Set("bypass_list", data.BypassList)
 	}
 	var reqList []interface{}
-	req := make(map[string]interface{})
 	if val, ok := d.GetOk("request"); ok {
+		req := make(map[string]interface{})
 		for _, item := range val.(*schema.Set).List() {
 			if val, ok := item.(map[string]interface{})["insert_xfwd_for"].(string); ok && val != "" {
 				req["insert_xfwd_for"] = val
@@ -314,9 +314,9 @@ func setRewriteProfileData(d *schema.ResourceData, data *bigip.RewriteProfile) d
 				req["rewrite_headers"] = val
 			}
 		}
+		reqList = append(reqList, req)
+		_ = d.Set("request", reqList)
 	}
-	reqList = append(reqList, req)
-	_ = d.Set("request", reqList)
 	var resList []interface{}
 	res := make(map[string]interface{})
 	if val, ok := d.GetOk("response"); ok {

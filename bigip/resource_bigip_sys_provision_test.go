@@ -8,6 +8,7 @@ package bigip
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -103,6 +104,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -123,6 +125,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -143,6 +146,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -163,6 +167,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -183,6 +188,7 @@ func TestAccBigipSysProvision_create(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -223,6 +229,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -240,6 +247,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -257,6 +265,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -274,6 +283,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -291,6 +301,7 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+	testAcctWaitForProvisioningSettle(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAcctPreCheck(t)
@@ -308,6 +319,23 @@ func TestAccBigipSysProvision_import(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAcctWaitForProvisioningSettle(t *testing.T) {
+	t.Helper()
+
+	client := testAcctBuildRawClient(t)
+	deadline := time.Now().Add(2 * time.Minute)
+	for time.Now().Before(deadline) {
+		if _, err := client.Provisions(TEST_APM_PROVISION_NAME); err == nil && freshLoginSucceeds(client) {
+			time.Sleep(10 * time.Second)
+			if _, err := client.Provisions(TEST_APM_PROVISION_NAME); err == nil && freshLoginSucceeds(client) {
+				return
+			}
+		}
+		time.Sleep(5 * time.Second)
+	}
+	t.Fatalf("timed out waiting for BIG-IP provisioning to settle between chained sys provision acceptance subcases")
 }
 
 func testCheckprovisionExists(name string) resource.TestCheckFunc {

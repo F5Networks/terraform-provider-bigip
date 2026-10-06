@@ -16,7 +16,7 @@ var TEST_GTM_SERVER_DATACENTER = "/Common/test_datacenter"
 func TestAccBigipGtmServer_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -43,7 +43,7 @@ func TestAccBigipGtmServer_create(t *testing.T) {
 func TestAccBigipGtmServer_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -75,7 +75,7 @@ func TestAccBigipGtmServer_withDeviceName(t *testing.T) {
 	serverName := "test_gtm_server_device"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -97,7 +97,7 @@ func TestAccBigipGtmServer_multipleAddresses(t *testing.T) {
 	serverName := "test_gtm_server_multi"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -119,7 +119,7 @@ func TestAccBigipGtmServer_multipleAddresses(t *testing.T) {
 func TestAccBigipGtmServer_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -295,7 +295,7 @@ func TestAccBigipGtmServer_withVirtualServers(t *testing.T) {
 	serverName := "test_gtm_generic_vs"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -323,7 +323,7 @@ func TestAccBigipGtmServer_virtualServersUpdate(t *testing.T) {
 	serverName := "test_gtm_vs_update"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -340,6 +340,16 @@ func TestAccBigipGtmServer_virtualServersUpdate(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckGtmServerExists(serverName, true),
 					resource.TestCheckResourceAttr("bigip_gtm_server.test-server-vs", "virtual_servers.#", "3"),
+					// BIG-IP's GTM server API always returns virtual
+					// servers sorted alphabetically by name, regardless of
+					// the order they were submitted/declared in the
+					// Terraform config (confirmed directly against a live
+					// device) -- resourceBigipGtmServerRead reorders its
+					// Read result to match the config's declared order
+					// (see reorderGtmVirtualServersToMatchConfig) to avoid
+					// permanent plan drift, so index 2 here is the
+					// third-declared entry ("api_service"), matching the
+					// config below, not BIG-IP's own alphabetical order.
 					resource.TestCheckResourceAttr("bigip_gtm_server.test-server-vs", "virtual_servers.2.name", "api_service"),
 					resource.TestCheckResourceAttr("bigip_gtm_server.test-server-vs", "virtual_servers.2.destination", "10.20.30.40:8080"),
 				),
@@ -352,7 +362,7 @@ func TestAccBigipGtmServer_virtualServersWithLimits(t *testing.T) {
 	serverName := "test_gtm_vs_limits"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,
@@ -377,7 +387,7 @@ func TestAccBigipGtmServer_virtualServersWithTranslation(t *testing.T) {
 	serverName := "test_gtm_vs_nat"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmServerDestroyed,

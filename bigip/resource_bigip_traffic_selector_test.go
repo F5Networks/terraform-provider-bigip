@@ -68,7 +68,7 @@ func testCheckIPSectsDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if ipsecTs.Name != "" {
+		if ipsecTs != nil {
 			return fmt.Errorf(" IPSec traffic-selector %s not destroyed.", name)
 		}
 	}

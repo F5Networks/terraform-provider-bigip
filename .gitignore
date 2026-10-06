@@ -39,6 +39,7 @@ website/node_modules
 *.tf
 .terraform.lock.hcl
 cover.out
+cover.html
 website/vendor
 keymap
 README.md
@@ -56,4 +57,10 @@ examples1
 # Allow
 # Keep windows files with windows line endings
 *.winfile eol=crlf
-build
+
+# Ignore a top-level build output dir only. Must be root-anchored ("/build")
+# so it does not match vendored packages named "build" (e.g.
+# vendor/github.com/hashicorp/hc-install/internal/build), which would break
+# `-mod=vendor` builds by silently dropping those files from git.
+/build
+.agents/

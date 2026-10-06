@@ -17,20 +17,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var folder2, _ = os.Getwd()
+var fastTemplateFolder, _ = os.Getwd()
 var TEST_TEMPLATE = `foo_template`
 var TEST_FAST_TEMPLATE = `
 resource "bigip_fast_template" "foo-template" {
-  name		= "` + TEST_TEMPLATE + `"
-  source   = "${"` + folder2 + `/../examples/fast/foo_template.zip"}"
-  md5_hash = "89011331d11ac8bac2a1ad3235f38c80"
+	name		= "` + TEST_TEMPLATE + `"
+	source   = "${"` + fastTemplateFolder + `/../examples/fast/foo_template.zip"}"
+	md5_hash = "89011331d11ac8bac2a1ad3235f38c80"
 }
 `
 
 func TestAccFastTemplateCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastTemplateDestroyed,

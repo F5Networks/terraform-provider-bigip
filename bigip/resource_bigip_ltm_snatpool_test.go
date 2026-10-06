@@ -12,7 +12,6 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
@@ -39,12 +38,15 @@ func TestAccBigipLtmsnatpool_create(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testChecksnatpoolExists(TEST_SNATPOOL_NAME, true),
 					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool", "name", TEST_SNATPOOL_NAME),
-					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
-						fmt.Sprintf("members.%d", schema.HashString("/Common/191.1.1.1")),
-						"/Common/191.1.1.1"),
-					resource.TestCheckResourceAttr("bigip_ltm_snatpool.test-snatpool",
-						fmt.Sprintf("members.%d", schema.HashString("/Common/194.2.2.2")),
-						"/Common/194.2.2.2"),
+					// members is a TypeSet; checking a specific element's
+					// value requires TestCheckTypeSetElemAttr (which hashes
+					// internally and handles SDK internals correctly), not
+					// a manually-computed schema.HashString index -- the
+					// SDK no longer supports indexing into a TypeSet that
+					// way ("likely indexes into TypeSet - This is
+					// currently not possible in the SDK").
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_snatpool.test-snatpool", "members.*", "/Common/191.1.1.1"),
+					resource.TestCheckTypeSetElemAttr("bigip_ltm_snatpool.test-snatpool", "members.*", "/Common/194.2.2.2"),
 				),
 			},
 		},

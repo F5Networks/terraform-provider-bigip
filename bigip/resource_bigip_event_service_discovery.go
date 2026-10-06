@@ -95,13 +95,13 @@ func resourceServiceDiscoveryRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error Reading node : %v", err))
 	}
+	if serviceDiscoveryResp == nil {
+		d.SetId("")
+		return diag.FromErr(fmt.Errorf("error Reading node : service discovery task %q not found", taskid))
+	}
 	nodeList1 := serviceDiscoveryResp.(map[string]interface{})["result"].(map[string]interface{})["providerOptions"].(map[string]interface{})["nodeList"]
 	log.Printf("[DEBUG] nodeList1 is :%v", nodeList1)
 
-	if serviceDiscoveryResp == nil {
-		d.SetId("")
-		return diag.FromErr(fmt.Errorf("[DEBUG]serviceDiscoveryResp is : %s", serviceDiscoveryResp))
-	}
 	if err := d.Set("node", nodeList1); err != nil {
 		return diag.FromErr(fmt.Errorf("error updating nodelist in state: %v", err))
 	}

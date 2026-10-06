@@ -109,6 +109,11 @@ func resourceBigipFastRead(ctx context.Context, d *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 	log.Printf("[INFO] Fast Template Set content: %+v", template)
+	if template == nil {
+		log.Printf("[WARN] Fast Template Set (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	_ = d.Set("name", template.Name)
 	_ = d.Set("md5_hash", checksum)
 

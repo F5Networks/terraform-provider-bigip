@@ -98,7 +98,7 @@ func testCheckdevicesDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if device == nil {
+		if device != nil {
 			return fmt.Errorf("device %s not destroyed.", name)
 		}
 	}

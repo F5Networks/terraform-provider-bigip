@@ -119,7 +119,15 @@ func TestAccBigipSysDNSCreateTC4(t *testing.T) {
 				Config: getsysDNSConfigTC4(TestDnsName),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckdnsExists(TestDnsName, true),
-					testCheckdnsExists("test-dns-tc4", false),
+					// bigip_sys_dns manages the singleton sys dns config
+					// object, which always exists on any BIG-IP (it's not
+					// a named/discrete object that can be independently
+					// created or destroyed) -- a "does not exist" check
+					// against this same resource can never be true, unlike
+					// the analogous negative-existence pattern for
+					// genuinely discrete, independently-creatable objects
+					// (e.g. bigip_ltm_profile_fastl4's "a typo'd name was
+					// never created" check).
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "description", TestDnsName),
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.0", "1.1.1.1"),
 					resource.TestCheckResourceAttr(fmt.Sprintf("bigip_sys_dns.%s", TestDnsName), "name_servers.1", "2.2.2.2"),

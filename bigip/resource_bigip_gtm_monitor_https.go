@@ -115,6 +115,12 @@ func resourceBigipGtmMonitorHttps() *schema.Resource {
 				Description: "Specifies the SSL version compatibility",
 				Default:     "enabled",
 			},
+			"sni_server_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Specifies the server name to use in the SNI (Server Name Indication) TLS extension that the monitor sends to the target object",
+				Default:     "none",
+			},
 		},
 	}
 }
@@ -141,6 +147,7 @@ func resourceBigipGtmMonitorHttpsCreate(ctx context.Context, d *schema.ResourceD
 		Key:                  d.Get("key").(string),
 		Cipherlist:           d.Get("cipherlist").(string),
 		Compatibility:        d.Get("compatibility").(string),
+		SniServerName:        d.Get("sni_server_name").(string),
 	}
 
 	err := client.CreateGtmMonitor(monitor, "https")
@@ -190,6 +197,11 @@ func resourceBigipGtmMonitorHttpsRead(ctx context.Context, d *schema.ResourceDat
 	d.Set("key", monitor.Key)
 	d.Set("cipherlist", monitor.Cipherlist)
 	d.Set("compatibility", monitor.Compatibility)
+	if monitor.SniServerName == "" {
+		d.Set("sni_server_name", "none")
+	} else {
+		d.Set("sni_server_name", monitor.SniServerName)
+	}
 
 	return nil
 }
@@ -216,6 +228,7 @@ func resourceBigipGtmMonitorHttpsUpdate(ctx context.Context, d *schema.ResourceD
 		Key:                  d.Get("key").(string),
 		Cipherlist:           d.Get("cipherlist").(string),
 		Compatibility:        d.Get("compatibility").(string),
+		SniServerName:        d.Get("sni_server_name").(string),
 	}
 
 	err := client.ModifyGtmMonitor(name, monitor, "https")

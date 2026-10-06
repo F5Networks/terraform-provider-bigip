@@ -54,16 +54,25 @@ func TestAccLtmRewriteProfileCreateOnBigipTC2(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_for", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_host", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_protocol", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.rule_name", "cookie1"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.client_domain", "wrong.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.client_path", "/this/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.server_domain", "right.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.server_path", "/that/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.rule_name", "cookie2"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.client_domain", "incorrect.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.client_path", "/this/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.server_domain", "absolute.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.server_path", "/that/"),
+					// cookie_rules is a TypeSet; BIG-IP/the SDK don't
+					// preserve declaration order, so check for each rule's
+					// full attribute set existing somewhere in the set
+					// (TestCheckTypeSetElemNestedAttrs) instead of
+					// asserting a specific numeric index.
+					resource.TestCheckTypeSetElemNestedAttrs("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.*", map[string]string{
+						"rule_name":     "cookie1",
+						"client_domain": "wrong.com",
+						"client_path":   "/this/",
+						"server_domain": "right.com",
+						"server_path":   "/that/",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.*", map[string]string{
+						"rule_name":     "cookie2",
+						"client_domain": "incorrect.com",
+						"client_path":   "/this/",
+						"server_domain": "absolute.com",
+						"server_path":   "/that/",
+					}),
 				),
 			},
 		},
@@ -86,16 +95,25 @@ func TestAccLtmRewriteProfileCreateOnBigipTC3(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_for", "enabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_host", "disabled"),
 					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "request.0.insert_xfwd_protocol", "enabled"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.rule_name", "cookie1"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.client_domain", "wrong.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.client_path", "/this/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.server_domain", "right.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.0.server_path", "/that/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.rule_name", "cookie2"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.client_domain", "incorrect.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.client_path", "/this/"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.server_domain", "absolute.com"),
-					resource.TestCheckResourceAttr("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.1.server_path", "/that/"),
+					// cookie_rules is a TypeSet; BIG-IP/the SDK don't
+					// preserve declaration order, so check for each rule's
+					// full attribute set existing somewhere in the set
+					// (TestCheckTypeSetElemNestedAttrs) instead of
+					// asserting a specific numeric index.
+					resource.TestCheckTypeSetElemNestedAttrs("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.*", map[string]string{
+						"rule_name":     "cookie1",
+						"client_domain": "wrong.com",
+						"client_path":   "/this/",
+						"server_domain": "right.com",
+						"server_path":   "/that/",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("bigip_ltm_profile_rewrite.test-profile", "cookie_rules.*", map[string]string{
+						"rule_name":     "cookie2",
+						"client_domain": "incorrect.com",
+						"client_path":   "/this/",
+						"server_domain": "absolute.com",
+						"server_path":   "/that/",
+					}),
 				),
 			},
 			{
@@ -125,10 +143,11 @@ func getLtmRewritePortalProfileConfig() string {
 		ca_file         = "/Common/ca-bundle.crt"
 		signing_cert    = "/Common/default.crt"
 		signing_key     = "/Common/default.key"
-		split_tunneling = "false"}`, "tf_profile-tc1")
+		split_tunneling = "false"
+	}`, "tf_profile-tc1")
 }
 func getLtmRewriteUriRewriteProfileConfig() string {
-	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile2" {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile" {
 		name          = "%v"
 		defaults_from = "/Common/rewrite"
 		rewrite_mode  = "uri-translation"
@@ -155,8 +174,9 @@ func getLtmRewriteUriRewriteProfileConfig() string {
 	  }`, "/Common/tf_profile_translate")
 }
 func getLtmRewriteUriRewriteProfileConfigChanged() string {
-	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile2" {
-	  name = "%v"
+	return fmt.Sprintf(`resource "bigip_ltm_profile_rewrite" "test-profile" {
+	  name         = "%v"
+	  rewrite_mode = "uri-translation"
 
 	  request {
 		insert_xfwd_for = "disabled"

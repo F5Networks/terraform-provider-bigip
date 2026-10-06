@@ -195,13 +195,14 @@ func testCheckIappExists(name, partition string) resource.TestCheckFunc {
 
 		}
 		body := s.RootModule().Resources["bigip_sys_iapp.test-iapp"].Primary.Attributes["name"]
-		if jsonfile.Name == body {
+		if jsonfile.Name != body {
 			return fmt.Errorf("jsonfile  body does not match. Expecting %s got %s.", body, jsonfile.Name)
 		}
 
 		jsonfile_name := fmt.Sprintf("/%s/%s", jsonfile.Partition, jsonfile.Name)
-		if jsonfile_name == name {
-			return fmt.Errorf("Jsonfile name does not match. Expecting %s got %s.", name, jsonfile_name)
+		expectedFullPath := fmt.Sprintf("/%s/%s", partition, name)
+		if jsonfile_name != expectedFullPath {
+			return fmt.Errorf("Jsonfile name does not match. Expecting %s got %s.", expectedFullPath, jsonfile_name)
 		}
 		return nil
 	}

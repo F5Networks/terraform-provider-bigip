@@ -21,7 +21,7 @@ var httpsTenantName = "fast_https_tenant"
 func TestAccFastHTTPSAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,
@@ -45,7 +45,7 @@ func TestAccFastHTTPSAppSSLProfileTC1(t *testing.T) {
 	httpsTenantName = "fast_https_tenanttc1"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,
@@ -69,7 +69,7 @@ func TestAccFastHTTPSAppSSLProfileTC2(t *testing.T) {
 	httpsTenantName = "fast_https_tenanttc2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,
@@ -93,7 +93,7 @@ func TestAccFastHTTPSAppProfileTC3(t *testing.T) {
 	httpsTenantName = "fast_https_tenanttc3"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,
@@ -117,7 +117,7 @@ func TestAccFastHTTPSAppProfileTC4(t *testing.T) {
 	httpsTenantName = "fast_https_tenanttc4"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,
@@ -142,7 +142,7 @@ func TestAccFastHTTPSAppProfileTC5(t *testing.T) {
 	httpsTenantName = "fast_https_tenanttc5"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastHTTPSAppDestroyed,

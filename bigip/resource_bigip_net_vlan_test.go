@@ -79,6 +79,9 @@ func testCheckvlanExists(name string, exists bool) resource.TestCheckFunc {
 		client := testAccProvider.Meta().(*bigip.BigIP)
 		p, err := client.Vlan(name)
 		if err != nil {
+			if !exists && IsNotFoundError(err) {
+				return nil
+			}
 			return err
 		}
 		if exists && p == nil {
@@ -102,9 +105,12 @@ func testCheckvlansDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		vlan, err := client.Vlan(name)
 		if err != nil {
+			if IsNotFoundError(err) {
+				continue
+			}
 			return err
 		}
-		if vlan == nil {
+		if vlan != nil {
 			return fmt.Errorf("vlan %s not destroyed.", name)
 		}
 	}

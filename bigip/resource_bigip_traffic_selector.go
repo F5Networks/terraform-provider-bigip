@@ -119,7 +119,7 @@ func resourceBigipTrafficselectorRead(ctx context.Context, d *schema.ResourceDat
 	}
 	if ts == nil {
 		d.SetId("")
-		return diag.FromErr(fmt.Errorf("[ERROR] Traffic-selctor (%s) not found, removing from state", d.Id()))
+		return nil
 	}
 	log.Printf("[DEBUG] Traffic Selector:%+v", ts)
 	_ = d.Set("ip_protocol", ts.IPProtocol)

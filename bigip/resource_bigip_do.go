@@ -10,11 +10,15 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"math"
+	"net"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -255,6 +259,11 @@ func resourceBigipDoCreate(ctx context.Context, d *schema.ResourceData, meta int
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
+		if err != nil && isRecoverableMgmtPlaneError(err) {
+			if waitErr := waitForDeviceManagementPlaneReady(clientBigip, 10*time.Minute); waitErr == nil {
+				taskResp, err = client.Do(req)
+			}
+		}
 		if taskResp == nil {
 			d.SetId("")
 			return diag.FromErr(fmt.Errorf("timedout while polling the DO task id with error :%v", err))
@@ -278,6 +287,9 @@ func resourceBigipDoCreate(ctx context.Context, d *schema.ResourceData, meta int
 		resultMap := respRef2["result"]
 		d.SetId("")
 		return diag.FromErr(fmt.Errorf("timeout while polling the DO task id with result:%v", resultMap))
+	}
+	if err := waitForDeviceManagementPlaneReady(clientBigip, 10*time.Minute); err != nil {
+		return diag.FromErr(err)
 	}
 
 	return resourceBigipDoRead(ctx, d, meta)
@@ -487,10 +499,17 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
 		taskResp, err := client.Do(req)
+		if err != nil && isRecoverableMgmtPlaneError(err) {
+			if waitErr := waitForDeviceManagementPlaneReady(clientBigip, 10*time.Minute); waitErr == nil {
+				taskResp, err = client.Do(req)
+			}
+		}
 
 		defer func() {
-			if err := taskResp.Body.Close(); err != nil {
-				log.Printf("[DEBUG] Could not close the request to %s", url)
+			if taskResp != nil && taskResp.Body != nil {
+				if err := taskResp.Body.Close(); err != nil {
+					log.Printf("[DEBUG] Could not close the request to %s", url)
+				}
 			}
 		}()
 
@@ -514,6 +533,9 @@ func resourceBigipDoUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		d.SetId("")
 		return diag.FromErr(fmt.Errorf("timeout while polling the DO task id with result:%v", resultMap))
 	}
+	if err := waitForDeviceManagementPlaneReady(clientBigip, 10*time.Minute); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return resourceBigipDoRead(ctx, d, meta)
 }
@@ -523,6 +545,24 @@ func resourceBigipDoDelete(ctx context.Context, d *schema.ResourceData, meta int
 	log.Println("[INFO]:Delete Operation is not supported for this resource")
 	d.SetId("")
 	return nil
+}
+
+// envIntOrDefault reads name from the environment as an integer, falling
+// back to def if unset or unparseable. Mirrors the provider schema's own
+// api_timeout/api_retries EnvDefaultFunc behavior (see Provider() in
+// provider.go) for connectBigIP's standalone reconnect path below, which
+// bypasses the provider's schema-driven Configure lifecycle entirely and so
+// has no other way to pick up those same settings.
+func envIntOrDefault(name string, def int) int {
+	v := os.Getenv(name)
+	if v == "" {
+		return def
+	}
+	parsed, err := strconv.Atoi(v)
+	if err != nil {
+		return def
+	}
+	return parsed
 }
 
 func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
@@ -538,6 +578,28 @@ func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
 		Username:          d.Get("bigip_user").(string),
 		Password:          d.Get("bigip_password").(string),
 		CertVerifyDisable: true,
+		// Explicit rather than left nil: go-bigip's NewSession only
+		// substitutes its own package-level default ConfigOptions (10
+		// retries, 10s apart, on every retriable failure including
+		// transport-level errors like a refused/timed-out connection)
+		// when ConfigOptions is nil -- a genuinely unreachable
+		// bigip_address could otherwise hang here, since this
+		// reconnect path (unlike the main provider client) isn't
+		// driven by the api_timeout/api_retries schema fields.
+		// TokenTimeout must still be set to the same 1200s the
+		// package default uses even though this path doesn't read
+		// token_timeout from anywhere: NewTokenSession compares the
+		// device's returned token timeout against
+		// ConfigOptions.TokenTimeout and issues an extra PUT to
+		// correct it if they differ, so leaving this at its Go zero
+		// value would make every bigiq_token_auth reconnect issue a
+		// spurious (and, for a device without that PUT permitted,
+		// failing) token-timeout adjustment.
+		ConfigOptions: &bigip.ConfigOptions{
+			APICallTimeout: time.Duration(envIntOrDefault("API_TIMEOUT", 60)) * time.Second,
+			APICallRetries: envIntOrDefault("API_RETRIES", 10),
+			TokenTimeout:   time.Duration(envIntOrDefault("TOKEN_TIMEOUT", 1200)) * time.Second,
+		},
 	}
 
 	if d.Get("bigip_token_auth").(bool) {
@@ -545,4 +607,33 @@ func connectBigIP(d *schema.ResourceData) (*bigip.BigIP, error) {
 	}
 
 	return Client(&bigipConfig)
+}
+
+func isRecoverableMgmtPlaneError(err error) bool {
+	if err == nil {
+		return false
+	}
+	var netErr net.Error
+	return errors.As(err, &netErr) || strings.Contains(strings.ToLower(err.Error()), "connection refused")
+}
+
+func waitForDeviceManagementPlaneReady(client *bigip.BigIP, timeout time.Duration) error {
+	const pollInterval = 5 * time.Second
+
+	var lastErr error
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if err := client.ValidateConnection(); err == nil {
+			if freshLoginSucceeds(client) {
+				return nil
+			}
+			lastErr = fmt.Errorf("validate connection succeeded but fresh login is still unavailable")
+		} else {
+			lastErr = err
+		}
+		log.Printf("[DEBUG] waiting for device management-plane recovery after DO: %v", lastErr)
+		time.Sleep(pollInterval)
+	}
+
+	return fmt.Errorf("timed out after %s waiting for device management-plane recovery after DO: %w", timeout, lastErr)
 }

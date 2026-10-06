@@ -393,9 +393,12 @@ func (b *BigIP) SelfIPs() (*SelfIPs, error) {
 // SelfIP returns a named Self IP.
 func (b *BigIP) SelfIP(selfip string) (*SelfIP, error) {
 	var self SelfIP
-	err, _ := b.getForEntity(&self, uriNet, uriSelf, selfip)
+	err, ok := b.getForEntity(&self, uriNet, uriSelf, selfip)
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &self, nil
@@ -477,10 +480,13 @@ func (b *BigIP) Vlans() (*Vlans, error) {
 // Vlan returns a named vlan.
 func (b *BigIP) Vlan(name string) (*Vlan, error) {
 	var vlan Vlan
-	err, _ := b.getForEntity(&vlan, uriNet, uriVlan, name)
+	err, ok := b.getForEntity(&vlan, uriNet, uriVlan, name)
 
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &vlan, nil
@@ -579,14 +585,18 @@ func (b *BigIP) RouteDomains() (*RouteDomains, error) {
 }
 
 // CreateRouteDomain adds a new route domain to the BIG-IP system. <vlans> must be separated
-// by a comma, i.e.: "vlan1010, vlan1020".
+// by a comma, i.e.: "vlan1010, vlan1020". Pass an empty string for vlans to
+// create a route domain with no VLAN members.
 func (b *BigIP) CreateRouteDomain(name string, id int, strict bool, vlans string) error {
 	strictIsolation := "enabled"
 	vlanMembers := []string{}
-	rawVlans := strings.Split(vlans, ",")
-
-	for _, v := range rawVlans {
-		vlanMembers = append(vlanMembers, strings.Trim(v, " "))
+	if vlans != "" {
+		rawVlans := strings.Split(vlans, ",")
+		for _, v := range rawVlans {
+			if trimmed := strings.Trim(v, " "); trimmed != "" {
+				vlanMembers = append(vlanMembers, trimmed)
+			}
+		}
 	}
 
 	if !strict {
@@ -759,10 +769,13 @@ func (b *BigIP) DeleteTrafficSelector(name string) error {
 // GetTrafficselctor returns a named IPsec Traffic selctor.
 func (b *BigIP) GetTrafficselctor(name string) (*TrafficSelector, error) {
 	var ts TrafficSelector
-	err, _ := b.getForEntity(&ts, uriNet, uriIpsec, uriTrafficselector, name)
+	err, ok := b.getForEntity(&ts, uriNet, uriIpsec, uriTrafficselector, name)
 
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &ts, nil
@@ -787,10 +800,13 @@ func (b *BigIP) DeleteIPSecPolicy(name string) error {
 // GetIPSecPolicy returns a named IPsec policy.
 func (b *BigIP) GetIPSecPolicy(name string) (*IPSecPolicy, error) {
 	var ipsec IPSecPolicy
-	err, _ := b.getForEntity(&ipsec, uriNet, uriIpsec, uriIpsecPolicy, name)
+	err, ok := b.getForEntity(&ipsec, uriNet, uriIpsec, uriIpsecPolicy, name)
 
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &ipsec, nil
@@ -815,10 +831,13 @@ func (b *BigIP) DeleteIPSecProfile(name string) error {
 // GetIPSecProfile returns a named IPsec profile.
 func (b *BigIP) GetIPSecProfile(name string) (*IPSecProfile, error) {
 	var ipsec IPSecProfile
-	err, _ := b.getForEntity(&ipsec, uriNet, uriTunnels, uriIpsec, name)
+	err, ok := b.getForEntity(&ipsec, uriNet, uriTunnels, uriIpsec, name)
 
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &ipsec, nil

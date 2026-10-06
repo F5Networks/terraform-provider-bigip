@@ -12,7 +12,6 @@ import (
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
@@ -39,9 +38,13 @@ func TestAccBigipSyssnmp_create(t *testing.T) {
 					testChecksnmpExists(TEST_SNMP_NAME, true),
 					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp", "sys_contact", "NetOPsAdmin s.shitole@f5.com"),
 					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp", "sys_location", "SeattleHQ"),
-					resource.TestCheckResourceAttr("bigip_sys_snmp.test-snmp",
-						fmt.Sprintf("allowedaddresses.%d", schema.HashString("202.10.10.2")),
-						"202.10.10.2"),
+					// allowedaddresses is a TypeSet; checking a specific
+					// element's value requires TestCheckTypeSetElemAttr
+					// (which hashes internally and handles SDK internals
+					// correctly), not a manually-computed
+					// schema.HashString index -- the SDK no longer
+					// supports indexing into a TypeSet that way.
+					resource.TestCheckTypeSetElemAttr("bigip_sys_snmp.test-snmp", "allowedaddresses.*", "202.10.10.2"),
 				),
 			},
 		},

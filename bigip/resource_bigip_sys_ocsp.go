@@ -101,12 +101,12 @@ func resourceBigipSysOcsp() *schema.Resource {
 			},
 			"signer_cert": {
 				Type:        schema.TypeString,
-				Description: "Specifies a certificate used to sign an OCSP request. It should be of the pattern '/partition/cert-name'",
+				Description: "Specifies a certificate used to sign an OCSP request. It should be of the pattern '/partition/cert-name.crt' (BIG-IP's sys file ssl-cert object full path, including the .crt suffix).",
 				Optional:    true,
 			},
 			"signer_key": {
 				Type:        schema.TypeString,
-				Description: "Specifies a key used to sign an OCSP request. It should be of the pattern '/partition/key-name'",
+				Description: "Specifies a key used to sign an OCSP request. It should be of the pattern '/partition/key-name.key' (BIG-IP's sys file ssl-key object full path, including the .key suffix).",
 				Optional:    true,
 			},
 			"passphrase": {

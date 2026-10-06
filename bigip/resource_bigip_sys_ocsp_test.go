@@ -15,8 +15,8 @@ const testSysOcspDNS = `
 resource "bigip_sys_ocsp" "test-ocsp" {
   name              = "/Common/test-ocsp"
   dns_resolver      = "/Common/f5-aws-dns"
-  signer_key        = "/Common/le-ssl"
-  signer_cert       = "/Common/le-ssl"
+  signer_key        = "/Common/le-ssl.key"
+  signer_cert       = "/Common/le-ssl.crt"
   passphrase        = "testabcdef"
 }
 `
@@ -25,8 +25,8 @@ const testSysOcspProxy = `
 resource "bigip_sys_ocsp" "test-ocsp" {
   name              = "/Common/test-ocsp"
   proxy_server_pool = "/Common/test-poolxyz"
-  signer_key        = "/Common/le-ssl"
-  signer_cert       = "/Common/le-ssl"
+  signer_key        = "/Common/le-ssl.key"
+  signer_cert       = "/Common/le-ssl.crt"
   passphrase        = "testabcdef"
 }
 `
@@ -34,7 +34,7 @@ resource "bigip_sys_ocsp" "test-ocsp" {
 func TestAccBigipSysOCSP_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckSysOcsp(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckOCSPDestroyed,
@@ -45,8 +45,8 @@ func TestAccBigipSysOCSP_create(t *testing.T) {
 					testCheckOCSPExists("~Common~test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "name", "/Common/test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "dns_resolver", "/Common/f5-aws-dns"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl.key"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl.crt"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "passphrase", "testabcdef"),
 				),
 			},
@@ -56,8 +56,8 @@ func TestAccBigipSysOCSP_create(t *testing.T) {
 					testCheckOCSPExists("~Common~test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "name", "/Common/test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "proxy_server_pool", "/Common/test-poolxyz"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl.key"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl.crt"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "passphrase", "testabcdef"),
 				),
 			},
@@ -67,8 +67,8 @@ func TestAccBigipSysOCSP_create(t *testing.T) {
 					testCheckOCSPExists("~Common~test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "name", "/Common/test-ocsp"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "proxy_server_pool", "/Common/test-poolxyz"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl"),
-					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_key", "/Common/le-ssl.key"),
+					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "signer_cert", "/Common/le-ssl.crt"),
 					resource.TestCheckResourceAttr("bigip_sys_ocsp.test-ocsp", "passphrase", "testabcdef"),
 				),
 				ExpectNonEmptyPlan: false,

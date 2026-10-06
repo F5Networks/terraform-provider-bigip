@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// this module does not have DELETE function as there is no API for Delete
+// This module supports all CRUD operations, including delete via DeleteTRAP.
 func resourceBigipSysSnmpTraps() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceBigipSysSnmpTrapsCreate,
@@ -75,6 +75,7 @@ func resourceBigipSysSnmpTraps() *schema.Resource {
 			"privacy_password": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "Specifies the clear text password used to encrypt traffic. This field will not be displayed. ",
 			},
 			"privacy_password_encrypted": {

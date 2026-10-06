@@ -97,6 +97,7 @@ func resourceBigipGtmPool() *schema.Resource {
 			"monitor": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "default",
 				Description: "Specifies the health monitor for the pool",
 			},
 			"qos_hit_ratio": {
@@ -567,7 +568,7 @@ func resourceBigipGtmPoolImport(ctx context.Context, d *schema.ResourceData, met
 
 	// Set the ID in the correct format
 	fullPath := fmt.Sprintf("/%s/%s", idParts["partition"], idParts["name"])
-	d.SetId(fmt.Sprintf("%s:%s", fullPath, idParts["type"]))
+	d.SetId(fmt.Sprintf("%s:%s", idParts["type"], fullPath))
 
 	// Read the resource to populate all attributes
 	diags := resourceBigipGtmPoolRead(ctx, d, meta)

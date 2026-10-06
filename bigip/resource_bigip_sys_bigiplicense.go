@@ -15,6 +15,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+// bigipLicenseApplyDelay is the delay after issuing a license Create call to
+// give the BIG-IP time to apply the license before proceeding. It is a
+// package-level var (rather than an inline constant) so that unit tests can
+// override it to a near-zero duration and exercise resourceBigipSysBigiplicenseCreate
+// without blocking for the full delay.
+var bigipLicenseApplyDelay = 300 * time.Second
+
 func resourceBigipSysBigiplicense() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceBigipSysBigiplicenseCreate,
@@ -50,7 +57,7 @@ func resourceBigipSysBigiplicenseCreate(ctx context.Context, d *schema.ResourceD
 		command,
 		registrationKey,
 	)
-	time.Sleep(300 * time.Second)
+	time.Sleep(bigipLicenseApplyDelay)
 	if err != nil {
 		log.Printf("[ERROR] Unable to Apply License to Bigip  (%v) ", err)
 		return diag.FromErr(err)

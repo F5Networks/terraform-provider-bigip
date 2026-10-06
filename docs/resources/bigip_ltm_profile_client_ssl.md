@@ -12,6 +12,8 @@ description: |-
 
 Resources should be named with their "full path". The full path is the combination of the partition + name (example: /Common/my-pool ) or  partition + directory + name of the resource  (example: /Common/test/my-pool )
 
+~> **Known Issue** Affected versions: v1.28.0 and earlier. Fix merged on `Unreleased` (not yet in a tagged release) -- see the `Unreleased` section of the [CHANGELOG](https://github.com/F5Networks/terraform-provider-bigip/blob/master/CHANGELOG.md). If a child profile sets `defaults_from` and does not itself set `tm_options`, applying any unrelated change to that child (e.g. `cert`/`key`) causes Terraform to write the parent's current inherited `tm_options` onto the child as an explicit `options` line, permanently ending inheritance for that attribute -- the child then stops tracking future changes to the parent's `tm_options`. **Workaround (until you upgrade):** either (a) explicitly set `tm_options` on the child to match the parent's current value, accepting that the parent's `tm_options` won't propagate to the child until you upgrade, or (b) avoid applying any other changes to affected inheriting child profiles until you upgrade. This note can be removed once the fixed version becomes the documented minimum supported provider version.
+
 ## Example Usage
     
 ```hcl

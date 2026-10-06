@@ -18,7 +18,7 @@ import (
 func TestAccFastUDPAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastUDPAppDestroyed,

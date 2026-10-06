@@ -14,7 +14,7 @@ var TEST_DATACENTER_NAME = "test_datacenter"
 func TestAccBigipGtmDatacenter_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmDatacenterDestroyed,
@@ -39,7 +39,7 @@ func TestAccBigipGtmDatacenter_create(t *testing.T) {
 func TestAccBigipGtmDatacenter_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmDatacenterDestroyed,
@@ -70,7 +70,7 @@ func TestAccBigipGtmDatacenter_withProberSettings(t *testing.T) {
 	dcName := "test_datacenter_prober"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtmProberPool(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmDatacenterDestroyed,
@@ -91,7 +91,7 @@ func TestAccBigipGtmDatacenter_disabled(t *testing.T) {
 	dcName := "test_datacenter_disabled"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmDatacenterDestroyed,
@@ -110,7 +110,7 @@ func TestAccBigipGtmDatacenter_disabled(t *testing.T) {
 func TestAccBigipGtmDatacenter_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmDatacenterDestroyed,
@@ -217,6 +217,7 @@ resource "bigip_gtm_datacenter" "test-datacenter-prober" {
   enabled           = true
   prober_preference = "pool"
   prober_fallback   = "outside-datacenter"
+  prober_pool       = "/Common/test-prober-pool"
 }
 `, dcName)
 }

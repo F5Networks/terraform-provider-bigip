@@ -315,7 +315,22 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 		}
 		res, err := client.Do(req)
 		if err != nil {
-			return nil, err
+			// A transport-level failure (connection refused, DNS
+			// failure, TLS handshake failure, client-side timeout,
+			// etc.) never reaches the HTTP-response-status handling
+			// below, so without this it always fell straight through
+			// to an immediate `return nil, err` on the very first
+			// attempt -- silently ignoring APICallRetries/maxRetries
+			// for exactly the class of transient failure a device
+			// that's mid-reboot or mid-daemon-restart produces. Retry
+			// it the same way the 503/"active asynchronous task"
+			// case below does, exhausting the same retry budget
+			// instead of a separate one.
+			if i == maxRetries-1 {
+				return nil, err
+			}
+			time.Sleep(10 * time.Second)
+			continue
 		}
 		defer res.Body.Close()
 		data, _ := io.ReadAll(res.Body)
@@ -324,6 +339,21 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 			contentType = ctHeaders[0]
 		}
 		if res.StatusCode >= 400 {
+			// A 503 means the service is temporarily unavailable --
+			// retriable regardless of what the response body looks
+			// like. restjavad/the mgmt UI returns a canned HTML
+			// "Configuration Utility restarting..." page (not JSON)
+			// for a 503 while bouncing mid-provisioning-change (e.g.
+			// a sys_provision update, which restarts mcpd and briefly
+			// the mgmt layer too), so this previously fell straight
+			// into the JSON-only branch's `else` and returned
+			// immediately on the very first attempt, bypassing
+			// maxRetries entirely for exactly the kind of transient
+			// unavailability a retry loop exists to absorb.
+			if res.StatusCode == 503 {
+				time.Sleep(10 * time.Second)
+				continue
+			}
 			if strings.Contains(contentType, "application/json") {
 				var reqError RequestError
 				err = json.Unmarshal(data, &reqError)
@@ -331,7 +361,7 @@ func (b *BigIP) APICall(options *APIRequest) ([]byte, error) {
 					return nil, err
 				}
 				// With how some of the requests come back from AS3, we sometimes have a nested error, so check the entire message for the "active asynchronous task" error
-				if res.StatusCode == 503 || reqError.Code == 503 || strings.Contains(strings.ToLower(reqError.Message), strings.ToLower("there is an active asynchronous task executing")) {
+				if reqError.Code == 503 || strings.Contains(strings.ToLower(reqError.Message), strings.ToLower("there is an active asynchronous task executing")) {
 					time.Sleep(10 * time.Second)
 					continue
 				}
@@ -626,7 +656,7 @@ func (b *BigIP) getForEntity(e interface{}, path ...string) (error, bool) {
 		var reqError RequestError
 		json.Unmarshal(resp, &reqError)
 		if reqError.Code == 404 {
-			return err, false
+			return nil, false
 		}
 		return err, false
 	}

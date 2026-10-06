@@ -67,7 +67,16 @@ func resourceBigipNetSelfIP() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional:    true,
+				Optional: true,
+				// Computed: Read always populates this (defaulting to
+				// ["none"] when BIG-IP's own allowService is absent/nil --
+				// see resourceBigipNetSelfIPRead), even when the user
+				// never configures port_lockdown at all. Without
+				// Computed, Terraform treated that as drift on every
+				// subsequent plan (state having a value an omitted-from-
+				// config attribute "shouldn't"), permanently failing
+				// terraform plan's empty-plan check after every apply.
+				Computed:    true,
 				Description: "port lockdown",
 			},
 		},
@@ -127,9 +136,73 @@ func resourceBigipNetSelfIPRead(ctx context.Context, d *schema.ResourceData, met
 	if selfIP.AllowService == nil {
 		_ = d.Set("port_lockdown", []string{"none"})
 	} else {
-		_ = d.Set("port_lockdown", selfIP.AllowService)
+		// AllowService can come back from the API as a plain string (e.g.
+		// "all", or occasionally an empty string), a []interface{} of
+		// "service:port" entries, or nil. d.Set on this TypeList/TypeSet
+		// field panics if given a bare (non-slice) value, so normalize all
+		// shapes to a []string before setting.
+		var portLockdown []string
+		switch v := selfIP.AllowService.(type) {
+		case string:
+			if v != "" {
+				portLockdown = []string{v}
+			} else {
+				portLockdown = []string{"none"}
+			}
+		case []interface{}:
+			for _, item := range v {
+				if s, ok := item.(string); ok {
+					portLockdown = append(portLockdown, s)
+				}
+			}
+		}
+		_ = d.Set("port_lockdown", reorderPortLockdownToMatchConfig(d, portLockdown))
 	}
 	return nil
+}
+
+// reorderPortLockdownToMatchConfig reorders apiValues (the port_lockdown
+// values freshly built from a SelfIP response, in whatever order BIG-IP
+// returned them) to match the order "port_lockdown" currently appears in
+// d's config/state. port_lockdown is a TypeList (order-sensitive) so
+// Terraform diffs it positionally, but BIG-IP does not preserve submission
+// order for a multi-entry allowService (confirmed directly against a live
+// device: ["default","tcp:4040"] and ["tcp:4040","default"] are both
+// stored and returned as ["tcp:4040","default"]) -- storing BIG-IP's own
+// order directly here would cause permanent plan drift for any config
+// listing more than one entry. Entries present in the API response but
+// not found in the config's current order (e.g. on import) are appended
+// at the end in their original (BIG-IP-returned) order.
+func reorderPortLockdownToMatchConfig(d *schema.ResourceData, apiValues []string) []string {
+	configRaw, ok := d.GetOk("port_lockdown")
+	if !ok {
+		return apiValues
+	}
+	configList, ok := configRaw.([]interface{})
+	if !ok || len(configList) == 0 {
+		return apiValues
+	}
+
+	remaining := append([]string{}, apiValues...)
+	ordered := make([]string, 0, len(apiValues))
+	for _, cfgEntry := range configList {
+		cfgVal, ok := cfgEntry.(string)
+		if !ok {
+			continue
+		}
+		for i, v := range remaining {
+			if v == cfgVal {
+				ordered = append(ordered, v)
+				remaining = append(remaining[:i], remaining[i+1:]...)
+				break
+			}
+		}
+	}
+	// Append any API-returned entries not present in the config's order
+	// (e.g. on import), preserving their original relative order.
+	ordered = append(ordered, remaining...)
+
+	return ordered
 }
 
 func resourceBigipNetSelfIPUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -172,15 +245,30 @@ func getNetSelfIPConfig(d *schema.ResourceData, config *bigip.SelfIP) *bigip.Sel
 	var portLockdown interface{}
 	p := d.Get("port_lockdown").([]interface{})
 
-	if len(p) > 0 {
+	if len(p) == 1 {
+		// "all"/"none"/"default" are BIG-IP keywords, not real
+		// "protocol:port" service entries -- when port_lockdown is a
+		// single-element list containing one of them, BIG-IP's
+		// allowService wire format expects the bare keyword string, not
+		// a one-element array (confirmed directly against a live
+		// device: allowService: "default" round-trips correctly, while
+		// allowService: ["default"] alongside other entries is also
+		// accepted, but a single ["default"] previously fell through to
+		// the raw-list default case below and was sent verbatim,
+		// producing a mismatch against what Read normalizes a bare
+		// "default" response back into).
 		switch p[0] {
 		case "all":
 			portLockdown = "all"
 		case "none":
 			portLockdown = nil
+		case "default":
+			portLockdown = "default"
 		default:
 			portLockdown = p
 		}
+	} else if len(p) > 1 {
+		portLockdown = p
 	}
 
 	config.Address = d.Get("ip").(string)

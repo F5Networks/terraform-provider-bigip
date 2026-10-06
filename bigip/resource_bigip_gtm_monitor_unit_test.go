@@ -87,7 +87,7 @@ func TestResourceBigipGtmMonitorHttpsSchema(t *testing.T) {
 	}
 
 	// Test HTTPS-specific fields
-	httpsFields := []string{"cert", "key", "cipherlist", "compatibility"}
+	httpsFields := []string{"cert", "key", "cipherlist", "compatibility", "sni_server_name"}
 	for _, field := range httpsFields {
 		if _, ok := resource.Schema[field]; !ok {
 			t.Errorf("Expected HTTPS-specific field '%s' to exist in schema", field)
@@ -107,6 +107,17 @@ func TestResourceBigipGtmMonitorHttpsSchema(t *testing.T) {
 		expectedDefault := "enabled"
 		if s.Default != expectedDefault {
 			t.Errorf("Expected compatibility default to be '%s', got '%v'", expectedDefault, s.Default)
+		}
+	}
+
+	// Verify sni_server_name default (GTM-specific: this field does not
+	// exist on LTM's equivalent https monitor -- see
+	// clouddocs.f5.com/api/icontrol-rest/APIRef_tm_ltm_monitor_https.html
+	// and "tmsh help ltm monitor https", neither of which mention it)
+	if s, ok := resource.Schema["sni_server_name"]; ok {
+		expectedDefault := "none"
+		if s.Default != expectedDefault {
+			t.Errorf("Expected sni_server_name default to be '%s', got '%v'", expectedDefault, s.Default)
 		}
 	}
 }

@@ -15,7 +15,7 @@ var TEST_WIDEIP_TYPE = "a"
 func TestAccBigipGtmWideip_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmWideipDestroyed,
@@ -40,7 +40,7 @@ func TestAccBigipGtmWideip_create(t *testing.T) {
 func TestAccBigipGtmWideip_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmWideipDestroyed,
@@ -68,7 +68,7 @@ func TestAccBigipGtmWideip_update(t *testing.T) {
 func TestAccBigipGtmWideip_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmWideipDestroyed,

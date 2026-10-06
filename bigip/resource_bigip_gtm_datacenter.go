@@ -90,6 +90,11 @@ func resourceBigipGtmDatacenter() *schema.Resource {
 					return
 				},
 			},
+			"prober_pool": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "GTM prober pool to use when prober_preference or prober_fallback is \"pool\". Required in that case; BIG-IP rejects prober_preference/prober_fallback = \"pool\" without a valid prober_pool reference.",
+			},
 		},
 	}
 }
@@ -113,11 +118,17 @@ func resourceBigipGtmDatacenterCreate(ctx context.Context, d *schema.ResourceDat
 	if v, ok := d.GetOk("description"); ok {
 		datacenter.Description = v.(string)
 	}
-	if v, ok := d.GetOk("enabled"); ok {
-		enabled := v.(bool)
-		datacenter.Enabled = enabled
-		datacenter.Disabled = !enabled
-	}
+	// enabled has a schema Default (true) and is a bool, so it is never
+	// truly "unset" -- GetOk cannot distinguish an explicit false from an
+	// absent value (both read back as the Go zero value), so it must be
+	// read directly via Get rather than GetOk. Using GetOk here meant
+	// enabled = false in config was silently dropped (the whole if-ok
+	// block was skipped), leaving datacenter.Enabled/Disabled at their own
+	// zero values and causing BIG-IP to fall back to its default of
+	// enabled.
+	enabled := d.Get("enabled").(bool)
+	datacenter.Enabled = enabled
+	datacenter.Disabled = !enabled
 	if v, ok := d.GetOk("location"); ok {
 		datacenter.Location = v.(string)
 	}
@@ -126,6 +137,9 @@ func resourceBigipGtmDatacenterCreate(ctx context.Context, d *schema.ResourceDat
 	}
 	if v, ok := d.GetOk("prober_preference"); ok {
 		datacenter.ProberPreference = v.(string)
+	}
+	if v, ok := d.GetOk("prober_pool"); ok {
+		datacenter.ProberPool = v.(string)
 	}
 
 	err := client.CreateGTMDatacenter(datacenter)
@@ -167,34 +181,20 @@ func resourceBigipGtmDatacenterRead(ctx context.Context, d *schema.ResourceData,
 		}
 	}
 
-	// Only set non-empty string fields to preserve user configuration
-	// Skip setting contact, description, and location if datacenter is disabled
-	if !datacenter.Disabled {
-		if _, ok := d.GetOk("contact"); ok || datacenter.Contact != "" {
-			d.Set("contact", datacenter.Contact)
-		}
-		if _, ok := d.GetOk("description"); ok || datacenter.Description != "" {
-			d.Set("description", datacenter.Description)
-		}
-		if _, ok := d.GetOk("location"); ok || datacenter.Location != "" {
-			d.Set("location", datacenter.Location)
-		}
-	}
-
-	if _, ok := d.GetOk("prober_fallback"); ok || datacenter.ProberFallback != "" {
-		d.Set("prober_fallback", datacenter.ProberFallback)
-	}
-	if _, ok := d.GetOk("prober_preference"); ok || datacenter.ProberPreference != "" {
-		d.Set("prober_preference", datacenter.ProberPreference)
-	}
-
-	// Always set boolean fields
-	if datacenter.Enabled {
-		d.Set("enabled", true)
-	}
-	if datacenter.Disabled {
-		d.Set("enabled", false)
-	}
+	// Set fields unconditionally from the device response so state always
+	// reflects the current device configuration, matching the pattern used
+	// in resource_bigip_gtm_server.go. There is no GTM API semantic where
+	// disabling a datacenter causes contact/description/location to be
+	// omitted from the response, so gating these on datacenter.Disabled (as
+	// this code previously did) could leave stale values in state if those
+	// fields changed on the device while the datacenter was disabled.
+	d.Set("contact", datacenter.Contact)
+	d.Set("description", datacenter.Description)
+	d.Set("location", datacenter.Location)
+	d.Set("prober_fallback", datacenter.ProberFallback)
+	d.Set("prober_preference", datacenter.ProberPreference)
+	d.Set("prober_pool", datacenter.ProberPool)
+	d.Set("enabled", datacenter.Enabled)
 
 	return nil
 }
@@ -213,11 +213,23 @@ func resourceBigipGtmDatacenterUpdate(ctx context.Context, d *schema.ResourceDat
 	if d.HasChange("description") {
 		datacenter.Description = d.Get("description").(string)
 	}
-	if d.HasChange("enabled") {
-		enabled := d.Get("enabled").(bool)
-		datacenter.Enabled = enabled
-		datacenter.Disabled = !enabled
-	}
+	// enabled/disabled must always be sent on every Update, not just when
+	// HasChange("enabled") is true: BIG-IP's GTM datacenter PATCH endpoint
+	// resets disabled back to false (i.e. enabled) whenever the request
+	// body doesn't include it, rather than leaving the device's existing
+	// value alone the way a PATCH normally would for an omitted field.
+	// Create always calls Update immediately afterward to apply the
+	// remaining properties (see the "Now update with all the additional
+	// properties" comment pattern shared across the other GTM resources
+	// in this package); HasChange("enabled") is false at that point since
+	// d already reflects the fully-planned config with no prior value to
+	// diff against, so gating on it here previously meant Create's
+	// immediate follow-up Update silently re-enabled every
+	// enabled = false datacenter right after Create had correctly
+	// disabled it.
+	enabled := d.Get("enabled").(bool)
+	datacenter.Enabled = enabled
+	datacenter.Disabled = !enabled
 	if d.HasChange("location") {
 		datacenter.Location = d.Get("location").(string)
 	}
@@ -226,6 +238,9 @@ func resourceBigipGtmDatacenterUpdate(ctx context.Context, d *schema.ResourceDat
 	}
 	if d.HasChange("prober_preference") {
 		datacenter.ProberPreference = d.Get("prober_preference").(string)
+	}
+	if d.HasChange("prober_pool") {
+		datacenter.ProberPool = d.Get("prober_pool").(string)
 	}
 
 	err := client.ModifyGTMDatacenter(fullPath, datacenter)

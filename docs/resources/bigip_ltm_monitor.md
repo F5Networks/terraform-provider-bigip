@@ -126,6 +126,8 @@ resource "bigip_ltm_monitor" "child-monitor" {
 
 * `ssl_profile` - (Optional,type `string`) Specifies the ssl profile for the monitor. It only makes sense when the parent is `/Common/https`
 
+* `domain` - (Optional,type `string`) Specifies the domain name to check. Only applicable when the parent monitor is `/Common/smtp`.
+
 ## Importing
 An existing monitor can be imported into this resource by supplying monitor Name in `full path` as `id`.
 An example is below:

@@ -34,9 +34,17 @@ resource "bigip_ssl_key_cert" "testkeycert" {
 
 * `key_content` - (Required) Content of SSL key on Local Disk,path of SSL key will be provided to terraform `file` function.
 
+* `key_content_wo` - (Optional) Write-only alternative to `key_content`. Terraform sends this key content to the provider but does not persist it in plan or state. Cannot be used with `key_content`.
+
+* `key_content_wo_version` - (Optional) A write-only version marker for `key_content_wo`. Change this value to trigger a key re-upload.
+
 * `cert_name`- (Required,type `string`) Name of the SSL certificate to be Imported on to BIGIP.
 
 * `cert_content` - (Required) Content of certificate on Local Disk,path of SSL certificate will be provided to terraform `file` function.
+
+* `cert_content_wo` - (Optional) Write-only alternative to `cert_content`. Terraform sends this certificate content to the provider but does not persist it in plan or state. Cannot be used with `cert_content`.
+
+* `cert_content_wo_version` - (Optional) A write-only version marker for `cert_content_wo`. Change this value to trigger a certificate re-upload.
 
 * `partition` - (Optional,type `string`) Partition on to SSL certificate and key to be imported.
 

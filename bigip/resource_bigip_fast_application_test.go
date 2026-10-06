@@ -17,21 +17,21 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var folder3, _ = os.Getwd()
+var fastApplicationFolder, _ = os.Getwd()
 var template = "examples/simple_http"
 var tenant = "sample_tenant"
 var app = "sample_app"
 var TestFastResource = `
 resource "bigip_fast_application"  "foo-app" {
      template = "` + template + `"
-     fast_json = "${file("` + folder3 + `/../examples/fast/new_fast_app.json")}"
+	fast_json = "${file("` + fastApplicationFolder + `/../examples/fast/new_fast_app.json")}" 
 }
 `
 
 func TestAccFastAppCreateOnBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckFast(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckFastAppDestroyed,

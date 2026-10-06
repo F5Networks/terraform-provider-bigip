@@ -21,23 +21,21 @@ resource "bigip_sys_ntp" "test-ntp" {
   timezone    = "America/Los_Angeles"
   invalidkey  = "foo"
 }
-provider "bigip" {
-  address  = "xxx.xxx.xxx.xxx"
-  username = "xxxxx"
-  password = "xxxxx"
-}
 	`, resourceName)
 }
 
-func TestAccBigipSysNtpInvalid(t *testing.T) {
+func TestUnitBigipSysNtpInvalid(t *testing.T) {
 	resourceName := "/Common/test-ntp"
+	setup()
+	defer teardown()
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
+		PreCheck:   func() { testAcctUnitPreCheck(t, server.URL) },
 		Providers:  testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config:      testBigipSysNtpInvalid(resourceName),
-				ExpectError: regexp.MustCompile("Unsupported argument: An argument named \"invalidkey\" is not expected here"),
+				ExpectError: regexp.MustCompile("An argument named \"invalidkey\" is not expected here"),
 			},
 		},
 	})

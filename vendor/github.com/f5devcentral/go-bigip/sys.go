@@ -1225,6 +1225,40 @@ func (b *BigIP) ModifyFolderDescription(partition string, body map[string]string
 	return b.patch(body, uriSys, uriFolder, partition)
 }
 
+// SysFolder represents a sys folder (/mgmt/tm/sys/folder), used for
+// subfolders within a partition (e.g. "/TEST/A1"). The partition field
+// here is the full-path parent (e.g. "/TEST"), not a bare partition name,
+// matching the request body sys/folder expects for creating nested
+// folders.
+type SysFolder struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
+}
+
+// CreateSysFolder creates a new sys folder.
+func (b *BigIP) CreateSysFolder(folder *SysFolder) error {
+	return b.post(folder, uriSys, uriFolder)
+}
+
+// GetSysFolder retrieves a sys folder by full path.
+func (b *BigIP) GetSysFolder(fullPath string) (*SysFolder, error) {
+	var folder SysFolder
+	err, ok := b.getForEntity(&folder, uriSys, uriFolder, fullPath)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &folder, nil
+}
+
+// DeleteSysFolder removes a sys folder.
+func (b *BigIP) DeleteSysFolder(fullPath string) error {
+	return b.delete(uriSys, uriFolder, fullPath)
+}
+
 func (b *BigIP) CreateRoleInfo(roleInfo *RoleInfo) error {
 	return b.post(roleInfo, uriAuth, uriRemoteRole, uriRoleInfo)
 }

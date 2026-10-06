@@ -28,16 +28,26 @@ resource "bigip_ssl_certificate" "test-cert" {
 }
 `
 
-var TestSslCertOCSPResource = `
+// testSslCertOCSPResource embeds leafCertPEM directly (rather than
+// file()-ing a static fixture) since issuer_cert = "/Common/MyCA" only
+// validates against a certificate actually signed by whatever CA key was
+// installed as /Common/MyCA -- see installMyCA's doc comment. leafCertPEM
+// must come from the same generateCAAndLeafCert call whose CA half gets
+// passed to testAcctPreCheckOCSP for that same test.
+func testSslCertOCSPResource(leafCertPEM []byte) string {
+	return fmt.Sprintf(`
 resource "bigip_ssl_certificate" "ssl-test-certificate-tc1" {
   name            = "test-certificate"
-  content         = "${file("` + folder + `/../examples/mycertocspv2.crt")}"
+  content         = <<-EOT
+%s
+EOT
   partition       = "Common"
   monitoring_type = "ocsp"
   issuer_cert     = "/Common/MyCA"
   ocsp            = "/Common/testocsp1"
 }
-`
+`, leafCertPEM)
+}
 
 func TestAccBigipSslCertificateImportToBigip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -100,15 +110,23 @@ func TestAccBigipSslCertificateTCs(t *testing.T) {
 }
 
 func TestAccBigipSslCertificateOCSP(t *testing.T) {
+	// Generated once, up front: the CA half is installed as /Common/MyCA
+	// by testAcctPreCheckOCSP, and the leaf half (cryptographically signed
+	// by that same CA key) is embedded directly in testSslCertOCSPResource
+	// below. See installMyCA's doc comment for why these must be
+	// generated together as a matched pair rather than using a static
+	// fixture file.
+	caCertPEM, leafCertPEM, _ := generateCAAndLeafCert(t, "MyCA", "ocsp-leaf.f5.com")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckOCSP(caCertPEM)(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testChecksslcertificateDestroyed,
 		Steps: []resource.TestStep{
 			{
-				Config: TestSslCertOCSPResource,
+				Config: testSslCertOCSPResource(leafCertPEM),
 				Check: resource.ComposeTestCheckFunc(
 					testChecksslcertificateExists("test-certificate", true),
 					resource.TestCheckResourceAttr("bigip_ssl_certificate.ssl-test-certificate-tc1", "name", "test-certificate"),

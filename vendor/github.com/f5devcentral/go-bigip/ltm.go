@@ -2168,64 +2168,65 @@ type ResponseAdaptProfile struct {
 }
 
 const (
-	uriLtm             = "ltm"
-	uriNode            = "node"
-	uriPool            = "pool"
-	uriPoolMember      = "members"
-	uriProfile         = "profile"
-	uriCipher          = "cipher"
-	uriServerSSL       = "server-ssl"
-	uriClientSSL       = "client-ssl"
-	uriVirtual         = "virtual"
-	uriVirtualAddress  = "virtual-address"
-	uriSnatPool        = "snatpool"
-	uriMonitor         = "monitor"
-	uriIRule           = "rule"
-	uriDatagroup       = "data-group"
-	uriInternal        = "internal"
-	uriExternal        = "external"
-	uriPolicy          = "policy"
-	uriOneconnect      = "one-connect"
-	uriPersistence     = "persistence"
-	ENABLED            = "enable"
-	DISABLED           = "disable"
-	CONTEXT_SERVER     = "serverside"
-	CONTEXT_CLIENT     = "clientside"
-	CONTEXT_ALL        = "all"
-	uriRewrite         = "rewrite"
-	uriRewriteRules    = "uri-rules"
-	uriTcp             = "tcp"
-	uriUDP             = "udp"
-	uriFtp             = "ftp"
-	uriFasthttp        = "fasthttp"
-	uriFastl4          = "fastl4"
-	uriHttpcompress    = "http-compression"
-	uriHttp2           = "http2"
-	uriSnat            = "snat"
-	uriSnatpool        = "snatpool"
-	uriCookie          = "cookie"
-	uriDestAddr        = "dest-addr"
-	uriHash            = "hash"
-	uriHost            = "host"
-	uriMSRDP           = "msrdp"
-	uriSIP             = "sip"
-	uriSourceAddr      = "source-addr"
-	uriSSL             = "ssl"
-	uriUniversal       = "universal"
-	uriCreateDraft     = "?options=create-draft"
-	uriRule            = "rule"
-	uriWebAcceleration = "web-acceleration"
-	uriHttp            = "http"
-	uriRequestLog      = "request-log"
-	uriSecurity        = "security"
-	uriBotDefense      = "bot-defense"
-	uriSaas            = "saas"
-	uriSaasBotDefense  = "bd"
-	uriRequestAdapt    = "request-adapt"
-	uriResponseAdapt   = "response-adapt"
-	uriWebsocket       = "websocket"
-	uriHTML            = "html"
-	uriAnalytics       = "analytics"
+	uriLtm                     = "ltm"
+	uriNode                    = "node"
+	uriPool                    = "pool"
+	uriPoolMember              = "members"
+	uriProfile                 = "profile"
+	uriCipher                  = "cipher"
+	uriServerSSL               = "server-ssl"
+	uriClientSSL               = "client-ssl"
+	uriVirtual                 = "virtual"
+	uriVirtualAddress          = "virtual-address"
+	uriTrafficMatchingCriteria = "traffic-matching-criteria"
+	uriSnatPool                = "snatpool"
+	uriMonitor                 = "monitor"
+	uriIRule                   = "rule"
+	uriDatagroup               = "data-group"
+	uriInternal                = "internal"
+	uriExternal                = "external"
+	uriPolicy                  = "policy"
+	uriOneconnect              = "one-connect"
+	uriPersistence             = "persistence"
+	ENABLED                    = "enable"
+	DISABLED                   = "disable"
+	CONTEXT_SERVER             = "serverside"
+	CONTEXT_CLIENT             = "clientside"
+	CONTEXT_ALL                = "all"
+	uriRewrite                 = "rewrite"
+	uriRewriteRules            = "uri-rules"
+	uriTcp                     = "tcp"
+	uriUDP                     = "udp"
+	uriFtp                     = "ftp"
+	uriFasthttp                = "fasthttp"
+	uriFastl4                  = "fastl4"
+	uriHttpcompress            = "http-compression"
+	uriHttp2                   = "http2"
+	uriSnat                    = "snat"
+	uriSnatpool                = "snatpool"
+	uriCookie                  = "cookie"
+	uriDestAddr                = "dest-addr"
+	uriHash                    = "hash"
+	uriHost                    = "host"
+	uriMSRDP                   = "msrdp"
+	uriSIP                     = "sip"
+	uriSourceAddr              = "source-addr"
+	uriSSL                     = "ssl"
+	uriUniversal               = "universal"
+	uriCreateDraft             = "?options=create-draft"
+	uriRule                    = "rule"
+	uriWebAcceleration         = "web-acceleration"
+	uriHttp                    = "http"
+	uriRequestLog              = "request-log"
+	uriSecurity                = "security"
+	uriBotDefense              = "bot-defense"
+	uriSaas                    = "saas"
+	uriSaasBotDefense          = "bd"
+	uriRequestAdapt            = "request-adapt"
+	uriResponseAdapt           = "response-adapt"
+	uriWebsocket               = "websocket"
+	uriHTML                    = "html"
+	uriAnalytics               = "analytics"
 )
 
 var cidr = map[string]string{
@@ -2351,13 +2352,13 @@ func (b *BigIP) AddSnatPool(config *SnatPool) error {
 // GetSnatPool retrieves a SnatPool by name. Returns nil if the snatpool does not exist
 func (b *BigIP) GetSnatPool(name string) (*SnatPool, error) {
 	var snatPool SnatPool
-	err, _ := b.getForEntity(&snatPool, uriLtm, uriSnatPool, name)
+	err, ok := b.getForEntity(&snatPool, uriLtm, uriSnatPool, name)
 	if err != nil {
 		return nil, err
 	}
-	//if !ok {
-	//	return nil, nil
-	//}
+	if !ok {
+		return nil, nil
+	}
 
 	return &snatPool, nil
 }
@@ -2899,6 +2900,41 @@ func (b *BigIP) GetVirtualServer(name string) (*VirtualServer, error) {
 	return &vs, nil
 }
 
+// TrafficMatchingCriteria represents an LTM traffic matching criteria
+// object (/mgmt/tm/ltm/traffic-matching-criteria), referenced by
+// VirtualServer.TrafficMatchingCriteria.
+type TrafficMatchingCriteria struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
+}
+
+// CreateTrafficMatchingCriterion creates a new LTM traffic matching
+// criteria object.
+func (b *BigIP) CreateTrafficMatchingCriterion(config *TrafficMatchingCriteria) error {
+	return b.post(config, uriLtm, uriTrafficMatchingCriteria)
+}
+
+// GetTrafficMatchingCriterion retrieves an LTM traffic matching criteria
+// object by full path.
+func (b *BigIP) GetTrafficMatchingCriterion(fullPath string) (*TrafficMatchingCriteria, error) {
+	var tmc TrafficMatchingCriteria
+	err, ok := b.getForEntity(&tmc, uriLtm, uriTrafficMatchingCriteria, fullPath)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &tmc, nil
+}
+
+// DeleteTrafficMatchingCriterion removes an LTM traffic matching criteria
+// object.
+func (b *BigIP) DeleteTrafficMatchingCriterion(fullPath string) error {
+	return b.delete(uriLtm, uriTrafficMatchingCriteria, fullPath)
+}
+
 // DeleteVirtualServer removes a virtual server.
 func (b *BigIP) DeleteVirtualServer(name string) error {
 	return b.delete(uriLtm, uriVirtual, name)
@@ -3139,7 +3175,7 @@ func (b *BigIP) GetPolicy(name string, partition string) (*Policy, error) {
 	}
 	p.Rules = rules.Items
 
-	for i, _ := range p.Rules {
+	for i := range p.Rules {
 		var a PolicyRuleActions
 		var c PolicyRuleConditions
 
@@ -3258,12 +3294,12 @@ func (b *BigIP) CheckDraftPolicy(name string, partition string) (bool, error) {
 
 func normalizePolicy(p *Policy) {
 	//f5 doesn't seem to automatically handle setting the ordinal
-	for ri, _ := range p.Rules {
+	for ri := range p.Rules {
 		p.Rules[ri].Ordinal = ri
-		for ai, _ := range p.Rules[ri].Actions {
+		for ai := range p.Rules[ri].Actions {
 			p.Rules[ri].Actions[ai].Name = fmt.Sprintf("%d", ai)
 		}
-		for ci, _ := range p.Rules[ri].Conditions {
+		for ci := range p.Rules[ri].Conditions {
 			p.Rules[ri].Conditions[ci].Name = fmt.Sprintf("%d", ci)
 		}
 	}

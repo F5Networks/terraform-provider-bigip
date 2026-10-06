@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var TestWebAccelerationName = fmt.Sprintf("/%s/test", TestPartition)
+var TestWebAccelerationName = fmt.Sprintf("/%s/web_acceleration", TestPartition)
 var resWebAccelerationName = "bigip_ltm_profile_web_acceleration"
 
 var TestWebAccelerationResource = `

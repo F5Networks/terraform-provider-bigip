@@ -55,7 +55,7 @@ func testCheckBotDefensesDestroyed(s *terraform.State) error {
 	client := testAccProvider.Meta().(*bigip.BigIP)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "bigip_ltm_profile_bot_defence" {
+		if rs.Type != "bigip_ltm_profile_bot_defense" {
 			continue
 		}
 
@@ -72,7 +72,7 @@ func testCheckBotDefensesDestroyed(s *terraform.State) error {
 }
 
 func testaccbigipltmprofileBotDefenseDefaultConfig(partition, profileName, resourceName string) string {
-	return fmt.Sprintf(`resource "bigip_ltm_profile_bot_defence" "%[3]s" {
+	return fmt.Sprintf(`resource "bigip_ltm_profile_bot_defense" "%[3]s" {
 		name = "%[2]s"
 		defaults_from = "/%[1]s/bot-defense"
 		description = "test-bot"

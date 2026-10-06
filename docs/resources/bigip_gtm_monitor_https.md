@@ -34,6 +34,17 @@ resource "bigip_gtm_monitor_https" "with_cert" {
 }
 ```
 
+### HTTPS Monitor with SNI Server Name
+
+```hcl
+resource "bigip_gtm_monitor_https" "with_sni" {
+  name            = "/Common/my_https_monitor"
+  defaults_from   = "/Common/https"
+  destination     = "*:443"
+  sni_server_name = "example.com"
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -63,6 +74,7 @@ The following arguments are supported:
 * `key` - (Optional, String) Specifies the key for the client certificate that the monitor sends to the target SSL server.
 * `cipherlist` - (Optional, String) Specifies the list of ciphers for this monitor. Default: `DEFAULT:!EXPORT`.
 * `compatibility` - (Optional, String) Specifies the SSL version compatibility. Valid values: `enabled`, `disabled`. Default: `enabled`.
+* `sni_server_name` - (Optional, String) Specifies the server name to use in the SNI (Server Name Indication) TLS extension that the monitor sends to the target object. Default: `none`. This is a GTM-specific field; it is not present on the equivalent `bigip_ltm_monitor` HTTPS monitor.
 
 ## Attribute Reference
 

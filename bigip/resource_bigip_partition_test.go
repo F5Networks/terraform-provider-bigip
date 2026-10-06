@@ -26,7 +26,7 @@ resource "bigip_partition" "test-partition" {
 func TestAccPartitionCreateUpdate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckRouteDomain2(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPartitionsDestroyed,

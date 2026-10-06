@@ -48,6 +48,7 @@ func dataSourceBigipFastConsulServiceDiscovery() *schema.Resource {
 			"encoded_token": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "Base 64 encoded bearer token to make requests to the Consul API. Will be stored in the declaration in an encrypted format.",
 			},
 			"jmes_path_query": {

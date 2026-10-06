@@ -36,7 +36,7 @@ resource "bigip_vcmp_guest" "test-guest" {
 func TestAccBigipVcmpguest_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckVcmp(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckvcmpguestDestroyed,
@@ -65,7 +65,7 @@ func TestAccBigipVcmpguest_create(t *testing.T) {
 func TestAccBigipVcmpguest_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckVcmp(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckvcmpguestDestroyed,

@@ -198,7 +198,7 @@ func testCheckfastl4Exists(name string, exists bool) resource.TestCheckFunc {
 		if exists && p == nil {
 			return fmt.Errorf("fastl4 %s was not created. ", name)
 		}
-		if !exists && p == nil {
+		if !exists && p != nil {
 			return fmt.Errorf("fastl4 %s was still exist. ", name)
 		}
 		return nil

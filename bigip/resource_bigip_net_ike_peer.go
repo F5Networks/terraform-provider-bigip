@@ -85,6 +85,7 @@ func resourceBigipNetIkePeer() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "Specifies the passphrase of the key used for my-cert-key-file",
 			},
 			"my_id_type": {

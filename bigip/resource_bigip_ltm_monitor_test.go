@@ -666,7 +666,9 @@ resource "bigip_ltm_monitor" "http_monitor_path" {
 `, monitorName)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAcctPreCheck(t) },
+		PreCheck: func() {
+			testAcctPreCheckPartitionWithFolder("Common", "/Common/ravi")(t)
+		},
 		Providers:    testAccProviders,
 		CheckDestroy: testMonitorsDestroyed,
 		Steps: []resource.TestStep{

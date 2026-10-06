@@ -187,7 +187,7 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 				Config:             testaccselfipRouteDomain("10.11.12.13/24"),
 				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
 				ExpectNonEmptyPlan: true,
-				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
+				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan"),
 			},
 			{
 				Config: testaccselfipRouteDomain("10.11.12.13%0/24"),
@@ -197,7 +197,7 @@ func TestAccBigipNetselfipRouteDomain(t *testing.T) {
 				Config:             testaccselfipRouteDomain("10.11.12.13%0/24"),
 				Check:              testCheckselfipExists(TEST_SELFIP_NAME),
 				ExpectNonEmptyPlan: true,
-				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan!"),
+				ExpectError:        regexp.MustCompile("Expected a non-empty plan, but got an empty plan"),
 			},
 		},
 	})
@@ -320,9 +320,12 @@ func testCheckselfipsDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		selfip, err := client.SelfIP(name)
 		if err != nil {
+			if IsNotFoundError(err) {
+				continue
+			}
 			return err
 		}
-		if selfip == nil {
+		if selfip != nil {
 			return fmt.Errorf("selfip %s not destroyed.", name)
 		}
 	}

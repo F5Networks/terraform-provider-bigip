@@ -114,6 +114,7 @@ func resourceBigipLtmPersistenceProfileCookie() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "Passphrase for encrypted cookies",
 			},
 

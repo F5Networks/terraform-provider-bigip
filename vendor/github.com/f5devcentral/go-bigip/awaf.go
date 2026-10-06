@@ -394,6 +394,20 @@ func (b *BigIP) GetWafPbExportResult(id string) (*PbExport, error) {
 	return &pbexport, nil
 }
 
+// CreateMinimalWafPolicy creates a bare ASM/WAF security policy from just
+// a name and partition (TMOS's own "Fundamental" template default),
+// without the full JSON-import workflow ImportAwafJson/ApplyAwafJson
+// drive. Useful as a lightweight prerequisite object for referencing an
+// existing ASM policy elsewhere (e.g. an LTM policy rule action's "asm"
+// + "policy" fields), where the policy's own contents don't matter.
+func (b *BigIP) CreateMinimalWafPolicy(name string, partition string) error {
+	policy := &WafPolicy{
+		Name:      name,
+		Partition: partition,
+	}
+	return b.post(policy, uriMgmt, uriTm, uriAsm, uriWafPol)
+}
+
 func (b *BigIP) GetWafPolicyQuery(wafPolicyName string, partition string) (*WafPolicy, error) {
 	var wafPolicies WafPolicies
 	query := fmt.Sprintf("?$filter=contains(name,'%s')+and+contains(partition,'%s')", wafPolicyName, partition)

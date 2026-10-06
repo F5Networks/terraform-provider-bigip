@@ -42,15 +42,15 @@ func TestAccBigipNetIPsecProfile_create(t *testing.T) {
 func testCheckIPSecProfileExists(name string, exists bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*bigip.BigIP)
-		p, err := client.GetIPSecPolicy(name)
+		p, err := client.GetIPSecProfile(name)
 		if err != nil {
 			return err
 		}
 		if exists && p == nil {
-			return fmt.Errorf(" IPSec Policy %s was not created.", name)
+			return fmt.Errorf(" IPSec Profile %s was not created.", name)
 		}
-		if !exists && p == nil {
-			return fmt.Errorf(" IPSec Policy %s still exists.", name)
+		if !exists && p != nil {
+			return fmt.Errorf(" IPSec Profile %s still exists.", name)
 		}
 		return nil
 	}
@@ -68,7 +68,7 @@ func testCheckIPSecProfileDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if ipsec.Name != "" {
+		if ipsec != nil {
 			return fmt.Errorf(" IPSec Policy %s not destroyed.", name)
 		}
 	}

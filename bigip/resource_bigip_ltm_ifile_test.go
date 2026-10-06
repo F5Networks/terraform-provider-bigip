@@ -178,7 +178,9 @@ resource "bigip_ltm_ifile" "testltmifile" {
 `, sysIfileName, ltmIfileName)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAcctPreCheck(t) },
+		PreCheck: func() {
+			testAcctPreCheckPartitionWithFolder("TEST_iFile_300", "/TEST_iFile_300/A1TEST")(t)
+		},
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
@@ -309,7 +311,9 @@ resource "bigip_ltm_ifile" "testltmifile" {
 `, sysIfileName, ltmIfileName)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAcctPreCheck(t) },
+		PreCheck: func() {
+			testAcctPreCheckPartition("TEST_iFile_300")(t)
+		},
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{

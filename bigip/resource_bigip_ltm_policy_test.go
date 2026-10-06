@@ -345,7 +345,7 @@ func TestAccBigipLtmPolicy_Issue132_c(t *testing.T) {
 	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue132-c")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckTestPartition(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPolicysDestroyed,
@@ -393,7 +393,7 @@ func TestAccBigipLtmPolicy_Issue634(t *testing.T) {
 	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue634")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckTestPartitionWithA1Folder(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPolicysDestroyed,
@@ -417,7 +417,7 @@ func TestAccBigipLtmPolicy_Issue634_a(t *testing.T) {
 	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "test-policy-issue634-a")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckTestPartition(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPolicysDestroyed,
@@ -460,11 +460,16 @@ func TestAccBigipLtmPolicy_Issue648(t *testing.T) {
 }
 func TestAccBigipLtmPolicyIssue737(t *testing.T) {
 	t.Parallel()
-	TestPolicyName = "/Common/testpolicy-issue-737"
-	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "testpolicy-issue-737")
+	// testaccbigipltmpoolicyissue737's config creates a policy named
+	// "/Common/f5-policy" (resource label "policy"), not
+	// "/Common/testpolicy-issue-737" -- TestPolicyName/resName here must
+	// match what the config actually creates, not the test function's own
+	// name.
+	policyName := "/Common/f5-policy"
+	resName := fmt.Sprintf("%s.%s", "bigip_ltm_policy", "policy")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckLtmPoolsAndWafPolicy("/Common/pool1", "/Common/pool2", "/Common/pool3")(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPolicysDestroyed,
@@ -472,9 +477,8 @@ func TestAccBigipLtmPolicyIssue737(t *testing.T) {
 			{
 				Config: testaccbigipltmpoolicyissue737(),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckPolicyExists(TestPolicyName),
-					testCheckPolicyExists(TestPolicyName),
-					resource.TestCheckResourceAttr(resName, "name", TestPolicyName),
+					testCheckPolicyExists(policyName),
+					resource.TestCheckResourceAttr(resName, "name", policyName),
 					resource.TestCheckResourceAttr(resName, "strategy", "first-match"),
 				),
 			},

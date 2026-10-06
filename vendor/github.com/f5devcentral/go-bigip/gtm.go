@@ -24,6 +24,7 @@ const (
 	uriWideIp     = "wideip"
 	uriTopology   = "topology"
 	uriRegion     = "region"
+	uriProberPool = "prober-pool"
 )
 
 type Datacenters struct {
@@ -83,6 +84,7 @@ type GTMDatacenter struct {
 	Disabled         bool   `json:"disabled,omitempty"`
 	Location         string `json:"location,omitempty"`
 	ProberFallback   string `json:"proberFallback,omitempty"`
+	ProberPool       string `json:"proberPool,omitempty"`
 	ProberPreference string `json:"proberPreference,omitempty"`
 }
 
@@ -109,6 +111,17 @@ type Gtmmonitor struct {
 	Key           string `json:"key,omitempty"`
 	Cipherlist    string `json:"cipherlist,omitempty"`
 	Compatibility string `json:"compatibility,omitempty"`
+	// SniServerName is a LOCAL PATCH: not present in the pinned upstream
+	// go-bigip commit (see go.mod/vendor/modules.txt), hand-added here to
+	// support bigip_gtm_monitor_https's sni_server_name attribute (see
+	// COREBIP-50067). This field corresponds to the real BIG-IP GTM HTTPS
+	// monitor's sniServerName API field (tmsh: sni-server-name), confirmed
+	// present via "tmsh help gtm monitor https" on a live 17.5.1 instance.
+	// Remove this comment (and verify the field/tag still match) once this
+	// is upstreamed to github.com/f5devcentral/go-bigip and the pinned
+	// commit is bumped to include it -- do not let a future blanket
+	// `go mod vendor` silently drop this field before that happens.
+	SniServerName string `json:"sniServerName,omitempty"`
 	// PostgreSQL-specific fields
 	Database string `json:"database,omitempty"`
 	Username string `json:"username,omitempty"`
@@ -742,6 +755,38 @@ func (b *BigIP) ModifyGTMDatacenter(fullPath string, config *GTMDatacenter) erro
 // DeleteGTMDatacenter removes a GTM datacenter
 func (b *BigIP) DeleteGTMDatacenter(fullPath string) error {
 	return b.delete(uriGtm, uriDatacenter, fullPath)
+}
+
+// GTMProberPool represents a GTM prober pool
+// (/mgmt/tm/gtm/prober-pool), referenced by GTMDatacenter.ProberPool when
+// ProberPreference is "pool".
+type GTMProberPool struct {
+	Name      string `json:"name,omitempty"`
+	Partition string `json:"partition,omitempty"`
+	FullPath  string `json:"fullPath,omitempty"`
+}
+
+// CreateGTMProberPool creates a new GTM prober pool
+func (b *BigIP) CreateGTMProberPool(config *GTMProberPool) error {
+	return b.post(config, uriGtm, uriProberPool)
+}
+
+// GetGTMProberPool retrieves a GTM prober pool by full path
+func (b *BigIP) GetGTMProberPool(fullPath string) (*GTMProberPool, error) {
+	var pp GTMProberPool
+	err, ok := b.getForEntity(&pp, uriGtm, uriProberPool, fullPath)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, nil
+	}
+	return &pp, nil
+}
+
+// DeleteGTMProberPool removes a GTM prober pool
+func (b *BigIP) DeleteGTMProberPool(fullPath string) error {
+	return b.delete(uriGtm, uriProberPool, fullPath)
 }
 
 // GTMTopologyRecord represents a GTM topology record

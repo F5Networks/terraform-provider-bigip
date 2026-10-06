@@ -305,10 +305,13 @@ func (b *BigIP) DeleteDevice(name string) error {
 
 func (b *BigIP) Devices(name string) (*Device, error) {
 	var device Device
-	err, _ := b.getForEntity(&device, uriCm, uriDiv, name)
+	err, ok := b.getForEntity(&device, uriCm, uriDiv, name)
 
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &device, nil
@@ -340,9 +343,12 @@ func (b *BigIP) ModifyDevicegroup(config *Devicegroup) error {
 
 func (b *BigIP) Devicegroups(name string) (*Devicegroup, error) {
 	var devicegroup Devicegroup
-	err, _ := b.getForEntity(&devicegroup, uriCm, uriDG, name)
+	err, ok := b.getForEntity(&devicegroup, uriCm, uriDG, name)
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	return &devicegroup, nil

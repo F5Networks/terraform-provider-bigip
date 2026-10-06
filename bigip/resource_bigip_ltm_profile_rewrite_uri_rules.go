@@ -169,7 +169,7 @@ func resourceBigipLtmProfileRewriteUriRuleUpdate(ctx context.Context, d *schema.
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error modifying LTM Rewrite URI rule (%s): %s", ruleName, err))
 	}
-	return resourceBigipLtmProfileRewriteRead(ctx, d, meta)
+	return resourceBigipLtmProfileRewriteUriRuleRead(ctx, d, meta)
 }
 
 func resourceBigipLtmProfileRewriteUriRuleDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

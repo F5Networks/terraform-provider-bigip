@@ -2,9 +2,11 @@ package bigip
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
@@ -29,10 +31,25 @@ func resourceBigipSSLKeyCert() *schema.Resource {
 				Description: "The name of the key.",
 			},
 			"key_content": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				Description: "The content of the key.",
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				ConflictsWith: []string{"key_content_wo"},
+				Description:   "The content of the key. Cannot be used with key_content_wo.",
+			},
+			"key_content_wo": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				WriteOnly:     true,
+				ConflictsWith: []string{"key_content"},
+				Description:   "Write-only content of the key. Not persisted to state. Cannot be used with key_content.",
+			},
+			"key_content_wo_version": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				WriteOnly:   true,
+				Description: "Version number to trigger key_content_wo re-upload. Increment to force key re-upload.",
 			},
 			"key_full_path": {
 				Type:        schema.TypeString,
@@ -47,10 +64,25 @@ func resourceBigipSSLKeyCert() *schema.Resource {
 				ForceNew:    true,
 			},
 			"cert_content": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				Description: "The content of the cert.",
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				ConflictsWith: []string{"cert_content_wo"},
+				Description:   "The content of the cert. Cannot be used with cert_content_wo.",
+			},
+			"cert_content_wo": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				WriteOnly:     true,
+				ConflictsWith: []string{"cert_content"},
+				Description:   "Write-only content of the cert. Not persisted to state. Cannot be used with cert_content.",
+			},
+			"cert_content_wo_version": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				WriteOnly:   true,
+				Description: "Version number to trigger cert_content_wo re-upload. Increment to force cert re-upload.",
 			},
 			"cert_full_path": {
 				Type:        schema.TypeString,
@@ -94,11 +126,39 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 	client := meta.(*bigip.BigIP)
 
 	keyName := d.Get("key_name").(string)
-	keyPath := d.Get("key_content").(string)
 	partition := d.Get("partition").(string)
 	passphrase := d.Get("passphrase").(string)
 	certName := d.Get("cert_name").(string)
-	certPath := d.Get("cert_content").(string)
+
+	// Handle both key_content and key_content_wo, ensuring at least one is provided
+	var keyPath string
+	if keyContentVal, ok := d.GetOk("key_content"); ok {
+		keyPath = keyContentVal.(string)
+	} else {
+		keyContentWoVal, ok, diags := getWriteOnlyString(d, "key_content_wo")
+		if diags.HasError() {
+			return diags
+		}
+		if !ok {
+			return diag.Errorf("either 'key_content' or 'key_content_wo' must be specified")
+		}
+		keyPath = keyContentWoVal
+	}
+
+	// Handle both cert_content and cert_content_wo, ensuring at least one is provided
+	var certPath string
+	if certContentVal, ok := d.GetOk("cert_content"); ok {
+		certPath = certContentVal.(string)
+	} else {
+		certContentWoVal, ok, diags := getWriteOnlyString(d, "cert_content_wo")
+		if diags.HasError() {
+			return diags
+		}
+		if !ok {
+			return diag.Errorf("either 'cert_content' or 'cert_content_wo' must be specified")
+		}
+		certPath = certContentWoVal
+	}
 
 	sourcePath, err := client.UploadKey(keyName, keyPath)
 	if err != nil {
@@ -119,29 +179,49 @@ func resourceBigipSSLKeyCertCreate(ctx context.Context, d *schema.ResourceData, 
 	if val, ok := d.GetOk("cert_monitoring_type"); ok {
 		cert.CertValidationOptions = []string{val.(string)}
 	}
+
+	if diags := func() diag.Diagnostics {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		t, err := client.StartTransaction()
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
+		}
+		err = client.AddKey(&keyCfg)
+		if err != nil {
+			rollbackTransaction(client, t.TransID)
+			return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
+		}
+
+		err = client.UploadCertificate(certPath, cert)
+		if err != nil {
+			rollbackTransaction(client, t.TransID)
+			return diag.FromErr(fmt.Errorf("error while uploading the ssl cert: %v", err))
+		}
+		err = client.CommitTransaction(t.TransID)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error while ending transaction: %d", err))
+		}
+		return nil
+	}(); diags != nil {
+		return diags
+	}
+
+	// issuer_cert is silently ignored by BIG-IP when set on the initial
+	// upload/create above (inside the transaction) -- it only takes
+	// effect via a follow-up PATCH/PUT against the already-created
+	// certificate, so it's applied here via ModifyCertificate instead.
+	// ModifyCertificate requires the full "/partition/name" path (it does
+	// not itself disambiguate a bare name against the partition field the
+	// way AddCertificate's request body does).
 	if val, ok := d.GetOk("issuer_cert"); ok {
 		cert.IssuerCert = val.(string)
+		fullPathCertName := fqdn(partition, certName)
+		if err := client.ModifyCertificate(fullPathCertName, &bigip.Certificate{IssuerCert: cert.IssuerCert}); err != nil {
+			return diag.FromErr(fmt.Errorf("error setting issuer_cert on certificate (%s): %s", fullPathCertName, err))
+		}
 	}
-
-	mutex.Lock()
-	t, err := client.StartTransaction()
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while starting transaction: %v", err))
-	}
-	err = client.AddKey(&keyCfg)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while adding the ssl key: %v", err))
-	}
-
-	err = client.UploadCertificate(certPath, cert)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while uploading the ssl cert: %v", err))
-	}
-	err = client.CommitTransaction(t.TransID)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while ending transaction: %d", err))
-	}
-	mutex.Unlock()
 
 	if val, ok := d.GetOk("cert_ocsp"); ok {
 		certValidState := &bigip.CertValidatorState{Name: val.(string)}
@@ -192,6 +272,7 @@ func resourceBigipSSLKeyCertRead(ctx context.Context, d *schema.ResourceData, me
 		monitor_type := certificate.CertValidationOptions[0]
 		_ = d.Set("cert_monitoring_type", monitor_type)
 	}
+	// Note: key_content, key_content_wo, cert_content, cert_content_wo are write-only and not set here - they are never read from BIG-IP
 
 	return nil
 }
@@ -200,23 +281,9 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 	client := meta.(*bigip.BigIP)
 
 	keyName := d.Get("key_name").(string)
-	keyPath := d.Get("key_content").(string)
 	partition := d.Get("partition").(string)
 	passphrase := d.Get("passphrase").(string)
 	certName := d.Get("cert_name").(string)
-	certPath := d.Get("cert_content").(string)
-
-	sourcePath, err := client.UploadKey(keyName, keyPath)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to upload ssl key (%s): %s", keyName, err))
-	}
-
-	keyCfg := bigip.Key{
-		Name:       keyName,
-		SourcePath: sourcePath,
-		Partition:  partition,
-		Passphrase: passphrase,
-	}
 
 	keyFullPath := fmt.Sprintf("/%s/%s", partition, keyName)
 
@@ -231,32 +298,101 @@ func resourceBigipSSLKeyCertUpdate(ctx context.Context, d *schema.ResourceData, 
 		cert.IssuerCert = val.(string)
 	}
 
-	mutex.Lock()
-	t, err := client.StartTransaction()
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to start transaction: %s", err))
-	}
-	err = client.ModifyKey(keyFullPath, &keyCfg)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
-	}
+	// Check if key content or version has changed
+	hasKeyContentChange := d.HasChange("key_content")
+	hasKeyContentWoChange := d.HasChange("key_content_wo")
+	hasKeyVersionChange := d.HasChange("key_content_wo_version")
 
-	if val, ok := d.GetOk("cert_ocsp"); ok {
-		certValidState := &bigip.CertValidatorState{Name: val.(string)}
-		certValidRef := &bigip.CertValidatorReference{}
-		certValidRef.Items = append(certValidRef.Items, *certValidState)
-		cert.CertValidatorRef = certValidRef
-	}
+	// Check if cert content or version has changed
+	hasCertContentChange := d.HasChange("cert_content")
+	hasCertContentWoChange := d.HasChange("cert_content_wo")
+	hasCertVersionChange := d.HasChange("cert_content_wo_version")
 
-	err = client.UpdateCertificate(certPath, cert)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while updating the ssl certificate (%s): %s", certName, err))
+	if diags := func() diag.Diagnostics {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		t, err := client.StartTransaction()
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error while trying to start transaction: %s", err))
+		}
+
+		// Update key if needed.
+		if hasKeyContentChange || hasKeyContentWoChange || hasKeyVersionChange {
+			var keyPath string
+			if keyContentVal, ok := d.GetOk("key_content"); ok {
+				keyPath = keyContentVal.(string)
+			} else {
+				keyContentWoVal, ok, diags := getWriteOnlyString(d, "key_content_wo")
+				if diags.HasError() {
+					rollbackTransaction(client, t.TransID)
+					return diags
+				}
+				if !ok {
+					rollbackTransaction(client, t.TransID)
+					return diag.Errorf("either 'key_content' or 'key_content_wo' must be specified")
+				}
+				keyPath = keyContentWoVal
+			}
+
+			sourcePath, err := client.UploadKey(keyName, keyPath)
+			if err != nil {
+				rollbackTransaction(client, t.TransID)
+				return diag.FromErr(fmt.Errorf("error while trying to upload ssl key (%s): %s", keyName, err))
+			}
+
+			keyCfg := bigip.Key{
+				Name:       keyName,
+				SourcePath: sourcePath,
+				Partition:  partition,
+				Passphrase: passphrase,
+			}
+			if err := client.ModifyKey(keyFullPath, &keyCfg); err != nil {
+				rollbackTransaction(client, t.TransID)
+				return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
+			}
+		} else if d.HasChange("passphrase") {
+			keyCfg := bigip.Key{Name: keyName, Partition: partition, Passphrase: passphrase}
+			if err := client.ModifyKey(keyFullPath, &keyCfg); err != nil {
+				rollbackTransaction(client, t.TransID)
+				return diag.FromErr(fmt.Errorf("error while trying to modify the ssl key (%s): %s", keyFullPath, err))
+			}
+		}
+
+		// Update certificate if needed.
+		if hasCertContentChange || hasCertContentWoChange || hasCertVersionChange {
+			var certPath string
+			if certContentVal, ok := d.GetOk("cert_content"); ok {
+				certPath = certContentVal.(string)
+			} else {
+				certContentWoVal, ok, diags := getWriteOnlyString(d, "cert_content_wo")
+				if diags.HasError() {
+					rollbackTransaction(client, t.TransID)
+					return diags
+				}
+				if !ok {
+					rollbackTransaction(client, t.TransID)
+					return diag.Errorf("either 'cert_content' or 'cert_content_wo' must be specified")
+				}
+				certPath = certContentWoVal
+			}
+			if err := client.UpdateCertificate(certPath, cert); err != nil {
+				rollbackTransaction(client, t.TransID)
+				return diag.FromErr(fmt.Errorf("error while updating the ssl certificate (%s): %s", certName, err))
+			}
+		}
+
+		if val, ok := d.GetOk("cert_ocsp"); ok {
+			cert.CertValidatorRef = &bigip.CertValidatorReference{Items: []bigip.CertValidatorState{{Name: val.(string)}}}
+		}
+
+		if err := client.CommitTransaction(t.TransID); err != nil {
+			return diag.FromErr(fmt.Errorf("error while trying to end transaction: %s", err))
+		}
+		return nil
+	}(); diags != nil {
+		return diags
 	}
-	err = client.CommitTransaction(t.TransID)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error while trying to end transaction: %s", err))
-	}
-	mutex.Unlock()
 
 	return resourceBigipSSLKeyCertRead(ctx, d, meta)
 }
@@ -295,6 +431,36 @@ func resourceBigipSSLKeyCertDelete(ctx context.Context, d *schema.ResourceData, 
 
 	d.SetId("")
 	return nil
+}
+
+// rollbackTransaction attempts to roll back an iControl REST transaction
+// that was started with client.StartTransaction but should not be committed
+// (e.g. because AddKey/ModifyKey/UploadCertificate failed partway through).
+// go-bigip has no exported RollbackTransaction, only CommitTransaction, and
+// its PATCH helper (patch) and URL builder (iControlPath) are unexported, so
+// this issues the equivalent request directly via the exported APICall,
+// mirroring exactly what CommitTransaction does but with
+// {"state":"ROLLED_BACK"} instead of {"state":"VALIDATING"}. Errors are
+// logged rather than returned: the caller is already in an error path and
+// returning a second, unrelated error here would obscure the original
+// failure. If the rollback request itself fails, the transaction is left to
+// expire on its own via BIG-IP's transaction timeout instead of remaining
+// open indefinitely.
+func rollbackTransaction(client *bigip.BigIP, transID int64) {
+	body, err := json.Marshal(map[string]interface{}{"state": "ROLLED_BACK"})
+	if err != nil {
+		log.Printf("[ERROR] unable to encode transaction rollback request for transaction %d: %v", transID, err)
+		return
+	}
+	req := &bigip.APIRequest{
+		Method:      "patch",
+		URL:         "mgmt/tm/transaction/" + strconv.FormatInt(transID, 10),
+		Body:        string(body),
+		ContentType: "application/json",
+	}
+	if _, err := client.APICall(req); err != nil {
+		log.Printf("[ERROR] unable to roll back transaction %d: %v", transID, err)
+	}
 }
 
 func fqdn(partition, name string) string {

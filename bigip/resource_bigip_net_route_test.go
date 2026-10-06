@@ -133,6 +133,9 @@ func testCheckrouteExists(name string, exists bool) resource.TestCheckFunc {
 
 		p, err := client.GetRoute(name)
 		if err != nil {
+			if !exists && IsNotFoundError(err) {
+				return nil
+			}
 			return err
 		}
 		if exists && p == nil {
@@ -156,6 +159,9 @@ func testCheckroutesDestroyed(s *terraform.State) error {
 		name := rs.Primary.ID
 		route, err := client.GetRoute(name)
 		if err != nil {
+			if IsNotFoundError(err) {
+				continue
+			}
 			return err
 		}
 		if route != nil {

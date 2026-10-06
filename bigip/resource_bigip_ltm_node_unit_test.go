@@ -29,7 +29,7 @@ resource "bigip_ltm_node" "test-node" {
 `, resourceName)
 }
 
-func TestAccBigipLtmNodeInvalid(t *testing.T) {
+func TestUnitBigipLtmNodeInvalid(t *testing.T) {
 	resourceName := "/Common/test-node"
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
@@ -58,7 +58,7 @@ resource "bigip_ltm_node" "test-node" {
 `, resourceName, address, url)
 }
 
-func TestAccBigipLtmNodeCreate(t *testing.T) {
+func TestUnitBigipLtmNodeCreate(t *testing.T) {
 	resourceName := "/Common/test-node"
 	address := "10.10.10.10"
 	setup()

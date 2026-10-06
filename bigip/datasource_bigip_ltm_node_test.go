@@ -20,7 +20,11 @@ func TestAccBigipLtmNode_basic(t *testing.T) {
 	var nodeName = "/Common/test-node"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAcctPreCheck(t) },
+		PreCheck: func() {
+			testAcctPreCheck(t)
+			client := testAcctBuildRawClient(t)
+			ensureNodeDoesNotExist(t, client, "/Common/192.168.30.1")
+		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckNodesDestroyed,
 		Steps: []resource.TestStep{

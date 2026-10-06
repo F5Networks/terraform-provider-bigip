@@ -121,6 +121,7 @@ resource "bigip_gtm_monitor_https" "test-gtm-https-monitor" {
   receive              = "status: ok"
   cipherlist           = "HIGH:!ADH:!MD5"
   compatibility        = "disabled"
+  sni_server_name      = "example.com"
 }
 `
 
@@ -148,7 +149,7 @@ resource "bigip_gtm_monitor_postgresql" "test-gtm-postgresql-monitor" {
 func TestAccBigipGtmMonitorHttp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpDestroyed,
@@ -171,7 +172,7 @@ func TestAccBigipGtmMonitorHttp_create(t *testing.T) {
 func TestAccBigipGtmMonitorHttps_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpsDestroyed,
@@ -185,6 +186,7 @@ func TestAccBigipGtmMonitorHttps_create(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "interval", "30"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "timeout", "120"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "DEFAULT:!EXPORT"),
+					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "sni_server_name", "none"),
 				),
 			},
 		},
@@ -194,7 +196,7 @@ func TestAccBigipGtmMonitorHttps_create(t *testing.T) {
 func TestAccBigipGtmMonitorTcp_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorTcpDestroyed,
@@ -216,7 +218,7 @@ func TestAccBigipGtmMonitorTcp_create(t *testing.T) {
 func TestAccBigipGtmMonitorPostgresql_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorPostgresqlDestroyed,
@@ -238,7 +240,7 @@ func TestAccBigipGtmMonitorPostgresql_create(t *testing.T) {
 func TestAccBigipGtmMonitorBigip_create(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorBigipDestroyed,
@@ -451,7 +453,7 @@ func testCheckGtmMonitorBigipDestroyed(s *terraform.State) error {
 func TestAccBigipGtmMonitorHttp_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpDestroyed,
@@ -486,7 +488,7 @@ func TestAccBigipGtmMonitorHttp_update(t *testing.T) {
 func TestAccBigipGtmMonitorHttps_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpsDestroyed,
@@ -507,6 +509,7 @@ func TestAccBigipGtmMonitorHttps_update(t *testing.T) {
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "interval", "45"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "cipherlist", "HIGH:!ADH:!MD5"),
 					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "compatibility", "disabled"),
+					resource.TestCheckResourceAttr("bigip_gtm_monitor_https.test-gtm-https-monitor", "sni_server_name", "example.com"),
 				),
 			},
 		},
@@ -516,7 +519,7 @@ func TestAccBigipGtmMonitorHttps_update(t *testing.T) {
 func TestAccBigipGtmMonitorPostgresql_update(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorPostgresqlDestroyed,
@@ -548,7 +551,7 @@ func TestAccBigipGtmMonitorPostgresql_update(t *testing.T) {
 func TestAccBigipGtmMonitorHttp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpDestroyed,
@@ -568,7 +571,7 @@ func TestAccBigipGtmMonitorHttp_import(t *testing.T) {
 func TestAccBigipGtmMonitorHttps_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorHttpsDestroyed,
@@ -588,7 +591,7 @@ func TestAccBigipGtmMonitorHttps_import(t *testing.T) {
 func TestAccBigipGtmMonitorTcp_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorTcpDestroyed,
@@ -608,7 +611,7 @@ func TestAccBigipGtmMonitorTcp_import(t *testing.T) {
 func TestAccBigipGtmMonitorPostgresql_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorPostgresqlDestroyed,
@@ -630,7 +633,7 @@ func TestAccBigipGtmMonitorPostgresql_import(t *testing.T) {
 func TestAccBigipGtmMonitorBigip_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorBigipDestroyed,
@@ -652,7 +655,7 @@ func TestAccBigipGtmMonitorBigip_import(t *testing.T) {
 func TestAccBigipGtmMonitorTcp_minimal(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckGtm(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckGtmMonitorTcpDestroyed,

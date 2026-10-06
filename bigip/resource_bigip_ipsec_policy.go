@@ -175,7 +175,7 @@ func resourceBigipIpsecPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	}
 	if ipsec == nil {
 		d.SetId("")
-		return diag.FromErr(fmt.Errorf("[ERROR] IPSec policy (%s) not found, removing from state", d.Id()))
+		return nil
 	}
 	log.Printf("[DEBUG] IPSec Policy:%+v", ipsec)
 	if err := d.Set("protocol", ipsec.Protocol); err != nil {

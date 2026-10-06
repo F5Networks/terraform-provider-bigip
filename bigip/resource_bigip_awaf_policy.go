@@ -28,6 +28,13 @@ var (
 	mutex sync.Mutex
 )
 
+// awafPolicySettleDelay is how long resourceBigipAwafPolicyCreate waits after
+// a successful AWAF import completes before querying for the newly-created
+// policy's ID, to give BIG-IP time to make the policy queryable. It's a
+// package-level var (rather than an inline literal) so unit tests can shrink
+// it instead of paying the real delay on every test run.
+var awafPolicySettleDelay = 10 * time.Second
+
 func resourceBigipAwafPolicy() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceBigipAwafPolicyCreate,
@@ -388,36 +395,45 @@ func resourceBigipAwafPolicyCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(fmt.Errorf("error in Json encode for waf policy %+v", err))
 	}
 	polName := fmt.Sprintf("/%s/%s", partition, name)
-	mutex.Lock()
-	log.Printf("[INFO] AWAF Policy Config: %+v ", config)
-	// os.WriteFile("awaf_output.json", []byte(config), 0644)
-	taskId, err := client.ImportAwafJson(polName, config, "")
-	log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
-	}
-	err = client.GetImportStatus(taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
-	}
-	part := strings.Split(partition, "/")[0]
-	time.Sleep(10 * time.Second)
-	wafpolicy, err := client.GetWafPolicyQuery(name, part)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err))
-	}
-	taskId, err = client.ApplyAwafJson(polName, wafpolicy.ID)
-	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
-	if err != nil {
-		err1 := client.DeleteWafPolicy(wafpolicy.ID)
-		if err1 != nil {
-			return diag.FromErr(fmt.Errorf(" Error Deleting AWAF Policy : %s", err1))
+
+	var wafpolicy *bigip.WafPolicy
+	if diags := func() diag.Diagnostics {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		log.Printf("[INFO] AWAF Policy Config: %+v ", config)
+		// os.WriteFile("awaf_output.json", []byte(config), 0644)
+		taskId, err := client.ImportAwafJson(polName, config, "")
+		log.Printf("[INFO] AWAF Import policy TaskID :%v", taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
 		}
-		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
-	}
-	err = client.GetApplyStatus(taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
+		err = client.GetImportStatus(taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
+		}
+		part := strings.Split(partition, "/")[0]
+		time.Sleep(awafPolicySettleDelay)
+		wafpolicy, err = client.GetWafPolicyQuery(name, part)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error retrieving waf policy %+v: %v", wafpolicy, err))
+		}
+		taskId, err = client.ApplyAwafJson(polName, wafpolicy.ID)
+		log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
+		if err != nil {
+			err1 := client.DeleteWafPolicy(wafpolicy.ID)
+			if err1 != nil {
+				return diag.FromErr(fmt.Errorf(" Error Deleting AWAF Policy : %s", err1))
+			}
+			return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
+		}
+		err = client.GetApplyStatus(taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
+		}
+		return nil
+	}(); diags != nil {
+		return diags
 	}
 
 	if !client.Teem {
@@ -444,7 +460,6 @@ func resourceBigipAwafPolicyCreate(ctx context.Context, d *schema.ResourceData, 
 		}
 	}
 	d.SetId(wafpolicy.ID)
-	mutex.Unlock()
 	return resourceBigipAwafPolicyRead(ctx, d, meta)
 }
 
@@ -506,26 +521,33 @@ func resourceBigipAwafPolicyUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 	log.Printf("[DEBUG] Policy config: %+v", config)
 	polName := fmt.Sprintf("/%s/%s", partition, name)
-	mutex.Lock()
-	taskId, err := client.ImportAwafJson(polName, config, policyID)
-	log.Printf("[DEBUG] AWAF Import policy TaskID :%v", taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
+
+	if diags := func() diag.Diagnostics {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		taskId, err := client.ImportAwafJson(polName, config, policyID)
+		log.Printf("[DEBUG] AWAF Import policy TaskID :%v", taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
+		}
+		err = client.GetImportStatus(taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
+		}
+		taskId, err = client.ApplyAwafJson(polName, policyID)
+		log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
+		}
+		err = client.GetApplyStatus(taskId)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
+		}
+		return nil
+	}(); diags != nil {
+		return diags
 	}
-	err = client.GetImportStatus(taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Importing AWAF json (%s): %s ", name, err))
-	}
-	taskId, err = client.ApplyAwafJson(polName, policyID)
-	log.Printf("[INFO] AWAF Apply policy TaskID :%v", taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
-	}
-	err = client.GetApplyStatus(taskId)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("Error in Applying AWAF json (%s): %s ", name, err))
-	}
-	mutex.Unlock()
 	return resourceBigipAwafPolicyRead(ctx, d, meta)
 }
 

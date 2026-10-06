@@ -430,10 +430,79 @@ func resourceBigipGtmServerRead(ctx context.Context, d *schema.ResourceData, met
 				"depends_on":                   vs.DependsOn,
 			}
 		}
-		d.Set("virtual_servers", virtualServers)
+		// BIG-IP's GTM server API always returns virtual servers sorted
+		// alphabetically by name, regardless of the order they were
+		// submitted in -- confirmed directly against a live device.
+		// virtual_servers is a TypeList (order-sensitive) so Terraform
+		// diffs it positionally; storing BIG-IP's alphabetical order
+		// directly here caused permanent drift (a non-empty plan after
+		// every apply) whenever the config declared virtual_servers in
+		// any other order. Reorder to match the config's current order
+		// instead, keyed by name; any entries present in the API response
+		// but not in the config's current order (e.g. a resource freshly
+		// imported, or a server modified out-of-band) are appended at the
+		// end in their original (alphabetical) order.
+		d.Set("virtual_servers", reorderGtmVirtualServersToMatchConfig(d, virtualServers))
 	}
 
 	return nil
+}
+
+// reorderGtmVirtualServersToMatchConfig reorders apiServers (virtual
+// server entries freshly built from a GetGTMServer response, in whatever
+// order BIG-IP returned them) to match the order "virtual_servers"
+// currently appears in d's config/state, matching entries by their "name"
+// field. Entries in apiServers whose name isn't found in the current
+// config order are appended at the end, preserving apiServers' own
+// relative order among themselves -- this covers import (no prior config
+// order to match) and out-of-band changes (a virtual server added/renamed
+// directly on the device) without dropping any data.
+func reorderGtmVirtualServersToMatchConfig(d *schema.ResourceData, apiServers []interface{}) []interface{} {
+	configOrder, ok := d.GetOk("virtual_servers")
+	if !ok {
+		return apiServers
+	}
+	configList, ok := configOrder.([]interface{})
+	if !ok || len(configList) == 0 {
+		return apiServers
+	}
+
+	byName := make(map[string]interface{}, len(apiServers))
+	for _, entry := range apiServers {
+		m, ok := entry.(map[string]interface{})
+		if !ok {
+			return apiServers
+		}
+		name, _ := m["name"].(string)
+		byName[name] = entry
+	}
+
+	ordered := make([]interface{}, 0, len(apiServers))
+	seen := make(map[string]bool, len(apiServers))
+	for _, cfgEntry := range configList {
+		cfgMap, ok := cfgEntry.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		name, _ := cfgMap["name"].(string)
+		if entry, found := byName[name]; found && !seen[name] {
+			ordered = append(ordered, entry)
+			seen[name] = true
+		}
+	}
+	// Append any API-returned entries not present in the config's order
+	// (e.g. on import, or a virtual server added out-of-band), preserving
+	// their original relative order.
+	for _, entry := range apiServers {
+		m := entry.(map[string]interface{})
+		name, _ := m["name"].(string)
+		if !seen[name] {
+			ordered = append(ordered, entry)
+			seen[name] = true
+		}
+	}
+
+	return ordered
 }
 
 func resourceBigipGtmServerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

@@ -215,7 +215,7 @@ func TestAccBigipLtmPoolAttachment_Issue92(t *testing.T) {
 	poolMemberFullpath1 := "/Common/test-node-issue92:0"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
-			testAcctPreCheck(t)
+			testAcctPreCheckRouteDomains(10)(t)
 		},
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckPoolsDestroyed,

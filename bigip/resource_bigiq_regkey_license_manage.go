@@ -12,12 +12,40 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
+// bigiqRevokeUnreachableDelayNanos is the delay (in nanoseconds) observed by
+// Delete after revoking an UNREACHABLE device's license, giving the BIG-IP
+// time to settle before polling its license status. It is stored as an
+// atomic value (rather than a plain time.Duration) so unit tests can safely
+// override it -- including from tests running in parallel via
+// t.Parallel() -- without a data race.
+var bigiqRevokeUnreachableDelayNanos atomic.Int64
+
+// bigiqRevokeRetryDelayNanos is the delay (in nanoseconds) between each
+// retry inside waitLicenseRevoke while polling for the BIG-IP license entry
+// to clear. Stored as an atomic value for the same reason as
+// bigiqRevokeUnreachableDelayNanos above.
+var bigiqRevokeRetryDelayNanos atomic.Int64
+
+func init() {
+	bigiqRevokeUnreachableDelayNanos.Store(int64(5 * time.Second))
+	bigiqRevokeRetryDelayNanos.Store(int64(5 * time.Second))
+}
+
+func getBigiqRevokeUnreachableDelay() time.Duration {
+	return time.Duration(bigiqRevokeUnreachableDelayNanos.Load())
+}
+
+func getBigiqRevokeRetryDelay() time.Duration {
+	return time.Duration(bigiqRevokeRetryDelayNanos.Load())
+}
 
 func resourceBigiqLicenseManage() *schema.Resource {
 	return &schema.Resource{
@@ -479,7 +507,7 @@ func resourceBigiqLicenseManageDelete(ctx context.Context, d *schema.ResourceDat
 			if err != nil {
 				return diag.FromErr(fmt.Errorf("license revoking to unreachable device failed : %v", err))
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(getBigiqRevokeUnreachableDelay())
 		}
 		log.Println("[DEBUG] wait for bigip status with license revoking")
 		bigipLicence, err := waitLicenseRevoke(bigipRef)
@@ -523,7 +551,7 @@ func waitLicenseRevoke(bigipRef *bigip.BigIP) (map[string]interface{}, error) {
 	}
 	retries := 0
 	for _, ok := bigipLicense["entries"]; ok && retries < 3; retries += 1 {
-		time.Sleep(time.Second * 5)
+		time.Sleep(getBigiqRevokeRetryDelay())
 		bigipLicense, err = bigipRef.GetBigipLiceseStatus()
 	}
 	return bigipLicense, err
@@ -536,6 +564,18 @@ func connectBigIq(d *schema.ResourceData) (*bigip.BigIP, error) {
 		Username:          d.Get("bigiq_user").(string),
 		Password:          d.Get("bigiq_password").(string),
 		CertVerifyDisable: true,
+		// See the identical, more detailed comment on connectBigIP in
+		// resource_bigip_do.go (envIntOrDefault is defined there):
+		// explicit rather than left nil, so an unreachable bigiq_address
+		// can't hang here on go-bigip's own zero-value ConfigOptions
+		// default, and TokenTimeout must still match that default's value
+		// so NewTokenSession's token-timeout-correction PUT isn't
+		// spuriously triggered on every bigiq_token_auth reconnect.
+		ConfigOptions: &bigip.ConfigOptions{
+			APICallTimeout: time.Duration(envIntOrDefault("API_TIMEOUT", 60)) * time.Second,
+			APICallRetries: envIntOrDefault("API_RETRIES", 10),
+			TokenTimeout:   time.Duration(envIntOrDefault("TOKEN_TIMEOUT", 1200)) * time.Second,
+		},
 	}
 	if d.Get("bigiq_token_auth").(bool) {
 		bigiqConfig.LoginReference = d.Get("bigiq_login_ref").(string)

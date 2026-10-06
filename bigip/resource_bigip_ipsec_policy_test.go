@@ -68,7 +68,7 @@ func testCheckIPSecPolicyDestroyed(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		if ipsec.Name != "" {
+		if ipsec != nil {
 			return fmt.Errorf(" IPSec Policy %s not destroyed.", name)
 		}
 	}
