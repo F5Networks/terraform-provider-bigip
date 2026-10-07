@@ -1177,6 +1177,11 @@ func resourceBigipLtmPolicyRead(ctx context.Context, d *schema.ResourceData, met
 	log.Println("[INFO] Fetching policy " + policyName)
 	p, err := client.GetPolicy(policyName, partition)
 
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Policy (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Policy   (%s) (%v) ", policyName, err)
 		return diag.FromErr(err)

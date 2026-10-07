@@ -180,6 +180,11 @@ func resourceBigipLtmProfileHttp2Read(ctx context.Context, d *schema.ResourceDat
 	name := d.Id()
 	log.Println("[INFO] Reading http2 profile " + name)
 	obj, err := client.GetHttp2(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] HTTP2 Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve http2  (%s) (%v) ", name, err)
 

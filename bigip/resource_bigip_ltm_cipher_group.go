@@ -106,6 +106,11 @@ func resourceBigipLtmCipherGroupRead(ctx context.Context, d *schema.ResourceData
 	name := d.Id()
 	log.Printf("[INFO] Fetching Cipher group :%+v", name)
 	cipherGroup, err := client.GetLtmCipherGroup(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Cipher Group (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve cipher group %s  %v :", name, err)
 		return diag.FromErr(err)

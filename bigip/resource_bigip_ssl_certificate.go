@@ -158,6 +158,11 @@ func resourceBigipSslCertificateRead(ctx context.Context, d *schema.ResourceData
 	}
 
 	certificate, err := client.GetCertificate(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Certificate (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		return diag.FromErr(err)
 	}

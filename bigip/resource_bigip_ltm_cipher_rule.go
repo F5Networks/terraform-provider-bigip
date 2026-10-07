@@ -105,6 +105,11 @@ func resourceBigipLtmCipherRuleRead(ctx context.Context, d *schema.ResourceData,
 	name := d.Id()
 	log.Printf("[INFO] Fetching Cipher rule :%+v", name)
 	cipherRule, err := client.GetLtmCipherRule(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Cipher Rule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve cipher rule %s  %v :", name, err)
 		return diag.FromErr(err)

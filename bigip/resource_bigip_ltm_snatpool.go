@@ -9,6 +9,7 @@ package bigip
 import (
 	"context"
 	"log"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -94,6 +95,11 @@ func resourceBigipLtmSnatpoolRead(ctx context.Context, d *schema.ResourceData, m
 	log.Println("[INFO] Fetching SNAT Pool " + name)
 
 	snatpool, err := client.GetSnatPool(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] SNAT Pool (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Snat Pool  (%s) (%v) ", name, err)
 		return diag.FromErr(err)

@@ -149,6 +149,11 @@ func resourceBigipSslKeyRead(ctx context.Context, d *schema.ResourceData, meta i
 		}
 	}
 	certkey, err := client.GetKey(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] SSL Key (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -10,6 +10,7 @@ import (
 	"context"
 	"log"
 	"strconv"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -189,6 +190,11 @@ func resourceBigipLtmPersistenceProfileCookieRead(ctx context.Context, d *schema
 	log.Println("[INFO] Fetching Cookie Persistence Profile " + name)
 
 	pp, err := client.GetCookiePersistenceProfile(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Cookie Persistence Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve Cookie Persistence Profile %s  %v : ", name, err)
 		return diag.FromErr(err)

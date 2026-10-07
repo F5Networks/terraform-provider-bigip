@@ -329,7 +329,9 @@ func resourceBigipLtmMonitorRead(ctx context.Context, d *schema.ResourceData, me
 			return nil
 		}
 	}
-	return diag.FromErr(fmt.Errorf("Couldn't find LTM Monitor %s ", name))
+	log.Printf("[WARN] LTM Monitor (%s) not found, removing from state", name)
+	d.SetId("")
+	return nil
 }
 
 func resourceBigipLtmMonitorUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

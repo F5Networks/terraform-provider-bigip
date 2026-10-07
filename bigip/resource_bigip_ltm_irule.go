@@ -71,6 +71,11 @@ func resourceBigipLtmIRuleRead(ctx context.Context, d *schema.ResourceData, meta
 	log.Printf("[INFO] Retrieving iRule %s", name)
 
 	irule, err := client.IRule(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] iRule (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error retrieving iRule %s: %v", name, err))
 	}

@@ -327,6 +327,11 @@ func resourceBigipLtmVirtualServerRead(ctx context.Context, d *schema.ResourceDa
 
 	vs, err := client.GetVirtualServer(name)
 	log.Printf("[DEBUG]virtual Server Details:%+v", vs)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] Virtual Server (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to Retrieve Virtual Server  (%s) (%v)", name, err)
 		d.SetId("")

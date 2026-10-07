@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	bigip "github.com/f5devcentral/go-bigip"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -197,6 +198,11 @@ func resourceBigipLtmProfileTcpRead(ctx context.Context, d *schema.ResourceData,
 	name := d.Id()
 	log.Println("[INFO] Reading TCP Profile  " + name)
 	obj, err := client.GetTcp(name)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		log.Printf("[WARN] TCP Profile (%s) not found, removing from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 	if err != nil {
 		log.Printf("[ERROR] Unable to retrieve tcp Profile  (%s) (%v)", name, err)
 		return diag.FromErr(err)
