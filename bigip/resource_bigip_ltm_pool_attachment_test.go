@@ -377,6 +377,109 @@ func TestAccBigipLtmPoolAttachment_ModifyState(t *testing.T) {
 	})
 }
 
+// Regression guard for https://github.com/F5Networks/terraform-provider-bigip/issues/1116:
+// after Terraform applies state="enabled", an out-of-band change on the device
+// (e.g. an operator disabling the member via the BIG-IP UI) must surface as
+// drift on the next plan rather than being silently masked.
+func TestAccBigipLtmPoolAttachment_StateDrift(t *testing.T) {
+	poolName := "/Common/test_pool_pa_drift"
+	memberFullPath := "/Common/10.10.100.21:80"
+	config := `
+		resource "bigip_ltm_pool" "drift" {
+			name                = "` + poolName + `"
+			monitors            = ["/Common/http"]
+			load_balancing_mode = "round-robin"
+		}
+		resource "bigip_ltm_pool_attachment" "drift" {
+			pool  = bigip_ltm_pool.drift.name
+			node  = "10.10.100.21:80"
+			state = "enabled"
+		}`
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolAttachment(poolName, memberFullPath, true),
+					resource.TestCheckResourceAttr("bigip_ltm_pool_attachment.drift", "state", "enabled"),
+				),
+			},
+			{
+				// Mutate the device out-of-band to mimic an operator force-offlining
+				// the member from the BIG-IP UI: session=user-disabled, state=user-down.
+				PreConfig: func() {
+					client := testAccProvider.Meta().(*bigip.BigIP)
+					patch := &bigip.PoolMember{
+						FullPath: memberFullPath,
+						Session:  "user-disabled",
+						State:    "user-down",
+					}
+					if err := client.ModifyPoolMember2(poolName, patch); err != nil {
+						t.Fatalf("out-of-band patch of pool member failed: %s", err)
+					}
+				},
+				Config:             config,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+// Regression guard for the unset-state behavior: when `state` is not set in
+// config, Terraform must not manage the pool member's state. An out-of-band
+// disable on the device should NOT produce drift on the next plan, and
+// Terraform must not try to re-enable the member.
+func TestAccBigipLtmPoolAttachment_StateUnsetLeavesAlone(t *testing.T) {
+	poolName := "/Common/test_pool_pa_unset_state"
+	memberFullPath := "/Common/10.10.100.22:80"
+	config := `
+		resource "bigip_ltm_pool" "unset" {
+			name                = "` + poolName + `"
+			monitors            = ["/Common/http"]
+			load_balancing_mode = "round-robin"
+		}
+		resource "bigip_ltm_pool_attachment" "unset" {
+			pool = bigip_ltm_pool.unset.name
+			node = "10.10.100.22:80"
+		}`
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAcctPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckPoolsDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckPoolAttachment(poolName, memberFullPath, true),
+				),
+			},
+			{
+				// Disable the member out-of-band. Because state is unset in
+				// config, the next plan must remain empty — Terraform leaves
+				// the member alone.
+				PreConfig: func() {
+					client := testAccProvider.Meta().(*bigip.BigIP)
+					patch := &bigip.PoolMember{
+						FullPath: memberFullPath,
+						Session:  "user-disabled",
+						State:    "user-up",
+					}
+					if err := client.ModifyPoolMember2(poolName, patch); err != nil {
+						t.Fatalf("out-of-band patch of pool member failed: %s", err)
+					}
+				},
+				Config:             config,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmPoolAttachmentTestCases(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
