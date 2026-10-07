@@ -81,12 +81,12 @@ func resourceBigipLtmNode() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Marks the node up or down. The default value is user-up.",
+				Description: "Specifies the state of the node. Preferred values are `enabled`, `disabled`, or `forced_offline`. Legacy values `user-up` and `user-down` are accepted for backwards compatibility; in legacy mode pair them with the `session` field (`user-enabled` or `user-disabled`) to fully describe the desired state.",
 			},
 			"session": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Enables or disables the node for new sessions. The default value is user-enabled.",
+				Description: "Legacy field controlling whether the node accepts new sessions (`user-enabled` or `user-disabled`). Ignored when `state` is set to `enabled`/`disabled`/`forced_offline`, since those values control session implicitly.",
 				Computed:    true,
 			},
 			"fqdn": {
@@ -145,6 +145,11 @@ func resourceBigipLtmNodeCreate(ctx context.Context, d *schema.ResourceData, met
 	description := d.Get("description").(string)
 	ratio := d.Get("ratio").(int)
 
+	apiState, apiSession := translateNodeState(state, session)
+	if isCanonicalNodeState(state) && session != "" && session != apiSession {
+		log.Printf("[WARN] state=%q overrides explicit session=%q; canonical state values control session implicitly", state, session)
+	}
+
 	r := regexp.MustCompile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
 	log.Println("[INFO] Creating node " + name + "::" + address)
@@ -155,8 +160,8 @@ func resourceBigipLtmNodeCreate(ctx context.Context, d *schema.ResourceData, met
 		ConnectionLimit: connectionLimit,
 		DynamicRatio:    dynamicRatio,
 		Monitor:         monitor,
-		State:           state,
-		Session:         session,
+		State:           apiState,
+		Session:         apiSession,
 		Description:     description,
 		Ratio:           ratio,
 	}
@@ -222,11 +227,10 @@ func resourceBigipLtmNodeRead(ctx context.Context, d *schema.ResourceData, meta 
 		return diag.FromErr(fmt.Errorf("[DEBUG] Error saving Monitor to state for Node (%s): %s", d.Id(), err))
 	}
 
-	if (node.Session == "monitor-enabled") || (node.Session == "user-enabled") {
-		_ = d.Set("session", "user-enabled")
-	} else {
-		_ = d.Set("session", "user-disabled")
-	}
+	priorState := d.Get("state").(string)
+	state, session := nodeStateForRead(priorState, node.State, node.Session)
+	_ = d.Set("state", state)
+	_ = d.Set("session", session)
 	_ = d.Set("connection_limit", node.ConnectionLimit)
 	_ = d.Set("description", node.Description)
 	_ = d.Set("dynamic_ratio", node.DynamicRatio)
@@ -272,13 +276,20 @@ func resourceBigipLtmNodeUpdate(ctx context.Context, d *schema.ResourceData, met
 	address := d.Get("address").(string)
 	r := regexp.MustCompile("^((?:[0-9]{1,3}.){3}[0-9]{1,3})|(.*:[^%]*)$")
 
+	state := d.Get("state").(string)
+	session := d.Get("session").(string)
+	apiState, apiSession := translateNodeState(state, session)
+	if isCanonicalNodeState(state) && session != "" && session != apiSession {
+		log.Printf("[WARN] state=%q overrides explicit session=%q; canonical state values control session implicitly", state, session)
+	}
+
 	nodeConfig := &bigip.Node{
 		ConnectionLimit: d.Get("connection_limit").(int),
 		DynamicRatio:    d.Get("dynamic_ratio").(int),
 		Monitor:         d.Get("monitor").(string),
 		RateLimit:       d.Get("rate_limit").(string),
-		State:           d.Get("state").(string),
-		Session:         d.Get("session").(string),
+		State:           apiState,
+		Session:         apiSession,
 		Description:     d.Get("description").(string),
 		Ratio:           d.Get("ratio").(int),
 	}
@@ -292,6 +303,59 @@ func resourceBigipLtmNodeUpdate(ctx context.Context, d *schema.ResourceData, met
 	}
 
 	return resourceBigipLtmNodeRead(ctx, d, meta)
+}
+
+// isCanonicalNodeState reports whether s is one of the preferred enabled/
+// disabled/forced_offline values that map cleanly onto a (state, session)
+// API tuple.
+func isCanonicalNodeState(s string) bool {
+	return s == "enabled" || s == "disabled" || s == "forced_offline"
+}
+
+// translateNodeState converts the user-facing state value into the
+// (apiState, apiSession) tuple sent to BIG-IP. Canonical values expand into
+// both fields; legacy values (user-up/user-down) and empty pass through with
+// the user-supplied session.
+func translateNodeState(state, session string) (string, string) {
+	switch state {
+	case "enabled":
+		return "user-up", "user-enabled"
+	case "disabled":
+		return "user-up", "user-disabled"
+	case "forced_offline":
+		return "user-down", "user-disabled"
+	default:
+		return state, session
+	}
+}
+
+// nodeStateForRead picks how to present the API's state/session pair back to
+// Terraform state, keyed off the prior value already stored. Canonical or
+// empty prior -> canonical form; legacy prior -> preserved legacy form so
+// existing configs stay diff-free.
+func nodeStateForRead(prior, apiState, apiSession string) (state, session string) {
+	if apiSession == "monitor-enabled" || apiSession == "user-enabled" {
+		session = "user-enabled"
+	} else {
+		session = "user-disabled"
+	}
+	if isCanonicalNodeState(prior) || prior == "" {
+		switch {
+		case apiState == "user-down":
+			state = "forced_offline"
+		case session == "user-disabled":
+			state = "disabled"
+		default:
+			state = "enabled"
+		}
+		return
+	}
+	if apiState == "user-down" {
+		state = "user-down"
+	} else {
+		state = "user-up"
+	}
+	return
 }
 
 func resourceBigipLtmNodeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
