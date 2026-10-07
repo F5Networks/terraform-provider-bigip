@@ -222,7 +222,7 @@ type dataGroupDTO struct {
 	FullPath   string            `json:"fullPath,omitempty"`
 	Generation int               `json:"generation,omitempty"`
 	Type       string            `json:"type,omitempty"`
-	Records    []DataGroupRecord `json:"records,omitempty"`
+	Records    []DataGroupRecord `json:"records"`
 }
 
 func (p *DataGroup) MarshalJSON() ([]byte, error) {

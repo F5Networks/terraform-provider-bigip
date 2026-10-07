@@ -30,6 +30,12 @@ var TestDatagroupStringResource = `
                 }
         }`
 
+var TestDatagroupStringResourceEmpty = `
+        resource "bigip_ltm_datagroup" "test-datagroup-string" {
+                name = "` + TestDatagroupName + `"
+                type = "string"
+        }`
+
 var TestExternalDatagroupResource = `
 resource "bigip_ltm_datagroup" "test-datagroup-string" {
 		name = "` + TestDatagroupName + `"
@@ -136,6 +142,32 @@ func TestAccBigipLtmDataGroup_Create_TypeInteger(t *testing.T) {
 	})
 }
 
+func TestAccBigipLtmDataGroup_Update_ClearRecords(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAcctPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckDataGroupDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: TestDatagroupStringResource,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TestDatagroupName),
+					testCheckDataGroupRecordCount(TestDatagroupName, 2),
+				),
+			},
+			{
+				Config: TestDatagroupStringResourceEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckDataGroupExists(TestDatagroupName),
+					testCheckDataGroupRecordCount(TestDatagroupName, 0),
+				),
+			},
+		},
+	})
+}
+
 func TestAccBigipLtmDataGroup_import(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -208,6 +240,24 @@ func testCheckDataGroupExists(name string) resource.TestCheckFunc {
 		datagroupName := fmt.Sprintf("/%s/%s", datagroup.Partition, datagroup.Name)
 		if datagroupName != name {
 			return fmt.Errorf("Data Group name does not match. Expecting %s got %s ", name, datagroupName)
+		}
+		return nil
+	}
+}
+
+func testCheckDataGroupRecordCount(name string, expected int) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		client := testAccProvider.Meta().(*bigip.BigIP)
+
+		datagroup, err := client.GetInternalDataGroup(name)
+		if err != nil {
+			return fmt.Errorf("Error while fetching Data Group: %v ", err)
+		}
+		if datagroup == nil {
+			return fmt.Errorf("Data Group %s not found", name)
+		}
+		if got := len(datagroup.Records); got != expected {
+			return fmt.Errorf("Data Group %s record count mismatch. Expected %d, got %d", name, expected, got)
 		}
 		return nil
 	}
